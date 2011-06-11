@@ -1,0 +1,16 @@
+<?xml version="1.0" ?>
+<plugin>
+	<extension id="UelMain" point="org.protege.editor.core.application.ViewComponent">
+		<label value="UEL"/>
+		<class value="de.tudresden.inf.lat.uel.plugin.main.Main"/>
+		<headerColor value="@org.protege.classcolor"/>
+		<category value="@org.protege.classcategory"/>
+	</extension>
+	<extension id="UelTab" point="org.protege.editor.core.application.WorkspaceTab">
+		<label value="UEL"/>
+		<class value="org.protege.editor.core.ui.workspace.WorkspaceViewsTab"/>
+		<defaultViewConfigFileName value="viewconfig-ueltab.xml"/>
+		<index value="A"/>
+		<editorKitId value="OWLEditorKit"/>
+	</extension>
+</plugin>
