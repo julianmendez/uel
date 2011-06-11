@@ -1,0 +1,48 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+		http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+
+	<!--
+ *
+ * @author Julian Mendez
+ *
+-->
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>uel</groupId>
+	<artifactId>parent</artifactId>
+	<packaging>pom</packaging>
+	<version>0.1.0</version>
+
+	<name>uel</name>
+
+	<repositories>
+
+		<repository>
+			<id>localrepo</id>
+			<name>local maven repository</name>
+			<url>file:../jars/lib</url>
+		</repository>
+
+	</repositories>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.7</version>
+				<configuration>
+					<includeDependencySources>true</includeDependencySources>
+					<dependencySourceIncludes>
+						<dependencySourceInclude>de.tudresden.inf.lat.uel.*</dependencySourceInclude>
+					</dependencySourceIncludes>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>
