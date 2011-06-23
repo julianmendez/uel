@@ -2,9 +2,9 @@ package de.tudresden.inf.lat.uel.sattranslator;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.File; //import java.io.FileOutputStream;
+import java.io.File;
 import java.io.FileReader;
-import java.io.FileWriter; //import java.io.PrintStream;
+import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.StringTokenizer;
@@ -16,12 +16,10 @@ import de.tudresden.inf.lat.uel.main.FAtom;
 import de.tudresden.inf.lat.uel.main.Goal;
 import de.tudresden.inf.lat.uel.main.Literal;
 
-
-
 /**
  * 
- * This static class performes reduction of goal equations to propositional
- * clauses. The reduction is explained in F. Baader, B. Morawska,
+ * This class performs reduction of goal equations to propositional clauses. The
+ * reduction is explained in F. Baader, B. Morawska,
  * "SAT Encoding of Unification in EL", LPAR 2010.
  * 
  * 
@@ -41,27 +39,27 @@ public class Translator {
 	 * hash map maps them to unique numbers.
 	 */
 
-	static private HashMap<String, Integer> literals = new HashMap<String, Integer>();
+	private HashMap<String, Integer> literals = new HashMap<String, Integer>();
 
 	/*
 	 * Identifiers are numbers, each number uniquely identifies a literal, i.e.
 	 * a subsumption.
 	 */
-	static private HashMap<Integer, Literal> identifiers = new HashMap<Integer, Literal>();
+	private HashMap<Integer, Literal> identifiers = new HashMap<Integer, Literal>();
 
 	/**
 	 * 
-	 * Update is a string of numbers or numbers preceeded with "-" encoding the
+	 * Update is a string of numbers or numbers preceded with "-" encoding the
 	 * negation of the computed unifier. This is needed for computation of the
 	 * next unifier.
 	 * 
 	 * 
 	 */
 
-	public static StringBuilder Update = new StringBuilder("");
+	public StringBuilder Update = new StringBuilder("");
 
-	private Translator() {
-	};
+	public Translator() {
+	}
 
 	/**
 	 * This method encodes equations into propositional clauses in DIMACS
@@ -78,7 +76,7 @@ public class Translator {
 	 * 
 	 * @param infile
 	 */
-	public static void toDIMACS(File infile) {
+	public void toDIMACS(File infile) {
 
 		setLiterals();
 
@@ -552,7 +550,7 @@ public class Translator {
 	 * Method to create dis-subsumptions and order literals from all pairs of
 	 * atoms of the goal
 	 */
-	private static void setLiterals() {
+	private void setLiterals() {
 
 		String first;
 		String second;
@@ -607,14 +605,14 @@ public class Translator {
 	 * solver i.e. UNSAT or SAT with the list of true literals. If the file
 	 * contains SAT and the list of true literals, the method translates it to a
 	 * TBox, which is written to the file <result> and returns "true".
-	 * Otherwise, it writed "NOT UNIFIABLE" to file <result> and returns
+	 * Otherwise, it writes "NOT UNIFIABLE" to file <result> and returns
 	 * "false".
 	 * 
 	 * @param outfile
 	 * @param result
 	 * @return
 	 */
-	public static boolean toTBox(File outfile, File result) {
+	public boolean toTBox(File outfile, File result) {
 
 		Pattern answer = Pattern.compile("^SAT");
 		Matcher manswer;
@@ -767,8 +765,7 @@ public class Translator {
 	 * Instead it appends a unifier to the existing file <result>
 	 */
 
-	public static boolean toTBoxB(File outfile, File result,
-			int numberofsolutions) {
+	public boolean toTBoxB(File outfile, File result, int numberofsolutions) {
 
 		Pattern answer = Pattern.compile("^SAT");
 		Matcher manswer;
@@ -906,7 +903,7 @@ public class Translator {
 	 * This method is the same as toTBox, but does not write a unifier to file
 	 * <result>
 	 */
-	public static boolean toTBox(File outfile) {
+	public boolean toTBox(File outfile) {
 
 		Pattern answer = Pattern.compile("^SAT");
 		Matcher manswer;
@@ -1013,10 +1010,10 @@ public class Translator {
 	}
 
 	/*
-	 * Method used by UEL to reset string Update values for literals and
-	 * S(X) for each X, before the next unifier is computed.
+	 * Method used by UEL to reset string Update values for literals and S(X)
+	 * for each X, before the next unifier is computed.
 	 */
-	public static void reset() {
+	public void reset() {
 
 		Update = new StringBuilder("");
 

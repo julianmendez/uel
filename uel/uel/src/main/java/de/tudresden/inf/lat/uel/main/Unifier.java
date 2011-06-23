@@ -34,6 +34,8 @@ public class Unifier {
 
 	private static int numberofsolutions = 0;
 
+	private static Translator translator = new Translator();
+
 	private Unifier() {
 	};
 
@@ -61,7 +63,7 @@ public class Unifier {
 	}
 
 	/**
-	 *This method is the basic unification procedure. It returns true if the
+	 * This method is the basic unification procedure. It returns true if the
 	 * goal is unifiable and false otherwise.
 	 * 
 	 * It creates an input file <satinput> for a sat solver, by calling the
@@ -86,7 +88,7 @@ public class Unifier {
 
 		result = new File(filename.concat(".unif"));
 
-		Translator.toDIMACS(satinput);
+		translator.toDIMACS(satinput);
 
 		ProcessBuilder pb = new ProcessBuilder("MiniSat", satinput.toString(),
 				satoutput.toString());
@@ -96,7 +98,7 @@ public class Unifier {
 
 		p.destroy();
 
-		boolean response = Translator.toTBox(satoutput, result);
+		boolean response = translator.toTBox(satoutput, result);
 
 		return response;
 
@@ -183,22 +185,22 @@ public class Unifier {
 				PrintWriter satout = new PrintWriter(new BufferedWriter(
 						new FileWriter(satinput, true)));
 
-				String additionalline = Translator.Update + " 0 ";
+				String additionalline = translator.Update + " 0 ";
 
 				satout.println(additionalline);
 
 				satout.close();
 
-				ProcessBuilder pb = new ProcessBuilder("MiniSat", satinput
-						.toString(), satoutput.toString());
+				ProcessBuilder pb = new ProcessBuilder("MiniSat",
+						satinput.toString(), satoutput.toString());
 				Process p = pb.start();
 
 				p.waitFor();
 
 				p.destroy();
 
-				Translator.reset();
-				unifiable = Translator.toTBoxB(satoutput, result,
+				translator.reset();
+				unifiable = translator.toTBoxB(satoutput, result,
 						numberofsolutions);
 
 				if (unifiable) {
@@ -228,7 +230,7 @@ public class Unifier {
 	}
 
 	/**
-	 *This method is used by Main class if the options string contains "a".
+	 * This method is used by Main class if the options string contains "a".
 	 * 
 	 * 
 	 * This method reads an input file, translates the goal equation into a set
@@ -271,22 +273,22 @@ public class Unifier {
 				PrintWriter satout = new PrintWriter(new BufferedWriter(
 						new FileWriter(satinput, true)));
 
-				String additionalline = Translator.Update + " 0 ";
+				String additionalline = translator.Update + " 0 ";
 
 				satout.println(additionalline);
 
 				satout.close();
 
-				ProcessBuilder pb = new ProcessBuilder("MiniSat", satinput
-						.toString(), satoutput.toString());
+				ProcessBuilder pb = new ProcessBuilder("MiniSat",
+						satinput.toString(), satoutput.toString());
 				Process p = pb.start();
 
 				p.waitFor();
 
 				p.destroy();
 
-				Translator.reset();
-				unifiable = Translator.toTBoxB(satoutput, result,
+				translator.reset();
+				unifiable = translator.toTBoxB(satoutput, result,
 						numberofsolutions);
 
 				if (unifiable) {
@@ -338,7 +340,7 @@ public class Unifier {
 
 		Goal.initialize(filename);
 
-		Translator.toDIMACS(satinput);
+		translator.toDIMACS(satinput);
 
 		ProcessBuilder pb = new ProcessBuilder("MiniSat", satinput.toString(),
 				satoutput.toString());
@@ -376,7 +378,7 @@ public class Unifier {
 	}
 
 	/**
-	 *This method is used by Main class if the options string contains an
+	 * This method is used by Main class if the options string contains an
 	 * integer <i>.
 	 * 
 	 * 
@@ -415,22 +417,22 @@ public class Unifier {
 				PrintWriter satout = new PrintWriter(new BufferedWriter(
 						new FileWriter(satinput, true)));
 
-				String additionalline = Translator.Update + " 0 ";
+				String additionalline = translator.Update + " 0 ";
 
 				satout.println(additionalline);
 
 				satout.close();
 
-				ProcessBuilder pb = new ProcessBuilder("MiniSat", satinput
-						.toString(), satoutput.toString());
+				ProcessBuilder pb = new ProcessBuilder("MiniSat",
+						satinput.toString(), satoutput.toString());
 				Process p = pb.start();
 
 				p.waitFor();
 
 				p.destroy();
 
-				Translator.reset();
-				unifiable = Translator.toTBoxB(satoutput, result,
+				translator.reset();
+				unifiable = translator.toTBoxB(satoutput, result,
 						numberofsolutions);
 
 				if (unifiable) {
@@ -461,7 +463,7 @@ public class Unifier {
 	}
 
 	/**
-	 *This method is used by Main class if the options string contains "n". If
+	 * This method is used by Main class if the options string contains "n". If
 	 * options contain also "t", then a file <filename>.TBox is created, for
 	 * testing with Tester.
 	 * 
@@ -496,19 +498,19 @@ public class Unifier {
 
 		satoutput = new File(filename.concat(".out"));
 
-		Translator.toDIMACS(satinput);
+		translator.toDIMACS(satinput);
 
 		while (unifiable) {
 
-			ProcessBuilder pb = new ProcessBuilder("MiniSat", satinput
-					.toString(), satoutput.toString());
+			ProcessBuilder pb = new ProcessBuilder("MiniSat",
+					satinput.toString(), satoutput.toString());
 			Process p = pb.start();
 
 			p.waitFor();
 
 			p.destroy();
 
-			if (Translator.toTBox(satoutput)) {
+			if (translator.toTBox(satoutput)) {
 
 				message = true;
 				numberofsolutions++;
@@ -516,13 +518,13 @@ public class Unifier {
 				PrintWriter satin = new PrintWriter(new BufferedWriter(
 						new FileWriter(satinput, true)));
 
-				String additionalline = Translator.Update + " 0 ";
+				String additionalline = translator.Update + " 0 ";
 
 				satin.println(additionalline);
 
 				satin.close();
 
-				Translator.reset();
+				translator.reset();
 
 			} else {
 
@@ -547,7 +549,7 @@ public class Unifier {
 	}
 
 	/**
-	 *This method is used by Main class if the options string is "-h" or "-H"
+	 * This method is used by Main class if the options string is "-h" or "-H"
 	 * or if the options are not valid.
 	 * 
 	 * The method displays the help file readme.txt to stdout.
