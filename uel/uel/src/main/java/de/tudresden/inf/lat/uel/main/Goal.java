@@ -4,17 +4,18 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 import de.tudresden.inf.lat.uel.ontmanager.Ontology;
 import de.tudresden.inf.lat.uel.parser.ReaderAndParser;
 
 /**
  * 
- * This static class implements a goal of unification, i.e., a set of equations
- * between concept terms with variables.
+ * This class implements a goal of unification, i.e., a set of equations between
+ * concept terms with variables.
  * 
- * It is static, because the goal is unique for the procedure, and should be
+ * It is , because the goal is unique for the procedure, and should be
  * accessible for most other objects.
  * 
  * @author Barbara Morawska
@@ -23,38 +24,40 @@ import de.tudresden.inf.lat.uel.parser.ReaderAndParser;
 
 public class Goal {
 
-	private static File tbox;
+	private File tbox;
+
+	private ReaderAndParser readerAndParser = new ReaderAndParser();
 
 	/**
 	 * constants is a hash map implementing all constant concept names in the
 	 * goal. keys are names and values are flat atoms
 	 */
-	public static HashMap<String, FAtom> constants = new HashMap<String, FAtom>();
+	public HashMap<String, FAtom> constants = new HashMap<String, FAtom>();
 	/**
 	 * variables is a hash map implementing all concept names which are treated
 	 * as variables keys are names and values are flat atoms
 	 */
-	public static HashMap<String, FAtom> variables = new HashMap<String, FAtom>();
+	public HashMap<String, FAtom> variables = new HashMap<String, FAtom>();
 	/**
 	 * eatoms is a hash map implementing all flat existential restrictions keys
 	 * are names and values are flat atoms
 	 */
-	public static HashMap<String, FAtom> eatoms = new HashMap<String, FAtom>();
+	public HashMap<String, FAtom> eatoms = new HashMap<String, FAtom>();
 	/**
 	 * allatoms is a hash map implementing all flat atoms in the goal keys are
 	 * names and values are flat atoms
 	 */
-	public static HashMap<String, FAtom> allatoms = new HashMap<String, FAtom>();
+	public HashMap<String, FAtom> allatoms = new HashMap<String, FAtom>();
 
-	private static int NbrVar = 0;
+	private int NbrVar = 0;
 	/**
 	 * equations is a list containing all goal equations
 	 * 
 	 */
-	public static ArrayList<Equation> equations = new ArrayList<Equation>();
+	public ArrayList<Equation> equations = new ArrayList<Equation>();
 
-	private Goal() {
-	};
+	public Goal() {
+	}
 
 	/**
 	 * This method initialize goal.
@@ -71,13 +74,13 @@ public class Goal {
 	 * @param filename
 	 * @throws Exception
 	 */
-	public static void initialize(String filename) throws Exception {
+	public void initialize(String filename, Unifier unifier) throws Exception {
 
 		File goal = new File(filename);
 
-		ReaderAndParser.readFromFile(goal);
+		readerAndParser.readFromFile(goal, this);
 
-		if (Unifier.getTest()) {
+		if (unifier.getTest()) {
 
 			tbox = new File(filename + ".TBox");
 
@@ -127,10 +130,10 @@ public class Goal {
 	 * @param concept
 	 * @throws Exception
 	 */
-	public static void importDefinition(Atom concept) throws Exception {
+	public void importDefinition(Atom concept) throws Exception {
 
 		Equation eq = Ontology.getDefinition(concept.toString());
-		Goal.addFlatten(eq);
+		addFlatten(eq);
 
 	}
 
@@ -142,7 +145,7 @@ public class Goal {
 	 *            (equation that need to be flattened)
 	 * @throws Exception
 	 */
-	public static void addFlatten(Equation e) throws Exception {
+	public void addFlatten(Equation e) throws Exception {
 
 		FAtom a;
 		Atom b = null;
@@ -173,7 +176,7 @@ public class Goal {
 
 		} else {
 
-			a = new FAtom(b, null);
+			a = new FAtom(b, null, this);
 
 			a.setVar(true);
 
@@ -188,12 +191,12 @@ public class Goal {
 
 			for (String key : e.right.keySet()) {
 
-				a = new FAtom(e.right.get(key));
+				a = new FAtom(e.right.get(key), this);
 
 				if (allatoms.containsKey(a.toString())) {
 
-					newequation.right.put(a.toString(), allatoms.get(a
-							.toString()));
+					newequation.right.put(a.toString(),
+							allatoms.get(a.toString()));
 
 				} else {
 
@@ -203,7 +206,7 @@ public class Goal {
 
 			}
 
-			Goal.addEquation(newequation);
+			addEquation(newequation);
 
 		}
 	}
@@ -223,18 +226,18 @@ public class Goal {
 	 * 
 	 * @param e
 	 */
-	public static void addEquation(Equation e) {
+	public void addEquation(Equation e) {
 
 		equations.add(e);
 
 	}
 
 	/**
-	 * This method is not used by UEL. It is here for testing purposes.
-	 * Prints all atoms of the goal.
+	 * This method is not used by UEL. It is here for testing purposes. Prints
+	 * all atoms of the goal.
 	 * 
 	 */
-	public static void printAllAtoms() {
+	public void printAllAtoms() {
 
 		System.out.print("From goal all atoms (" + allatoms.size() + "):");
 
@@ -250,11 +253,11 @@ public class Goal {
 	}
 
 	/**
-	 * This method is not used by UEL. It is here for testing purposes.
-	 * Prints all constants of the goal.
+	 * This method is not used by UEL. It is here for testing purposes. Prints
+	 * all constants of the goal.
 	 * 
 	 */
-	public static void printConstants() {
+	public void printConstants() {
 
 		System.out
 				.println("From goal all constants(" + constants.size() + "):");
@@ -271,11 +274,11 @@ public class Goal {
 	}
 
 	/**
-	 * This method is not used by UEL. It is here for testing purposes.
-	 * Prints all variables of the goal.
+	 * This method is not used by UEL. It is here for testing purposes. Prints
+	 * all variables of the goal.
 	 * 
 	 */
-	public static void printVariables() {
+	public void printVariables() {
 
 		System.out.println("From goal all variables: (" + variables.size()
 				+ "):");
@@ -291,11 +294,11 @@ public class Goal {
 	}
 
 	/**
-	 * This method is not used by UEL. It is here for testing purposes.
-	 * Prints all existential atoms of the goal.
+	 * This method is not used by UEL. It is here for testing purposes. Prints
+	 * all existential atoms of the goal.
 	 * 
 	 */
-	public static void printEatoms() {
+	public void printEatoms() {
 
 		System.out.println("From goal all existential restrictions ("
 				+ eatoms.size() + "):");
@@ -311,11 +314,11 @@ public class Goal {
 	}
 
 	/**
-	 * This method is not used by UEL. It is here for testing purposes.
-	 * Prints all equations of the goal.
+	 * This method is not used by UEL. It is here for testing purposes. Prints
+	 * all equations of the goal.
 	 * 
 	 */
-	public static void printGoal() throws Exception {
+	public void printGoal() throws Exception {
 
 		int i = 0;
 
@@ -337,7 +340,7 @@ public class Goal {
 	 * 
 	 * @param nbrVar
 	 */
-	public static void setNbrVar(int nbrVar) {
+	public void setNbrVar(int nbrVar) {
 		NbrVar = nbrVar;
 	}
 
@@ -349,17 +352,17 @@ public class Goal {
 	 * 
 	 * @return
 	 */
-	public static int getNbrVar() {
+	public int getNbrVar() {
 		return NbrVar;
 	}
 
 	/**
-	 * This method is not used by UEL. It is here for testing purposes.
-	 * Prints all equations of the goal to a Print Writer out.
+	 * This method is not used by UEL. It is here for testing purposes. Prints
+	 * all equations of the goal to a Print Writer out.
 	 * 
 	 * @param out
 	 */
-	public static void printDefinitions(PrintWriter out) {
+	public void printDefinitions(PrintWriter out) {
 
 		for (Equation eq : equations) {
 

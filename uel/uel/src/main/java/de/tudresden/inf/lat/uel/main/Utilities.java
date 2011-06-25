@@ -64,13 +64,13 @@ public class Utilities {
 	 * @return
 	 */
 
-	public static int option(String argument) {
+	public static int option(String argument, Unifier unifier) {
 
 		boolean test = false;
 
 		if (argument.contains("t")) {
 
-			Unifier.setTest(true);
+			unifier.setTest(true);
 
 		}
 

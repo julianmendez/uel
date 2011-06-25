@@ -34,6 +34,8 @@ public class Translator {
 
 	static private Integer identificator = 1;
 
+	private Goal goal;
+
 	/*
 	 * Literals are all dis-subsumptions between atoms in the goal the first
 	 * hash map maps them to unique numbers.
@@ -58,7 +60,8 @@ public class Translator {
 
 	public StringBuilder Update = new StringBuilder("");
 
-	public Translator() {
+	public Translator(Goal g) {
+		goal = g;
 	}
 
 	/**
@@ -90,13 +93,13 @@ public class Translator {
 			 * Clauses created in Step 1
 			 */
 
-			for (Equation e : Goal.equations) {
+			for (Equation e : goal.equations) {
 
 				/*
 				 * Step 1 for constants
 				 */
 
-				for (String key1 : Goal.constants.keySet()) {
+				for (String key1 : goal.constants.keySet()) {
 
 					if (!e.left.containsKey(key1) && !e.right.containsKey(key1)) {
 
@@ -189,7 +192,7 @@ public class Translator {
 				 * Step 1 for existential atoms
 				 */
 
-				for (String key1 : Goal.eatoms.keySet()) {
+				for (String key1 : goal.eatoms.keySet()) {
 
 					if (!e.left.containsKey(key1) && !e.right.containsKey(key1)) {
 
@@ -290,9 +293,9 @@ public class Translator {
 			 * Step 2.1
 			 */
 
-			for (String key1 : Goal.constants.keySet()) {
+			for (String key1 : goal.constants.keySet()) {
 
-				for (String key2 : Goal.constants.keySet()) {
+				for (String key2 : goal.constants.keySet()) {
 
 					if (!key2.equals("TOP") && (!key1.equals(key2))) {
 
@@ -313,14 +316,14 @@ public class Translator {
 			 * Step 2.2 and Step 2.3
 			 */
 
-			for (String key1 : Goal.eatoms.keySet()) {
+			for (String key1 : goal.eatoms.keySet()) {
 
-				for (String key2 : Goal.eatoms.keySet()) {
+				for (String key2 : goal.eatoms.keySet()) {
 
 					if (!key1.equals(key2)) {
 
-						String role1 = Goal.eatoms.get(key1).getName();
-						String role2 = Goal.eatoms.get(key2).getName();
+						String role1 = goal.eatoms.get(key1).getName();
+						String role2 = goal.eatoms.get(key2).getName();
 
 						/*
 						 * if roles are not equal, then Step 2.2
@@ -339,9 +342,9 @@ public class Translator {
 							 */
 						} else {
 
-							FAtom child1 = (FAtom) Goal.eatoms.get(key1)
+							FAtom child1 = (FAtom) goal.eatoms.get(key1)
 									.getChild();
-							FAtom child2 = (FAtom) Goal.eatoms.get(key2)
+							FAtom child2 = (FAtom) goal.eatoms.get(key2)
 									.getChild();
 
 							String child1name = child1.getName();
@@ -378,9 +381,9 @@ public class Translator {
 			 * Step 2.4
 			 */
 
-			for (String key1 : Goal.constants.keySet()) {
+			for (String key1 : goal.constants.keySet()) {
 
-				for (String key2 : Goal.eatoms.keySet()) {
+				for (String key2 : goal.eatoms.keySet()) {
 
 					Literal lit = new Literal(key1, key2, 's');
 
@@ -407,7 +410,7 @@ public class Translator {
 			 * 
 			 * Reflexivity for order literals
 			 */
-			for (String key1 : Goal.variables.keySet()) {
+			for (String key1 : goal.variables.keySet()) {
 
 				Literal lit = new Literal(key1, key1, 'o');
 
@@ -426,11 +429,11 @@ public class Translator {
 			 * Transitivity for order literals
 			 */
 
-			for (String key1 : Goal.variables.keySet()) {
+			for (String key1 : goal.variables.keySet()) {
 
-				for (String key2 : Goal.variables.keySet()) {
+				for (String key2 : goal.variables.keySet()) {
 
-					for (String key3 : Goal.variables.keySet()) {
+					for (String key3 : goal.variables.keySet()) {
 
 						if (!key1.equals(key2) && !key2.equals(key3)) {
 
@@ -468,11 +471,11 @@ public class Translator {
 			 * Transitivity of dis-subsumption
 			 */
 
-			for (String key1 : Goal.allatoms.keySet()) {
+			for (String key1 : goal.allatoms.keySet()) {
 
-				for (String key2 : Goal.allatoms.keySet()) {
+				for (String key2 : goal.allatoms.keySet()) {
 
-					for (String key3 : Goal.allatoms.keySet()) {
+					for (String key3 : goal.allatoms.keySet()) {
 
 						if (!key1.equals(key2) && !key1.equals(key3)
 								&& !key2.equals(key3)) {
@@ -506,14 +509,14 @@ public class Translator {
 			 * Step 3.2 Disjunction between order literals and dis-subsumption
 			 */
 
-			for (String key1 : Goal.eatoms.keySet()) {
+			for (String key1 : goal.eatoms.keySet()) {
 
-				FAtom eatom = (FAtom) Goal.eatoms.get(key1);
+				FAtom eatom = (FAtom) goal.eatoms.get(key1);
 				FAtom child = (FAtom) eatom.getChild();
 
 				if (child.isVar()) {
 
-					for (String key2 : Goal.variables.keySet()) {
+					for (String key2 : goal.variables.keySet()) {
 
 						Literal lit1 = new Literal(key2, child.getName(), 'o');
 
@@ -560,11 +563,11 @@ public class Translator {
 		 * Literals for dis-subsumptions
 		 */
 
-		for (String key1 : Goal.allatoms.keySet()) {
+		for (String key1 : goal.allatoms.keySet()) {
 
 			first = key1;
 
-			for (String key2 : Goal.allatoms.keySet()) {
+			for (String key2 : goal.allatoms.keySet()) {
 
 				second = key2;
 				literal = new Literal(first, second, 's');
@@ -580,11 +583,11 @@ public class Translator {
 		 * Literals for order on variables
 		 */
 
-		for (String key1 : Goal.variables.keySet()) {
+		for (String key1 : goal.variables.keySet()) {
 
 			first = key1;
 
-			for (String key2 : Goal.variables.keySet()) {
+			for (String key2 : goal.variables.keySet()) {
 
 				second = key2;
 
@@ -674,22 +677,22 @@ public class Translator {
 					if (identifiers.get(i).getValue()
 							&& identifiers.get(i).getKind() == 's') {
 
-						if (Goal.variables.containsKey(name1)) {
-							if (Goal.constants.containsKey(name2)) {
+						if (goal.variables.containsKey(name1)) {
+							if (goal.constants.containsKey(name2)) {
 
-								Goal.variables.get(name1).addToS(
-										(FAtom) Goal.constants.get(name2));
+								goal.variables.get(name1).addToS(
+										(FAtom) goal.constants.get(name2));
 
-								if (!Goal.variables.get(name1).isSys()) {
+								if (!goal.variables.get(name1).isSys()) {
 									Update.append(i + " ");
 								}
 
-							} else if (Goal.eatoms.containsKey(name2)) {
+							} else if (goal.eatoms.containsKey(name2)) {
 
-								Goal.variables.get(name1).addToS(
-										(FAtom) Goal.eatoms.get(name2));
+								goal.variables.get(name1).addToS(
+										(FAtom) goal.eatoms.get(name2));
 
-								if (!Goal.variables.get(name1).isSys()) {
+								if (!goal.variables.get(name1).isSys()) {
 									Update.append(i + " ");
 								}
 							}
@@ -697,16 +700,16 @@ public class Translator {
 
 					} else if (identifiers.get(i).getKind() == 's') {
 
-						if (Goal.variables.containsKey(name1)
-								&& !Goal.variables.get(name1).isSys()) {
-							if (Goal.constants.containsKey(name2)) {
+						if (goal.variables.containsKey(name1)
+								&& !goal.variables.get(name1).isSys()) {
+							if (goal.constants.containsKey(name2)) {
 
 								// goal.variables.get(name1).addToS((Atom)
 								// goal.constants.get(name2));
 
 								Update.append("-" + i + " ");
 
-							} else if (Goal.eatoms.containsKey(name2)) {
+							} else if (goal.eatoms.containsKey(name2)) {
 
 								// goal.variables.get(name1).addToS((Atom)
 								// goal.eatoms.get(name2));
@@ -725,13 +728,13 @@ public class Translator {
 				out.println("UNIFIABLE:");
 				out.println("Unifier: ");
 
-				for (String variable : Goal.variables.keySet()) {
+				for (String variable : goal.variables.keySet()) {
 
-					if (!Goal.variables.get(variable).isSys()) {
+					if (!goal.variables.get(variable).isSys()) {
 						out.print("(define-concept ");
 						out.print(variable + " ");
 
-						Goal.variables.get(variable).printS(out);
+						goal.variables.get(variable).printS(out);
 						out.println(" ) ");
 					}
 				}
@@ -820,22 +823,22 @@ public class Translator {
 					if (identifiers.get(i).getValue()
 							&& identifiers.get(i).getKind() == 's') {
 
-						if (Goal.variables.containsKey(name1)) {
-							if (Goal.constants.containsKey(name2)) {
+						if (goal.variables.containsKey(name1)) {
+							if (goal.constants.containsKey(name2)) {
 
-								Goal.variables.get(name1).addToS(
-										(FAtom) Goal.constants.get(name2));
+								goal.variables.get(name1).addToS(
+										(FAtom) goal.constants.get(name2));
 
-								if (!Goal.variables.get(name1).isSys()) {
+								if (!goal.variables.get(name1).isSys()) {
 									Update.append(i + " ");
 								}
 
-							} else if (Goal.eatoms.containsKey(name2)) {
+							} else if (goal.eatoms.containsKey(name2)) {
 
-								Goal.variables.get(name1).addToS(
-										(FAtom) Goal.eatoms.get(name2));
+								goal.variables.get(name1).addToS(
+										(FAtom) goal.eatoms.get(name2));
 
-								if (!Goal.variables.get(name1).isSys()) {
+								if (!goal.variables.get(name1).isSys()) {
 									Update.append(i + " ");
 								}
 							}
@@ -843,13 +846,13 @@ public class Translator {
 
 					} else if (identifiers.get(i).getKind() == 's') {
 
-						if (Goal.variables.containsKey(name1)
-								&& !Goal.variables.get(name1).isSys()) {
-							if (Goal.constants.containsKey(name2)) {
+						if (goal.variables.containsKey(name1)
+								&& !goal.variables.get(name1).isSys()) {
+							if (goal.constants.containsKey(name2)) {
 
 								Update.append("-" + i + " ");
 
-							} else if (Goal.eatoms.containsKey(name2)) {
+							} else if (goal.eatoms.containsKey(name2)) {
 
 								Update.append("-" + i + " ");
 							}
@@ -864,13 +867,13 @@ public class Translator {
 
 				out.println(numberofsolutions + " UNIFIER: ");
 
-				for (String variable : Goal.variables.keySet()) {
+				for (String variable : goal.variables.keySet()) {
 
-					if (!Goal.variables.get(variable).isSys()) {
+					if (!goal.variables.get(variable).isSys()) {
 						out.print("(define-concept ");
 						out.print(variable + " ");
 
-						Goal.variables.get(variable).printS(out);
+						goal.variables.get(variable).printS(out);
 						out.println(" ) ");
 					}
 				}
@@ -959,22 +962,22 @@ public class Translator {
 					if (identifiers.get(i).getValue()
 							&& identifiers.get(i).getKind() == 's') {
 
-						if (Goal.variables.containsKey(name1)) {
-							if (Goal.constants.containsKey(name2)) {
+						if (goal.variables.containsKey(name1)) {
+							if (goal.constants.containsKey(name2)) {
 
-								Goal.variables.get(name1).addToS(
-										(FAtom) Goal.constants.get(name2));
+								goal.variables.get(name1).addToS(
+										(FAtom) goal.constants.get(name2));
 
-								if (!Goal.variables.get(name1).isSys()) {
+								if (!goal.variables.get(name1).isSys()) {
 									Update.append(i + " ");
 								}
 
-							} else if (Goal.eatoms.containsKey(name2)) {
+							} else if (goal.eatoms.containsKey(name2)) {
 
-								Goal.variables.get(name1).addToS(
-										(FAtom) Goal.eatoms.get(name2));
+								goal.variables.get(name1).addToS(
+										(FAtom) goal.eatoms.get(name2));
 
-								if (!Goal.variables.get(name1).isSys()) {
+								if (!goal.variables.get(name1).isSys()) {
 									Update.append(i + " ");
 								}
 							}
@@ -982,13 +985,13 @@ public class Translator {
 
 					} else if (identifiers.get(i).getKind() == 's') {
 
-						if (Goal.variables.containsKey(name1)
-								&& !Goal.variables.get(name1).isSys()) {
-							if (Goal.constants.containsKey(name2)) {
+						if (goal.variables.containsKey(name1)
+								&& !goal.variables.get(name1).isSys()) {
+							if (goal.constants.containsKey(name2)) {
 
 								Update.append("-" + i + " ");
 
-							} else if (Goal.eatoms.containsKey(name2)) {
+							} else if (goal.eatoms.containsKey(name2)) {
 
 								Update.append("-" + i + " ");
 							}
@@ -1023,9 +1026,9 @@ public class Translator {
 
 		}
 
-		for (String var : Goal.variables.keySet()) {
+		for (String var : goal.variables.keySet()) {
 
-			Goal.variables.get(var).resetS();
+			goal.variables.get(var).resetS();
 
 		}
 

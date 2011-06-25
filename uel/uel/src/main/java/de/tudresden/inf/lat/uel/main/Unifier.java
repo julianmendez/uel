@@ -15,8 +15,8 @@ import java.util.regex.Pattern;
 import de.tudresden.inf.lat.uel.sattranslator.Translator;
 
 /**
- * This static class calls provides variations of unification procedure
- * depending on the input and output required.
+ * This class calls provides variations of unification procedure depending on
+ * the input and output required.
  * 
  * @author Barbara Morawska
  * 
@@ -24,20 +24,23 @@ import de.tudresden.inf.lat.uel.sattranslator.Translator;
 
 public class Unifier {
 
-	private static boolean test = false;
+	private boolean test = false;
 
-	private static File satinput;
+	private File satinput;
 
-	private static File satoutput;
+	private File satoutput;
 
-	private static File result;
+	private File result;
 
-	private static int numberofsolutions = 0;
+	private int numberofsolutions = 0;
 
-	private static Translator translator = new Translator();
+	private Translator translator;
 
-	private Unifier() {
-	};
+	private Goal goal = new Goal();
+
+	public Unifier() {
+		translator = new Translator(goal);
+	}
 
 	/**
 	 * This method is used in the class Utilities.java If the option t is used
@@ -47,7 +50,7 @@ public class Unifier {
 	 * 
 	 * 
 	 */
-	public static void setTest(boolean value) {
+	public void setTest(boolean value) {
 
 		test = value;
 
@@ -56,7 +59,7 @@ public class Unifier {
 	/**
 	 * If test is true, <filename>.TBox is created.
 	 */
-	public static boolean getTest() {
+	public boolean getTest() {
 
 		return test;
 
@@ -67,7 +70,7 @@ public class Unifier {
 	 * goal is unifiable and false otherwise.
 	 * 
 	 * It creates an input file <satinput> for a sat solver, by calling the
-	 * static method of Translator. It calls MiniSat on this file. The output of
+	 * method of Translator. It calls MiniSat on this file. The output of
 	 * MiniSat is saved in file <satoutput>. It calls Translator again to detect
 	 * if MiniSat returned "satisfiable" and to translate MiniSat output into a
 	 * unifier. The unifier is written into result.
@@ -79,7 +82,7 @@ public class Unifier {
 	 * 
 	 */
 
-	private static boolean unify(String filename) throws IOException,
+	private boolean unify(String filename) throws IOException,
 			InterruptedException {
 
 		satinput = new File(filename.concat(".in"));
@@ -126,9 +129,9 @@ public class Unifier {
 	 * @param filename
 	 * @throws Exception
 	 */
-	public static void unifySimple(String filename) throws Exception {
+	public void unifySimple(String filename) throws Exception {
 
-		Goal.initialize(filename);
+		goal.initialize(filename, this);
 
 		if (unify(filename)) {
 
@@ -166,9 +169,9 @@ public class Unifier {
 	 * @param filename
 	 * @throws Exception
 	 */
-	public static void unifyX(String filename) throws Exception {
+	public void unifyX(String filename) throws Exception {
 
-		Goal.initialize(filename);
+		goal.initialize(filename, this);
 
 		boolean unifiable = unify(filename);
 
@@ -253,9 +256,9 @@ public class Unifier {
 	 * @throws Exception
 	 */
 
-	public static void unifyA(String filename) throws Exception {
+	public void unifyA(String filename) throws Exception {
 
-		Goal.initialize(filename);
+		goal.initialize(filename, this);
 
 		boolean unifiable = unify(filename);
 
@@ -332,13 +335,13 @@ public class Unifier {
 	 * @param filename
 	 * @throws Exception
 	 */
-	public static void unify0(String filename) throws Exception {
+	public void unify0(String filename) throws Exception {
 
 		satinput = new File(filename.concat(".in"));
 
 		satoutput = new File(filename.concat(".out"));
 
-		Goal.initialize(filename);
+		goal.initialize(filename, this);
 
 		translator.toDIMACS(satinput);
 
@@ -395,9 +398,9 @@ public class Unifier {
 	 * @param filename
 	 * @throws Exception
 	 */
-	public static void unifyInt(int max, String filename) throws Exception {
+	public void unifyInt(int max, String filename) throws Exception {
 
-		Goal.initialize(filename);
+		goal.initialize(filename, this);
 
 		int nbrUnifiers = 0;
 
@@ -485,9 +488,9 @@ public class Unifier {
 	 * @param filename
 	 * @throws Exception
 	 */
-	public static void unifyN(String filename) throws Exception {
+	public void unifyN(String filename) throws Exception {
 
-		Goal.initialize(filename);
+		goal.initialize(filename, this);
 
 		boolean unifiable = true;
 		boolean message = false;
@@ -557,7 +560,7 @@ public class Unifier {
 	 * 
 	 * 
 	 */
-	public static void help() {
+	public void help() {
 
 		try {
 			InputStream help = Unifier.class.getResourceAsStream("/readme.txt");

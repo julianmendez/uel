@@ -1,14 +1,10 @@
 package de.tudresden.inf.lat.uel.main;
 
-
-
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import de.tudresden.inf.lat.uel.infhandler.OutputStreamHandler;
 import de.tudresden.inf.lat.uel.ontmanager.Ontology;
-
-
 
 /**
  * This class starts a unifier from the command line.
@@ -37,13 +33,15 @@ public class Main {
 
 	public static void main(String[] args) throws Exception {
 
+		Unifier unifier = new Unifier();
+
 		logger.setLevel(Level.INFO);
 		logger.addHandler(new OutputStreamHandler(System.out));
 		logger.setUseParentHandlers(false);
 
 		if (args.length == 1 && !args[0].equalsIgnoreCase("-h")) {
 
-			Unifier.unify0(args[0]);
+			unifier.unify0(args[0]);
 
 		} else if (args.length > 1 && args[0].startsWith("-")) {
 
@@ -53,42 +51,42 @@ public class Main {
 
 			String argument = args[0].substring(1);
 
-			switch (Utilities.option(argument)) {
+			switch (Utilities.option(argument, unifier)) {
 
 			case 1:
 
-				Unifier.help();
+				unifier.help();
 				break;
 
 			case 2:
 
-				Unifier.unifyA(args[1]);
+				unifier.unifyA(args[1]);
 				break;
 
 			case 3:
 
-				Unifier.unifyX(args[1]);
+				unifier.unifyX(args[1]);
 				break;
 
 			case 4:
 
-				Unifier.unifyN(args[1]);
+				unifier.unifyN(args[1]);
 				break;
 
 			case 5:
 
-				Unifier.unifyInt(Utilities.MaxNbr, args[1]);
+				unifier.unifyInt(Utilities.MaxNbr, args[1]);
 				break;
 
 			case 6:
 
-				Unifier.unifySimple(args[1]);
+				unifier.unifySimple(args[1]);
 				break;
 
 			default:
 
 				logger.info("Wrong option.");
-				Unifier.help();
+				unifier.help();
 
 				break;
 
@@ -98,11 +96,11 @@ public class Main {
 
 			Ontology.loadOntology(args[1]);
 
-			Unifier.unify0(args[0]);
+			unifier.unify0(args[0]);
 
 		} else {
 
-			Unifier.help();
+			unifier.help();
 
 		}
 

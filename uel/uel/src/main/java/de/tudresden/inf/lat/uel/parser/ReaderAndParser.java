@@ -13,7 +13,6 @@ import de.tudresden.inf.lat.uel.main.Equation;
 import de.tudresden.inf.lat.uel.main.FAtom;
 import de.tudresden.inf.lat.uel.main.Goal;
 
-
 /**
  * This is a static class, which is a parser of the file with the goal of
  * unification.
@@ -24,22 +23,21 @@ import de.tudresden.inf.lat.uel.main.Goal;
 
 public class ReaderAndParser {
 
-	private static StreamTokenizer str;
+	private StreamTokenizer str;
 
 	/*
 	 * leftvar is the first defined concept in the goal file
 	 */
-	private static String leftvar;
+	private String leftvar;
 
 	/*
 	 * rightvar is the second defined concept in the goal file
 	 */
-	private static String rightvar;
+	private String rightvar;
 
-	
-	private ReaderAndParser(){};
-	
-	
+	public ReaderAndParser() {
+	}
+
 	/**
 	 * This method attempts to open input file while reading it, it creates goal
 	 * equations. Two equations from two definitions, and one equations between
@@ -49,7 +47,7 @@ public class ReaderAndParser {
 	 * 
 	 */
 
-	public static void readFromFile(File input) throws Exception {
+	public void readFromFile(File input, Goal goal) throws Exception {
 
 		Equation equation;
 
@@ -128,7 +126,7 @@ public class ReaderAndParser {
 				 * The first concept is initialized as a flat atom,
 				 */
 
-				FAtom var = new FAtom(leftvar, false, true, null);
+				FAtom var = new FAtom(leftvar, false, true, null, goal);
 
 				left = new HashMap<String, Atom>();
 				left.put(var.toString(), var);
@@ -145,7 +143,7 @@ public class ReaderAndParser {
 
 				equation = new Equation(left, right);
 
-				Goal.addFlatten(equation);
+				goal.addFlatten(equation);
 
 				/*
 				 * close bracket for this definition
@@ -207,7 +205,7 @@ public class ReaderAndParser {
 					 * The second concept is initialized as a flat atom,
 					 */
 
-					FAtom var = new FAtom(rightvar, false, true, null);
+					FAtom var = new FAtom(rightvar, false, true, null, goal);
 
 					left = new HashMap<String, Atom>();
 					left.put(var.toString(), var);
@@ -225,7 +223,7 @@ public class ReaderAndParser {
 
 					equation = new Equation(left, right);
 
-					Goal.addFlatten(equation);
+					goal.addFlatten(equation);
 
 					/*
 					 * close bracket for this definition
@@ -244,7 +242,7 @@ public class ReaderAndParser {
 
 				equation = new Equation(mainleft, mainright);
 
-				Goal.addEquation(equation);
+				goal.addEquation(equation);
 
 				r.close();
 
@@ -262,7 +260,7 @@ public class ReaderAndParser {
 	 * Parse method Parsing right side of a definition
 	 */
 
-	private static HashMap<String, Atom> parse() throws Exception {
+	private HashMap<String, Atom> parse() throws Exception {
 
 		HashMap<String, Atom> result = new HashMap<String, Atom>();
 		Atom a;
@@ -469,7 +467,7 @@ public class ReaderAndParser {
 
 	}
 
-	private static void initTokenizer(Reader reader) {
+	private void initTokenizer(Reader reader) {
 
 		str = new StreamTokenizer(reader);
 		str.ordinaryChar('(');

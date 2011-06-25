@@ -5,8 +5,6 @@ import java.util.ArrayList;
 
 import de.tudresden.inf.lat.uel.ontmanager.Ontology;
 
-
-
 /**
  * 
  * This class extends Atom. It implements a flat atom, hence an atom which is
@@ -30,6 +28,8 @@ public class FAtom extends Atom {
 	private ArrayList<FAtom> S = new ArrayList<FAtom>();
 	private boolean sys = false;
 
+	private Goal goal;
+
 	/**
 	 * Constructor of flat atom (used in ReaderAndParser to create a flat system
 	 * variable).
@@ -43,10 +43,11 @@ public class FAtom extends Atom {
 	 * @param v
 	 * @param arg
 	 */
-	public FAtom(String name, boolean r, boolean v, FAtom arg) {
+	public FAtom(String name, boolean r, boolean v, FAtom arg, Goal g) {
 		super(name, r);
 		var = v;
 		child = arg;
+		goal = g;
 	}
 
 	/**
@@ -59,9 +60,10 @@ public class FAtom extends Atom {
 	 * @param atom
 	 * @param c
 	 */
-	public FAtom(Atom atom, FAtom c) {
+	public FAtom(Atom atom, FAtom c, Goal g) {
 		super(atom.getName(), atom.isRoot());
 		child = c;
+		goal = g;
 	}
 
 	/**
@@ -75,55 +77,57 @@ public class FAtom extends Atom {
 	 * @param atom
 	 * @throws Exception
 	 */
-	public FAtom(Atom atom) throws Exception {
+	public FAtom(Atom atom, Goal g) throws Exception {
 		super(atom.getName(), atom.isRoot());
+
+		goal = g;
 
 		if (!atom.isRoot()) {
 			child = null;
 			if (Ontology.definitions.containsKey(atom.toString())
-					&& !Goal.variables.containsKey(atom.toString())) {
+					&& !goal.variables.containsKey(atom.toString())) {
 
-				Goal.importDefinition(atom);
+				goal.importDefinition(atom);
 
 			}
 
 		} else if (!atom.isFlat()) {
 
 			FAtom b = null;
-			String newvar = "VAR" + Goal.getNbrVar();
+			String newvar = "VAR" + goal.getNbrVar();
 
 			Equation eq = new Equation();
 
-			b = new FAtom(newvar, false, true, null);
+			b = new FAtom(newvar, false, true, null, goal);
 
-			Goal.setNbrVar(Goal.getNbrVar() + 1);
+			goal.setNbrVar(goal.getNbrVar() + 1);
 
 			child = b;
 
 			eq.left.put(b.toString(), b);
 			eq.setRight(atom.getChildren());
 
-			Goal.addFlatten(eq);
+			goal.addFlatten(eq);
 
 		} else {
 
 			for (String key : atom.getChildren().keySet()) {
 
-				if (Goal.allatoms.containsKey(key)) {
+				if (goal.allatoms.containsKey(key)) {
 
-					child = Goal.allatoms.get(key);
+					child = goal.allatoms.get(key);
 
 				} else {
 
-					child = new FAtom(atom.getChildren().get(key));
+					child = new FAtom(atom.getChildren().get(key), goal);
 
 				}
 			}
 		}
 
-		if (!Goal.allatoms.containsKey(this.toString())) {
+		if (!goal.allatoms.containsKey(this.toString())) {
 
-			Goal.allatoms.put(this.toString(), this);
+			goal.allatoms.put(this.toString(), this);
 
 		}
 
@@ -230,7 +234,7 @@ public class FAtom extends Atom {
 	}
 
 	/**
-	 *Resets substitution set of a variable. This is necessary to be able to
+	 * Resets substitution set of a variable. This is necessary to be able to
 	 * compute new substitution
 	 * 
 	 * Used in Translator
