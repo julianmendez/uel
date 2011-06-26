@@ -6,8 +6,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -26,20 +24,11 @@ public class Unifier {
 
 	private boolean test = false;
 
-	private File satinput;
-
-	private File satoutput;
-
-	private File result;
-
 	private int numberofsolutions = 0;
 
-	private Translator translator;
-
-	private Goal goal = new Goal();
+	private String filename = "minisattempfile";
 
 	public Unifier() {
-		translator = new Translator(goal);
 	}
 
 	/**
@@ -82,14 +71,8 @@ public class Unifier {
 	 * 
 	 */
 
-	private boolean unify(String filename) throws IOException,
-			InterruptedException {
-
-		satinput = new File(filename.concat(".in"));
-
-		satoutput = new File(filename.concat(".out"));
-
-		result = new File(filename.concat(".unif"));
+	private boolean unify(Translator translator, File satinput, File satoutput,
+			File result) throws IOException, InterruptedException {
 
 		translator.toDIMACS(satinput);
 
@@ -129,11 +112,18 @@ public class Unifier {
 	 * @param filename
 	 * @throws Exception
 	 */
-	public void unifySimple(String filename) throws Exception {
+	public void unifySimple() throws Exception {
+
+		File satinput = new File(filename.concat(".in"));
+		File satoutput = new File(filename.concat(".out"));
+		File result = new File(filename.concat(".unif"));
+
+		Goal goal = new Goal();
+		Translator translator = new Translator(goal);
 
 		goal.initialize(filename, this);
 
-		if (unify(filename)) {
+		if (unify(translator, satinput, satoutput, result)) {
 
 			Main.logger.info("UNIFIABLE\n" + "Unifier printed to "
 					+ result.toString());
@@ -169,11 +159,18 @@ public class Unifier {
 	 * @param filename
 	 * @throws Exception
 	 */
-	public void unifyX(String filename) throws Exception {
+	public void unifyX() throws Exception {
+
+		File satinput = new File(filename.concat(".in"));
+		File satoutput = new File(filename.concat(".out"));
+		File result = new File(filename.concat(".unif"));
+
+		Goal goal = new Goal();
+		Translator translator = new Translator(goal);
 
 		goal.initialize(filename, this);
 
-		boolean unifiable = unify(filename);
+		boolean unifiable = unify(translator, satinput, satoutput, result);
 
 		if (unifiable) {
 
@@ -256,11 +253,18 @@ public class Unifier {
 	 * @throws Exception
 	 */
 
-	public void unifyA(String filename) throws Exception {
+	public void unifyA() throws Exception {
+
+		File satinput = new File(filename.concat(".in"));
+		File satoutput = new File(filename.concat(".out"));
+		File result = new File(filename.concat(".unif"));
+
+		Goal goal = new Goal();
+		Translator translator = new Translator(goal);
 
 		goal.initialize(filename, this);
 
-		boolean unifiable = unify(filename);
+		boolean unifiable = unify(translator, satinput, satoutput, result);
 
 		if (unifiable) {
 
@@ -335,11 +339,13 @@ public class Unifier {
 	 * @param filename
 	 * @throws Exception
 	 */
-	public void unify0(String filename) throws Exception {
+	public void unify0() throws Exception {
 
-		satinput = new File(filename.concat(".in"));
+		File satinput = new File(filename.concat(".in"));
+		File satoutput = new File(filename.concat(".out"));
 
-		satoutput = new File(filename.concat(".out"));
+		Goal goal = new Goal();
+		Translator translator = new Translator(goal);
 
 		goal.initialize(filename, this);
 
@@ -398,13 +404,20 @@ public class Unifier {
 	 * @param filename
 	 * @throws Exception
 	 */
-	public void unifyInt(int max, String filename) throws Exception {
+	public void unifyInt(int max) throws Exception {
+
+		File satinput = new File(filename.concat(".in"));
+		File satoutput = new File(filename.concat(".out"));
+		File result = new File(filename.concat(".unif"));
+
+		Goal goal = new Goal();
+		Translator translator = new Translator(goal);
 
 		goal.initialize(filename, this);
 
 		int nbrUnifiers = 0;
 
-		boolean unifiable = unify(filename);
+		boolean unifiable = unify(translator, satinput, satoutput, result);
 
 		if (unifiable) {
 
@@ -488,7 +501,10 @@ public class Unifier {
 	 * @param filename
 	 * @throws Exception
 	 */
-	public void unifyN(String filename) throws Exception {
+	public void unifyN() throws Exception {
+
+		Goal goal = new Goal();
+		Translator translator = new Translator(goal);
 
 		goal.initialize(filename, this);
 
@@ -497,9 +513,9 @@ public class Unifier {
 
 		numberofsolutions = 0;
 
-		satinput = new File(filename.concat(".in"));
+		File satinput = new File(filename.concat(".in"));
 
-		satoutput = new File(filename.concat(".out"));
+		File satoutput = new File(filename.concat(".out"));
 
 		translator.toDIMACS(satinput);
 
@@ -551,34 +567,12 @@ public class Unifier {
 
 	}
 
-	/**
-	 * This method is used by Main class if the options string is "-h" or "-H"
-	 * or if the options are not valid.
-	 * 
-	 * The method displays the help file readme.txt to stdout.
-	 * 
-	 * 
-	 * 
-	 */
-	public void help() {
+	public String getFileName() {
+		return filename;
+	}
 
-		try {
-			InputStream help = Unifier.class.getResourceAsStream("/readme.txt");
-			BufferedReader helpreader = new BufferedReader(
-					new InputStreamReader(help));
-
-			String line;
-
-			while (null != (line = helpreader.readLine())) {
-
-				System.out.println(line);
-
-			}
-		} catch (Exception ex) {
-
-			ex.printStackTrace();
-		}
-
+	public void setFileName(String name) {
+		filename = name;
 	}
 
 }
