@@ -19,6 +19,8 @@ public class Main {
 
 	static final Logger logger = Logger.getLogger("Unifier");
 
+	private int MaxNbr = 0;
+
 	/**
 	 * Starts a unifier from the command line.
 	 * 
@@ -35,7 +37,13 @@ public class Main {
 	 */
 
 	public static void main(String[] args) throws Exception {
+		(new Main()).run(args);
+	}
 
+	public Main() {
+	}
+
+	public void run(String[] args) throws Exception {
 		Unifier unifier = new Unifier();
 
 		logger.setLevel(Level.INFO);
@@ -57,7 +65,7 @@ public class Main {
 
 			String argument = args[0].substring(1);
 
-			switch (Utilities.option(argument, unifier)) {
+			switch (option(argument, unifier)) {
 
 			case 1:
 
@@ -85,7 +93,7 @@ public class Main {
 			case 5:
 
 				unifier.setFileName(args[1]);
-				unifier.unifyInt(Utilities.MaxNbr);
+				unifier.unifyInt(MaxNbr);
 				break;
 
 			case 6:
@@ -127,7 +135,7 @@ public class Main {
 	 * 
 	 * 
 	 */
-	public static void help() {
+	public void help() {
 
 		try {
 			InputStream help = Main.class.getResourceAsStream("/readme.txt");
@@ -144,6 +152,60 @@ public class Main {
 		} catch (Exception ex) {
 
 			ex.printStackTrace();
+		}
+
+	}
+
+	/**
+	 * This method analyzes the option string given to the Main class as one of
+	 * the parameters.
+	 * 
+	 * 
+	 * 
+	 * @param argument
+	 * @return
+	 */
+
+	public int option(String argument, Unifier unifier) {
+
+		boolean test = false;
+
+		if (argument.contains("t")) {
+
+			unifier.setTest(true);
+
+		}
+
+		if (argument.contains("h")) {
+
+			return 1;
+
+		} else if (argument.contains("a")) {
+
+			return 2;
+
+		} else if (argument.contains("x")) {
+
+			return 3;
+
+		} else if (argument.contains("n")) {
+
+			return 4;
+
+		} else if (argument.contains("w")) {
+
+			return 6;
+		} else {
+
+			if (test) {
+
+				argument = argument.substring(0, argument.length() - 1);
+
+			}
+
+			MaxNbr = Integer.parseInt(argument);
+
+			return 5;
 		}
 
 	}

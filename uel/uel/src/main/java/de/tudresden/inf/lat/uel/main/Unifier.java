@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -271,7 +272,7 @@ public class Unifier {
 			Main.logger.info("UNIFIABLE\n" + "Unifier printed to "
 					+ result.toString());
 
-			boolean test = Utilities.questionYN();
+			boolean test = questionYN();
 
 			while (test && unifiable) {
 
@@ -303,7 +304,7 @@ public class Unifier {
 					Main.logger.info(numberofsolutions + " UNIFIER\n"
 							+ "Unifier appended to " + result.toString());
 
-					test = Utilities.questionYN();
+					test = questionYN();
 				} else {
 
 					Main.logger.info("NO MORE UNIFIERS");
@@ -573,6 +574,40 @@ public class Unifier {
 
 	public void setFileName(String name) {
 		filename = name;
+	}
+
+	/**
+	 * This method questions a user if another unifier should be computed. It
+	 * returns true if a user answers "Y" and false otherwise.
+	 * 
+	 * stdout and stdin is used.
+	 * 
+	 * @return boolean
+	 */
+	public boolean questionYN() {
+		System.out.print("Should I compute another unifier? (Y/N) ");
+
+		String answer = "Y";
+
+		try {
+			BufferedReader in = new BufferedReader(new InputStreamReader(
+					System.in));
+			answer = in.readLine();
+
+		} catch (Exception ex) {
+
+			ex.printStackTrace();
+		}
+
+		if (answer.equalsIgnoreCase("Y")) {
+
+			return true;
+
+		} else {
+
+			return false;
+		}
+
 	}
 
 }
