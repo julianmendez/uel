@@ -1,9 +1,6 @@
 package de.tudresden.inf.lat.uel.parser;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StreamTokenizer;
 import java.util.HashMap;
@@ -46,7 +43,7 @@ public class ReaderAndParser {
 	 * 
 	 */
 
-	public void readFromFile(File input, Goal goal) throws Exception {
+	public void readFromFile(Reader input, Goal goal) throws Exception {
 
 		Equation equation;
 
@@ -66,11 +63,7 @@ public class ReaderAndParser {
 		 * Opens input file
 		 */
 
-		FileInputStream file;
-
-		file = new FileInputStream(input);
-
-		Reader r = new BufferedReader(new InputStreamReader(file));
+		Reader r = new BufferedReader(input);
 
 		initTokenizer(r);
 

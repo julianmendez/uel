@@ -122,8 +122,6 @@ public class Unifier {
 
 		Translator translator = new Translator(goal);
 
-		goal.initialize(filename, this);
-
 		if (unify(translator, satinput, satoutput, result)) {
 
 			Main.logger.info("UNIFIABLE\n" + "Unifier printed to "
@@ -168,8 +166,6 @@ public class Unifier {
 		File result = new File(filename.concat(".unif"));
 
 		Translator translator = new Translator(goal);
-
-		goal.initialize(filename, this);
 
 		boolean unifiable = unify(translator, satinput, satoutput, result);
 
@@ -263,8 +259,6 @@ public class Unifier {
 
 		Translator translator = new Translator(goal);
 
-		goal.initialize(filename, this);
-
 		boolean unifiable = unify(translator, satinput, satoutput, result);
 
 		if (unifiable) {
@@ -348,8 +342,6 @@ public class Unifier {
 
 		Translator translator = new Translator(goal);
 
-		goal.initialize(filename, this);
-
 		translator.toDIMACS(satinput);
 
 		ProcessBuilder pb = new ProcessBuilder("MiniSat", satinput.toString(),
@@ -413,8 +405,6 @@ public class Unifier {
 		File result = new File(filename.concat(".unif"));
 
 		Translator translator = new Translator(goal);
-
-		goal.initialize(filename, this);
 
 		int nbrUnifiers = 0;
 
@@ -502,8 +492,6 @@ public class Unifier {
 	 */
 	public void unifyN(Goal goal) throws Exception {
 		Translator translator = new Translator(goal);
-
-		goal.initialize(filename, this);
 
 		boolean unifiable = true;
 		boolean message = false;

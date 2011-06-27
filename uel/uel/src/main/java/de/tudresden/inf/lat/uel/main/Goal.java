@@ -2,8 +2,11 @@ package de.tudresden.inf.lat.uel.main;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileWriter;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -85,7 +88,8 @@ public class Goal {
 	 */
 	public void initialize(String filename, Unifier unifier) throws Exception {
 
-		File goal = new File(filename);
+		Reader goal = new InputStreamReader(new FileInputStream(new File(
+				filename)));
 
 		readerAndParser.readFromFile(goal, this);
 

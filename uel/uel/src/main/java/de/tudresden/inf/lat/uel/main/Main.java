@@ -54,6 +54,7 @@ public class Main {
 
 		if (args.length == 1 && !args[0].equalsIgnoreCase("-h")) {
 
+			goal.initialize(args[0], unifier);
 			unifier.setFileName(args[0]);
 			unifier.unify0(goal);
 
@@ -76,30 +77,35 @@ public class Main {
 
 			case 2:
 
+				goal.initialize(args[1], unifier);
 				unifier.setFileName(args[1]);
 				unifier.unifyA(goal);
 				break;
 
 			case 3:
 
+				goal.initialize(args[1], unifier);
 				unifier.setFileName(args[1]);
 				unifier.unifyX(goal);
 				break;
 
 			case 4:
 
+				goal.initialize(args[1], unifier);
 				unifier.setFileName(args[1]);
 				unifier.unifyN(goal);
 				break;
 
 			case 5:
 
+				goal.initialize(args[1], unifier);
 				unifier.setFileName(args[1]);
 				unifier.unifyInt(goal, MaxNbr);
 				break;
 
 			case 6:
 
+				goal.initialize(args[1], unifier);
 				unifier.setFileName(args[1]);
 				unifier.unifySimple(goal);
 				break;
@@ -117,6 +123,7 @@ public class Main {
 
 			ontology.loadOntology(args[1]);
 
+			goal.initialize(args[0], unifier);
 			unifier.setFileName(args[0]);
 			unifier.unify0(goal);
 
