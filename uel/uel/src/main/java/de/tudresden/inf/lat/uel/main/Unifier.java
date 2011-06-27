@@ -186,7 +186,7 @@ public class Unifier {
 				PrintWriter satout = new PrintWriter(new BufferedWriter(
 						new FileWriter(satinput, true)));
 
-				String additionalline = translator.Update + " 0 ";
+				String additionalline = translator.getUpdate() + " 0 ";
 
 				satout.println(additionalline);
 
@@ -281,7 +281,7 @@ public class Unifier {
 				PrintWriter satout = new PrintWriter(new BufferedWriter(
 						new FileWriter(satinput, true)));
 
-				String additionalline = translator.Update + " 0 ";
+				String additionalline = translator.getUpdate() + " 0 ";
 
 				satout.println(additionalline);
 
@@ -434,7 +434,7 @@ public class Unifier {
 				PrintWriter satout = new PrintWriter(new BufferedWriter(
 						new FileWriter(satinput, true)));
 
-				String additionalline = translator.Update + " 0 ";
+				String additionalline = translator.getUpdate() + " 0 ";
 
 				satout.println(additionalline);
 
@@ -534,7 +534,7 @@ public class Unifier {
 				PrintWriter satin = new PrintWriter(new BufferedWriter(
 						new FileWriter(satinput, true)));
 
-				String additionalline = translator.Update + " 0 ";
+				String additionalline = translator.getUpdate() + " 0 ";
 
 				satin.println(additionalline);
 

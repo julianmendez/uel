@@ -28,7 +28,7 @@ public class Ontology {
 	 * 
 	 */
 
-	public HashMap<String, Equation> definitions = new HashMap<String, Equation>();
+	private HashMap<String, Equation> definitions = new HashMap<String, Equation>();
 
 	private HashMap<String, Atom> allatoms = new HashMap<String, Atom>();
 
@@ -388,6 +388,10 @@ public class Ontology {
 
 		return result;
 
+	}
+	
+	public HashMap<String, Equation> getDefinitions() {
+		return definitions;
 	}
 
 }

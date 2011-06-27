@@ -1,7 +1,7 @@
 package de.tudresden.inf.lat.uel.main;
 
 import java.io.PrintWriter;
-import java.util.*;
+import java.util.HashMap;
 
 /**
  * This class implements equation as two hash maps of atoms. It is used by Goal
@@ -16,12 +16,12 @@ public class Equation {
 	 * Left side of equation. Hash map with keys names of the atoms and values
 	 * the atoms.
 	 */
-	public HashMap<String, Atom> left;
+	private HashMap<String, Atom> left;
 	/**
 	 * Right side of equation Hash map with keys names of the atoms and values
 	 * the atoms.
 	 */
-	public HashMap<String, Atom> right;
+	private HashMap<String, Atom> right;
 
 	/**
 	 * Constructor initializes two hash maps for the left and right side of

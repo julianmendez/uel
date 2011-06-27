@@ -33,29 +33,33 @@ public class Goal {
 	 * constants is a hash map implementing all constant concept names in the
 	 * goal. keys are names and values are flat atoms
 	 */
-	public HashMap<String, FAtom> constants = new HashMap<String, FAtom>();
+	private HashMap<String, FAtom> constants = new HashMap<String, FAtom>();
+
 	/**
 	 * variables is a hash map implementing all concept names which are treated
 	 * as variables keys are names and values are flat atoms
 	 */
-	public HashMap<String, FAtom> variables = new HashMap<String, FAtom>();
+	private HashMap<String, FAtom> variables = new HashMap<String, FAtom>();
+
 	/**
 	 * eatoms is a hash map implementing all flat existential restrictions keys
 	 * are names and values are flat atoms
 	 */
-	public HashMap<String, FAtom> eatoms = new HashMap<String, FAtom>();
+	private HashMap<String, FAtom> eatoms = new HashMap<String, FAtom>();
+
 	/**
 	 * allatoms is a hash map implementing all flat atoms in the goal keys are
 	 * names and values are flat atoms
 	 */
-	public HashMap<String, FAtom> allatoms = new HashMap<String, FAtom>();
+	private HashMap<String, FAtom> allatoms = new HashMap<String, FAtom>();
 
 	private int NbrVar = 0;
+
 	/**
 	 * equations is a list containing all goal equations
 	 * 
 	 */
-	public ArrayList<Equation> equations = new ArrayList<Equation>();
+	private ArrayList<Equation> equations = new ArrayList<Equation>();
 
 	public Goal(Ontology ont) {
 		ontology = ont;
@@ -137,7 +141,7 @@ public class Goal {
 	 * @throws Exception
 	 */
 	public void importDefinition(Atom concept) throws Exception {
-		if (ontology.definitions.containsKey(concept.toString())
+		if (ontology.getDefinitions().containsKey(concept.toString())
 				&& !variables.containsKey(concept.toString())) {
 
 			Equation eq = ontology.getDefinition(concept.toString());
@@ -161,14 +165,14 @@ public class Goal {
 		Atom b = null;
 		Equation newequation = new Equation();
 
-		if (e.left.size() != 1) {
+		if (e.getLeft().size() != 1) {
 
 			throw new RuntimeException(" Wrong format of this definition ");
 
 		}
 
-		for (String key : e.left.keySet()) {
-			b = e.left.get(key);
+		for (String key : e.getLeft().keySet()) {
+			b = e.getLeft().get(key);
 		}
 
 		if (b.isRoot()) {
@@ -193,24 +197,24 @@ public class Goal {
 			variables.put(a.toString(), a);
 			allatoms.put(a.toString(), a);
 
-			newequation.left.put(a.toString(), a);
+			newequation.getLeft().put(a.toString(), a);
 
 			/*
 			 * FLATTENING
 			 */
 
-			for (String key : e.right.keySet()) {
+			for (String key : e.getRight().keySet()) {
 
-				a = new FAtom(e.right.get(key), this);
+				a = new FAtom(e.getRight().get(key), this);
 
 				if (allatoms.containsKey(a.toString())) {
 
-					newequation.right.put(a.toString(),
+					newequation.getRight().put(a.toString(),
 							allatoms.get(a.toString()));
 
 				} else {
 
-					newequation.right.put(a.toString(), a);
+					newequation.getRight().put(a.toString(), a);
 
 				}
 
@@ -382,6 +386,22 @@ public class Goal {
 
 		}
 
+	}
+
+	public HashMap<String, FAtom> getAllAtoms() {
+		return allatoms;
+	}
+
+	public HashMap<String, FAtom> getConstants() {
+		return constants;
+	}
+
+	public HashMap<String, FAtom> getVariables() {
+		return variables;
+	}
+
+	public HashMap<String, FAtom> getEAtoms() {
+		return eatoms;
 	}
 
 }

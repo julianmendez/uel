@@ -98,7 +98,7 @@ public class FAtom extends Atom {
 
 			child = b;
 
-			eq.left.put(b.toString(), b);
+			eq.getLeft().put(b.toString(), b);
 			eq.setRight(atom.getChildren());
 
 			goal.addFlatten(eq);
@@ -107,9 +107,9 @@ public class FAtom extends Atom {
 
 			for (String key : atom.getChildren().keySet()) {
 
-				if (goal.allatoms.containsKey(key)) {
+				if (goal.getAllAtoms().containsKey(key)) {
 
-					child = goal.allatoms.get(key);
+					child = goal.getAllAtoms().get(key);
 
 				} else {
 
@@ -119,9 +119,9 @@ public class FAtom extends Atom {
 			}
 		}
 
-		if (!goal.allatoms.containsKey(this.toString())) {
+		if (!goal.getAllAtoms().containsKey(this.toString())) {
 
-			goal.allatoms.put(this.toString(), this);
+			goal.getAllAtoms().put(this.toString(), this);
 
 		}
 
