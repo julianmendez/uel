@@ -45,6 +45,8 @@ public class Main {
 
 	public void run(String[] args) throws Exception {
 		Unifier unifier = new Unifier();
+		Ontology ontology = new Ontology();
+		Goal goal = new Goal(ontology);
 
 		logger.setLevel(Level.INFO);
 		logger.addHandler(new OutputStreamHandler(System.out));
@@ -53,13 +55,13 @@ public class Main {
 		if (args.length == 1 && !args[0].equalsIgnoreCase("-h")) {
 
 			unifier.setFileName(args[0]);
-			unifier.unify0();
+			unifier.unify0(goal);
 
 		} else if (args.length > 1 && args[0].startsWith("-")) {
 
 			if (args.length == 3) {
 
-				Ontology.loadOntology(args[2]);
+				ontology.loadOntology(args[2]);
 
 			}
 
@@ -75,31 +77,31 @@ public class Main {
 			case 2:
 
 				unifier.setFileName(args[1]);
-				unifier.unifyA();
+				unifier.unifyA(goal);
 				break;
 
 			case 3:
 
 				unifier.setFileName(args[1]);
-				unifier.unifyX();
+				unifier.unifyX(goal);
 				break;
 
 			case 4:
 
 				unifier.setFileName(args[1]);
-				unifier.unifyN();
+				unifier.unifyN(goal);
 				break;
 
 			case 5:
 
 				unifier.setFileName(args[1]);
-				unifier.unifyInt(MaxNbr);
+				unifier.unifyInt(goal, MaxNbr);
 				break;
 
 			case 6:
 
 				unifier.setFileName(args[1]);
-				unifier.unifySimple();
+				unifier.unifySimple(goal);
 				break;
 
 			default:
@@ -113,10 +115,10 @@ public class Main {
 
 		} else if (args.length == 2 && !args[0].startsWith("-")) {
 
-			Ontology.loadOntology(args[1]);
+			ontology.loadOntology(args[1]);
 
 			unifier.setFileName(args[0]);
-			unifier.unify0();
+			unifier.unify0(goal);
 
 		} else {
 

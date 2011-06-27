@@ -3,8 +3,6 @@ package de.tudresden.inf.lat.uel.main;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
-import de.tudresden.inf.lat.uel.ontmanager.Ontology;
-
 /**
  * 
  * This class extends Atom. It implements a flat atom, hence an atom which is
@@ -84,12 +82,8 @@ public class FAtom extends Atom {
 
 		if (!atom.isRoot()) {
 			child = null;
-			if (Ontology.definitions.containsKey(atom.toString())
-					&& !goal.variables.containsKey(atom.toString())) {
 
-				goal.importDefinition(atom);
-
-			}
+			goal.importDefinition(atom);
 
 		} else if (!atom.isFlat()) {
 

@@ -15,8 +15,8 @@ import de.tudresden.inf.lat.uel.parser.ReaderAndParser;
  * This class implements a goal of unification, i.e., a set of equations between
  * concept terms with variables.
  * 
- * It is , because the goal is unique for the procedure, and should be
- * accessible for most other objects.
+ * The goal is unique for the procedure, and should be accessible for most other
+ * objects.
  * 
  * @author Barbara Morawska
  * 
@@ -25,6 +25,7 @@ import de.tudresden.inf.lat.uel.parser.ReaderAndParser;
 public class Goal {
 
 	private File tbox;
+	private Ontology ontology;
 
 	private ReaderAndParser readerAndParser = new ReaderAndParser();
 
@@ -56,7 +57,8 @@ public class Goal {
 	 */
 	public ArrayList<Equation> equations = new ArrayList<Equation>();
 
-	public Goal() {
+	public Goal(Ontology ont) {
+		ontology = ont;
 	}
 
 	/**
@@ -72,6 +74,9 @@ public class Goal {
 	 * Then all variables, constants and existential atoms are identified.
 	 * 
 	 * @param filename
+	 *            file name
+	 * @param unifier
+	 *            unifier
 	 * @throws Exception
 	 */
 	public void initialize(String filename, Unifier unifier) throws Exception {
@@ -128,12 +133,17 @@ public class Goal {
 	 * <concept> is a concept name that may be defined in the ontology.
 	 * 
 	 * @param concept
+	 *            concept
 	 * @throws Exception
 	 */
 	public void importDefinition(Atom concept) throws Exception {
+		if (ontology.definitions.containsKey(concept.toString())
+				&& !variables.containsKey(concept.toString())) {
 
-		Equation eq = Ontology.getDefinition(concept.toString());
-		addFlatten(eq);
+			Equation eq = ontology.getDefinition(concept.toString());
+			addFlatten(eq);
+
+		}
 
 	}
 
@@ -142,7 +152,7 @@ public class Goal {
 	 * to flatten an equation and to add it to the list of goal equations
 	 * 
 	 * @param e
-	 *            (equation that need to be flattened)
+	 *            equation that needs to be flattened
 	 * @throws Exception
 	 */
 	public void addFlatten(Equation e) throws Exception {
@@ -214,7 +224,7 @@ public class Goal {
 	/**
 	 * Method to get the list of goal equations
 	 * 
-	 * @return
+	 * @return the list of goal equations
 	 */
 	public ArrayList<Equation> getEquations() {
 
@@ -225,6 +235,7 @@ public class Goal {
 	 * Method to add an equation e to the list of goal equations
 	 * 
 	 * @param e
+	 *            equation
 	 */
 	public void addEquation(Equation e) {
 

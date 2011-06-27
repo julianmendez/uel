@@ -110,16 +110,16 @@ public class Unifier {
 	 * <filename>.unif and to the stdout. It deletes some additional files
 	 * created by the unification procedure.
 	 * 
-	 * @param filename
+	 * @param goal
+	 *            goal
 	 * @throws Exception
 	 */
-	public void unifySimple() throws Exception {
+	public void unifySimple(Goal goal) throws Exception {
 
 		File satinput = new File(filename.concat(".in"));
 		File satoutput = new File(filename.concat(".out"));
 		File result = new File(filename.concat(".unif"));
 
-		Goal goal = new Goal();
 		Translator translator = new Translator(goal);
 
 		goal.initialize(filename, this);
@@ -157,16 +157,16 @@ public class Unifier {
 	 * procedure. It will terminate, but after an exponential time in the size
 	 * of the goal, in the worst case. The output file can be very big.
 	 * 
-	 * @param filename
+	 * @param goal
+	 *            goal
 	 * @throws Exception
 	 */
-	public void unifyX() throws Exception {
+	public void unifyX(Goal goal) throws Exception {
 
 		File satinput = new File(filename.concat(".in"));
 		File satoutput = new File(filename.concat(".out"));
 		File result = new File(filename.concat(".unif"));
 
-		Goal goal = new Goal();
 		Translator translator = new Translator(goal);
 
 		goal.initialize(filename, this);
@@ -250,17 +250,17 @@ public class Unifier {
 	 * 
 	 * All computed unifiers are written to the output file.
 	 * 
-	 * @param filename
+	 * @param goal
+	 *            goal
 	 * @throws Exception
 	 */
 
-	public void unifyA() throws Exception {
+	public void unifyA(Goal goal) throws Exception {
 
 		File satinput = new File(filename.concat(".in"));
 		File satoutput = new File(filename.concat(".out"));
 		File result = new File(filename.concat(".unif"));
 
-		Goal goal = new Goal();
 		Translator translator = new Translator(goal);
 
 		goal.initialize(filename, this);
@@ -337,15 +337,15 @@ public class Unifier {
 	 * 
 	 * It deletes some additional files created by the unification procedure.
 	 * 
-	 * @param filename
+	 * @param goal
+	 *            goal
 	 * @throws Exception
 	 */
-	public void unify0() throws Exception {
+	public void unify0(Goal goal) throws Exception {
 
 		File satinput = new File(filename.concat(".in"));
 		File satoutput = new File(filename.concat(".out"));
 
-		Goal goal = new Goal();
 		Translator translator = new Translator(goal);
 
 		goal.initialize(filename, this);
@@ -402,16 +402,16 @@ public class Unifier {
 	 * If the goal is unifiable, then it writes UNIFIABLE to stdout and computes
 	 * <i> unifiers, while writing them to the output file.
 	 * 
-	 * @param filename
+	 * @param goal
+	 *            goal
 	 * @throws Exception
 	 */
-	public void unifyInt(int max) throws Exception {
+	public void unifyInt(Goal goal, int max) throws Exception {
 
 		File satinput = new File(filename.concat(".in"));
 		File satoutput = new File(filename.concat(".out"));
 		File result = new File(filename.concat(".unif"));
 
-		Goal goal = new Goal();
 		Translator translator = new Translator(goal);
 
 		goal.initialize(filename, this);
@@ -496,15 +496,11 @@ public class Unifier {
 	 * 
 	 * The method does not write the unifiers into an output file.
 	 * 
-	 * 
-	 * 
-	 * 
-	 * @param filename
+	 * @param goal
+	 *            goal
 	 * @throws Exception
 	 */
-	public void unifyN() throws Exception {
-
-		Goal goal = new Goal();
+	public void unifyN(Goal goal) throws Exception {
 		Translator translator = new Translator(goal);
 
 		goal.initialize(filename, this);

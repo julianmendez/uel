@@ -13,8 +13,8 @@ import de.tudresden.inf.lat.uel.main.Equation;
 
 /**
  * 
- * This static class is used to load a part of ontology to the goal. Ontology is
- * a set of definitions written in a file in the krss format
+ * This class is used to load a part of ontology to the goal. Ontology is a set
+ * of definitions written in a file in the krss format
  * 
  * @author Barbara Morawska
  * 
@@ -28,20 +28,20 @@ public class Ontology {
 	 * 
 	 */
 
-	static public HashMap<String, Equation> definitions = new HashMap<String, Equation>();
+	public HashMap<String, Equation> definitions = new HashMap<String, Equation>();
 
-	static private HashMap<String, Atom> allatoms = new HashMap<String, Atom>();
+	private HashMap<String, Atom> allatoms = new HashMap<String, Atom>();
 
-	static StreamTokenizer str;
+	private StreamTokenizer str;
 
-	private Ontology() {
-	};
+	public Ontology() {
+	}
 
 	/**
 	 * Method to get a definition from the ontology by the defined concept (Used
 	 * by Goal initialization.)
 	 */
-	public static Equation getDefinition(String name) {
+	public Equation getDefinition(String name) {
 
 		return definitions.get(name);
 
@@ -53,7 +53,7 @@ public class Ontology {
 	 * 
 	 */
 
-	public static void loadOntology(String filename) throws Exception {
+	public void loadOntology(String filename) throws Exception {
 
 		/*
 		 * open file
@@ -132,7 +132,7 @@ public class Ontology {
 
 	}
 
-	private static void parse(String concept) throws Exception {
+	private void parse(String concept) throws Exception {
 		/*
 		 * create atom concept (constant)
 		 */
@@ -161,7 +161,7 @@ public class Ontology {
 	 * parsing the right side of the equation:
 	 */
 
-	private static HashMap<String, Atom> parse() throws Exception {
+	private HashMap<String, Atom> parse() throws Exception {
 
 		HashMap<String, Atom> result = new HashMap<String, Atom>();
 		Atom a;
@@ -253,8 +253,8 @@ public class Ontology {
 								result.put(a.toString(), a);
 								allatoms.put(a.toString(), a);
 							} else {
-								result.put(a.toString(), allatoms.get(a
-										.toString()));
+								result.put(a.toString(),
+										allatoms.get(a.toString()));
 
 							}
 
