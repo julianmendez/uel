@@ -14,8 +14,7 @@ import de.tudresden.inf.lat.uel.main.FAtom;
 import de.tudresden.inf.lat.uel.main.Goal;
 
 /**
- * This is a static class, which is a parser of the file with the goal of
- * unification.
+ * This is a class, which is a parser of the file with the goal of unification.
  * 
  * @author Barbara Morawska
  * 

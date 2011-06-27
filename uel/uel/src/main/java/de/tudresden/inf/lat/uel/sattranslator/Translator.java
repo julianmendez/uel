@@ -32,7 +32,7 @@ import de.tudresden.inf.lat.uel.main.Literal;
 
 public class Translator {
 
-	static private Integer identificator = 1;
+	private Integer identificator = 1;
 
 	private Goal goal;
 
