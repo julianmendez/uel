@@ -123,11 +123,6 @@ public class Ontology {
 
 		}
 
-		/*
-		 * close reader
-		 */
-		reader.close();
-
 	}
 
 	private void parse(String concept) throws IOException {

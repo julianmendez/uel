@@ -236,8 +236,6 @@ public class ReaderAndParser {
 
 				goal.addEquation(equation);
 
-				r.close();
-
 			} else {
 
 				throw new RuntimeException(

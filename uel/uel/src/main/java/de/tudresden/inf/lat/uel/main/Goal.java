@@ -106,7 +106,7 @@ public class Goal {
 				eq.printFDefinition(writer);
 
 			}
-			writer.close();
+			writer.flush();
 
 		}
 

@@ -538,8 +538,6 @@ public class Translator {
 
 		out.flush();
 
-		out.close();
-
 	}
 
 	/*
@@ -734,7 +732,7 @@ public class Translator {
 			}
 
 			out.println("-------------------------------------");
-			out.close();
+			out.flush();
 
 		} else {
 
@@ -742,7 +740,7 @@ public class Translator {
 
 			out.println("NOT UNIFIABLE");
 
-			out.close();
+			out.flush();
 
 		}
 
@@ -866,7 +864,7 @@ public class Translator {
 			}
 
 			out.println("---------------------------------------");
-			out.close();
+			out.flush();
 
 		} else {
 
@@ -874,7 +872,7 @@ public class Translator {
 
 			out.println("NO MORE UNIFIERS");
 
-			out.close();
+			out.flush();
 
 		}
 
