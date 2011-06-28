@@ -1,6 +1,7 @@
 package de.tudresden.inf.lat.uel.main;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -22,6 +23,7 @@ import de.tudresden.inf.lat.uel.ontmanager.Ontology;
 public class Main {
 
 	static final Logger logger = Logger.getLogger("Unifier");
+	private static final String unifSuffix = ".unif";
 
 	private int MaxNbr = 0;
 
@@ -56,7 +58,6 @@ public class Main {
 		} else {
 			goal.initialize(reader);
 		}
-		unifier.setFileName(filename);
 	}
 
 	public void run(String[] args) throws IOException {
@@ -94,13 +95,13 @@ public class Main {
 			case 2:
 
 				initialize(goal, unifier, args[1]);
-				unifier.unifyA(goal);
+				store(args[1], unifier.unifyA(goal));
 				break;
 
 			case 3:
 
 				initialize(goal, unifier, args[1]);
-				unifier.unifyX(goal);
+				store(args[1], unifier.unifyX(goal));
 				break;
 
 			case 4:
@@ -112,13 +113,13 @@ public class Main {
 			case 5:
 
 				initialize(goal, unifier, args[1]);
-				unifier.unifyInt(goal, MaxNbr);
+				store(args[1], unifier.unifyInt(goal, MaxNbr));
 				break;
 
 			case 6:
 
 				initialize(goal, unifier, args[1]);
-				unifier.unifySimple(goal);
+				store(args[1], unifier.unifySimple(goal));
 				break;
 
 			default:
@@ -228,6 +229,13 @@ public class Main {
 			return 5;
 		}
 
+	}
+
+	private void store(String output, String str) throws IOException {
+		FileWriter writer = new FileWriter(new File(output.concat(unifSuffix)));
+		writer.write(str);
+		writer.flush();
+		writer.close();
 	}
 
 }

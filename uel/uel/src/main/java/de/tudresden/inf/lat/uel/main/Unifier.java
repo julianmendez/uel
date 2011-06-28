@@ -8,6 +8,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -29,8 +31,6 @@ public class Unifier {
 	private boolean test = false;
 
 	private int numberofsolutions = 0;
-
-	private String filename = "uelResult";
 
 	public Unifier() {
 	}
@@ -89,14 +89,13 @@ public class Unifier {
 	 * 
 	 */
 	private boolean unify(Translator translator, File satinput, File satoutput,
-			File result) throws IOException {
+			Writer result) throws IOException {
 
 		translator.toDIMACS(new FileWriter(satinput));
 
 		runMiniSat(satinput, satoutput);
 
-		boolean response = translator.toTBox(new FileReader(satoutput),
-				new FileWriter(result));
+		boolean response = translator.toTBox(new FileReader(satoutput), result);
 
 		return response;
 
@@ -126,19 +125,16 @@ public class Unifier {
 	 * @throws InterruptedException
 	 * @throws IOException
 	 */
-	public void unifySimple(Goal goal) throws IOException {
+	public String unifySimple(Goal goal) throws IOException {
 
 		File satinput = File.createTempFile(tempPrefix, tempSuffix);
 		File satoutput = File.createTempFile(tempPrefix, tempSuffix);
-
-		File result = new File(filename.concat(".unif"));
-
+		StringWriter result = new StringWriter();
 		Translator translator = new Translator(goal);
 
 		if (unify(translator, satinput, satoutput, result)) {
 
-			Main.logger.info("UNIFIABLE\n" + "Unifier printed to "
-					+ result.toString());
+			Main.logger.info("UNIFIABLE\n" + "Unifier stored in file.");
 		} else {
 
 			Main.logger.info("UNUNIFIABLE");
@@ -146,7 +142,7 @@ public class Unifier {
 
 		satinput.delete();
 		satoutput.delete();
-
+		return result.toString();
 	}
 
 	/**
@@ -172,13 +168,11 @@ public class Unifier {
 	 *            goal
 	 * @throws Exception
 	 */
-	public void unifyX(Goal goal) throws IOException {
+	public String unifyX(Goal goal) throws IOException {
 
 		File satinput = File.createTempFile(tempPrefix, tempSuffix);
 		File satoutput = File.createTempFile(tempPrefix, tempSuffix);
-
-		File result = new File(filename.concat(".unif"));
-
+		StringWriter result = new StringWriter();
 		Translator translator = new Translator(goal);
 
 		boolean unifiable = unify(translator, satinput, satoutput, result);
@@ -186,8 +180,7 @@ public class Unifier {
 		if (unifiable) {
 
 			numberofsolutions++;
-			Main.logger.info("UNIFIABLE\n" + "Unifier printed to "
-					+ result.toString());
+			Main.logger.info("UNIFIABLE\n" + "Unifier stored in file.");
 
 			while (unifiable) {
 
@@ -206,7 +199,7 @@ public class Unifier {
 
 				translator.reset();
 				unifiable = translator.toTBoxB(new FileReader(satoutput),
-						new FileWriter(result, true), numberofsolutions);
+						result, numberofsolutions);
 
 				if (unifiable) {
 
@@ -231,7 +224,7 @@ public class Unifier {
 
 		satinput.delete();
 		satoutput.delete();
-
+		return result.toString();
 	}
 
 	/**
@@ -259,21 +252,18 @@ public class Unifier {
 	 * @throws Exception
 	 */
 
-	public void unifyA(Goal goal) throws IOException {
+	public String unifyA(Goal goal) throws IOException {
 
 		File satinput = File.createTempFile(tempPrefix, tempSuffix);
 		File satoutput = File.createTempFile(tempPrefix, tempSuffix);
-
-		File result = new File(filename.concat(".unif"));
-
+		StringWriter result = new StringWriter();
 		Translator translator = new Translator(goal);
 
 		boolean unifiable = unify(translator, satinput, satoutput, result);
 
 		if (unifiable) {
 
-			Main.logger.info("UNIFIABLE\n" + "Unifier printed to "
-					+ result.toString());
+			Main.logger.info("UNIFIABLE\n" + "Unifier stored in file.");
 
 			boolean test = questionYN();
 
@@ -294,12 +284,12 @@ public class Unifier {
 
 				translator.reset();
 				unifiable = translator.toTBoxB(new FileReader(satoutput),
-						new FileWriter(result, true), numberofsolutions);
+						result, numberofsolutions);
 
 				if (unifiable) {
 
 					Main.logger.info(numberofsolutions + " UNIFIER\n"
-							+ "Unifier appended to " + result.toString());
+							+ "Unifier appended to file.");
 
 					test = questionYN();
 				} else {
@@ -320,7 +310,7 @@ public class Unifier {
 
 		satinput.delete();
 		satoutput.delete();
-
+		return result.toString();
 	}
 
 	/**
@@ -395,12 +385,11 @@ public class Unifier {
 	 *            goal
 	 * @throws Exception
 	 */
-	public void unifyInt(Goal goal, int max) throws IOException {
+	public String unifyInt(Goal goal, int max) throws IOException {
 
 		File satinput = File.createTempFile(tempPrefix, tempSuffix);
 		File satoutput = File.createTempFile(tempPrefix, tempSuffix);
-
-		File result = new File(filename.concat(".unif"));
+		StringWriter result = new StringWriter();
 
 		Translator translator = new Translator(goal);
 
@@ -410,8 +399,7 @@ public class Unifier {
 
 		if (unifiable) {
 
-			Main.logger.info("UNIFIABLE\n" + "Unifier printed to "
-					+ result.toString());
+			Main.logger.info("UNIFIABLE\n" + "Unifier stored in file.");
 
 			nbrUnifiers++;
 
@@ -432,12 +420,12 @@ public class Unifier {
 
 				translator.reset();
 				unifiable = translator.toTBoxB(new FileReader(satoutput),
-						new FileWriter(result, true), numberofsolutions);
+						result, numberofsolutions);
 
 				if (unifiable) {
 
 					Main.logger.info(numberofsolutions + " UNIFIER\n"
-							+ "Unifier appended to " + result.toString());
+							+ "Unifier stored in file.");
 					nbrUnifiers++;
 
 				} else {
@@ -458,7 +446,7 @@ public class Unifier {
 
 		satinput.delete();
 		satoutput.delete();
-
+		return result.toString();
 	}
 
 	/**
@@ -490,10 +478,8 @@ public class Unifier {
 
 		numberofsolutions = 0;
 
-		File satinput = new File(filename.concat(".in"));
-
-		File satoutput = new File(filename.concat(".out"));
-
+		File satinput = File.createTempFile(tempPrefix, tempSuffix);
+		File satoutput = File.createTempFile(tempPrefix, tempSuffix);
 		translator.toDIMACS(new FileWriter(satinput));
 
 		while (unifiable) {
@@ -536,14 +522,6 @@ public class Unifier {
 		satinput.delete();
 		satoutput.delete();
 
-	}
-
-	public String getFileName() {
-		return filename;
-	}
-
-	public void setFileName(String name) {
-		filename = name;
 	}
 
 	/**
