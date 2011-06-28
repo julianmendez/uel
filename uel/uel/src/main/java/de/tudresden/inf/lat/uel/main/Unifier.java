@@ -23,11 +23,14 @@ import de.tudresden.inf.lat.uel.sattranslator.Translator;
 
 public class Unifier {
 
+	private static final String tempPrefix = "uelMiniSat";
+	private static final String tempSuffix = "";
+
 	private boolean test = false;
 
 	private int numberofsolutions = 0;
 
-	private String filename = "minisattempfile";
+	private String filename = "uelResult";
 
 	public Unifier() {
 	}
@@ -86,7 +89,7 @@ public class Unifier {
 		p.destroy();
 
 		boolean response = translator.toTBox(new FileReader(satoutput),
-				new FileWriter(result, true));
+				new FileWriter(result));
 
 		return response;
 
@@ -117,8 +120,9 @@ public class Unifier {
 	 */
 	public void unifySimple(Goal goal) throws Exception {
 
-		File satinput = new File(filename.concat(".in"));
-		File satoutput = new File(filename.concat(".out"));
+		File satinput = File.createTempFile(tempPrefix, tempSuffix);
+		File satoutput = File.createTempFile(tempPrefix, tempSuffix);
+
 		File result = new File(filename.concat(".unif"));
 
 		Translator translator = new Translator(goal);
@@ -162,8 +166,9 @@ public class Unifier {
 	 */
 	public void unifyX(Goal goal) throws Exception {
 
-		File satinput = new File(filename.concat(".in"));
-		File satoutput = new File(filename.concat(".out"));
+		File satinput = File.createTempFile(tempPrefix, tempSuffix);
+		File satoutput = File.createTempFile(tempPrefix, tempSuffix);
+
 		File result = new File(filename.concat(".unif"));
 
 		Translator translator = new Translator(goal);
@@ -254,8 +259,9 @@ public class Unifier {
 
 	public void unifyA(Goal goal) throws Exception {
 
-		File satinput = new File(filename.concat(".in"));
-		File satoutput = new File(filename.concat(".out"));
+		File satinput = File.createTempFile(tempPrefix, tempSuffix);
+		File satoutput = File.createTempFile(tempPrefix, tempSuffix);
+
 		File result = new File(filename.concat(".unif"));
 
 		Translator translator = new Translator(goal);
@@ -338,8 +344,8 @@ public class Unifier {
 	 */
 	public void unify0(Goal goal) throws Exception {
 
-		File satinput = new File(filename.concat(".in"));
-		File satoutput = new File(filename.concat(".out"));
+		File satinput = File.createTempFile(tempPrefix, tempSuffix);
+		File satoutput = File.createTempFile(tempPrefix, tempSuffix);
 
 		Translator translator = new Translator(goal);
 
@@ -401,8 +407,9 @@ public class Unifier {
 	 */
 	public void unifyInt(Goal goal, int max) throws Exception {
 
-		File satinput = new File(filename.concat(".in"));
-		File satoutput = new File(filename.concat(".out"));
+		File satinput = File.createTempFile(tempPrefix, tempSuffix);
+		File satoutput = File.createTempFile(tempPrefix, tempSuffix);
+
 		File result = new File(filename.concat(".unif"));
 
 		Translator translator = new Translator(goal);
