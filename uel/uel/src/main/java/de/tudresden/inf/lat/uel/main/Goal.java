@@ -86,14 +86,14 @@ public class Goal {
 	 *            unifier
 	 * @throws Exception
 	 */
-	public void initialize(String filename, Unifier unifier) throws Exception {
+	public void initialize(String filename, boolean test) throws Exception {
 
 		Reader goal = new InputStreamReader(new FileInputStream(new File(
 				filename)));
 
 		readerAndParser.readFromFile(goal, this);
 
-		if (unifier.getTest()) {
+		if (test) {
 
 			tbox = new File(filename + ".TBox");
 
