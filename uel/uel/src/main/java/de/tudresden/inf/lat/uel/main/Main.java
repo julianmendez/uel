@@ -35,12 +35,12 @@ public class Main {
 	 *            file (optional, but if options string is non-empty it should
 	 *            contain "t" in order for ontology to be loaded);
 	 * 
-	 * @throws Exception
+	 * @throws IOException
 	 * @author Barbara Morawska
 	 * 
 	 */
 
-	public static void main(String[] args) throws Exception {
+	public static void main(String[] args) throws IOException {
 		(new Main()).run(args);
 	}
 
@@ -59,7 +59,7 @@ public class Main {
 		unifier.setFileName(filename);
 	}
 
-	public void run(String[] args) throws Exception {
+	public void run(String[] args) throws IOException {
 		Unifier unifier = new Unifier();
 		Ontology ontology = new Ontology();
 		Goal goal = new Goal(ontology);
