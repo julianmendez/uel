@@ -1,6 +1,7 @@
 package de.tudresden.inf.lat.uel.ontmanager;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.Reader;
 import java.io.StreamTokenizer;
 import java.util.HashMap;
@@ -48,9 +49,11 @@ public class Ontology {
 	 * Method to load ontology from a file containing definitions in the krss
 	 * format.
 	 * 
+	 * @throws IOException
+	 * 
 	 */
 
-	public void loadOntology(Reader input) throws Exception {
+	public void loadOntology(Reader input) throws IOException {
 
 		/*
 		 * open file
@@ -127,7 +130,7 @@ public class Ontology {
 
 	}
 
-	private void parse(String concept) throws Exception {
+	private void parse(String concept) throws IOException {
 		/*
 		 * create atom concept (constant)
 		 */
@@ -156,7 +159,7 @@ public class Ontology {
 	 * parsing the right side of the equation:
 	 */
 
-	private HashMap<String, Atom> parse() throws Exception {
+	private HashMap<String, Atom> parse() throws IOException {
 
 		HashMap<String, Atom> result = new HashMap<String, Atom>();
 		Atom a;

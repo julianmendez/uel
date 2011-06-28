@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.logging.Level;
@@ -47,7 +48,7 @@ public class Main {
 	}
 
 	private void initialize(Goal goal, Unifier unifier, String filename)
-			throws Exception {
+			throws IOException {
 		FileReader reader = new FileReader(filename);
 		if (unifier.getTest()) {
 			FileWriter output = new FileWriter(filename + ".TBox");

@@ -73,9 +73,8 @@ public class FAtom extends Atom {
 	 * Flattening is recursive.
 	 * 
 	 * @param atom
-	 * @throws Exception
 	 */
-	public FAtom(Atom atom, Goal g) throws Exception {
+	public FAtom(Atom atom, Goal g) {
 		super(atom.getName(), atom.isRoot());
 
 		goal = g;

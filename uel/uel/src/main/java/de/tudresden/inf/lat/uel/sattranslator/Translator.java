@@ -2,6 +2,7 @@ package de.tudresden.inf.lat.uel.sattranslator;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.Writer;
@@ -82,308 +83,220 @@ public class Translator {
 
 		setLiterals();
 
-		try {
+		PrintWriter out = new PrintWriter(new BufferedWriter(infile));
 
-			PrintWriter out = new PrintWriter(new BufferedWriter(infile));
+		/*
+		 * 
+		 * Clauses created in Step 1
+		 */
+
+		for (Equation e : goal.getEquations()) {
 
 			/*
-			 * 
-			 * Clauses created in Step 1
-			 */
-
-			for (Equation e : goal.getEquations()) {
-
-				/*
-				 * Step 1 for constants
-				 */
-
-				for (String key1 : goal.getConstants().keySet()) {
-
-					if (!e.getLeft().containsKey(key1)
-							&& !e.getRight().containsKey(key1)) {
-
-						/*
-						 * constant not in the equation
-						 * 
-						 * 
-						 * 
-						 * one side of an equation
-						 */
-
-						for (String key3 : e.getRight().keySet()) {
-							for (String key2 : e.getLeft().keySet()) {
-
-								Literal lit2 = new Literal(key2, key1, 's');
-
-								out.print(" -");
-								out.print(literals.get(lit2.toString()));
-								out.print(" ");
-
-							}
-
-							Literal lit3 = new Literal(key3, key1, 's');
-
-							out.print(" " + literals.get(lit3.toString()));
-							out.print(" 0 \n");
-
-						}
-
-						/*
-						 * another side of an equation
-						 */
-
-						for (String key2 : e.getLeft().keySet()) {
-							for (String key3 : e.getRight().keySet()) {
-
-								Literal lit2 = new Literal(key3, key1, 's');
-
-								out.print(" -");
-								out.print(literals.get(lit2.toString()));
-								out.print(" ");
-
-							}
-
-							Literal lit3 = new Literal(key2, key1, 's');
-
-							out.print(literals.get(lit3.toString()));
-							out.print(" 0 \n");
-
-						}
-
-					} else if (!e.getLeft().containsKey(key1)
-							&& e.getRight().containsKey(key1)) {
-
-						/*
-						 * constant of the right but not on the left
-						 */
-
-						for (String key2 : e.getLeft().keySet()) {
-							Literal lit4 = new Literal(key2, key1, 's');
-
-							out.print(" -");
-							out.print(literals.get(lit4.toString()));
-							out.print(" ");
-
-						}
-						out.print(" 0 \n");
-
-					} else if (e.getLeft().containsKey(key1)
-							&& !e.getRight().containsKey(key1)) {
-
-						/*
-						 * constant on the left but not on the right
-						 */
-
-						for (String key3 : e.getRight().keySet()) {
-							Literal lit5 = new Literal(key3, key1, 's');
-
-							out.print(" -");
-							out.print(literals.get(lit5.toString()));
-							out.print(" ");
-
-						}
-						out.print(" 0 \n");
-
-					}
-				}
-
-				/*
-				 * Step 1 for existential atoms
-				 */
-
-				for (String key1 : goal.getEAtoms().keySet()) {
-
-					if (!e.getLeft().containsKey(key1)
-							&& !e.getRight().containsKey(key1)) {
-
-						/*
-						 * atom not in the equation
-						 * 
-						 * one side of equation
-						 */
-
-						for (String key3 : e.getRight().keySet()) {
-							for (String key2 : e.getLeft().keySet()) {
-
-								Literal lit2 = new Literal(key2, key1, 's');
-
-								out.print(" -");
-								out.print(literals.get(lit2.toString()));
-								out.print(" ");
-
-							}
-
-							Literal lit3 = new Literal(key3, key1, 's');
-
-							out.print(literals.get(lit3.toString()));
-							out.print(" 0 \n");
-
-						}
-
-						/*
-						 * another side of the equation
-						 */
-
-						for (String key2 : e.getLeft().keySet()) {
-							for (String key3 : e.getRight().keySet()) {
-
-								Literal lit2 = new Literal(key3, key1, 's');
-
-								out.print(" -");
-								out.print(literals.get(lit2.toString()));
-								out.print(" ");
-							}
-
-							Literal lit3 = new Literal(key2, key1, 's');
-
-							out.print(literals.get(lit3.toString()));
-							out.print(" 0 \n");
-
-						}
-
-					} else if (!e.getLeft().containsKey(key1)
-							&& e.getRight().containsKey(key1)) {
-
-						/*
-						 * 
-						 * existential atom on the right but not on the left
-						 * side of an equation
-						 */
-
-						for (String key2 : e.getLeft().keySet()) {
-							Literal lit4 = new Literal(key2, key1, 's');
-
-							out.print(" -");
-							out.print(literals.get(lit4.toString()));
-							out.print(" ");
-
-						}
-						out.print(" 0 \n");
-
-						// end of outer if; key1 is not on the left, ask if it
-						// is on the right
-					} else if (e.getLeft().containsKey(key1)
-							&& !e.getRight().containsKey(key1)) {
-
-						/*
-						 * 
-						 * existential atom on the left but not on the right
-						 * side of equation
-						 */
-
-						for (String key3 : e.getRight().keySet()) {
-							Literal lit5 = new Literal(key3, key1, 's');
-
-							out.print(" -");
-							out.print(literals.get(lit5.toString()));
-							out.print(" ");
-
-						}
-						out.print(" 0 \n");
-
-					}
-				}
-
-			}
-			/*
-			 * 
-			 * Clauses created in Step 2.
-			 * 
-			 * 
-			 * Step 2.1
+			 * Step 1 for constants
 			 */
 
 			for (String key1 : goal.getConstants().keySet()) {
 
-				for (String key2 : goal.getConstants().keySet()) {
+				if (!e.getLeft().containsKey(key1)
+						&& !e.getRight().containsKey(key1)) {
 
-					if (!key2.equals("TOP") && (!key1.equals(key2))) {
+					/*
+					 * constant not in the equation
+					 * 
+					 * 
+					 * 
+					 * one side of an equation
+					 */
 
-						Literal lit = new Literal(key1, key2, 's');
+					for (String key3 : e.getRight().keySet()) {
+						for (String key2 : e.getLeft().keySet()) {
 
-						out.print(literals.get(lit.toString()));
+							Literal lit2 = new Literal(key2, key1, 's');
 
+							out.print(" -");
+							out.print(literals.get(lit2.toString()));
+							out.print(" ");
+
+						}
+
+						Literal lit3 = new Literal(key3, key1, 's');
+
+						out.print(" " + literals.get(lit3.toString()));
 						out.print(" 0 \n");
 
 					}
 
-				}
+					/*
+					 * another side of an equation
+					 */
 
+					for (String key2 : e.getLeft().keySet()) {
+						for (String key3 : e.getRight().keySet()) {
+
+							Literal lit2 = new Literal(key3, key1, 's');
+
+							out.print(" -");
+							out.print(literals.get(lit2.toString()));
+							out.print(" ");
+
+						}
+
+						Literal lit3 = new Literal(key2, key1, 's');
+
+						out.print(literals.get(lit3.toString()));
+						out.print(" 0 \n");
+
+					}
+
+				} else if (!e.getLeft().containsKey(key1)
+						&& e.getRight().containsKey(key1)) {
+
+					/*
+					 * constant of the right but not on the left
+					 */
+
+					for (String key2 : e.getLeft().keySet()) {
+						Literal lit4 = new Literal(key2, key1, 's');
+
+						out.print(" -");
+						out.print(literals.get(lit4.toString()));
+						out.print(" ");
+
+					}
+					out.print(" 0 \n");
+
+				} else if (e.getLeft().containsKey(key1)
+						&& !e.getRight().containsKey(key1)) {
+
+					/*
+					 * constant on the left but not on the right
+					 */
+
+					for (String key3 : e.getRight().keySet()) {
+						Literal lit5 = new Literal(key3, key1, 's');
+
+						out.print(" -");
+						out.print(literals.get(lit5.toString()));
+						out.print(" ");
+
+					}
+					out.print(" 0 \n");
+
+				}
 			}
 
 			/*
-			 * 
-			 * Step 2.2 and Step 2.3
+			 * Step 1 for existential atoms
 			 */
 
 			for (String key1 : goal.getEAtoms().keySet()) {
 
-				for (String key2 : goal.getEAtoms().keySet()) {
+				if (!e.getLeft().containsKey(key1)
+						&& !e.getRight().containsKey(key1)) {
 
-					if (!key1.equals(key2)) {
+					/*
+					 * atom not in the equation
+					 * 
+					 * one side of equation
+					 */
 
-						String role1 = goal.getEAtoms().get(key1).getName();
-						String role2 = goal.getEAtoms().get(key2).getName();
+					for (String key3 : e.getRight().keySet()) {
+						for (String key2 : e.getLeft().keySet()) {
 
-						/*
-						 * if roles are not equal, then Step 2.2
-						 */
+							Literal lit2 = new Literal(key2, key1, 's');
 
-						if (!role1.equals(role2)) {
-
-							Literal lit = new Literal(key1, key2, 's');
-
-							out.print(literals.get(lit.toString()));
-
-							out.print(" 0 \n");
-
-							/*
-							 * if the roles are equal, then clause in Step 2.3
-							 */
-						} else {
-
-							FAtom child1 = (FAtom) goal.getEAtoms().get(key1)
-									.getChild();
-							FAtom child2 = (FAtom) goal.getEAtoms().get(key2)
-									.getChild();
-
-							String child1name = child1.getName();
-							String child2name = child2.getName();
-
-							if (!child1name.equals(child2name)) {
-
-								Literal lit1 = new Literal(child1name,
-										child2name, 's');
-
-								Literal lit2 = new Literal(key1, key2, 's');
-
-								out.print(" -");
-								out.print(literals.get(lit1.toString()));
-								out.print(" ");
-
-								out.print(literals.get(lit2.toString()));
-								out.print(" ");
-
-								out.print(" 0 \n");
-
-							}
+							out.print(" -");
+							out.print(literals.get(lit2.toString()));
+							out.print(" ");
 
 						}
 
+						Literal lit3 = new Literal(key3, key1, 's');
+
+						out.print(literals.get(lit3.toString()));
+						out.print(" 0 \n");
+
 					}
 
-				}
+					/*
+					 * another side of the equation
+					 */
 
+					for (String key2 : e.getLeft().keySet()) {
+						for (String key3 : e.getRight().keySet()) {
+
+							Literal lit2 = new Literal(key3, key1, 's');
+
+							out.print(" -");
+							out.print(literals.get(lit2.toString()));
+							out.print(" ");
+						}
+
+						Literal lit3 = new Literal(key2, key1, 's');
+
+						out.print(literals.get(lit3.toString()));
+						out.print(" 0 \n");
+
+					}
+
+				} else if (!e.getLeft().containsKey(key1)
+						&& e.getRight().containsKey(key1)) {
+
+					/*
+					 * 
+					 * existential atom on the right but not on the left side of
+					 * an equation
+					 */
+
+					for (String key2 : e.getLeft().keySet()) {
+						Literal lit4 = new Literal(key2, key1, 's');
+
+						out.print(" -");
+						out.print(literals.get(lit4.toString()));
+						out.print(" ");
+
+					}
+					out.print(" 0 \n");
+
+					// end of outer if; key1 is not on the left, ask if it
+					// is on the right
+				} else if (e.getLeft().containsKey(key1)
+						&& !e.getRight().containsKey(key1)) {
+
+					/*
+					 * 
+					 * existential atom on the left but not on the right side of
+					 * equation
+					 */
+
+					for (String key3 : e.getRight().keySet()) {
+						Literal lit5 = new Literal(key3, key1, 's');
+
+						out.print(" -");
+						out.print(literals.get(lit5.toString()));
+						out.print(" ");
+
+					}
+					out.print(" 0 \n");
+
+				}
 			}
 
-			/*
-			 * 
-			 * Step 2.4
-			 */
+		}
+		/*
+		 * 
+		 * Clauses created in Step 2.
+		 * 
+		 * 
+		 * Step 2.1
+		 */
 
-			for (String key1 : goal.getConstants().keySet()) {
+		for (String key1 : goal.getConstants().keySet()) {
 
-				for (String key2 : goal.getEAtoms().keySet()) {
+			for (String key2 : goal.getConstants().keySet()) {
+
+				if (!key2.equals("TOP") && (!key1.equals(key2))) {
 
 					Literal lit = new Literal(key1, key2, 's');
 
@@ -391,11 +304,154 @@ public class Translator {
 
 					out.print(" 0 \n");
 
-					if (!key1.equals("TOP")) {
+				}
 
-						Literal lit1 = new Literal(key2, key1, 's');
+			}
 
+		}
+
+		/*
+		 * 
+		 * Step 2.2 and Step 2.3
+		 */
+
+		for (String key1 : goal.getEAtoms().keySet()) {
+
+			for (String key2 : goal.getEAtoms().keySet()) {
+
+				if (!key1.equals(key2)) {
+
+					String role1 = goal.getEAtoms().get(key1).getName();
+					String role2 = goal.getEAtoms().get(key2).getName();
+
+					/*
+					 * if roles are not equal, then Step 2.2
+					 */
+
+					if (!role1.equals(role2)) {
+
+						Literal lit = new Literal(key1, key2, 's');
+
+						out.print(literals.get(lit.toString()));
+
+						out.print(" 0 \n");
+
+						/*
+						 * if the roles are equal, then clause in Step 2.3
+						 */
+					} else {
+
+						FAtom child1 = (FAtom) goal.getEAtoms().get(key1)
+								.getChild();
+						FAtom child2 = (FAtom) goal.getEAtoms().get(key2)
+								.getChild();
+
+						String child1name = child1.getName();
+						String child2name = child2.getName();
+
+						if (!child1name.equals(child2name)) {
+
+							Literal lit1 = new Literal(child1name, child2name,
+									's');
+
+							Literal lit2 = new Literal(key1, key2, 's');
+
+							out.print(" -");
+							out.print(literals.get(lit1.toString()));
+							out.print(" ");
+
+							out.print(literals.get(lit2.toString()));
+							out.print(" ");
+
+							out.print(" 0 \n");
+
+						}
+
+					}
+
+				}
+
+			}
+
+		}
+
+		/*
+		 * 
+		 * Step 2.4
+		 */
+
+		for (String key1 : goal.getConstants().keySet()) {
+
+			for (String key2 : goal.getEAtoms().keySet()) {
+
+				Literal lit = new Literal(key1, key2, 's');
+
+				out.print(literals.get(lit.toString()));
+
+				out.print(" 0 \n");
+
+				if (!key1.equals("TOP")) {
+
+					Literal lit1 = new Literal(key2, key1, 's');
+
+					out.print(literals.get(lit1.toString()));
+
+					out.print(" 0 \n");
+
+				}
+
+			}
+
+		}
+
+		/*
+		 * Step 3.1
+		 * 
+		 * Reflexivity for order literals
+		 */
+		for (String key1 : goal.getVariables().keySet()) {
+
+			Literal lit = new Literal(key1, key1, 'o');
+
+			out.print(" -");
+			out.print(literals.get(lit.toString()));
+			out.print(" ");
+
+			out.print(" 0 \n");
+
+		}// end of clauses in step 2.5
+
+		/*
+		 * 
+		 * Step 3.1
+		 * 
+		 * Transitivity for order literals
+		 */
+
+		for (String key1 : goal.getVariables().keySet()) {
+
+			for (String key2 : goal.getVariables().keySet()) {
+
+				for (String key3 : goal.getVariables().keySet()) {
+
+					if (!key1.equals(key2) && !key2.equals(key3)) {
+
+						Literal lit1 = new Literal(key1, key2, 'o');
+
+						Literal lit2 = new Literal(key2, key3, 'o');
+
+						Literal lit3 = new Literal(key1, key3, 'o');
+
+						out.print(" -");
 						out.print(literals.get(lit1.toString()));
+						out.print(" ");
+
+						out.print(" -");
+						out.print(literals.get(lit2.toString()));
+						out.print(" ");
+
+						out.print(literals.get(lit3.toString()));
+						out.print(" ");
 
 						out.print(" 0 \n");
 
@@ -405,124 +461,34 @@ public class Translator {
 
 			}
 
-			/*
-			 * Step 3.1
-			 * 
-			 * Reflexivity for order literals
-			 */
-			for (String key1 : goal.getVariables().keySet()) {
+		}
 
-				Literal lit = new Literal(key1, key1, 'o');
+		/*
+		 * 
+		 * Step 2.5
+		 * 
+		 * Transitivity of dis-subsumption
+		 */
 
-				out.print(" -");
-				out.print(literals.get(lit.toString()));
-				out.print(" ");
+		for (String key1 : goal.getAllAtoms().keySet()) {
 
-				out.print(" 0 \n");
+			for (String key2 : goal.getAllAtoms().keySet()) {
 
-			}// end of clauses in step 2.5
+				for (String key3 : goal.getAllAtoms().keySet()) {
 
-			/*
-			 * 
-			 * Step 3.1
-			 * 
-			 * Transitivity for order literals
-			 */
+					if (!key1.equals(key2) && !key1.equals(key3)
+							&& !key2.equals(key3)) {
 
-			for (String key1 : goal.getVariables().keySet()) {
+						Literal lit1 = new Literal(key1, key2, 's');
 
-				for (String key2 : goal.getVariables().keySet()) {
+						Literal lit2 = new Literal(key2, key3, 's');
 
-					for (String key3 : goal.getVariables().keySet()) {
+						Literal lit3 = new Literal(key1, key3, 's');
 
-						if (!key1.equals(key2) && !key2.equals(key3)) {
+						out.print(" -");
+						out.print(literals.get(lit3.toString()));
+						out.print(" ");
 
-							Literal lit1 = new Literal(key1, key2, 'o');
-
-							Literal lit2 = new Literal(key2, key3, 'o');
-
-							Literal lit3 = new Literal(key1, key3, 'o');
-
-							out.print(" -");
-							out.print(literals.get(lit1.toString()));
-							out.print(" ");
-
-							out.print(" -");
-							out.print(literals.get(lit2.toString()));
-							out.print(" ");
-
-							out.print(literals.get(lit3.toString()));
-							out.print(" ");
-
-							out.print(" 0 \n");
-
-						}
-
-					}
-
-				}
-
-			}
-
-			/*
-			 * 
-			 * Step 2.5
-			 * 
-			 * Transitivity of dis-subsumption
-			 */
-
-			for (String key1 : goal.getAllAtoms().keySet()) {
-
-				for (String key2 : goal.getAllAtoms().keySet()) {
-
-					for (String key3 : goal.getAllAtoms().keySet()) {
-
-						if (!key1.equals(key2) && !key1.equals(key3)
-								&& !key2.equals(key3)) {
-
-							Literal lit1 = new Literal(key1, key2, 's');
-
-							Literal lit2 = new Literal(key2, key3, 's');
-
-							Literal lit3 = new Literal(key1, key3, 's');
-
-							out.print(" -");
-							out.print(literals.get(lit3.toString()));
-							out.print(" ");
-
-							out.print(literals.get(lit1.toString()));
-							out.print(" ");
-
-							out.print(literals.get(lit2.toString()));
-							out.print(" ");
-
-							out.print(" 0 \n");
-
-						}
-
-					}
-				}
-			}
-
-			/*
-			 * 
-			 * Step 3.2 Disjunction between order literals and dis-subsumption
-			 */
-
-			for (String key1 : goal.getEAtoms().keySet()) {
-
-				FAtom eatom = (FAtom) goal.getEAtoms().get(key1);
-				FAtom child = (FAtom) eatom.getChild();
-
-				if (child.isVar()) {
-
-					for (String key2 : goal.getVariables().keySet()) {
-
-						Literal lit1 = new Literal(key2, child.getName(), 'o');
-
-						Literal lit2 = new Literal(key2, key1, 's');
-
-						// out.print(" -");
 						out.print(literals.get(lit1.toString()));
 						out.print(" ");
 
@@ -534,17 +500,45 @@ public class Translator {
 					}
 
 				}
+			}
+		}
+
+		/*
+		 * 
+		 * Step 3.2 Disjunction between order literals and dis-subsumption
+		 */
+
+		for (String key1 : goal.getEAtoms().keySet()) {
+
+			FAtom eatom = (FAtom) goal.getEAtoms().get(key1);
+			FAtom child = (FAtom) eatom.getChild();
+
+			if (child.isVar()) {
+
+				for (String key2 : goal.getVariables().keySet()) {
+
+					Literal lit1 = new Literal(key2, child.getName(), 'o');
+
+					Literal lit2 = new Literal(key2, key1, 's');
+
+					// out.print(" -");
+					out.print(literals.get(lit1.toString()));
+					out.print(" ");
+
+					out.print(literals.get(lit2.toString()));
+					out.print(" ");
+
+					out.print(" 0 \n");
+
+				}
 
 			}
 
-			out.flush();
-
-			out.close();
-
-		} catch (Exception ex) {
-			ex.printStackTrace();
-
 		}
+
+		out.flush();
+
+		out.close();
 
 	}
 
@@ -613,149 +607,142 @@ public class Translator {
 	 * 
 	 * @param outfile
 	 * @param result
+	 * @throws IOException
 	 * @return
 	 */
-	public boolean toTBox(Reader outfile, Writer result) {
+	public boolean toTBox(Reader outfile, Writer result) throws IOException {
 
 		Pattern answer = Pattern.compile("^SAT");
 		Matcher manswer;
 		String line;
 		boolean response = false;
 
-		try {
-			BufferedReader reader = new BufferedReader(outfile);
+		BufferedReader reader = new BufferedReader(outfile);
+
+		line = reader.readLine();
+
+		manswer = answer.matcher(line);
+
+		/*
+		 * if SAT is in the beginning of the file
+		 */
+		if (manswer.find()) {
+
+			response = true;
+
+			Pattern sign = Pattern.compile("^-");
+			Matcher msign;
 
 			line = reader.readLine();
+			StringTokenizer st = new StringTokenizer(line);
 
-			manswer = answer.matcher(line);
+			StringBuilder token;
 
-			/*
-			 * if SAT is in the beginning of the file
-			 */
-			if (manswer.find()) {
+			while (st.hasMoreTokens()) {
 
-				response = true;
+				token = new StringBuilder(st.nextToken());
+				msign = sign.matcher(token);
 
-				Pattern sign = Pattern.compile("^-");
-				Matcher msign;
+				if (msign.find()) {
 
-				line = reader.readLine();
-				StringTokenizer st = new StringTokenizer(line);
+					token = token.delete(0, msign.end());
 
-				StringBuilder token;
+					Integer i = Integer.parseInt(token.toString());
 
-				while (st.hasMoreTokens()) {
+					Literal literal = (Literal) identifiers.get(i);
 
-					token = new StringBuilder(st.nextToken());
-					msign = sign.matcher(token);
-
-					if (msign.find()) {
-
-						token = token.delete(0, msign.end());
-
-						Integer i = Integer.parseInt(token.toString());
-
-						Literal literal = (Literal) identifiers.get(i);
-
-						literal.setValue(true);
-
-					}
+					literal.setValue(true);
 
 				}
-
-				/*
-				 * Define S_X for each variable X
-				 */
-
-				for (Integer i : identifiers.keySet()) {
-
-					String name1 = identifiers.get(i).getFirst();
-					String name2 = identifiers.get(i).getSecond();
-
-					if (identifiers.get(i).getValue()
-							&& identifiers.get(i).getKind() == 's') {
-
-						if (goal.getVariables().containsKey(name1)) {
-							if (goal.getConstants().containsKey(name2)) {
-
-								goal.getVariables()
-										.get(name1)
-										.addToS((FAtom) goal.getConstants()
-												.get(name2));
-
-								if (!goal.getVariables().get(name1).isSys()) {
-									update.append(i + " ");
-								}
-
-							} else if (goal.getEAtoms().containsKey(name2)) {
-
-								goal.getVariables()
-										.get(name1)
-										.addToS((FAtom) goal.getEAtoms().get(
-												name2));
-
-								if (!goal.getVariables().get(name1).isSys()) {
-									update.append(i + " ");
-								}
-							}
-						}
-
-					} else if (identifiers.get(i).getKind() == 's') {
-
-						if (goal.getVariables().containsKey(name1)
-								&& !goal.getVariables().get(name1).isSys()) {
-							if (goal.getConstants().containsKey(name2)) {
-
-								// goal.variables.get(name1).addToS((Atom)
-								// goal.constants.get(name2));
-
-								update.append("-" + i + " ");
-
-							} else if (goal.getEAtoms().containsKey(name2)) {
-
-								// goal.variables.get(name1).addToS((Atom)
-								// goal.eatoms.get(name2));
-
-								update.append("-" + i + " ");
-							}
-						}
-
-					}
-
-				}
-
-				PrintWriter out = new PrintWriter(new BufferedWriter(result));
-
-				out.println("UNIFIABLE:");
-				out.println("Unifier: ");
-
-				for (String variable : goal.getVariables().keySet()) {
-
-					if (!goal.getVariables().get(variable).isSys()) {
-						out.print("(define-concept ");
-						out.print(variable + " ");
-
-						goal.getVariables().get(variable).printS(out);
-						out.println(" ) ");
-					}
-				}
-
-				out.println("-------------------------------------");
-				out.close();
-
-			} else {
-
-				PrintWriter out = new PrintWriter(new BufferedWriter(result));
-
-				out.println("NOT UNIFIABLE");
-
-				out.close();
 
 			}
 
-		} catch (Exception ex) {
+			/*
+			 * Define S_X for each variable X
+			 */
 
-			ex.printStackTrace();
+			for (Integer i : identifiers.keySet()) {
+
+				String name1 = identifiers.get(i).getFirst();
+				String name2 = identifiers.get(i).getSecond();
+
+				if (identifiers.get(i).getValue()
+						&& identifiers.get(i).getKind() == 's') {
+
+					if (goal.getVariables().containsKey(name1)) {
+						if (goal.getConstants().containsKey(name2)) {
+
+							goal.getVariables()
+									.get(name1)
+									.addToS((FAtom) goal.getConstants().get(
+											name2));
+
+							if (!goal.getVariables().get(name1).isSys()) {
+								update.append(i + " ");
+							}
+
+						} else if (goal.getEAtoms().containsKey(name2)) {
+
+							goal.getVariables()
+									.get(name1)
+									.addToS((FAtom) goal.getEAtoms().get(name2));
+
+							if (!goal.getVariables().get(name1).isSys()) {
+								update.append(i + " ");
+							}
+						}
+					}
+
+				} else if (identifiers.get(i).getKind() == 's') {
+
+					if (goal.getVariables().containsKey(name1)
+							&& !goal.getVariables().get(name1).isSys()) {
+						if (goal.getConstants().containsKey(name2)) {
+
+							// goal.variables.get(name1).addToS((Atom)
+							// goal.constants.get(name2));
+
+							update.append("-" + i + " ");
+
+						} else if (goal.getEAtoms().containsKey(name2)) {
+
+							// goal.variables.get(name1).addToS((Atom)
+							// goal.eatoms.get(name2));
+
+							update.append("-" + i + " ");
+						}
+					}
+
+				}
+
+			}
+
+			PrintWriter out = new PrintWriter(new BufferedWriter(result));
+
+			out.println("UNIFIABLE:");
+			out.println("Unifier: ");
+
+			for (String variable : goal.getVariables().keySet()) {
+
+				if (!goal.getVariables().get(variable).isSys()) {
+					out.print("(define-concept ");
+					out.print(variable + " ");
+
+					goal.getVariables().get(variable).printS(out);
+					out.println(" ) ");
+				}
+			}
+
+			out.println("-------------------------------------");
+			out.close();
+
+		} else {
+
+			PrintWriter out = new PrintWriter(new BufferedWriter(result));
+
+			out.println("NOT UNIFIABLE");
+
+			out.close();
 
 		}
 
@@ -768,133 +755,126 @@ public class Translator {
 	 * Instead it appends a unifier to the existing file <result>
 	 */
 
-	public boolean toTBoxB(Reader outfile, Writer result, int numberofsolutions) {
+	public boolean toTBoxB(Reader outfile, Writer result, int numberofsolutions)
+			throws IOException {
 
 		Pattern answer = Pattern.compile("^SAT");
 		Matcher manswer;
 		String line;
 		boolean response = false;
 
-		try {
-			BufferedReader reader = new BufferedReader(outfile);
+		BufferedReader reader = new BufferedReader(outfile);
+
+		line = reader.readLine();
+
+		manswer = answer.matcher(line);
+
+		if (manswer.find()) {
+
+			response = true;
+
+			Pattern sign = Pattern.compile("^-");
+			Matcher msign;
 
 			line = reader.readLine();
+			StringTokenizer st = new StringTokenizer(line);
 
-			manswer = answer.matcher(line);
+			StringBuilder token;
 
-			if (manswer.find()) {
+			while (st.hasMoreTokens()) {
 
-				response = true;
+				token = new StringBuilder(st.nextToken());
+				msign = sign.matcher(token);
 
-				Pattern sign = Pattern.compile("^-");
-				Matcher msign;
+				if (msign.find()) {
 
-				line = reader.readLine();
-				StringTokenizer st = new StringTokenizer(line);
+					token = token.delete(0, msign.end());
 
-				StringBuilder token;
+					Integer i = Integer.parseInt(token.toString());
 
-				while (st.hasMoreTokens()) {
+					Literal literal = (Literal) identifiers.get(i);
 
-					token = new StringBuilder(st.nextToken());
-					msign = sign.matcher(token);
-
-					if (msign.find()) {
-
-						token = token.delete(0, msign.end());
-
-						Integer i = Integer.parseInt(token.toString());
-
-						Literal literal = (Literal) identifiers.get(i);
-
-						literal.setValue(true);
-
-					}
+					literal.setValue(true);
 
 				}
-
-				for (Integer i : identifiers.keySet()) {
-
-					String name1 = identifiers.get(i).getFirst();
-					String name2 = identifiers.get(i).getSecond();
-
-					if (identifiers.get(i).getValue()
-							&& identifiers.get(i).getKind() == 's') {
-
-						if (goal.getVariables().containsKey(name1)) {
-							if (goal.getConstants().containsKey(name2)) {
-
-								goal.getVariables()
-										.get(name1)
-										.addToS((FAtom) goal.getConstants()
-												.get(name2));
-
-								if (!goal.getVariables().get(name1).isSys()) {
-									update.append(i + " ");
-								}
-
-							} else if (goal.getEAtoms().containsKey(name2)) {
-
-								goal.getVariables()
-										.get(name1)
-										.addToS((FAtom) goal.getEAtoms().get(
-												name2));
-
-								if (!goal.getVariables().get(name1).isSys()) {
-									update.append(i + " ");
-								}
-							}
-						}
-
-					} else if (identifiers.get(i).getKind() == 's') {
-
-						if (goal.getVariables().containsKey(name1)
-								&& !goal.getVariables().get(name1).isSys()) {
-							if (goal.getConstants().containsKey(name2)) {
-
-								update.append("-" + i + " ");
-
-							} else if (goal.getEAtoms().containsKey(name2)) {
-
-								update.append("-" + i + " ");
-							}
-						}
-
-					}
-
-				}
-
-				PrintWriter out = new PrintWriter(new BufferedWriter(result));
-
-				out.println(numberofsolutions + " UNIFIER: ");
-
-				for (String variable : goal.getVariables().keySet()) {
-
-					if (!goal.getVariables().get(variable).isSys()) {
-						out.print("(define-concept ");
-						out.print(variable + " ");
-
-						goal.getVariables().get(variable).printS(out);
-						out.println(" ) ");
-					}
-				}
-
-				out.println("---------------------------------------");
-				out.close();
-
-			} else {
-
-				PrintWriter out = new PrintWriter(new BufferedWriter(result));
-
-				out.println("NO MORE UNIFIERS");
-
-				out.close();
 
 			}
 
-		} catch (Exception ex) {
+			for (Integer i : identifiers.keySet()) {
 
-			ex.printStackTrace();
+				String name1 = identifiers.get(i).getFirst();
+				String name2 = identifiers.get(i).getSecond();
+
+				if (identifiers.get(i).getValue()
+						&& identifiers.get(i).getKind() == 's') {
+
+					if (goal.getVariables().containsKey(name1)) {
+						if (goal.getConstants().containsKey(name2)) {
+
+							goal.getVariables()
+									.get(name1)
+									.addToS((FAtom) goal.getConstants().get(
+											name2));
+
+							if (!goal.getVariables().get(name1).isSys()) {
+								update.append(i + " ");
+							}
+
+						} else if (goal.getEAtoms().containsKey(name2)) {
+
+							goal.getVariables()
+									.get(name1)
+									.addToS((FAtom) goal.getEAtoms().get(name2));
+
+							if (!goal.getVariables().get(name1).isSys()) {
+								update.append(i + " ");
+							}
+						}
+					}
+
+				} else if (identifiers.get(i).getKind() == 's') {
+
+					if (goal.getVariables().containsKey(name1)
+							&& !goal.getVariables().get(name1).isSys()) {
+						if (goal.getConstants().containsKey(name2)) {
+
+							update.append("-" + i + " ");
+
+						} else if (goal.getEAtoms().containsKey(name2)) {
+
+							update.append("-" + i + " ");
+						}
+					}
+
+				}
+
+			}
+
+			PrintWriter out = new PrintWriter(new BufferedWriter(result));
+
+			out.println(numberofsolutions + " UNIFIER: ");
+
+			for (String variable : goal.getVariables().keySet()) {
+
+				if (!goal.getVariables().get(variable).isSys()) {
+					out.print("(define-concept ");
+					out.print(variable + " ");
+
+					goal.getVariables().get(variable).printS(out);
+					out.println(" ) ");
+				}
+			}
+
+			out.println("---------------------------------------");
+			out.close();
+
+		} else {
+
+			PrintWriter out = new PrintWriter(new BufferedWriter(result));
+
+			out.println("NO MORE UNIFIERS");
+
+			out.close();
 
 		}
 
@@ -906,108 +886,101 @@ public class Translator {
 	 * This method is the same as toTBox, but does not write a unifier to file
 	 * <result>
 	 */
-	public boolean toTBox(Reader outfile) {
+	public boolean toTBox(Reader outfile) throws IOException {
 
 		Pattern answer = Pattern.compile("^SAT");
 		Matcher manswer;
 		String line;
 		boolean response = false;
 
-		try {
-			BufferedReader reader = new BufferedReader(outfile);
+		BufferedReader reader = new BufferedReader(outfile);
+
+		line = reader.readLine();
+
+		manswer = answer.matcher(line);
+
+		if (manswer.find()) {
+
+			response = true;
+
+			Pattern sign = Pattern.compile("^-");
+			Matcher msign;
 
 			line = reader.readLine();
 
-			manswer = answer.matcher(line);
+			StringTokenizer st = new StringTokenizer(line);
 
-			if (manswer.find()) {
+			StringBuilder token;
 
-				response = true;
+			while (st.hasMoreTokens()) {
 
-				Pattern sign = Pattern.compile("^-");
-				Matcher msign;
+				token = new StringBuilder(st.nextToken());
+				msign = sign.matcher(token);
 
-				line = reader.readLine();
+				if (msign.find()) {
 
-				StringTokenizer st = new StringTokenizer(line);
+					token = token.delete(0, msign.end());
 
-				StringBuilder token;
+					Integer i = Integer.parseInt(token.toString());
 
-				while (st.hasMoreTokens()) {
+					Literal literal = (Literal) identifiers.get(i);
 
-					token = new StringBuilder(st.nextToken());
-					msign = sign.matcher(token);
-
-					if (msign.find()) {
-
-						token = token.delete(0, msign.end());
-
-						Integer i = Integer.parseInt(token.toString());
-
-						Literal literal = (Literal) identifiers.get(i);
-
-						literal.setValue(true);
-
-					}
+					literal.setValue(true);
 
 				}
 
-				for (Integer i : identifiers.keySet()) {
+			}
 
-					String name1 = identifiers.get(i).getFirst();
-					String name2 = identifiers.get(i).getSecond();
+			for (Integer i : identifiers.keySet()) {
 
-					if (identifiers.get(i).getValue()
-							&& identifiers.get(i).getKind() == 's') {
+				String name1 = identifiers.get(i).getFirst();
+				String name2 = identifiers.get(i).getSecond();
 
-						if (goal.getVariables().containsKey(name1)) {
-							if (goal.getConstants().containsKey(name2)) {
+				if (identifiers.get(i).getValue()
+						&& identifiers.get(i).getKind() == 's') {
 
-								goal.getVariables()
-										.get(name1)
-										.addToS((FAtom) goal.getConstants()
-												.get(name2));
+					if (goal.getVariables().containsKey(name1)) {
+						if (goal.getConstants().containsKey(name2)) {
 
-								if (!goal.getVariables().get(name1).isSys()) {
-									update.append(i + " ");
-								}
+							goal.getVariables()
+									.get(name1)
+									.addToS((FAtom) goal.getConstants().get(
+											name2));
 
-							} else if (goal.getEAtoms().containsKey(name2)) {
+							if (!goal.getVariables().get(name1).isSys()) {
+								update.append(i + " ");
+							}
 
-								goal.getVariables()
-										.get(name1)
-										.addToS((FAtom) goal.getEAtoms().get(
-												name2));
+						} else if (goal.getEAtoms().containsKey(name2)) {
 
-								if (!goal.getVariables().get(name1).isSys()) {
-									update.append(i + " ");
-								}
+							goal.getVariables()
+									.get(name1)
+									.addToS((FAtom) goal.getEAtoms().get(name2));
+
+							if (!goal.getVariables().get(name1).isSys()) {
+								update.append(i + " ");
 							}
 						}
+					}
 
-					} else if (identifiers.get(i).getKind() == 's') {
+				} else if (identifiers.get(i).getKind() == 's') {
 
-						if (goal.getVariables().containsKey(name1)
-								&& !goal.getVariables().get(name1).isSys()) {
-							if (goal.getConstants().containsKey(name2)) {
+					if (goal.getVariables().containsKey(name1)
+							&& !goal.getVariables().get(name1).isSys()) {
+						if (goal.getConstants().containsKey(name2)) {
 
-								update.append("-" + i + " ");
+							update.append("-" + i + " ");
 
-							} else if (goal.getEAtoms().containsKey(name2)) {
+						} else if (goal.getEAtoms().containsKey(name2)) {
 
-								update.append("-" + i + " ");
-							}
+							update.append("-" + i + " ");
 						}
-
 					}
 
 				}
 
 			}
 
-		} catch (Exception ex) {
-
-			ex.printStackTrace();
 		}
 
 		return response;

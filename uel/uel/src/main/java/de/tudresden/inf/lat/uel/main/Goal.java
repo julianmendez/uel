@@ -1,6 +1,7 @@
 package de.tudresden.inf.lat.uel.main;
 
 import java.io.BufferedWriter;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.Writer;
@@ -80,19 +81,19 @@ public class Goal {
 	 *            file name
 	 * @param unifier
 	 *            unifier
-	 * @throws Exception
+	 * @throws IOException
 	 */
-	public void initialize(Reader input) throws Exception {
+	public void initialize(Reader input) throws IOException {
 		initialize(input, false, null);
 	}
 
 	public void initializeWithTest(Reader input, Writer output)
-			throws Exception {
+			throws IOException {
 		initialize(input, true, output);
 	}
 
 	private void initialize(Reader input, boolean test, Writer output)
-			throws Exception {
+			throws IOException {
 
 		readerAndParser.read(input, this);
 
@@ -142,9 +143,8 @@ public class Goal {
 	 * 
 	 * @param concept
 	 *            concept
-	 * @throws Exception
 	 */
-	public void importDefinition(Atom concept) throws Exception {
+	public void importDefinition(Atom concept) {
 		if (ontology.getDefinitions().containsKey(concept.toString())
 				&& !variables.containsKey(concept.toString())) {
 
@@ -161,9 +161,8 @@ public class Goal {
 	 * 
 	 * @param e
 	 *            equation that needs to be flattened
-	 * @throws Exception
 	 */
-	public void addFlatten(Equation e) throws Exception {
+	public void addFlatten(Equation e) {
 
 		FAtom a;
 		Atom b = null;
@@ -337,7 +336,7 @@ public class Goal {
 	 * all equations of the goal.
 	 * 
 	 */
-	public void printGoal() throws Exception {
+	public void printGoal() {
 
 		int i = 0;
 

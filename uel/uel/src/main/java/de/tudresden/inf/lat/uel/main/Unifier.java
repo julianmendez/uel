@@ -58,6 +58,20 @@ public class Unifier {
 
 	}
 
+	private void runMiniSat(File satinput, File satoutput) throws IOException {
+		try {
+			ProcessBuilder pb = new ProcessBuilder("MiniSat",
+					satinput.toString(), satoutput.toString());
+			Process p = pb.start();
+
+			p.waitFor();
+
+			p.destroy();
+		} catch (InterruptedException e) {
+			throw new IOException(e);
+		}
+	}
+
 	/**
 	 * This method is the basic unification procedure. It returns true if the
 	 * goal is unifiable and false otherwise.
@@ -74,19 +88,12 @@ public class Unifier {
 	 * @throws InterruptedException
 	 * 
 	 */
-
 	private boolean unify(Translator translator, File satinput, File satoutput,
-			File result) throws IOException, InterruptedException {
+			File result) throws IOException {
 
 		translator.toDIMACS(new FileWriter(satinput));
 
-		ProcessBuilder pb = new ProcessBuilder("MiniSat", satinput.toString(),
-				satoutput.toString());
-		Process p = pb.start();
-
-		p.waitFor();
-
-		p.destroy();
+		runMiniSat(satinput, satoutput);
 
 		boolean response = translator.toTBox(new FileReader(satoutput),
 				new FileWriter(result));
@@ -116,9 +123,10 @@ public class Unifier {
 	 * 
 	 * @param goal
 	 *            goal
-	 * @throws Exception
+	 * @throws InterruptedException
+	 * @throws IOException
 	 */
-	public void unifySimple(Goal goal) throws Exception {
+	public void unifySimple(Goal goal) throws IOException {
 
 		File satinput = File.createTempFile(tempPrefix, tempSuffix);
 		File satoutput = File.createTempFile(tempPrefix, tempSuffix);
@@ -164,7 +172,7 @@ public class Unifier {
 	 *            goal
 	 * @throws Exception
 	 */
-	public void unifyX(Goal goal) throws Exception {
+	public void unifyX(Goal goal) throws IOException {
 
 		File satinput = File.createTempFile(tempPrefix, tempSuffix);
 		File satoutput = File.createTempFile(tempPrefix, tempSuffix);
@@ -194,13 +202,7 @@ public class Unifier {
 
 				satout.close();
 
-				ProcessBuilder pb = new ProcessBuilder("MiniSat",
-						satinput.toString(), satoutput.toString());
-				Process p = pb.start();
-
-				p.waitFor();
-
-				p.destroy();
+				runMiniSat(satinput, satoutput);
 
 				translator.reset();
 				unifiable = translator.toTBoxB(new FileReader(satoutput),
@@ -257,7 +259,7 @@ public class Unifier {
 	 * @throws Exception
 	 */
 
-	public void unifyA(Goal goal) throws Exception {
+	public void unifyA(Goal goal) throws IOException {
 
 		File satinput = File.createTempFile(tempPrefix, tempSuffix);
 		File satoutput = File.createTempFile(tempPrefix, tempSuffix);
@@ -288,13 +290,7 @@ public class Unifier {
 
 				satout.close();
 
-				ProcessBuilder pb = new ProcessBuilder("MiniSat",
-						satinput.toString(), satoutput.toString());
-				Process p = pb.start();
-
-				p.waitFor();
-
-				p.destroy();
+				runMiniSat(satinput, satoutput);
 
 				translator.reset();
 				unifiable = translator.toTBoxB(new FileReader(satoutput),
@@ -342,7 +338,7 @@ public class Unifier {
 	 *            goal
 	 * @throws Exception
 	 */
-	public void unify0(Goal goal) throws Exception {
+	public void unify0(Goal goal) throws IOException {
 
 		File satinput = File.createTempFile(tempPrefix, tempSuffix);
 		File satoutput = File.createTempFile(tempPrefix, tempSuffix);
@@ -351,13 +347,7 @@ public class Unifier {
 
 		translator.toDIMACS(new FileWriter(satinput));
 
-		ProcessBuilder pb = new ProcessBuilder("MiniSat", satinput.toString(),
-				satoutput.toString());
-		Process p = pb.start();
-
-		p.waitFor();
-
-		p.destroy();
+		runMiniSat(satinput, satoutput);
 
 		Pattern answer = Pattern.compile("^SAT");
 		Matcher manswer;
@@ -405,7 +395,7 @@ public class Unifier {
 	 *            goal
 	 * @throws Exception
 	 */
-	public void unifyInt(Goal goal, int max) throws Exception {
+	public void unifyInt(Goal goal, int max) throws IOException {
 
 		File satinput = File.createTempFile(tempPrefix, tempSuffix);
 		File satoutput = File.createTempFile(tempPrefix, tempSuffix);
@@ -438,13 +428,7 @@ public class Unifier {
 
 				satout.close();
 
-				ProcessBuilder pb = new ProcessBuilder("MiniSat",
-						satinput.toString(), satoutput.toString());
-				Process p = pb.start();
-
-				p.waitFor();
-
-				p.destroy();
+				runMiniSat(satinput, satoutput);
 
 				translator.reset();
 				unifiable = translator.toTBoxB(new FileReader(satoutput),
@@ -498,7 +482,7 @@ public class Unifier {
 	 *            goal
 	 * @throws Exception
 	 */
-	public void unifyN(Goal goal) throws Exception {
+	public void unifyN(Goal goal) throws IOException {
 		Translator translator = new Translator(goal);
 
 		boolean unifiable = true;
@@ -514,13 +498,7 @@ public class Unifier {
 
 		while (unifiable) {
 
-			ProcessBuilder pb = new ProcessBuilder("MiniSat",
-					satinput.toString(), satoutput.toString());
-			Process p = pb.start();
-
-			p.waitFor();
-
-			p.destroy();
+			runMiniSat(satinput, satoutput);
 
 			if (translator.toTBox(new FileReader(satoutput))) {
 

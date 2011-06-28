@@ -1,6 +1,7 @@
 package de.tudresden.inf.lat.uel.parser;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.Reader;
 import java.io.StreamTokenizer;
 import java.util.HashMap;
@@ -39,11 +40,10 @@ public class ReaderAndParser {
 	 * from two definitions, and one equations between the concepts defined in
 	 * the input.
 	 * 
-	 * 
-	 * 
+	 * @throws IOException
 	 */
 
-	public void read(Reader input, Goal goal) throws Exception {
+	public void read(Reader input, Goal goal) throws IOException {
 
 		Equation equation;
 
@@ -252,7 +252,7 @@ public class ReaderAndParser {
 	 * Parse method Parsing right side of a definition
 	 */
 
-	private HashMap<String, Atom> parse() throws Exception {
+	private HashMap<String, Atom> parse() throws IOException {
 
 		HashMap<String, Atom> result = new HashMap<String, Atom>();
 		Atom a;

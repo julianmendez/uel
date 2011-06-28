@@ -97,10 +97,8 @@ public class Equation {
 	/**
 	 * This method is defined for testing purposes only. It is used by printing
 	 * method of Goal.
-	 * 
-	 * @throws Exception
 	 */
-	public void printEquation() throws Exception {
+	public void printEquation() {
 
 		if (left != null && right != null) {
 
