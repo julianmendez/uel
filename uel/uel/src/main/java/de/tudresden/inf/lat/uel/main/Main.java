@@ -1,6 +1,7 @@
 package de.tudresden.inf.lat.uel.main;
 
 import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.logging.Level;
@@ -62,7 +63,8 @@ public class Main {
 
 			if (args.length == 3) {
 
-				ontology.loadOntology(args[2]);
+				ontology.loadOntology(new InputStreamReader(
+						new FileInputStream(args[2])));
 
 			}
 
@@ -121,7 +123,8 @@ public class Main {
 
 		} else if (args.length == 2 && !args[0].startsWith("-")) {
 
-			ontology.loadOntology(args[1]);
+			ontology.loadOntology(new InputStreamReader(new FileInputStream(
+					args[1])));
 
 			goal.initialize(args[0], unifier);
 			unifier.setFileName(args[0]);

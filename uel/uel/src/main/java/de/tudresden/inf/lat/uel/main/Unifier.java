@@ -75,7 +75,7 @@ public class Unifier {
 	private boolean unify(Translator translator, File satinput, File satoutput,
 			File result) throws IOException, InterruptedException {
 
-		translator.toDIMACS(satinput);
+		translator.toDIMACS(new FileWriter(satinput));
 
 		ProcessBuilder pb = new ProcessBuilder("MiniSat", satinput.toString(),
 				satoutput.toString());
@@ -85,7 +85,8 @@ public class Unifier {
 
 		p.destroy();
 
-		boolean response = translator.toTBox(satoutput, result);
+		boolean response = translator.toTBox(new FileReader(satoutput),
+				new FileWriter(result, true));
 
 		return response;
 
@@ -197,8 +198,8 @@ public class Unifier {
 				p.destroy();
 
 				translator.reset();
-				unifiable = translator.toTBoxB(satoutput, result,
-						numberofsolutions);
+				unifiable = translator.toTBoxB(new FileReader(satoutput),
+						new FileWriter(result, true), numberofsolutions);
 
 				if (unifiable) {
 
@@ -290,8 +291,8 @@ public class Unifier {
 				p.destroy();
 
 				translator.reset();
-				unifiable = translator.toTBoxB(satoutput, result,
-						numberofsolutions);
+				unifiable = translator.toTBoxB(new FileReader(satoutput),
+						new FileWriter(result, true), numberofsolutions);
 
 				if (unifiable) {
 
@@ -342,7 +343,7 @@ public class Unifier {
 
 		Translator translator = new Translator(goal);
 
-		translator.toDIMACS(satinput);
+		translator.toDIMACS(new FileWriter(satinput));
 
 		ProcessBuilder pb = new ProcessBuilder("MiniSat", satinput.toString(),
 				satoutput.toString());
@@ -439,8 +440,8 @@ public class Unifier {
 				p.destroy();
 
 				translator.reset();
-				unifiable = translator.toTBoxB(satoutput, result,
-						numberofsolutions);
+				unifiable = translator.toTBoxB(new FileReader(satoutput),
+						new FileWriter(result, true), numberofsolutions);
 
 				if (unifiable) {
 
@@ -502,7 +503,7 @@ public class Unifier {
 
 		File satoutput = new File(filename.concat(".out"));
 
-		translator.toDIMACS(satinput);
+		translator.toDIMACS(new FileWriter(satinput));
 
 		while (unifiable) {
 
@@ -514,7 +515,7 @@ public class Unifier {
 
 			p.destroy();
 
-			if (translator.toTBox(satoutput)) {
+			if (translator.toTBox(new FileReader(satoutput))) {
 
 				message = true;
 				numberofsolutions++;

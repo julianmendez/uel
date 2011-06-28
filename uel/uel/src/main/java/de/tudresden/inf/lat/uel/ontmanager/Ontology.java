@@ -1,9 +1,6 @@
 package de.tudresden.inf.lat.uel.ontmanager;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StreamTokenizer;
 import java.util.HashMap;
@@ -53,15 +50,13 @@ public class Ontology {
 	 * 
 	 */
 
-	public void loadOntology(String filename) throws Exception {
+	public void loadOntology(Reader input) throws Exception {
 
 		/*
 		 * open file
 		 */
 
-		FileInputStream database = new FileInputStream(new File(filename));
-
-		Reader reader = new BufferedReader(new InputStreamReader(database));
+		Reader reader = new BufferedReader(input);
 
 		str = new StreamTokenizer(reader);
 		str.ordinaryChar('(');
@@ -389,7 +384,7 @@ public class Ontology {
 		return result;
 
 	}
-	
+
 	public HashMap<String, Equation> getDefinitions() {
 		return definitions;
 	}

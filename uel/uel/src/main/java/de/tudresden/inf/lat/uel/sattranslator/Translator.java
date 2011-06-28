@@ -2,10 +2,9 @@ package de.tudresden.inf.lat.uel.sattranslator;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.PrintWriter;
+import java.io.Reader;
+import java.io.Writer;
 import java.util.HashMap;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
@@ -79,14 +78,13 @@ public class Translator {
 	 * 
 	 * @param infile
 	 */
-	public void toDIMACS(File infile) {
+	public void toDIMACS(Writer infile) {
 
 		setLiterals();
 
 		try {
 
-			PrintWriter out = new PrintWriter(new BufferedWriter(
-					new FileWriter(infile)));
+			PrintWriter out = new PrintWriter(new BufferedWriter(infile));
 
 			/*
 			 * 
@@ -617,7 +615,7 @@ public class Translator {
 	 * @param result
 	 * @return
 	 */
-	public boolean toTBox(File outfile, File result) {
+	public boolean toTBox(Reader outfile, Writer result) {
 
 		Pattern answer = Pattern.compile("^SAT");
 		Matcher manswer;
@@ -625,9 +623,7 @@ public class Translator {
 		boolean response = false;
 
 		try {
-			FileReader fileReader = new FileReader(outfile);
-
-			BufferedReader reader = new BufferedReader(fileReader);
+			BufferedReader reader = new BufferedReader(outfile);
 
 			line = reader.readLine();
 
@@ -728,8 +724,7 @@ public class Translator {
 
 				}
 
-				PrintWriter out = new PrintWriter(new BufferedWriter(
-						new FileWriter(result)));
+				PrintWriter out = new PrintWriter(new BufferedWriter(result));
 
 				out.println("UNIFIABLE:");
 				out.println("Unifier: ");
@@ -750,8 +745,7 @@ public class Translator {
 
 			} else {
 
-				PrintWriter out = new PrintWriter(new BufferedWriter(
-						new FileWriter(result)));
+				PrintWriter out = new PrintWriter(new BufferedWriter(result));
 
 				out.println("NOT UNIFIABLE");
 
@@ -774,7 +768,7 @@ public class Translator {
 	 * Instead it appends a unifier to the existing file <result>
 	 */
 
-	public boolean toTBoxB(File outfile, File result, int numberofsolutions) {
+	public boolean toTBoxB(Reader outfile, Writer result, int numberofsolutions) {
 
 		Pattern answer = Pattern.compile("^SAT");
 		Matcher manswer;
@@ -782,9 +776,7 @@ public class Translator {
 		boolean response = false;
 
 		try {
-			FileReader fileReader = new FileReader(outfile);
-
-			BufferedReader reader = new BufferedReader(fileReader);
+			BufferedReader reader = new BufferedReader(outfile);
 
 			line = reader.readLine();
 
@@ -872,8 +864,7 @@ public class Translator {
 
 				}
 
-				PrintWriter out = new PrintWriter(new BufferedWriter(
-						new FileWriter(result, true)));
+				PrintWriter out = new PrintWriter(new BufferedWriter(result));
 
 				out.println(numberofsolutions + " UNIFIER: ");
 
@@ -893,8 +884,7 @@ public class Translator {
 
 			} else {
 
-				PrintWriter out = new PrintWriter(new BufferedWriter(
-						new FileWriter(result, true)));
+				PrintWriter out = new PrintWriter(new BufferedWriter(result));
 
 				out.println("NO MORE UNIFIERS");
 
@@ -916,7 +906,7 @@ public class Translator {
 	 * This method is the same as toTBox, but does not write a unifier to file
 	 * <result>
 	 */
-	public boolean toTBox(File outfile) {
+	public boolean toTBox(Reader outfile) {
 
 		Pattern answer = Pattern.compile("^SAT");
 		Matcher manswer;
@@ -924,9 +914,7 @@ public class Translator {
 		boolean response = false;
 
 		try {
-			FileReader fileReader = new FileReader(outfile);
-
-			BufferedReader reader = new BufferedReader(fileReader);
+			BufferedReader reader = new BufferedReader(outfile);
 
 			line = reader.readLine();
 
