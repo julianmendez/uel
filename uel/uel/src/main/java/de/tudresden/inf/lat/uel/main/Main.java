@@ -2,6 +2,8 @@ package de.tudresden.inf.lat.uel.main;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.logging.Level;
@@ -44,6 +46,18 @@ public class Main {
 	public Main() {
 	}
 
+	private void initialize(Goal goal, Unifier unifier, String filename)
+			throws Exception {
+		FileReader reader = new FileReader(filename);
+		if (unifier.getTest()) {
+			FileWriter output = new FileWriter(filename + ".TBox");
+			goal.initializeWithTest(reader, output);
+		} else {
+			goal.initialize(reader);
+		}
+		unifier.setFileName(filename);
+	}
+
 	public void run(String[] args) throws Exception {
 		Unifier unifier = new Unifier();
 		Ontology ontology = new Ontology();
@@ -55,8 +69,7 @@ public class Main {
 
 		if (args.length == 1 && !args[0].equalsIgnoreCase("-h")) {
 
-			goal.initialize(args[0], unifier.getTest());
-			unifier.setFileName(args[0]);
+			initialize(goal, unifier, args[0]);
 			unifier.unify0(goal);
 
 		} else if (args.length > 1 && args[0].startsWith("-")) {
@@ -79,36 +92,31 @@ public class Main {
 
 			case 2:
 
-				goal.initialize(args[1], unifier.getTest());
-				unifier.setFileName(args[1]);
+				initialize(goal, unifier, args[1]);
 				unifier.unifyA(goal);
 				break;
 
 			case 3:
 
-				goal.initialize(args[1], unifier.getTest());
-				unifier.setFileName(args[1]);
+				initialize(goal, unifier, args[1]);
 				unifier.unifyX(goal);
 				break;
 
 			case 4:
 
-				goal.initialize(args[1], unifier.getTest());
-				unifier.setFileName(args[1]);
+				initialize(goal, unifier, args[1]);
 				unifier.unifyN(goal);
 				break;
 
 			case 5:
 
-				goal.initialize(args[1], unifier.getTest());
-				unifier.setFileName(args[1]);
+				initialize(goal, unifier, args[1]);
 				unifier.unifyInt(goal, MaxNbr);
 				break;
 
 			case 6:
 
-				goal.initialize(args[1], unifier.getTest());
-				unifier.setFileName(args[1]);
+				initialize(goal, unifier, args[1]);
 				unifier.unifySimple(goal);
 				break;
 
@@ -126,8 +134,7 @@ public class Main {
 			ontology.loadOntology(new InputStreamReader(new FileInputStream(
 					args[1])));
 
-			goal.initialize(args[0], unifier.getTest());
-			unifier.setFileName(args[0]);
+			initialize(goal, unifier, args[0]);
 			unifier.unify0(goal);
 
 		} else {

@@ -1,12 +1,9 @@
 package de.tudresden.inf.lat.uel.main;
 
 import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileWriter;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.Reader;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -27,7 +24,6 @@ import de.tudresden.inf.lat.uel.parser.ReaderAndParser;
 
 public class Goal {
 
-	private File tbox;
 	private Ontology ontology;
 
 	private ReaderAndParser readerAndParser = new ReaderAndParser();
@@ -86,19 +82,23 @@ public class Goal {
 	 *            unifier
 	 * @throws Exception
 	 */
-	public void initialize(String filename, boolean test) throws Exception {
+	public void initialize(Reader input) throws Exception {
+		initialize(input, false, null);
+	}
 
-		Reader goal = new InputStreamReader(new FileInputStream(new File(
-				filename)));
+	public void initializeWithTest(Reader input, Writer output)
+			throws Exception {
+		initialize(input, true, output);
+	}
 
-		readerAndParser.readFromFile(goal, this);
+	private void initialize(Reader input, boolean test, Writer output)
+			throws Exception {
+
+		readerAndParser.read(input, this);
 
 		if (test) {
 
-			tbox = new File(filename + ".TBox");
-
-			PrintWriter writer = new PrintWriter(new BufferedWriter(
-					new FileWriter(tbox)));
+			PrintWriter writer = new PrintWriter(new BufferedWriter(output));
 
 			for (Equation eq : equations) {
 
@@ -156,8 +156,8 @@ public class Goal {
 	}
 
 	/**
-	 * This method is used by ReaderAndParser.readFromFile and importDefinition
-	 * to flatten an equation and to add it to the list of goal equations
+	 * This method is used by ReaderAndParser.read and importDefinition to
+	 * flatten an equation and to add it to the list of goal equations
 	 * 
 	 * @param e
 	 *            equation that needs to be flattened

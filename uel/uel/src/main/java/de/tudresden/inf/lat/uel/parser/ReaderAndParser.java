@@ -35,15 +35,15 @@ public class ReaderAndParser {
 	}
 
 	/**
-	 * This method attempts to open input file while reading it, it creates goal
-	 * equations. Two equations from two definitions, and one equations between
-	 * the concepts defined in the input file.
+	 * This method reads from a Reader. It creates goal equations. Two equations
+	 * from two definitions, and one equations between the concepts defined in
+	 * the input.
 	 * 
 	 * 
 	 * 
 	 */
 
-	public void readFromFile(Reader input, Goal goal) throws Exception {
+	public void read(Reader input, Goal goal) throws Exception {
 
 		Equation equation;
 
