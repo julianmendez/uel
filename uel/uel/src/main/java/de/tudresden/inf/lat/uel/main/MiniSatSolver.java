@@ -11,7 +11,7 @@ import de.tudresden.inf.lat.uel.sattranslator.Translator;
 /**
  * An object of this class uses the MiniSat solver to solve a SAT problem.
  */
-public class MiniSatSolver {
+public class MiniSatSolver implements Solver {
 
 	public void runMiniSat(File satinput, File satoutput) throws IOException {
 		try {
@@ -25,6 +25,7 @@ public class MiniSatSolver {
 		}
 	}
 
+	@Override
 	public boolean unify(Translator translator, File satinput, File satoutput,
 			Writer result) throws IOException {
 		translator.toDIMACS(new FileWriter(satinput));
