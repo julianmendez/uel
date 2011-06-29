@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.io.Writer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -26,7 +25,7 @@ import de.tudresden.inf.lat.uel.sattranslator.Translator;
 public class Unifier {
 
 	private static final String tempPrefix = "uelMiniSat";
-	private static final String tempSuffix = "";
+	private static final String tempSuffix = ".tmp";
 
 	private boolean test = false;
 
@@ -55,49 +54,6 @@ public class Unifier {
 	public boolean getTest() {
 
 		return test;
-
-	}
-
-	private void runMiniSat(File satinput, File satoutput) throws IOException {
-		try {
-			ProcessBuilder pb = new ProcessBuilder("MiniSat",
-					satinput.toString(), satoutput.toString());
-			Process p = pb.start();
-
-			p.waitFor();
-
-			p.destroy();
-		} catch (InterruptedException e) {
-			throw new IOException(e);
-		}
-	}
-
-	/**
-	 * This method is the basic unification procedure. It returns true if the
-	 * goal is unifiable and false otherwise.
-	 * 
-	 * It creates an input file <satinput> for a sat solver, by calling the
-	 * method of Translator. It calls MiniSat on this file. The output of
-	 * MiniSat is saved in file <satoutput>. It calls Translator again to detect
-	 * if MiniSat returned "satisfiable" and to translate MiniSat output into a
-	 * unifier. The unifier is written into result.
-	 * 
-	 * @param filename
-	 * 
-	 * @throws IOException
-	 * @throws InterruptedException
-	 * 
-	 */
-	private boolean unify(Translator translator, File satinput, File satoutput,
-			Writer result) throws IOException {
-
-		translator.toDIMACS(new FileWriter(satinput));
-
-		runMiniSat(satinput, satoutput);
-
-		boolean response = translator.toTBox(new FileReader(satoutput), result);
-
-		return response;
 
 	}
 
@@ -131,8 +87,9 @@ public class Unifier {
 		File satoutput = File.createTempFile(tempPrefix, tempSuffix);
 		StringWriter result = new StringWriter();
 		Translator translator = new Translator(goal);
+		MiniSatSolver solver = new MiniSatSolver();
 
-		if (unify(translator, satinput, satoutput, result)) {
+		if (solver.unify(translator, satinput, satoutput, result)) {
 
 			Main.logger.info("UNIFIABLE\n" + "Unifier stored in file.");
 		} else {
@@ -175,7 +132,9 @@ public class Unifier {
 		StringWriter result = new StringWriter();
 		Translator translator = new Translator(goal);
 
-		boolean unifiable = unify(translator, satinput, satoutput, result);
+		MiniSatSolver solver = new MiniSatSolver();
+		boolean unifiable = solver.unify(translator, satinput, satoutput,
+				result);
 
 		if (unifiable) {
 
@@ -195,7 +154,7 @@ public class Unifier {
 
 				satout.close();
 
-				runMiniSat(satinput, satoutput);
+				solver.runMiniSat(satinput, satoutput);
 
 				translator.reset();
 				unifiable = translator.toTBoxB(new FileReader(satoutput),
@@ -259,7 +218,9 @@ public class Unifier {
 		StringWriter result = new StringWriter();
 		Translator translator = new Translator(goal);
 
-		boolean unifiable = unify(translator, satinput, satoutput, result);
+		MiniSatSolver solver = new MiniSatSolver();
+		boolean unifiable = solver.unify(translator, satinput, satoutput,
+				result);
 
 		if (unifiable) {
 
@@ -280,7 +241,7 @@ public class Unifier {
 
 				satout.close();
 
-				runMiniSat(satinput, satoutput);
+				solver.runMiniSat(satinput, satoutput);
 
 				translator.reset();
 				unifiable = translator.toTBoxB(new FileReader(satoutput),
@@ -337,7 +298,8 @@ public class Unifier {
 
 		translator.toDIMACS(new FileWriter(satinput));
 
-		runMiniSat(satinput, satoutput);
+		MiniSatSolver solver = new MiniSatSolver();
+		solver.runMiniSat(satinput, satoutput);
 
 		Pattern answer = Pattern.compile("^SAT");
 		Matcher manswer;
@@ -395,7 +357,9 @@ public class Unifier {
 
 		int nbrUnifiers = 0;
 
-		boolean unifiable = unify(translator, satinput, satoutput, result);
+		MiniSatSolver solver = new MiniSatSolver();
+		boolean unifiable = solver.unify(translator, satinput, satoutput,
+				result);
 
 		if (unifiable) {
 
@@ -416,7 +380,7 @@ public class Unifier {
 
 				satout.close();
 
-				runMiniSat(satinput, satoutput);
+				solver.runMiniSat(satinput, satoutput);
 
 				translator.reset();
 				unifiable = translator.toTBoxB(new FileReader(satoutput),
@@ -484,7 +448,8 @@ public class Unifier {
 
 		while (unifiable) {
 
-			runMiniSat(satinput, satoutput);
+			MiniSatSolver solver = new MiniSatSolver();
+			solver.runMiniSat(satinput, satoutput);
 
 			if (translator.toTBox(new FileReader(satoutput))) {
 

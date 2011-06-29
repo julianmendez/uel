@@ -5,6 +5,8 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Reader;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.io.Writer;
 import java.util.HashMap;
 import java.util.StringTokenizer;
@@ -65,7 +67,7 @@ public class Translator {
 	}
 
 	/**
-	 * This method encodes equations into propositional clauses in DIMACS
+	 * This method encodes equations into propositional clauses in DIMACS CNF
 	 * format, i.e. positive literal is represented by a positive number and a
 	 * negative literal is represented by a corresponding negative number. Each
 	 * clause is on one line. The end of a clause is marked by 0. Example of a
@@ -79,11 +81,41 @@ public class Translator {
 	 * 
 	 * @param infile
 	 */
-	public void toDIMACS(Writer infile) {
+	public void toDIMACS(Writer infile) throws IOException {
+		int numberOfClauses = 0;
+		int numberOfVariables = 0;
+		StringWriter strWriter = new StringWriter();
 
-		setLiterals();
+		toCNFWithoutHeader(strWriter);
+		BufferedReader reader = new BufferedReader(new StringReader(
+				strWriter.toString()));
+		String line = "";
+		while (line != null) {
+			line = reader.readLine();
+			if (line != null) {
+				numberOfClauses++;
+				StringTokenizer stok = new StringTokenizer(line);
+				int current = Integer.parseInt(stok.nextToken());
+				if (current < 0) {
+					current = (-1) * current;
+				}
+				if (current > numberOfVariables) {
+					numberOfVariables = current;
+				}
+			}
+		}
 
 		PrintWriter out = new PrintWriter(new BufferedWriter(infile));
+		out.println("p cnf " + numberOfVariables + " " + numberOfClauses);
+		out.print(strWriter.toString());
+		out.flush();
+	}
+
+	private void toCNFWithoutHeader(Writer infile) {
+
+		PrintWriter out = new PrintWriter(new BufferedWriter(infile));
+
+		setLiterals();
 
 		/*
 		 * 
@@ -123,7 +155,7 @@ public class Translator {
 						Literal lit3 = new Literal(key3, key1, 's');
 
 						out.print(" " + literals.get(lit3.toString()));
-						out.print(" 0 \n");
+						out.println(" 0");
 
 					}
 
@@ -145,7 +177,7 @@ public class Translator {
 						Literal lit3 = new Literal(key2, key1, 's');
 
 						out.print(literals.get(lit3.toString()));
-						out.print(" 0 \n");
+						out.println(" 0");
 
 					}
 
@@ -164,7 +196,7 @@ public class Translator {
 						out.print(" ");
 
 					}
-					out.print(" 0 \n");
+					out.println(" 0");
 
 				} else if (e.getLeft().containsKey(key1)
 						&& !e.getRight().containsKey(key1)) {
@@ -181,7 +213,7 @@ public class Translator {
 						out.print(" ");
 
 					}
-					out.print(" 0 \n");
+					out.println(" 0");
 
 				}
 			}
@@ -215,7 +247,7 @@ public class Translator {
 						Literal lit3 = new Literal(key3, key1, 's');
 
 						out.print(literals.get(lit3.toString()));
-						out.print(" 0 \n");
+						out.println(" 0");
 
 					}
 
@@ -236,7 +268,7 @@ public class Translator {
 						Literal lit3 = new Literal(key2, key1, 's');
 
 						out.print(literals.get(lit3.toString()));
-						out.print(" 0 \n");
+						out.println(" 0");
 
 					}
 
@@ -257,7 +289,7 @@ public class Translator {
 						out.print(" ");
 
 					}
-					out.print(" 0 \n");
+					out.println(" 0");
 
 					// end of outer if; key1 is not on the left, ask if it
 					// is on the right
@@ -278,7 +310,7 @@ public class Translator {
 						out.print(" ");
 
 					}
-					out.print(" 0 \n");
+					out.println(" 0");
 
 				}
 			}
@@ -302,7 +334,7 @@ public class Translator {
 
 					out.print(literals.get(lit.toString()));
 
-					out.print(" 0 \n");
+					out.println(" 0");
 
 				}
 
@@ -334,7 +366,7 @@ public class Translator {
 
 						out.print(literals.get(lit.toString()));
 
-						out.print(" 0 \n");
+						out.println(" 0");
 
 						/*
 						 * if the roles are equal, then clause in Step 2.3
@@ -363,7 +395,7 @@ public class Translator {
 							out.print(literals.get(lit2.toString()));
 							out.print(" ");
 
-							out.print(" 0 \n");
+							out.println(" 0");
 
 						}
 
@@ -388,7 +420,7 @@ public class Translator {
 
 				out.print(literals.get(lit.toString()));
 
-				out.print(" 0 \n");
+				out.println(" 0");
 
 				if (!key1.equals("TOP")) {
 
@@ -396,7 +428,7 @@ public class Translator {
 
 					out.print(literals.get(lit1.toString()));
 
-					out.print(" 0 \n");
+					out.println(" 0");
 
 				}
 
@@ -417,7 +449,7 @@ public class Translator {
 			out.print(literals.get(lit.toString()));
 			out.print(" ");
 
-			out.print(" 0 \n");
+			out.println(" 0");
 
 		}// end of clauses in step 2.5
 
@@ -453,7 +485,7 @@ public class Translator {
 						out.print(literals.get(lit3.toString()));
 						out.print(" ");
 
-						out.print(" 0 \n");
+						out.println(" 0");
 
 					}
 
@@ -495,7 +527,7 @@ public class Translator {
 						out.print(literals.get(lit2.toString()));
 						out.print(" ");
 
-						out.print(" 0 \n");
+						out.println(" 0");
 
 					}
 
@@ -528,7 +560,7 @@ public class Translator {
 					out.print(literals.get(lit2.toString()));
 					out.print(" ");
 
-					out.print(" 0 \n");
+					out.println(" 0");
 
 				}
 
