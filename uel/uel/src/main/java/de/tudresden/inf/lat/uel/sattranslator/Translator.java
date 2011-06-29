@@ -628,17 +628,18 @@ public class Translator {
 	}
 
 	/**
-	 * This method reads a file <outfile> which contains an output from SAT
-	 * solver i.e. UNSAT or SAT with the list of true literals. If the file
-	 * contains SAT and the list of true literals, the method translates it to a
-	 * TBox, which is written to the file <result> and returns "true".
-	 * Otherwise, it writes "NOT UNIFIABLE" to file <result> and returns
-	 * "false".
+	 * This method reads a file <code>outfile</code> which contains an output
+	 * from SAT solver i.e. UNSAT or SAT with the list of true literals. If the
+	 * file contains SAT and the list of true literals, the method translates it
+	 * to a TBox, which is written to the file <code>result</code> and returns
+	 * "true". Otherwise, it writes "NOT UNIFIABLE" to file <code>result</code>
+	 * and returns "false".
 	 * 
 	 * @param outfile
 	 * @param result
 	 * @throws IOException
-	 * @return
+	 * @return <code>true</code> if and only if the output of the SAT solver
+	 *         contains SAT.
 	 */
 	public boolean toTBox(Reader outfile, Writer result) throws IOException {
 

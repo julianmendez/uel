@@ -17,8 +17,8 @@ public class Atom {
 
 	/*
 	 * Atom has a name. If it is a concept name, this concept name is the
-	 * <name>. If it is an existential restriction, then its role name is the
-	 * <name>. In the case of existential restriction, the variable <root> is
+	 * <code>name</code>. If it is an existential restriction, then its role name is the
+	 * <code>name</code>. In the case of existential restriction, the variable <code>root</code> is
 	 * true and the hash map children implements conjunction of atoms that is an
 	 * argument for the role name.
 	 */
@@ -60,9 +60,9 @@ public class Atom {
 	}
 
 	/**
-	 * Returns name of the atom
+	 * Returns name of the atom.
 	 * 
-	 * @return
+	 * @return name of the atom
 	 */
 	public String getName() {
 
@@ -70,9 +70,9 @@ public class Atom {
 	}
 
 	/**
-	 * Is true if the atom is an existential restriction
+	 * Is true if the atom is an existential restriction.
 	 * 
-	 * @return
+	 * @return <code>true</code> if and only if the atom is an existential restriction
 	 */
 	public boolean isRoot() {
 
@@ -82,7 +82,7 @@ public class Atom {
 	/**
 	 * Checks if the atom is flat. Used by the constructor FAtom(Atom).
 	 * 
-	 * @return
+	 * @return <code>true</code> if and only if the atom is flat
 	 */
 	public boolean isFlat() {
 
@@ -113,7 +113,7 @@ public class Atom {
 	 * Returns the hash map representing a conjunction of atoms, which is an
 	 * argument for a role name in an existential atom.
 	 * 
-	 * @return
+	 * @return the hash map representing a conjunction of atoms
 	 */
 	public HashMap<String, Atom> getChildren() {
 

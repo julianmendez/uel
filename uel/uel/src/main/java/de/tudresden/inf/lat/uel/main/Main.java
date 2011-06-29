@@ -38,8 +38,6 @@ public class Main {
 	 *            contain "t" in order for ontology to be loaded);
 	 * 
 	 * @throws IOException
-	 * @author Barbara Morawska
-	 * 
 	 */
 
 	public static void main(String[] args) throws IOException {
@@ -181,10 +179,9 @@ public class Main {
 	 * This method analyzes the option string given to the Main class as one of
 	 * the parameters.
 	 * 
-	 * 
-	 * 
 	 * @param argument
-	 * @return
+	 * @param unifier
+	 * @return the option number
 	 */
 
 	public int option(String argument, Unifier unifier) {

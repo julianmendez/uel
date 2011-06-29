@@ -49,9 +49,9 @@ public class Equation {
 	}
 
 	/**
-	 * Returns the left side of equation as the hash map of names and atoms.
+	 * Returns the left side of the equation as the hash map of names and atoms.
 	 * 
-	 * @return
+	 * @return the left side of the equation
 	 */
 	public HashMap<String, Atom> getLeft() {
 
@@ -59,9 +59,9 @@ public class Equation {
 	}
 
 	/**
-	 * Returns the right side of equation as the hash map of names and atoms.
+	 * Returns the right side of the equation as the hash map of names and atoms.
 	 * 
-	 * @return
+	 * @return the right side of the equation
 	 */
 	public HashMap<String, Atom> getRight() {
 
@@ -69,7 +69,7 @@ public class Equation {
 	}
 
 	/**
-	 * Sets the left side of the equation to the hash map <list> with keys names
+	 * Sets the left side of the equation to the hash map <code>list</code> with keys names
 	 * and values atoms.
 	 * 
 	 * Not used in UEL.
@@ -82,7 +82,7 @@ public class Equation {
 	}
 
 	/**
-	 * Sets the right side of the equation to the hash map <list> with keys
+	 * Sets the right side of the equation to the hash map <code>list</code> with keys
 	 * names and values atoms.
 	 * 
 	 * Used in FAtom
@@ -129,7 +129,7 @@ public class Equation {
 	}
 
 	/**
-	 * Prints an equation to Print Writer <out>. Used in Goal initialization, in
+	 * Prints an equation to Print Writer <code>out</code>. Used in Goal initialization, in
 	 * creating TBox file.
 	 * 
 	 * 

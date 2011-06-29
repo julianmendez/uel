@@ -33,8 +33,8 @@ public class Unifier {
 	/**
 	 * This method is used in the class Utilities.java If the option t is used
 	 * by the Main class, test is set to true. This means that an additional
-	 * file <filename>.TBox is created. This file is then used in testing
-	 * obtained unifiers for correctness with Tester.
+	 * file <code>filename</code>.TBox is created. This file is then used in
+	 * testing obtained unifiers for correctness with Tester.
 	 * 
 	 * 
 	 */
@@ -45,7 +45,7 @@ public class Unifier {
 	}
 
 	/**
-	 * If test is true, <filename>.TBox is created.
+	 * If test is true, <code>filename</code>.TBox is created.
 	 */
 	public boolean getTest() {
 
@@ -57,17 +57,15 @@ public class Unifier {
 	 * This method is the basic unification procedure. It returns true if the
 	 * goal is unifiable and false otherwise.
 	 * 
-	 * It creates an input file <satinput> for a SAT solver, by using the method
-	 * of Translator. It calls a solver with this file. The output is saved in
-	 * file <satoutput>. It calls Translator again to detect if the solver
-	 * returned "satisfiable" and to translate the output into a result.
+	 * It creates an input for a SAT solver, by using a method in Translator,
+	 * and calls a solver with this input. It calls Translator again to detect
+	 * if the solver returned "satisfiable" and to translate the output into a
+	 * result.
 	 * 
 	 * @param translator
 	 *            translator
-	 * @param satinput
-	 *            input file
-	 * @param satoutput
-	 *            output file
+	 * @param result
+	 *            result
 	 * @throws IOException
 	 * @return true if and only if the goal is unifiable
 	 */
@@ -92,15 +90,15 @@ public class Unifier {
 	 * 
 	 * 
 	 * If the options string provided for Main class contained "t" an additional
-	 * file <filename>.TBox is created. This file is useful for testing unifiers
-	 * with Tester.
+	 * file <code>filename</code>.TBox is created. This file is useful for
+	 * testing unifiers with Tester.
 	 * 
 	 * 
 	 * If the goal is unifiable, then the method writes UNIFIABLE and a unifier
-	 * to the output file <filename>.unif and it writes UNIFIABLE to the stdout.
-	 * If it is ununifiable, then it writes UNUNIFIABLE to the output file
-	 * <filename>.unif and to the stdout. It deletes some additional files
-	 * created by the unification procedure.
+	 * to the output file <code>filename</code>.unif and it writes UNIFIABLE to
+	 * the stdout. If it is ununifiable, then it writes UNUNIFIABLE to the
+	 * output file <code>filename</code>.unif and to the stdout. It deletes some
+	 * additional files created by the unification procedure.
 	 * 
 	 * @param goal
 	 *            goal
@@ -130,8 +128,8 @@ public class Unifier {
 	 * ontology definitions too.
 	 * 
 	 * If the options string provided for Main class contained "t" an additional
-	 * file <filename>.TBox is created. This file is useful for testing unifiers
-	 * with Tester.
+	 * file <code>filename</code>.TBox is created. This file is useful for
+	 * testing unifiers with Tester.
 	 * 
 	 * If the goal is unifiable, then it writes UNIFIABLE to stdout and computes
 	 * ALL local unifiers, while writing them to the output file. If it is
@@ -370,8 +368,8 @@ public class Unifier {
 
 	/**
 	 * This method is used by Main class if the options string contains "n". If
-	 * options contain also "t", then a file <filename>.TBox is created, for
-	 * testing with Tester.
+	 * options contain also "t", then a file <code>filename</code>.TBox is
+	 * created, for testing with Tester.
 	 * 
 	 * This method reads an input file, translates the goal equation into a set
 	 * of flat equations with variables. (If the ontology file is provided, it

@@ -32,9 +32,9 @@ public class FAtom extends Atom {
 	 * Constructor of flat atom (used in ReaderAndParser to create a flat system
 	 * variable).
 	 * 
-	 * name is <name> of an atom r is true if atom is an existential restriction
-	 * v is true if atom is a variable arg is a flat atom, which is an argument
-	 * for a role name in an existential restriction
+	 * name is <code>name</code> of an atom r is true if atom is an existential
+	 * restriction v is true if atom is a variable arg is a flat atom, which is
+	 * an argument for a role name in an existential restriction
 	 * 
 	 * @param name
 	 * @param r
@@ -127,9 +127,9 @@ public class FAtom extends Atom {
 	}
 
 	/**
-	 * Checks if a flat atom is a variable
+	 * Checks if a flat atom is a variable.
 	 * 
-	 * @return
+	 * @return <code>true</code> if and only if a flat atom is a variable
 	 */
 	public boolean isVar() {
 
@@ -149,9 +149,9 @@ public class FAtom extends Atom {
 	}
 
 	/**
-	 * Not used in UEL. Checks if this atom is a constant
+	 * Not used in UEL. Checks if this atom is a constant.
 	 * 
-	 * @return
+	 * @return <code>true</code> if and only if this atoms is a constant
 	 */
 	public boolean isCons() {
 
@@ -164,7 +164,8 @@ public class FAtom extends Atom {
 	 * 
 	 * Used in defining clauses in Translator
 	 * 
-	 * @return
+	 * @return an argument in the flat atom, which is an existential
+	 *         restriction; otherwise it returns null
 	 */
 	public FAtom getChild() {
 
@@ -186,7 +187,8 @@ public class FAtom extends Atom {
 	/**
 	 * Checks if this flat atom is a system variable.
 	 * 
-	 * @return
+	 * @return <code>true</code> if and only if this flat atom is a system
+	 *         variable
 	 */
 	public boolean isSys() {
 
@@ -196,7 +198,7 @@ public class FAtom extends Atom {
 
 	/**
 	 * Prints to a Print Writer out a substitution set (i.e. a set of atoms) as
-	 * a conjunction of atoms in the krss format. Used in Translator
+	 * a conjunction of atoms in the krss format. Used in Translator.
 	 * 
 	 * @param out
 	 */

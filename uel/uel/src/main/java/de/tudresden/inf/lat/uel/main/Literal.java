@@ -42,8 +42,8 @@ public class Literal {
 
 	/**
 	 * Constructor. Constructs a literal given two names and the letter, which
-	 * should indicate the kind of literal. It should be <s> for dis-subsumption
-	 * or <o> for order literal.
+	 * should indicate the kind of literal. It should be <code>s</code> for
+	 * dis-subsumption or <code>o</code> for order literal.
 	 * 
 	 * @param one
 	 * @param two
@@ -69,8 +69,8 @@ public class Literal {
 	}
 
 	/**
-	 * Sets kind of the literal to s. If s is <s> then it is dis-subsumption
-	 * literal, if s is <o> it is order literal.
+	 * Sets kind of the literal to s. If s is <code>s</code> then it is
+	 * dis-subsumption literal, if s is <code>o</code> it is order literal.
 	 * 
 	 * @param s
 	 */
@@ -83,7 +83,7 @@ public class Literal {
 	/**
 	 * Returns the kind of literal.
 	 * 
-	 * @return
+	 * @return the kind
 	 */
 	public char getKind() {
 
@@ -94,7 +94,7 @@ public class Literal {
 	/**
 	 * Returns the value of literal.
 	 * 
-	 * @return
+	 * @return the value
 	 */
 	public boolean getValue() {
 
@@ -102,7 +102,7 @@ public class Literal {
 	}
 
 	/**
-	 * Sets the value <t> for the literal.
+	 * Sets the value <code>t</code> for the literal.
 	 * 
 	 * @param t
 	 */

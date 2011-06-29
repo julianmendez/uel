@@ -53,7 +53,7 @@ public class Goal {
 	 */
 	private HashMap<String, FAtom> allatoms = new HashMap<String, FAtom>();
 
-	private int NbrVar = 0;
+	private int nbrVar = 0;
 
 	/**
 	 * equations is a list containing all goal equations
@@ -65,28 +65,26 @@ public class Goal {
 		ontology = ont;
 	}
 
-	/**
-	 * This method initialize goal.
-	 * 
-	 * <filename> is the name of the input file (the file containing unification
-	 * problem). The method calls ReaderAndParser to parse and flatten goal
-	 * equations.
-	 * 
-	 * Then if variable Unifier.text is true, all equations are written to a
-	 * file <filename>.TBox
-	 * 
-	 * Then all variables, constants and existential atoms are identified.
-	 * 
-	 * @param filename
-	 *            file name
-	 * @param unifier
-	 *            unifier
-	 * @throws IOException
-	 */
 	public void initialize(Reader input) throws IOException {
 		initialize(input, false, null);
 	}
 
+	/**
+	 * This method initializes the goal using a reader containing unification
+	 * problem. The method calls ReaderAndParser to parse and flatten goal
+	 * equations.
+	 * 
+	 * Then if variable Unifier.text is true, all equations are written to a
+	 * writer.
+	 * 
+	 * Then all variables, constants and existential atoms are identified.
+	 * 
+	 * @param input
+	 *            input
+	 * @param output
+	 *            output
+	 * @throws IOException
+	 */
 	public void initializeWithTest(Reader input, Writer output)
 			throws IOException {
 		initialize(input, true, output);
@@ -136,10 +134,11 @@ public class Goal {
 	}
 
 	/**
-	 * The method used in the flattening method <addFlatten> to add a relevant
-	 * definition from the ontology to the goal.
+	 * The method used in the flattening method <code>addFlatten</code> to add a
+	 * relevant definition from the ontology to the goal.
 	 * 
-	 * <concept> is a concept name that may be defined in the ontology.
+	 * <code>concept</code> is a concept name that may be defined in the
+	 * ontology.
 	 * 
 	 * @param concept
 	 *            concept
@@ -351,27 +350,27 @@ public class Goal {
 	}
 
 	/**
-	 * This method is used by a constructor of a flat atom <FAtom(Atom)> from
-	 * atom. This requires to introduce a new variable. New variables are
-	 * identified by unique numbers. The next unique number is stored in
-	 * <nbrVar>.
+	 * This method is used by a constructor of a flat atom
+	 * <code>FAtom(Atom)</code> from atom. This requires to introduce a new
+	 * variable. New variables are identified by unique numbers. The next unique
+	 * number is stored in <code>nbrVar</code>.
 	 * 
-	 * @param nbrVar
+	 * @param nbrV
 	 */
-	public void setNbrVar(int nbrVar) {
-		NbrVar = nbrVar;
+	public void setNbrVar(int nbrV) {
+		nbrVar = nbrV;
 	}
 
 	/**
-	 * This method is used by a constructor of a flat atom <FAtom(Atom)> from
-	 * atom. This requires to introduce a new variable. New variables are
-	 * identified by unique numbers. The next unique number is stored in
-	 * <nbrVar>.
+	 * This method is used by a constructor of a flat atom
+	 * <code>FAtom(Atom)</code> from atom. This requires to introduce a new
+	 * variable. New variables are identified by unique numbers. The next unique
+	 * number is stored in <code>nbrVar</code>.
 	 * 
-	 * @return
+	 * @return nbrVar
 	 */
 	public int getNbrVar() {
-		return NbrVar;
+		return nbrVar;
 	}
 
 	/**
