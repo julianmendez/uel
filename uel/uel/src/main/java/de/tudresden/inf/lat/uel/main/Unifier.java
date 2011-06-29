@@ -1,14 +1,11 @@
 package de.tudresden.inf.lat.uel.main;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.StringReader;
 import java.io.StringWriter;
+import java.io.Writer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -24,14 +21,13 @@ import de.tudresden.inf.lat.uel.sattranslator.Translator;
 
 public class Unifier {
 
-	private static final String tempPrefix = "uelMiniSat";
-	private static final String tempSuffix = ".tmp";
-
 	private boolean test = false;
 
 	private int numberofsolutions = 0;
+	private Solver solver = null;
 
-	public Unifier() {
+	public Unifier(Solver s) {
+		solver = s;
 	}
 
 	/**
@@ -55,6 +51,36 @@ public class Unifier {
 
 		return test;
 
+	}
+
+	/**
+	 * This method is the basic unification procedure. It returns true if the
+	 * goal is unifiable and false otherwise.
+	 * 
+	 * It creates an input file <satinput> for a SAT solver, by using the method
+	 * of Translator. It calls a solver with this file. The output is saved in
+	 * file <satoutput>. It calls Translator again to detect if the solver
+	 * returned "satisfiable" and to translate the output into a result.
+	 * 
+	 * @param translator
+	 *            translator
+	 * @param satinput
+	 *            input file
+	 * @param satoutput
+	 *            output file
+	 * @throws IOException
+	 * @return true if and only if the goal is unifiable
+	 */
+	public boolean unify(Translator translator, Writer result)
+			throws IOException {
+		StringWriter satinputWriter = new StringWriter();
+		translator.toDIMACS(satinputWriter);
+
+		String res = solver.solve(satinputWriter.toString());
+
+		StringReader satoutputReader = new StringReader(res);
+		boolean response = translator.toTBox(satoutputReader, result);
+		return response;
 	}
 
 	/**
@@ -83,22 +109,15 @@ public class Unifier {
 	 */
 	public String unifySimple(Goal goal) throws IOException {
 
-		File satinput = File.createTempFile(tempPrefix, tempSuffix);
-		File satoutput = File.createTempFile(tempPrefix, tempSuffix);
 		StringWriter result = new StringWriter();
 		Translator translator = new Translator(goal);
-		MiniSatSolver solver = new MiniSatSolver();
 
-		if (solver.unify(translator, satinput, satoutput, result)) {
-
+		if (unify(translator, result)) {
 			Main.logger.info("UNIFIABLE\n" + "Unifier stored in file.");
 		} else {
-
 			Main.logger.info("UNUNIFIABLE");
 		}
 
-		satinput.delete();
-		satoutput.delete();
 		return result.toString();
 	}
 
@@ -127,14 +146,14 @@ public class Unifier {
 	 */
 	public String unifyX(Goal goal) throws IOException {
 
-		File satinput = File.createTempFile(tempPrefix, tempSuffix);
-		File satoutput = File.createTempFile(tempPrefix, tempSuffix);
 		StringWriter result = new StringWriter();
 		Translator translator = new Translator(goal);
 
-		MiniSatSolver solver = new MiniSatSolver();
-		boolean unifiable = solver.unify(translator, satinput, satoutput,
-				result);
+		boolean unifiable = unify(translator, result);
+
+		StringWriter satinputWriter = new StringWriter();
+		translator.toDIMACS(satinputWriter);
+		String satinputStr = satinputWriter.toString();
 
 		if (unifiable) {
 
@@ -145,44 +164,29 @@ public class Unifier {
 
 				numberofsolutions++;
 
-				PrintWriter satout = new PrintWriter(new BufferedWriter(
-						new FileWriter(satinput, true)));
-
 				String additionalline = translator.getUpdate() + " 0 ";
-
-				satout.println(additionalline);
-
-				satout.close();
-
-				solver.runMiniSat(satinput, satoutput);
+				satinputStr += additionalline + "\n";
+				String satoutputStr = solver.solve(satinputStr);
 
 				translator.reset();
-				unifiable = translator.toTBoxB(new FileReader(satoutput),
+
+				unifiable = translator.toTBoxB(new StringReader(satoutputStr),
 						result, numberofsolutions);
 
 				if (unifiable) {
-
 					Main.logger.info(numberofsolutions + " UNIFIER\n"
 							+ "Unifier appended to " + result.toString());
-
 				} else {
-
 					Main.logger.info("NO MORE UNIFIERS");
-
 				}
 
 			}
 
 			Main.logger.info("Have a good day!");
-
 		} else {
-
 			Main.logger.info("UNUNIFIABLE");
-
 		}
 
-		satinput.delete();
-		satoutput.delete();
 		return result.toString();
 	}
 
@@ -213,17 +217,16 @@ public class Unifier {
 
 	public String unifyA(Goal goal) throws IOException {
 
-		File satinput = File.createTempFile(tempPrefix, tempSuffix);
-		File satoutput = File.createTempFile(tempPrefix, tempSuffix);
 		StringWriter result = new StringWriter();
 		Translator translator = new Translator(goal);
 
-		MiniSatSolver solver = new MiniSatSolver();
-		boolean unifiable = solver.unify(translator, satinput, satoutput,
-				result);
+		boolean unifiable = unify(translator, result);
+
+		StringWriter satinputWriter = new StringWriter();
+		translator.toDIMACS(satinputWriter);
+		String satinputStr = satinputWriter.toString();
 
 		if (unifiable) {
-
 			Main.logger.info("UNIFIABLE\n" + "Unifier stored in file.");
 
 			boolean test = questionYN();
@@ -232,45 +235,30 @@ public class Unifier {
 
 				numberofsolutions++;
 
-				PrintWriter satout = new PrintWriter(new BufferedWriter(
-						new FileWriter(satinput, true)));
-
 				String additionalline = translator.getUpdate() + " 0 ";
-
-				satout.println(additionalline);
-
-				satout.close();
-
-				solver.runMiniSat(satinput, satoutput);
+				satinputStr += additionalline + "\n";
+				String satoutputStr = solver.solve(satinputStr);
 
 				translator.reset();
-				unifiable = translator.toTBoxB(new FileReader(satoutput),
+
+				unifiable = translator.toTBoxB(new StringReader(satoutputStr),
 						result, numberofsolutions);
 
 				if (unifiable) {
-
 					Main.logger.info(numberofsolutions + " UNIFIER\n"
 							+ "Unifier appended to file.");
 
 					test = questionYN();
 				} else {
-
 					Main.logger.info("NO MORE UNIFIERS");
-
 				}
 
 			}
 
 			Main.logger.info("Have a good day!");
-
 		} else {
-
 			Main.logger.info("UNUNIFIABLE");
-
 		}
-
-		satinput.delete();
-		satoutput.delete();
 		return result.toString();
 	}
 
@@ -291,41 +279,24 @@ public class Unifier {
 	 */
 	public void unify0(Goal goal) throws IOException {
 
-		File satinput = File.createTempFile(tempPrefix, tempSuffix);
-		File satoutput = File.createTempFile(tempPrefix, tempSuffix);
-
 		Translator translator = new Translator(goal);
 
-		translator.toDIMACS(new FileWriter(satinput));
+		StringWriter satinputWriter = new StringWriter();
+		translator.toDIMACS(satinputWriter);
 
-		MiniSatSolver solver = new MiniSatSolver();
-		solver.runMiniSat(satinput, satoutput);
+		String satoutputStr = solver.solve(satinputWriter.toString());
 
-		Pattern answer = Pattern.compile("^SAT");
-		Matcher manswer;
-		String line;
-
-		FileReader fileReader = new FileReader(satoutput);
-
-		BufferedReader reader = new BufferedReader(fileReader);
-
-		line = reader.readLine();
-
-		manswer = answer.matcher(line);
+		Pattern answer = Pattern.compile("^" + Solver.msgSat);
+		BufferedReader reader = new BufferedReader(new StringReader(
+				satoutputStr));
+		String line = reader.readLine();
+		Matcher manswer = answer.matcher(line);
 
 		if (manswer.find()) {
-
 			Main.logger.info("UNIFIABLE");
-
 		} else {
-
 			Main.logger.info("UNUNIFIABLE");
-
 		}
-
-		satinput.delete();
-		satoutput.delete();
-
 	}
 
 	/**
@@ -349,17 +320,17 @@ public class Unifier {
 	 */
 	public String unifyInt(Goal goal, int max) throws IOException {
 
-		File satinput = File.createTempFile(tempPrefix, tempSuffix);
-		File satoutput = File.createTempFile(tempPrefix, tempSuffix);
 		StringWriter result = new StringWriter();
 
 		Translator translator = new Translator(goal);
 
 		int nbrUnifiers = 0;
 
-		MiniSatSolver solver = new MiniSatSolver();
-		boolean unifiable = solver.unify(translator, satinput, satoutput,
-				result);
+		boolean unifiable = unify(translator, result);
+
+		StringWriter satinputWriter = new StringWriter();
+		translator.toDIMACS(satinputWriter);
+		String satinputStr = satinputWriter.toString();
 
 		if (unifiable) {
 
@@ -371,45 +342,29 @@ public class Unifier {
 
 				numberofsolutions++;
 
-				PrintWriter satout = new PrintWriter(new BufferedWriter(
-						new FileWriter(satinput, true)));
-
 				String additionalline = translator.getUpdate() + " 0 ";
-
-				satout.println(additionalline);
-
-				satout.close();
-
-				solver.runMiniSat(satinput, satoutput);
+				satinputStr += additionalline + "\n";
+				String satoutputStr = solver.solve(satinputStr);
 
 				translator.reset();
-				unifiable = translator.toTBoxB(new FileReader(satoutput),
+				unifiable = translator.toTBoxB(new StringReader(satoutputStr),
 						result, numberofsolutions);
 
 				if (unifiable) {
-
 					Main.logger.info(numberofsolutions + " UNIFIER\n"
 							+ "Unifier stored in file.");
 					nbrUnifiers++;
 
 				} else {
-
 					Main.logger.info("NO MORE UNIFIERS");
-
 				}
-
 			}
 
 			Main.logger.info("Have a good day!");
-
 		} else {
-
 			Main.logger.info("UNUNIFIABLE");
-
 		}
 
-		satinput.delete();
-		satoutput.delete();
 		return result.toString();
 	}
 
@@ -442,28 +397,23 @@ public class Unifier {
 
 		numberofsolutions = 0;
 
-		File satinput = File.createTempFile(tempPrefix, tempSuffix);
-		File satoutput = File.createTempFile(tempPrefix, tempSuffix);
-		translator.toDIMACS(new FileWriter(satinput));
+		StringWriter satinputWriter = new StringWriter();
+		translator.toDIMACS(satinputWriter);
+		String satinputStr = satinputWriter.toString();
 
 		while (unifiable) {
 
-			MiniSatSolver solver = new MiniSatSolver();
-			solver.runMiniSat(satinput, satoutput);
+			String satoutputStr = solver.solve(satinputWriter.toString());
 
-			if (translator.toTBox(new FileReader(satoutput))) {
+			StringReader satoutputReader = new StringReader(satoutputStr);
+			if (translator.toTBox(satoutputReader)) {
 
 				message = true;
 				numberofsolutions++;
 
-				PrintWriter satin = new PrintWriter(new BufferedWriter(
-						new FileWriter(satinput, true)));
-
 				String additionalline = translator.getUpdate() + " 0 ";
-
-				satin.println(additionalline);
-
-				satin.close();
+				satinputStr += additionalline + "\n";
+				satoutputStr = solver.solve(satinputStr);
 
 				translator.reset();
 
@@ -475,18 +425,11 @@ public class Unifier {
 		}
 
 		if (message) {
-
 			Main.logger.info("UNIFIABLE\n" + numberofsolutions
 					+ " unifiers found");
-
 		} else {
-
 			Main.logger.info("UNUNIFIABLE");
 		}
-
-		satinput.delete();
-		satoutput.delete();
-
 	}
 
 	/**
@@ -508,19 +451,14 @@ public class Unifier {
 			answer = in.readLine();
 
 		} catch (Exception ex) {
-
 			ex.printStackTrace();
 		}
 
 		if (answer.equalsIgnoreCase("Y")) {
-
 			return true;
-
 		} else {
-
 			return false;
 		}
-
 	}
 
 }

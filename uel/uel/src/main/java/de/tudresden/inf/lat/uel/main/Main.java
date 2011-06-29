@@ -25,7 +25,7 @@ public class Main {
 	static final Logger logger = Logger.getLogger("Unifier");
 	private static final String unifSuffix = ".unif";
 
-	private int MaxNbr = 0;
+	private int maxNbr = 0;
 
 	/**
 	 * Starts a unifier from the command line.
@@ -61,7 +61,7 @@ public class Main {
 	}
 
 	public void run(String[] args) throws IOException {
-		Unifier unifier = new Unifier();
+		Unifier unifier = new Unifier(new MiniSatSolver());
 		Ontology ontology = new Ontology();
 		Goal goal = new Goal(ontology);
 
@@ -113,7 +113,7 @@ public class Main {
 			case 5:
 
 				initialize(goal, unifier, args[1]);
-				store(args[1], unifier.unifyInt(goal, MaxNbr));
+				store(args[1], unifier.unifyInt(goal, maxNbr));
 				break;
 
 			case 6:
@@ -224,7 +224,7 @@ public class Main {
 
 			}
 
-			MaxNbr = Integer.parseInt(argument);
+			maxNbr = Integer.parseInt(argument);
 
 			return 5;
 		}
