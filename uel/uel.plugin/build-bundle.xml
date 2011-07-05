@@ -24,7 +24,7 @@
 	<property name="_lib.directory" value="${project.build.directory}/lib" />
 	<property name="_targetlib.directory" value="target" />
 	<property name="groupId.directory" value="uel" />
-	<property name="repository.directory" value="../jars/lib" />
+	<property name="repository.directory" value="../uel.jars/lib" />
 	<property name="project.build.outputDirectory" value="${project.build.directory}/classes" />
 	<property name="_jars.directory" value="${basedir}/.." />
 	<property name="_resources.directory" value="${src.directory}/main/resources" />
@@ -35,8 +35,8 @@
 	<property name="_javadoc.directory" value="${project.build.directory}/site/javadoc" />
 	<property name="_src.javadoc.directory" value="${src.directory}/main/javadoc" />
 
-	<property name="module.0.name" value="uel" />
-	<property name="module.1.name" value="plugin" />
+	<property name="module.0.name" value="uel.core" />
+	<property name="module.1.name" value="uel.plugin" />
 
 	<path id="libs.directory">
 		<fileset dir="${_jars.directory}" includes="${dependencies}" />

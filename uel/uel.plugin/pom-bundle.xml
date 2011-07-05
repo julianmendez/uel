@@ -23,7 +23,7 @@
 		<groupId>uel</groupId>
 		<artifactId>parent</artifactId>
 		<version>0.1.0</version>
-		<relativePath>../jars</relativePath>
+		<relativePath>../uel.jars</relativePath>
 	</parent>
 
 	<build>
@@ -50,9 +50,8 @@
 					<instructions>
 						<Include-Resource>
 							{maven-resources}, {maven-dependencies},
-							@target/plugin-0.1.0.jar,
-							lib/uel/uel/0.1.0/plugin-0.1.0.jar=../uel/target/plugin-0.1.0.jar,
-							lib/uel/uel/0.1.0/copying.txt=../uel/copying.txt
+							@target/uel.plugin-0.1.0.jar,
+							lib/uel/uel.core/0.1.0/uel.core-0.1.0.jar=../uel.core/target/uel.core-0.1.0.jar
 						</Include-Resource>
 					</instructions>
 				</configuration>

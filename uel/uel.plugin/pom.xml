@@ -3,7 +3,6 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
 		http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-
 	<!--
  *
  * @author Julian Mendez
@@ -13,11 +12,11 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>uel</groupId>
-	<artifactId>uel.core</artifactId>
+	<artifactId>plugin</artifactId>
 	<version>0.1.0</version>
 	<packaging>jar</packaging>
 
-	<name>uel</name>
+	<name>uel Protege plug-in</name>
 
 	<parent>
 		<groupId>uel</groupId>
@@ -29,12 +28,25 @@
 	<dependencies>
 
 		<dependency>
-			<groupId>org.sat4j</groupId>
-			<artifactId>core</artifactId>
-			<version>2.3.0</version>
+			<groupId>uel</groupId>
+			<artifactId>uel.core</artifactId>
+			<version>0.1.0</version>
+		</dependency>
+
+		</dependency>
+
+		<dependency>
+			<groupId>org.protege</groupId>
+			<artifactId>editor.owl</artifactId>
+			<version>4.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.protege</groupId>
+			<artifactId>editor.core.application</artifactId>
+			<version>4.1</version>
 		</dependency>
 
 	</dependencies>
 
 </project>
-

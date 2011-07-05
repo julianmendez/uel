@@ -20,7 +20,7 @@
 	<name>uel</name>
 
 	<modules>
-		<module>../uel</module>
+		<module>../uel.core</module>
 	</modules>
 
 </project>
