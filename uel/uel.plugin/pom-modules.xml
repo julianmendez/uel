@@ -21,6 +21,7 @@
 
 	<modules>
 		<module>../uel.core</module>
+		<module>../uel.plugin</module>
 	</modules>
 
 </project>

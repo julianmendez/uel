@@ -12,7 +12,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>uel</groupId>
-	<artifactId>plugin</artifactId>
+	<artifactId>uel.plugin</artifactId>
 	<version>0.1.0</version>
 	<packaging>jar</packaging>
 
@@ -33,6 +33,10 @@
 			<version>0.1.0</version>
 		</dependency>
 
+		<dependency>
+			<groupId>owlapi</groupId>
+			<artifactId>owlapi</artifactId>
+			<version>3.2.3</version>
 		</dependency>
 
 		<dependency>

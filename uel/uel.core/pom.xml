@@ -17,7 +17,7 @@
 	<version>0.1.0</version>
 	<packaging>jar</packaging>
 
-	<name>uel</name>
+	<name>uel core</name>
 
 	<parent>
 		<groupId>uel</groupId>
