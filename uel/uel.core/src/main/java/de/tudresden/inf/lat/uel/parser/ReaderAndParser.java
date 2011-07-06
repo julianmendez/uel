@@ -463,6 +463,12 @@ public class ReaderAndParser {
 		str.ordinaryChar('(');
 		str.ordinaryChar(')');
 		str.wordChars('_', '_');
+		str.wordChars('-', '-');
+
+		str.wordChars(':', ':');
+		str.wordChars('/', '/');
+		str.wordChars('.', '.');
+		str.wordChars('#', '#');
 
 	}
 

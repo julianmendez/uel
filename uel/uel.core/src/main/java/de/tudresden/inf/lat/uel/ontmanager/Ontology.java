@@ -67,6 +67,11 @@ public class Ontology {
 		str.wordChars('_', '_');
 		str.wordChars('-', '-');
 
+		str.wordChars(':', ':');
+		str.wordChars('/', '/');
+		str.wordChars('.', '.');
+		str.wordChars('#', '#');
+
 		str.nextToken();
 		String definition = str.sval;
 
