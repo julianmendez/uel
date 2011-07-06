@@ -118,7 +118,7 @@ public class ReaderAndParser {
 				 * The first concept is initialized as a flat atom,
 				 */
 
-				FAtom var = new FAtom(leftvar, false, true, null, goal);
+				FAtom var = new FAtom(leftvar, false, true, null);
 
 				left = new HashMap<String, Atom>();
 				left.put(var.toString(), var);
@@ -197,7 +197,7 @@ public class ReaderAndParser {
 					 * The second concept is initialized as a flat atom,
 					 */
 
-					FAtom var = new FAtom(rightvar, false, true, null, goal);
+					FAtom var = new FAtom(rightvar, false, true, null);
 
 					left = new HashMap<String, Atom>();
 					left.put(var.toString(), var);

@@ -192,7 +192,7 @@ public class Goal {
 
 		} else {
 
-			a = new FAtom(b, null, this);
+			a = new FAtom(null, b);
 
 			a.setVar(true);
 

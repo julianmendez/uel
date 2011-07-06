@@ -26,8 +26,6 @@ public class FAtom extends Atom {
 	private ArrayList<FAtom> S = new ArrayList<FAtom>();
 	private boolean sys = false;
 
-	private Goal goal;
-
 	/**
 	 * Constructor of flat atom (used in ReaderAndParser to create a flat system
 	 * variable).
@@ -41,11 +39,10 @@ public class FAtom extends Atom {
 	 * @param v
 	 * @param arg
 	 */
-	public FAtom(String name, boolean r, boolean v, FAtom arg, Goal g) {
+	public FAtom(String name, boolean r, boolean v, FAtom arg) {
 		super(name, r);
 		var = v;
 		child = arg;
-		goal = g;
 	}
 
 	/**
@@ -58,10 +55,9 @@ public class FAtom extends Atom {
 	 * @param atom
 	 * @param c
 	 */
-	public FAtom(Atom atom, FAtom c, Goal g) {
+	public FAtom(FAtom c, Atom atom) {
 		super(atom.getName(), atom.isRoot());
 		child = c;
-		goal = g;
 	}
 
 	/**
@@ -74,10 +70,8 @@ public class FAtom extends Atom {
 	 * 
 	 * @param atom
 	 */
-	public FAtom(Atom atom, Goal g) {
+	public FAtom(Atom atom, Goal goal) {
 		super(atom.getName(), atom.isRoot());
-
-		goal = g;
 
 		if (!atom.isRoot()) {
 			child = null;
@@ -91,7 +85,7 @@ public class FAtom extends Atom {
 
 			Equation eq = new Equation();
 
-			b = new FAtom(newvar, false, true, null, goal);
+			b = new FAtom(newvar, false, true, null);
 
 			goal.setNbrVar(goal.getNbrVar() + 1);
 
