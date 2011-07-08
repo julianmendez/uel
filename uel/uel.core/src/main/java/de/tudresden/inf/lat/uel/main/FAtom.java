@@ -21,44 +21,10 @@ public class FAtom extends Atom {
 
 	private FAtom child = null;
 
-	private boolean var = false;
-
 	private ArrayList<FAtom> S = new ArrayList<FAtom>();
+
 	private boolean sys = false;
-
-	/**
-	 * Constructor of flat atom (used in ReaderAndParser to create a flat system
-	 * variable).
-	 * 
-	 * name is <code>name</code> of an atom r is true if atom is an existential
-	 * restriction v is true if atom is a variable arg is a flat atom, which is
-	 * an argument for a role name in an existential restriction
-	 * 
-	 * @param name
-	 * @param r
-	 * @param v
-	 * @param arg
-	 */
-	public FAtom(String name, boolean r, boolean v, FAtom arg) {
-		super(name, r);
-		var = v;
-		child = arg;
-	}
-
-	/**
-	 * Constructor of flat atom (used in flattening Goal.addAndFlatten)
-	 * 
-	 * atom is possible non-flat atom c is a flat atom, which is an argument for
-	 * a flat atom to be constructed.
-	 * 
-	 * 
-	 * @param atom
-	 * @param c
-	 */
-	public FAtom(FAtom c, Atom atom) {
-		super(atom.getName(), atom.isRoot());
-		child = c;
-	}
+	private boolean var = false;
 
 	/**
 	 * Constructor of flat atom which takes a non-flat atom, flattens it:
@@ -121,35 +87,49 @@ public class FAtom extends Atom {
 	}
 
 	/**
-	 * Checks if a flat atom is a variable.
+	 * Constructor of flat atom (used in flattening Goal.addAndFlatten)
 	 * 
-	 * @return <code>true</code> if and only if a flat atom is a variable
+	 * atom is possible non-flat atom c is a flat atom, which is an argument for
+	 * a flat atom to be constructed.
+	 * 
+	 * 
+	 * @param atom
+	 * @param c
 	 */
-	public boolean isVar() {
-
-		return var;
-
+	public FAtom(FAtom c, Atom atom) {
+		super(atom.getName(), atom.isRoot());
+		child = c;
 	}
 
 	/**
-	 * If v is true, it defines this atom as a variable
+	 * Constructor of flat atom (used in ReaderAndParser to create a flat system
+	 * variable).
 	 * 
+	 * name is <code>name</code> of an atom r is true if atom is an existential
+	 * restriction v is true if atom is a variable arg is a flat atom, which is
+	 * an argument for a role name in an existential restriction
+	 * 
+	 * @param name
+	 * @param r
 	 * @param v
+	 * @param arg
 	 */
-	public void setVar(boolean v) {
-
+	public FAtom(String name, boolean r, boolean v, FAtom arg) {
+		super(name, r);
 		var = v;
-
+		child = arg;
 	}
 
 	/**
-	 * Not used in UEL. Checks if this atom is a constant.
+	 * Adds a flat atom to a substitution set Used in Translator, to define
+	 * substitution for variables.
 	 * 
-	 * @return <code>true</code> if and only if this atoms is a constant
+	 * @param atom
 	 */
-	public boolean isCons() {
+	public void addToS(FAtom atom) {
 
-		return !(var || this.isRoot());
+		S.add((FAtom) atom);
+
 	}
 
 	/**
@@ -167,15 +147,13 @@ public class FAtom extends Atom {
 	}
 
 	/**
-	 * Adds a flat atom to a substitution set Used in Translator, to define
-	 * substitution for variables.
+	 * Not used in UEL. Checks if this atom is a constant.
 	 * 
-	 * @param atom
+	 * @return <code>true</code> if and only if this atoms is a constant
 	 */
-	public void addToS(FAtom atom) {
+	public boolean isCons() {
 
-		S.add((FAtom) atom);
-
+		return !(var || this.isRoot());
 	}
 
 	/**
@@ -187,6 +165,17 @@ public class FAtom extends Atom {
 	public boolean isSys() {
 
 		return sys;
+
+	}
+
+	/**
+	 * Checks if a flat atom is a variable.
+	 * 
+	 * @return <code>true</code> if and only if a flat atom is a variable
+	 */
+	public boolean isVar() {
+
+		return var;
 
 	}
 
@@ -235,20 +224,15 @@ public class FAtom extends Atom {
 
 	}
 
-	@Override
-	public String toString() {
+	/**
+	 * If v is true, it defines this atom as a variable
+	 * 
+	 * @param v
+	 */
+	public void setVar(boolean v) {
 
-		StringBuilder str = new StringBuilder(this.getName());
+		var = v;
 
-		if (child != null) {
-
-			str = str.insert(0, "(SOME ");
-
-			str.append(" ");
-			str.append(child.toString());
-			str.append(")");
-		}
-		return str.toString();
 	}
 
 	/**
@@ -264,6 +248,22 @@ public class FAtom extends Atom {
 					.println("WARNING: cannot change existential atom  into a system variable");
 		}
 
+	}
+
+	@Override
+	public String toString() {
+
+		StringBuilder str = new StringBuilder(this.getName());
+
+		if (child != null) {
+
+			str = str.insert(0, "(SOME ");
+
+			str.append(" ");
+			str.append(child.toString());
+			str.append(")");
+		}
+		return str.toString();
 	}
 
 }

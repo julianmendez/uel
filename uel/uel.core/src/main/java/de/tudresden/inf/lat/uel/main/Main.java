@@ -25,8 +25,6 @@ public class Main {
 	static final Logger logger = Logger.getLogger("Unifier");
 	private static final String unifSuffix = ".unif";
 
-	private int maxNbr = 0;
-
 	/**
 	 * Starts a unifier from the command line.
 	 * 
@@ -44,7 +42,39 @@ public class Main {
 		(new Main()).run(args);
 	}
 
+	private int maxNbr = 0;
+
 	public Main() {
+	}
+
+	/**
+	 * This method is used by Main class if the options string is "-h" or "-H"
+	 * or if the options are not valid.
+	 * 
+	 * The method displays the help file readme.txt to stdout.
+	 * 
+	 * 
+	 * 
+	 */
+	public void help() {
+
+		try {
+			InputStream help = Main.class.getResourceAsStream("/readme.txt");
+			BufferedReader helpreader = new BufferedReader(
+					new InputStreamReader(help));
+
+			String line;
+
+			while (null != (line = helpreader.readLine())) {
+
+				System.out.println(line);
+
+			}
+		} catch (Exception ex) {
+
+			ex.printStackTrace();
+		}
+
 	}
 
 	private void initialize(Goal goal, Unifier unifier, String filename)
@@ -56,6 +86,59 @@ public class Main {
 		} else {
 			goal.initialize(reader);
 		}
+	}
+
+	/**
+	 * This method analyzes the option string given to the Main class as one of
+	 * the parameters.
+	 * 
+	 * @param argument
+	 * @param unifier
+	 * @return the option number
+	 */
+
+	public int option(String argument, Unifier unifier) {
+
+		boolean test = false;
+
+		if (argument.contains("t")) {
+
+			unifier.setTest(true);
+
+		}
+
+		if (argument.contains("h")) {
+
+			return 1;
+
+		} else if (argument.contains("a")) {
+
+			return 2;
+
+		} else if (argument.contains("x")) {
+
+			return 3;
+
+		} else if (argument.contains("n")) {
+
+			return 4;
+
+		} else if (argument.contains("w")) {
+
+			return 6;
+		} else {
+
+			if (test) {
+
+				argument = argument.substring(0, argument.length() - 1);
+
+			}
+
+			maxNbr = Integer.parseInt(argument);
+
+			return 5;
+		}
+
 	}
 
 	public void run(String[] args) throws IOException {
@@ -141,89 +224,6 @@ public class Main {
 
 			help();
 
-		}
-
-	}
-
-	/**
-	 * This method is used by Main class if the options string is "-h" or "-H"
-	 * or if the options are not valid.
-	 * 
-	 * The method displays the help file readme.txt to stdout.
-	 * 
-	 * 
-	 * 
-	 */
-	public void help() {
-
-		try {
-			InputStream help = Main.class.getResourceAsStream("/readme.txt");
-			BufferedReader helpreader = new BufferedReader(
-					new InputStreamReader(help));
-
-			String line;
-
-			while (null != (line = helpreader.readLine())) {
-
-				System.out.println(line);
-
-			}
-		} catch (Exception ex) {
-
-			ex.printStackTrace();
-		}
-
-	}
-
-	/**
-	 * This method analyzes the option string given to the Main class as one of
-	 * the parameters.
-	 * 
-	 * @param argument
-	 * @param unifier
-	 * @return the option number
-	 */
-
-	public int option(String argument, Unifier unifier) {
-
-		boolean test = false;
-
-		if (argument.contains("t")) {
-
-			unifier.setTest(true);
-
-		}
-
-		if (argument.contains("h")) {
-
-			return 1;
-
-		} else if (argument.contains("a")) {
-
-			return 2;
-
-		} else if (argument.contains("x")) {
-
-			return 3;
-
-		} else if (argument.contains("n")) {
-
-			return 4;
-
-		} else if (argument.contains("w")) {
-
-			return 6;
-		} else {
-
-			if (test) {
-
-				argument = argument.substring(0, argument.length() - 1);
-
-			}
-
-			maxNbr = Integer.parseInt(argument);
-
-			return 5;
 		}
 
 	}

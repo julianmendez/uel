@@ -20,6 +20,8 @@ import de.tudresden.inf.lat.uel.main.Equation;
 
 public class Ontology {
 
+	private HashMap<String, Atom> allatoms = new HashMap<String, Atom>();
+
 	/**
 	 * 
 	 * The flattened definitions stored by the defined concepts.
@@ -27,8 +29,6 @@ public class Ontology {
 	 */
 
 	private HashMap<String, Equation> definitions = new HashMap<String, Equation>();
-
-	private HashMap<String, Atom> allatoms = new HashMap<String, Atom>();
 
 	private StreamTokenizer str;
 
@@ -43,6 +43,10 @@ public class Ontology {
 
 		return definitions.get(name);
 
+	}
+
+	public HashMap<String, Equation> getDefinitions() {
+		return definitions;
 	}
 
 	/**
@@ -127,31 +131,6 @@ public class Ontology {
 			token = str.nextToken();
 
 		}
-
-	}
-
-	private void parse(String concept) throws IOException {
-		/*
-		 * create atom concept (constant)
-		 */
-		HashMap<String, Atom> leftside = new HashMap<String, Atom>();
-		HashMap<String, Atom> rightside = new HashMap<String, Atom>(parse());
-
-		Atom a;
-
-		if (!allatoms.containsKey(concept)) {
-			a = new Atom(concept, false, null);
-			allatoms.put(a.toString(), a);
-
-		} else {
-			a = allatoms.get(concept);
-		}
-
-		leftside.put(a.toString(), a);
-
-		Equation equation = new Equation(leftside, rightside);
-
-		definitions.put(concept, equation);
 
 	}
 
@@ -388,8 +367,29 @@ public class Ontology {
 
 	}
 
-	public HashMap<String, Equation> getDefinitions() {
-		return definitions;
+	private void parse(String concept) throws IOException {
+		/*
+		 * create atom concept (constant)
+		 */
+		HashMap<String, Atom> leftside = new HashMap<String, Atom>();
+		HashMap<String, Atom> rightside = new HashMap<String, Atom>(parse());
+
+		Atom a;
+
+		if (!allatoms.containsKey(concept)) {
+			a = new Atom(concept, false, null);
+			allatoms.put(a.toString(), a);
+
+		} else {
+			a = allatoms.get(concept);
+		}
+
+		leftside.put(a.toString(), a);
+
+		Equation equation = new Equation(leftside, rightside);
+
+		definitions.put(concept, equation);
+
 	}
 
 }

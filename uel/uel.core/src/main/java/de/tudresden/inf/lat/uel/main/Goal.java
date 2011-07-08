@@ -25,9 +25,11 @@ import de.tudresden.inf.lat.uel.parser.ReaderAndParser;
 
 public class Goal {
 
-	private Ontology ontology;
-
-	private ReaderAndParser readerAndParser = new ReaderAndParser();
+	/**
+	 * allatoms is a hash map implementing all flat atoms in the goal keys are
+	 * names and values are flat atoms
+	 */
+	private HashMap<String, FAtom> allatoms = new HashMap<String, FAtom>();
 
 	/**
 	 * constants is a hash map implementing all constant concept names in the
@@ -36,24 +38,10 @@ public class Goal {
 	private HashMap<String, FAtom> constants = new HashMap<String, FAtom>();
 
 	/**
-	 * variables is a hash map implementing all concept names which are treated
-	 * as variables keys are names and values are flat atoms
-	 */
-	private HashMap<String, FAtom> variables = new HashMap<String, FAtom>();
-
-	/**
 	 * eatoms is a hash map implementing all flat existential restrictions keys
 	 * are names and values are flat atoms
 	 */
 	private HashMap<String, FAtom> eatoms = new HashMap<String, FAtom>();
-
-	/**
-	 * allatoms is a hash map implementing all flat atoms in the goal keys are
-	 * names and values are flat atoms
-	 */
-	private HashMap<String, FAtom> allatoms = new HashMap<String, FAtom>();
-
-	private int nbrVar = 0;
 
 	/**
 	 * equations is a list containing all goal equations
@@ -61,96 +49,31 @@ public class Goal {
 	 */
 	private ArrayList<Equation> equations = new ArrayList<Equation>();
 
+	private int nbrVar = 0;
+
+	private Ontology ontology;
+
+	private ReaderAndParser readerAndParser = new ReaderAndParser();
+
+	/**
+	 * variables is a hash map implementing all concept names which are treated
+	 * as variables keys are names and values are flat atoms
+	 */
+	private HashMap<String, FAtom> variables = new HashMap<String, FAtom>();
+
 	public Goal(Ontology ont) {
 		ontology = ont;
 	}
 
-	public void initialize(Reader input) throws IOException {
-		initialize(input, false, null);
-	}
-
 	/**
-	 * This method initializes the goal using a reader containing unification
-	 * problem. The method calls ReaderAndParser to parse and flatten goal
-	 * equations.
+	 * Method to add an equation e to the list of goal equations
 	 * 
-	 * Then if variable Unifier.text is true, all equations are written to a
-	 * writer.
-	 * 
-	 * Then all variables, constants and existential atoms are identified.
-	 * 
-	 * @param input
-	 *            input
-	 * @param output
-	 *            output
-	 * @throws IOException
+	 * @param e
+	 *            equation
 	 */
-	public void initializeWithTest(Reader input, Writer output)
-			throws IOException {
-		initialize(input, true, output);
-	}
+	public void addEquation(Equation e) {
 
-	private void initialize(Reader input, boolean test, Writer output)
-			throws IOException {
-
-		readerAndParser.read(input, this);
-
-		if (test) {
-
-			PrintWriter writer = new PrintWriter(new BufferedWriter(output));
-
-			for (Equation eq : equations) {
-
-				eq.printFDefinition(writer);
-
-			}
-			writer.flush();
-
-		}
-
-		for (String key : variables.keySet()) {
-			variables.get(key).setVar(true);
-			variables.get(key).SysVar();
-		}
-
-		for (String key : allatoms.keySet()) {
-
-			FAtom a = allatoms.get(key);
-
-			if (!variables.containsKey(key) && a.getName().contains("VAR")) {
-
-				a.setVar(true);
-				variables.put(key, a);
-			} else if (!variables.containsKey(key) && !a.isRoot()) {
-
-				constants.put(key, a);
-
-			} else if (a.isRoot()) {
-
-				eatoms.put(key, a);
-			}
-
-		}
-	}
-
-	/**
-	 * The method used in the flattening method <code>addFlatten</code> to add a
-	 * relevant definition from the ontology to the goal.
-	 * 
-	 * <code>concept</code> is a concept name that may be defined in the
-	 * ontology.
-	 * 
-	 * @param concept
-	 *            concept
-	 */
-	public void importDefinition(Atom concept) {
-		if (ontology.getDefinitions().containsKey(concept.toString())
-				&& !variables.containsKey(concept.toString())) {
-
-			Equation eq = ontology.getDefinition(concept.toString());
-			addFlatten(eq);
-
-		}
+		equations.add(e);
 
 	}
 
@@ -227,6 +150,18 @@ public class Goal {
 		}
 	}
 
+	public HashMap<String, FAtom> getAllAtoms() {
+		return allatoms;
+	}
+
+	public HashMap<String, FAtom> getConstants() {
+		return constants;
+	}
+
+	public HashMap<String, FAtom> getEAtoms() {
+		return eatoms;
+	}
+
 	/**
 	 * Method to get the list of goal equations
 	 * 
@@ -238,15 +173,108 @@ public class Goal {
 	}
 
 	/**
-	 * Method to add an equation e to the list of goal equations
+	 * This method is used by a constructor of a flat atom
+	 * <code>FAtom(Atom)</code> from atom. This requires to introduce a new
+	 * variable. New variables are identified by unique numbers. The next unique
+	 * number is stored in <code>nbrVar</code>.
 	 * 
-	 * @param e
-	 *            equation
+	 * @return nbrVar
 	 */
-	public void addEquation(Equation e) {
+	public int getNbrVar() {
+		return nbrVar;
+	}
 
-		equations.add(e);
+	public HashMap<String, FAtom> getVariables() {
+		return variables;
+	}
 
+	/**
+	 * The method used in the flattening method <code>addFlatten</code> to add a
+	 * relevant definition from the ontology to the goal.
+	 * 
+	 * <code>concept</code> is a concept name that may be defined in the
+	 * ontology.
+	 * 
+	 * @param concept
+	 *            concept
+	 */
+	public void importDefinition(Atom concept) {
+		if (ontology.getDefinitions().containsKey(concept.toString())
+				&& !variables.containsKey(concept.toString())) {
+
+			Equation eq = ontology.getDefinition(concept.toString());
+			addFlatten(eq);
+
+		}
+
+	}
+
+	public void initialize(Reader input) throws IOException {
+		initialize(input, false, null);
+	}
+
+	private void initialize(Reader input, boolean test, Writer output)
+			throws IOException {
+
+		readerAndParser.read(input, this);
+
+		if (test) {
+
+			PrintWriter writer = new PrintWriter(new BufferedWriter(output));
+
+			for (Equation eq : equations) {
+
+				eq.printFDefinition(writer);
+
+			}
+			writer.flush();
+
+		}
+
+		for (String key : variables.keySet()) {
+			variables.get(key).setVar(true);
+			variables.get(key).SysVar();
+		}
+
+		for (String key : allatoms.keySet()) {
+
+			FAtom a = allatoms.get(key);
+
+			if (!variables.containsKey(key) && a.getName().contains("VAR")) {
+
+				a.setVar(true);
+				variables.put(key, a);
+			} else if (!variables.containsKey(key) && !a.isRoot()) {
+
+				constants.put(key, a);
+
+			} else if (a.isRoot()) {
+
+				eatoms.put(key, a);
+			}
+
+		}
+	}
+
+	/**
+	 * This method initializes the goal using a reader containing unification
+	 * problem. The method calls ReaderAndParser to parse and flatten goal
+	 * equations.
+	 * 
+	 * Then if variable Unifier.text is true, all equations are written to a
+	 * writer.
+	 * 
+	 * Then all variables, constants and existential atoms are identified.
+	 * 
+	 * @param input
+	 *            input
+	 * @param output
+	 *            output
+	 * @throws IOException
+	 */
+	public void initializeWithTest(Reader input, Writer output)
+			throws IOException {
+		initialize(input, true, output);
 	}
 
 	/**
@@ -292,22 +320,19 @@ public class Goal {
 
 	/**
 	 * This method is not used by UEL. It is here for testing purposes. Prints
-	 * all variables of the goal.
+	 * all equations of the goal to a Print Writer out.
 	 * 
+	 * @param out
 	 */
-	public void printVariables() {
+	public void printDefinitions(PrintWriter out) {
 
-		System.out.println("From goal all variables: (" + variables.size()
-				+ "):");
+		for (Equation eq : equations) {
 
-		for (String key : variables.keySet()) {
-
-			System.out.print(variables.get(key));
-			System.out.print(" | ");
+			eq.printFDefinition(out);
+			out.println();
 
 		}
 
-		System.out.println("");
 	}
 
 	/**
@@ -350,6 +375,26 @@ public class Goal {
 	}
 
 	/**
+	 * This method is not used by UEL. It is here for testing purposes. Prints
+	 * all variables of the goal.
+	 * 
+	 */
+	public void printVariables() {
+
+		System.out.println("From goal all variables: (" + variables.size()
+				+ "):");
+
+		for (String key : variables.keySet()) {
+
+			System.out.print(variables.get(key));
+			System.out.print(" | ");
+
+		}
+
+		System.out.println("");
+	}
+
+	/**
 	 * This method is used by a constructor of a flat atom
 	 * <code>FAtom(Atom)</code> from atom. This requires to introduce a new
 	 * variable. New variables are identified by unique numbers. The next unique
@@ -359,51 +404,6 @@ public class Goal {
 	 */
 	public void setNbrVar(int nbrV) {
 		nbrVar = nbrV;
-	}
-
-	/**
-	 * This method is used by a constructor of a flat atom
-	 * <code>FAtom(Atom)</code> from atom. This requires to introduce a new
-	 * variable. New variables are identified by unique numbers. The next unique
-	 * number is stored in <code>nbrVar</code>.
-	 * 
-	 * @return nbrVar
-	 */
-	public int getNbrVar() {
-		return nbrVar;
-	}
-
-	/**
-	 * This method is not used by UEL. It is here for testing purposes. Prints
-	 * all equations of the goal to a Print Writer out.
-	 * 
-	 * @param out
-	 */
-	public void printDefinitions(PrintWriter out) {
-
-		for (Equation eq : equations) {
-
-			eq.printFDefinition(out);
-			out.println();
-
-		}
-
-	}
-
-	public HashMap<String, FAtom> getAllAtoms() {
-		return allatoms;
-	}
-
-	public HashMap<String, FAtom> getConstants() {
-		return constants;
-	}
-
-	public HashMap<String, FAtom> getVariables() {
-		return variables;
-	}
-
-	public HashMap<String, FAtom> getEAtoms() {
-		return eatoms;
 	}
 
 }

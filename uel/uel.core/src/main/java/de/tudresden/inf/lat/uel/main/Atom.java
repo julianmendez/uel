@@ -17,17 +17,17 @@ public class Atom {
 
 	/*
 	 * Atom has a name. If it is a concept name, this concept name is the
-	 * <code>name</code>. If it is an existential restriction, then its role name is the
-	 * <code>name</code>. In the case of existential restriction, the variable <code>root</code> is
-	 * true and the hash map children implements conjunction of atoms that is an
-	 * argument for the role name.
+	 * <code>name</code>. If it is an existential restriction, then its role
+	 * name is the <code>name</code>. In the case of existential restriction,
+	 * the variable <code>root</code> is true and the hash map children
+	 * implements conjunction of atoms that is an argument for the role name.
 	 */
+
+	private HashMap<String, Atom> children;
 
 	final private String name;
 
 	final private boolean root;
-
-	private HashMap<String, Atom> children;
 
 	/**
 	 * Constructor used by the constructor of FAtom. n is a name of an atom and
@@ -60,6 +60,26 @@ public class Atom {
 	}
 
 	/**
+	 * Returns the hash map representing a conjunction of atoms, which is an
+	 * argument for a role name in an existential atom.
+	 * 
+	 * @return the hash map representing a conjunction of atoms
+	 */
+	public HashMap<String, Atom> getChildren() {
+
+		if (root) {
+			return children;
+		} else {
+
+			System.out
+					.println("WARNING: Cannot return children of a variable or constant");
+
+			return null;
+		}
+
+	}
+
+	/**
 	 * Returns name of the atom.
 	 * 
 	 * @return name of the atom
@@ -67,16 +87,6 @@ public class Atom {
 	public String getName() {
 
 		return name;
-	}
-
-	/**
-	 * Is true if the atom is an existential restriction.
-	 * 
-	 * @return <code>true</code> if and only if the atom is an existential restriction
-	 */
-	public boolean isRoot() {
-
-		return root;
 	}
 
 	/**
@@ -110,22 +120,27 @@ public class Atom {
 	}
 
 	/**
-	 * Returns the hash map representing a conjunction of atoms, which is an
-	 * argument for a role name in an existential atom.
+	 * Is true if the atom is an existential restriction.
 	 * 
-	 * @return the hash map representing a conjunction of atoms
+	 * @return <code>true</code> if and only if the atom is an existential
+	 *         restriction
 	 */
-	public HashMap<String, Atom> getChildren() {
+	public boolean isRoot() {
 
-		if (root) {
-			return children;
-		} else {
+		return root;
+	}
 
-			System.out
-					.println("WARNING: Cannot return children of a variable or constant");
+	/**
+	 * 
+	 * This method is not used by UEL. It is here for testing purposes. Prints
+	 * atom to a Print Writer out.
+	 * 
+	 * 
+	 * @param out
+	 */
+	public void print(PrintWriter out) {
 
-			return null;
-		}
+		out.print(this.toString());
 
 	}
 
@@ -146,20 +161,6 @@ public class Atom {
 		}
 
 		return str.toString();
-
-	}
-
-	/**
-	 * 
-	 * This method is not used by UEL. It is here for testing purposes.
-	 * Prints atom to a Print Writer out.
-	 * 
-	 * 
-	 * @param out
-	 */
-	public void print(PrintWriter out) {
-
-		out.print(this.toString());
 
 	}
 

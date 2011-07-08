@@ -34,22 +34,22 @@ import de.tudresden.inf.lat.uel.main.Literal;
 
 public class Translator {
 
-	private Integer identificator = 1;
-
 	private Goal goal;
+
+	private Integer identificator = 1;
 
 	/*
 	 * Literals are all dis-subsumptions between atoms in the goal the first
 	 * hash map maps them to unique numbers.
 	 */
 
-	private HashMap<String, Integer> literals = new HashMap<String, Integer>();
-
 	/*
 	 * Identifiers are numbers, each number uniquely identifies a literal, i.e.
 	 * a subsumption.
 	 */
 	private HashMap<Integer, Literal> identifiers = new HashMap<Integer, Literal>();
+
+	private HashMap<String, Integer> literals = new HashMap<String, Integer>();
 
 	/**
 	 * 
@@ -66,49 +66,85 @@ public class Translator {
 		goal = g;
 	}
 
-	/**
-	 * This method encodes equations into propositional clauses in DIMACS CNF
-	 * format, i.e. positive literal is represented by a positive number and a
-	 * negative literal is represented by a corresponding negative number. Each
-	 * clause is on one line. The end of a clause is marked by 0. Example of a
-	 * clause in DIMACS format: 1 -3 0
-	 * 
-	 * Parameter infile is a file previously created for writing propositional
-	 * clauses.
-	 * 
-	 * It should be previously created, because the name of the same file is
-	 * then sent to a sat solver by Unifier.
-	 * 
-	 * @param infile
-	 */
-	public void toDIMACS(Writer infile) throws IOException {
-		int numberOfClauses = 0;
-		int numberOfVariables = 0;
-		StringWriter strWriter = new StringWriter();
+	public StringBuilder getUpdate() {
+		return update;
+	}
 
-		toCNFWithoutHeader(strWriter);
-		BufferedReader reader = new BufferedReader(new StringReader(
-				strWriter.toString()));
-		String line = "";
-		while (line != null) {
-			line = reader.readLine();
-			if (line != null) {
-				numberOfClauses++;
-				StringTokenizer stok = new StringTokenizer(line);
-				int current = Integer.parseInt(stok.nextToken());
-				if (current < 0) {
-					current = (-1) * current;
-				}
-				if (current > numberOfVariables) {
-					numberOfVariables = current;
-				}
+	/*
+	 * Method used by UEL to reset string Update values for literals and S(X)
+	 * for each X, before the next unifier is computed.
+	 */
+	public void reset() {
+
+		update = new StringBuilder("");
+
+		for (Integer key : identifiers.keySet()) {
+
+			identifiers.get(key).setValue(false);
+
+		}
+
+		for (String var : goal.getVariables().keySet()) {
+
+			goal.getVariables().get(var).resetS();
+
+		}
+
+	}
+
+	/*
+	 * 
+	 * Method to create dis-subsumptions and order literals from all pairs of
+	 * atoms of the goal
+	 */
+	private void setLiterals() {
+
+		String first;
+		String second;
+		Literal literal;
+
+		/*
+		 * Literals for dis-subsumptions
+		 */
+
+		for (String key1 : goal.getAllAtoms().keySet()) {
+
+			first = key1;
+
+			for (String key2 : goal.getAllAtoms().keySet()) {
+
+				second = key2;
+				literal = new Literal(first, second, 's');
+
+				literals.put(literal.toString(), identificator);
+				identifiers.put(identificator, literal);
+				identificator++;
 			}
 		}
 
-		PrintWriter out = new PrintWriter(new BufferedWriter(infile));
-		out.println("p cnf " + numberOfVariables + " " + numberOfClauses);
-		out.print(strWriter.toString());
-		out.flush();
+		/*
+		 * 
+		 * Literals for order on variables
+		 */
+
+		for (String key1 : goal.getVariables().keySet()) {
+
+			first = key1;
+
+			for (String key2 : goal.getVariables().keySet()) {
+
+				second = key2;
+
+				literal = new Literal(first, second, 'o');
+
+				literals.put(literal.toString(), identificator);
+				identifiers.put(identificator, literal);
+				identificator++;
+
+			}
+
+		}
+
 	}
 
 	private void toCNFWithoutHeader(Writer infile) {
@@ -573,57 +609,157 @@ public class Translator {
 	}
 
 	/*
-	 * 
-	 * Method to create dis-subsumptions and order literals from all pairs of
-	 * atoms of the goal
+	 * This method is the same as toTBox but it does not overwrite result.
+	 * Instead it appends a unifier to the existing file <result>
 	 */
-	private void setLiterals() {
 
-		String first;
-		String second;
-		Literal literal;
+	/**
+	 * This method encodes equations into propositional clauses in DIMACS CNF
+	 * format, i.e. positive literal is represented by a positive number and a
+	 * negative literal is represented by a corresponding negative number. Each
+	 * clause is on one line. The end of a clause is marked by 0. Example of a
+	 * clause in DIMACS format: 1 -3 0
+	 * 
+	 * Parameter infile is a file previously created for writing propositional
+	 * clauses.
+	 * 
+	 * It should be previously created, because the name of the same file is
+	 * then sent to a sat solver by Unifier.
+	 * 
+	 * @param infile
+	 */
+	public void toDIMACS(Writer infile) throws IOException {
+		int numberOfClauses = 0;
+		int numberOfVariables = 0;
+		StringWriter strWriter = new StringWriter();
 
-		/*
-		 * Literals for dis-subsumptions
-		 */
-
-		for (String key1 : goal.getAllAtoms().keySet()) {
-
-			first = key1;
-
-			for (String key2 : goal.getAllAtoms().keySet()) {
-
-				second = key2;
-				literal = new Literal(first, second, 's');
-
-				literals.put(literal.toString(), identificator);
-				identifiers.put(identificator, literal);
-				identificator++;
+		toCNFWithoutHeader(strWriter);
+		BufferedReader reader = new BufferedReader(new StringReader(
+				strWriter.toString()));
+		String line = "";
+		while (line != null) {
+			line = reader.readLine();
+			if (line != null) {
+				numberOfClauses++;
+				StringTokenizer stok = new StringTokenizer(line);
+				int current = Integer.parseInt(stok.nextToken());
+				if (current < 0) {
+					current = (-1) * current;
+				}
+				if (current > numberOfVariables) {
+					numberOfVariables = current;
+				}
 			}
 		}
 
-		/*
-		 * 
-		 * Literals for order on variables
-		 */
+		PrintWriter out = new PrintWriter(new BufferedWriter(infile));
+		out.println("p cnf " + numberOfVariables + " " + numberOfClauses);
+		out.print(strWriter.toString());
+		out.flush();
+	}
 
-		for (String key1 : goal.getVariables().keySet()) {
+	/*
+	 * This method is the same as toTBox, but does not write a unifier to file
+	 * <result>
+	 */
+	public boolean toTBox(Reader outfile) throws IOException {
 
-			first = key1;
+		Pattern answer = Pattern.compile("^SAT");
+		Matcher manswer;
+		String line;
+		boolean response = false;
 
-			for (String key2 : goal.getVariables().keySet()) {
+		BufferedReader reader = new BufferedReader(outfile);
 
-				second = key2;
+		line = reader.readLine();
 
-				literal = new Literal(first, second, 'o');
+		manswer = answer.matcher(line);
 
-				literals.put(literal.toString(), identificator);
-				identifiers.put(identificator, literal);
-				identificator++;
+		if (manswer.find()) {
+
+			response = true;
+
+			Pattern sign = Pattern.compile("^-");
+			Matcher msign;
+
+			line = reader.readLine();
+
+			StringTokenizer st = new StringTokenizer(line);
+
+			StringBuilder token;
+
+			while (st.hasMoreTokens()) {
+
+				token = new StringBuilder(st.nextToken());
+				msign = sign.matcher(token);
+
+				if (msign.find()) {
+
+					token = token.delete(0, msign.end());
+
+					Integer i = Integer.parseInt(token.toString());
+
+					Literal literal = (Literal) identifiers.get(i);
+
+					literal.setValue(true);
+
+				}
+
+			}
+
+			for (Integer i : identifiers.keySet()) {
+
+				String name1 = identifiers.get(i).getFirst();
+				String name2 = identifiers.get(i).getSecond();
+
+				if (identifiers.get(i).getValue()
+						&& identifiers.get(i).getKind() == 's') {
+
+					if (goal.getVariables().containsKey(name1)) {
+						if (goal.getConstants().containsKey(name2)) {
+
+							goal.getVariables()
+									.get(name1)
+									.addToS((FAtom) goal.getConstants().get(
+											name2));
+
+							if (!goal.getVariables().get(name1).isSys()) {
+								update.append(i + " ");
+							}
+
+						} else if (goal.getEAtoms().containsKey(name2)) {
+
+							goal.getVariables()
+									.get(name1)
+									.addToS((FAtom) goal.getEAtoms().get(name2));
+
+							if (!goal.getVariables().get(name1).isSys()) {
+								update.append(i + " ");
+							}
+						}
+					}
+
+				} else if (identifiers.get(i).getKind() == 's') {
+
+					if (goal.getVariables().containsKey(name1)
+							&& !goal.getVariables().get(name1).isSys()) {
+						if (goal.getConstants().containsKey(name2)) {
+
+							update.append("-" + i + " ");
+
+						} else if (goal.getEAtoms().containsKey(name2)) {
+
+							update.append("-" + i + " ");
+						}
+					}
+
+				}
 
 			}
 
 		}
+
+		return response;
 
 	}
 
@@ -781,11 +917,6 @@ public class Translator {
 
 	}
 
-	/*
-	 * This method is the same as toTBox but it does not overwrite result.
-	 * Instead it appends a unifier to the existing file <result>
-	 */
-
 	public boolean toTBoxB(Reader outfile, Writer result, int numberofsolutions)
 			throws IOException {
 
@@ -911,137 +1042,6 @@ public class Translator {
 
 		return response;
 
-	}
-
-	/*
-	 * This method is the same as toTBox, but does not write a unifier to file
-	 * <result>
-	 */
-	public boolean toTBox(Reader outfile) throws IOException {
-
-		Pattern answer = Pattern.compile("^SAT");
-		Matcher manswer;
-		String line;
-		boolean response = false;
-
-		BufferedReader reader = new BufferedReader(outfile);
-
-		line = reader.readLine();
-
-		manswer = answer.matcher(line);
-
-		if (manswer.find()) {
-
-			response = true;
-
-			Pattern sign = Pattern.compile("^-");
-			Matcher msign;
-
-			line = reader.readLine();
-
-			StringTokenizer st = new StringTokenizer(line);
-
-			StringBuilder token;
-
-			while (st.hasMoreTokens()) {
-
-				token = new StringBuilder(st.nextToken());
-				msign = sign.matcher(token);
-
-				if (msign.find()) {
-
-					token = token.delete(0, msign.end());
-
-					Integer i = Integer.parseInt(token.toString());
-
-					Literal literal = (Literal) identifiers.get(i);
-
-					literal.setValue(true);
-
-				}
-
-			}
-
-			for (Integer i : identifiers.keySet()) {
-
-				String name1 = identifiers.get(i).getFirst();
-				String name2 = identifiers.get(i).getSecond();
-
-				if (identifiers.get(i).getValue()
-						&& identifiers.get(i).getKind() == 's') {
-
-					if (goal.getVariables().containsKey(name1)) {
-						if (goal.getConstants().containsKey(name2)) {
-
-							goal.getVariables()
-									.get(name1)
-									.addToS((FAtom) goal.getConstants().get(
-											name2));
-
-							if (!goal.getVariables().get(name1).isSys()) {
-								update.append(i + " ");
-							}
-
-						} else if (goal.getEAtoms().containsKey(name2)) {
-
-							goal.getVariables()
-									.get(name1)
-									.addToS((FAtom) goal.getEAtoms().get(name2));
-
-							if (!goal.getVariables().get(name1).isSys()) {
-								update.append(i + " ");
-							}
-						}
-					}
-
-				} else if (identifiers.get(i).getKind() == 's') {
-
-					if (goal.getVariables().containsKey(name1)
-							&& !goal.getVariables().get(name1).isSys()) {
-						if (goal.getConstants().containsKey(name2)) {
-
-							update.append("-" + i + " ");
-
-						} else if (goal.getEAtoms().containsKey(name2)) {
-
-							update.append("-" + i + " ");
-						}
-					}
-
-				}
-
-			}
-
-		}
-
-		return response;
-
-	}
-
-	/*
-	 * Method used by UEL to reset string Update values for literals and S(X)
-	 * for each X, before the next unifier is computed.
-	 */
-	public void reset() {
-
-		update = new StringBuilder("");
-
-		for (Integer key : identifiers.keySet()) {
-
-			identifiers.get(key).setValue(false);
-
-		}
-
-		for (String var : goal.getVariables().keySet()) {
-
-			goal.getVariables().get(var).resetS();
-
-		}
-
-	}
-
-	public StringBuilder getUpdate() {
-		return update;
 	}
 
 }

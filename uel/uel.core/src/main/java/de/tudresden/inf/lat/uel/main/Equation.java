@@ -59,39 +59,14 @@ public class Equation {
 	}
 
 	/**
-	 * Returns the right side of the equation as the hash map of names and atoms.
+	 * Returns the right side of the equation as the hash map of names and
+	 * atoms.
 	 * 
 	 * @return the right side of the equation
 	 */
 	public HashMap<String, Atom> getRight() {
 
 		return right;
-	}
-
-	/**
-	 * Sets the left side of the equation to the hash map <code>list</code> with keys names
-	 * and values atoms.
-	 * 
-	 * Not used in UEL.
-	 * 
-	 * @param list
-	 */
-	public void setLeft(HashMap<String, Atom> list) {
-
-		left = list;
-	}
-
-	/**
-	 * Sets the right side of the equation to the hash map <code>list</code> with keys
-	 * names and values atoms.
-	 * 
-	 * Used in FAtom
-	 * 
-	 * @param list
-	 */
-	public void setRight(HashMap<String, Atom> list) {
-
-		right = list;
 	}
 
 	/**
@@ -129,8 +104,8 @@ public class Equation {
 	}
 
 	/**
-	 * Prints an equation to Print Writer <code>out</code>. Used in Goal initialization, in
-	 * creating TBox file.
+	 * Prints an equation to Print Writer <code>out</code>. Used in Goal
+	 * initialization, in creating TBox file.
 	 * 
 	 * 
 	 * @param out
@@ -188,6 +163,32 @@ public class Equation {
 
 		}
 
+	}
+
+	/**
+	 * Sets the left side of the equation to the hash map <code>list</code> with
+	 * keys names and values atoms.
+	 * 
+	 * Not used in UEL.
+	 * 
+	 * @param list
+	 */
+	public void setLeft(HashMap<String, Atom> list) {
+
+		left = list;
+	}
+
+	/**
+	 * Sets the right side of the equation to the hash map <code>list</code>
+	 * with keys names and values atoms.
+	 * 
+	 * Used in FAtom
+	 * 
+	 * @param list
+	 */
+	public void setRight(HashMap<String, Atom> list) {
+
+		right = list;
 	}
 
 }

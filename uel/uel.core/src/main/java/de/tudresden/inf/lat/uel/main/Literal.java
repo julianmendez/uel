@@ -19,8 +19,8 @@ package de.tudresden.inf.lat.uel.main;
  */
 public class Literal {
 
-	private char kind;
 	final private String first;
+	private char kind;
 	final private String second;
 	private boolean value = false;
 
@@ -63,9 +63,30 @@ public class Literal {
 
 	}
 
+	/**
+	 * Returns the kind of literal.
+	 * 
+	 * @return the kind
+	 */
+	public char getKind() {
+
+		return kind;
+
+	}
+
 	public String getSecond() {
 
 		return second;
+	}
+
+	/**
+	 * Returns the value of literal.
+	 * 
+	 * @return the value
+	 */
+	public boolean getValue() {
+
+		return value;
 	}
 
 	/**
@@ -78,27 +99,6 @@ public class Literal {
 
 		kind = s;
 
-	}
-
-	/**
-	 * Returns the kind of literal.
-	 * 
-	 * @return the kind
-	 */
-	public char getKind() {
-
-		return kind;
-
-	}
-
-	/**
-	 * Returns the value of literal.
-	 * 
-	 * @return the value
-	 */
-	public boolean getValue() {
-
-		return value;
 	}
 
 	/**

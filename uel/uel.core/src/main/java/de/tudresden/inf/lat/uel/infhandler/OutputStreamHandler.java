@@ -1,7 +1,6 @@
 package de.tudresden.inf.lat.uel.infhandler;
 
 import java.io.BufferedWriter;
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
