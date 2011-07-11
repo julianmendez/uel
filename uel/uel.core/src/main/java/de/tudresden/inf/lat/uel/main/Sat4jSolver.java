@@ -1,8 +1,8 @@
 package de.tudresden.inf.lat.uel.main;
 
 import java.io.BufferedWriter;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.StringReader;
 import java.io.StringWriter;
 
 import org.sat4j.minisat.SolverFactory;
@@ -22,14 +22,15 @@ public class Sat4jSolver implements Solver {
 
 	@Override
 	public String solve(String input) throws IOException {
-		StringReader satinputReader = new StringReader(input);
+		ByteArrayInputStream satinputInputStream = new ByteArrayInputStream(
+				input.getBytes());
 		StringWriter satoutputWriter = new StringWriter();
 
 		ISolver solver = SolverFactory.newDefault();
 		solver.setTimeout(timeout);
 		DimacsReader reader = new DimacsReader(solver);
 		try {
-			IProblem problem = reader.parseInstance(satinputReader);
+			IProblem problem = reader.parseInstance(satinputInputStream);
 			if (problem.isSatisfiable()) {
 				BufferedWriter output = new BufferedWriter(satoutputWriter);
 				output.write(msgSat);
