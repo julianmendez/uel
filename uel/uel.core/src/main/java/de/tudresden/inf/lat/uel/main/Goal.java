@@ -282,7 +282,7 @@ public class Goal {
 	 * all atoms of the goal.
 	 * 
 	 */
-	public void printAllAtoms() {
+	public String printAllAtoms() {
 		StringBuffer sbuf = new StringBuffer();
 		sbuf.append("From goal all atoms (" + allatoms.size());
 		sbuf.append("):\n");
@@ -291,6 +291,7 @@ public class Goal {
 			sbuf.append(" | ");
 		}
 		sbuf.append("\n");
+		return sbuf.toString();
 	}
 
 	/**
@@ -298,7 +299,7 @@ public class Goal {
 	 * all constants of the goal.
 	 * 
 	 */
-	public void printConstants() {
+	public String printConstants() {
 		StringBuffer sbuf = new StringBuffer();
 		sbuf.append("From goal all constants(" + constants.size());
 		sbuf.append("):\n");
@@ -307,6 +308,7 @@ public class Goal {
 			sbuf.append(" | ");
 		}
 		sbuf.append("\n");
+		return sbuf.toString();
 	}
 
 	/**
