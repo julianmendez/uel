@@ -144,7 +144,8 @@ public class Ontology {
 		Atom a;
 		String s = "";
 		int token = str.nextToken();
-
+		int brcounter=0;
+		
 		if (token == '(') {
 
 			token = str.nextToken();
@@ -188,11 +189,14 @@ public class Ontology {
 						s = "(".concat(ss);
 
 						/*
-						 * And cannot appear in AND
+						 * Now And can appear in AND
 						 */
 						if (s.equalsIgnoreCase("(AND"))
-							throw new RuntimeException(
-									"AND cannot occur inside (AND ...) " + str);
+//							throw new RuntimeException(
+//									"AND cannot occur inside (AND ...) " + str);
+						{
+							brcounter++;
+						}
 
 						/*
 						 * SOME was found inside AND
@@ -222,7 +226,7 @@ public class Ontology {
 									parse());
 
 							/*
-							 * WARNING ONTOLOGY IS NOT FLATTENED
+							 * WARNING: ONTOLOGY IS NOT FLATTENED
 							 */
 
 							a = new Atom(rolename, true, arglist);
@@ -264,8 +268,11 @@ public class Ontology {
 						}
 
 					} else if (token == ')') {
-
+						if(brcounter==0){
 						return result;
+						}else{
+							brcounter--;
+						}
 
 					}
 
