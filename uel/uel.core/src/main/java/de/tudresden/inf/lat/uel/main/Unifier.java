@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -20,6 +21,8 @@ import de.tudresden.inf.lat.uel.sattranslator.Translator;
  */
 
 public class Unifier {
+
+	static final Logger logger = Logger.getLogger("Unifier");
 
 	private int numberofsolutions = 0;
 
@@ -141,9 +144,9 @@ public class Unifier {
 		Matcher manswer = answer.matcher(line);
 
 		if (manswer.find()) {
-			Main.logger.info("UNIFIABLE");
+			logger.info("UNIFIABLE");
 		} else {
-			Main.logger.info("UNUNIFIABLE");
+			logger.info("UNUNIFIABLE");
 		}
 	}
 
@@ -184,7 +187,7 @@ public class Unifier {
 		String satinputStr = satinputWriter.toString();
 
 		if (unifiable) {
-			Main.logger.info("UNIFIABLE\n" + "Unifier stored in file.");
+			logger.info("UNIFIABLE\n" + "Unifier stored in file.");
 
 			boolean test = questionYN();
 
@@ -202,19 +205,19 @@ public class Unifier {
 						result, numberofsolutions);
 
 				if (unifiable) {
-					Main.logger.info(numberofsolutions + " UNIFIER\n"
+					logger.info(numberofsolutions + " UNIFIER\n"
 							+ "Unifier appended to file.");
 
 					test = questionYN();
 				} else {
-					Main.logger.info("NO MORE UNIFIERS");
+					logger.info("NO MORE UNIFIERS");
 				}
 
 			}
 
-			Main.logger.info("Have a good day!");
+			logger.info("Have a good day!");
 		} else {
-			Main.logger.info("UNUNIFIABLE");
+			logger.info("UNUNIFIABLE");
 		}
 		return result.toString();
 	}
@@ -254,7 +257,7 @@ public class Unifier {
 
 		if (unifiable) {
 
-			Main.logger.info("UNIFIABLE\n" + "Unifier stored in file.");
+			logger.info("UNIFIABLE\n" + "Unifier stored in file.");
 
 			nbrUnifiers++;
 
@@ -271,18 +274,18 @@ public class Unifier {
 						result, numberofsolutions);
 
 				if (unifiable) {
-					Main.logger.info(numberofsolutions + " UNIFIER\n"
+					logger.info(numberofsolutions + " UNIFIER\n"
 							+ "Unifier stored in file.");
 					nbrUnifiers++;
 
 				} else {
-					Main.logger.info("NO MORE UNIFIERS");
+					logger.info("NO MORE UNIFIERS");
 				}
 			}
 
-			Main.logger.info("Have a good day!");
+			logger.info("Have a good day!");
 		} else {
-			Main.logger.info("UNUNIFIABLE");
+			logger.info("UNUNIFIABLE");
 		}
 
 		return result.toString();
@@ -345,10 +348,9 @@ public class Unifier {
 		}
 
 		if (message) {
-			Main.logger.info("UNIFIABLE\n" + numberofsolutions
-					+ " unifiers found");
+			logger.info("UNIFIABLE\n" + numberofsolutions + " unifiers found");
 		} else {
-			Main.logger.info("UNUNIFIABLE");
+			logger.info("UNUNIFIABLE");
 		}
 	}
 
@@ -382,9 +384,9 @@ public class Unifier {
 		Translator translator = new Translator(goal);
 
 		if (unify(translator, result)) {
-			Main.logger.info("UNIFIABLE\n" + "Unifier stored in file.");
+			logger.info("UNIFIABLE\n" + "Unifier stored in file.");
 		} else {
-			Main.logger.info("UNUNIFIABLE");
+			logger.info("UNUNIFIABLE");
 		}
 
 		return result.toString();
@@ -427,7 +429,7 @@ public class Unifier {
 		if (unifiable) {
 
 			numberofsolutions++;
-			Main.logger.info("UNIFIABLE\n" + "Unifier stored in file.");
+			logger.info("UNIFIABLE\n" + "Unifier stored in file.");
 
 			while (unifiable) {
 
@@ -443,17 +445,17 @@ public class Unifier {
 						result, numberofsolutions);
 
 				if (unifiable) {
-					Main.logger.info(numberofsolutions + " UNIFIER\n"
+					logger.info(numberofsolutions + " UNIFIER\n"
 							+ "Unifier appended to " + result.toString());
 				} else {
-					Main.logger.info("NO MORE UNIFIERS");
+					logger.info("NO MORE UNIFIERS");
 				}
 
 			}
 
-			Main.logger.info("Have a good day!");
+			logger.info("Have a good day!");
 		} else {
-			Main.logger.info("UNUNIFIABLE");
+			logger.info("UNUNIFIABLE");
 		}
 
 		return result.toString();
