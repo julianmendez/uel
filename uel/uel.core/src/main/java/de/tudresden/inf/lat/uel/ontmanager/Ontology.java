@@ -30,8 +30,6 @@ public class Ontology {
 
 	private HashMap<String, Equation> definitions = new HashMap<String, Equation>();
 
-	private StreamTokenizer str;
-
 	public Ontology() {
 	}
 
@@ -67,9 +65,7 @@ public class Ontology {
 		 * open file
 		 */
 
-		Reader reader = new BufferedReader(input);
-
-		str = new StreamTokenizer(reader);
+		StreamTokenizer str = new StreamTokenizer(new BufferedReader(input));
 		str.ordinaryChar('(');
 		str.ordinaryChar(')');
 		str.wordChars('_', '_');
@@ -123,7 +119,7 @@ public class Ontology {
 
 					str.pushBack();
 
-					parse(concept);
+					parse(str, concept);
 
 				} else {
 
@@ -143,7 +139,7 @@ public class Ontology {
 	 * parsing the right side of the equation:
 	 */
 
-	private HashMap<String, Atom> parse() throws IOException {
+	private HashMap<String, Atom> parse(StreamTokenizer str) throws IOException {
 
 		HashMap<String, Atom> result = new HashMap<String, Atom>();
 		Atom a;
@@ -228,7 +224,7 @@ public class Ontology {
 							}
 
 							HashMap<String, Atom> arglist = new HashMap<String, Atom>(
-									parse());
+									parse(str));
 
 							/*
 							 * WARNING: ONTOLOGY IS NOT FLATTENED
@@ -311,7 +307,7 @@ public class Ontology {
 				}
 
 				HashMap<String, Atom> arglist = new HashMap<String, Atom>(
-						parse());
+						parse(str));
 
 				/*
 				 * WARNING ONTOLOGY IS NOT FLATTENED
@@ -379,12 +375,12 @@ public class Ontology {
 
 	}
 
-	private void parse(String concept) throws IOException {
+	private void parse(StreamTokenizer str, String concept) throws IOException {
 		/*
 		 * create atom concept (constant)
 		 */
 		HashMap<String, Atom> leftside = new HashMap<String, Atom>();
-		HashMap<String, Atom> rightside = new HashMap<String, Atom>(parse());
+		HashMap<String, Atom> rightside = new HashMap<String, Atom>(parse(str));
 
 		Atom a;
 
