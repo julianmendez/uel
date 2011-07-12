@@ -73,34 +73,35 @@ public class Equation {
 	 * This method is defined for testing purposes only. It is used by printing
 	 * method of Goal.
 	 */
-	public void printEquation() {
+	public String printEquation() {
 
+		StringBuffer sbuf = new StringBuffer();
 		if (left != null && right != null) {
 
-			System.out.print("From Equation: left side is -- ");
+			sbuf.append("From Equation: left side is -- ");
 
 			for (String concept : left.keySet()) {
 
-				System.out.print(left.get(concept));
-				System.out.print(" | ");
+				sbuf.append(left.get(concept));
+				sbuf.append(" | ");
 			}
 
-			System.out.println("");
-			System.out.print("From Equation: right side is -- ");
+			sbuf.append("\n");
+			sbuf.append("From Equation: right side is -- ");
 
 			for (String concept : right.keySet()) {
 
-				System.out.print(right.get(concept));
-				System.out.print(" | ");
+				sbuf.append(right.get(concept));
+				sbuf.append(" | ");
 			}
 
-			System.out.println("");
+			sbuf.append("\n");
 		} else {
 
 			throw new RuntimeException("Error: equation is empty");
 
 		}
-
+		return sbuf.toString();
 	}
 
 	/**

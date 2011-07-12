@@ -283,18 +283,14 @@ public class Goal {
 	 * 
 	 */
 	public void printAllAtoms() {
-
-		System.out.print("From goal all atoms (" + allatoms.size() + "):");
-
+		StringBuffer sbuf = new StringBuffer();
+		sbuf.append("From goal all atoms (" + allatoms.size());
+		sbuf.append("):\n");
 		for (String key : allatoms.keySet()) {
-
-			System.out.print(allatoms.get(key));
-			System.out.print(" | ");
-
+			sbuf.append(allatoms.get(key));
+			sbuf.append(" | ");
 		}
-
-		System.out.println("");
-
+		sbuf.append("\n");
 	}
 
 	/**
@@ -303,19 +299,14 @@ public class Goal {
 	 * 
 	 */
 	public void printConstants() {
-
-		System.out
-				.println("From goal all constants(" + constants.size() + "):");
-
+		StringBuffer sbuf = new StringBuffer();
+		sbuf.append("From goal all constants(" + constants.size());
+		sbuf.append("):\n");
 		for (String key : constants.keySet()) {
-
-			System.out.print(constants.get(key));
-			System.out.print(" | ");
-
+			sbuf.append(constants.get(key));
+			sbuf.append(" | ");
 		}
-
-		System.out.println("");
-
+		sbuf.append("\n");
 	}
 
 	/**
@@ -325,14 +316,10 @@ public class Goal {
 	 * @param out
 	 */
 	public void printDefinitions(PrintWriter out) {
-
 		for (Equation eq : equations) {
-
 			eq.printFDefinition(out);
 			out.println();
-
 		}
-
 	}
 
 	/**
@@ -340,19 +327,16 @@ public class Goal {
 	 * all existential atoms of the goal.
 	 * 
 	 */
-	public void printEatoms() {
-
-		System.out.println("From goal all existential restrictions ("
-				+ eatoms.size() + "):");
-
+	public String printEatoms() {
+		StringBuffer sbuf = new StringBuffer();
+		sbuf.append("From goal all existential restrictions (" + eatoms.size());
+		sbuf.append("):\n");
 		for (String key : eatoms.keySet()) {
-
-			System.out.print(eatoms.get(key));
-			System.out.print(" | ");
-
+			sbuf.append(eatoms.get(key));
+			sbuf.append(" | ");
 		}
-
-		System.out.println("");
+		sbuf.append("\n");
+		return sbuf.toString();
 	}
 
 	/**
@@ -360,18 +344,17 @@ public class Goal {
 	 * all equations of the goal.
 	 * 
 	 */
-	public void printGoal() {
-
+	public String printGoal() {
+		StringBuffer sbuf = new StringBuffer();
 		int i = 0;
-
 		for (Equation e : equations) {
-
-			System.out.println("Goal equation nr." + i + ":");
-			e.printEquation();
-
+			sbuf.append("Goal equation nr." + i);
+			sbuf.append(":");
+			sbuf.append(e.printEquation());
+			sbuf.append("\n");
 			i++;
 		}
-
+		return sbuf.toString();
 	}
 
 	/**
@@ -379,19 +362,16 @@ public class Goal {
 	 * all variables of the goal.
 	 * 
 	 */
-	public void printVariables() {
-
-		System.out.println("From goal all variables: (" + variables.size()
-				+ "):");
-
+	public String printVariables() {
+		StringBuffer sbuf = new StringBuffer();
+		sbuf.append("From goal all variables: (" + variables.size());
+		sbuf.append("):\n");
 		for (String key : variables.keySet()) {
-
-			System.out.print(variables.get(key));
-			System.out.print(" | ");
-
+			sbuf.append(variables.get(key));
+			sbuf.append(" | ");
 		}
-
-		System.out.println("");
+		sbuf.append("\n");
+		return sbuf.toString();
 	}
 
 	/**
