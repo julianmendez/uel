@@ -191,4 +191,24 @@ public class Equation {
 		right = list;
 	}
 
+	@Override
+	public String toString() {
+		StringBuffer sbuf = new StringBuffer();
+		sbuf.append("(define-concept ");
+		sbuf.append(left.keySet().iterator().next());
+		if (right.keySet().size() > 1) {
+			sbuf.append(" (and");
+			for (String concept : right.keySet()) {
+				sbuf.append(" ");
+				sbuf.append(right.get(concept));
+			}
+			sbuf.append(")");
+		} else if (right.keySet().size() == 1) {
+			sbuf.append(" ");
+			sbuf.append(right.get(right.keySet().iterator().next()));
+		}
+		sbuf.append(")");
+		return sbuf.toString();
+	}
+
 }
