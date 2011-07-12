@@ -30,31 +30,14 @@ public class ReaderAndParser {
 	 */
 	private String rightvar;
 
-	private StreamTokenizer str;
-
 	public ReaderAndParser() {
-	}
-
-	private void initTokenizer(Reader reader) {
-
-		str = new StreamTokenizer(reader);
-		str.ordinaryChar('(');
-		str.ordinaryChar(')');
-		str.wordChars('_', '_');
-		str.wordChars('-', '-');
-
-		str.wordChars(':', ':');
-		str.wordChars('/', '/');
-		str.wordChars('.', '.');
-		str.wordChars('#', '#');
-
 	}
 
 	/*
 	 * Parse method Parsing right side of a definition
 	 */
 
-	private HashMap<String, Atom> parse() throws IOException {
+	private HashMap<String, Atom> parse(StreamTokenizer str) throws IOException {
 
 		HashMap<String, Atom> result = new HashMap<String, Atom>();
 		Atom a;
@@ -138,7 +121,7 @@ public class ReaderAndParser {
 							}
 
 							HashMap<String, Atom> arglist = new HashMap<String, Atom>(
-									parse());
+									parse(str));
 
 							a = new Atom(rolename, true, arglist);
 
@@ -207,7 +190,7 @@ public class ReaderAndParser {
 				}
 
 				HashMap<String, Atom> arglist = new HashMap<String, Atom>(
-						parse());
+						parse(str));
 
 				a = new Atom(rolename, true, arglist);
 
@@ -289,9 +272,16 @@ public class ReaderAndParser {
 		 * Opens input file
 		 */
 
-		Reader r = new BufferedReader(input);
+		StreamTokenizer str = new StreamTokenizer(new BufferedReader(input));
+		str.ordinaryChar('(');
+		str.ordinaryChar(')');
+		str.wordChars('_', '_');
+		str.wordChars('-', '-');
 
-		initTokenizer(r);
+		str.wordChars(':', ':');
+		str.wordChars('/', '/');
+		str.wordChars('.', '.');
+		str.wordChars('#', '#');
 
 		int token = str.nextToken();
 
@@ -353,7 +343,7 @@ public class ReaderAndParser {
 				/*
 				 * Parse left side of the goal equation
 				 */
-				right = parse();
+				right = parse(str);
 
 				/*
 				 * Add equation to the goal while flattening it
@@ -433,7 +423,7 @@ public class ReaderAndParser {
 					 * Parse left side of the second goal equation
 					 */
 
-					right = parse();
+					right = parse(str);
 
 					/*
 					 * Add equation to the goal while flattening it
