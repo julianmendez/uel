@@ -35,6 +35,10 @@ public class Ontology {
 	public Ontology() {
 	}
 
+	public HashMap<String, Atom> getAllAtoms() {
+		return this.allatoms;
+	}
+
 	/**
 	 * Method to get a definition from the ontology by the defined concept (Used
 	 * by Goal initialization.)
@@ -108,7 +112,8 @@ public class Ontology {
 			 */
 
 			if (definition != null
-					&& definition.equalsIgnoreCase("define-concept")) {
+					&& (definition.equalsIgnoreCase("define-concept") || definition
+							.equalsIgnoreCase("define-primitive-concept"))) {
 
 				int tokenTOP = str.nextToken();
 
