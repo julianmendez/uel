@@ -144,8 +144,8 @@ public class Ontology {
 		Atom a;
 		String s = "";
 		int token = str.nextToken();
-		int brcounter=0;
-		
+		int brcounter = 0;
+
 		if (token == '(') {
 
 			token = str.nextToken();
@@ -192,8 +192,8 @@ public class Ontology {
 						 * Now And can appear in AND
 						 */
 						if (s.equalsIgnoreCase("(AND"))
-//							throw new RuntimeException(
-//									"AND cannot occur inside (AND ...) " + str);
+						// throw new RuntimeException(
+						// "AND cannot occur inside (AND ...) " + str);
 						{
 							brcounter++;
 						}
@@ -268,9 +268,9 @@ public class Ontology {
 						}
 
 					} else if (token == ')') {
-						if(brcounter==0){
-						return result;
-						}else{
+						if (brcounter == 0) {
+							return result;
+						} else {
 							brcounter--;
 						}
 
