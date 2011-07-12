@@ -192,7 +192,7 @@ public class Unifier {
 
 				numberofsolutions++;
 
-				String additionalline = translator.getUpdate() + " 0 ";
+				String additionalline = translator.getUpdate() + " 0";
 				satinputStr += additionalline + "\n";
 				String satoutputStr = solver.solve(satinputStr);
 
@@ -262,7 +262,7 @@ public class Unifier {
 
 				numberofsolutions++;
 
-				String additionalline = translator.getUpdate() + " 0 ";
+				String additionalline = translator.getUpdate() + " 0";
 				satinputStr += additionalline + "\n";
 				String satoutputStr = solver.solve(satinputStr);
 
@@ -331,7 +331,7 @@ public class Unifier {
 				message = true;
 				numberofsolutions++;
 
-				String additionalline = translator.getUpdate() + " 0 ";
+				String additionalline = translator.getUpdate() + " 0";
 				satinputStr += additionalline + "\n";
 				satoutputStr = solver.solve(satinputStr);
 
@@ -433,7 +433,7 @@ public class Unifier {
 
 				numberofsolutions++;
 
-				String additionalline = translator.getUpdate() + " 0 ";
+				String additionalline = translator.getUpdate() + " 0";
 				satinputStr += additionalline + "\n";
 				String satoutputStr = solver.solve(satinputStr);
 
