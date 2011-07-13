@@ -30,6 +30,8 @@ public class Ontology {
 
 	private HashMap<String, Equation> definitions = new HashMap<String, Equation>();
 
+	private HashMap<String, Equation> primitiveDefinitions = new HashMap<String, Equation>();
+
 	public Ontology() {
 	}
 
@@ -42,13 +44,19 @@ public class Ontology {
 	 * by Goal initialization.)
 	 */
 	public Equation getDefinition(String name) {
-
 		return definitions.get(name);
-
 	}
 
 	public HashMap<String, Equation> getDefinitions() {
 		return definitions;
+	}
+
+	public Equation getPrimitiveDefinition(String name) {
+		return primitiveDefinitions.get(name);
+	}
+
+	public HashMap<String, Equation> getPrimitiveDefinitions() {
+		return primitiveDefinitions;
 	}
 
 	/**
@@ -107,24 +115,22 @@ public class Ontology {
 			 * concept definition found -- need to parse it and add to equations
 			 */
 
-			if (definition != null
-					&& (definition.equalsIgnoreCase("define-concept") || definition
-							.equalsIgnoreCase("define-primitive-concept"))) {
-
-				int tokenTOP = str.nextToken();
-
-				if (tokenTOP == '('
-						|| (str.sval != null && !str.sval
-								.equalsIgnoreCase("top"))) {
-
-					str.pushBack();
-
-					parse(str, concept);
-
-				} else {
-
-					System.out.println("Something wrong with database");
-
+			if (definition != null) {
+				if (definition.equalsIgnoreCase("define-concept")) {
+					int tokenTOP = str.nextToken();
+					if (tokenTOP == '('
+							|| (str.sval != null && !str.sval
+									.equalsIgnoreCase("top"))) {
+						str.pushBack();
+						parse(str, concept);
+					} else {
+						throw new RuntimeException(
+								"Something wrong with database: '" + str.sval
+										+ "'.");
+					}
+				} else if (definition
+						.equalsIgnoreCase("define-primitive-concept")) {
+					parsePrimitive(str, concept);
 				}
 			}
 
@@ -397,6 +403,32 @@ public class Ontology {
 		Equation equation = new Equation(leftside, rightside);
 
 		definitions.put(concept, equation);
+
+	}
+
+	private void parsePrimitive(StreamTokenizer str, String concept)
+			throws IOException {
+		/*
+		 * create atom concept (constant)
+		 */
+		HashMap<String, Atom> leftside = new HashMap<String, Atom>();
+		HashMap<String, Atom> rightside = new HashMap<String, Atom>(parse(str));
+
+		Atom a;
+
+		if (!allatoms.containsKey(concept)) {
+			a = new Atom(concept, false, null);
+			allatoms.put(a.toString(), a);
+
+		} else {
+			a = allatoms.get(concept);
+		}
+
+		leftside.put(a.toString(), a);
+
+		Equation equation = new Equation(leftside, rightside);
+
+		primitiveDefinitions.put(concept, equation);
 
 	}
 
