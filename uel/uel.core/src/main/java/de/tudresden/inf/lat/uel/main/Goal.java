@@ -7,6 +7,8 @@ import java.io.Reader;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import de.tudresden.inf.lat.uel.ontmanager.Ontology;
 import de.tudresden.inf.lat.uel.parser.ReaderAndParser;
@@ -29,25 +31,25 @@ public class Goal {
 	 * allatoms is a hash map implementing all flat atoms in the goal keys are
 	 * names and values are flat atoms
 	 */
-	private HashMap<String, FAtom> allatoms = new HashMap<String, FAtom>();
+	private Map<String, FAtom> allatoms = new HashMap<String, FAtom>();
 
 	/**
 	 * constants is a hash map implementing all constant concept names in the
 	 * goal. keys are names and values are flat atoms
 	 */
-	private HashMap<String, FAtom> constants = new HashMap<String, FAtom>();
+	private Map<String, FAtom> constants = new HashMap<String, FAtom>();
 
 	/**
 	 * eatoms is a hash map implementing all flat existential restrictions keys
 	 * are names and values are flat atoms
 	 */
-	private HashMap<String, FAtom> eatoms = new HashMap<String, FAtom>();
+	private Map<String, FAtom> eatoms = new HashMap<String, FAtom>();
 
 	/**
 	 * equations is a list containing all goal equations
 	 * 
 	 */
-	private ArrayList<Equation> equations = new ArrayList<Equation>();
+	private List<Equation> equations = new ArrayList<Equation>();
 
 	private int nbrVar = 0;
 
@@ -59,7 +61,7 @@ public class Goal {
 	 * variables is a hash map implementing all concept names which are treated
 	 * as variables keys are names and values are flat atoms
 	 */
-	private HashMap<String, FAtom> variables = new HashMap<String, FAtom>();
+	private Map<String, FAtom> variables = new HashMap<String, FAtom>();
 
 	public Goal(Ontology ont) {
 		ontology = ont;
@@ -150,15 +152,15 @@ public class Goal {
 		}
 	}
 
-	public HashMap<String, FAtom> getAllAtoms() {
+	public Map<String, FAtom> getAllAtoms() {
 		return allatoms;
 	}
 
-	public HashMap<String, FAtom> getConstants() {
+	public Map<String, FAtom> getConstants() {
 		return constants;
 	}
 
-	public HashMap<String, FAtom> getEAtoms() {
+	public Map<String, FAtom> getEAtoms() {
 		return eatoms;
 	}
 
@@ -167,7 +169,7 @@ public class Goal {
 	 * 
 	 * @return the list of goal equations
 	 */
-	public ArrayList<Equation> getEquations() {
+	public List<Equation> getEquations() {
 
 		return equations;
 	}
@@ -184,7 +186,7 @@ public class Goal {
 		return nbrVar;
 	}
 
-	public HashMap<String, FAtom> getVariables() {
+	public Map<String, FAtom> getVariables() {
 		return variables;
 	}
 
