@@ -26,20 +26,48 @@ public class UelView extends JPanel {
 
 	private JComboBox classNameList00 = null;
 	private JComboBox classNameList01 = null;
-	private JButton computeButton = null;
-
+	private JButton getVarButton = null;
 	private DefaultListModel listmodel = new DefaultListModel();
 	private UelProcessor model = null;
+	private JButton unifyButton = null;
 
 	public UelView(UelProcessor processor) {
+		if (processor == null) {
+			throw new IllegalArgumentException("Null argument.");
+		}
+
 		this.model = processor;
 		init();
 	}
 
-	public void addComputeButtonListener(ActionListener listener,
+	public void addGetVarButtonListener(ActionListener listener,
 			String actionCommand) {
-		this.computeButton.addActionListener(listener);
-		this.computeButton.setActionCommand(actionCommand);
+		if (listener == null) {
+			throw new IllegalArgumentException("Null argument.");
+		}
+		if (actionCommand == null) {
+			throw new IllegalArgumentException("Null argument.");
+		}
+
+		this.getVarButton.addActionListener(listener);
+		this.getVarButton.setActionCommand(actionCommand);
+	}
+
+	public void addUnifyButtonListener(ActionListener listener,
+			String actionCommand) {
+		if (listener == null) {
+			throw new IllegalArgumentException("Null argument.");
+		}
+		if (actionCommand == null) {
+			throw new IllegalArgumentException("Null argument.");
+		}
+
+		this.unifyButton.addActionListener(listener);
+		this.unifyButton.setActionCommand(actionCommand);
+	}
+
+	public JButton getGetVarButton() {
+		return this.getVarButton;
 	}
 
 	public DefaultListModel getListModel() {
@@ -56,6 +84,10 @@ public class UelView extends JPanel {
 
 	public int getSelectedIndex01() {
 		return this.classNameList01.getSelectedIndex();
+	}
+
+	public JButton getUnifyButton() {
+		return this.unifyButton;
 	}
 
 	public void init() {
@@ -92,11 +124,12 @@ public class UelView extends JPanel {
 		selectionPanel.add(this.classNameList01);
 
 		JPanel computePanel = new JPanel(new FlowLayout());
-		this.computeButton = new JButton(Message.computeButton);
-		this.computeButton.setToolTipText(Message.computeTooltip);
-		this.computeButton.setMinimumSize(new Dimension(56, 28));
-		this.computeButton.setMaximumSize(new Dimension(74, 28));
-		computePanel.add(this.computeButton);
+		this.getVarButton = new JButton(Message.getVarButton);
+		this.getVarButton.setToolTipText(Message.getVarTooltip);
+		computePanel.add(this.getVarButton);
+		this.unifyButton = new JButton(Message.unifyButton);
+		this.unifyButton.setToolTipText(Message.unifyTooltip);
+		computePanel.add(this.unifyButton);
 
 		ret.add(textPanel);
 		ret.add(selectionPanel);
@@ -106,6 +139,10 @@ public class UelView extends JPanel {
 	}
 
 	public void refresh(List<String> classNameSet) {
+		if (classNameSet == null) {
+			throw new IllegalArgumentException("Null argument.");
+		}
+
 		for (String cls : classNameSet) {
 			this.classNameList00.addItem(cls);
 			this.classNameList01.addItem(cls);

@@ -7,14 +7,15 @@ package de.tudresden.inf.lat.uel.plugin.ui;
  */
 public interface Message {
 
-	public static final String computeButton = "UEL";
-
-	/* button texts */
-	public static final String computeTooltip = "Starts UEL";
-	/* titles */
+	public static final String acceptVarButton = "OK";
+	public static final String acceptVarTooltip = "use the selected entities as variables";
+	public static final String getVarButton = "Get";
+	public static final String getVarTooltip = "get candidates for variables";
+	public static final String rejectVarButton = "Cancel";
+	public static final String rejectVarTooltip = "cancel this selection of variables";
 	public static final String titleError = "Error";
-
-	/* labels */
 	public static final String uelLabel = "Concepts to unify";
+	public static final String unifyButton = "Unify";
+	public static final String unifyTooltip = "unifies the chosen class names using the selected variables";
 
 }
