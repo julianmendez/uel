@@ -9,6 +9,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -66,6 +67,37 @@ public class Translator {
 		goal = g;
 	}
 
+	public Map<String, Integer> getLiterals() {
+		return this.literals;
+	}
+
+	/**
+	 * This method encodes equations into propositional clauses in DIMACS CNF
+	 * format, i.e. positive literal is represented by a positive number and a
+	 * negative literal is represented by a corresponding negative number. Each
+	 * clause is on one line. The end of a clause is marked by 0. Example of a
+	 * clause in DIMACS format: 1 -3 0
+	 */
+	public SatInput getSatInput() {
+		StringWriter writer = new StringWriter();
+		toCNFWithoutHeader(writer);
+		SatInput ret = new SatInput();
+		BufferedReader reader = new BufferedReader(new StringReader(
+				writer.toString()));
+		String line = "";
+		while (line != null) {
+			try {
+				line = reader.readLine();
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+			if (line != null) {
+				ret.add(line);
+			}
+		}
+		return ret;
+	}
+
 	public StringBuilder getUpdate() {
 		return update;
 	}
@@ -114,7 +146,7 @@ public class Translator {
 			for (String key2 : goal.getAllAtoms().keySet()) {
 
 				second = key2;
-				literal = new Literal(first, second, 's');
+				literal = new Literal(first, second, Literal.SUBSUMPTION);
 
 				literals.put(literal.toString(), identificator);
 				identifiers.put(identificator, literal);
@@ -135,7 +167,7 @@ public class Translator {
 
 				second = key2;
 
-				literal = new Literal(first, second, 'o');
+				literal = new Literal(first, second, Literal.ORDER);
 
 				literals.put(literal.toString(), identificator);
 				identifiers.put(identificator, literal);
@@ -146,6 +178,11 @@ public class Translator {
 		}
 
 	}
+
+	/*
+	 * This method is the same as toTBox but it does not overwrite result.
+	 * Instead it appends a unifier to the existing file <result>
+	 */
 
 	private void toCNFWithoutHeader(Writer infile) {
 
@@ -180,7 +217,8 @@ public class Translator {
 					for (String key3 : e.getRight().keySet()) {
 						for (String key2 : e.getLeft().keySet()) {
 
-							Literal lit2 = new Literal(key2, key1, 's');
+							Literal lit2 = new Literal(key2, key1,
+									Literal.SUBSUMPTION);
 
 							out.print(" -");
 							out.print(literals.get(lit2.toString()));
@@ -188,7 +226,8 @@ public class Translator {
 
 						}
 
-						Literal lit3 = new Literal(key3, key1, 's');
+						Literal lit3 = new Literal(key3, key1,
+								Literal.SUBSUMPTION);
 
 						out.print(" " + literals.get(lit3.toString()));
 						out.println(" 0");
@@ -202,7 +241,8 @@ public class Translator {
 					for (String key2 : e.getLeft().keySet()) {
 						for (String key3 : e.getRight().keySet()) {
 
-							Literal lit2 = new Literal(key3, key1, 's');
+							Literal lit2 = new Literal(key3, key1,
+									Literal.SUBSUMPTION);
 
 							out.print(" -");
 							out.print(literals.get(lit2.toString()));
@@ -210,7 +250,8 @@ public class Translator {
 
 						}
 
-						Literal lit3 = new Literal(key2, key1, 's');
+						Literal lit3 = new Literal(key2, key1,
+								Literal.SUBSUMPTION);
 
 						out.print(literals.get(lit3.toString()));
 						out.println(" 0");
@@ -225,7 +266,8 @@ public class Translator {
 					 */
 
 					for (String key2 : e.getLeft().keySet()) {
-						Literal lit4 = new Literal(key2, key1, 's');
+						Literal lit4 = new Literal(key2, key1,
+								Literal.SUBSUMPTION);
 
 						out.print(" -");
 						out.print(literals.get(lit4.toString()));
@@ -242,7 +284,8 @@ public class Translator {
 					 */
 
 					for (String key3 : e.getRight().keySet()) {
-						Literal lit5 = new Literal(key3, key1, 's');
+						Literal lit5 = new Literal(key3, key1,
+								Literal.SUBSUMPTION);
 
 						out.print(" -");
 						out.print(literals.get(lit5.toString()));
@@ -272,7 +315,8 @@ public class Translator {
 					for (String key3 : e.getRight().keySet()) {
 						for (String key2 : e.getLeft().keySet()) {
 
-							Literal lit2 = new Literal(key2, key1, 's');
+							Literal lit2 = new Literal(key2, key1,
+									Literal.SUBSUMPTION);
 
 							out.print(" -");
 							out.print(literals.get(lit2.toString()));
@@ -280,7 +324,8 @@ public class Translator {
 
 						}
 
-						Literal lit3 = new Literal(key3, key1, 's');
+						Literal lit3 = new Literal(key3, key1,
+								Literal.SUBSUMPTION);
 
 						out.print(literals.get(lit3.toString()));
 						out.println(" 0");
@@ -294,14 +339,16 @@ public class Translator {
 					for (String key2 : e.getLeft().keySet()) {
 						for (String key3 : e.getRight().keySet()) {
 
-							Literal lit2 = new Literal(key3, key1, 's');
+							Literal lit2 = new Literal(key3, key1,
+									Literal.SUBSUMPTION);
 
 							out.print(" -");
 							out.print(literals.get(lit2.toString()));
 							out.print(" ");
 						}
 
-						Literal lit3 = new Literal(key2, key1, 's');
+						Literal lit3 = new Literal(key2, key1,
+								Literal.SUBSUMPTION);
 
 						out.print(literals.get(lit3.toString()));
 						out.println(" 0");
@@ -318,7 +365,8 @@ public class Translator {
 					 */
 
 					for (String key2 : e.getLeft().keySet()) {
-						Literal lit4 = new Literal(key2, key1, 's');
+						Literal lit4 = new Literal(key2, key1,
+								Literal.SUBSUMPTION);
 
 						out.print(" -");
 						out.print(literals.get(lit4.toString()));
@@ -339,7 +387,8 @@ public class Translator {
 					 */
 
 					for (String key3 : e.getRight().keySet()) {
-						Literal lit5 = new Literal(key3, key1, 's');
+						Literal lit5 = new Literal(key3, key1,
+								Literal.SUBSUMPTION);
 
 						out.print(" -");
 						out.print(literals.get(lit5.toString()));
@@ -366,7 +415,7 @@ public class Translator {
 
 				if (!key2.equals("TOP") && (!key1.equals(key2))) {
 
-					Literal lit = new Literal(key1, key2, 's');
+					Literal lit = new Literal(key1, key2, Literal.SUBSUMPTION);
 
 					out.print(literals.get(lit.toString()));
 
@@ -398,7 +447,8 @@ public class Translator {
 
 					if (!role1.equals(role2)) {
 
-						Literal lit = new Literal(key1, key2, 's');
+						Literal lit = new Literal(key1, key2,
+								Literal.SUBSUMPTION);
 
 						out.print(literals.get(lit.toString()));
 
@@ -420,9 +470,10 @@ public class Translator {
 						if (!child1name.equals(child2name)) {
 
 							Literal lit1 = new Literal(child1name, child2name,
-									's');
+									Literal.SUBSUMPTION);
 
-							Literal lit2 = new Literal(key1, key2, 's');
+							Literal lit2 = new Literal(key1, key2,
+									Literal.SUBSUMPTION);
 
 							out.print(" -");
 							out.print(literals.get(lit1.toString()));
@@ -452,7 +503,7 @@ public class Translator {
 
 			for (String key2 : goal.getEAtoms().keySet()) {
 
-				Literal lit = new Literal(key1, key2, 's');
+				Literal lit = new Literal(key1, key2, Literal.SUBSUMPTION);
 
 				out.print(literals.get(lit.toString()));
 
@@ -460,7 +511,7 @@ public class Translator {
 
 				if (!key1.equals("TOP")) {
 
-					Literal lit1 = new Literal(key2, key1, 's');
+					Literal lit1 = new Literal(key2, key1, Literal.SUBSUMPTION);
 
 					out.print(literals.get(lit1.toString()));
 
@@ -479,7 +530,7 @@ public class Translator {
 		 */
 		for (String key1 : goal.getVariables().keySet()) {
 
-			Literal lit = new Literal(key1, key1, 'o');
+			Literal lit = new Literal(key1, key1, Literal.ORDER);
 
 			out.print(" -");
 			out.print(literals.get(lit.toString()));
@@ -504,11 +555,11 @@ public class Translator {
 
 					if (!key1.equals(key2) && !key2.equals(key3)) {
 
-						Literal lit1 = new Literal(key1, key2, 'o');
+						Literal lit1 = new Literal(key1, key2, Literal.ORDER);
 
-						Literal lit2 = new Literal(key2, key3, 'o');
+						Literal lit2 = new Literal(key2, key3, Literal.ORDER);
 
-						Literal lit3 = new Literal(key1, key3, 'o');
+						Literal lit3 = new Literal(key1, key3, Literal.ORDER);
 
 						out.print(" -");
 						out.print(literals.get(lit1.toString()));
@@ -547,11 +598,14 @@ public class Translator {
 					if (!key1.equals(key2) && !key1.equals(key3)
 							&& !key2.equals(key3)) {
 
-						Literal lit1 = new Literal(key1, key2, 's');
+						Literal lit1 = new Literal(key1, key2,
+								Literal.SUBSUMPTION);
 
-						Literal lit2 = new Literal(key2, key3, 's');
+						Literal lit2 = new Literal(key2, key3,
+								Literal.SUBSUMPTION);
 
-						Literal lit3 = new Literal(key1, key3, 's');
+						Literal lit3 = new Literal(key1, key3,
+								Literal.SUBSUMPTION);
 
 						out.print(" -");
 						out.print(literals.get(lit3.toString()));
@@ -585,9 +639,10 @@ public class Translator {
 
 				for (String key2 : goal.getVariables().keySet()) {
 
-					Literal lit1 = new Literal(key2, child.getName(), 'o');
+					Literal lit1 = new Literal(key2, child.getName(),
+							Literal.ORDER);
 
-					Literal lit2 = new Literal(key2, key1, 's');
+					Literal lit2 = new Literal(key2, key1, Literal.SUBSUMPTION);
 
 					// out.print(" -");
 					out.print(literals.get(lit1.toString()));
@@ -606,56 +661,6 @@ public class Translator {
 
 		out.flush();
 
-	}
-
-	/*
-	 * This method is the same as toTBox but it does not overwrite result.
-	 * Instead it appends a unifier to the existing file <result>
-	 */
-
-	/**
-	 * This method encodes equations into propositional clauses in DIMACS CNF
-	 * format, i.e. positive literal is represented by a positive number and a
-	 * negative literal is represented by a corresponding negative number. Each
-	 * clause is on one line. The end of a clause is marked by 0. Example of a
-	 * clause in DIMACS format: 1 -3 0
-	 * 
-	 * Parameter infile is a file previously created for writing propositional
-	 * clauses.
-	 * 
-	 * It should be previously created, because the name of the same file is
-	 * then sent to a sat solver by Unifier.
-	 * 
-	 * @param infile
-	 */
-	public void toDIMACS(Writer infile) throws IOException {
-		int numberOfClauses = 0;
-		int numberOfVariables = 0;
-		StringWriter strWriter = new StringWriter();
-
-		toCNFWithoutHeader(strWriter);
-		BufferedReader reader = new BufferedReader(new StringReader(
-				strWriter.toString()));
-		String line = "";
-		while (line != null) {
-			line = reader.readLine();
-			if (line != null) {
-				numberOfClauses++;
-				StringTokenizer stok = new StringTokenizer(line);
-				int current = Integer.parseInt(stok.nextToken());
-				if (current < 0) {
-					current = (-1) * current;
-				}
-				if (current > numberOfVariables) {
-					numberOfVariables = current;
-				}
-			}
-		}
-
-		PrintWriter out = new PrintWriter(new BufferedWriter(infile));
-		out.println("p cnf " + numberOfVariables + " " + numberOfClauses);
-		out.print(strWriter.toString());
-		out.flush();
 	}
 
 	/*
@@ -713,7 +718,7 @@ public class Translator {
 				String name2 = identifiers.get(i).getSecond();
 
 				if (identifiers.get(i).getValue()
-						&& identifiers.get(i).getKind() == 's') {
+						&& identifiers.get(i).getKind() == Literal.SUBSUMPTION) {
 
 					if (goal.getVariables().containsKey(name1)) {
 						if (goal.getConstants().containsKey(name2)) {
@@ -739,7 +744,7 @@ public class Translator {
 						}
 					}
 
-				} else if (identifiers.get(i).getKind() == 's') {
+				} else if (identifiers.get(i).getKind() == Literal.SUBSUMPTION) {
 
 					if (goal.getVariables().containsKey(name1)
 							&& !goal.getVariables().get(name1).isSys()) {
@@ -757,6 +762,7 @@ public class Translator {
 
 			}
 
+			updateWithNegations();
 		}
 
 		return response;
@@ -834,7 +840,7 @@ public class Translator {
 				String name2 = identifiers.get(i).getSecond();
 
 				if (identifiers.get(i).getValue()
-						&& identifiers.get(i).getKind() == 's') {
+						&& identifiers.get(i).getKind() == Literal.SUBSUMPTION) {
 
 					if (goal.getVariables().containsKey(name1)) {
 						if (goal.getConstants().containsKey(name2)) {
@@ -860,21 +866,15 @@ public class Translator {
 						}
 					}
 
-				} else if (identifiers.get(i).getKind() == 's') {
+				} else if (identifiers.get(i).getKind() == Literal.SUBSUMPTION) {
 
 					if (goal.getVariables().containsKey(name1)
 							&& !goal.getVariables().get(name1).isSys()) {
 						if (goal.getConstants().containsKey(name2)) {
 
-							// goal.variables.get(name1).addToS((Atom)
-							// goal.constants.get(name2));
-
 							update.append("-" + i + " ");
 
 						} else if (goal.getEAtoms().containsKey(name2)) {
-
-							// goal.variables.get(name1).addToS((Atom)
-							// goal.eatoms.get(name2));
 
 							update.append("-" + i + " ");
 						}
@@ -883,11 +883,9 @@ public class Translator {
 				}
 
 			}
+			updateWithNegations();
 
 			PrintWriter out = new PrintWriter(new BufferedWriter(result));
-
-			out.println("UNIFIABLE:");
-			out.println("Unifier: ");
 
 			for (String variable : goal.getVariables().keySet()) {
 
@@ -900,7 +898,6 @@ public class Translator {
 				}
 			}
 
-			out.println("-------------------------------------");
 			out.flush();
 
 		} else {
@@ -968,7 +965,7 @@ public class Translator {
 				String name2 = identifiers.get(i).getSecond();
 
 				if (identifiers.get(i).getValue()
-						&& identifiers.get(i).getKind() == 's') {
+						&& identifiers.get(i).getKind() == Literal.SUBSUMPTION) {
 
 					if (goal.getVariables().containsKey(name1)) {
 						if (goal.getConstants().containsKey(name2)) {
@@ -994,7 +991,7 @@ public class Translator {
 						}
 					}
 
-				} else if (identifiers.get(i).getKind() == 's') {
+				} else if (identifiers.get(i).getKind() == Literal.SUBSUMPTION) {
 
 					if (goal.getVariables().containsKey(name1)
 							&& !goal.getVariables().get(name1).isSys()) {
@@ -1012,9 +1009,9 @@ public class Translator {
 
 			}
 
-			PrintWriter out = new PrintWriter(new BufferedWriter(result));
+			updateWithNegations();
 
-			out.println(numberofsolutions + " UNIFIER: ");
+			PrintWriter out = new PrintWriter(new BufferedWriter(result));
 
 			for (String variable : goal.getVariables().keySet()) {
 
@@ -1027,7 +1024,6 @@ public class Translator {
 				}
 			}
 
-			out.println("---------------------------------------");
 			out.flush();
 
 		} else {
@@ -1042,6 +1038,21 @@ public class Translator {
 
 		return response;
 
+	}
+
+	private void updateWithNegations() {
+		for (FAtom var : goal.getVariables().values()) {
+			if (var.getS().isEmpty() && !var.isSys()) {
+				for (FAtom atom : goal.getAllAtoms().values()) {
+					if (atom.isCons() || atom.isRoot()) {
+						Literal lit = new Literal(var.toString(),
+								atom.toString(), Literal.SUBSUMPTION);
+						int i = literals.get(lit.toString());
+						update.append("-" + i + " ");
+					}
+				}
+			}
+		}
 	}
 
 }

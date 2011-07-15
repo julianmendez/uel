@@ -19,26 +19,12 @@ package de.tudresden.inf.lat.uel.main;
  */
 public class Literal {
 
+	public static final char ORDER = 'o';
+	public static final char SUBSUMPTION = 's';
 	final private String first;
 	private char kind;
 	final private String second;
 	private boolean value = false;
-
-	/**
-	 * Constructor. Constructs a literal given two names.
-	 * 
-	 * Not used by Unifier (it does not indicate what kind of literal is
-	 * created).
-	 * 
-	 * @param one
-	 * @param two
-	 */
-	public Literal(String one, String two) {
-
-		first = one;
-		second = two;
-
-	}
 
 	/**
 	 * Constructor. Constructs a literal given two names and the letter, which
@@ -114,7 +100,7 @@ public class Literal {
 	@Override
 	public String toString() {
 
-		if (kind == 's') {
+		if (kind == SUBSUMPTION) {
 
 			StringBuilder str = new StringBuilder("(");
 
@@ -125,7 +111,7 @@ public class Literal {
 
 			return str.toString();
 
-		} else if (kind == 'o') {
+		} else if (kind == ORDER) {
 
 			StringBuilder str = new StringBuilder("(");
 			str.append(first.toString());
@@ -137,9 +123,9 @@ public class Literal {
 
 		} else {
 
-			System.out.println("Failed to create string from literal");
-			return "";
+			throw new IllegalStateException(
+					"Failed to create string from literal");
 		}
-
 	}
+
 }

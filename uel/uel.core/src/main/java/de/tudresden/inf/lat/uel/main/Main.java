@@ -8,6 +8,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.HashSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -22,7 +23,7 @@ import de.tudresden.inf.lat.uel.ontmanager.Ontology;
  */
 public class Main {
 
-	static final Logger logger = Logger.getLogger("Unifier");
+	private static final Logger logger = Logger.getLogger(Main.class.getName());
 	private static final String unifSuffix = ".unif";
 
 	/**
@@ -79,12 +80,14 @@ public class Main {
 
 	private void initialize(Goal goal, Unifier unifier, String filename)
 			throws IOException {
+		// FIXME this method uses an empty set of variables
+
 		FileReader reader = new FileReader(filename);
 		if (unifier.getTest()) {
 			FileWriter output = new FileWriter(filename + ".TBox");
-			goal.initializeWithTest(reader, output);
+			goal.initializeWithTest(reader, output, new HashSet<String>());
 		} else {
-			goal.initialize(reader);
+			goal.initialize(reader, new HashSet<String>());
 		}
 	}
 

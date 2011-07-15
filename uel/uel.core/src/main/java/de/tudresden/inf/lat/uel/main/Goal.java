@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import de.tudresden.inf.lat.uel.ontmanager.Ontology;
 import de.tudresden.inf.lat.uel.parser.ReaderAndParser;
@@ -211,12 +212,8 @@ public class Goal {
 
 	}
 
-	public void initialize(Reader input) throws IOException {
-		initialize(input, false, null);
-	}
-
-	private void initialize(Reader input, boolean test, Writer output)
-			throws IOException {
+	private void initialize(Reader input, boolean test, Writer output,
+			Set<String> vars) throws IOException {
 
 		readerAndParser.read(input, this);
 
@@ -235,14 +232,14 @@ public class Goal {
 
 		for (String key : variables.keySet()) {
 			variables.get(key).setVar(true);
-			variables.get(key).SysVar();
+			variables.get(key).sysVar();
 		}
 
 		for (String key : allatoms.keySet()) {
 
 			FAtom a = allatoms.get(key);
 
-			if (!variables.containsKey(key) && a.getName().contains("VAR")) {
+			if (!variables.containsKey(key) && vars.contains(a.getName())) {
 
 				a.setVar(true);
 				variables.put(key, a);
@@ -256,6 +253,10 @@ public class Goal {
 			}
 
 		}
+	}
+
+	public void initialize(Reader input, Set<String> vars) throws IOException {
+		initialize(input, false, null, vars);
 	}
 
 	/**
@@ -274,9 +275,9 @@ public class Goal {
 	 *            output
 	 * @throws IOException
 	 */
-	public void initializeWithTest(Reader input, Writer output)
+	public void initializeWithTest(Reader input, Writer output, Set<String> vars)
 			throws IOException {
-		initialize(input, true, output);
+		initialize(input, true, output, vars);
 	}
 
 	/**

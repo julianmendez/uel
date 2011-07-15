@@ -19,7 +19,11 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
 import de.tudresden.inf.lat.uel.main.Equation;
 import de.tudresden.inf.lat.uel.main.FAtom;
 import de.tudresden.inf.lat.uel.main.Goal;
+import de.tudresden.inf.lat.uel.main.Sat4jSolver;
+import de.tudresden.inf.lat.uel.main.Solver;
 import de.tudresden.inf.lat.uel.ontmanager.Ontology;
+import de.tudresden.inf.lat.uel.sattranslator.SatInput;
+import de.tudresden.inf.lat.uel.sattranslator.Translator;
 import de.uulm.ecs.ai.owlapi.krssrenderer.KRSS2OWLSyntaxRenderer;
 
 /**
@@ -52,7 +56,7 @@ public class UelProcessor {
 		this.candidates.clear();
 	}
 
-	private Goal createGoal(Ontology ont, Set<OWLClass> input) {
+	private Goal createGoal(Ontology ont, Set<OWLClass> input, Set<String> vars) {
 		Goal goal = new Goal(ont);
 		StringBuffer sbuf = new StringBuffer();
 		for (OWLClass cls : input) {
@@ -63,7 +67,7 @@ public class UelProcessor {
 		}
 
 		try {
-			goal.initialize(new StringReader(sbuf.toString()));
+			goal.initialize(new StringReader(sbuf.toString()), vars);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
@@ -101,19 +105,83 @@ public class UelProcessor {
 		return this.owlWorkspace;
 	}
 
-	public Set<String> recalculateCandidates(Set<OWLClass> input) {
+	public void recalculateCandidates(Set<OWLClass> input) {
 		if (input == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
 
 		Ontology ont = getOntology(getOWLWorkspace().getOWLModelManager());
-		Goal goal = createGoal(ont, input);
+		Goal goal = createGoal(ont, input, new HashSet<String>());
 		Map<String, FAtom> consMap = goal.getConstants();
 		Set<String> varSet = new HashSet<String>();
 		for (Iterator<String> it = consMap.keySet().iterator(); it.hasNext();) {
 			varSet.add(consMap.get(it.next()).toString());
 		}
-		return Collections.unmodifiableSet(varSet);
+		this.candidates = varSet;
+	}
+
+	private String unify(Goal goal) throws IOException {
+		StringBuffer ret = new StringBuffer();
+		Solver solver = new Sat4jSolver();
+		Translator translator = new Translator(goal);
+		boolean unifiable = false;
+		{
+			StringWriter result = new StringWriter();
+			String res = solver.solve(translator.getSatInput().toString());
+			StringReader satoutputReader = new StringReader(res);
+			unifiable = translator.toTBox(satoutputReader, result);
+			result.flush();
+			ret.append(result.toString());
+		}
+
+		SatInput satinput = translator.getSatInput();
+		int numberofsolutions = 0;
+		if (unifiable) {
+			ret.append("UNIFIABLE\n");
+			numberofsolutions++;
+
+			while (unifiable && translator.getUpdate().length() > 0
+					&& numberofsolutions < 10) {
+				String subsumers = "";
+				for (FAtom var : goal.getVariables().values()) {
+					subsumers += var + ":" + var.getS() + "\n";
+				}
+				ret.append("-----------------\n");
+
+				StringWriter result = new StringWriter();
+				satinput.add(translator.getUpdate().toString());
+				String satoutputStr = solver.solve(satinput.toString());
+				translator.reset();
+				unifiable = translator.toTBoxB(new StringReader(satoutputStr),
+						result, numberofsolutions);
+				result.flush();
+				ret.append(result.toString());
+				if (unifiable) {
+					numberofsolutions++;
+				}
+			}
+			ret.append("solutions : " + numberofsolutions);
+			ret.append("\n");
+		} else {
+			ret.append("UNUNIFIABLE\n");
+		}
+		return ret.toString();
+	}
+
+	public String unify(Set<OWLClass> input) {
+		if (input == null) {
+			throw new IllegalArgumentException("Null argument.");
+		}
+
+		Ontology ont = getOntology(getOWLWorkspace().getOWLModelManager());
+		Goal goal = createGoal(ont, input, this.candidates);
+		String ret = null;
+		try {
+			ret = unify(goal);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+		return ret;
 	}
 
 }

@@ -62,8 +62,8 @@ public class UelController implements ActionListener, OWLOntologyChangeListener 
 			Set<OWLClass> classSet = new HashSet<OWLClass>();
 			classSet.add(getSelectedClass00());
 			classSet.add(getSelectedClass01());
-			this.varFrame = initVarFrame(getModel().recalculateCandidates(
-					classSet));
+			getModel().recalculateCandidates(classSet);
+			this.varFrame = initVarFrame(getModel().getCandidates());
 			getVarWindow().setVisible(true);
 
 		} else if (cmd.equals(action_acceptVar)) {
@@ -74,7 +74,6 @@ public class UelController implements ActionListener, OWLOntologyChangeListener 
 			getView().getUnifyButton().setEnabled(true);
 
 		} else if (cmd.equals(action_rejectVar)) {
-			logger.info("Selection rejected.");
 			getVarWindow().setVisible(false);
 			getVarWindow().dispose();
 			getView().getUnifyButton().setEnabled(false);
@@ -83,11 +82,15 @@ public class UelController implements ActionListener, OWLOntologyChangeListener 
 			getVarWindow().setVisible(false);
 			getView().getUnifyButton().setEnabled(false);
 
+			Set<OWLClass> classSet = new HashSet<OWLClass>();
+			classSet.add(getSelectedClass00());
+			classSet.add(getSelectedClass01());
+			String res = getModel().unify(classSet);
+
 			logger.info("Unifying " + getSelectedClass00().toStringID()
 					+ " and " + getSelectedClass01().toStringID()
-					+ " using variables " + getModel().getCandidates());
-
-			// FIXME not implemented
+					+ " using variables " + getModel().getCandidates()
+					+ "\nResult: " + res);
 
 		} else {
 			throw new IllegalStateException();
@@ -186,14 +189,6 @@ public class UelController implements ActionListener, OWLOntologyChangeListener 
 	public void removeListeners() {
 		getOWLWorkspace().getOWLModelManager().removeOntologyChangeListener(
 				this);
-	}
-
-	public void retrieveVariables() {
-		keepUpdated();
-		Set<OWLClass> classSet = new HashSet<OWLClass>();
-		classSet.add(getSelectedClass00());
-		classSet.add(getSelectedClass01());
-		this.varFrame = initVarFrame(getModel().recalculateCandidates(classSet));
 	}
 
 	public void setSelectedClass(OWLClass selectedClass) {

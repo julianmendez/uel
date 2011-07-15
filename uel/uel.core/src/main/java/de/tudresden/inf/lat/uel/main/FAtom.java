@@ -1,7 +1,8 @@
 package de.tudresden.inf.lat.uel.main;
 
 import java.io.PrintWriter;
-import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * 
@@ -21,7 +22,7 @@ public class FAtom extends Atom {
 
 	private FAtom child = null;
 
-	private ArrayList<FAtom> S = new ArrayList<FAtom>();
+	private Set<FAtom> S = new HashSet<FAtom>();
 
 	private boolean sys = false;
 	private boolean var = false;
@@ -146,6 +147,10 @@ public class FAtom extends Atom {
 		return child;
 	}
 
+	public Set<FAtom> getS() {
+		return this.S;
+	}
+
 	/**
 	 * Not used in UEL. Checks if this atom is a constant.
 	 * 
@@ -193,7 +198,7 @@ public class FAtom extends Atom {
 
 		} else if (S.size() == 1) {
 
-			S.get(0).print(out);
+			S.iterator().next().print(out);
 
 		} else {
 
@@ -220,7 +225,7 @@ public class FAtom extends Atom {
 	 */
 	public void resetS() {
 
-		S = new ArrayList<FAtom>();
+		S = new HashSet<FAtom>();
 
 	}
 
@@ -239,13 +244,13 @@ public class FAtom extends Atom {
 	 * Sets a flat atom to be a system variable. Used at Goal initialization.
 	 * 
 	 */
-	public void SysVar() {
+	public void sysVar() {
 
 		if (!isRoot()) {
 			sys = true;
 		} else {
-			System.out
-					.println("WARNING: cannot change existential atom  into a system variable");
+			throw new IllegalStateException(
+					"WARNING: cannot change existential atom  into a system variable");
 		}
 
 	}

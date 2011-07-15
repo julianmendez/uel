@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import de.tudresden.inf.lat.uel.sattranslator.SatInput;
 import de.tudresden.inf.lat.uel.sattranslator.Translator;
 
 /**
@@ -103,10 +104,7 @@ public class Unifier {
 	 */
 	public boolean unify(Translator translator, Writer result)
 			throws IOException {
-		StringWriter satinputWriter = new StringWriter();
-		translator.toDIMACS(satinputWriter);
-
-		String res = solver.solve(satinputWriter.toString());
+		String res = solver.solve(translator.getSatInput().toString());
 
 		StringReader satoutputReader = new StringReader(res);
 		boolean response = translator.toTBox(satoutputReader, result);
@@ -132,10 +130,7 @@ public class Unifier {
 
 		Translator translator = new Translator(goal);
 
-		StringWriter satinputWriter = new StringWriter();
-		translator.toDIMACS(satinputWriter);
-
-		String satoutputStr = solver.solve(satinputWriter.toString());
+		String satoutputStr = solver.solve(translator.getSatInput().toString());
 
 		Pattern answer = Pattern.compile("^" + Solver.msgSat);
 		BufferedReader reader = new BufferedReader(new StringReader(
@@ -182,9 +177,7 @@ public class Unifier {
 
 		boolean unifiable = unify(translator, result);
 
-		StringWriter satinputWriter = new StringWriter();
-		translator.toDIMACS(satinputWriter);
-		String satinputStr = satinputWriter.toString();
+		SatInput satinput = translator.getSatInput();
 
 		if (unifiable) {
 			logger.info("UNIFIABLE\n" + "Unifier stored in file.");
@@ -195,9 +188,8 @@ public class Unifier {
 
 				numberofsolutions++;
 
-				String additionalline = translator.getUpdate() + " 0";
-				satinputStr += additionalline + "\n";
-				String satoutputStr = solver.solve(satinputStr);
+				satinput.add(translator.getUpdate().toString());
+				String satoutputStr = solver.solve(satinput.toString());
 
 				translator.reset();
 
@@ -251,9 +243,7 @@ public class Unifier {
 
 		boolean unifiable = unify(translator, result);
 
-		StringWriter satinputWriter = new StringWriter();
-		translator.toDIMACS(satinputWriter);
-		String satinputStr = satinputWriter.toString();
+		SatInput satinput = translator.getSatInput();
 
 		if (unifiable) {
 
@@ -265,9 +255,8 @@ public class Unifier {
 
 				numberofsolutions++;
 
-				String additionalline = translator.getUpdate() + " 0";
-				satinputStr += additionalline + "\n";
-				String satoutputStr = solver.solve(satinputStr);
+				satinput.add(translator.getUpdate().toString());
+				String satoutputStr = solver.solve(satinput.toString());
 
 				translator.reset();
 				unifiable = translator.toTBoxB(new StringReader(satoutputStr),
@@ -320,13 +309,11 @@ public class Unifier {
 
 		numberofsolutions = 0;
 
-		StringWriter satinputWriter = new StringWriter();
-		translator.toDIMACS(satinputWriter);
-		String satinputStr = satinputWriter.toString();
+		SatInput satinput = translator.getSatInput();
 
 		while (unifiable) {
 
-			String satoutputStr = solver.solve(satinputWriter.toString());
+			String satoutputStr = solver.solve(satinput.toString());
 
 			StringReader satoutputReader = new StringReader(satoutputStr);
 			if (translator.toTBox(satoutputReader)) {
@@ -334,9 +321,8 @@ public class Unifier {
 				message = true;
 				numberofsolutions++;
 
-				String additionalline = translator.getUpdate() + " 0";
-				satinputStr += additionalline + "\n";
-				satoutputStr = solver.solve(satinputStr);
+				satinput.add(translator.getUpdate().toString());
+				satoutputStr = solver.solve(satinput.toString());
 
 				translator.reset();
 
@@ -422,9 +408,7 @@ public class Unifier {
 
 		boolean unifiable = unify(translator, result);
 
-		StringWriter satinputWriter = new StringWriter();
-		translator.toDIMACS(satinputWriter);
-		String satinputStr = satinputWriter.toString();
+		SatInput satinput = translator.getSatInput();
 
 		if (unifiable) {
 
@@ -435,9 +419,8 @@ public class Unifier {
 
 				numberofsolutions++;
 
-				String additionalline = translator.getUpdate() + " 0";
-				satinputStr += additionalline + "\n";
-				String satoutputStr = solver.solve(satinputStr);
+				satinput.add(translator.getUpdate().toString());
+				String satoutputStr = solver.solve(satinput.toString());
 
 				translator.reset();
 
