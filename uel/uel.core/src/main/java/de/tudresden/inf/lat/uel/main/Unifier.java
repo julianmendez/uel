@@ -193,8 +193,8 @@ public class Unifier {
 
 				translator.reset();
 
-				unifiable = translator.toTBoxB(new StringReader(satoutputStr),
-						result, numberofsolutions);
+				unifiable = translator.toTBox(new StringReader(satoutputStr),
+						result);
 
 				if (unifiable) {
 					logger.info(numberofsolutions + " UNIFIER\n"
@@ -259,8 +259,8 @@ public class Unifier {
 				String satoutputStr = solver.solve(satinput.toString());
 
 				translator.reset();
-				unifiable = translator.toTBoxB(new StringReader(satoutputStr),
-						result, numberofsolutions);
+				unifiable = translator.toTBox(new StringReader(satoutputStr),
+						result);
 
 				if (unifiable) {
 					logger.info(numberofsolutions + " UNIFIER\n"
@@ -424,8 +424,8 @@ public class Unifier {
 
 				translator.reset();
 
-				unifiable = translator.toTBoxB(new StringReader(satoutputStr),
-						result, numberofsolutions);
+				unifiable = translator.toTBox(new StringReader(satoutputStr),
+						result);
 
 				if (unifiable) {
 					logger.info(numberofsolutions + " UNIFIER\n"

@@ -158,8 +158,8 @@ public class UelProcessor {
 				satinput.add(translator.getUpdate().toString());
 				String satoutputStr = solver.solve(satinput.toString());
 				translator.reset();
-				unifiable = translator.toTBoxB(new StringReader(satoutputStr),
-						result, numberofsolutions);
+				unifiable = translator.toTBox(new StringReader(satoutputStr),
+						result);
 				result.flush();
 				ret.append(result.toString());
 				if (unifiable) {
