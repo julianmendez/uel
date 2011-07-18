@@ -1,8 +1,8 @@
 package de.tudresden.inf.lat.uel.main;
 
 import java.io.PrintWriter;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * 
@@ -22,7 +22,7 @@ public class FAtom extends Atom {
 
 	private FAtom child = null;
 
-	private Set<FAtom> S = new HashSet<FAtom>();
+	private Collection<FAtom> S = new ArrayList<FAtom>();
 
 	private boolean sys = false;
 	private boolean var = false;
@@ -147,7 +147,7 @@ public class FAtom extends Atom {
 		return child;
 	}
 
-	public Set<FAtom> getS() {
+	public Collection<FAtom> getS() {
 		return this.S;
 	}
 
@@ -225,7 +225,7 @@ public class FAtom extends Atom {
 	 */
 	public void resetS() {
 
-		S = new HashSet<FAtom>();
+		S = new ArrayList<FAtom>();
 
 	}
 

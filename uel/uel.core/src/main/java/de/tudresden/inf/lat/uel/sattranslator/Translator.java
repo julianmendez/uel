@@ -65,6 +65,7 @@ public class Translator {
 
 	public Translator(Goal g) {
 		goal = g;
+		setLiterals();
 	}
 
 	public Map<String, Integer> getLiterals() {
@@ -187,8 +188,6 @@ public class Translator {
 	private void toCNFWithoutHeader(Writer infile) {
 
 		PrintWriter out = new PrintWriter(new BufferedWriter(infile));
-
-		setLiterals();
 
 		/*
 		 * 

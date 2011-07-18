@@ -120,6 +120,17 @@ public class UelProcessor {
 		this.candidates = varSet;
 	}
 
+	protected String showSubsumers(Goal goal) {
+		StringBuffer subsumers = new StringBuffer();
+		for (FAtom var : goal.getVariables().values()) {
+			subsumers.append(var);
+			subsumers.append(":");
+			subsumers.append(var.getS());
+			subsumers.append("\n");
+		}
+		return subsumers.toString();
+	}
+
 	private String unify(Goal goal) throws IOException {
 		StringBuffer ret = new StringBuffer();
 		Solver solver = new Sat4jSolver();
@@ -142,12 +153,7 @@ public class UelProcessor {
 
 			while (unifiable && translator.getUpdate().length() > 0
 					&& numberofsolutions < 10) {
-				String subsumers = "";
-				for (FAtom var : goal.getVariables().values()) {
-					subsumers += var + ":" + var.getS() + "\n";
-				}
 				ret.append("-----------------\n");
-
 				StringWriter result = new StringWriter();
 				satinput.add(translator.getUpdate().toString());
 				String satoutputStr = solver.solve(satinput.toString());
