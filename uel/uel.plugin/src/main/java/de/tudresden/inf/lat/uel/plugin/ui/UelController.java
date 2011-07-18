@@ -2,6 +2,10 @@ package de.tudresden.inf.lat.uel.plugin.ui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -10,6 +14,7 @@ import java.util.TreeSet;
 import java.util.logging.Logger;
 
 import javax.swing.DefaultListModel;
+import javax.swing.JFileChooser;
 import javax.swing.WindowConstants;
 
 import org.protege.editor.owl.model.OWLWorkspace;
@@ -27,15 +32,19 @@ import de.tudresden.inf.lat.uel.plugin.processor.UelProcessor;
  */
 public class UelController implements ActionListener, OWLOntologyChangeListener {
 
-	private static final String action_acceptVar = "accept var";
-	private static final String action_getVar = "get var candidate";
-	private static final String action_rejectVar = "reject var";
-	private static final String action_unify = "unify";
+	private static final String actionAcceptVar = "accept var";
+	private static final String actionGetVar = "get var candidate";
+	private static final String actionNext = "next";
+	private static final String actionPrevious = "previous";
+	private static final String actionRejectVar = "reject var";
+	private static final String actionSave = "save";
+
 	private static final Logger logger = Logger.getLogger(UelController.class
 			.getName());
 
 	private List<OWLClass> classList = null;
 	private boolean ontologyChanged = true;
+	private int unifierIndex = -1;
 	private VarSelectionView varFrame = null;
 	private UelView view = null;
 
@@ -57,43 +66,108 @@ public class UelController implements ActionListener, OWLOntologyChangeListener 
 		}
 
 		String cmd = e.getActionCommand();
-		if (cmd.equals(action_getVar)) {
-			getView().getUnifyButton().setEnabled(false);
-			Set<OWLClass> classSet = new HashSet<OWLClass>();
-			classSet.add(getSelectedClass00());
-			classSet.add(getSelectedClass01());
-			getModel().recalculateCandidates(classSet);
-			this.varFrame = initVarFrame(getModel().getCandidates());
-			getVarWindow().setVisible(true);
-
-		} else if (cmd.equals(action_acceptVar)) {
-			getVarWindow().setVisible(false);
-			getModel().clearCandidates();
-			getModel().addAll(getVarWindow().getSelectedValues());
-			getVarWindow().dispose();
-			getView().getUnifyButton().setEnabled(true);
-
-		} else if (cmd.equals(action_rejectVar)) {
-			getVarWindow().setVisible(false);
-			getVarWindow().dispose();
-			getView().getUnifyButton().setEnabled(false);
-
-		} else if (cmd.equals(action_unify)) {
-			getVarWindow().setVisible(false);
-			getView().getUnifyButton().setEnabled(false);
-
-			Set<OWLClass> classSet = new HashSet<OWLClass>();
-			classSet.add(getSelectedClass00());
-			classSet.add(getSelectedClass01());
-			String res = getModel().unify(classSet);
-
-			logger.info("Unifying " + getSelectedClass00().toStringID()
-					+ " and " + getSelectedClass01().toStringID()
-					+ " using variables " + getModel().getCandidates()
-					+ "\nResult: " + res);
-
+		if (cmd.equals(actionGetVar)) {
+			executeActionGetVar();
+		} else if (cmd.equals(actionAcceptVar)) {
+			executeActionAcceptVar();
+		} else if (cmd.equals(actionRejectVar)) {
+			executeActionRejectVar();
+		} else if (cmd.equals(actionPrevious)) {
+			executeActionPrevious();
+		} else if (cmd.equals(actionNext)) {
+			executeActionNext();
+		} else if (cmd.equals(actionSave)) {
+			executeActionSave();
 		} else {
 			throw new IllegalStateException();
+		}
+	}
+
+	private void executeActionAcceptVar() {
+		getVarWindow().setVisible(false);
+		getModel().clearCandidates();
+		getModel().addAll(getVarWindow().getSelectedValues());
+		getVarWindow().dispose();
+		getView().setButtonPreviousEnabled(false);
+		getView().setButtonNextEnabled(true);
+		getView().setButtonSaveEnabled(false);
+	}
+
+	private void executeActionGetVar() {
+		getView().setButtonPreviousEnabled(false);
+		getView().setButtonNextEnabled(false);
+		getView().setButtonSaveEnabled(false);
+		Set<OWLClass> classSet = new HashSet<OWLClass>();
+		classSet.add(getSelectedClass00());
+		classSet.add(getSelectedClass01());
+		getModel().recalculateCandidates(classSet);
+		this.varFrame = initVarFrame(getModel().getCandidates());
+		getVarWindow().setVisible(true);
+		this.unifierIndex = -1;
+	}
+
+	private void executeActionNext() {
+		getVarWindow().setVisible(false);
+		getView().setButtonPreviousEnabled(true);
+		getView().setButtonNextEnabled(true);
+		getView().setButtonSaveEnabled(true);
+
+		if (getModel().getUnifierList().isEmpty()) {
+			Set<OWLClass> classSet = new HashSet<OWLClass>();
+			classSet.add(getSelectedClass00());
+			classSet.add(getSelectedClass01());
+			getModel().configure(classSet);
+		}
+		this.unifierIndex++;
+		if (this.unifierIndex >= getModel().getUnifierList().size()) {
+			boolean unifiable = getModel().computeNextUnifier();
+			if (!unifiable && this.unifierIndex > 0) {
+				this.unifierIndex--;
+			}
+		}
+		updateUnifier();
+	}
+
+	private void executeActionPrevious() {
+		getVarWindow().setVisible(false);
+		getView().setButtonPreviousEnabled(true);
+		getView().setButtonNextEnabled(true);
+		getView().setButtonSaveEnabled(true);
+
+		this.unifierIndex--;
+		if (this.unifierIndex < 0) {
+			this.unifierIndex = 0;
+		}
+		updateUnifier();
+	}
+
+	private void executeActionRejectVar() {
+		getVarWindow().setVisible(false);
+		getVarWindow().dispose();
+		getView().setButtonPreviousEnabled(false);
+		getView().setButtonNextEnabled(false);
+		getView().setButtonSaveEnabled(false);
+	}
+
+	private void executeActionSave() {
+		JFileChooser fileChooser = new JFileChooser();
+		int returnVal = fileChooser.showSaveDialog(getView());
+		File file = null;
+		if (returnVal == JFileChooser.APPROVE_OPTION) {
+			file = fileChooser.getSelectedFile();
+		}
+		if (file != null) {
+			try {
+				BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+				if (getModel().getUnifierList().size() > 0) {
+					writer.write(getModel().getUnifierList().get(
+							this.unifierIndex));
+				}
+				writer.flush();
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+
 		}
 	}
 
@@ -131,20 +205,24 @@ public class UelController implements ActionListener, OWLOntologyChangeListener 
 	 */
 	public void init() {
 		getOWLWorkspace().getOWLModelManager().addOntologyChangeListener(this);
-		getView().getUnifyButton().setEnabled(false);
-		getView().addGetVarButtonListener(this, action_getVar);
-		getView().addUnifyButtonListener(this, action_unify);
+		getView().setButtonPreviousEnabled(false);
+		getView().setButtonNextEnabled(false);
+		getView().setButtonSaveEnabled(false);
+		getView().addButtonGetVarListener(this, actionGetVar);
+		getView().addButtonPreviousListener(this, actionPrevious);
+		getView().addButtonNextListener(this, actionNext);
+		getView().addButtonSaveListener(this, actionSave);
 		refresh();
-		getView().getGetVarButton().setEnabled(true);
+		getView().setButtonGetVarEnabled(true);
 	}
 
 	private VarSelectionView initVarFrame(Set<String> set) {
 		VarSelectionView ret = new VarSelectionView(set);
 		ret.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-		ret.addAcceptVarButtonListener(this, action_acceptVar);
-		ret.addRejectVarButtonListener(this, action_rejectVar);
+		ret.addAcceptVarButtonListener(this, actionAcceptVar);
+		ret.addRejectVarButtonListener(this, actionRejectVar);
 		ret.setLocation(400, 400);
-		ret.setSize(200, 400);
+		ret.setSize(300, 200);
 		ret.setVisible(true);
 		return ret;
 	}
@@ -192,6 +270,15 @@ public class UelController implements ActionListener, OWLOntologyChangeListener 
 	}
 
 	public void setSelectedClass(OWLClass selectedClass) {
+	}
+
+	private void updateUnifier() {
+		if (getModel().getUnifierList().size() > 0) {
+			getView().getUnifier().setText(
+					getModel().getUnifierList().get(this.unifierIndex));
+		} else {
+			getView().getUnifier().setText("[not unifiable]");
+		}
 	}
 
 }

@@ -3,9 +3,11 @@ package de.tudresden.inf.lat.uel.plugin.processor;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -35,6 +37,9 @@ public class UelProcessor {
 
 	private Set<String> candidates = new HashSet<String>();
 	private OWLWorkspace owlWorkspace = null;
+	private SatInput satinput = null;
+	private Translator translator = null;
+	private List<String> unifierList = new ArrayList<String>();
 
 	public UelProcessor(OWLWorkspace workspace) {
 		if (workspace == null) {
@@ -54,6 +59,44 @@ public class UelProcessor {
 
 	public void clearCandidates() {
 		this.candidates.clear();
+	}
+
+	public boolean computeNextUnifier() {
+		boolean unifiable = false;
+		Solver solver = new Sat4jSolver();
+		StringWriter result = new StringWriter();
+		String satoutputStr = null;
+		try {
+			if (getUnifierList().isEmpty()) {
+				this.satinput = this.translator.getSatInput();
+				satoutputStr = solver.solve(this.satinput.toString());
+				unifiable = this.translator.toTBox(new StringReader(
+						satoutputStr), result);
+			} else if (this.translator.getUpdate().length() > 0) {
+				this.satinput.add(this.translator.getUpdate().toString());
+				satoutputStr = solver.solve(this.satinput.toString());
+				this.translator.reset();
+				unifiable = this.translator.toTBox(new StringReader(
+						satoutputStr), result);
+			}
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+		result.flush();
+		if (unifiable) {
+			this.unifierList.add(result.toString());
+		}
+		return unifiable;
+	}
+
+	public void configure(Set<OWLClass> input) {
+		if (input == null) {
+			throw new IllegalArgumentException("Null argument.");
+		}
+
+		Ontology ont = getOntology(getOWLWorkspace().getOWLModelManager());
+		Goal goal = createGoal(ont, input, this.candidates);
+		this.translator = new Translator(goal);
 	}
 
 	private Goal createGoal(Ontology ont, Set<OWLClass> input, Set<String> vars) {
@@ -105,6 +148,10 @@ public class UelProcessor {
 		return this.owlWorkspace;
 	}
 
+	public List<String> getUnifierList() {
+		return Collections.unmodifiableList(this.unifierList);
+	}
+
 	public void recalculateCandidates(Set<OWLClass> input) {
 		if (input == null) {
 			throw new IllegalArgumentException("Null argument.");
@@ -118,6 +165,7 @@ public class UelProcessor {
 			varSet.add(consMap.get(it.next()).toString());
 		}
 		this.candidates = varSet;
+		this.unifierList.clear();
 	}
 
 	protected String showSubsumers(Goal goal) {
@@ -129,65 +177,6 @@ public class UelProcessor {
 			subsumers.append("\n");
 		}
 		return subsumers.toString();
-	}
-
-	private String unify(Goal goal) throws IOException {
-		StringBuffer ret = new StringBuffer();
-		Solver solver = new Sat4jSolver();
-		Translator translator = new Translator(goal);
-		boolean unifiable = false;
-		{
-			StringWriter result = new StringWriter();
-			String res = solver.solve(translator.getSatInput().toString());
-			StringReader satoutputReader = new StringReader(res);
-			unifiable = translator.toTBox(satoutputReader, result);
-			result.flush();
-			ret.append(result.toString());
-		}
-
-		SatInput satinput = translator.getSatInput();
-		int numberofsolutions = 0;
-		if (unifiable) {
-			ret.append("UNIFIABLE\n");
-			numberofsolutions++;
-
-			while (unifiable && translator.getUpdate().length() > 0
-					&& numberofsolutions < 10) {
-				ret.append("-----------------\n");
-				StringWriter result = new StringWriter();
-				satinput.add(translator.getUpdate().toString());
-				String satoutputStr = solver.solve(satinput.toString());
-				translator.reset();
-				unifiable = translator.toTBox(new StringReader(satoutputStr),
-						result);
-				result.flush();
-				ret.append(result.toString());
-				if (unifiable) {
-					numberofsolutions++;
-				}
-			}
-			ret.append("solutions : " + numberofsolutions);
-			ret.append("\n");
-		} else {
-			ret.append("UNUNIFIABLE\n");
-		}
-		return ret.toString();
-	}
-
-	public String unify(Set<OWLClass> input) {
-		if (input == null) {
-			throw new IllegalArgumentException("Null argument.");
-		}
-
-		Ontology ont = getOntology(getOWLWorkspace().getOWLModelManager());
-		Goal goal = createGoal(ont, input, this.candidates);
-		String ret = null;
-		try {
-			ret = unify(goal);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-		return ret;
 	}
 
 }

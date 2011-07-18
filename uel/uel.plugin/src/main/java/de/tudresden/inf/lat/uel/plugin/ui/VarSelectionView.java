@@ -94,18 +94,16 @@ class VarSelectionView extends JFrame {
 
 		JPanel varSelPanel = new JPanel();
 		varSelPanel.setLayout(new BoxLayout(varSelPanel, BoxLayout.Y_AXIS));
-		varSelPanel.setMinimumSize(new Dimension(200, 200));
-		varSelPanel.setMaximumSize(new Dimension(300, 300));
 
 		JPanel buttonPanel = new JPanel(new FlowLayout());
-		this.acceptVarButton = new JButton(Message.acceptVarButton);
-		this.acceptVarButton.setToolTipText(Message.acceptVarTooltip);
+		this.acceptVarButton = new JButton(Message.buttonAcceptVar);
+		this.acceptVarButton.setToolTipText(Message.tooltipAcceptVar);
 		this.acceptVarButton.setMinimumSize(new Dimension(56, 28));
 		this.acceptVarButton.setMaximumSize(new Dimension(74, 28));
 		buttonPanel.add(this.acceptVarButton);
 
-		this.rejectVarButton = new JButton(Message.rejectVarButton);
-		this.rejectVarButton.setToolTipText(Message.rejectVarTooltip);
+		this.rejectVarButton = new JButton(Message.buttonRejectVar);
+		this.rejectVarButton.setToolTipText(Message.tooltipRejectVar);
 		this.rejectVarButton.setMinimumSize(new Dimension(56, 28));
 		this.rejectVarButton.setMaximumSize(new Dimension(74, 28));
 		buttonPanel.add(this.rejectVarButton);
