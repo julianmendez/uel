@@ -679,123 +679,6 @@ public class Translator {
 
 		manswer = answer.matcher(line);
 
-		if (manswer.find()) {
-
-			response = true;
-
-			Pattern sign = Pattern.compile("^-");
-			Matcher msign;
-
-			line = reader.readLine();
-
-			StringTokenizer st = new StringTokenizer(line);
-
-			StringBuilder token;
-
-			while (st.hasMoreTokens()) {
-
-				token = new StringBuilder(st.nextToken());
-				msign = sign.matcher(token);
-
-				if (msign.find()) {
-
-					token = token.delete(0, msign.end());
-
-					Integer i = Integer.parseInt(token.toString());
-
-					Literal literal = (Literal) identifiers.get(i);
-
-					literal.setValue(true);
-
-				}
-
-			}
-
-			for (Integer i : identifiers.keySet()) {
-
-				String name1 = identifiers.get(i).getFirst();
-				String name2 = identifiers.get(i).getSecond();
-
-				if (identifiers.get(i).getValue()
-						&& identifiers.get(i).getKind() == Literal.SUBSUMPTION) {
-
-					if (goal.getVariables().containsKey(name1)) {
-						if (goal.getConstants().containsKey(name2)) {
-
-							goal.getVariables()
-									.get(name1)
-									.addToS((FAtom) goal.getConstants().get(
-											name2));
-
-							if (!goal.getVariables().get(name1).isSys()) {
-								update.append(i + " ");
-							}
-
-						} else if (goal.getEAtoms().containsKey(name2)) {
-
-							goal.getVariables()
-									.get(name1)
-									.addToS((FAtom) goal.getEAtoms().get(name2));
-
-							if (!goal.getVariables().get(name1).isSys()) {
-								update.append(i + " ");
-							}
-						}
-					}
-
-				} else if (identifiers.get(i).getKind() == Literal.SUBSUMPTION) {
-
-					if (goal.getVariables().containsKey(name1)
-							&& !goal.getVariables().get(name1).isSys()) {
-						if (goal.getConstants().containsKey(name2)) {
-
-							update.append("-" + i + " ");
-
-						} else if (goal.getEAtoms().containsKey(name2)) {
-
-							update.append("-" + i + " ");
-						}
-					}
-
-				}
-
-			}
-			if (update.length() == 0) {
-				updateWithNegations();
-			}
-		}
-
-		return response;
-
-	}
-
-	/**
-	 * This method reads a file <code>outfile</code> which contains an output
-	 * from SAT solver i.e. UNSAT or SAT with the list of true literals. If the
-	 * file contains SAT and the list of true literals, the method translates it
-	 * to a TBox, which is written to the file <code>result</code> and returns
-	 * "true". Otherwise, it writes "NOT UNIFIABLE" to file <code>result</code>
-	 * and returns "false".
-	 * 
-	 * @param outfile
-	 * @param result
-	 * @throws IOException
-	 * @return <code>true</code> if and only if the output of the SAT solver
-	 *         contains SAT.
-	 */
-	public boolean toTBox(Reader outfile, Writer result) throws IOException {
-
-		Pattern answer = Pattern.compile("^SAT");
-		Matcher manswer;
-		String line;
-		boolean response = false;
-
-		BufferedReader reader = new BufferedReader(outfile);
-
-		line = reader.readLine();
-
-		manswer = answer.matcher(line);
-
 		/*
 		 * if SAT is in the beginning of the file
 		 */
@@ -886,6 +769,30 @@ public class Translator {
 			if (update.length() == 0) {
 				updateWithNegations();
 			}
+		}
+
+		return response;
+
+	}
+
+	/**
+	 * This method reads a file <code>outfile</code> which contains an output
+	 * from SAT solver i.e. UNSAT or SAT with the list of true literals. If the
+	 * file contains SAT and the list of true literals, the method translates it
+	 * to a TBox, which is written to the file <code>result</code> and returns
+	 * "true". Otherwise, it writes "NOT UNIFIABLE" to file <code>result</code>
+	 * and returns "false".
+	 * 
+	 * @param outfile
+	 * @param result
+	 * @throws IOException
+	 * @return <code>true</code> if and only if the output of the SAT solver
+	 *         contains SAT.
+	 */
+	public boolean toTBox(Reader outfile, Writer result) throws IOException {
+		boolean ret = toTBox(outfile);
+
+		if (ret) {
 
 			PrintWriter out = new PrintWriter(new BufferedWriter(result));
 
@@ -912,8 +819,7 @@ public class Translator {
 
 		}
 
-		return response;
-
+		return ret;
 	}
 
 	private void updateWithNegations() {
