@@ -36,9 +36,11 @@ import de.uulm.ecs.ai.owlapi.krssrenderer.KRSS2OWLSyntaxRenderer;
 public class UelProcessor {
 
 	private Set<String> candidates = new HashSet<String>();
+	private Ontology ontology = null;
 	private OWLWorkspace owlWorkspace = null;
 	private SatInput satinput = null;
 	private Translator translator = null;
+
 	private List<String> unifierList = new ArrayList<String>();
 
 	public UelProcessor(OWLWorkspace workspace) {
@@ -91,8 +93,10 @@ public class UelProcessor {
 			throw new IllegalArgumentException("Null argument.");
 		}
 
-		Ontology ont = getOntology(getOWLWorkspace().getOWLModelManager());
-		Goal goal = createGoal(ont, input, this.candidates);
+		if (this.ontology == null) {
+			reloadOntology(getOWLWorkspace().getOWLModelManager());
+		}
+		Goal goal = createGoal(ontology, input, this.candidates);
 		this.translator = new Translator(goal);
 	}
 
@@ -118,29 +122,6 @@ public class UelProcessor {
 		return Collections.unmodifiableSet(this.candidates);
 	}
 
-	private Ontology getOntology(OWLModelManager modelManager) {
-		OWLOntologyManager owlOntologyManager = modelManager
-				.getOWLOntologyManager();
-		OWLOntology owlOntology = modelManager.getActiveOntology();
-		StringWriter writer = new StringWriter();
-		KRSS2OWLSyntaxRenderer renderer = new KRSS2OWLSyntaxRenderer(
-				owlOntologyManager);
-		try {
-			renderer.render(owlOntology, writer);
-		} catch (OWLRendererException e) {
-			throw new RuntimeException(e);
-		}
-		writer.flush();
-
-		Ontology ret = new Ontology();
-		try {
-			ret.loadOntology(new StringReader(writer.toString()));
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-		return ret;
-	}
-
 	public OWLWorkspace getOWLWorkspace() {
 		return this.owlWorkspace;
 	}
@@ -154,8 +135,10 @@ public class UelProcessor {
 			throw new IllegalArgumentException("Null argument.");
 		}
 
-		Ontology ont = getOntology(getOWLWorkspace().getOWLModelManager());
-		Goal goal = createGoal(ont, input, new HashSet<String>());
+		if (this.ontology == null) {
+			reloadOntology(getOWLWorkspace().getOWLModelManager());
+		}
+		Goal goal = createGoal(this.ontology, input, new HashSet<String>());
 		Map<String, FAtom> consMap = goal.getConstants();
 		Set<String> varSet = new HashSet<String>();
 		for (Iterator<String> it = consMap.keySet().iterator(); it.hasNext();) {
@@ -165,15 +148,26 @@ public class UelProcessor {
 		this.unifierList.clear();
 	}
 
-	protected String showSubsumers(Goal goal) {
-		StringBuffer subsumers = new StringBuffer();
-		for (FAtom var : goal.getVariables().values()) {
-			subsumers.append(var);
-			subsumers.append(":");
-			subsumers.append(var.getS());
-			subsumers.append("\n");
+	public void reloadOntology(OWLModelManager modelManager) {
+		OWLOntologyManager owlOntologyManager = modelManager
+				.getOWLOntologyManager();
+		OWLOntology owlOntology = modelManager.getActiveOntology();
+		StringWriter writer = new StringWriter();
+		KRSS2OWLSyntaxRenderer renderer = new KRSS2OWLSyntaxRenderer(
+				owlOntologyManager);
+		try {
+			renderer.render(owlOntology, writer);
+		} catch (OWLRendererException e) {
+			throw new RuntimeException(e);
 		}
-		return subsumers.toString();
+		writer.flush();
+
+		this.ontology = new Ontology();
+		try {
+			this.ontology.loadOntology(new StringReader(writer.toString()));
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 }

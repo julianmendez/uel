@@ -362,6 +362,17 @@ public class Goal {
 		return sbuf.toString();
 	}
 
+	public String printSubsumers() {
+		StringBuffer sbuf = new StringBuffer();
+		for (FAtom var : getVariables().values()) {
+			sbuf.append(var);
+			sbuf.append(":");
+			sbuf.append(var.getS());
+			sbuf.append("\n");
+		}
+		return sbuf.toString();
+	}
+
 	/**
 	 * This method is not used by UEL. It is here for testing purposes. Prints
 	 * all variables of the goal.

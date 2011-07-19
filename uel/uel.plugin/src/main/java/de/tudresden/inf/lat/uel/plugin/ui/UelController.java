@@ -97,6 +97,7 @@ public class UelController implements ActionListener, OWLOntologyChangeListener 
 		getView().setButtonPreviousEnabled(false);
 		getView().setButtonNextEnabled(false);
 		getView().setButtonSaveEnabled(false);
+		keepOntologyUpdated();
 		Set<OWLClass> classSet = new HashSet<OWLClass>();
 		classSet.add(getSelectedClass00());
 		classSet.add(getSelectedClass01());
@@ -227,9 +228,10 @@ public class UelController implements ActionListener, OWLOntologyChangeListener 
 		return ret;
 	}
 
-	protected void keepUpdated() {
+	private void keepOntologyUpdated() {
 		if (this.ontologyChanged) {
 			this.ontologyChanged = false;
+			getModel().reloadOntology(getOWLWorkspace().getOWLModelManager());
 		}
 	}
 
