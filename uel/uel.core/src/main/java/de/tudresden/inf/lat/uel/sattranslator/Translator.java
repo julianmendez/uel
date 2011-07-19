@@ -802,7 +802,7 @@ public class Translator {
 					out.print("(define-concept ");
 					out.print(variable + " ");
 
-					goal.getVariables().get(variable).printS(out);
+					out.print(goal.getVariables().get(variable).printS());
 					out.println(" ) ");
 				}
 			}

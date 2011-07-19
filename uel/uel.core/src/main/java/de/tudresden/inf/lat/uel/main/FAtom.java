@@ -1,6 +1,5 @@
 package de.tudresden.inf.lat.uel.main;
 
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -185,35 +184,36 @@ public class FAtom extends Atom {
 	}
 
 	/**
-	 * Prints to a Print Writer out a substitution set (i.e. a set of atoms) as
-	 * a conjunction of atoms in the krss format. Used in Translator.
+	 * Prints a substitution set (i.e. a set of atoms) as a conjunction of atoms
+	 * in the krss format. Used in Translator.
 	 * 
-	 * @param out
+	 * @return the string representation of a substitution set
 	 */
-	public void printS(PrintWriter out) {
+	public String printS() {
+
+		StringBuffer sbuf = new StringBuffer();
 
 		if (S.isEmpty()) {
 
-			out.print("TOP ");
+			sbuf.append("TOP ");
 
 		} else if (S.size() == 1) {
 
-			out.print(S.iterator().next().toString());
+			sbuf.append(S.iterator().next().toString());
 
 		} else {
 
-			out.print("(AND ");
+			sbuf.append("(AND ");
 
 			for (FAtom atom : S) {
-				out.print(" ");
-				out.print(atom.toString());
-				// out.print(atom.getName());
-				out.print(" ");
+				sbuf.append(" ");
+				sbuf.append(atom.toString());
+				sbuf.append(" ");
 			}
 
-			out.print(" )");
+			sbuf.append(" )");
 		}
-
+		return sbuf.toString();
 	}
 
 	/**
