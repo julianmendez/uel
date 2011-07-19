@@ -22,22 +22,23 @@ public class SatInput {
 	}
 
 	/**
-	 * Adds a new clause.
+	 * Adds a new clause. Empty clauses are ignored.
 	 * 
 	 * @param clause
 	 *            new clause
 	 */
-	public void add(Collection<Integer> clause) {
+	public boolean add(Collection<Integer> clause) {
+		boolean ret = false;
 		Set<Integer> newSet = new TreeSet<Integer>();
 		newSet.addAll(clause);
 		newSet.remove(0);
-		this.clauses.add(newSet);
-		for (Integer elem : newSet) {
-			Integer absElem = elem < 0 ? (-1) * elem : elem;
-			if (absElem > this.lastId) {
-				this.lastId = absElem;
+		if (!newSet.isEmpty()) {
+			ret = this.clauses.add(newSet);
+			if (ret) {
+				updateLastId(newSet);
 			}
 		}
+		return ret;
 	}
 
 	/**
@@ -46,13 +47,13 @@ public class SatInput {
 	 * @param clause
 	 *            line representing the clause
 	 */
-	public void add(String clause) {
+	public boolean add(String clause) {
 		StringTokenizer stok = new StringTokenizer(clause);
 		Set<Integer> litSet = new HashSet<Integer>();
 		while (stok.hasMoreTokens()) {
 			litSet.add(Integer.parseInt(stok.nextToken()));
 		}
-		add(litSet);
+		return add(litSet);
 	}
 
 	/**
@@ -80,6 +81,18 @@ public class SatInput {
 			sbuf.append("\n");
 		}
 		return sbuf.toString();
+	}
+
+	private boolean updateLastId(Set<Integer> newSet) {
+		boolean ret = false;
+		for (Integer elem : newSet) {
+			Integer absElem = elem < 0 ? (-1) * elem : elem;
+			if (absElem > this.lastId) {
+				this.lastId = absElem;
+				ret = true;
+			}
+		}
+		return ret;
 	}
 
 }

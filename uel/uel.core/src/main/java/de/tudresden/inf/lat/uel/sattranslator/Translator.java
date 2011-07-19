@@ -760,8 +760,9 @@ public class Translator {
 				}
 
 			}
-
-			updateWithNegations();
+			if (update.length() == 0) {
+				updateWithNegations();
+			}
 		}
 
 		return response;
@@ -882,7 +883,9 @@ public class Translator {
 				}
 
 			}
-			updateWithNegations();
+			if (update.length() == 0) {
+				updateWithNegations();
+			}
 
 			PrintWriter out = new PrintWriter(new BufferedWriter(result));
 
@@ -915,7 +918,7 @@ public class Translator {
 
 	private void updateWithNegations() {
 		for (FAtom var : goal.getVariables().values()) {
-			if (var.getS().isEmpty() && !var.isSys()) {
+			if (!var.isSys()) {
 				for (FAtom atom : goal.getAllAtoms().values()) {
 					if (atom.isCons() || atom.isRoot()) {
 						Literal lit = new Literal(var.toString(),

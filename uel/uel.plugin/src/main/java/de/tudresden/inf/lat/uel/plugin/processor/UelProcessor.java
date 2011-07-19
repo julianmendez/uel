@@ -69,16 +69,13 @@ public class UelProcessor {
 		try {
 			if (getUnifierList().isEmpty()) {
 				this.satinput = this.translator.getSatInput();
-				satoutputStr = solver.solve(this.satinput.toString());
-				unifiable = this.translator.toTBox(new StringReader(
-						satoutputStr), result);
-			} else if (this.translator.getUpdate().length() > 0) {
+			} else {
 				this.satinput.add(this.translator.getUpdate().toString());
-				satoutputStr = solver.solve(this.satinput.toString());
-				this.translator.reset();
-				unifiable = this.translator.toTBox(new StringReader(
-						satoutputStr), result);
 			}
+			satoutputStr = solver.solve(this.satinput.toString());
+			this.translator.reset();
+			unifiable = this.translator.toTBox(new StringReader(satoutputStr),
+					result);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
