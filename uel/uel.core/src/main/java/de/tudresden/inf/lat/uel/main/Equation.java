@@ -1,6 +1,5 @@
 package de.tudresden.inf.lat.uel.main;
 
-import java.io.PrintWriter;
 import java.util.HashMap;
 
 /**
@@ -105,13 +104,13 @@ public class Equation {
 	}
 
 	/**
-	 * Prints an equation to Print Writer <code>out</code>. Used in Goal
-	 * initialization, in creating TBox file.
+	 * Prints an equation. Used in Goal initialization, in creating TBox file.
 	 * 
-	 * 
-	 * @param out
+	 * @return string representation of the equation
 	 */
-	public void printFDefinition(PrintWriter out) {
+	public String printFDefinition() {
+
+		StringBuffer sbuf = new StringBuffer();
 
 		if (left.size() == 1 && right != null) {
 
@@ -119,13 +118,13 @@ public class Equation {
 
 				FAtom a = (FAtom) left.get(key);
 				if (a.isVar()) {
-					out.print("(");
-					out.print("DEFINE-CONCEPT ");
-					out.print(a.toString());
-					out.print(" ");
+					sbuf.append("(");
+					sbuf.append("DEFINE-CONCEPT ");
+					sbuf.append(a.toString());
+					sbuf.append(" ");
 
 				} else {
-					System.out.println("Cannot find a defined concept");
+					throw new RuntimeException("Cannot find a defined concept");
 				}
 
 			}
@@ -136,34 +135,34 @@ public class Equation {
 
 					FAtom a = (FAtom) right.get(key);
 
-					out.print(a.toString());
+					sbuf.append(a.toString());
 
 				}
 
 			} else {
 
-				out.print(" (AND ");
+				sbuf.append(" (AND ");
 
 				for (String key : right.keySet()) {
 
 					FAtom a = (FAtom) right.get(key);
 
-					out.print(a.toString());
+					sbuf.append(a.toString());
 
-					out.print(" ");
+					sbuf.append(" ");
 				}
 
-				out.print(") ");
+				sbuf.append(") ");
 
 			}
-			out.print(" ) ");
-			out.println("");
+			sbuf.append(" ) ");
+			sbuf.append("\n");
 		} else {
 
-			System.out.println("Error: equation is empty");
+			throw new RuntimeException("Error: equation is empty");
 
 		}
-
+		return sbuf.toString();
 	}
 
 	/**

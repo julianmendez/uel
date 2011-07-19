@@ -23,7 +23,8 @@ import de.tudresden.inf.lat.uel.sattranslator.Translator;
 
 public class Unifier {
 
-	static final Logger logger = Logger.getLogger("Unifier");
+	private static final Logger logger = Logger.getLogger(Unifier.class
+			.getName());
 
 	private int numberofsolutions = 0;
 

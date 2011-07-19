@@ -223,7 +223,7 @@ public class Goal {
 
 			for (Equation eq : equations) {
 
-				eq.printFDefinition(writer);
+				writer.print(eq.printFDefinition());
 
 			}
 			writer.flush();
@@ -322,7 +322,7 @@ public class Goal {
 	 */
 	public void printDefinitions(PrintWriter out) {
 		for (Equation eq : equations) {
-			eq.printFDefinition(out);
+			out.print(eq.printFDefinition());
 			out.println();
 		}
 	}
