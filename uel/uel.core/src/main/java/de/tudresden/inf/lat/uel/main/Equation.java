@@ -121,7 +121,7 @@ public class Equation {
 				if (a.isVar()) {
 					out.print("(");
 					out.print("DEFINE-CONCEPT ");
-					a.print(out);
+					out.print(a.toString());
 					out.print(" ");
 
 				} else {
@@ -136,7 +136,7 @@ public class Equation {
 
 					FAtom a = (FAtom) right.get(key);
 
-					a.print(out);
+					out.print(a.toString());
 
 				}
 
@@ -148,7 +148,7 @@ public class Equation {
 
 					FAtom a = (FAtom) right.get(key);
 
-					a.print(out);
+					out.print(a.toString());
 
 					out.print(" ");
 				}

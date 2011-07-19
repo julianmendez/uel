@@ -1,6 +1,5 @@
 package de.tudresden.inf.lat.uel.main;
 
-import java.io.PrintWriter;
 import java.util.HashMap;
 
 /**
@@ -128,20 +127,6 @@ public class Atom {
 	public boolean isRoot() {
 
 		return root;
-	}
-
-	/**
-	 * 
-	 * This method is not used by UEL. It is here for testing purposes. Prints
-	 * atom to a Print Writer out.
-	 * 
-	 * 
-	 * @param out
-	 */
-	public void print(PrintWriter out) {
-
-		out.print(this.toString());
-
 	}
 
 	@Override

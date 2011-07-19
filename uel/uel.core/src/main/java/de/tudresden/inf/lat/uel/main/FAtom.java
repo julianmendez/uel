@@ -198,7 +198,7 @@ public class FAtom extends Atom {
 
 		} else if (S.size() == 1) {
 
-			S.iterator().next().print(out);
+			out.print(S.iterator().next().toString());
 
 		} else {
 
@@ -206,7 +206,7 @@ public class FAtom extends Atom {
 
 			for (FAtom atom : S) {
 				out.print(" ");
-				atom.print(out);
+				out.print(atom.toString());
 				// out.print(atom.getName());
 				out.print(" ");
 			}
