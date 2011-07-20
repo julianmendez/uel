@@ -9,6 +9,8 @@ public interface Message {
 
 	public static final String buttonAcceptVar = "OK";
 	public static final String buttonGetVar = "Vars";
+	public static final String buttonMakeCons = "<<<";
+	public static final String buttonMakeVar = ">>>";
 	public static final String buttonNext = "Next";
 	public static final String buttonPrevious = "Pre";
 	public static final String buttonRejectVar = "Cancel";
@@ -17,6 +19,8 @@ public interface Message {
 	public static final String titleError = "Error";
 	public static final String tooltipAcceptVar = "use the selected entities as variables";
 	public static final String tooltipGetVar = "get candidates for variables";
+	public static final String tooltipMakeCons = "defines the selected items as constants";
+	public static final String tooltipMakeVar = "defines the selected items as variables";
 	public static final String tooltipNext = "shows the next unifier, it unifies the chosen class names using the selected variables";
 	public static final String tooltipPrevious = "shows the previous unifier";
 	public static final String tooltipRejectVar = "cancel this selection of variables";

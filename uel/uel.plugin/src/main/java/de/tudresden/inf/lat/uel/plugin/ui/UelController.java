@@ -15,7 +15,6 @@ import java.util.logging.Logger;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JFileChooser;
-import javax.swing.WindowConstants;
 
 import org.protege.editor.owl.model.OWLWorkspace;
 import org.semanticweb.owlapi.model.OWLAnnotation;
@@ -43,13 +42,12 @@ public class UelController implements ActionListener, OWLOntologyChangeListener 
 	private static final String actionSave = "save";
 	private static final Logger logger = Logger.getLogger(UelController.class
 			.getName());
-
 	public static final String RDFS_LABEL = "rdfs:label";
 
 	private List<OWLClass> classList = null;
 	private boolean ontologyChanged = true;
 	private int unifierIndex = -1;
-	private VarSelectionView varFrame = null;
+	private VarSelectionController varWindow = null;
 	private UelView view = null;
 
 	public UelController(UelView panel) {
@@ -88,10 +86,9 @@ public class UelController implements ActionListener, OWLOntologyChangeListener 
 	}
 
 	private void executeActionAcceptVar() {
-		getVarWindow().setVisible(false);
 		getModel().clearCandidates();
-		getModel().addAll(getVarWindow().getSelectedValues());
-		getVarWindow().dispose();
+		getModel().addAll(this.varWindow.getView().getModel().getVariables());
+		this.varWindow.close();
 		getView().setButtonPreviousEnabled(false);
 		getView().setButtonNextEnabled(true);
 		getView().setButtonSaveEnabled(false);
@@ -106,13 +103,12 @@ public class UelController implements ActionListener, OWLOntologyChangeListener 
 		classSet.add(getSelectedClass00());
 		classSet.add(getSelectedClass01());
 		getModel().recalculateCandidates(classSet);
-		this.varFrame = initVarFrame();
-		getVarWindow().setVisible(true);
+		this.varWindow = initVarWindow();
+		this.varWindow.open();
 		this.unifierIndex = -1;
 	}
 
 	private void executeActionNext() {
-		getVarWindow().setVisible(false);
 		getView().setButtonPreviousEnabled(true);
 		getView().setButtonNextEnabled(true);
 		getView().setButtonSaveEnabled(true);
@@ -134,7 +130,6 @@ public class UelController implements ActionListener, OWLOntologyChangeListener 
 	}
 
 	private void executeActionPrevious() {
-		getVarWindow().setVisible(false);
 		getView().setButtonPreviousEnabled(true);
 		getView().setButtonNextEnabled(true);
 		getView().setButtonSaveEnabled(true);
@@ -147,8 +142,7 @@ public class UelController implements ActionListener, OWLOntologyChangeListener 
 	}
 
 	private void executeActionRejectVar() {
-		getVarWindow().setVisible(false);
-		getVarWindow().dispose();
+		this.varWindow.close();
 		getView().setButtonPreviousEnabled(false);
 		getView().setButtonNextEnabled(false);
 		getView().setButtonSaveEnabled(false);
@@ -207,10 +201,6 @@ public class UelController implements ActionListener, OWLOntologyChangeListener 
 		return this.classList.get(getView().getSelectedIndex01());
 	}
 
-	public VarSelectionView getVarWindow() {
-		return this.varFrame;
-	}
-
 	public UelView getView() {
 		return this.view;
 	}
@@ -232,16 +222,12 @@ public class UelController implements ActionListener, OWLOntologyChangeListener 
 		getView().setButtonGetVarEnabled(true);
 	}
 
-	private VarSelectionView initVarFrame() {
-		VarSelectionModel varSelection = new VarSelectionModel();
-		varSelection.getVariables().addAll(getModel().getCandidates());
-		VarSelectionView ret = new VarSelectionView(varSelection);
-		ret.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+	private VarSelectionController initVarWindow() {
+		VarSelectionController ret = new VarSelectionController(
+				new VarSelectionView(new VarSelectionModel(getModel()
+						.getCandidates())));
 		ret.addAcceptVarButtonListener(this, actionAcceptVar);
 		ret.addRejectVarButtonListener(this, actionRejectVar);
-		ret.setLocation(400, 400);
-		ret.setSize(300, 200);
-		ret.setVisible(true);
 		return ret;
 	}
 
