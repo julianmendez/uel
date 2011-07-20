@@ -18,8 +18,11 @@ import javax.swing.JFileChooser;
 import javax.swing.WindowConstants;
 
 import org.protege.editor.owl.model.OWLWorkspace;
+import org.semanticweb.owlapi.model.OWLAnnotation;
+import org.semanticweb.owlapi.model.OWLAnnotationValue;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLException;
+import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyChange;
 import org.semanticweb.owlapi.model.OWLOntologyChangeListener;
 
@@ -38,9 +41,10 @@ public class UelController implements ActionListener, OWLOntologyChangeListener 
 	private static final String actionPrevious = "previous";
 	private static final String actionRejectVar = "reject var";
 	private static final String actionSave = "save";
-
 	private static final Logger logger = Logger.getLogger(UelController.class
 			.getName());
+
+	public static final String RDFS_LABEL = "rdfs:label";
 
 	private List<OWLClass> classList = null;
 	private boolean ontologyChanged = true;
@@ -172,6 +176,17 @@ public class UelController implements ActionListener, OWLOntologyChangeListener 
 		}
 	}
 
+	private OWLAnnotationValue getLabel(OWLClass cls, OWLOntology ontology) {
+		OWLAnnotationValue ret = null;
+		Set<OWLAnnotation> annotationSet = cls.getAnnotations(ontology);
+		for (OWLAnnotation annotation : annotationSet) {
+			if (annotation.getProperty().toString().equals(RDFS_LABEL)) {
+				ret = annotation.getValue();
+			}
+		}
+		return ret;
+	}
+
 	public DefaultListModel getListModel() {
 		return getView().getListModel();
 	}
@@ -250,18 +265,24 @@ public class UelController implements ActionListener, OWLOntologyChangeListener 
 				.getOWLDataFactory().getOWLNothing();
 		OWLClass thing = getModel().getOWLWorkspace().getOWLModelManager()
 				.getOWLDataFactory().getOWLThing();
+		OWLOntology ontology = getModel().getOWLWorkspace()
+				.getOWLModelManager().getActiveOntology();
+
 		Set<OWLClass> set = new TreeSet<OWLClass>();
-		set.addAll(getModel().getOWLWorkspace().getOWLModelManager()
-				.getActiveOntology().getClassesInSignature());
+		set.addAll(ontology.getClassesInSignature());
 		set.remove(nothing);
 		set.remove(thing);
+
 		this.classList = new ArrayList<OWLClass>();
 		this.classList.add(nothing);
 		this.classList.add(thing);
 		this.classList.addAll(set);
+
 		List<String> classNameSet = new ArrayList<String>();
 		for (OWLClass cls : this.classList) {
-			classNameSet.add(cls.getIRI().toURI().getFragment());
+			OWLAnnotationValue value = getLabel(cls, ontology);
+			classNameSet.add(value == null ? cls.getIRI().toURI().getFragment()
+					: value.toString());
 		}
 		getView().refresh(classNameSet);
 	}
