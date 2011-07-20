@@ -5,7 +5,6 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionListener;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -25,10 +24,10 @@ class VarSelectionView extends JFrame {
 
 	private JButton acceptVarButton = null;
 	private Map<String, JCheckBox> mainMap = new HashMap<String, JCheckBox>();
-	private Set<String> model = null;
+	private VarSelectionModel model = null;
 	private JButton rejectVarButton = null;
 
-	public VarSelectionView(Set<String> m) {
+	public VarSelectionView(VarSelectionModel m) {
 		super("Variable selection");
 		this.model = m;
 		initVarFrame();
@@ -60,8 +59,8 @@ class VarSelectionView extends JFrame {
 		this.rejectVarButton.setActionCommand(actionCommand);
 	}
 
-	public Set<String> getModel() {
-		return Collections.unmodifiableSet(this.model);
+	public VarSelectionModel getModel() {
+		return this.model;
 	}
 
 	public Set<String> getSelectedValues() {
@@ -83,11 +82,14 @@ class VarSelectionView extends JFrame {
 
 		JPanel panel = new JPanel();
 		Set<String> candidates = new TreeSet<String>();
-		candidates.addAll(getModel());
-		int n = getModel().size();
+		candidates.addAll(getModel().getVariables());
+		candidates.addAll(getModel().getConstants());
+
+		int n = getModel().getVariables().size();
 		panel.setLayout(new GridLayout(n, 1));
 		for (String candidate : candidates) {
-			JCheckBox checkBox = new JCheckBox(candidate, true);
+			JCheckBox checkBox = new JCheckBox(candidate, getModel()
+					.getVariables().contains(candidate));
 			this.mainMap.put(candidate, checkBox);
 			panel.add(checkBox);
 		}

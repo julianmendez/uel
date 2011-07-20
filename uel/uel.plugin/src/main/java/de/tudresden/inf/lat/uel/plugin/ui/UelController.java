@@ -106,7 +106,7 @@ public class UelController implements ActionListener, OWLOntologyChangeListener 
 		classSet.add(getSelectedClass00());
 		classSet.add(getSelectedClass01());
 		getModel().recalculateCandidates(classSet);
-		this.varFrame = initVarFrame(getModel().getCandidates());
+		this.varFrame = initVarFrame();
 		getVarWindow().setVisible(true);
 		this.unifierIndex = -1;
 	}
@@ -232,8 +232,10 @@ public class UelController implements ActionListener, OWLOntologyChangeListener 
 		getView().setButtonGetVarEnabled(true);
 	}
 
-	private VarSelectionView initVarFrame(Set<String> set) {
-		VarSelectionView ret = new VarSelectionView(set);
+	private VarSelectionView initVarFrame() {
+		VarSelectionModel varSelection = new VarSelectionModel();
+		varSelection.getVariables().addAll(getModel().getCandidates());
+		VarSelectionView ret = new VarSelectionView(varSelection);
 		ret.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		ret.addAcceptVarButtonListener(this, actionAcceptVar);
 		ret.addRejectVarButtonListener(this, actionRejectVar);
