@@ -49,6 +49,7 @@ public class UelProcessor {
 		}
 
 		this.owlWorkspace = workspace;
+		reloadOntology(getOWLWorkspace().getOWLModelManager());
 	}
 
 	public void addAll(Set<String> set) {
@@ -93,9 +94,6 @@ public class UelProcessor {
 			throw new IllegalArgumentException("Null argument.");
 		}
 
-		if (this.ontology == null) {
-			reloadOntology(getOWLWorkspace().getOWLModelManager());
-		}
 		Goal goal = createGoal(ontology, input, this.candidates);
 		this.translator = new Translator(goal);
 	}
