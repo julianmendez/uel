@@ -34,7 +34,7 @@ public class UelView extends JPanel {
 	private JComboBox classNameList01 = null;
 	private DefaultListModel listmodel = new DefaultListModel();
 	private UelProcessor model = null;
-	private JTextArea unifier = null;
+	private JTextArea textUnifier = null;
 
 	public UelView(UelProcessor processor) {
 		if (processor == null) {
@@ -114,7 +114,7 @@ public class UelView extends JPanel {
 	}
 
 	public JTextArea getUnifier() {
-		return this.unifier;
+		return this.textUnifier;
 	}
 
 	public void init() {
@@ -156,16 +156,15 @@ public class UelView extends JPanel {
 		computePanel.add(this.buttonGetVar);
 
 		JPanel unifierPanel = new JPanel(new FlowLayout());
-
-		this.unifier = new JTextArea();
-		this.unifier.setToolTipText("unifier");
-		this.unifier.setWrapStyleWord(true);
-		this.unifier.setLineWrap(true);
-		this.unifier.setPreferredSize(new Dimension(400, 200));
-		JScrollPane scroll = new JScrollPane(this.unifier,
-				JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		unifierPanel.add(scroll);
+		this.textUnifier = new JTextArea();
+		this.textUnifier.setToolTipText("unifier");
+		this.textUnifier.setWrapStyleWord(true);
+		this.textUnifier.setLineWrap(true);
+		JScrollPane scrollPane = new JScrollPane(this.textUnifier);
+		scrollPane
+				.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		scrollPane.setPreferredSize(new Dimension(400, 200));
+		unifierPanel.add(scrollPane);
 		this.buttonPrevious = new JButton(Message.buttonPrevious);
 		this.buttonPrevious.setToolTipText(Message.tooltipPrevious);
 		unifierPanel.add(this.buttonPrevious);
