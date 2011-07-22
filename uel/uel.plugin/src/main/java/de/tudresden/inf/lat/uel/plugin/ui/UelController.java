@@ -7,8 +7,10 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.logging.Logger;
@@ -35,6 +37,7 @@ import de.tudresden.inf.lat.uel.plugin.processor.UelProcessor;
 public class UelController implements ActionListener, OWLOntologyChangeListener {
 
 	private static final String actionAcceptVar = "accept var";
+	private static final String actionGetNames = "get classes";
 	private static final String actionGetVar = "get var candidate";
 	private static final String actionNext = "next";
 	private static final String actionPrevious = "previous";
@@ -44,18 +47,30 @@ public class UelController implements ActionListener, OWLOntologyChangeListener 
 			.getName());
 	public static final String RDFS_LABEL = "rdfs:label";
 
-	private List<OWLClass> classList = null;
+	private List<String> classList00 = null;
+	private List<String> classList01 = null;
+	private Map<String, OWLClass> mapIdClass = new HashMap<String, OWLClass>();
+	private Map<String, String> mapIdLabel = new HashMap<String, String>();
+	private OWLOntology ontology00 = null;
+	private OWLOntology ontology01 = null;
 	private boolean ontologyChanged = true;
+	private List<String> ontologyList = new ArrayList<String>();
+	private Map<String, OWLOntology> ontologyMap = new HashMap<String, OWLOntology>();
+	private OWLWorkspace owlWorkspace = null;
 	private int unifierIndex = -1;
 	private VarSelectionController varWindow = null;
 	private UelView view = null;
 
-	public UelController(UelView panel) {
+	public UelController(UelView panel, OWLWorkspace workspace) {
 		if (panel == null) {
+			throw new IllegalArgumentException("Null argument.");
+		}
+		if (workspace == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
 
 		this.view = panel;
+		this.owlWorkspace = workspace;
 		init();
 	}
 
@@ -70,6 +85,8 @@ public class UelController implements ActionListener, OWLOntologyChangeListener 
 		String cmd = e.getActionCommand();
 		if (cmd.equals(actionGetVar)) {
 			executeActionGetVar();
+		} else if (cmd.equals(actionGetNames)) {
+			executeActionGetNames();
 		} else if (cmd.equals(actionAcceptVar)) {
 			executeActionAcceptVar();
 		} else if (cmd.equals(actionRejectVar)) {
@@ -94,14 +111,38 @@ public class UelController implements ActionListener, OWLOntologyChangeListener 
 		getView().setButtonSaveEnabled(false);
 	}
 
+	private void executeActionGetNames() {
+		getView().setButtonPreviousEnabled(false);
+		getView().setButtonNextEnabled(false);
+		getView().setButtonSaveEnabled(false);
+
+		this.ontology00 = this.ontologyMap.get(this.ontologyList.get(getView()
+				.getSelectedOntologyName00()));
+		this.ontology01 = this.ontologyMap.get(this.ontologyList.get(getView()
+				.getSelectedOntologyName01()));
+
+		keepOntologyUpdated();
+
+		processMapIdLabel(this.ontology00);
+		processMapIdClass(this.ontology00);
+		processMapIdLabel(this.ontology01);
+		processMapIdClass(this.ontology01);
+
+		reloadClassNames();
+
+		getView().setButtonGetVarEnabled(true);
+		getView().setComboBoxClassName00Enabled(true);
+		getView().setComboBoxClassName01Enabled(true);
+	}
+
 	private void executeActionGetVar() {
 		getView().setButtonPreviousEnabled(false);
 		getView().setButtonNextEnabled(false);
 		getView().setButtonSaveEnabled(false);
 		keepOntologyUpdated();
-		Set<OWLClass> classSet = new HashSet<OWLClass>();
-		classSet.add(getSelectedClass00());
-		classSet.add(getSelectedClass01());
+		Set<String> classSet = new HashSet<String>();
+		classSet.add(this.classList00.get(getView().getSelectedClassName00()));
+		classSet.add(this.classList01.get(getView().getSelectedClassName01()));
 		getModel().recalculateCandidates(classSet);
 		this.varWindow = initVarWindow();
 		this.varWindow.open();
@@ -114,9 +155,11 @@ public class UelController implements ActionListener, OWLOntologyChangeListener 
 		getView().setButtonSaveEnabled(true);
 
 		if (getModel().getUnifierList().isEmpty()) {
-			Set<OWLClass> classSet = new HashSet<OWLClass>();
-			classSet.add(getSelectedClass00());
-			classSet.add(getSelectedClass01());
+			Set<String> classSet = new HashSet<String>();
+			classSet.add(this.classList00.get(getView()
+					.getSelectedClassName00()));
+			classSet.add(this.classList01.get(getView()
+					.getSelectedClassName01()));
 			getModel().configure(classSet);
 		}
 		this.unifierIndex++;
@@ -170,6 +213,30 @@ public class UelController implements ActionListener, OWLOntologyChangeListener 
 		}
 	}
 
+	private List<String> getClassNames(OWLOntology ontology) {
+		OWLClass nothing = ontology.getOWLOntologyManager().getOWLDataFactory()
+				.getOWLNothing();
+		OWLClass thing = ontology.getOWLOntologyManager().getOWLDataFactory()
+				.getOWLThing();
+
+		Set<OWLClass> set = new TreeSet<OWLClass>();
+		set.addAll(ontology.getClassesInSignature());
+		set.remove(nothing);
+		set.remove(thing);
+
+		List<String> ret = new ArrayList<String>();
+		ret.add(nothing.toStringID());
+		ret.add(thing.toStringID());
+		for (OWLClass cls : set) {
+			ret.add(getId(cls));
+		}
+		return ret;
+	}
+
+	private String getId(OWLClass cls) {
+		return cls.getIRI().toURI().toString();
+	}
+
 	private OWLAnnotationValue getLabel(OWLClass cls, OWLOntology ontology) {
 		OWLAnnotationValue ret = null;
 		Set<OWLAnnotation> annotationSet = cls.getAnnotations(ontology);
@@ -181,6 +248,10 @@ public class UelController implements ActionListener, OWLOntologyChangeListener 
 		return ret;
 	}
 
+	private String getLabel(String id) {
+		return this.mapIdLabel.get(id);
+	}
+
 	public DefaultListModel getListModel() {
 		return getView().getListModel();
 	}
@@ -190,15 +261,7 @@ public class UelController implements ActionListener, OWLOntologyChangeListener 
 	}
 
 	public OWLWorkspace getOWLWorkspace() {
-		return getModel().getOWLWorkspace();
-	}
-
-	public OWLClass getSelectedClass00() {
-		return this.classList.get(getView().getSelectedIndex00());
-	}
-
-	public OWLClass getSelectedClass01() {
-		return this.classList.get(getView().getSelectedIndex01());
+		return this.owlWorkspace;
 	}
 
 	public UelView getView() {
@@ -214,11 +277,18 @@ public class UelController implements ActionListener, OWLOntologyChangeListener 
 		getView().setButtonPreviousEnabled(false);
 		getView().setButtonNextEnabled(false);
 		getView().setButtonSaveEnabled(false);
+
+		getView().setComboBoxClassName00Enabled(false);
+		getView().setComboBoxClassName01Enabled(false);
+
+		getView().addButtonGetNamesListener(this, actionGetNames);
 		getView().addButtonGetVarListener(this, actionGetVar);
 		getView().addButtonPreviousListener(this, actionPrevious);
 		getView().addButtonNextListener(this, actionNext);
 		getView().addButtonSaveListener(this, actionSave);
-		refresh();
+
+		reloadOntologyNames();
+
 		getView().setButtonGetVarEnabled(true);
 	}
 
@@ -234,7 +304,13 @@ public class UelController implements ActionListener, OWLOntologyChangeListener 
 	private void keepOntologyUpdated() {
 		if (this.ontologyChanged) {
 			this.ontologyChanged = false;
-			getModel().reloadOntology(getOWLWorkspace().getOWLModelManager());
+			getModel().clearOntology();
+			getModel().loadOntology(
+					getOWLWorkspace().getOWLModelManager()
+							.getOWLOntologyManager(), this.ontology00);
+			getModel().loadOntology(
+					getOWLWorkspace().getOWLModelManager()
+							.getOWLOntologyManager(), this.ontology01);
 		}
 	}
 
@@ -248,31 +324,48 @@ public class UelController implements ActionListener, OWLOntologyChangeListener 
 		this.ontologyChanged = true;
 	}
 
-	public void refresh() {
-		OWLClass nothing = getModel().getOWLWorkspace().getOWLModelManager()
-				.getOWLDataFactory().getOWLNothing();
-		OWLClass thing = getModel().getOWLWorkspace().getOWLModelManager()
-				.getOWLDataFactory().getOWLThing();
-		OWLOntology ontology = getModel().getOWLWorkspace()
-				.getOWLModelManager().getActiveOntology();
-
-		Set<OWLClass> set = new TreeSet<OWLClass>();
-		set.addAll(ontology.getClassesInSignature());
-		set.remove(nothing);
-		set.remove(thing);
-
-		this.classList = new ArrayList<OWLClass>();
-		this.classList.add(nothing);
-		this.classList.add(thing);
-		this.classList.addAll(set);
-
-		List<String> classNameSet = new ArrayList<String>();
-		for (OWLClass cls : this.classList) {
-			OWLAnnotationValue value = getLabel(cls, ontology);
-			classNameSet.add(value == null ? cls.getIRI().toURI().getFragment()
-					: value.toString());
+	private void processMapIdClass(OWLOntology ontology) {
+		Set<OWLClass> set = ontology.getClassesInSignature();
+		for (OWLClass cls : set) {
+			this.mapIdClass.put(getId(cls), cls);
 		}
-		getView().refresh(classNameSet);
+	}
+
+	private void processMapIdLabel(OWLOntology ontology) {
+		Set<OWLClass> set = ontology.getClassesInSignature();
+		for (OWLClass cls : set) {
+			OWLAnnotationValue value = getLabel(cls, ontology);
+			this.mapIdLabel.put(getId(cls), value == null ? cls.getIRI()
+					.toURI().getFragment() : value.toString());
+		}
+	}
+
+	private void reloadClassNames() {
+		this.classList00 = getClassNames(this.ontology00);
+		List<String> classNameList00 = new ArrayList<String>();
+		for (String className : this.classList00) {
+			classNameList00.add(getLabel(className));
+		}
+
+		this.classList01 = getClassNames(this.ontology01);
+		List<String> classNameList01 = new ArrayList<String>();
+		for (String className : this.classList01) {
+			classNameList01.add(getLabel(className));
+		}
+		getView().reloadClassNames(this.classList00, this.classList01);
+	}
+
+	public void reloadOntologyNames() {
+		Set<OWLOntology> ontologies = this.owlWorkspace.getOWLModelManager()
+				.getOntologies();
+		for (OWLOntology ontology : ontologies) {
+			this.ontologyMap.put(ontology.getOntologyID().toString(), ontology);
+		}
+		Set<String> set = new TreeSet<String>();
+		set.addAll(this.ontologyMap.keySet());
+		this.ontologyList.clear();
+		this.ontologyList.addAll(set);
+		getView().reloadOntologies(this.ontologyList);
 	}
 
 	public void removeListeners() {

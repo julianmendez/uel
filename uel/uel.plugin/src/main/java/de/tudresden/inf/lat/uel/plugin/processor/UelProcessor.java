@@ -11,10 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.protege.editor.owl.model.OWLModelManager;
-import org.protege.editor.owl.model.OWLWorkspace;
 import org.semanticweb.owlapi.io.OWLRendererException;
-import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 
@@ -37,19 +34,11 @@ public class UelProcessor {
 
 	private Set<String> candidates = new HashSet<String>();
 	private Ontology ontology = null;
-	private OWLWorkspace owlWorkspace = null;
 	private SatInput satinput = null;
 	private Translator translator = null;
-
 	private List<String> unifierList = new ArrayList<String>();
 
-	public UelProcessor(OWLWorkspace workspace) {
-		if (workspace == null) {
-			throw new IllegalArgumentException("Null argument.");
-		}
-
-		this.owlWorkspace = workspace;
-		reloadOntology(getOWLWorkspace().getOWLModelManager());
+	public UelProcessor() {
 	}
 
 	public void addAll(Set<String> set) {
@@ -62,6 +51,10 @@ public class UelProcessor {
 
 	public void clearCandidates() {
 		this.candidates.clear();
+	}
+
+	public void clearOntology() {
+		this.ontology = new Ontology();
 	}
 
 	public boolean computeNextUnifier() {
@@ -89,7 +82,7 @@ public class UelProcessor {
 		return unifiable;
 	}
 
-	public void configure(Set<OWLClass> input) {
+	public void configure(Set<String> input) {
 		if (input == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
@@ -98,12 +91,11 @@ public class UelProcessor {
 		this.translator = new Translator(goal);
 	}
 
-	private Goal createGoal(Ontology ont, Set<OWLClass> input, Set<String> vars) {
+	private Goal createGoal(Ontology ont, Set<String> input, Set<String> vars) {
 		Goal goal = new Goal(ont);
 		StringBuffer sbuf = new StringBuffer();
-		for (OWLClass cls : input) {
-			String key = cls.toStringID();
-			Equation eq = ont.getPrimitiveDefinition(key);
+		for (String cls : input) {
+			Equation eq = ont.getPrimitiveDefinition(cls);
 			sbuf.append(eq.toString());
 			sbuf.append("\n");
 		}
@@ -120,36 +112,19 @@ public class UelProcessor {
 		return Collections.unmodifiableSet(this.candidates);
 	}
 
-	public OWLWorkspace getOWLWorkspace() {
-		return this.owlWorkspace;
-	}
-
 	public List<String> getUnifierList() {
 		return Collections.unmodifiableList(this.unifierList);
 	}
 
-	public void recalculateCandidates(Set<OWLClass> input) {
-		if (input == null) {
+	public void loadOntology(OWLOntologyManager owlOntologyManager,
+			OWLOntology owlOntology) {
+		if (owlOntologyManager == null) {
+			throw new IllegalArgumentException("Null argument.");
+		}
+		if (owlOntology == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
 
-		if (this.ontology == null) {
-			reloadOntology(getOWLWorkspace().getOWLModelManager());
-		}
-		Goal goal = createGoal(this.ontology, input, new HashSet<String>());
-		Map<String, FAtom> consMap = goal.getConstants();
-		Set<String> varSet = new HashSet<String>();
-		for (Iterator<String> it = consMap.keySet().iterator(); it.hasNext();) {
-			varSet.add(consMap.get(it.next()).toString());
-		}
-		this.candidates = varSet;
-		this.unifierList.clear();
-	}
-
-	public void reloadOntology(OWLModelManager modelManager) {
-		OWLOntologyManager owlOntologyManager = modelManager
-				.getOWLOntologyManager();
-		OWLOntology owlOntology = modelManager.getActiveOntology();
 		StringWriter writer = new StringWriter();
 		KRSS2OWLSyntaxRenderer renderer = new KRSS2OWLSyntaxRenderer(
 				owlOntologyManager);
@@ -160,12 +135,26 @@ public class UelProcessor {
 		}
 		writer.flush();
 
-		this.ontology = new Ontology();
 		try {
 			this.ontology.loadOntology(new StringReader(writer.toString()));
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	public void recalculateCandidates(Set<String> input) {
+		if (input == null) {
+			throw new IllegalArgumentException("Null argument.");
+		}
+
+		Goal goal = createGoal(this.ontology, input, new HashSet<String>());
+		Map<String, FAtom> consMap = goal.getConstants();
+		Set<String> varSet = new HashSet<String>();
+		for (Iterator<String> it = consMap.keySet().iterator(); it.hasNext();) {
+			varSet.add(consMap.get(it.next()).toString());
+		}
+		this.candidates = varSet;
+		this.unifierList.clear();
 	}
 
 }

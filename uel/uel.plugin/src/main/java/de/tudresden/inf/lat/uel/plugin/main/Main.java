@@ -30,8 +30,8 @@ public class Main extends AbstractOWLClassViewComponent {
 	 */
 	public void initialiseClassView() throws Exception {
 		this.setLayout(new BorderLayout());
-		this.uelController = new UelController(new UelView(new UelProcessor(
-				getOWLWorkspace())));
+		this.uelController = new UelController(new UelView(new UelProcessor()),
+				getOWLWorkspace());
 		add(this.uelController.getView(), BorderLayout.CENTER);
 	}
 
