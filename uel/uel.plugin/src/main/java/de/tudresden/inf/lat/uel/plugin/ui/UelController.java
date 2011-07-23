@@ -37,12 +37,13 @@ import de.tudresden.inf.lat.uel.plugin.processor.UelProcessor;
 public class UelController implements ActionListener, OWLOntologyChangeListener {
 
 	private static final String actionAcceptVar = "accept var";
-	private static final String actionGetNames = "get classes";
-	private static final String actionGetVar = "get var candidate";
+	private static final String actionGetConceptNames = "get classes";
 	private static final String actionNext = "next";
 	private static final String actionPrevious = "previous";
 	private static final String actionRejectVar = "reject var";
+	private static final String actionReset = "reset";
 	private static final String actionSave = "save";
+	private static final String actionSelectVariables = "get var candidate";
 	private static final Logger logger = Logger.getLogger(UelController.class
 			.getName());
 	public static final String RDFS_LABEL = "rdfs:label";
@@ -83,10 +84,12 @@ public class UelController implements ActionListener, OWLOntologyChangeListener 
 		}
 
 		String cmd = e.getActionCommand();
-		if (cmd.equals(actionGetVar)) {
-			executeActionGetVar();
-		} else if (cmd.equals(actionGetNames)) {
-			executeActionGetNames();
+		if (cmd.equals(actionSelectVariables)) {
+			executeActionSelectVariables();
+		} else if (cmd.equals(actionReset)) {
+			executeActionReset();
+		} else if (cmd.equals(actionGetConceptNames)) {
+			executeActionGetConceptNames();
 		} else if (cmd.equals(actionAcceptVar)) {
 			executeActionAcceptVar();
 		} else if (cmd.equals(actionRejectVar)) {
@@ -111,7 +114,7 @@ public class UelController implements ActionListener, OWLOntologyChangeListener 
 		getView().setButtonSaveEnabled(false);
 	}
 
-	private void executeActionGetNames() {
+	private void executeActionGetConceptNames() {
 		getView().setButtonPreviousEnabled(false);
 		getView().setButtonNextEnabled(false);
 		getView().setButtonSaveEnabled(false);
@@ -130,23 +133,9 @@ public class UelController implements ActionListener, OWLOntologyChangeListener 
 
 		reloadClassNames();
 
-		getView().setButtonGetVarEnabled(true);
+		getView().setButtonSelectVariablesEnabled(true);
 		getView().setComboBoxClassName00Enabled(true);
 		getView().setComboBoxClassName01Enabled(true);
-	}
-
-	private void executeActionGetVar() {
-		getView().setButtonPreviousEnabled(false);
-		getView().setButtonNextEnabled(false);
-		getView().setButtonSaveEnabled(false);
-		keepOntologyUpdated();
-		Set<String> classSet = new HashSet<String>();
-		classSet.add(this.classList00.get(getView().getSelectedClassName00()));
-		classSet.add(this.classList01.get(getView().getSelectedClassName01()));
-		getModel().recalculateCandidates(classSet);
-		this.varWindow = initVarWindow();
-		this.varWindow.open();
-		this.unifierIndex = -1;
 	}
 
 	private void executeActionNext() {
@@ -191,6 +180,17 @@ public class UelController implements ActionListener, OWLOntologyChangeListener 
 		getView().setButtonSaveEnabled(false);
 	}
 
+	private void executeActionReset() {
+		getView().setButtonPreviousEnabled(false);
+		getView().setButtonNextEnabled(false);
+		getView().setButtonSaveEnabled(false);
+		getView().setComboBoxClassName00Enabled(false);
+		getView().setComboBoxClassName01Enabled(false);
+		reloadOntologyNames();
+		getView().getUnifier().setText("");
+		getView().setButtonSelectVariablesEnabled(true);
+	}
+
 	private void executeActionSave() {
 		JFileChooser fileChooser = new JFileChooser();
 		int returnVal = fileChooser.showSaveDialog(getView());
@@ -209,8 +209,21 @@ public class UelController implements ActionListener, OWLOntologyChangeListener 
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
-
 		}
+	}
+
+	private void executeActionSelectVariables() {
+		getView().setButtonPreviousEnabled(false);
+		getView().setButtonNextEnabled(false);
+		getView().setButtonSaveEnabled(false);
+		keepOntologyUpdated();
+		Set<String> classSet = new HashSet<String>();
+		classSet.add(this.classList00.get(getView().getSelectedClassName00()));
+		classSet.add(this.classList01.get(getView().getSelectedClassName01()));
+		getModel().recalculateCandidates(classSet);
+		this.varWindow = initVarWindow();
+		this.varWindow.open();
+		this.unifierIndex = -1;
 	}
 
 	private List<String> getClassNames(OWLOntology ontology) {
@@ -274,22 +287,13 @@ public class UelController implements ActionListener, OWLOntologyChangeListener 
 	 */
 	public void init() {
 		getOWLWorkspace().getOWLModelManager().addOntologyChangeListener(this);
-		getView().setButtonPreviousEnabled(false);
-		getView().setButtonNextEnabled(false);
-		getView().setButtonSaveEnabled(false);
-
-		getView().setComboBoxClassName00Enabled(false);
-		getView().setComboBoxClassName01Enabled(false);
-
-		getView().addButtonGetNamesListener(this, actionGetNames);
-		getView().addButtonGetVarListener(this, actionGetVar);
+		getView().addButtonResetListener(this, actionReset);
+		getView().addButtonGetConceptNamesListener(this, actionGetConceptNames);
+		getView().addButtonSelectVariablesListener(this, actionSelectVariables);
 		getView().addButtonPreviousListener(this, actionPrevious);
 		getView().addButtonNextListener(this, actionNext);
 		getView().addButtonSaveListener(this, actionSave);
-
-		reloadOntologyNames();
-
-		getView().setButtonGetVarEnabled(true);
+		executeActionReset();
 	}
 
 	private VarSelectionController initVarWindow() {
@@ -358,6 +362,7 @@ public class UelController implements ActionListener, OWLOntologyChangeListener 
 	public void reloadOntologyNames() {
 		Set<OWLOntology> ontologies = this.owlWorkspace.getOWLModelManager()
 				.getOntologies();
+		this.ontologyMap.clear();
 		for (OWLOntology ontology : ontologies) {
 			this.ontologyMap.put(ontology.getOntologyID().toString(), ontology);
 		}

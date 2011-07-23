@@ -26,18 +26,21 @@ public class UelView extends JPanel {
 
 	private static final long serialVersionUID = 9096602357606632334L;
 
-	private JButton buttonGetNames = new JButton(Message.buttonGetNames);;
-	private JButton buttonGetVar = new JButton(Message.buttonGetVar);;
+	private JButton buttonGetConceptNames = new JButton(
+			Message.buttonGetConceptNames);
 	private JButton buttonNext = new JButton(Message.buttonNext);
 	private JButton buttonPrevious = new JButton(Message.buttonPrevious);
+	private JButton buttonReset = new JButton(Message.buttonReset);
 	private JButton buttonSave = new JButton(Message.buttonSave);
-	private JComboBox listClassName00 = new JComboBox();;
-	private JComboBox listClassName01 = new JComboBox();;
+	private JButton buttonSelectVariables = new JButton(
+			Message.buttonSelectVariables);
+	private JComboBox listClassName00 = new JComboBox();
+	private JComboBox listClassName01 = new JComboBox();
 	private DefaultListModel listmodel = new DefaultListModel();
-	private JComboBox listOntologyName00 = new JComboBox();;
-	private JComboBox listOntologyName01 = new JComboBox();;
+	private JComboBox listOntologyName00 = new JComboBox();
+	private JComboBox listOntologyName01 = new JComboBox();
 	private UelProcessor model = null;
-	private JTextArea textUnifier = new JTextArea();;
+	private JTextArea textUnifier = new JTextArea();
 
 	public UelView(UelProcessor processor) {
 		if (processor == null) {
@@ -48,7 +51,7 @@ public class UelView extends JPanel {
 		init();
 	}
 
-	public void addButtonGetNamesListener(ActionListener listener,
+	public void addButtonGetConceptNamesListener(ActionListener listener,
 			String actionCommand) {
 		if (listener == null) {
 			throw new IllegalArgumentException("Null argument.");
@@ -57,21 +60,8 @@ public class UelView extends JPanel {
 			throw new IllegalArgumentException("Null argument.");
 		}
 
-		this.buttonGetNames.addActionListener(listener);
-		this.buttonGetNames.setActionCommand(actionCommand);
-	}
-
-	public void addButtonGetVarListener(ActionListener listener,
-			String actionCommand) {
-		if (listener == null) {
-			throw new IllegalArgumentException("Null argument.");
-		}
-		if (actionCommand == null) {
-			throw new IllegalArgumentException("Null argument.");
-		}
-
-		this.buttonGetVar.addActionListener(listener);
-		this.buttonGetVar.setActionCommand(actionCommand);
+		this.buttonGetConceptNames.addActionListener(listener);
+		this.buttonGetConceptNames.setActionCommand(actionCommand);
 	}
 
 	public void addButtonNextListener(ActionListener listener,
@@ -100,6 +90,19 @@ public class UelView extends JPanel {
 		this.buttonPrevious.setActionCommand(actionCommand);
 	}
 
+	public void addButtonResetListener(ActionListener listener,
+			String actionCommand) {
+		if (listener == null) {
+			throw new IllegalArgumentException("Null argument.");
+		}
+		if (actionCommand == null) {
+			throw new IllegalArgumentException("Null argument.");
+		}
+
+		this.buttonReset.addActionListener(listener);
+		this.buttonReset.setActionCommand(actionCommand);
+	}
+
 	public void addButtonSaveListener(ActionListener listener,
 			String actionCommand) {
 		if (listener == null) {
@@ -111,6 +114,19 @@ public class UelView extends JPanel {
 
 		this.buttonSave.addActionListener(listener);
 		this.buttonSave.setActionCommand(actionCommand);
+	}
+
+	public void addButtonSelectVariablesListener(ActionListener listener,
+			String actionCommand) {
+		if (listener == null) {
+			throw new IllegalArgumentException("Null argument.");
+		}
+		if (actionCommand == null) {
+			throw new IllegalArgumentException("Null argument.");
+		}
+
+		this.buttonSelectVariables.addActionListener(listener);
+		this.buttonSelectVariables.setActionCommand(actionCommand);
 	}
 
 	private JPanel createControlPanel() {
@@ -125,11 +141,16 @@ public class UelView extends JPanel {
 
 	private JPanel createExecutionPanel() {
 		JPanel computePanel = new JPanel(new FlowLayout());
-		this.buttonGetNames.setToolTipText(Message.tooltipGetNames);
-		computePanel.add(this.buttonGetNames);
+		this.buttonReset.setToolTipText(Message.tooltipReset);
+		computePanel.add(this.buttonReset);
 
-		this.buttonGetVar.setToolTipText(Message.tooltipGetVar);
-		computePanel.add(this.buttonGetVar);
+		this.buttonGetConceptNames
+				.setToolTipText(Message.tooltipGetConceptNames);
+		computePanel.add(this.buttonGetConceptNames);
+
+		this.buttonSelectVariables
+				.setToolTipText(Message.tooltipSelectVariables);
+		computePanel.add(this.buttonSelectVariables);
 		return computePanel;
 	}
 
@@ -235,12 +256,12 @@ public class UelView extends JPanel {
 			throw new IllegalArgumentException("Null argument.");
 		}
 
-		// this.listClassName00.removeAll();
+		this.listClassName00.removeAllItems();
 		for (String className : firstList) {
 			this.listClassName00.addItem(className);
 		}
 
-		// this.listClassName01.removeAll();
+		this.listClassName01.removeAllItems();
 		for (String className : secondList) {
 			this.listClassName01.addItem(className);
 		}
@@ -251,20 +272,18 @@ public class UelView extends JPanel {
 			throw new IllegalArgumentException("Null argument.");
 		}
 
-		// this.listOntologyName00.removeAll();
-		// this.listOntologyName01.removeAll();
+		this.listOntologyName00.removeAllItems();
+		this.listOntologyName01.removeAllItems();
 		for (String ontologyName : listOfOntologyNames) {
 			this.listOntologyName00.addItem(ontologyName);
 			this.listOntologyName01.addItem(ontologyName);
 		}
+		this.listClassName00.removeAllItems();
+		this.listClassName01.removeAllItems();
 	}
 
-	public void setButtonGetNameEnabled(boolean b) {
-		this.buttonGetNames.setEnabled(b);
-	}
-
-	public void setButtonGetVarEnabled(boolean b) {
-		this.buttonGetVar.setEnabled(b);
+	public void setButtonGetConceptNamesEnabled(boolean b) {
+		this.buttonGetConceptNames.setEnabled(b);
 	}
 
 	public void setButtonNextEnabled(boolean b) {
@@ -275,8 +294,16 @@ public class UelView extends JPanel {
 		this.buttonPrevious.setEnabled(b);
 	}
 
+	public void setButtonResetEnabled(boolean b) {
+		this.buttonReset.setEnabled(b);
+	}
+
 	public void setButtonSaveEnabled(boolean b) {
 		this.buttonSave.setEnabled(b);
+	}
+
+	public void setButtonSelectVariablesEnabled(boolean b) {
+		this.buttonSelectVariables.setEnabled(b);
 	}
 
 	public void setComboBoxClassName00Enabled(boolean b) {
