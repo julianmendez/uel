@@ -20,6 +20,7 @@ public class Main extends AbstractOWLClassViewComponent {
 
 	private UelController uelController = null;
 
+	@Override
 	public void disposeView() {
 		this.uelController.removeListeners();
 	}
@@ -28,6 +29,7 @@ public class Main extends AbstractOWLClassViewComponent {
 	 * Initializes the data and GUI. This method is called when the view is
 	 * initialized.
 	 */
+	@Override
 	public void initialiseClassView() throws Exception {
 		this.setLayout(new BorderLayout());
 		this.uelController = new UelController(new UelView(new UelProcessor()),
@@ -35,13 +37,8 @@ public class Main extends AbstractOWLClassViewComponent {
 		add(this.uelController.getView(), BorderLayout.CENTER);
 	}
 
+	@Override
 	protected OWLClass updateView(OWLClass selectedClass) {
-		this.uelController.setSelectedClass(selectedClass);
-		if (selectedClass != null) {
-			getOWLModelManager().getOWLHierarchyManager()
-					.getOWLClassHierarchyProvider();
-			getOWLModelManager().getOWLEntityRenderer();
-		}
 		return selectedClass;
 	}
 

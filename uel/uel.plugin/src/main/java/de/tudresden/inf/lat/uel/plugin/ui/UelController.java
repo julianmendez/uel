@@ -26,6 +26,7 @@ import org.semanticweb.owlapi.model.OWLException;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyChange;
 import org.semanticweb.owlapi.model.OWLOntologyChangeListener;
+import org.semanticweb.owlapi.model.OWLOntologyLoaderListener;
 
 import de.tudresden.inf.lat.uel.plugin.processor.UelProcessor;
 
@@ -34,7 +35,8 @@ import de.tudresden.inf.lat.uel.plugin.processor.UelProcessor;
  * 
  * @author Julian Mendez
  */
-public class UelController implements ActionListener, OWLOntologyChangeListener {
+public class UelController implements ActionListener,
+		OWLOntologyChangeListener, OWLOntologyLoaderListener {
 
 	private static final String actionAcceptVar = "accept var";
 	private static final String actionGetConceptNames = "get classes";
@@ -78,6 +80,7 @@ public class UelController implements ActionListener, OWLOntologyChangeListener 
 	/**
 	 * Action handler.
 	 */
+	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e == null) {
 			throw new IllegalArgumentException("Null argument.");
@@ -226,6 +229,15 @@ public class UelController implements ActionListener, OWLOntologyChangeListener 
 		this.unifierIndex = -1;
 	}
 
+	@Override
+	public void finishedLoadingOntology(LoadingFinishedEvent event) {
+		if (event == null) {
+			throw new IllegalArgumentException("Null argument.");
+		}
+
+		executeActionReset();
+	}
+
 	private List<String> getClassNames(OWLOntology ontology) {
 		OWLClass nothing = ontology.getOWLOntologyManager().getOWLDataFactory()
 				.getOWLNothing();
@@ -285,8 +297,11 @@ public class UelController implements ActionListener, OWLOntologyChangeListener 
 	 * Initializes the data and GUI. This method is called when the view is
 	 * initialized.
 	 */
-	public void init() {
-		getOWLWorkspace().getOWLModelManager().addOntologyChangeListener(this);
+	private void init() {
+		getOWLWorkspace().getOWLModelManager().getOWLOntologyManager()
+				.addOntologyLoaderListener(this);
+		getOWLWorkspace().getOWLModelManager().getOWLOntologyManager()
+				.addOntologyChangeListener(this);
 		getView().addButtonResetListener(this, actionReset);
 		getView().addButtonGetConceptNamesListener(this, actionGetConceptNames);
 		getView().addButtonSelectVariablesListener(this, actionSelectVariables);
@@ -318,6 +333,7 @@ public class UelController implements ActionListener, OWLOntologyChangeListener 
 		}
 	}
 
+	@Override
 	public void ontologiesChanged(List<? extends OWLOntologyChange> change)
 			throws OWLException {
 		if (change == null) {
@@ -378,7 +394,11 @@ public class UelController implements ActionListener, OWLOntologyChangeListener 
 				this);
 	}
 
-	public void setSelectedClass(OWLClass selectedClass) {
+	@Override
+	public void startedLoadingOntology(LoadingStartedEvent event) {
+		if (event == null) {
+			throw new IllegalArgumentException("Null argument.");
+		}
 	}
 
 	private void updateUnifier() {
