@@ -19,7 +19,9 @@ import javax.swing.DefaultListModel;
 import javax.swing.JFileChooser;
 
 import org.protege.editor.owl.model.OWLWorkspace;
+import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.OWLAnnotation;
+import org.semanticweb.owlapi.model.OWLAnnotationProperty;
 import org.semanticweb.owlapi.model.OWLAnnotationValue;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLException;
@@ -48,7 +50,8 @@ public class UelController implements ActionListener,
 	private static final String actionSelectVariables = "get var candidate";
 	private static final Logger logger = Logger.getLogger(UelController.class
 			.getName());
-	public static final String RDFS_LABEL = "rdfs:label";
+	private static final OWLAnnotationProperty RDFS_LABEL = OWLManager
+			.getOWLDataFactory().getRDFSLabel();
 
 	private List<String> classList00 = null;
 	private List<String> classList01 = null;
@@ -266,7 +269,7 @@ public class UelController implements ActionListener,
 		OWLAnnotationValue ret = null;
 		Set<OWLAnnotation> annotationSet = cls.getAnnotations(ontology);
 		for (OWLAnnotation annotation : annotationSet) {
-			if (annotation.getProperty().toString().equals(RDFS_LABEL)) {
+			if (annotation.getProperty().equals(RDFS_LABEL)) {
 				ret = annotation.getValue();
 			}
 		}
