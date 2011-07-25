@@ -19,10 +19,7 @@ import javax.swing.DefaultListModel;
 import javax.swing.JFileChooser;
 
 import org.protege.editor.owl.model.OWLWorkspace;
-import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.model.OWLAnnotation;
-import org.semanticweb.owlapi.model.OWLAnnotationProperty;
-import org.semanticweb.owlapi.model.OWLAnnotationValue;
+import org.protege.editor.owl.ui.renderer.OWLModelManagerEntityRenderer;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLException;
 import org.semanticweb.owlapi.model.OWLOntology;
@@ -50,13 +47,10 @@ public class UelController implements ActionListener,
 	private static final String actionSelectVariables = "get var candidate";
 	private static final Logger logger = Logger.getLogger(UelController.class
 			.getName());
-	private static final OWLAnnotationProperty RDFS_LABEL = OWLManager
-			.getOWLDataFactory().getRDFSLabel();
 
 	private List<String> classList00 = null;
 	private List<String> classList01 = null;
 	private Map<String, OWLClass> mapIdClass = new HashMap<String, OWLClass>();
-	private Map<String, String> mapIdLabel = new HashMap<String, String>();
 	private OWLOntology ontology00 = null;
 	private OWLOntology ontology01 = null;
 	private boolean ontologyChanged = true;
@@ -132,9 +126,7 @@ public class UelController implements ActionListener,
 
 		keepOntologyUpdated();
 
-		processMapIdLabel(this.ontology00);
 		processMapIdClass(this.ontology00);
-		processMapIdLabel(this.ontology01);
 		processMapIdClass(this.ontology01);
 
 		reloadClassNames();
@@ -265,21 +257,6 @@ public class UelController implements ActionListener,
 		return cls.getIRI().toURI().toString();
 	}
 
-	private OWLAnnotationValue getLabel(OWLClass cls, OWLOntology ontology) {
-		OWLAnnotationValue ret = null;
-		Set<OWLAnnotation> annotationSet = cls.getAnnotations(ontology);
-		for (OWLAnnotation annotation : annotationSet) {
-			if (annotation.getProperty().equals(RDFS_LABEL)) {
-				ret = annotation.getValue();
-			}
-		}
-		return ret;
-	}
-
-	private String getLabel(String id) {
-		return this.mapIdLabel.get(id);
-	}
-
 	public DefaultListModel getListModel() {
 		return getView().getListModel();
 	}
@@ -352,30 +329,35 @@ public class UelController implements ActionListener,
 		for (OWLClass cls : set) {
 			this.mapIdClass.put(getId(cls), cls);
 		}
-	}
 
-	private void processMapIdLabel(OWLOntology ontology) {
-		Set<OWLClass> set = ontology.getClassesInSignature();
-		for (OWLClass cls : set) {
-			OWLAnnotationValue value = getLabel(cls, ontology);
-			this.mapIdLabel.put(getId(cls), value == null ? cls.getIRI()
-					.toURI().getFragment() : value.toString());
-		}
+		OWLClass nothing = ontology.getOWLOntologyManager().getOWLDataFactory()
+				.getOWLNothing();
+		this.mapIdClass.put(getId(nothing), nothing);
+
+		OWLClass thing = ontology.getOWLOntologyManager().getOWLDataFactory()
+				.getOWLThing();
+		this.mapIdClass.put(getId(thing), thing);
 	}
 
 	private void reloadClassNames() {
+		OWLModelManagerEntityRenderer renderer = this.owlWorkspace
+				.getOWLModelManager().getOWLEntityRenderer();
 		this.classList00 = getClassNames(this.ontology00);
 		List<String> classNameList00 = new ArrayList<String>();
 		for (String className : this.classList00) {
-			classNameList00.add(getLabel(className));
+			String label = renderer
+					.getShortForm(this.mapIdClass.get(className));
+			classNameList00.add(label);
 		}
 
 		this.classList01 = getClassNames(this.ontology01);
 		List<String> classNameList01 = new ArrayList<String>();
 		for (String className : this.classList01) {
-			classNameList01.add(getLabel(className));
+			String label = renderer
+					.getShortForm(this.mapIdClass.get(className));
+			classNameList01.add(label);
 		}
-		getView().reloadClassNames(this.classList00, this.classList01);
+		getView().reloadClassNames(classNameList00, classNameList01);
 	}
 
 	public void reloadOntologyNames() {
