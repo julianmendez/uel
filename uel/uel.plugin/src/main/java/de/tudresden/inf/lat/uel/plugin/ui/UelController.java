@@ -2,16 +2,19 @@ package de.tudresden.inf.lat.uel.plugin.ui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.StringTokenizer;
 import java.util.TreeSet;
 import java.util.logging.Logger;
 
@@ -393,6 +396,36 @@ public class UelController implements ActionListener,
 				this);
 	}
 
+	private String showUnifier(String str) {
+		StringBuffer ret = new StringBuffer();
+		try {
+			BufferedReader reader = new BufferedReader(new StringReader(str));
+			String line = "";
+			while (line != null) {
+				line = reader.readLine();
+				if (line != null) {
+					StringTokenizer stok = new StringTokenizer(line);
+					while (stok.hasMoreTokens()) {
+						String token = stok.nextToken();
+						OWLClass cls = this.mapIdClass.get(token);
+						if (cls != null) {
+							ret.append(getLabel(token));
+						} else {
+							ret.append(token);
+						}
+						if (stok.hasMoreTokens()) {
+							ret.append(" ");
+						}
+					}
+				}
+				ret.append("\n");
+			}
+		} catch (IOException e) {
+			throw new IllegalStateException(e);
+		}
+		return ret.toString();
+	}
+
 	@Override
 	public void startedLoadingOntology(LoadingStartedEvent event) {
 		if (event == null) {
@@ -403,7 +436,8 @@ public class UelController implements ActionListener,
 	private void updateUnifier() {
 		if (getModel().getUnifierList().size() > 0) {
 			getView().getUnifier().setText(
-					getModel().getUnifierList().get(this.unifierIndex));
+					showUnifier(getModel().getUnifierList().get(
+							this.unifierIndex)));
 		} else {
 			getView().getUnifier().setText("[not unifiable]");
 		}
