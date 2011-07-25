@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
 import javax.swing.BoxLayout;
@@ -19,15 +21,13 @@ class VarSelectionView extends JFrame {
 
 	private JButton acceptVarButton = null;
 	private JList listConstants = null;
+	private List<LabelId> listOfConstants = null;
+	private List<LabelId> listOfVariables = null;
 	private JList listVariables = null;
 	private JButton makeConsButton = null;
 	private JButton makeVarButton = null;
 	private VarSelectionModel model = null;
 	private JButton rejectVarButton = null;
-
-	private Vector<String> vecConstants = null;
-
-	private Vector<String> vecVariables = null;
 
 	public VarSelectionView(VarSelectionModel m) {
 		super("Variable selection");
@@ -88,8 +88,8 @@ class VarSelectionView extends JFrame {
 		this.rejectVarButton.setActionCommand(actionCommand);
 	}
 
-	public String getConstant(int index) {
-		return vecConstants.get(index);
+	public LabelId getConstant(int index) {
+		return this.listOfConstants.get(index);
 	}
 
 	public VarSelectionModel getModel() {
@@ -104,8 +104,8 @@ class VarSelectionView extends JFrame {
 		return this.listVariables.getSelectedIndices();
 	}
 
-	public String getVariable(int index) {
-		return vecVariables.get(index);
+	public LabelId getVariable(int index) {
+		return this.listOfVariables.get(index);
 	}
 
 	private void initVarFrame() {
@@ -166,12 +166,28 @@ class VarSelectionView extends JFrame {
 	}
 
 	public void updateLists() {
-		this.vecConstants = new Vector<String>(getModel().getConstants());
-		this.listConstants.setListData(this.vecConstants);
+		this.listOfConstants = new ArrayList<LabelId>();
+		for (String str : getModel().getConstants()) {
+			this.listOfConstants
+					.add(new LabelId(getModel().getLabel(str), str));
+		}
+		Vector<String> vectorOfLabelsOfConstants = new Vector<String>();
+		for (LabelId elem : this.listOfConstants) {
+			vectorOfLabelsOfConstants.add(elem.getLabel());
+		}
+		this.listConstants.setListData(vectorOfLabelsOfConstants);
 		this.listConstants.setSelectedIndices(new int[0]);
 
-		this.vecVariables = new Vector<String>(getModel().getVariables());
-		this.listVariables.setListData(this.vecVariables);
+		this.listOfVariables = new ArrayList<LabelId>();
+		for (String str : getModel().getVariables()) {
+			this.listOfVariables
+					.add(new LabelId(getModel().getLabel(str), str));
+		}
+		Vector<String> vectorOfLabelsOfVariables = new Vector<String>();
+		for (LabelId elem : this.listOfVariables) {
+			vectorOfLabelsOfVariables.add(elem.getLabel());
+		}
+		this.listVariables.setListData(vectorOfLabelsOfVariables);
 		this.listVariables.setSelectedIndices(new int[0]);
 	}
 

@@ -262,6 +262,16 @@ public class UelController implements ActionListener,
 		return cls.getIRI().toURI().toString();
 	}
 
+	private String getLabel(String candidateId) {
+		String ret = candidateId;
+		OWLClass cls = this.mapIdClass.get(candidateId);
+		if (cls != null) {
+			ret = this.owlWorkspace.getOWLModelManager().getOWLEntityRenderer()
+					.getShortForm(cls);
+		}
+		return ret;
+	}
+
 	public DefaultListModel getListModel() {
 		return getView().getListModel();
 	}
@@ -297,9 +307,13 @@ public class UelController implements ActionListener,
 	}
 
 	private VarSelectionController initVarWindow() {
+		Map<String, String> map = new HashMap<String, String>();
+		Set<String> candidates = getModel().getCandidates();
+		for (String candidateId : candidates) {
+			map.put(candidateId, getLabel(candidateId));
+		}
 		VarSelectionController ret = new VarSelectionController(
-				new VarSelectionView(new VarSelectionModel(getModel()
-						.getCandidates())));
+				new VarSelectionView(new VarSelectionModel(candidates, map)));
 		ret.addAcceptVarButtonListener(this, actionAcceptVar);
 		ret.addRejectVarButtonListener(this, actionRejectVar);
 		return ret;

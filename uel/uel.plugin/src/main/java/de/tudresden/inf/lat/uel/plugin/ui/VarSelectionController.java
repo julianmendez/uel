@@ -33,7 +33,7 @@ class VarSelectionController implements ActionListener {
 			int[] options = getView().getSelectedConstants();
 			for (int i = 0; i < options.length; i++) {
 				getView().getModel().makeVariable(
-						getView().getConstant(options[i]));
+						getView().getConstant(options[i]).getId());
 			}
 			getView().updateLists();
 
@@ -41,7 +41,7 @@ class VarSelectionController implements ActionListener {
 			int[] options = getView().getSelectedVariables();
 			for (int i = 0; i < options.length; i++) {
 				getView().getModel().makeConstant(
-						getView().getVariable(options[i]));
+						getView().getVariable(options[i]).getId());
 			}
 			getView().updateLists();
 
