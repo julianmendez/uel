@@ -48,8 +48,8 @@ public class UelController implements ActionListener,
 	private static final Logger logger = Logger.getLogger(UelController.class
 			.getName());
 
-	private List<String> classList00 = null;
-	private List<String> classList01 = null;
+	private List<LabelId> classList00 = null;
+	private List<LabelId> classList01 = null;
 	private Map<String, OWLClass> mapIdClass = new HashMap<String, OWLClass>();
 	private OWLOntology ontology00 = null;
 	private OWLOntology ontology01 = null;
@@ -143,10 +143,10 @@ public class UelController implements ActionListener,
 
 		if (getModel().getUnifierList().isEmpty()) {
 			Set<String> classSet = new HashSet<String>();
-			classSet.add(this.classList00.get(getView()
-					.getSelectedClassName00()));
-			classSet.add(this.classList01.get(getView()
-					.getSelectedClassName01()));
+			classSet.add(this.classList00.get(
+					getView().getSelectedClassName00()).getId());
+			classSet.add(this.classList01.get(
+					getView().getSelectedClassName01()).getId());
 			getModel().configure(classSet);
 		}
 		this.unifierIndex++;
@@ -216,8 +216,10 @@ public class UelController implements ActionListener,
 		getView().setButtonSaveEnabled(false);
 		keepOntologyUpdated();
 		Set<String> classSet = new HashSet<String>();
-		classSet.add(this.classList00.get(getView().getSelectedClassName00()));
-		classSet.add(this.classList01.get(getView().getSelectedClassName01()));
+		classSet.add(this.classList00.get(getView().getSelectedClassName00())
+				.getId());
+		classSet.add(this.classList01.get(getView().getSelectedClassName01())
+				.getId());
 		getModel().recalculateCandidates(classSet);
 		this.varWindow = initVarWindow();
 		this.varWindow.open();
@@ -233,22 +235,25 @@ public class UelController implements ActionListener,
 		executeActionReset();
 	}
 
-	private List<String> getClassNames(OWLOntology ontology) {
+	private List<LabelId> getClassNames(OWLOntology ontology) {
 		OWLClass nothing = ontology.getOWLOntologyManager().getOWLDataFactory()
 				.getOWLNothing();
 		OWLClass thing = ontology.getOWLOntologyManager().getOWLDataFactory()
 				.getOWLThing();
+		OWLModelManagerEntityRenderer renderer = this.owlWorkspace
+				.getOWLModelManager().getOWLEntityRenderer();
 
 		Set<OWLClass> set = new TreeSet<OWLClass>();
 		set.addAll(ontology.getClassesInSignature());
 		set.remove(nothing);
 		set.remove(thing);
 
-		List<String> ret = new ArrayList<String>();
-		ret.add(nothing.toStringID());
-		ret.add(thing.toStringID());
+		List<LabelId> ret = new ArrayList<LabelId>();
+		ret.add(new LabelId(renderer.getShortForm(nothing), nothing
+				.toStringID()));
+		ret.add(new LabelId(renderer.getShortForm(thing), thing.toStringID()));
 		for (OWLClass cls : set) {
-			ret.add(getId(cls));
+			ret.add(new LabelId(renderer.getShortForm(cls), getId(cls)));
 		}
 		return ret;
 	}
@@ -340,23 +345,18 @@ public class UelController implements ActionListener,
 	}
 
 	private void reloadClassNames() {
-		OWLModelManagerEntityRenderer renderer = this.owlWorkspace
-				.getOWLModelManager().getOWLEntityRenderer();
 		this.classList00 = getClassNames(this.ontology00);
 		List<String> classNameList00 = new ArrayList<String>();
-		for (String className : this.classList00) {
-			String label = renderer
-					.getShortForm(this.mapIdClass.get(className));
-			classNameList00.add(label);
+		for (LabelId className : this.classList00) {
+			classNameList00.add(className.getLabel());
 		}
 
 		this.classList01 = getClassNames(this.ontology01);
 		List<String> classNameList01 = new ArrayList<String>();
-		for (String className : this.classList01) {
-			String label = renderer
-					.getShortForm(this.mapIdClass.get(className));
-			classNameList01.add(label);
+		for (LabelId className : this.classList01) {
+			classNameList01.add(className.getLabel());
 		}
+
 		getView().reloadClassNames(classNameList00, classNameList01);
 	}
 
