@@ -48,7 +48,7 @@ public class UelController implements ActionListener,
 	private static final String actionReset = "reset";
 	private static final String actionSave = "save";
 	private static final String actionSelectVariables = "get var candidate";
-	private static final String initialUnifierIdText = " 0 / 0";
+	private static final String initialUnifierIdText = " 0 / 0 ";
 	private static final Logger logger = Logger.getLogger(UelController.class
 			.getName());
 
@@ -124,14 +124,22 @@ public class UelController implements ActionListener,
 		getView().setButtonNextEnabled(false);
 		getView().setButtonSaveEnabled(false);
 
-		this.ontology00 = this.ontologyMap.get(this.ontologyList.get(getView()
-				.getSelectedOntologyName00()));
-		this.ontology01 = this.ontologyMap.get(this.ontologyList.get(getView()
-				.getSelectedOntologyName01()));
-
 		keepOntologyUpdated();
 
+		getModel().clearOntology();
+
+		this.ontology00 = this.ontologyMap.get(this.ontologyList.get(getView()
+				.getSelectedOntologyName00()));
+		getModel().loadOntology(
+				getOWLWorkspace().getOWLModelManager().getOWLOntologyManager(),
+				this.ontology00);
 		processMapIdClass(this.ontology00);
+
+		this.ontology01 = this.ontologyMap.get(this.ontologyList.get(getView()
+				.getSelectedOntologyName01()));
+		getModel().loadOntology(
+				getOWLWorkspace().getOWLModelManager().getOWLOntologyManager(),
+				this.ontology01);
 		processMapIdClass(this.ontology01);
 
 		reloadClassNames();
@@ -191,11 +199,11 @@ public class UelController implements ActionListener,
 		getView().setButtonSaveEnabled(false);
 		getView().setComboBoxClassName00Enabled(false);
 		getView().setComboBoxClassName01Enabled(false);
-		reloadOntologyNames();
 		this.unifierIndex = -1;
 		this.allUnifiersFound = false;
 		getView().getUnifier().setText("");
 		getView().getUnifierId().setText(initialUnifierIdText);
+		reloadOntologyNames();
 		getView().setButtonSelectVariablesEnabled(true);
 	}
 
@@ -334,13 +342,7 @@ public class UelController implements ActionListener,
 	private void keepOntologyUpdated() {
 		if (this.ontologyChanged) {
 			this.ontologyChanged = false;
-			getModel().clearOntology();
-			getModel().loadOntology(
-					getOWLWorkspace().getOWLModelManager()
-							.getOWLOntologyManager(), this.ontology00);
-			getModel().loadOntology(
-					getOWLWorkspace().getOWLModelManager()
-							.getOWLOntologyManager(), this.ontology01);
+			executeActionReset();
 		}
 	}
 
@@ -452,7 +454,7 @@ public class UelController implements ActionListener,
 		}
 		getView().getUnifierId().setText(
 				" "
-						+ (getModel().getUnifierList().size() == 0 ? 0
+						+ (getModel().getUnifierList().isEmpty() ? 0
 								: (this.unifierIndex + 1)) + " / "
 						+ getModel().getUnifierList().size() + " ");
 		if (this.unifierIndex == 0) {

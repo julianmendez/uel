@@ -59,7 +59,6 @@ public class UelProcessor {
 		this.candidates.clear();
 		this.unifierList.clear();
 		this.unifierSet.clear();
-
 	}
 
 	public boolean computeNextUnifier() {
