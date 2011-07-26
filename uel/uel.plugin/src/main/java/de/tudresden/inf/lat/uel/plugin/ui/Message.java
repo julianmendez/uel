@@ -30,5 +30,6 @@ public interface Message {
 	public static final String tooltipSave = "saves the current unifier into a file";
 	public static final String tooltipSelectVariables = "gets candidates for variables";
 	public static final String tooltipUnifier = "unifier";
+	public static final String tooltipUnifierId = "unifier id";
 
 }

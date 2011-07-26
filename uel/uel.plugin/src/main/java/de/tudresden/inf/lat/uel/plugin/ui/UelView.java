@@ -41,6 +41,7 @@ public class UelView extends JPanel {
 	private JComboBox listOntologyName01 = new JComboBox();
 	private UelProcessor model = null;
 	private JTextArea textUnifier = new JTextArea();
+	private JTextArea textUnifierId = new JTextArea();
 
 	public UelView(UelProcessor processor) {
 		if (processor == null) {
@@ -204,6 +205,10 @@ public class UelView extends JPanel {
 		this.buttonPrevious.setToolTipText(Message.tooltipPrevious);
 		ret.add(this.buttonPrevious);
 
+		this.textUnifierId.setToolTipText(Message.tooltipUnifierId);
+		this.textUnifierId.setEditable(false);
+		ret.add(this.textUnifierId);
+		
 		this.buttonNext.setToolTipText(Message.tooltipNext);
 		ret.add(this.buttonNext);
 
@@ -238,6 +243,10 @@ public class UelView extends JPanel {
 
 	public JTextArea getUnifier() {
 		return this.textUnifier;
+	}
+
+	public JTextArea getUnifierId() {
+		return this.textUnifierId;
 	}
 
 	public void init() {

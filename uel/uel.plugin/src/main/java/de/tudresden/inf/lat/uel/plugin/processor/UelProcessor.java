@@ -37,6 +37,7 @@ public class UelProcessor {
 	private SatInput satinput = null;
 	private Translator translator = null;
 	private List<String> unifierList = new ArrayList<String>();
+	private Set<String> unifierSet = new HashSet<String>();
 
 	public UelProcessor() {
 	}
@@ -55,6 +56,10 @@ public class UelProcessor {
 
 	public void clearOntology() {
 		this.ontology = new Ontology();
+		this.candidates.clear();
+		this.unifierList.clear();
+		this.unifierSet.clear();
+
 	}
 
 	public boolean computeNextUnifier() {
@@ -76,8 +81,10 @@ public class UelProcessor {
 			throw new RuntimeException(e);
 		}
 		result.flush();
-		if (unifiable) {
-			this.unifierList.add(result.toString());
+		String res = result.toString();
+		if (unifiable && !this.unifierSet.contains(res)) {
+			this.unifierList.add(res);
+			this.unifierSet.add(res);
 		}
 		return unifiable;
 	}
@@ -87,7 +94,7 @@ public class UelProcessor {
 			throw new IllegalArgumentException("Null argument.");
 		}
 
-		Goal goal = createGoal(ontology, input, this.candidates);
+		Goal goal = createGoal(this.ontology, input, this.candidates);
 		this.translator = new Translator(goal);
 	}
 
@@ -155,6 +162,7 @@ public class UelProcessor {
 		}
 		this.candidates = varSet;
 		this.unifierList.clear();
+		this.unifierSet.clear();
 	}
 
 }

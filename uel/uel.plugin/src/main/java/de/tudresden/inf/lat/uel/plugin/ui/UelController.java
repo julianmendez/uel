@@ -48,9 +48,11 @@ public class UelController implements ActionListener,
 	private static final String actionReset = "reset";
 	private static final String actionSave = "save";
 	private static final String actionSelectVariables = "get var candidate";
+	private static final String initialUnifierIdText = " 0 / 0";
 	private static final Logger logger = Logger.getLogger(UelController.class
 			.getName());
 
+	private boolean allUnifiersFound = false;
 	private List<LabelId> classList00 = null;
 	private List<LabelId> classList01 = null;
 	private Map<String, OWLClass> mapIdClass = new HashMap<String, OWLClass>();
@@ -154,9 +156,11 @@ public class UelController implements ActionListener,
 		}
 		this.unifierIndex++;
 		if (this.unifierIndex >= getModel().getUnifierList().size()) {
-			boolean unifiable = getModel().computeNextUnifier();
-			if (!unifiable && this.unifierIndex > 0) {
-				this.unifierIndex--;
+			int previousSize = getModel().getUnifierList().size();
+			getModel().computeNextUnifier();
+			if (getModel().getUnifierList().size() == previousSize) {
+				this.allUnifiersFound = true;
+				this.unifierIndex = getModel().getUnifierList().size() - 1;
 			}
 		}
 		updateUnifier();
@@ -188,7 +192,10 @@ public class UelController implements ActionListener,
 		getView().setComboBoxClassName00Enabled(false);
 		getView().setComboBoxClassName01Enabled(false);
 		reloadOntologyNames();
+		this.unifierIndex = -1;
+		this.allUnifiersFound = false;
 		getView().getUnifier().setText("");
+		getView().getUnifierId().setText(initialUnifierIdText);
 		getView().setButtonSelectVariablesEnabled(true);
 	}
 
@@ -227,6 +234,8 @@ public class UelController implements ActionListener,
 		this.varWindow = initVarWindow();
 		this.varWindow.open();
 		this.unifierIndex = -1;
+		this.allUnifiersFound = false;
+		getView().getUnifierId().setText(initialUnifierIdText);
 	}
 
 	@Override
@@ -440,6 +449,22 @@ public class UelController implements ActionListener,
 							this.unifierIndex)));
 		} else {
 			getView().getUnifier().setText("[not unifiable]");
+		}
+		getView().getUnifierId().setText(
+				" "
+						+ (getModel().getUnifierList().size() == 0 ? 0
+								: (this.unifierIndex + 1)) + " / "
+						+ getModel().getUnifierList().size() + " ");
+		if (this.unifierIndex == 0) {
+			getView().setButtonPreviousEnabled(false);
+		} else {
+			getView().setButtonNextEnabled(false);
+		}
+		if (this.allUnifiersFound
+				&& this.unifierIndex >= getModel().getUnifierList().size() - 1) {
+			getView().setButtonNextEnabled(false);
+		} else {
+			getView().setButtonNextEnabled(true);
 		}
 	}
 
