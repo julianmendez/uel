@@ -199,12 +199,12 @@ public class UelController implements ActionListener,
 		getView().setButtonSaveEnabled(false);
 		getView().setComboBoxClassName00Enabled(false);
 		getView().setComboBoxClassName01Enabled(false);
+		getView().setButtonSelectVariablesEnabled(false);
 		this.unifierIndex = -1;
 		this.allUnifiersFound = false;
 		getView().getUnifier().setText("");
 		getView().getUnifierId().setText(initialUnifierIdText);
 		reloadOntologyNames();
-		getView().setButtonSelectVariablesEnabled(true);
 	}
 
 	private void executeActionSave() {
@@ -238,9 +238,12 @@ public class UelController implements ActionListener,
 				.getId());
 		classSet.add(this.classList01.get(getView().getSelectedClassName01())
 				.getId());
-		getModel().recalculateCandidates(classSet);
-		this.varWindow = initVarWindow();
-		this.varWindow.open();
+		try {
+			getModel().recalculateCandidates(classSet);
+			this.varWindow = initVarWindow();
+			this.varWindow.open();
+		} catch (RuntimeException e) {
+		}
 		this.unifierIndex = -1;
 		this.allUnifiersFound = false;
 		getView().getUnifierId().setText(initialUnifierIdText);
