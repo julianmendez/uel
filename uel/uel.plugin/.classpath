@@ -3,10 +3,12 @@
 	<classpathentry kind="src" path="src/main/java"/>
 	<classpathentry kind="src" path="src/main/resources"/>
 	<classpathentry kind="src" path="src/main/manifest"/>
+	<classpathentry kind="src" path="src/test/java"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="/uel.jars/lib/owlapi/owlapi/3.2.4/owlapi-3.2.4.jar" sourcepath="/uel.jars/lib/owlapi/owlapi/3.2.4/owlapi-src-3.2.4.jar"/>
 	<classpathentry kind="lib" path="/uel.jars/lib/org/protege/editor.owl/4.1/editor.owl-4.1.jar"/>
 	<classpathentry kind="lib" path="/uel.jars/lib/org/protege/editor.core.application/4.1/editor.core.application-4.1.jar"/>
+	<classpathentry kind="lib" path="/uel.jars/lib/org/junit/junit/4.8.2/junit-4.8.2.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/uel.core"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
