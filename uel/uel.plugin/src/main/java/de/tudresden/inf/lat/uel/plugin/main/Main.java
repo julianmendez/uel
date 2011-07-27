@@ -5,10 +5,6 @@ import java.awt.BorderLayout;
 import org.protege.editor.owl.ui.view.cls.AbstractOWLClassViewComponent;
 import org.semanticweb.owlapi.model.OWLClass;
 
-import de.tudresden.inf.lat.uel.plugin.processor.UelProcessor;
-import de.tudresden.inf.lat.uel.plugin.ui.UelController;
-import de.tudresden.inf.lat.uel.plugin.ui.UelView;
-
 /**
  * Protege view component for UEL.
  * 
@@ -18,11 +14,11 @@ public class Main extends AbstractOWLClassViewComponent {
 
 	private static final long serialVersionUID = -5363687740449453246L;
 
-	private UelController uelController = null;
+	private UelStarter uelStarter = null;
 
 	@Override
 	public void disposeView() {
-		this.uelController.removeListeners();
+		this.uelStarter.removeListeners();
 	}
 
 	/**
@@ -31,10 +27,9 @@ public class Main extends AbstractOWLClassViewComponent {
 	 */
 	@Override
 	public void initialiseClassView() {
+		this.uelStarter = new UelStarter(getOWLModelManager());
 		this.setLayout(new BorderLayout());
-		this.uelController = new UelController(new UelView(new UelProcessor()),
-				getOWLWorkspace().getOWLModelManager());
-		add(this.uelController.getView(), BorderLayout.CENTER);
+		add(this.uelStarter.getPanel().getView(), BorderLayout.CENTER);
 	}
 
 	@Override

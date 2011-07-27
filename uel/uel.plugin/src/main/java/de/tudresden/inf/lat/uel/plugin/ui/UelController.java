@@ -9,6 +9,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -16,19 +17,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
-import java.util.logging.Logger;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JFileChooser;
 
-import org.protege.editor.owl.model.OWLModelManager;
-import org.protege.editor.owl.ui.renderer.OWLModelManagerEntityRenderer;
 import org.semanticweb.owlapi.model.OWLClass;
-import org.semanticweb.owlapi.model.OWLException;
 import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLOntologyChange;
-import org.semanticweb.owlapi.model.OWLOntologyChangeListener;
-import org.semanticweb.owlapi.model.OWLOntologyLoaderListener;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
 
 import de.tudresden.inf.lat.uel.plugin.processor.UelProcessor;
 
@@ -37,8 +32,7 @@ import de.tudresden.inf.lat.uel.plugin.processor.UelProcessor;
  * 
  * @author Julian Mendez
  */
-public class UelController implements ActionListener,
-		OWLOntologyChangeListener, OWLOntologyLoaderListener {
+public class UelController implements ActionListener {
 
 	private static final String actionAcceptVar = "accept var";
 	private static final String actionGetConceptNames = "get classes";
@@ -49,8 +43,6 @@ public class UelController implements ActionListener,
 	private static final String actionSave = "save";
 	private static final String actionSelectVariables = "get var candidate";
 	private static final String initialUnifierIdText = " 0 / 0 ";
-	private static final Logger logger = Logger.getLogger(UelController.class
-			.getName());
 
 	private boolean allUnifiersFound = false;
 	private List<LabelId> classList00 = null;
@@ -58,24 +50,24 @@ public class UelController implements ActionListener,
 	private Map<String, OWLClass> mapIdClass = new HashMap<String, OWLClass>();
 	private OWLOntology ontology00 = null;
 	private OWLOntology ontology01 = null;
-	private boolean ontologyChanged = true;
 	private List<String> ontologyList = new ArrayList<String>();
 	private Map<String, OWLOntology> ontologyMap = new HashMap<String, OWLOntology>();
-	private OWLModelManager owlModelManager = null;
+	private OWLOntologyManager owlOntologyManager = null;
+	private Map<OWLClass, String> shortFormMap = new HashMap<OWLClass, String>();
 	private int unifierIndex = -1;
 	private VarSelectionController varWindow = null;
 	private UelView view = null;
 
-	public UelController(UelView panel, OWLModelManager modelManager) {
+	public UelController(UelView panel, OWLOntologyManager ontologyManager) {
 		if (panel == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
-		if (modelManager == null) {
+		if (ontologyManager == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
 
 		this.view = panel;
-		this.owlModelManager = modelManager;
+		this.owlOntologyManager = ontologyManager;
 		init();
 	}
 
@@ -124,20 +116,16 @@ public class UelController implements ActionListener,
 		getView().setButtonNextEnabled(false);
 		getView().setButtonSaveEnabled(false);
 
-		keepOntologyUpdated();
-
 		getModel().clearOntology();
 
 		this.ontology00 = this.ontologyMap.get(this.ontologyList.get(getView()
 				.getSelectedOntologyName00()));
-		getModel().loadOntology(getOWLModelManager().getOWLOntologyManager(),
-				this.ontology00);
+		getModel().loadOntology(getOWLOntologyManager(), this.ontology00);
 		processMapIdClass(this.ontology00);
 
 		this.ontology01 = this.ontologyMap.get(this.ontologyList.get(getView()
 				.getSelectedOntologyName01()));
-		getModel().loadOntology(getOWLModelManager().getOWLOntologyManager(),
-				this.ontology01);
+		getModel().loadOntology(getOWLOntologyManager(), this.ontology01);
 		processMapIdClass(this.ontology01);
 
 		reloadClassNames();
@@ -230,7 +218,6 @@ public class UelController implements ActionListener,
 		getView().setButtonPreviousEnabled(false);
 		getView().setButtonNextEnabled(false);
 		getView().setButtonSaveEnabled(false);
-		keepOntologyUpdated();
 		Set<String> classSet = new HashSet<String>();
 		classSet.add(this.classList00.get(getView().getSelectedClassName00())
 				.getId());
@@ -247,22 +234,11 @@ public class UelController implements ActionListener,
 		getView().getUnifierId().setText(initialUnifierIdText);
 	}
 
-	@Override
-	public void finishedLoadingOntology(LoadingFinishedEvent event) {
-		if (event == null) {
-			throw new IllegalArgumentException("Null argument.");
-		}
-
-		executeActionReset();
-	}
-
 	private List<LabelId> getClassNames(OWLOntology ontology) {
 		OWLClass nothing = ontology.getOWLOntologyManager().getOWLDataFactory()
 				.getOWLNothing();
 		OWLClass thing = ontology.getOWLOntologyManager().getOWLDataFactory()
 				.getOWLThing();
-		OWLModelManagerEntityRenderer renderer = getOWLModelManager()
-				.getOWLEntityRenderer();
 
 		Set<OWLClass> set = new TreeSet<OWLClass>();
 		set.addAll(ontology.getClassesInSignature());
@@ -270,11 +246,10 @@ public class UelController implements ActionListener,
 		set.remove(thing);
 
 		List<LabelId> ret = new ArrayList<LabelId>();
-		ret.add(new LabelId(renderer.getShortForm(nothing), nothing
-				.toStringID()));
-		ret.add(new LabelId(renderer.getShortForm(thing), thing.toStringID()));
+		ret.add(new LabelId(getShortForm(nothing), nothing.toStringID()));
+		ret.add(new LabelId(getShortForm(thing), thing.toStringID()));
 		for (OWLClass cls : set) {
-			ret.add(new LabelId(renderer.getShortForm(cls), getId(cls)));
+			ret.add(new LabelId(getShortForm(cls), getId(cls)));
 		}
 		return ret;
 	}
@@ -287,7 +262,7 @@ public class UelController implements ActionListener,
 		String ret = candidateId;
 		OWLClass cls = this.mapIdClass.get(candidateId);
 		if (cls != null) {
-			ret = getOWLModelManager().getOWLEntityRenderer().getShortForm(cls);
+			ret = getShortForm(cls);
 		}
 		return ret;
 	}
@@ -300,8 +275,20 @@ public class UelController implements ActionListener,
 		return getView().getModel();
 	}
 
-	public OWLModelManager getOWLModelManager() {
-		return this.owlModelManager;
+	public OWLOntologyManager getOWLOntologyManager() {
+		return this.owlOntologyManager;
+	}
+
+	private String getShortForm(OWLClass cls) {
+		String ret = this.shortFormMap.get(cls);
+		if (ret == null) {
+			ret = cls.toStringID();
+		}
+		return ret;
+	}
+
+	public Map<OWLClass, String> getShortFormMap() {
+		return Collections.unmodifiableMap(this.shortFormMap);
 	}
 
 	public UelView getView() {
@@ -313,10 +300,6 @@ public class UelController implements ActionListener,
 	 * initialized.
 	 */
 	private void init() {
-		getOWLModelManager().getOWLOntologyManager().addOntologyLoaderListener(
-				this);
-		getOWLModelManager().getOWLOntologyManager().addOntologyChangeListener(
-				this);
 		getView().addButtonResetListener(this, actionReset);
 		getView().addButtonGetConceptNamesListener(this, actionGetConceptNames);
 		getView().addButtonSelectVariablesListener(this, actionSelectVariables);
@@ -337,24 +320,6 @@ public class UelController implements ActionListener,
 		ret.addAcceptVarButtonListener(this, actionAcceptVar);
 		ret.addRejectVarButtonListener(this, actionRejectVar);
 		return ret;
-	}
-
-	private void keepOntologyUpdated() {
-		if (this.ontologyChanged) {
-			this.ontologyChanged = false;
-			executeActionReset();
-		}
-	}
-
-	@Override
-	public void ontologiesChanged(List<? extends OWLOntologyChange> change)
-			throws OWLException {
-		if (change == null) {
-			throw new IllegalArgumentException("Null argument.");
-		}
-
-		logger.info("The ontology has changed.");
-		this.ontologyChanged = true;
 	}
 
 	private void processMapIdClass(OWLOntology ontology) {
@@ -388,8 +353,8 @@ public class UelController implements ActionListener,
 		getView().reloadClassNames(classNameList00, classNameList01);
 	}
 
-	public void reloadOntologyNames() {
-		Set<OWLOntology> ontologies = getOWLModelManager().getOntologies();
+	private void reloadOntologyNames() {
+		Set<OWLOntology> ontologies = getOWLOntologyManager().getOntologies();
 		this.ontologyMap.clear();
 		for (OWLOntology ontology : ontologies) {
 			this.ontologyMap.put(ontology.getOntologyID().toString(), ontology);
@@ -401,8 +366,16 @@ public class UelController implements ActionListener,
 		getView().reloadOntologies(this.ontologyList);
 	}
 
-	public void removeListeners() {
-		getOWLModelManager().removeOntologyChangeListener(this);
+	public void reset() {
+		executeActionReset();
+	}
+
+	public void setShortFormMap(Map<OWLClass, String> map) {
+		if (map == null) {
+			throw new IllegalArgumentException("Null argument.");
+		}
+
+		this.shortFormMap = map;
 	}
 
 	private String showUnifier(String str) {
@@ -433,13 +406,6 @@ public class UelController implements ActionListener,
 			throw new IllegalStateException(e);
 		}
 		return ret.toString();
-	}
-
-	@Override
-	public void startedLoadingOntology(LoadingStartedEvent event) {
-		if (event == null) {
-			throw new IllegalArgumentException("Null argument.");
-		}
 	}
 
 	private void updateUnifier() {
