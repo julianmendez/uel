@@ -30,10 +30,10 @@ public class Main extends AbstractOWLClassViewComponent {
 	 * initialized.
 	 */
 	@Override
-	public void initialiseClassView() throws Exception {
+	public void initialiseClassView() {
 		this.setLayout(new BorderLayout());
 		this.uelController = new UelController(new UelView(new UelProcessor()),
-				getOWLWorkspace());
+				getOWLWorkspace().getOWLModelManager());
 		add(this.uelController.getView(), BorderLayout.CENTER);
 	}
 

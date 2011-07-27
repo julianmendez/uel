@@ -21,7 +21,7 @@ import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
 import javax.swing.JFileChooser;
 
-import org.protege.editor.owl.model.OWLWorkspace;
+import org.protege.editor.owl.model.OWLModelManager;
 import org.protege.editor.owl.ui.renderer.OWLModelManagerEntityRenderer;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLException;
@@ -61,21 +61,21 @@ public class UelController implements ActionListener,
 	private boolean ontologyChanged = true;
 	private List<String> ontologyList = new ArrayList<String>();
 	private Map<String, OWLOntology> ontologyMap = new HashMap<String, OWLOntology>();
-	private OWLWorkspace owlWorkspace = null;
+	private OWLModelManager owlModelManager = null;
 	private int unifierIndex = -1;
 	private VarSelectionController varWindow = null;
 	private UelView view = null;
 
-	public UelController(UelView panel, OWLWorkspace workspace) {
+	public UelController(UelView panel, OWLModelManager modelManager) {
 		if (panel == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
-		if (workspace == null) {
+		if (modelManager == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
 
 		this.view = panel;
-		this.owlWorkspace = workspace;
+		this.owlModelManager = modelManager;
 		init();
 	}
 
@@ -130,15 +130,13 @@ public class UelController implements ActionListener,
 
 		this.ontology00 = this.ontologyMap.get(this.ontologyList.get(getView()
 				.getSelectedOntologyName00()));
-		getModel().loadOntology(
-				getOWLWorkspace().getOWLModelManager().getOWLOntologyManager(),
+		getModel().loadOntology(getOWLModelManager().getOWLOntologyManager(),
 				this.ontology00);
 		processMapIdClass(this.ontology00);
 
 		this.ontology01 = this.ontologyMap.get(this.ontologyList.get(getView()
 				.getSelectedOntologyName01()));
-		getModel().loadOntology(
-				getOWLWorkspace().getOWLModelManager().getOWLOntologyManager(),
+		getModel().loadOntology(getOWLModelManager().getOWLOntologyManager(),
 				this.ontology01);
 		processMapIdClass(this.ontology01);
 
@@ -263,8 +261,8 @@ public class UelController implements ActionListener,
 				.getOWLNothing();
 		OWLClass thing = ontology.getOWLOntologyManager().getOWLDataFactory()
 				.getOWLThing();
-		OWLModelManagerEntityRenderer renderer = this.owlWorkspace
-				.getOWLModelManager().getOWLEntityRenderer();
+		OWLModelManagerEntityRenderer renderer = getOWLModelManager()
+				.getOWLEntityRenderer();
 
 		Set<OWLClass> set = new TreeSet<OWLClass>();
 		set.addAll(ontology.getClassesInSignature());
@@ -289,8 +287,7 @@ public class UelController implements ActionListener,
 		String ret = candidateId;
 		OWLClass cls = this.mapIdClass.get(candidateId);
 		if (cls != null) {
-			ret = this.owlWorkspace.getOWLModelManager().getOWLEntityRenderer()
-					.getShortForm(cls);
+			ret = getOWLModelManager().getOWLEntityRenderer().getShortForm(cls);
 		}
 		return ret;
 	}
@@ -303,8 +300,8 @@ public class UelController implements ActionListener,
 		return getView().getModel();
 	}
 
-	public OWLWorkspace getOWLWorkspace() {
-		return this.owlWorkspace;
+	public OWLModelManager getOWLModelManager() {
+		return this.owlModelManager;
 	}
 
 	public UelView getView() {
@@ -316,10 +313,10 @@ public class UelController implements ActionListener,
 	 * initialized.
 	 */
 	private void init() {
-		getOWLWorkspace().getOWLModelManager().getOWLOntologyManager()
-				.addOntologyLoaderListener(this);
-		getOWLWorkspace().getOWLModelManager().getOWLOntologyManager()
-				.addOntologyChangeListener(this);
+		getOWLModelManager().getOWLOntologyManager().addOntologyLoaderListener(
+				this);
+		getOWLModelManager().getOWLOntologyManager().addOntologyChangeListener(
+				this);
 		getView().addButtonResetListener(this, actionReset);
 		getView().addButtonGetConceptNamesListener(this, actionGetConceptNames);
 		getView().addButtonSelectVariablesListener(this, actionSelectVariables);
@@ -392,8 +389,7 @@ public class UelController implements ActionListener,
 	}
 
 	public void reloadOntologyNames() {
-		Set<OWLOntology> ontologies = this.owlWorkspace.getOWLModelManager()
-				.getOntologies();
+		Set<OWLOntology> ontologies = getOWLModelManager().getOntologies();
 		this.ontologyMap.clear();
 		for (OWLOntology ontology : ontologies) {
 			this.ontologyMap.put(ontology.getOntologyID().toString(), ontology);
@@ -406,8 +402,7 @@ public class UelController implements ActionListener,
 	}
 
 	public void removeListeners() {
-		getOWLWorkspace().getOWLModelManager().removeOntologyChangeListener(
-				this);
+		getOWLModelManager().removeOntologyChangeListener(this);
 	}
 
 	private String showUnifier(String str) {
