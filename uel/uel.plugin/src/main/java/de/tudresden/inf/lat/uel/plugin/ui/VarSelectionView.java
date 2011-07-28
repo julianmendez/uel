@@ -3,6 +3,7 @@ package de.tudresden.inf.lat.uel.plugin.ui;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Frame;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,12 +11,12 @@ import java.util.Vector;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.JFrame;
+import javax.swing.JDialog;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-class VarSelectionView extends JFrame {
+class VarSelectionView extends JDialog {
 
 	private static final long serialVersionUID = 1742164773153032359L;
 
@@ -29,8 +30,8 @@ class VarSelectionView extends JFrame {
 	private VarSelectionModel model = null;
 	private JButton rejectVarButton = null;
 
-	public VarSelectionView(VarSelectionModel m) {
-		super("Variable selection");
+	public VarSelectionView(Frame owner, VarSelectionModel m) {
+		super(owner, "Variable selection", true);
 		this.model = m;
 		initVarFrame();
 		updateLists();

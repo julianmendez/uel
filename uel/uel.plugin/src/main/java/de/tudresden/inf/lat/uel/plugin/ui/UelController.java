@@ -316,7 +316,8 @@ public class UelController implements ActionListener {
 			map.put(candidateId, getLabel(candidateId));
 		}
 		VarSelectionController ret = new VarSelectionController(
-				new VarSelectionView(new VarSelectionModel(candidates, map)));
+				new VarSelectionView(null, new VarSelectionModel(candidates,
+						map)));
 		ret.addAcceptVarButtonListener(this, actionAcceptVar);
 		ret.addRejectVarButtonListener(this, actionRejectVar);
 		return ret;
