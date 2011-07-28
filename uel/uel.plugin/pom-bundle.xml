@@ -51,7 +51,8 @@
 						<Include-Resource>
 							{maven-resources}, {maven-dependencies},
 							@target/uel.plugin-0.1.0.jar,
-							lib/uel/uel.core/0.1.0/uel.core-0.1.0.jar=../uel.core/target/uel.core-0.1.0.jar
+							lib/uel/uel.core/0.1.0/uel.core-0.1.0.jar=../uel.core/target/uel.core-0.1.0.jar,
+							lib/org/sat4j/core/2.3.0/core-2.3.0.jar=../uel.jars/lib/org/sat4j/core/2.3.0/core-2.3.0.jar
 						</Include-Resource>
 					</instructions>
 				</configuration>
