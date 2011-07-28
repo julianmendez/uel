@@ -13,7 +13,6 @@ import java.util.Set;
 
 import org.semanticweb.owlapi.io.OWLRendererException;
 import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLOntologyManager;
 
 import de.tudresden.inf.lat.uel.main.Equation;
 import de.tudresden.inf.lat.uel.main.FAtom;
@@ -33,7 +32,7 @@ import de.uulm.ecs.ai.owlapi.krssrenderer.KRSS2OWLSyntaxRenderer;
 public class UelProcessor {
 
 	private Set<String> candidates = new HashSet<String>();
-	private Ontology ontology = null;
+	private Ontology ontology = new Ontology();
 	private SatInput satinput = null;
 	private Translator translator = null;
 	private List<String> unifierList = new ArrayList<String>();
@@ -81,7 +80,10 @@ public class UelProcessor {
 		}
 		result.flush();
 		String res = result.toString();
-		if (unifiable && !this.unifierSet.contains(res)) {
+		if (this.unifierSet.contains(res)) {
+			unifiable = false;
+		}
+		if (unifiable) {
 			this.unifierList.add(res);
 			this.unifierSet.add(res);
 		}
@@ -124,18 +126,14 @@ public class UelProcessor {
 		return Collections.unmodifiableList(this.unifierList);
 	}
 
-	public void loadOntology(OWLOntologyManager owlOntologyManager,
-			OWLOntology owlOntology) {
-		if (owlOntologyManager == null) {
-			throw new IllegalArgumentException("Null argument.");
-		}
+	public void loadOntology(OWLOntology owlOntology) {
 		if (owlOntology == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
 
 		StringWriter writer = new StringWriter();
 		KRSS2OWLSyntaxRenderer renderer = new KRSS2OWLSyntaxRenderer(
-				owlOntologyManager);
+				owlOntology.getOWLOntologyManager());
 		try {
 			renderer.render(owlOntology, writer);
 		} catch (OWLRendererException e) {

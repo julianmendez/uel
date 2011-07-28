@@ -120,12 +120,12 @@ public class UelController implements ActionListener {
 
 		this.ontology00 = this.ontologyMap.get(this.ontologyList.get(getView()
 				.getSelectedOntologyName00()));
-		getModel().loadOntology(getOWLOntologyManager(), this.ontology00);
+		getModel().loadOntology(this.ontology00);
 		processMapIdClass(this.ontology00);
 
 		this.ontology01 = this.ontologyMap.get(this.ontologyList.get(getView()
 				.getSelectedOntologyName01()));
-		getModel().loadOntology(getOWLOntologyManager(), this.ontology01);
+		getModel().loadOntology(this.ontology01);
 		processMapIdClass(this.ontology01);
 
 		reloadClassNames();
