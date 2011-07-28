@@ -101,7 +101,9 @@ public class UelProcessor {
 		Goal goal = new Goal(ont);
 		StringBuffer sbuf = new StringBuffer();
 		for (String cls : input) {
-			Equation eq = ont.getPrimitiveDefinition(cls);
+			Equation eq1 = ont.getPrimitiveDefinition(cls);
+			Equation eq2 = ont.getDefinition(cls);
+			Equation eq = eq1 == null ? eq2 : eq1;
 			sbuf.append(eq.toString());
 			sbuf.append("\n");
 		}
