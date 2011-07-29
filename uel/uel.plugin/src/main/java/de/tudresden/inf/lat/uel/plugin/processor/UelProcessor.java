@@ -90,13 +90,14 @@ public class UelProcessor {
 		return unifiable;
 	}
 
-	public void configure(Set<String> input) {
+	public Goal configure(Set<String> input) {
 		if (input == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
 
 		Goal goal = createGoal(this.ontology, input, this.candidates);
 		this.translator = new Translator(goal);
+		return goal;
 	}
 
 	private Goal createGoal(Ontology ont, Set<String> input, Set<String> vars) {
