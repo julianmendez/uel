@@ -444,14 +444,6 @@ public class ReaderAndParser {
 
 				}
 
-				/*
-				 * Add main equation
-				 */
-
-				equation = new Equation(mainleft, mainright);
-
-				goal.addEquation(equation);
-
 			} else {
 
 				throw new RuntimeException(
