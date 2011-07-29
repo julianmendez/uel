@@ -1,10 +1,7 @@
 package de.tudresden.inf.lat.uel.plugin.processor;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -23,10 +20,12 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 
 import de.tudresden.inf.lat.jcel.owlapi.main.JcelReasoner;
+import de.tudresden.inf.lat.uel.main.Goal;
 
 public class ProcessorTest extends TestCase {
 
 	private static final String ontology01 = "src/test/resources/testOntology-01.krss";
+	private static final String ontology02 = "src/test/resources/testOntology-02.krss";
 
 	private OWLOntology createOntology(InputStream input)
 			throws OWLOntologyCreationException {
@@ -44,26 +43,21 @@ public class ProcessorTest extends TestCase {
 		return reasoner;
 	}
 
-	private String readFile(File file) throws IOException {
-		StringBuffer sbuf = new StringBuffer();
-		BufferedReader reader = new BufferedReader(new FileReader(file));
-		String line = "";
-		while (line != null) {
-			line = reader.readLine();
-			if (line != null) {
-				sbuf.append(line);
-				sbuf.append("\n");
-			}
-		}
-		return sbuf.toString();
+	public void test01() throws OWLOntologyCreationException, IOException {
+		tryOntology(ontology01);
 	}
 
-	public void testOne() throws OWLOntologyCreationException, IOException {
+	public void test02() throws OWLOntologyCreationException, IOException {
+		tryOntology(ontology02);
+	}
+
+	private void tryOntology(String ontologyName)
+			throws OWLOntologyCreationException, IOException {
 		Map<String, OWLClass> idClassMap = new HashMap<String, OWLClass>();
 		UelProcessor processor = new UelProcessor();
 		{
 			OWLOntology ontology = createOntology(new FileInputStream(
-					ontology01));
+					ontologyName));
 			processor.loadOntology(ontology);
 
 			Set<OWLClass> clsSet = ontology.getClassesInSignature();
@@ -79,7 +73,7 @@ public class ProcessorTest extends TestCase {
 		Set<String> input = new HashSet<String>();
 		input.add(idClassMap.get("C").toStringID());
 		input.add(idClassMap.get("D").toStringID());
-		processor.configure(input);
+		Goal goal = processor.configure(input);
 
 		boolean hasUnifiers = true;
 		while (hasUnifiers) {
@@ -87,9 +81,10 @@ public class ProcessorTest extends TestCase {
 		}
 
 		List<String> unifiers = processor.getUnifierList();
-		String ontologyStr = readFile(new File(ontology01));
+		String goalStr = goal.toString();
+
 		for (String unifier : unifiers) {
-			String extendedOntology = ontologyStr + unifier;
+			String extendedOntology = goalStr + unifier;
 			OWLReasoner reasoner = createReasoner(extendedOntology);
 			assertTrue(reasoner.getEquivalentClasses(idClassMap.get("C"))
 					.contains(idClassMap.get("D")));

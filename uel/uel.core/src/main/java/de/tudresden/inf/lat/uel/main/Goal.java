@@ -402,4 +402,14 @@ public class Goal {
 		nbrVar = nbrV;
 	}
 
+	@Override
+	public String toString() {
+		StringBuffer sbuf = new StringBuffer();
+		for (Equation eq : getEquations()) {
+			sbuf.append(eq.toString());
+			sbuf.append("\n");
+		}
+		return sbuf.toString();
+	}
+
 }

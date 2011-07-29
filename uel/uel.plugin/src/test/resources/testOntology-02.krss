@@ -1,0 +1,5 @@
+(define-concept x#B1 (and x#B2 x#B3))
+(define-concept x#C (and x#A1 x#A2 x#A3))
+(define-concept x#D (and x#A4 x#A2 x#A3))
+(define-concept x#A3 (and x#E1 x#E2))
+(define-concept x#B4 (and x#B5 x#B6))
