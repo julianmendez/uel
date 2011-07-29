@@ -10,7 +10,6 @@ import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -29,6 +28,7 @@ public class UelView extends JPanel {
 	private JButton buttonGetConceptNames = new JButton(
 			Message.buttonGetConceptNames);
 	private JButton buttonNext = new JButton(Message.buttonNext);
+	private JButton buttonOpen = new JButton(Message.buttonOpen);
 	private JButton buttonPrevious = new JButton(Message.buttonPrevious);
 	private JButton buttonReset = new JButton(Message.buttonReset);
 	private JButton buttonSave = new JButton(Message.buttonSave);
@@ -76,6 +76,19 @@ public class UelView extends JPanel {
 
 		this.buttonNext.addActionListener(listener);
 		this.buttonNext.setActionCommand(actionCommand);
+	}
+
+	public void addButtonOpenListener(ActionListener listener,
+			String actionCommand) {
+		if (listener == null) {
+			throw new IllegalArgumentException("Null argument.");
+		}
+		if (actionCommand == null) {
+			throw new IllegalArgumentException("Null argument.");
+		}
+
+		this.buttonOpen.addActionListener(listener);
+		this.buttonOpen.setActionCommand(actionCommand);
 	}
 
 	public void addButtonPreviousListener(ActionListener listener,
@@ -133,41 +146,36 @@ public class UelView extends JPanel {
 	private JPanel createControlPanel() {
 		JPanel ret = new JPanel(new FlowLayout());
 		ret.setLayout(new BoxLayout(ret, BoxLayout.Y_AXIS));
-		ret.add(createTextPanel());
 		ret.add(createSelectionPanel());
-		ret.add(createExecutionPanel());
 		ret.add(createUnifierPanel());
 		return ret;
 	}
 
-	private JPanel createExecutionPanel() {
-		JPanel computePanel = new JPanel(new FlowLayout());
+	private JPanel createSelectionPanel() {
+		JPanel ret = new JPanel();
+
+		this.buttonOpen.setToolTipText(Message.tooltipOpen);
+		ret.add(this.buttonOpen);
+
+		this.listOntologyName00.setPreferredSize(new Dimension(200, 28));
+		//this.listOntologyName00.setMinimumSize(new Dimension(, 28));
+		this.listOntologyName00.setMaximumSize(new Dimension(400, 28));
+		ret.add(this.listOntologyName00);
+
+		this.listOntologyName01.setPreferredSize(new Dimension(200, 28));
+		//this.listOntologyName01.setMinimumSize(new Dimension(56, 28));
+		this.listOntologyName01.setMaximumSize(new Dimension(400, 28));
+		ret.add(this.listOntologyName01);
+
+		JPanel smallPanel = new JPanel(new FlowLayout());
+
 		this.buttonReset.setToolTipText(Message.tooltipReset);
-		computePanel.add(this.buttonReset);
+		smallPanel.add(this.buttonReset);
 
 		this.buttonGetConceptNames
 				.setToolTipText(Message.tooltipGetConceptNames);
-		computePanel.add(this.buttonGetConceptNames);
-
-		this.buttonSelectVariables
-				.setToolTipText(Message.tooltipSelectVariables);
-		computePanel.add(this.buttonSelectVariables);
-		return computePanel;
-	}
-
-	private JPanel createSelectionPanel() {
-		JPanel ret = new JPanel();
-		ret.setLayout(new BoxLayout(ret, BoxLayout.Y_AXIS));
-
-		this.listOntologyName00.setPreferredSize(new Dimension(112, 28));
-		this.listOntologyName00.setMinimumSize(new Dimension(56, 28));
-		this.listOntologyName00.setMaximumSize(new Dimension(280, 28));
-		ret.add(this.listOntologyName00);
-
-		this.listOntologyName01.setPreferredSize(new Dimension(112, 28));
-		this.listOntologyName01.setMinimumSize(new Dimension(56, 28));
-		this.listOntologyName01.setMaximumSize(new Dimension(280, 28));
-		ret.add(this.listOntologyName01);
+		smallPanel.add(this.buttonGetConceptNames);
+		ret.add(smallPanel);
 
 		this.listClassName00.setPreferredSize(new Dimension(112, 28));
 		this.listClassName00.setMinimumSize(new Dimension(56, 28));
@@ -178,20 +186,18 @@ public class UelView extends JPanel {
 		this.listClassName01.setMinimumSize(new Dimension(56, 28));
 		this.listClassName01.setMaximumSize(new Dimension(280, 28));
 		ret.add(this.listClassName01);
-		return ret;
-	}
 
-	private JPanel createTextPanel() {
-		JPanel ret = new JPanel();
-		ret.setMinimumSize(new Dimension(280, 28));
-		JLabel label00 = new JLabel(Message.labelUel);
-		label00.setPreferredSize(new Dimension(280, 28));
-		ret.add(label00);
+		this.buttonSelectVariables
+				.setToolTipText(Message.tooltipSelectVariables);
+		ret.add(this.buttonSelectVariables);
+
 		return ret;
 	}
 
 	private JPanel createUnifierPanel() {
 		JPanel ret = new JPanel(new FlowLayout());
+		ret.setLayout(new BoxLayout(ret, BoxLayout.Y_AXIS));
+
 		this.textUnifier.setToolTipText(Message.tooltipUnifier);
 		this.textUnifier.setWrapStyleWord(true);
 		this.textUnifier.setLineWrap(true);
@@ -202,18 +208,21 @@ public class UelView extends JPanel {
 		scrollPane.setPreferredSize(new Dimension(400, 200));
 		ret.add(scrollPane);
 
+		JPanel smallPanel = new JPanel();
 		this.buttonPrevious.setToolTipText(Message.tooltipPrevious);
-		ret.add(this.buttonPrevious);
+		smallPanel.add(this.buttonPrevious);
 
 		this.textUnifierId.setToolTipText(Message.tooltipUnifierId);
 		this.textUnifierId.setEditable(false);
-		ret.add(this.textUnifierId);
-		
+		smallPanel.add(this.textUnifierId);
+
 		this.buttonNext.setToolTipText(Message.tooltipNext);
-		ret.add(this.buttonNext);
+		smallPanel.add(this.buttonNext);
 
 		this.buttonSave.setToolTipText(Message.tooltipSave);
-		ret.add(this.buttonSave);
+		smallPanel.add(this.buttonSave);
+
+		ret.add(smallPanel);
 		return ret;
 	}
 
@@ -293,6 +302,10 @@ public class UelView extends JPanel {
 
 	public void setButtonGetConceptNamesEnabled(boolean b) {
 		this.buttonGetConceptNames.setEnabled(b);
+	}
+
+	public void setButtonLoadEnabled(boolean b) {
+		this.buttonOpen.setEnabled(b);
 	}
 
 	public void setButtonNextEnabled(boolean b) {

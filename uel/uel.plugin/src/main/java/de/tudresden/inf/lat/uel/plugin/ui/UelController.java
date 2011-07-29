@@ -23,6 +23,7 @@ import javax.swing.JFileChooser;
 
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 
 import de.tudresden.inf.lat.uel.plugin.processor.UelProcessor;
@@ -37,6 +38,7 @@ public class UelController implements ActionListener {
 	private static final String actionAcceptVar = "accept var";
 	private static final String actionGetConceptNames = "get classes";
 	private static final String actionNext = "next";
+	private static final String actionOpen = "open";
 	private static final String actionPrevious = "previous";
 	private static final String actionRejectVar = "reject var";
 	private static final String actionReset = "reset";
@@ -95,6 +97,8 @@ public class UelController implements ActionListener {
 			executeActionPrevious();
 		} else if (cmd.equals(actionNext)) {
 			executeActionNext();
+		} else if (cmd.equals(actionOpen)) {
+			executeActionOpen();
 		} else if (cmd.equals(actionSave)) {
 			executeActionSave();
 		} else {
@@ -158,6 +162,22 @@ public class UelController implements ActionListener {
 			}
 		}
 		updateUnifier();
+	}
+
+	private void executeActionOpen() {
+		JFileChooser fileChooser = new JFileChooser();
+		int returnVal = fileChooser.showOpenDialog(getView());
+		File file = null;
+		if (returnVal == JFileChooser.APPROVE_OPTION) {
+			file = fileChooser.getSelectedFile();
+		}
+		if (file != null) {
+			try {
+				this.owlOntologyManager.loadOntologyFromOntologyDocument(file);
+			} catch (OWLOntologyCreationException e) {
+				throw new RuntimeException(e);
+			}
+		}
 	}
 
 	private void executeActionPrevious() {
@@ -305,6 +325,7 @@ public class UelController implements ActionListener {
 		getView().addButtonSelectVariablesListener(this, actionSelectVariables);
 		getView().addButtonPreviousListener(this, actionPrevious);
 		getView().addButtonNextListener(this, actionNext);
+		getView().addButtonOpenListener(this, actionOpen);
 		getView().addButtonSaveListener(this, actionSave);
 		executeActionReset();
 	}
