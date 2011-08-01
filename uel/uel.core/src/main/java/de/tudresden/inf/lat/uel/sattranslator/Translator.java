@@ -18,6 +18,7 @@ import de.tudresden.inf.lat.uel.main.Equation;
 import de.tudresden.inf.lat.uel.main.FAtom;
 import de.tudresden.inf.lat.uel.main.Goal;
 import de.tudresden.inf.lat.uel.main.Literal;
+import de.tudresden.inf.lat.uel.parser.KRSSKeyword;
 
 /**
  * 
@@ -34,6 +35,8 @@ import de.tudresden.inf.lat.uel.main.Literal;
  */
 
 public class Translator {
+
+	private static final String zero = " 0";
 
 	private Goal goal;
 
@@ -229,7 +232,7 @@ public class Translator {
 								Literal.SUBSUMPTION);
 
 						out.print(" " + literals.get(lit3.toString()));
-						out.println(" 0");
+						out.println(zero);
 
 					}
 
@@ -253,7 +256,7 @@ public class Translator {
 								Literal.SUBSUMPTION);
 
 						out.print(literals.get(lit3.toString()));
-						out.println(" 0");
+						out.println(zero);
 
 					}
 
@@ -273,7 +276,7 @@ public class Translator {
 						out.print(" ");
 
 					}
-					out.println(" 0");
+					out.println(zero);
 
 				} else if (e.getLeft().containsKey(key1)
 						&& !e.getRight().containsKey(key1)) {
@@ -291,7 +294,7 @@ public class Translator {
 						out.print(" ");
 
 					}
-					out.println(" 0");
+					out.println(zero);
 
 				}
 			}
@@ -327,7 +330,7 @@ public class Translator {
 								Literal.SUBSUMPTION);
 
 						out.print(literals.get(lit3.toString()));
-						out.println(" 0");
+						out.println(zero);
 
 					}
 
@@ -350,7 +353,7 @@ public class Translator {
 								Literal.SUBSUMPTION);
 
 						out.print(literals.get(lit3.toString()));
-						out.println(" 0");
+						out.println(zero);
 
 					}
 
@@ -372,7 +375,7 @@ public class Translator {
 						out.print(" ");
 
 					}
-					out.println(" 0");
+					out.println(zero);
 
 					// end of outer if; key1 is not on the left, ask if it
 					// is on the right
@@ -394,7 +397,7 @@ public class Translator {
 						out.print(" ");
 
 					}
-					out.println(" 0");
+					out.println(zero);
 
 				}
 			}
@@ -418,7 +421,7 @@ public class Translator {
 
 					out.print(literals.get(lit.toString()));
 
-					out.println(" 0");
+					out.println(zero);
 
 				}
 
@@ -451,7 +454,7 @@ public class Translator {
 
 						out.print(literals.get(lit.toString()));
 
-						out.println(" 0");
+						out.println(zero);
 
 						/*
 						 * if the roles are equal, then clause in Step 2.3
@@ -481,7 +484,7 @@ public class Translator {
 							out.print(literals.get(lit2.toString()));
 							out.print(" ");
 
-							out.println(" 0");
+							out.println(zero);
 
 						}
 
@@ -506,15 +509,15 @@ public class Translator {
 
 				out.print(literals.get(lit.toString()));
 
-				out.println(" 0");
+				out.println(zero);
 
-				if (!key1.equals("TOP")) {
+				if (!key1.equalsIgnoreCase(KRSSKeyword.top)) {
 
 					Literal lit1 = new Literal(key2, key1, Literal.SUBSUMPTION);
 
 					out.print(literals.get(lit1.toString()));
 
-					out.println(" 0");
+					out.println(zero);
 
 				}
 
@@ -535,7 +538,7 @@ public class Translator {
 			out.print(literals.get(lit.toString()));
 			out.print(" ");
 
-			out.println(" 0");
+			out.println(zero);
 
 		}// end of clauses in step 2.5
 
@@ -571,7 +574,7 @@ public class Translator {
 						out.print(literals.get(lit3.toString()));
 						out.print(" ");
 
-						out.println(" 0");
+						out.println(zero);
 
 					}
 
@@ -616,7 +619,7 @@ public class Translator {
 						out.print(literals.get(lit2.toString()));
 						out.print(" ");
 
-						out.println(" 0");
+						out.println(zero);
 
 					}
 
@@ -643,14 +646,13 @@ public class Translator {
 
 					Literal lit2 = new Literal(key2, key1, Literal.SUBSUMPTION);
 
-					// out.print(" -");
 					out.print(literals.get(lit1.toString()));
 					out.print(" ");
 
 					out.print(literals.get(lit2.toString()));
 					out.print(" ");
 
-					out.println(" 0");
+					out.println(zero);
 
 				}
 
@@ -799,7 +801,7 @@ public class Translator {
 			for (String variable : goal.getVariables().keySet()) {
 
 				if (!goal.getVariables().get(variable).isSys()) {
-					out.print("(define-concept ");
+					out.print("(" + KRSSKeyword.define_concept + " ");
 					out.print(variable + " ");
 
 					out.print(goal.getVariables().get(variable).printS());

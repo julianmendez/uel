@@ -57,7 +57,7 @@ public class ReaderAndParser {
 
 			s = str.sval;
 
-			if (s.equalsIgnoreCase("AND")) {
+			if (s.equalsIgnoreCase(KRSSKeyword.and)) {
 				token = str.nextToken();
 
 				/*
@@ -92,14 +92,14 @@ public class ReaderAndParser {
 						/*
 						 * And cannot appear in AND
 						 */
-						if (s.equalsIgnoreCase("(AND"))
+						if (s.equalsIgnoreCase("(" + KRSSKeyword.and))
 							throw new RuntimeException(
 									"AND cannot occur inside (AND ...) " + str);
 
 						/*
 						 * SOME was found inside AND
 						 */
-						if (s.equalsIgnoreCase("(SOME")) {
+						if (s.equalsIgnoreCase("(" + KRSSKeyword.some)) {
 
 							token = str.nextToken();
 							if (token != StreamTokenizer.TT_WORD
@@ -306,9 +306,10 @@ public class ReaderAndParser {
 			 * looks for the first concept defined in the input
 			 */
 
-			if (namestr.equalsIgnoreCase("DEFINE-CONCEPT")
-					|| namestr.equalsIgnoreCase("define-primitive-concept")
-					|| namestr.equalsIgnoreCase("DEFCONCEPT")) {
+			if (namestr.equalsIgnoreCase(KRSSKeyword.define_concept)
+					|| namestr
+							.equalsIgnoreCase(KRSSKeyword.define_primitive_concept)
+					|| namestr.equalsIgnoreCase(KRSSKeyword.defconcept)) {
 
 				/*
 				 * 
@@ -391,9 +392,10 @@ public class ReaderAndParser {
 				 * looks for the second concept defined in the input
 				 */
 
-				if (namestr.equalsIgnoreCase("DEFINE-CONCEPT")
-						|| namestr.equalsIgnoreCase("define-primitive-concept")
-						|| namestr.equalsIgnoreCase("DEFCONCEPT")) {
+				if (namestr.equalsIgnoreCase(KRSSKeyword.define_concept)
+						|| namestr
+								.equalsIgnoreCase(KRSSKeyword.define_primitive_concept)
+						|| namestr.equalsIgnoreCase(KRSSKeyword.defconcept)) {
 
 					/*
 					 * 

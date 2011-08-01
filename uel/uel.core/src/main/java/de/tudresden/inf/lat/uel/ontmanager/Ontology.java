@@ -8,6 +8,7 @@ import java.util.HashMap;
 
 import de.tudresden.inf.lat.uel.main.Atom;
 import de.tudresden.inf.lat.uel.main.Equation;
+import de.tudresden.inf.lat.uel.parser.KRSSKeyword;
 
 /**
  * 
@@ -116,11 +117,11 @@ public class Ontology {
 			 */
 
 			if (definition != null) {
-				if (definition.equalsIgnoreCase("define-concept")) {
+				if (definition.equalsIgnoreCase(KRSSKeyword.define_concept)) {
 					int tokenTOP = str.nextToken();
 					if (tokenTOP == '('
 							|| (str.sval != null && !str.sval
-									.equalsIgnoreCase("top"))) {
+									.equalsIgnoreCase(KRSSKeyword.top))) {
 						str.pushBack();
 						parse(str, concept);
 					} else {
@@ -129,7 +130,7 @@ public class Ontology {
 										+ "'.");
 					}
 				} else if (definition
-						.equalsIgnoreCase("define-primitive-concept")) {
+						.equalsIgnoreCase(KRSSKeyword.define_primitive_concept)) {
 					parsePrimitive(str, concept);
 				}
 			}
@@ -162,7 +163,7 @@ public class Ontology {
 
 			s = str.sval;
 
-			if (s.equalsIgnoreCase("AND")) {
+			if (s.equalsIgnoreCase(KRSSKeyword.and)) {
 				token = str.nextToken();
 
 				/*
@@ -198,7 +199,7 @@ public class Ontology {
 						/*
 						 * Now And can appear in AND
 						 */
-						if (s.equalsIgnoreCase("(AND"))
+						if (s.equalsIgnoreCase("(" + KRSSKeyword.and))
 						// throw new RuntimeException(
 						// "AND cannot occur inside (AND ...) " + str);
 						{
@@ -208,7 +209,7 @@ public class Ontology {
 						/*
 						 * SOME was found inside AND
 						 */
-						if (s.equalsIgnoreCase("(SOME")) {
+						if (s.equalsIgnoreCase("(" + KRSSKeyword.some)) {
 
 							token = str.nextToken();
 							if (token != StreamTokenizer.TT_WORD
@@ -291,7 +292,7 @@ public class Ontology {
 				 * Parsing SOME at top level
 				 */
 
-			} else if (s.equalsIgnoreCase("SOME")) {
+			} else if (s.equalsIgnoreCase(KRSSKeyword.some)) {
 
 				token = str.nextToken();
 
@@ -355,12 +356,14 @@ public class Ontology {
 				s = new Integer((int) str.nval).toString();
 			}
 
-			if (!s.equalsIgnoreCase("TOP") && !allatoms.containsKey(s)) {
+			if (!s.equalsIgnoreCase(KRSSKeyword.top)
+					&& !allatoms.containsKey(s)) {
 
 				a = new Atom(s, false, null);
 				result.put(a.toString(), a);
 
-			} else if (!s.equalsIgnoreCase("TOP") && allatoms.containsKey(s)) {
+			} else if (!s.equalsIgnoreCase(KRSSKeyword.top)
+					&& allatoms.containsKey(s)) {
 
 				a = allatoms.get(s);
 				result.put(a.toString(), a);
