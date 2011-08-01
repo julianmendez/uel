@@ -19,11 +19,20 @@ package de.tudresden.inf.lat.uel.main;
  */
 public class Literal {
 
-	public static final char ORDER = 'o';
-	public static final char SUBSUMPTION = 's';
-	final private String first;
+	private static final char ORDER = 'o';
+	private static final char SUBSUMPTION = 's';
+
+	public static Literal newOrder(String one, String two) {
+		return new Literal(one, two, ORDER);
+	}
+
+	public static Literal newSubsumption(String one, String two) {
+		return new Literal(one, two, SUBSUMPTION);
+	}
+
+	private final String first;
 	private char kind;
-	final private String second;
+	private final String second;
 	private boolean value = false;
 
 	/**
@@ -35,33 +44,18 @@ public class Literal {
 	 * @param two
 	 * @param letter
 	 */
-	public Literal(String one, String two, char letter) {
-
+	private Literal(String one, String two, char letter) {
 		first = one;
 		second = two;
 		kind = letter;
-
 	}
 
 	public String getFirst() {
-
 		return first;
 
 	}
 
-	/**
-	 * Returns the kind of literal.
-	 * 
-	 * @return the kind
-	 */
-	public char getKind() {
-
-		return kind;
-
-	}
-
 	public String getSecond() {
-
 		return second;
 	}
 
@@ -71,8 +65,15 @@ public class Literal {
 	 * @return the value
 	 */
 	public boolean getValue() {
-
 		return value;
+	}
+
+	public boolean isOrder() {
+		return this.kind == ORDER;
+	}
+
+	public boolean isSubsumption() {
+		return this.kind == SUBSUMPTION;
 	}
 
 	/**
@@ -100,7 +101,7 @@ public class Literal {
 	@Override
 	public String toString() {
 
-		if (kind == SUBSUMPTION) {
+		if (isSubsumption()) {
 
 			StringBuilder str = new StringBuilder("(");
 
@@ -111,7 +112,7 @@ public class Literal {
 
 			return str.toString();
 
-		} else if (kind == ORDER) {
+		} else if (isOrder()) {
 
 			StringBuilder str = new StringBuilder("(");
 			str.append(first.toString());

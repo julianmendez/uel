@@ -39,7 +39,6 @@ public class Translator {
 	private static final String zero = " 0";
 
 	private Goal goal;
-
 	private Integer identificator = 1;
 
 	/*
@@ -150,7 +149,7 @@ public class Translator {
 			for (String key2 : goal.getAllAtoms().keySet()) {
 
 				second = key2;
-				literal = new Literal(first, second, Literal.SUBSUMPTION);
+				literal = Literal.newSubsumption(first, second);
 
 				literals.put(literal.toString(), identificator);
 				identifiers.put(identificator, literal);
@@ -171,7 +170,7 @@ public class Translator {
 
 				second = key2;
 
-				literal = new Literal(first, second, Literal.ORDER);
+				literal = Literal.newOrder(first, second);
 
 				literals.put(literal.toString(), identificator);
 				identifiers.put(identificator, literal);
@@ -219,8 +218,7 @@ public class Translator {
 					for (String key3 : e.getRight().keySet()) {
 						for (String key2 : e.getLeft().keySet()) {
 
-							Literal lit2 = new Literal(key2, key1,
-									Literal.SUBSUMPTION);
+							Literal lit2 = Literal.newSubsumption(key2, key1);
 
 							out.print(" -");
 							out.print(literals.get(lit2.toString()));
@@ -228,8 +226,7 @@ public class Translator {
 
 						}
 
-						Literal lit3 = new Literal(key3, key1,
-								Literal.SUBSUMPTION);
+						Literal lit3 = Literal.newSubsumption(key3, key1);
 
 						out.print(" " + literals.get(lit3.toString()));
 						out.println(zero);
@@ -243,8 +240,7 @@ public class Translator {
 					for (String key2 : e.getLeft().keySet()) {
 						for (String key3 : e.getRight().keySet()) {
 
-							Literal lit2 = new Literal(key3, key1,
-									Literal.SUBSUMPTION);
+							Literal lit2 = Literal.newSubsumption(key3, key1);
 
 							out.print(" -");
 							out.print(literals.get(lit2.toString()));
@@ -252,8 +248,7 @@ public class Translator {
 
 						}
 
-						Literal lit3 = new Literal(key2, key1,
-								Literal.SUBSUMPTION);
+						Literal lit3 = Literal.newSubsumption(key2, key1);
 
 						out.print(literals.get(lit3.toString()));
 						out.println(zero);
@@ -268,8 +263,7 @@ public class Translator {
 					 */
 
 					for (String key2 : e.getLeft().keySet()) {
-						Literal lit4 = new Literal(key2, key1,
-								Literal.SUBSUMPTION);
+						Literal lit4 = Literal.newSubsumption(key2, key1);
 
 						out.print(" -");
 						out.print(literals.get(lit4.toString()));
@@ -286,8 +280,7 @@ public class Translator {
 					 */
 
 					for (String key3 : e.getRight().keySet()) {
-						Literal lit5 = new Literal(key3, key1,
-								Literal.SUBSUMPTION);
+						Literal lit5 = Literal.newSubsumption(key3, key1);
 
 						out.print(" -");
 						out.print(literals.get(lit5.toString()));
@@ -317,8 +310,7 @@ public class Translator {
 					for (String key3 : e.getRight().keySet()) {
 						for (String key2 : e.getLeft().keySet()) {
 
-							Literal lit2 = new Literal(key2, key1,
-									Literal.SUBSUMPTION);
+							Literal lit2 = Literal.newSubsumption(key2, key1);
 
 							out.print(" -");
 							out.print(literals.get(lit2.toString()));
@@ -326,8 +318,7 @@ public class Translator {
 
 						}
 
-						Literal lit3 = new Literal(key3, key1,
-								Literal.SUBSUMPTION);
+						Literal lit3 = Literal.newSubsumption(key3, key1);
 
 						out.print(literals.get(lit3.toString()));
 						out.println(zero);
@@ -341,16 +332,14 @@ public class Translator {
 					for (String key2 : e.getLeft().keySet()) {
 						for (String key3 : e.getRight().keySet()) {
 
-							Literal lit2 = new Literal(key3, key1,
-									Literal.SUBSUMPTION);
+							Literal lit2 = Literal.newSubsumption(key3, key1);
 
 							out.print(" -");
 							out.print(literals.get(lit2.toString()));
 							out.print(" ");
 						}
 
-						Literal lit3 = new Literal(key2, key1,
-								Literal.SUBSUMPTION);
+						Literal lit3 = Literal.newSubsumption(key2, key1);
 
 						out.print(literals.get(lit3.toString()));
 						out.println(zero);
@@ -367,8 +356,7 @@ public class Translator {
 					 */
 
 					for (String key2 : e.getLeft().keySet()) {
-						Literal lit4 = new Literal(key2, key1,
-								Literal.SUBSUMPTION);
+						Literal lit4 = Literal.newSubsumption(key2, key1);
 
 						out.print(" -");
 						out.print(literals.get(lit4.toString()));
@@ -389,8 +377,7 @@ public class Translator {
 					 */
 
 					for (String key3 : e.getRight().keySet()) {
-						Literal lit5 = new Literal(key3, key1,
-								Literal.SUBSUMPTION);
+						Literal lit5 = Literal.newSubsumption(key3, key1);
 
 						out.print(" -");
 						out.print(literals.get(lit5.toString()));
@@ -417,7 +404,7 @@ public class Translator {
 
 				if (!key2.equals("TOP") && (!key1.equals(key2))) {
 
-					Literal lit = new Literal(key1, key2, Literal.SUBSUMPTION);
+					Literal lit = Literal.newSubsumption(key1, key2);
 
 					out.print(literals.get(lit.toString()));
 
@@ -449,8 +436,7 @@ public class Translator {
 
 					if (!role1.equals(role2)) {
 
-						Literal lit = new Literal(key1, key2,
-								Literal.SUBSUMPTION);
+						Literal lit = Literal.newSubsumption(key1, key2);
 
 						out.print(literals.get(lit.toString()));
 
@@ -471,11 +457,10 @@ public class Translator {
 
 						if (!child1name.equals(child2name)) {
 
-							Literal lit1 = new Literal(child1name, child2name,
-									Literal.SUBSUMPTION);
+							Literal lit1 = Literal.newSubsumption(child1name,
+									child2name);
 
-							Literal lit2 = new Literal(key1, key2,
-									Literal.SUBSUMPTION);
+							Literal lit2 = Literal.newSubsumption(key1, key2);
 
 							out.print(" -");
 							out.print(literals.get(lit1.toString()));
@@ -505,7 +490,7 @@ public class Translator {
 
 			for (String key2 : goal.getEAtoms().keySet()) {
 
-				Literal lit = new Literal(key1, key2, Literal.SUBSUMPTION);
+				Literal lit = Literal.newSubsumption(key1, key2);
 
 				out.print(literals.get(lit.toString()));
 
@@ -513,7 +498,7 @@ public class Translator {
 
 				if (!key1.equalsIgnoreCase(KRSSKeyword.top)) {
 
-					Literal lit1 = new Literal(key2, key1, Literal.SUBSUMPTION);
+					Literal lit1 = Literal.newSubsumption(key2, key1);
 
 					out.print(literals.get(lit1.toString()));
 
@@ -532,7 +517,7 @@ public class Translator {
 		 */
 		for (String key1 : goal.getVariables().keySet()) {
 
-			Literal lit = new Literal(key1, key1, Literal.ORDER);
+			Literal lit = Literal.newOrder(key1, key1);
 
 			out.print(" -");
 			out.print(literals.get(lit.toString()));
@@ -557,11 +542,11 @@ public class Translator {
 
 					if (!key1.equals(key2) && !key2.equals(key3)) {
 
-						Literal lit1 = new Literal(key1, key2, Literal.ORDER);
+						Literal lit1 = Literal.newOrder(key1, key2);
 
-						Literal lit2 = new Literal(key2, key3, Literal.ORDER);
+						Literal lit2 = Literal.newOrder(key2, key3);
 
-						Literal lit3 = new Literal(key1, key3, Literal.ORDER);
+						Literal lit3 = Literal.newOrder(key1, key3);
 
 						out.print(" -");
 						out.print(literals.get(lit1.toString()));
@@ -600,14 +585,11 @@ public class Translator {
 					if (!key1.equals(key2) && !key1.equals(key3)
 							&& !key2.equals(key3)) {
 
-						Literal lit1 = new Literal(key1, key2,
-								Literal.SUBSUMPTION);
+						Literal lit1 = Literal.newSubsumption(key1, key2);
 
-						Literal lit2 = new Literal(key2, key3,
-								Literal.SUBSUMPTION);
+						Literal lit2 = Literal.newSubsumption(key2, key3);
 
-						Literal lit3 = new Literal(key1, key3,
-								Literal.SUBSUMPTION);
+						Literal lit3 = Literal.newSubsumption(key1, key3);
 
 						out.print(" -");
 						out.print(literals.get(lit3.toString()));
@@ -641,10 +623,9 @@ public class Translator {
 
 				for (String key2 : goal.getVariables().keySet()) {
 
-					Literal lit1 = new Literal(key2, child.getName(),
-							Literal.ORDER);
+					Literal lit1 = Literal.newOrder(key2, child.getName());
 
-					Literal lit2 = new Literal(key2, key1, Literal.SUBSUMPTION);
+					Literal lit2 = Literal.newSubsumption(key2, key1);
 
 					out.print(literals.get(lit1.toString()));
 					out.print(" ");
@@ -725,7 +706,7 @@ public class Translator {
 				String name2 = identifiers.get(i).getSecond();
 
 				if (identifiers.get(i).getValue()
-						&& identifiers.get(i).getKind() == Literal.SUBSUMPTION) {
+						&& identifiers.get(i).isSubsumption()) {
 
 					if (goal.getVariables().containsKey(name1)) {
 						if (goal.getConstants().containsKey(name2)) {
@@ -751,7 +732,7 @@ public class Translator {
 						}
 					}
 
-				} else if (identifiers.get(i).getKind() == Literal.SUBSUMPTION) {
+				} else if (identifiers.get(i).isSubsumption()) {
 
 					if (goal.getVariables().containsKey(name1)
 							&& !goal.getVariables().get(name1).isSys()) {
@@ -829,8 +810,8 @@ public class Translator {
 			if (!var.isSys()) {
 				for (FAtom atom : goal.getAllAtoms().values()) {
 					if (atom.isCons() || atom.isRoot()) {
-						Literal lit = new Literal(var.toString(),
-								atom.toString(), Literal.SUBSUMPTION);
+						Literal lit = Literal.newSubsumption(var.toString(),
+								atom.toString());
 						int i = literals.get(lit.toString());
 						update.append("-" + i + " ");
 					}
