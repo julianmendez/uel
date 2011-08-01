@@ -174,6 +174,7 @@ public class UelController implements ActionListener {
 		if (file != null) {
 			try {
 				this.owlOntologyManager.loadOntologyFromOntologyDocument(file);
+				reset();
 			} catch (OWLOntologyCreationException e) {
 				throw new RuntimeException(e);
 			}
