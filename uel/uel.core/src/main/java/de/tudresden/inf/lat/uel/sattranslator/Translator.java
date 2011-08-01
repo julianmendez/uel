@@ -36,6 +36,8 @@ import de.tudresden.inf.lat.uel.parser.KRSSKeyword;
 
 public class Translator {
 
+	private static final String minus = " -";
+	private static final String space = " ";
 	private static final String zero = " 0";
 
 	private Goal goal;
@@ -220,15 +222,15 @@ public class Translator {
 
 							Literal lit2 = Literal.newSubsumption(key2, key1);
 
-							out.print(" -");
+							out.print(minus);
 							out.print(literals.get(lit2.toString()));
-							out.print(" ");
+							out.print(space);
 
 						}
 
 						Literal lit3 = Literal.newSubsumption(key3, key1);
 
-						out.print(" " + literals.get(lit3.toString()));
+						out.print(space + literals.get(lit3.toString()));
 						out.println(zero);
 
 					}
@@ -242,9 +244,9 @@ public class Translator {
 
 							Literal lit2 = Literal.newSubsumption(key3, key1);
 
-							out.print(" -");
+							out.print(minus);
 							out.print(literals.get(lit2.toString()));
-							out.print(" ");
+							out.print(space);
 
 						}
 
@@ -265,9 +267,9 @@ public class Translator {
 					for (String key2 : e.getLeft().keySet()) {
 						Literal lit4 = Literal.newSubsumption(key2, key1);
 
-						out.print(" -");
+						out.print(minus);
 						out.print(literals.get(lit4.toString()));
-						out.print(" ");
+						out.print(space);
 
 					}
 					out.println(zero);
@@ -282,9 +284,9 @@ public class Translator {
 					for (String key3 : e.getRight().keySet()) {
 						Literal lit5 = Literal.newSubsumption(key3, key1);
 
-						out.print(" -");
+						out.print(minus);
 						out.print(literals.get(lit5.toString()));
-						out.print(" ");
+						out.print(space);
 
 					}
 					out.println(zero);
@@ -312,9 +314,9 @@ public class Translator {
 
 							Literal lit2 = Literal.newSubsumption(key2, key1);
 
-							out.print(" -");
+							out.print(minus);
 							out.print(literals.get(lit2.toString()));
-							out.print(" ");
+							out.print(space);
 
 						}
 
@@ -334,9 +336,9 @@ public class Translator {
 
 							Literal lit2 = Literal.newSubsumption(key3, key1);
 
-							out.print(" -");
+							out.print(minus);
 							out.print(literals.get(lit2.toString()));
-							out.print(" ");
+							out.print(space);
 						}
 
 						Literal lit3 = Literal.newSubsumption(key2, key1);
@@ -358,9 +360,9 @@ public class Translator {
 					for (String key2 : e.getLeft().keySet()) {
 						Literal lit4 = Literal.newSubsumption(key2, key1);
 
-						out.print(" -");
+						out.print(minus);
 						out.print(literals.get(lit4.toString()));
-						out.print(" ");
+						out.print(space);
 
 					}
 					out.println(zero);
@@ -379,9 +381,9 @@ public class Translator {
 					for (String key3 : e.getRight().keySet()) {
 						Literal lit5 = Literal.newSubsumption(key3, key1);
 
-						out.print(" -");
+						out.print(minus);
 						out.print(literals.get(lit5.toString()));
-						out.print(" ");
+						out.print(space);
 
 					}
 					out.println(zero);
@@ -402,7 +404,8 @@ public class Translator {
 
 			for (String key2 : goal.getConstants().keySet()) {
 
-				if (!key2.equals("TOP") && (!key1.equals(key2))) {
+				if (!key2.equalsIgnoreCase(KRSSKeyword.top)
+						&& (!key1.equals(key2))) {
 
 					Literal lit = Literal.newSubsumption(key1, key2);
 
@@ -462,12 +465,12 @@ public class Translator {
 
 							Literal lit2 = Literal.newSubsumption(key1, key2);
 
-							out.print(" -");
+							out.print(minus);
 							out.print(literals.get(lit1.toString()));
-							out.print(" ");
+							out.print(space);
 
 							out.print(literals.get(lit2.toString()));
-							out.print(" ");
+							out.print(space);
 
 							out.println(zero);
 
@@ -519,9 +522,9 @@ public class Translator {
 
 			Literal lit = Literal.newOrder(key1, key1);
 
-			out.print(" -");
+			out.print(minus);
 			out.print(literals.get(lit.toString()));
-			out.print(" ");
+			out.print(space);
 
 			out.println(zero);
 
@@ -548,16 +551,16 @@ public class Translator {
 
 						Literal lit3 = Literal.newOrder(key1, key3);
 
-						out.print(" -");
+						out.print(minus);
 						out.print(literals.get(lit1.toString()));
-						out.print(" ");
+						out.print(space);
 
-						out.print(" -");
+						out.print(minus);
 						out.print(literals.get(lit2.toString()));
-						out.print(" ");
+						out.print(space);
 
 						out.print(literals.get(lit3.toString()));
-						out.print(" ");
+						out.print(space);
 
 						out.println(zero);
 
@@ -591,15 +594,15 @@ public class Translator {
 
 						Literal lit3 = Literal.newSubsumption(key1, key3);
 
-						out.print(" -");
+						out.print(minus);
 						out.print(literals.get(lit3.toString()));
-						out.print(" ");
+						out.print(space);
 
 						out.print(literals.get(lit1.toString()));
-						out.print(" ");
+						out.print(space);
 
 						out.print(literals.get(lit2.toString()));
-						out.print(" ");
+						out.print(space);
 
 						out.println(zero);
 
@@ -628,10 +631,10 @@ public class Translator {
 					Literal lit2 = Literal.newSubsumption(key2, key1);
 
 					out.print(literals.get(lit1.toString()));
-					out.print(" ");
+					out.print(space);
 
 					out.print(literals.get(lit2.toString()));
-					out.print(" ");
+					out.print(space);
 
 					out.println(zero);
 
@@ -717,7 +720,7 @@ public class Translator {
 											name2));
 
 							if (!goal.getVariables().get(name1).isSys()) {
-								update.append(i + " ");
+								update.append(i + space);
 							}
 
 						} else if (goal.getEAtoms().containsKey(name2)) {
@@ -727,7 +730,7 @@ public class Translator {
 									.addToS((FAtom) goal.getEAtoms().get(name2));
 
 							if (!goal.getVariables().get(name1).isSys()) {
-								update.append(i + " ");
+								update.append(i + space);
 							}
 						}
 					}
@@ -738,11 +741,11 @@ public class Translator {
 							&& !goal.getVariables().get(name1).isSys()) {
 						if (goal.getConstants().containsKey(name2)) {
 
-							update.append("-" + i + " ");
+							update.append("-" + i + space);
 
 						} else if (goal.getEAtoms().containsKey(name2)) {
 
-							update.append("-" + i + " ");
+							update.append("-" + i + space);
 						}
 					}
 
@@ -782,8 +785,8 @@ public class Translator {
 			for (String variable : goal.getVariables().keySet()) {
 
 				if (!goal.getVariables().get(variable).isSys()) {
-					out.print("(" + KRSSKeyword.define_concept + " ");
-					out.print(variable + " ");
+					out.print("(" + KRSSKeyword.define_concept + space);
+					out.print(variable + space);
 
 					out.print(goal.getVariables().get(variable).printS());
 					out.println(" ) ");
@@ -813,7 +816,7 @@ public class Translator {
 						Literal lit = Literal.newSubsumption(var.toString(),
 								atom.toString());
 						int i = literals.get(lit.toString());
-						update.append("-" + i + " ");
+						update.append("-" + i + space);
 					}
 				}
 			}
