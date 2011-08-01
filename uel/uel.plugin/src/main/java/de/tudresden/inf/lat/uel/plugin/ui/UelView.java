@@ -25,8 +25,10 @@ public class UelView extends JPanel {
 
 	private static final long serialVersionUID = 9096602357606632334L;
 
+	private JButton buttonFirst = new JButton(Message.buttonFirst);
 	private JButton buttonGetConceptNames = new JButton(
 			Message.buttonGetConceptNames);
+	private JButton buttonLast = new JButton(Message.buttonLast);
 	private JButton buttonNext = new JButton(Message.buttonNext);
 	private JButton buttonOpen = new JButton(Message.buttonOpen);
 	private JButton buttonPrevious = new JButton(Message.buttonPrevious);
@@ -52,6 +54,19 @@ public class UelView extends JPanel {
 		init();
 	}
 
+	public void addButtonFirstListener(ActionListener listener,
+			String actionCommand) {
+		if (listener == null) {
+			throw new IllegalArgumentException("Null argument.");
+		}
+		if (actionCommand == null) {
+			throw new IllegalArgumentException("Null argument.");
+		}
+
+		this.buttonFirst.addActionListener(listener);
+		this.buttonFirst.setActionCommand(actionCommand);
+	}
+
 	public void addButtonGetConceptNamesListener(ActionListener listener,
 			String actionCommand) {
 		if (listener == null) {
@@ -63,6 +78,19 @@ public class UelView extends JPanel {
 
 		this.buttonGetConceptNames.addActionListener(listener);
 		this.buttonGetConceptNames.setActionCommand(actionCommand);
+	}
+
+	public void addButtonLastListener(ActionListener listener,
+			String actionCommand) {
+		if (listener == null) {
+			throw new IllegalArgumentException("Null argument.");
+		}
+		if (actionCommand == null) {
+			throw new IllegalArgumentException("Null argument.");
+		}
+
+		this.buttonLast.addActionListener(listener);
+		this.buttonLast.setActionCommand(actionCommand);
 	}
 
 	public void addButtonNextListener(ActionListener listener,
@@ -158,12 +186,10 @@ public class UelView extends JPanel {
 		ret.add(this.buttonOpen);
 
 		this.listOntologyName00.setPreferredSize(new Dimension(200, 28));
-		//this.listOntologyName00.setMinimumSize(new Dimension(, 28));
 		this.listOntologyName00.setMaximumSize(new Dimension(400, 28));
 		ret.add(this.listOntologyName00);
 
 		this.listOntologyName01.setPreferredSize(new Dimension(200, 28));
-		//this.listOntologyName01.setMinimumSize(new Dimension(56, 28));
 		this.listOntologyName01.setMaximumSize(new Dimension(400, 28));
 		ret.add(this.listOntologyName01);
 
@@ -209,6 +235,10 @@ public class UelView extends JPanel {
 		ret.add(scrollPane);
 
 		JPanel smallPanel = new JPanel();
+
+		this.buttonFirst.setToolTipText(Message.tooltipFirst);
+		smallPanel.add(this.buttonFirst);
+
 		this.buttonPrevious.setToolTipText(Message.tooltipPrevious);
 		smallPanel.add(this.buttonPrevious);
 
@@ -218,6 +248,9 @@ public class UelView extends JPanel {
 
 		this.buttonNext.setToolTipText(Message.tooltipNext);
 		smallPanel.add(this.buttonNext);
+
+		this.buttonLast.setToolTipText(Message.tooltipLast);
+		smallPanel.add(this.buttonLast);
 
 		this.buttonSave.setToolTipText(Message.tooltipSave);
 		smallPanel.add(this.buttonSave);
@@ -300,8 +333,16 @@ public class UelView extends JPanel {
 		this.listClassName01.removeAllItems();
 	}
 
+	public void setButtonFirstEnabled(boolean b) {
+		this.buttonFirst.setEnabled(b);
+	}
+
 	public void setButtonGetConceptNamesEnabled(boolean b) {
 		this.buttonGetConceptNames.setEnabled(b);
+	}
+
+	public void setButtonLastEnabled(boolean b) {
+		this.buttonLast.setEnabled(b);
 	}
 
 	public void setButtonLoadEnabled(boolean b) {

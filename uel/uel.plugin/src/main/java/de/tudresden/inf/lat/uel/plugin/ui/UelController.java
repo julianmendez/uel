@@ -36,7 +36,9 @@ import de.tudresden.inf.lat.uel.plugin.processor.UelProcessor;
 public class UelController implements ActionListener {
 
 	private static final String actionAcceptVar = "accept var";
+	private static final String actionFirst = "first";
 	private static final String actionGetConceptNames = "get classes";
+	private static final String actionLast = "last";
 	private static final String actionNext = "next";
 	private static final String actionOpen = "open";
 	private static final String actionPrevious = "previous";
@@ -44,7 +46,7 @@ public class UelController implements ActionListener {
 	private static final String actionReset = "reset";
 	private static final String actionSave = "save";
 	private static final String actionSelectVariables = "get var candidate";
-	private static final String initialUnifierIdText = " 0 / 0 ";
+	private static final String initialUnifierIdText = " 0 ";
 
 	private boolean allUnifiersFound = false;
 	private List<LabelId> classList00 = null;
@@ -83,22 +85,26 @@ public class UelController implements ActionListener {
 		}
 
 		String cmd = e.getActionCommand();
-		if (cmd.equals(actionSelectVariables)) {
-			executeActionSelectVariables();
+		if (cmd.equals(actionOpen)) {
+			executeActionOpen();
 		} else if (cmd.equals(actionReset)) {
 			executeActionReset();
 		} else if (cmd.equals(actionGetConceptNames)) {
 			executeActionGetConceptNames();
+		} else if (cmd.equals(actionSelectVariables)) {
+			executeActionSelectVariables();
 		} else if (cmd.equals(actionAcceptVar)) {
 			executeActionAcceptVar();
 		} else if (cmd.equals(actionRejectVar)) {
 			executeActionRejectVar();
+		} else if (cmd.equals(actionFirst)) {
+			executeActionFirst();
 		} else if (cmd.equals(actionPrevious)) {
 			executeActionPrevious();
 		} else if (cmd.equals(actionNext)) {
 			executeActionNext();
-		} else if (cmd.equals(actionOpen)) {
-			executeActionOpen();
+		} else if (cmd.equals(actionLast)) {
+			executeActionLast();
 		} else if (cmd.equals(actionSave)) {
 			executeActionSave();
 		} else {
@@ -110,15 +116,20 @@ public class UelController implements ActionListener {
 		getModel().clearCandidates();
 		getModel().addAll(this.varWindow.getView().getModel().getVariables());
 		this.varWindow.close();
-		getView().setButtonPreviousEnabled(false);
+
+		setUnifierButtons(false);
 		getView().setButtonNextEnabled(true);
-		getView().setButtonSaveEnabled(false);
+	}
+
+	private void executeActionFirst() {
+		setUnifierButtons(true);
+
+		this.unifierIndex = 0;
+		updateUnifier();
 	}
 
 	private void executeActionGetConceptNames() {
-		getView().setButtonPreviousEnabled(false);
-		getView().setButtonNextEnabled(false);
-		getView().setButtonSaveEnabled(false);
+		setUnifierButtons(false);
 
 		getModel().clearOntology();
 
@@ -139,10 +150,21 @@ public class UelController implements ActionListener {
 		getView().setComboBoxClassName01Enabled(true);
 	}
 
+	private void executeActionLast() {
+		while (!this.allUnifiersFound) {
+			int previousSize = getModel().getUnifierList().size();
+			getModel().computeNextUnifier();
+			if (getModel().getUnifierList().size() == previousSize) {
+				this.allUnifiersFound = true;
+				this.unifierIndex = getModel().getUnifierList().size() - 1;
+			}
+		}
+		this.unifierIndex = getModel().getUnifierList().size() - 1;
+		updateUnifier();
+	}
+
 	private void executeActionNext() {
-		getView().setButtonPreviousEnabled(true);
-		getView().setButtonNextEnabled(true);
-		getView().setButtonSaveEnabled(true);
+		setUnifierButtons(true);
 
 		if (getModel().getUnifierList().isEmpty()) {
 			Set<String> classSet = new HashSet<String>();
@@ -182,9 +204,7 @@ public class UelController implements ActionListener {
 	}
 
 	private void executeActionPrevious() {
-		getView().setButtonPreviousEnabled(true);
-		getView().setButtonNextEnabled(true);
-		getView().setButtonSaveEnabled(true);
+		setUnifierButtons(true);
 
 		this.unifierIndex--;
 		if (this.unifierIndex < 0) {
@@ -195,15 +215,12 @@ public class UelController implements ActionListener {
 
 	private void executeActionRejectVar() {
 		this.varWindow.close();
-		getView().setButtonPreviousEnabled(false);
-		getView().setButtonNextEnabled(false);
-		getView().setButtonSaveEnabled(false);
+		setUnifierButtons(false);
 	}
 
 	private void executeActionReset() {
-		getView().setButtonPreviousEnabled(false);
-		getView().setButtonNextEnabled(false);
-		getView().setButtonSaveEnabled(false);
+		setUnifierButtons(false);
+
 		getView().setComboBoxClassName00Enabled(false);
 		getView().setComboBoxClassName01Enabled(false);
 		getView().setButtonSelectVariablesEnabled(false);
@@ -236,9 +253,8 @@ public class UelController implements ActionListener {
 	}
 
 	private void executeActionSelectVariables() {
-		getView().setButtonPreviousEnabled(false);
-		getView().setButtonNextEnabled(false);
-		getView().setButtonSaveEnabled(false);
+		setUnifierButtons(false);
+
 		Set<String> classSet = new HashSet<String>();
 		classSet.add(this.classList00.get(getView().getSelectedClassName00())
 				.getId());
@@ -321,12 +337,14 @@ public class UelController implements ActionListener {
 	 * initialized.
 	 */
 	private void init() {
+		getView().addButtonOpenListener(this, actionOpen);
 		getView().addButtonResetListener(this, actionReset);
 		getView().addButtonGetConceptNamesListener(this, actionGetConceptNames);
 		getView().addButtonSelectVariablesListener(this, actionSelectVariables);
+		getView().addButtonFirstListener(this, actionFirst);
 		getView().addButtonPreviousListener(this, actionPrevious);
 		getView().addButtonNextListener(this, actionNext);
-		getView().addButtonOpenListener(this, actionOpen);
+		getView().addButtonLastListener(this, actionLast);
 		getView().addButtonSaveListener(this, actionSave);
 		executeActionReset();
 	}
@@ -401,6 +419,14 @@ public class UelController implements ActionListener {
 		this.shortFormMap = map;
 	}
 
+	private void setUnifierButtons(boolean b) {
+		getView().setButtonFirstEnabled(b);
+		getView().setButtonPreviousEnabled(b);
+		getView().setButtonNextEnabled(b);
+		getView().setButtonLastEnabled(b);
+		getView().setButtonSaveEnabled(b);
+	}
+
 	private String showUnifier(String str) {
 		StringBuffer ret = new StringBuffer();
 		try {
@@ -442,18 +468,21 @@ public class UelController implements ActionListener {
 		getView().getUnifierId().setText(
 				" "
 						+ (getModel().getUnifierList().isEmpty() ? 0
-								: (this.unifierIndex + 1)) + " / "
-						+ getModel().getUnifierList().size() + " ");
+								: (this.unifierIndex + 1)) + " ");
 		if (this.unifierIndex == 0) {
 			getView().setButtonPreviousEnabled(false);
+			getView().setButtonFirstEnabled(false);
 		} else {
-			getView().setButtonNextEnabled(false);
+			getView().setButtonPreviousEnabled(true);
+			getView().setButtonFirstEnabled(true);
 		}
 		if (this.allUnifiersFound
 				&& this.unifierIndex >= getModel().getUnifierList().size() - 1) {
 			getView().setButtonNextEnabled(false);
+			getView().setButtonLastEnabled(false);
 		} else {
 			getView().setButtonNextEnabled(true);
+			getView().setButtonLastEnabled(true);
 		}
 	}
 
