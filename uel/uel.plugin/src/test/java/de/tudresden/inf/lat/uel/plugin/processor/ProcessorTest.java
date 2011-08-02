@@ -58,7 +58,7 @@ public class ProcessorTest extends TestCase {
 		{
 			OWLOntology ontology = createOntology(new FileInputStream(
 					ontologyName));
-			processor.loadOntology(ontology);
+			processor.loadOntology(processor.createOntology(ontology));
 
 			Set<OWLClass> clsSet = ontology.getClassesInSignature();
 			for (OWLClass cls : clsSet) {

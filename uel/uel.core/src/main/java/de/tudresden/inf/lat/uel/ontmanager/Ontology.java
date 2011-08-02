@@ -26,6 +26,12 @@ public class Ontology {
 	public Ontology() {
 	}
 
+	public void clear() {
+		this.atoms.clear();
+		this.definitions.clear();
+		this.primitiveDefinitions.clear();
+	}
+
 	public boolean containsAtom(String name) {
 		return this.atoms.containsKey(name);
 	}

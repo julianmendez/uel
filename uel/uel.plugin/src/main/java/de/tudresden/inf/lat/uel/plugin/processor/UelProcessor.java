@@ -55,7 +55,7 @@ public class UelProcessor {
 	}
 
 	public void clearOntology() {
-		this.ontology = new Ontology();
+		this.ontology.clear();
 		this.candidates.clear();
 		this.unifierList.clear();
 		this.unifierSet.clear();
@@ -120,15 +120,7 @@ public class UelProcessor {
 		return goal;
 	}
 
-	public Set<String> getCandidates() {
-		return Collections.unmodifiableSet(this.candidates);
-	}
-
-	public List<String> getUnifierList() {
-		return Collections.unmodifiableList(this.unifierList);
-	}
-
-	public void loadOntology(OWLOntology owlOntology) {
+	public Ontology createOntology(OWLOntology owlOntology) {
 		if (owlOntology == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
@@ -143,12 +135,26 @@ public class UelProcessor {
 		}
 		writer.flush();
 
+		Ontology ret = new Ontology();
 		try {
-			OntologyParser parser = new OntologyParser(this.ontology);
+			OntologyParser parser = new OntologyParser(ret);
 			parser.loadOntology(new StringReader(writer.toString()));
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
+		return ret;
+	}
+
+	public Set<String> getCandidates() {
+		return Collections.unmodifiableSet(this.candidates);
+	}
+
+	public List<String> getUnifierList() {
+		return Collections.unmodifiableList(this.unifierList);
+	}
+
+	public void loadOntology(Ontology ontology) {
+		this.ontology.merge(ontology);
 	}
 
 	public void recalculateCandidates(Set<String> input) {

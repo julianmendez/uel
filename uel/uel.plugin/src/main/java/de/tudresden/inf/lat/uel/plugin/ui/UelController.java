@@ -26,6 +26,7 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 
+import de.tudresden.inf.lat.uel.ontmanager.Ontology;
 import de.tudresden.inf.lat.uel.plugin.processor.UelProcessor;
 
 /**
@@ -52,9 +53,10 @@ public class UelController implements ActionListener {
 	private List<LabelId> classList00 = null;
 	private List<LabelId> classList01 = null;
 	private Map<String, OWLClass> mapIdClass = new HashMap<String, OWLClass>();
+	private Ontology ontology00 = null;
+	private Ontology ontology01 = null;
 	private List<String> ontologyList = new ArrayList<String>();
-	private OWLOntology owlOntology00 = null;
-	private OWLOntology owlOntology01 = null;
+	private Map<String, Ontology> ontologyMap = new HashMap<String, Ontology>();
 	private OWLOntologyManager owlOntologyManager = null;
 	private Map<String, OWLOntology> owlOntologyMap = new HashMap<String, OWLOntology>();
 	private Map<OWLClass, String> shortFormMap = new HashMap<OWLClass, String>();
@@ -131,19 +133,16 @@ public class UelController implements ActionListener {
 	private void executeActionGetConceptNames() {
 		setUnifierButtons(false);
 
-		getModel().clearOntology();
+		String ontologyId00 = this.ontologyList.get(getView()
+				.getSelectedOntologyName00());
+		this.ontology00 = this.ontologyMap.get(ontologyId00);
 
-		this.owlOntology00 = this.owlOntologyMap.get(this.ontologyList
-				.get(getView().getSelectedOntologyName00()));
-		getModel().loadOntology(this.owlOntology00);
-		processMapIdClass(this.owlOntology00);
+		String ontologyId01 = this.ontologyList.get(getView()
+				.getSelectedOntologyName01());
+		this.ontology01 = this.ontologyMap.get(ontologyId01);
 
-		this.owlOntology01 = this.owlOntologyMap.get(this.ontologyList
-				.get(getView().getSelectedOntologyName01()));
-		getModel().loadOntology(this.owlOntology01);
-		processMapIdClass(this.owlOntology01);
-
-		reloadClassNames();
+		reloadClassNames(this.owlOntologyMap.get(ontologyId00),
+				this.owlOntologyMap.get(ontologyId01));
 
 		getView().setButtonSelectVariablesEnabled(true);
 		getView().setComboBoxClassName00Enabled(true);
@@ -195,7 +194,9 @@ public class UelController implements ActionListener {
 		}
 		if (file != null) {
 			try {
-				this.owlOntologyManager.loadOntologyFromOntologyDocument(file);
+				OWLOntology owlOntology = this.owlOntologyManager
+						.loadOntologyFromOntologyDocument(file);
+				loadOntology(owlOntology);
 				reset();
 			} catch (OWLOntologyCreationException e) {
 				throw new RuntimeException(e);
@@ -228,7 +229,6 @@ public class UelController implements ActionListener {
 		this.allUnifiersFound = false;
 		getView().getUnifier().setText("");
 		getView().getUnifierId().setText(initialUnifierIdText);
-		reloadOntologyNames();
 	}
 
 	private void executeActionSave() {
@@ -254,6 +254,10 @@ public class UelController implements ActionListener {
 
 	private void executeActionSelectVariables() {
 		setUnifierButtons(false);
+
+		getModel().clearOntology();
+		getModel().loadOntology(this.ontology00);
+		getModel().loadOntology(this.ontology01);
 
 		Set<String> classSet = new HashSet<String>();
 		classSet.add(this.classList00.get(getView().getSelectedClassName00())
@@ -347,6 +351,11 @@ public class UelController implements ActionListener {
 		getView().addButtonLastListener(this, actionLast);
 		getView().addButtonSaveListener(this, actionSave);
 		executeActionReset();
+		Set<OWLOntology> owlOntologies = getOWLOntologyManager()
+				.getOntologies();
+		for (OWLOntology owlOntology : owlOntologies) {
+			loadOntology(owlOntology);
+		}
 	}
 
 	private VarSelectionController initVarWindow() {
@@ -361,6 +370,19 @@ public class UelController implements ActionListener {
 		ret.addAcceptVarButtonListener(this, actionAcceptVar);
 		ret.addRejectVarButtonListener(this, actionRejectVar);
 		return ret;
+	}
+
+	private void loadOntology(OWLOntology owlOntology) {
+		String ontologyId = owlOntology.getOntologyID().toString();
+		this.ontologyMap
+				.put(ontologyId, getModel().createOntology(owlOntology));
+		this.owlOntologyMap.put(ontologyId, owlOntology);
+		processMapIdClass(owlOntology);
+		Set<String> set = new TreeSet<String>();
+		set.addAll(this.owlOntologyMap.keySet());
+		this.ontologyList.clear();
+		this.ontologyList.addAll(set);
+		getView().reloadOntologies(this.ontologyList);
 	}
 
 	private void processMapIdClass(OWLOntology ontology) {
@@ -378,34 +400,21 @@ public class UelController implements ActionListener {
 		this.mapIdClass.put(getId(thing), thing);
 	}
 
-	private void reloadClassNames() {
-		this.classList00 = getClassNames(this.owlOntology00);
+	private void reloadClassNames(OWLOntology owlOntology00,
+			OWLOntology owlOntology01) {
+		this.classList00 = getClassNames(owlOntology00);
 		List<String> classNameList00 = new ArrayList<String>();
 		for (LabelId className : this.classList00) {
 			classNameList00.add(className.getLabel());
 		}
 
-		this.classList01 = getClassNames(this.owlOntology01);
+		this.classList01 = getClassNames(owlOntology01);
 		List<String> classNameList01 = new ArrayList<String>();
 		for (LabelId className : this.classList01) {
 			classNameList01.add(className.getLabel());
 		}
 
 		getView().reloadClassNames(classNameList00, classNameList01);
-	}
-
-	private void reloadOntologyNames() {
-		Set<OWLOntology> ontologies = getOWLOntologyManager().getOntologies();
-		this.owlOntologyMap.clear();
-		for (OWLOntology ontology : ontologies) {
-			this.owlOntologyMap.put(ontology.getOntologyID().toString(),
-					ontology);
-		}
-		Set<String> set = new TreeSet<String>();
-		set.addAll(this.owlOntologyMap.keySet());
-		this.ontologyList.clear();
-		this.ontologyList.addAll(set);
-		getView().reloadOntologies(this.ontologyList);
 	}
 
 	public void reset() {
