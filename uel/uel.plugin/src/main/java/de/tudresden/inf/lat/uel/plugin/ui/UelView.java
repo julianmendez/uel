@@ -1,8 +1,8 @@
 package de.tudresden.inf.lat.uel.plugin.ui;
 
-import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.event.ActionListener;
 import java.util.List;
 
@@ -10,6 +10,7 @@ import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -26,13 +27,10 @@ public class UelView extends JPanel {
 	private static final long serialVersionUID = 9096602357606632334L;
 
 	private JButton buttonFirst = new JButton(Message.buttonFirst);
-	private JButton buttonGetConceptNames = new JButton(
-			Message.buttonGetConceptNames);
 	private JButton buttonLast = new JButton(Message.buttonLast);
 	private JButton buttonNext = new JButton(Message.buttonNext);
 	private JButton buttonOpen = new JButton(Message.buttonOpen);
 	private JButton buttonPrevious = new JButton(Message.buttonPrevious);
-	private JButton buttonReset = new JButton(Message.buttonReset);
 	private JButton buttonSave = new JButton(Message.buttonSave);
 	private JButton buttonSelectVariables = new JButton(
 			Message.buttonSelectVariables);
@@ -65,19 +63,6 @@ public class UelView extends JPanel {
 
 		this.buttonFirst.addActionListener(listener);
 		this.buttonFirst.setActionCommand(actionCommand);
-	}
-
-	public void addButtonGetConceptNamesListener(ActionListener listener,
-			String actionCommand) {
-		if (listener == null) {
-			throw new IllegalArgumentException("Null argument.");
-		}
-		if (actionCommand == null) {
-			throw new IllegalArgumentException("Null argument.");
-		}
-
-		this.buttonGetConceptNames.addActionListener(listener);
-		this.buttonGetConceptNames.setActionCommand(actionCommand);
 	}
 
 	public void addButtonLastListener(ActionListener listener,
@@ -132,19 +117,6 @@ public class UelView extends JPanel {
 		this.buttonPrevious.setActionCommand(actionCommand);
 	}
 
-	public void addButtonResetListener(ActionListener listener,
-			String actionCommand) {
-		if (listener == null) {
-			throw new IllegalArgumentException("Null argument.");
-		}
-		if (actionCommand == null) {
-			throw new IllegalArgumentException("Null argument.");
-		}
-
-		this.buttonReset.addActionListener(listener);
-		this.buttonReset.setActionCommand(actionCommand);
-	}
-
 	public void addButtonSaveListener(ActionListener listener,
 			String actionCommand) {
 		if (listener == null) {
@@ -171,57 +143,103 @@ public class UelView extends JPanel {
 		this.buttonSelectVariables.setActionCommand(actionCommand);
 	}
 
+	public void addComboBoxClass00Listener(ActionListener listener,
+			String actionCommand) {
+		if (listener == null) {
+			throw new IllegalArgumentException("Null argument.");
+		}
+		if (actionCommand == null) {
+			throw new IllegalArgumentException("Null argument.");
+		}
+
+		this.listClassName00.addActionListener(listener);
+		this.listClassName00.setActionCommand(actionCommand);
+	}
+
+	public void addComboBoxClass01Listener(ActionListener listener,
+			String actionCommand) {
+		if (listener == null) {
+			throw new IllegalArgumentException("Null argument.");
+		}
+		if (actionCommand == null) {
+			throw new IllegalArgumentException("Null argument.");
+		}
+
+		this.listClassName00.addActionListener(listener);
+		this.listClassName00.setActionCommand(actionCommand);
+	}
+
+	public void addComboBoxOntology00Listener(ActionListener listener,
+			String actionCommand) {
+		if (listener == null) {
+			throw new IllegalArgumentException("Null argument.");
+		}
+		if (actionCommand == null) {
+			throw new IllegalArgumentException("Null argument.");
+		}
+
+		this.listOntologyName00.addActionListener(listener);
+		this.listOntologyName00.setActionCommand(actionCommand);
+	}
+
+	public void addComboBoxOntology01Listener(ActionListener listener,
+			String actionCommand) {
+		if (listener == null) {
+			throw new IllegalArgumentException("Null argument.");
+		}
+		if (actionCommand == null) {
+			throw new IllegalArgumentException("Null argument.");
+		}
+
+		this.listOntologyName01.addActionListener(listener);
+		this.listOntologyName01.setActionCommand(actionCommand);
+	}
+
 	private JPanel createControlPanel() {
-		JPanel ret = new JPanel(new FlowLayout());
-		ret.setLayout(new BoxLayout(ret, BoxLayout.Y_AXIS));
+		JPanel ret = new JPanel(new GridLayout());
 		ret.add(createSelectionPanel());
 		ret.add(createUnifierPanel());
 		return ret;
 	}
 
 	private JPanel createSelectionPanel() {
-		JPanel ret = new JPanel();
+		JPanel ret = new JPanel(new GridBagLayout());
+		ret.setLayout(new BoxLayout(ret, BoxLayout.Y_AXIS));
 
+		JPanel smallPanel = new JPanel();
 		this.buttonOpen.setToolTipText(Message.tooltipOpen);
-		ret.add(this.buttonOpen);
-
-		this.listOntologyName00.setPreferredSize(new Dimension(200, 28));
-		this.listOntologyName00.setMaximumSize(new Dimension(400, 28));
-		ret.add(this.listOntologyName00);
-
-		this.listOntologyName01.setPreferredSize(new Dimension(200, 28));
-		this.listOntologyName01.setMaximumSize(new Dimension(400, 28));
-		ret.add(this.listOntologyName01);
-
-		JPanel smallPanel = new JPanel(new FlowLayout());
-
-		this.buttonReset.setToolTipText(Message.tooltipReset);
-		smallPanel.add(this.buttonReset);
-
-		this.buttonGetConceptNames
-				.setToolTipText(Message.tooltipGetConceptNames);
-		smallPanel.add(this.buttonGetConceptNames);
-		ret.add(smallPanel);
-
-		this.listClassName00.setPreferredSize(new Dimension(112, 28));
-		this.listClassName00.setMinimumSize(new Dimension(56, 28));
-		this.listClassName00.setMaximumSize(new Dimension(280, 28));
-		ret.add(this.listClassName00);
-
-		this.listClassName01.setPreferredSize(new Dimension(112, 28));
-		this.listClassName01.setMinimumSize(new Dimension(56, 28));
-		this.listClassName01.setMaximumSize(new Dimension(280, 28));
-		ret.add(this.listClassName01);
-
+		smallPanel.add(this.buttonOpen);
 		this.buttonSelectVariables
 				.setToolTipText(Message.tooltipSelectVariables);
-		ret.add(this.buttonSelectVariables);
+		smallPanel.add(this.buttonSelectVariables);
+		ret.add(smallPanel);
+
+		this.listOntologyName00.setPreferredSize(new Dimension(280, 28));
+		this.listOntologyName00.setMinimumSize(new Dimension(112, 28));
+		ret.add(this.listOntologyName00);
+
+		this.listClassName00.setPreferredSize(new Dimension(280, 28));
+		this.listClassName00.setMinimumSize(new Dimension(112, 28));
+		ret.add(this.listClassName00);
+
+		JLabel gap = new JLabel();
+		gap.setPreferredSize(new Dimension(280, 28));
+		gap.setMinimumSize(new Dimension(112, 28));
+		ret.add(gap);
+
+		this.listOntologyName01.setPreferredSize(new Dimension(280, 28));
+		this.listOntologyName01.setMinimumSize(new Dimension(112, 28));
+		ret.add(this.listOntologyName01);
+
+		this.listClassName01.setPreferredSize(new Dimension(280, 28));
+		this.listClassName01.setMinimumSize(new Dimension(112, 28));
+		ret.add(this.listClassName01);
 
 		return ret;
 	}
 
 	private JPanel createUnifierPanel() {
-		JPanel ret = new JPanel(new FlowLayout());
+		JPanel ret = new JPanel();
 		ret.setLayout(new BoxLayout(ret, BoxLayout.Y_AXIS));
 
 		this.textUnifier.setToolTipText(Message.tooltipUnifier);
@@ -292,28 +310,28 @@ public class UelView extends JPanel {
 	}
 
 	public void init() {
-		this.setLayout(new BorderLayout());
-		JPanel mainPanel = new JPanel();
-		mainPanel.setLayout(new BorderLayout());
-		mainPanel.add(createControlPanel(), BorderLayout.NORTH);
-		add(mainPanel, BorderLayout.CENTER);
+		setLayout(new GridBagLayout());
+		add(createControlPanel());
 	}
 
-	public void reloadClassNames(List<String> firstList, List<String> secondList) {
-		if (firstList == null) {
-			throw new IllegalArgumentException("Null argument.");
-		}
-		if (secondList == null) {
+	public void reloadClassNames00(List<String> list) {
+		if (list == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
 
 		this.listClassName00.removeAllItems();
-		for (String className : firstList) {
+		for (String className : list) {
 			this.listClassName00.addItem(className);
+		}
+	}
+
+	public void reloadClassNames01(List<String> list) {
+		if (list == null) {
+			throw new IllegalArgumentException("Null argument.");
 		}
 
 		this.listClassName01.removeAllItems();
-		for (String className : secondList) {
+		for (String className : list) {
 			this.listClassName01.addItem(className);
 		}
 	}
@@ -337,10 +355,6 @@ public class UelView extends JPanel {
 		this.buttonFirst.setEnabled(b);
 	}
 
-	public void setButtonGetConceptNamesEnabled(boolean b) {
-		this.buttonGetConceptNames.setEnabled(b);
-	}
-
 	public void setButtonLastEnabled(boolean b) {
 		this.buttonLast.setEnabled(b);
 	}
@@ -355,10 +369,6 @@ public class UelView extends JPanel {
 
 	public void setButtonPreviousEnabled(boolean b) {
 		this.buttonPrevious.setEnabled(b);
-	}
-
-	public void setButtonResetEnabled(boolean b) {
-		this.buttonReset.setEnabled(b);
 	}
 
 	public void setButtonSaveEnabled(boolean b) {

@@ -9,7 +9,6 @@ public interface Message {
 
 	public static final String buttonAcceptVar = "OK";
 	public static final String buttonFirst = "|<";
-	public static final String buttonGetConceptNames = "OK";
 	public static final String buttonLast = ">|";
 	public static final String buttonMakeCons = "<<<";
 	public static final String buttonMakeVar = ">>>";
@@ -17,13 +16,11 @@ public interface Message {
 	public static final String buttonOpen = "Open";
 	public static final String buttonPrevious = "<";
 	public static final String buttonRejectVar = "Cancel";
-	public static final String buttonReset = "Reset";
 	public static final String buttonSave = "Save";
 	public static final String buttonSelectVariables = "Vars";
 	public static final String titleError = "Error";
 	public static final String tooltipAcceptVar = "use the selected entities as variables";
 	public static final String tooltipFirst = "shows the first unifier";
-	public static final String tooltipGetConceptNames = "gets the classes for the selected ontologies";
 	public static final String tooltipLast = "computes all unifiers and shows the last unifier";
 	public static final String tooltipMakeCons = "defines the selected items as constants";
 	public static final String tooltipMakeVar = "defines the selected items as variables";
@@ -31,7 +28,6 @@ public interface Message {
 	public static final String tooltipOpen = "opens an ontology";
 	public static final String tooltipPrevious = "shows the previous unifier";
 	public static final String tooltipRejectVar = "cancels this selection of variables";
-	public static final String tooltipReset = "resets the panel information";
 	public static final String tooltipSave = "saves the current unifier into a file";
 	public static final String tooltipSelectVariables = "gets candidates for variables";
 	public static final String tooltipUnifier = "unifier";

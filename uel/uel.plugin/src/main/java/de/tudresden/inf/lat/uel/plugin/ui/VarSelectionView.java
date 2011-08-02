@@ -1,9 +1,8 @@
 package de.tudresden.inf.lat.uel.plugin.ui;
 
-import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Frame;
+import java.awt.GridBagLayout;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
@@ -89,54 +88,30 @@ class VarSelectionView extends JDialog {
 		this.rejectVarButton.setActionCommand(actionCommand);
 	}
 
-	public LabelId getConstant(int index) {
-		return this.listOfConstants.get(index);
-	}
-
-	public VarSelectionModel getModel() {
-		return this.model;
-	}
-
-	public int[] getSelectedConstants() {
-		return this.listConstants.getSelectedIndices();
-	}
-
-	public int[] getSelectedVariables() {
-		return this.listVariables.getSelectedIndices();
-	}
-
-	public LabelId getVariable(int index) {
-		return this.listOfVariables.get(index);
-	}
-
-	private void initVarFrame() {
-		setLocation(400, 400);
-		setSize(new Dimension(300, 200));
-		setMinimumSize(new Dimension(200, 200));
-
-		JPanel mainPanel = new JPanel();
-		mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+	private JPanel createMainPanel() {
+		JPanel ret = new JPanel();
+		ret.setLayout(new BoxLayout(ret, BoxLayout.Y_AXIS));
 
 		this.listConstants = new JList();
 		this.listConstants.setToolTipText("constants");
 		JScrollPane scrollPaneCons = new JScrollPane(this.listConstants);
 		scrollPaneCons
 				.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-		scrollPaneCons.setPreferredSize(new Dimension(300, 200));
+		scrollPaneCons.setPreferredSize(new Dimension(360, 240));
 
 		this.listVariables = new JList();
 		this.listVariables.setToolTipText("variables");
 		JScrollPane scrollPaneVars = new JScrollPane(this.listVariables);
 		scrollPaneVars
 				.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-		scrollPaneVars.setPreferredSize(new Dimension(300, 200));
+		scrollPaneVars.setPreferredSize(new Dimension(360, 240));
 
 		JPanel varSelPanel = new JPanel();
 		varSelPanel.setLayout(new BoxLayout(varSelPanel, BoxLayout.X_AXIS));
 		varSelPanel.add(scrollPaneCons);
 		varSelPanel.add(scrollPaneVars);
 
-		JPanel buttonPanel = new JPanel(new FlowLayout());
+		JPanel buttonPanel = new JPanel();
 		this.makeConsButton = new JButton(Message.buttonMakeCons);
 		this.makeConsButton.setToolTipText(Message.tooltipMakeCons);
 		this.makeConsButton.setMinimumSize(new Dimension(56, 28));
@@ -161,9 +136,38 @@ class VarSelectionView extends JDialog {
 		this.rejectVarButton.setMaximumSize(new Dimension(74, 28));
 		buttonPanel.add(this.rejectVarButton);
 
-		mainPanel.add(varSelPanel);
-		mainPanel.add(buttonPanel);
-		getContentPane().add(mainPanel, BorderLayout.CENTER);
+		ret.add(varSelPanel);
+		ret.add(buttonPanel);
+
+		return ret;
+	}
+
+	public LabelId getConstant(int index) {
+		return this.listOfConstants.get(index);
+	}
+
+	public VarSelectionModel getModel() {
+		return this.model;
+	}
+
+	public int[] getSelectedConstants() {
+		return this.listConstants.getSelectedIndices();
+	}
+
+	public int[] getSelectedVariables() {
+		return this.listVariables.getSelectedIndices();
+	}
+
+	public LabelId getVariable(int index) {
+		return this.listOfVariables.get(index);
+	}
+
+	private void initVarFrame() {
+		setLocation(400, 400);
+		setSize(new Dimension(800, 400));
+		setMinimumSize(new Dimension(200, 200));
+		setLayout(new GridBagLayout());
+		getContentPane().add(createMainPanel());
 	}
 
 	public void updateLists() {

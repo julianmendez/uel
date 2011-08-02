@@ -93,6 +93,7 @@ public class UelStarter implements OWLOntologyChangeListener,
 	public void reset() {
 		this.panel.setShortFormMap(createShortFormMap());
 		this.panel.reset();
+		this.panel.reloadOntologies();
 	}
 
 	@Override
