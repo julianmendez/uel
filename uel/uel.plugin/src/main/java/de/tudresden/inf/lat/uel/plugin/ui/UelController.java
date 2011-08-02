@@ -52,11 +52,11 @@ public class UelController implements ActionListener {
 	private List<LabelId> classList00 = null;
 	private List<LabelId> classList01 = null;
 	private Map<String, OWLClass> mapIdClass = new HashMap<String, OWLClass>();
-	private OWLOntology ontology00 = null;
-	private OWLOntology ontology01 = null;
 	private List<String> ontologyList = new ArrayList<String>();
-	private Map<String, OWLOntology> ontologyMap = new HashMap<String, OWLOntology>();
+	private OWLOntology owlOntology00 = null;
+	private OWLOntology owlOntology01 = null;
 	private OWLOntologyManager owlOntologyManager = null;
+	private Map<String, OWLOntology> owlOntologyMap = new HashMap<String, OWLOntology>();
 	private Map<OWLClass, String> shortFormMap = new HashMap<OWLClass, String>();
 	private int unifierIndex = -1;
 	private VarSelectionController varWindow = null;
@@ -133,15 +133,15 @@ public class UelController implements ActionListener {
 
 		getModel().clearOntology();
 
-		this.ontology00 = this.ontologyMap.get(this.ontologyList.get(getView()
-				.getSelectedOntologyName00()));
-		getModel().loadOntology(this.ontology00);
-		processMapIdClass(this.ontology00);
+		this.owlOntology00 = this.owlOntologyMap.get(this.ontologyList
+				.get(getView().getSelectedOntologyName00()));
+		getModel().loadOntology(this.owlOntology00);
+		processMapIdClass(this.owlOntology00);
 
-		this.ontology01 = this.ontologyMap.get(this.ontologyList.get(getView()
-				.getSelectedOntologyName01()));
-		getModel().loadOntology(this.ontology01);
-		processMapIdClass(this.ontology01);
+		this.owlOntology01 = this.owlOntologyMap.get(this.ontologyList
+				.get(getView().getSelectedOntologyName01()));
+		getModel().loadOntology(this.owlOntology01);
+		processMapIdClass(this.owlOntology01);
 
 		reloadClassNames();
 
@@ -379,13 +379,13 @@ public class UelController implements ActionListener {
 	}
 
 	private void reloadClassNames() {
-		this.classList00 = getClassNames(this.ontology00);
+		this.classList00 = getClassNames(this.owlOntology00);
 		List<String> classNameList00 = new ArrayList<String>();
 		for (LabelId className : this.classList00) {
 			classNameList00.add(className.getLabel());
 		}
 
-		this.classList01 = getClassNames(this.ontology01);
+		this.classList01 = getClassNames(this.owlOntology01);
 		List<String> classNameList01 = new ArrayList<String>();
 		for (LabelId className : this.classList01) {
 			classNameList01.add(className.getLabel());
@@ -396,12 +396,13 @@ public class UelController implements ActionListener {
 
 	private void reloadOntologyNames() {
 		Set<OWLOntology> ontologies = getOWLOntologyManager().getOntologies();
-		this.ontologyMap.clear();
+		this.owlOntologyMap.clear();
 		for (OWLOntology ontology : ontologies) {
-			this.ontologyMap.put(ontology.getOntologyID().toString(), ontology);
+			this.owlOntologyMap.put(ontology.getOntologyID().toString(),
+					ontology);
 		}
 		Set<String> set = new TreeSet<String>();
-		set.addAll(this.ontologyMap.keySet());
+		set.addAll(this.owlOntologyMap.keySet());
 		this.ontologyList.clear();
 		this.ontologyList.addAll(set);
 		getView().reloadOntologies(this.ontologyList);

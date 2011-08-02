@@ -20,6 +20,7 @@ import de.tudresden.inf.lat.uel.main.Goal;
 import de.tudresden.inf.lat.uel.main.Sat4jSolver;
 import de.tudresden.inf.lat.uel.main.Solver;
 import de.tudresden.inf.lat.uel.ontmanager.Ontology;
+import de.tudresden.inf.lat.uel.ontmanager.OntologyParser;
 import de.tudresden.inf.lat.uel.sattranslator.SatInput;
 import de.tudresden.inf.lat.uel.sattranslator.Translator;
 import de.uulm.ecs.ai.owlapi.krssrenderer.KRSS2OWLSyntaxRenderer;
@@ -143,7 +144,8 @@ public class UelProcessor {
 		writer.flush();
 
 		try {
-			this.ontology.loadOntology(new StringReader(writer.toString()));
+			OntologyParser parser = new OntologyParser(this.ontology);
+			parser.loadOntology(new StringReader(writer.toString()));
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}

@@ -202,7 +202,7 @@ public class Goal {
 	 *            concept
 	 */
 	public void importDefinition(Atom concept) {
-		if (ontology.getDefinitions().containsKey(concept.toString())
+		if (ontology.containsDefinition(concept.toString())
 				&& !variables.containsKey(concept.toString())) {
 
 			Equation eq = ontology.getDefinition(concept.toString());

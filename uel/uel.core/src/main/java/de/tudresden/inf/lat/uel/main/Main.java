@@ -14,6 +14,7 @@ import java.util.logging.Logger;
 
 import de.tudresden.inf.lat.uel.infhandler.OutputStreamHandler;
 import de.tudresden.inf.lat.uel.ontmanager.Ontology;
+import de.tudresden.inf.lat.uel.ontmanager.OntologyParser;
 
 /**
  * This class starts a unifier from the command line.
@@ -161,9 +162,9 @@ public class Main {
 		} else if (args.length > 1 && args[0].startsWith("-")) {
 
 			if (args.length == 3) {
-
-				ontology.loadOntology(new InputStreamReader(
-						new FileInputStream(args[2])));
+				OntologyParser parser = new OntologyParser(ontology);
+				parser.loadOntology(new InputStreamReader(new FileInputStream(
+						args[2])));
 
 			}
 
@@ -216,8 +217,8 @@ public class Main {
 			}
 
 		} else if (args.length == 2 && !args[0].startsWith("-")) {
-
-			ontology.loadOntology(new InputStreamReader(new FileInputStream(
+			OntologyParser parser = new OntologyParser(ontology);
+			parser.loadOntology(new InputStreamReader(new FileInputStream(
 					args[1])));
 
 			initialize(goal, unifier, args[0]);
