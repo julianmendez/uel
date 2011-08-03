@@ -29,8 +29,13 @@ class VarSelectionView extends JDialog {
 	private VarSelectionModel model = null;
 	private JButton rejectVarButton = null;
 
-	public VarSelectionView(Frame owner, VarSelectionModel m) {
-		super(owner, "Variable selection", true);
+	public VarSelectionView(VarSelectionModel m) {
+		super(new Frame(), "Variable selection", true);
+
+		if (m == null) {
+			throw new IllegalArgumentException("Null argument.");
+		}
+
 		this.model = m;
 		initVarFrame();
 		updateLists();

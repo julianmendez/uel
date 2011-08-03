@@ -55,6 +55,7 @@ public class UelController implements ActionListener {
 	private List<LabelId> classList00 = null;
 	private List<LabelId> classList01 = null;
 	private Map<String, OWLClass> mapIdClass = new HashMap<String, OWLClass>();
+	private Map<String, String> mapIdLabel = new HashMap<String, String>();
 	private Ontology ontology00 = null;
 	private Ontology ontology01 = null;
 	private List<String> ontologyList = new ArrayList<String>();
@@ -301,8 +302,7 @@ public class UelController implements ActionListener {
 		classSet.add(this.classList01.get(getView().getSelectedClassName01())
 				.getId());
 		try {
-			getModel().recalculateCandidates(classSet);
-			this.varWindow = initVarWindow();
+			this.varWindow = initVarWindow(classSet);
 			this.varWindow.open();
 		} catch (RuntimeException e) {
 		}
@@ -396,15 +396,10 @@ public class UelController implements ActionListener {
 		executeActionOntology01Selected(0);
 	}
 
-	private VarSelectionController initVarWindow() {
-		Map<String, String> map = new HashMap<String, String>();
-		Set<String> candidates = getModel().getCandidates();
-		for (String candidateId : candidates) {
-			map.put(candidateId, getLabel(candidateId));
-		}
+	private VarSelectionController initVarWindow(Set<String> originalVariables) {
 		VarSelectionController ret = new VarSelectionController(
-				new VarSelectionView(null, new VarSelectionModel(candidates,
-						map)));
+				new VarSelectionView(new VarSelectionModel(originalVariables,
+						this.mapIdLabel, getModel().getOntology())));
 		ret.addAcceptVarButtonListener(this, actionAcceptVar);
 		ret.addRejectVarButtonListener(this, actionRejectVar);
 		return ret;
@@ -440,6 +435,13 @@ public class UelController implements ActionListener {
 		this.mapIdClass.put(getId(thing), thing);
 	}
 
+	private void recomputeShortForm() {
+		this.mapIdLabel.clear();
+		for (OWLClass cls : this.shortFormMap.keySet()) {
+			this.mapIdLabel.put(getId(cls), getShortForm(cls));
+		}
+	}
+
 	public void reloadOntologies() {
 		Set<OWLOntology> owlOntologies = getOWLOntologyManager()
 				.getOntologies();
@@ -468,6 +470,7 @@ public class UelController implements ActionListener {
 		}
 
 		this.shortFormMap = map;
+		recomputeShortForm();
 	}
 
 	private void setUnifierButtons(boolean b) {

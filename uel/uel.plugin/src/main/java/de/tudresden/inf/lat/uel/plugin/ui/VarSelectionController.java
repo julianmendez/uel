@@ -30,21 +30,9 @@ class VarSelectionController implements ActionListener {
 		String cmd = e.getActionCommand();
 
 		if (cmd.equals(BUTTON_VAR)) {
-			int[] options = getView().getSelectedConstants();
-			for (int i = 0; i < options.length; i++) {
-				getView().getModel().makeVariable(
-						getView().getConstant(options[i]).getId());
-			}
-			getView().updateLists();
-
+			executeMakeVar();
 		} else if (cmd.equals(BUTTON_CONS)) {
-			int[] options = getView().getSelectedVariables();
-			for (int i = 0; i < options.length; i++) {
-				getView().getModel().makeConstant(
-						getView().getVariable(options[i]).getId());
-			}
-			getView().updateLists();
-
+			executeMakeCons();
 		}
 	}
 
@@ -62,6 +50,29 @@ class VarSelectionController implements ActionListener {
 	public void close() {
 		getView().setVisible(false);
 		getView().dispose();
+	}
+
+	private void executeMakeCons() {
+		int[] options = getView().getSelectedVariables();
+		for (int i = 0; i < options.length; i++) {
+			getView().getModel().makeConstant(
+					getView().getVariable(options[i]).getId());
+		}
+		getView().updateLists();
+
+	}
+
+	private void executeMakeVar() {
+		int[] options = getView().getSelectedConstants();
+		for (int i = 0; i < options.length; i++) {
+			getView().getModel().makeVariable(
+					getView().getConstant(options[i]).getId());
+		}
+		getView().updateLists();
+	}
+
+	public VarSelectionModel getModel() {
+		return getView().getModel();
 	}
 
 	public VarSelectionView getView() {

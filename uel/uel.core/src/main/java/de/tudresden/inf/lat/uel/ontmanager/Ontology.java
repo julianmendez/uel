@@ -2,6 +2,7 @@ package de.tudresden.inf.lat.uel.ontmanager;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Set;
 
 import de.tudresden.inf.lat.uel.main.Atom;
@@ -73,12 +74,30 @@ public class Ontology {
 		return Collections.unmodifiableSet(this.definitions.keySet());
 	}
 
+	public Set<String> getDefinitionSymbols(String name) {
+		Set<String> ret = new HashSet<String>();
+		Equation equation = getDefinition(name);
+		if (equation != null) {
+			ret.addAll(equation.getRight().keySet());
+		}
+		return Collections.unmodifiableSet(ret);
+	}
+
 	public Equation getPrimitiveDefinition(String name) {
 		return primitiveDefinitions.get(name);
 	}
 
 	public Set<String> getPrimitiveDefinitionIds() {
 		return Collections.unmodifiableSet(this.primitiveDefinitions.keySet());
+	}
+
+	public Set<String> getPrimitiveDefinitionSymbols(String name) {
+		Set<String> ret = new HashSet<String>();
+		Equation equation = getPrimitiveDefinition(name);
+		if (equation != null) {
+			ret.addAll(equation.getRight().keySet());
+		}
+		return Collections.unmodifiableSet(ret);
 	}
 
 	@Override

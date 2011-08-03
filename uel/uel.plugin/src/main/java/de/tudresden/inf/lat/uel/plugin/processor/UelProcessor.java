@@ -6,16 +6,13 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.semanticweb.owlapi.io.OWLRendererException;
 import org.semanticweb.owlapi.model.OWLOntology;
 
 import de.tudresden.inf.lat.uel.main.Equation;
-import de.tudresden.inf.lat.uel.main.FAtom;
 import de.tudresden.inf.lat.uel.main.Goal;
 import de.tudresden.inf.lat.uel.main.Sat4jSolver;
 import de.tudresden.inf.lat.uel.main.Solver;
@@ -96,28 +93,30 @@ public class UelProcessor {
 			throw new IllegalArgumentException("Null argument.");
 		}
 
-		Goal goal = createGoal(this.ontology, input, this.candidates);
-		this.translator = new Translator(goal);
-		return goal;
+		Goal ret = createGoal(this.ontology, input, this.candidates);
+		this.translator = new Translator(ret);
+		return ret;
 	}
 
 	private Goal createGoal(Ontology ont, Set<String> input, Set<String> vars) {
-		Goal goal = new Goal(ont);
 		StringBuffer sbuf = new StringBuffer();
 		for (String cls : input) {
 			Equation eq1 = ont.getPrimitiveDefinition(cls);
 			Equation eq2 = ont.getDefinition(cls);
 			Equation eq = eq1 == null ? eq2 : eq1;
-			sbuf.append(eq.toString());
-			sbuf.append("\n");
+			if (eq != null) {
+				sbuf.append(eq.toString());
+				sbuf.append("\n");
+			}
 		}
 
+		Goal ret = new Goal(ont);
 		try {
-			goal.initialize(new StringReader(sbuf.toString()), vars);
+			ret.initialize(new StringReader(sbuf.toString()), vars);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-		return goal;
+		return ret;
 	}
 
 	public Ontology createOntology(OWLOntology owlOntology) {
@@ -149,28 +148,16 @@ public class UelProcessor {
 		return Collections.unmodifiableSet(this.candidates);
 	}
 
+	public Ontology getOntology() {
+		return this.ontology;
+	}
+
 	public List<String> getUnifierList() {
 		return Collections.unmodifiableList(this.unifierList);
 	}
 
 	public void loadOntology(Ontology ontology) {
 		this.ontology.merge(ontology);
-	}
-
-	public void recalculateCandidates(Set<String> input) {
-		if (input == null) {
-			throw new IllegalArgumentException("Null argument.");
-		}
-
-		Goal goal = createGoal(this.ontology, input, new HashSet<String>());
-		Map<String, FAtom> consMap = goal.getConstants();
-		Set<String> varSet = new HashSet<String>();
-		for (Iterator<String> it = consMap.keySet().iterator(); it.hasNext();) {
-			varSet.add(consMap.get(it.next()).toString());
-		}
-		this.candidates = varSet;
-		this.unifierList.clear();
-		this.unifierSet.clear();
 	}
 
 }
