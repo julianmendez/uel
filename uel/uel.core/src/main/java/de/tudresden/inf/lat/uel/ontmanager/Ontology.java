@@ -78,7 +78,7 @@ public class Ontology {
 		Set<String> ret = new HashSet<String>();
 		Equation equation = getDefinition(name);
 		if (equation != null) {
-			ret.addAll(equation.getRight().keySet());
+			ret.addAll(getSymbols(equation));
 		}
 		return Collections.unmodifiableSet(ret);
 	}
@@ -95,9 +95,17 @@ public class Ontology {
 		Set<String> ret = new HashSet<String>();
 		Equation equation = getPrimitiveDefinition(name);
 		if (equation != null) {
-			ret.addAll(equation.getRight().keySet());
+			ret.addAll(getSymbols(equation));
 		}
 		return Collections.unmodifiableSet(ret);
+	}
+
+	private Set<String> getSymbols(Equation equation) {
+		Set<String> ret = new HashSet<String>();
+		for (Atom e : equation.getRight().values()) {
+			ret.add(e.getName());
+		}
+		return ret;
 	}
 
 	@Override
