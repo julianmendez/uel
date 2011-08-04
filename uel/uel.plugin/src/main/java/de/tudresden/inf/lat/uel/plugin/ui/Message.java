@@ -20,6 +20,10 @@ public interface Message {
 	public static final String buttonSelectVariables = "Vars";
 	public static final String titleError = "Error";
 	public static final String tooltipAcceptVar = "use the selected entities as variables";
+	public static final String tooltipComboBoxClassName00 = "first class name to be selected";
+	public static final String tooltipComboBoxClassName01 = "second class name to be selected";
+	public static final String tooltipComboBoxOntology00 = "first ontology to be selected";
+	public static final String tooltipComboBoxOntology01 = "second ontology to be selected";
 	public static final String tooltipFirst = "shows the first unifier";
 	public static final String tooltipLast = "computes all unifiers and shows the last unifier";
 	public static final String tooltipMakeCons = "defines the selected items as constants";

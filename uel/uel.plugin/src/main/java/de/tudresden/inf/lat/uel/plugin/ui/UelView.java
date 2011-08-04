@@ -214,10 +214,13 @@ public class UelView extends JPanel {
 		smallPanel.add(this.buttonSelectVariables);
 		ret.add(smallPanel);
 
+		this.listOntologyName00
+				.setToolTipText(Message.tooltipComboBoxOntology00);
 		this.listOntologyName00.setPreferredSize(new Dimension(280, 28));
 		this.listOntologyName00.setMinimumSize(new Dimension(112, 28));
 		ret.add(this.listOntologyName00);
 
+		this.listClassName00.setToolTipText(Message.tooltipComboBoxClassName00);
 		this.listClassName00.setPreferredSize(new Dimension(280, 28));
 		this.listClassName00.setMinimumSize(new Dimension(112, 28));
 		ret.add(this.listClassName00);
@@ -227,10 +230,13 @@ public class UelView extends JPanel {
 		gap.setMinimumSize(new Dimension(112, 28));
 		ret.add(gap);
 
+		this.listOntologyName01
+				.setToolTipText(Message.tooltipComboBoxOntology01);
 		this.listOntologyName01.setPreferredSize(new Dimension(280, 28));
 		this.listOntologyName01.setMinimumSize(new Dimension(112, 28));
 		ret.add(this.listOntologyName01);
 
+		this.listClassName01.setToolTipText(Message.tooltipComboBoxClassName01);
 		this.listClassName01.setPreferredSize(new Dimension(280, 28));
 		this.listClassName01.setMinimumSize(new Dimension(112, 28));
 		ret.add(this.listClassName01);
@@ -245,6 +251,7 @@ public class UelView extends JPanel {
 		this.textUnifier.setToolTipText(Message.tooltipUnifier);
 		this.textUnifier.setWrapStyleWord(true);
 		this.textUnifier.setLineWrap(true);
+		this.textUnifier.setEditable(false);
 
 		JScrollPane scrollPane = new JScrollPane(this.textUnifier);
 		scrollPane
