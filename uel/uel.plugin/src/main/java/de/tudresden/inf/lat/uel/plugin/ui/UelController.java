@@ -4,10 +4,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -21,6 +23,10 @@ import java.util.TreeSet;
 import javax.swing.DefaultListModel;
 import javax.swing.JFileChooser;
 
+import org.coode.owlapi.owlxml.renderer.OWLXMLRenderer;
+import org.coode.owlapi.rdf.rdfxml.RDFXMLRenderer;
+import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.io.OWLRendererException;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
@@ -28,6 +34,7 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
 
 import de.tudresden.inf.lat.uel.ontmanager.Ontology;
 import de.tudresden.inf.lat.uel.plugin.processor.UelProcessor;
+import de.uulm.ecs.ai.owlapi.krssrenderer.KRSS2OWLSyntaxRenderer;
 
 /**
  * This class is a controller for UEL.
@@ -49,6 +56,9 @@ public class UelController implements ActionListener {
 	private static final String actionRejectVar = "reject var";
 	private static final String actionSave = "save";
 	private static final String actionSelectVariables = "get var candidate";
+	private static final String extension_krss = ".krss";
+	private static final String extension_owl = ".owl";
+	private static final String extension_rdf = ".rdf";
 	private static final String initialUnifierIdText = " 0 ";
 
 	private boolean allUnifiersFound = false;
@@ -277,15 +287,30 @@ public class UelController implements ActionListener {
 		}
 		if (file != null) {
 			try {
+				String unifier = getModel().getUnifierList().get(
+						this.unifierIndex);
+				OWLOntology owlOntology = parseUnifier(unifier);
+				if (file.getName().endsWith(extension_rdf)) {
+					unifier = this.renderRDF(owlOntology);
+				} else if (file.getName().endsWith(extension_owl)) {
+					unifier = this.renderOWL(owlOntology);
+				} else if (file.getName().endsWith(extension_krss)) {
+					unifier = this.renderKRSS(owlOntology);
+				}
+
 				BufferedWriter writer = new BufferedWriter(new FileWriter(file));
 				if (getModel().getUnifierList().size() > 0) {
-					writer.write(getModel().getUnifierList().get(
-							this.unifierIndex));
+					writer.write(unifier);
 				}
 				writer.flush();
+			} catch (OWLRendererException e) {
+				throw new RuntimeException(e);
+			} catch (OWLOntologyCreationException e) {
+				throw new RuntimeException(e);
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
+
 		}
 	}
 
@@ -420,6 +445,14 @@ public class UelController implements ActionListener {
 		}
 	}
 
+	private OWLOntology parseUnifier(String krss)
+			throws OWLOntologyCreationException {
+		OWLOntologyManager ontologyManager = OWLManager
+				.createOWLOntologyManager();
+		ByteArrayInputStream input = new ByteArrayInputStream(krss.getBytes());
+		return ontologyManager.loadOntologyFromOntologyDocument(input);
+	}
+
 	private void processMapIdClass(OWLOntology ontology) {
 		Set<OWLClass> set = ontology.getClassesInSignature();
 		for (OWLClass cls : set) {
@@ -450,6 +483,35 @@ public class UelController implements ActionListener {
 		}
 		executeActionOntology00Selected();
 		executeActionOntology01Selected();
+	}
+
+	private String renderKRSS(OWLOntology owlOntology)
+			throws OWLRendererException {
+		StringWriter writer = new StringWriter();
+		KRSS2OWLSyntaxRenderer renderer = new KRSS2OWLSyntaxRenderer(
+				owlOntology.getOWLOntologyManager());
+		renderer.render(owlOntology, writer);
+		writer.flush();
+		return writer.toString();
+	}
+
+	private String renderOWL(OWLOntology owlOntology)
+			throws OWLRendererException {
+		StringWriter writer = new StringWriter();
+		OWLXMLRenderer renderer = new OWLXMLRenderer(
+				owlOntology.getOWLOntologyManager());
+		renderer.render(owlOntology, writer);
+		writer.flush();
+		return writer.toString();
+	}
+
+	private String renderRDF(OWLOntology owlOntology) throws IOException {
+		StringWriter writer = new StringWriter();
+		RDFXMLRenderer renderer = new RDFXMLRenderer(
+				owlOntology.getOWLOntologyManager(), owlOntology, writer);
+		renderer.render();
+		writer.flush();
+		return writer.toString();
 	}
 
 	public void reset() {
