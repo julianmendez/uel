@@ -112,7 +112,7 @@ public class UelProcessor {
 
 		Goal ret = new Goal(ont);
 		try {
-			ret.initialize(new StringReader(sbuf.toString()), vars);
+			ret.initialize(sbuf.toString(), vars);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}

@@ -2,8 +2,8 @@ package de.tudresden.inf.lat.uel.parser;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.Reader;
 import java.io.StreamTokenizer;
+import java.io.StringReader;
 import java.util.HashMap;
 
 import de.tudresden.inf.lat.uel.main.Atom;
@@ -252,7 +252,7 @@ public class ReaderAndParser {
 	 * @throws IOException
 	 */
 
-	public void read(Reader input, Goal goal) throws IOException {
+	public void read(String inputStr, Goal goal) throws IOException {
 
 		Equation equation;
 
@@ -272,7 +272,8 @@ public class ReaderAndParser {
 		 * Opens input file
 		 */
 
-		StreamTokenizer str = new StreamTokenizer(new BufferedReader(input));
+		StreamTokenizer str = new StreamTokenizer(new BufferedReader(
+				new StringReader(inputStr)));
 		str.ordinaryChar('(');
 		str.ordinaryChar(')');
 		str.wordChars('_', '_');

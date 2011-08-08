@@ -3,7 +3,6 @@ package de.tudresden.inf.lat.uel.main;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.Reader;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -218,10 +217,10 @@ public class Goal {
 
 	}
 
-	private void initialize(Reader input, boolean test, Writer output,
+	private void initialize(String inputStr, boolean test, Writer output,
 			Set<String> vars) throws IOException {
 
-		readerAndParser.read(input, this);
+		readerAndParser.read(inputStr, this);
 
 		if (test) {
 
@@ -261,8 +260,9 @@ public class Goal {
 		}
 	}
 
-	public void initialize(Reader input, Set<String> vars) throws IOException {
-		initialize(input, false, null, vars);
+	public void initialize(String inputStr, Set<String> vars)
+			throws IOException {
+		initialize(inputStr, false, null, vars);
 	}
 
 	/**
@@ -275,15 +275,15 @@ public class Goal {
 	 * 
 	 * Then all variables, constants and existential atoms are identified.
 	 * 
-	 * @param input
-	 *            input
+	 * @param inputStr
+	 *            input string
 	 * @param output
 	 *            output
 	 * @throws IOException
 	 */
-	public void initializeWithTest(Reader input, Writer output, Set<String> vars)
-			throws IOException {
-		initialize(input, true, output, vars);
+	public void initializeWithTest(String inputStr, Writer output,
+			Set<String> vars) throws IOException {
+		initialize(inputStr, true, output, vars);
 	}
 
 	/**

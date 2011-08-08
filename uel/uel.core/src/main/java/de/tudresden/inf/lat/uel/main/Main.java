@@ -83,12 +83,12 @@ public class Main {
 			throws IOException {
 		// FIXME this method uses an empty set of variables
 
-		FileReader reader = new FileReader(filename);
+		String inputStr = readFile(filename);
 		if (unifier.getTest()) {
 			FileWriter output = new FileWriter(filename + ".TBox");
-			goal.initializeWithTest(reader, output, new HashSet<String>());
+			goal.initializeWithTest(inputStr, output, new HashSet<String>());
 		} else {
-			goal.initialize(reader, new HashSet<String>());
+			goal.initialize(inputStr, new HashSet<String>());
 		}
 	}
 
@@ -143,6 +143,20 @@ public class Main {
 			return 5;
 		}
 
+	}
+
+	public String readFile(String filename) throws IOException {
+		BufferedReader reader = new BufferedReader(new FileReader(filename));
+		StringBuffer sbuf = new StringBuffer();
+		String line = "";
+		while (line != null) {
+			line = reader.readLine();
+			if (line != null) {
+				sbuf.append(line);
+				sbuf.append("\n");
+			}
+		}
+		return sbuf.toString();
 	}
 
 	public void run(String[] args) throws IOException {
