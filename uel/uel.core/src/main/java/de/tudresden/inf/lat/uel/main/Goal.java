@@ -52,9 +52,11 @@ public class Goal {
 	 */
 	private List<Equation> equations = new ArrayList<Equation>();
 
+	private Equation mainEquation = null;
+
 	private int nbrVar = 0;
 
-	private Ontology ontology;
+	private Ontology ontology = null;
 
 	private ReaderAndParser readerAndParser = new ReaderAndParser();
 
@@ -173,6 +175,10 @@ public class Goal {
 	public List<Equation> getEquations() {
 
 		return equations;
+	}
+
+	public Equation getMainEquation() {
+		return mainEquation;
 	}
 
 	/**
@@ -388,6 +394,10 @@ public class Goal {
 		}
 		sbuf.append("\n");
 		return sbuf.toString();
+	}
+
+	public void setMainEquation(Equation equation) {
+		this.mainEquation = equation;
 	}
 
 	/**

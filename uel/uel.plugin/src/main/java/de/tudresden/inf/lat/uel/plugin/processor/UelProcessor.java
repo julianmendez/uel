@@ -101,9 +101,9 @@ public class UelProcessor {
 	private Goal createGoal(Ontology ont, Set<String> input, Set<String> vars) {
 		StringBuffer sbuf = new StringBuffer();
 		for (String cls : input) {
-			Equation eq1 = ont.getPrimitiveDefinition(cls);
-			Equation eq2 = ont.getDefinition(cls);
-			Equation eq = eq1 == null ? eq2 : eq1;
+			Equation eqDef = ont.getDefinition(cls);
+			Equation eqPrimDef = ont.getPrimitiveDefinition(cls);
+			Equation eq = eqDef != null ? eqDef : eqPrimDef;
 			if (eq != null) {
 				sbuf.append(eq.toString());
 				sbuf.append("\n");

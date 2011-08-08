@@ -9,7 +9,9 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -197,8 +199,11 @@ public class Translator {
 		 * 
 		 * Clauses created in Step 1
 		 */
+		Set<Equation> equations = new HashSet<Equation>();
+		equations.addAll(goal.getEquations());
+		equations.add(goal.getMainEquation());
 
-		for (Equation e : goal.getEquations()) {
+		for (Equation e : equations) {
 
 			/*
 			 * Step 1 for constants
