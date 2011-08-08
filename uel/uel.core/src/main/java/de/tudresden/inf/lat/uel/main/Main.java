@@ -2,7 +2,6 @@ package de.tudresden.inf.lat.uel.main;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -177,8 +176,7 @@ public class Main {
 
 			if (args.length == 3) {
 				OntologyParser parser = new OntologyParser(ontology);
-				parser.loadOntology(new InputStreamReader(new FileInputStream(
-						args[2])));
+				parser.loadOntology(readFile(args[2]));
 
 			}
 
@@ -232,8 +230,7 @@ public class Main {
 
 		} else if (args.length == 2 && !args[0].startsWith("-")) {
 			OntologyParser parser = new OntologyParser(ontology);
-			parser.loadOntology(new InputStreamReader(new FileInputStream(
-					args[1])));
+			parser.loadOntology(readFile(args[1]));
 
 			initialize(goal, unifier, args[0]);
 			unifier.unify0(goal);

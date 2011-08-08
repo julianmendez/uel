@@ -2,8 +2,8 @@ package de.tudresden.inf.lat.uel.ontmanager;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.Reader;
 import java.io.StreamTokenizer;
+import java.io.StringReader;
 import java.util.HashMap;
 
 import de.tudresden.inf.lat.uel.main.Atom;
@@ -30,13 +30,10 @@ public class OntologyParser {
 	 * 
 	 * @throws IOException
 	 */
-	public void loadOntology(Reader input) throws IOException {
+	public void loadOntology(String inputStr) throws IOException {
 
-		/*
-		 * open file
-		 */
-
-		StreamTokenizer str = new StreamTokenizer(new BufferedReader(input));
+		StreamTokenizer str = new StreamTokenizer(new BufferedReader(
+				new StringReader(inputStr)));
 		str.ordinaryChar('(');
 		str.ordinaryChar(')');
 		str.wordChars('_', '_');

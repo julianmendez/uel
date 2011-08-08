@@ -133,11 +133,12 @@ public class UelProcessor {
 			throw new RuntimeException(e);
 		}
 		writer.flush();
+		String inputStr = writer.toString();
 
 		Ontology ret = new Ontology();
 		try {
 			OntologyParser parser = new OntologyParser(ret);
-			parser.loadOntology(new StringReader(writer.toString()));
+			parser.loadOntology(inputStr);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
