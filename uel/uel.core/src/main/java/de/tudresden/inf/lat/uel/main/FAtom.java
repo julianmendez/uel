@@ -3,6 +3,8 @@ package de.tudresden.inf.lat.uel.main;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import de.tudresden.inf.lat.uel.parser.KRSSKeyword;
+
 /**
  * 
  * This class extends Atom. It implements a flat atom, hence an atom which is
@@ -19,10 +21,10 @@ import java.util.Collection;
 
 public class FAtom extends Atom {
 
+	public static final String VAR_PREFIX = "VAR";
+
 	private FAtom child = null;
-
 	private Collection<FAtom> S = new ArrayList<FAtom>();
-
 	private boolean sys = false;
 	private boolean var = false;
 
@@ -47,7 +49,7 @@ public class FAtom extends Atom {
 		} else if (!atom.isFlat()) {
 
 			FAtom b = null;
-			String newvar = "VAR" + goal.getNbrVar();
+			String newvar = VAR_PREFIX + goal.getNbrVar();
 
 			Equation eq = new Equation();
 
@@ -195,7 +197,8 @@ public class FAtom extends Atom {
 
 		if (S.isEmpty()) {
 
-			sbuf.append("TOP ");
+			sbuf.append(KRSSKeyword.top);
+			sbuf.append(KRSSKeyword.blank);
 
 		} else if (S.size() == 1) {
 
@@ -203,15 +206,18 @@ public class FAtom extends Atom {
 
 		} else {
 
-			sbuf.append("(AND ");
+			sbuf.append(KRSSKeyword.open);
+			sbuf.append(KRSSKeyword.and);
+			sbuf.append(KRSSKeyword.blank);
 
 			for (FAtom atom : S) {
-				sbuf.append(" ");
+				sbuf.append(KRSSKeyword.blank);
 				sbuf.append(atom.toString());
-				sbuf.append(" ");
+				sbuf.append(KRSSKeyword.blank);
 			}
 
-			sbuf.append(" )");
+			sbuf.append(KRSSKeyword.blank);
+			sbuf.append(KRSSKeyword.close);
 		}
 		return sbuf.toString();
 	}
@@ -262,11 +268,12 @@ public class FAtom extends Atom {
 
 		if (child != null) {
 
-			str = str.insert(0, "(SOME ");
+			str = str.insert(0,
+					(KRSSKeyword.open + KRSSKeyword.some + KRSSKeyword.blank));
 
-			str.append(" ");
+			str.append(KRSSKeyword.blank);
 			str.append(child.toString());
-			str.append(")");
+			str.append(KRSSKeyword.close);
 		}
 		return str.toString();
 	}

@@ -790,11 +790,13 @@ public class Translator {
 			for (String variable : goal.getVariables().keySet()) {
 
 				if (!goal.getVariables().get(variable).isSys()) {
-					out.print("(" + KRSSKeyword.define_concept + space);
+					out.print(KRSSKeyword.open + KRSSKeyword.define_concept
+							+ KRSSKeyword.blank);
 					out.print(variable + space);
 
 					out.print(goal.getVariables().get(variable).printS());
-					out.println(" ) ");
+					out.println(KRSSKeyword.blank + KRSSKeyword.close
+							+ KRSSKeyword.blank);
 				}
 			}
 

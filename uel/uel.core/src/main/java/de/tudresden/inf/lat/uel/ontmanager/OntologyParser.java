@@ -153,12 +153,13 @@ public class OntologyParser {
 							ss = new Integer((int) str.nval).toString();
 						}
 
-						s = "(".concat(ss);
+						s = KRSSKeyword.open.concat(ss);
 
 						/*
 						 * Now And can appear in AND
 						 */
-						if (s.equalsIgnoreCase("(" + KRSSKeyword.and))
+						if (s.equalsIgnoreCase(KRSSKeyword.open
+								+ KRSSKeyword.and))
 						// throw new RuntimeException(
 						// "AND cannot occur inside (AND ...) " + str);
 						{
@@ -168,7 +169,8 @@ public class OntologyParser {
 						/*
 						 * SOME was found inside AND
 						 */
-						if (s.equalsIgnoreCase("(" + KRSSKeyword.some)) {
+						if (s.equalsIgnoreCase(KRSSKeyword.open
+								+ KRSSKeyword.some)) {
 
 							token = str.nextToken();
 							if (token != StreamTokenizer.TT_WORD

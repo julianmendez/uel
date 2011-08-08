@@ -87,19 +87,21 @@ public class ReaderAndParser {
 							ss = new Integer((int) str.nval).toString();
 						}
 
-						s = "(".concat(ss);
+						s = KRSSKeyword.open.concat(ss);
 
 						/*
 						 * And cannot appear in AND
 						 */
-						if (s.equalsIgnoreCase("(" + KRSSKeyword.and))
+						if (s.equalsIgnoreCase(KRSSKeyword.open
+								+ KRSSKeyword.and))
 							throw new RuntimeException(
 									"AND cannot occur inside (AND ...) " + str);
 
 						/*
 						 * SOME was found inside AND
 						 */
-						if (s.equalsIgnoreCase("(" + KRSSKeyword.some)) {
+						if (s.equalsIgnoreCase(KRSSKeyword.open
+								+ KRSSKeyword.some)) {
 
 							token = str.nextToken();
 							if (token != StreamTokenizer.TT_WORD
@@ -168,7 +170,7 @@ public class ReaderAndParser {
 				 * Parsing SOME at top level
 				 */
 
-			} else if (s.equalsIgnoreCase("SOME")) {
+			} else if (s.equalsIgnoreCase(KRSSKeyword.some)) {
 
 				token = str.nextToken();
 
@@ -226,7 +228,7 @@ public class ReaderAndParser {
 				s = new Integer((int) str.nval).toString();
 			}
 
-			if (!s.equalsIgnoreCase("TOP")) {
+			if (!s.equalsIgnoreCase(KRSSKeyword.top)) {
 
 				a = new Atom(s, false, null);
 				result.put(a.toString(), a);

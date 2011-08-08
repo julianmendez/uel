@@ -2,6 +2,8 @@ package de.tudresden.inf.lat.uel.main;
 
 import java.util.HashMap;
 
+import de.tudresden.inf.lat.uel.parser.KRSSKeyword;
+
 /**
  * This class implements equation as two hash maps of atoms. It is used by Goal
  * and FAtom.
@@ -118,10 +120,11 @@ public class Equation {
 
 				FAtom a = (FAtom) left.get(key);
 				if (a.isVar()) {
-					sbuf.append("(");
-					sbuf.append("DEFINE-CONCEPT ");
+					sbuf.append(KRSSKeyword.open);
+					sbuf.append(KRSSKeyword.define_concept);
+					sbuf.append(KRSSKeyword.blank);
 					sbuf.append(a.toString());
-					sbuf.append(" ");
+					sbuf.append(KRSSKeyword.blank);
 
 				} else {
 					throw new RuntimeException("Cannot find a defined concept");
@@ -141,7 +144,10 @@ public class Equation {
 
 			} else {
 
-				sbuf.append(" (AND ");
+				sbuf.append(KRSSKeyword.blank);
+				sbuf.append(KRSSKeyword.open);
+				sbuf.append(KRSSKeyword.and);
+				sbuf.append(KRSSKeyword.blank);
 
 				for (String key : right.keySet()) {
 
@@ -149,13 +155,16 @@ public class Equation {
 
 					sbuf.append(a.toString());
 
-					sbuf.append(" ");
+					sbuf.append(KRSSKeyword.blank);
 				}
 
-				sbuf.append(") ");
+				sbuf.append(KRSSKeyword.close);
+				sbuf.append(KRSSKeyword.blank);
 
 			}
-			sbuf.append(" ) ");
+			sbuf.append(KRSSKeyword.blank);
+			sbuf.append(KRSSKeyword.close);
+			sbuf.append(KRSSKeyword.blank);
 			sbuf.append("\n");
 		} else {
 
@@ -194,20 +203,24 @@ public class Equation {
 	@Override
 	public String toString() {
 		StringBuffer sbuf = new StringBuffer();
-		sbuf.append("(define-concept ");
+		sbuf.append(KRSSKeyword.open);
+		sbuf.append(KRSSKeyword.define_concept);
+		sbuf.append(KRSSKeyword.blank);
 		sbuf.append(left.keySet().iterator().next());
 		if (right.keySet().size() > 1) {
-			sbuf.append(" (and");
+			sbuf.append(KRSSKeyword.blank);
+			sbuf.append(KRSSKeyword.open);
+			sbuf.append(KRSSKeyword.and);
 			for (String concept : right.keySet()) {
-				sbuf.append(" ");
+				sbuf.append(KRSSKeyword.blank);
 				sbuf.append(right.get(concept));
 			}
-			sbuf.append(")");
+			sbuf.append(KRSSKeyword.close);
 		} else if (right.keySet().size() == 1) {
-			sbuf.append(" ");
+			sbuf.append(KRSSKeyword.blank);
 			sbuf.append(right.get(right.keySet().iterator().next()));
 		}
-		sbuf.append(")");
+		sbuf.append(KRSSKeyword.close);
 		return sbuf.toString();
 	}
 
