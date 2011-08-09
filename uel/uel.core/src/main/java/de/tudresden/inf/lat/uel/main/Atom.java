@@ -1,6 +1,6 @@
 package de.tudresden.inf.lat.uel.main;
 
-import java.util.HashMap;
+import java.util.Map;
 
 /**
  * This class implement an object atom. Atom is a concept term, which is not a
@@ -22,7 +22,7 @@ public class Atom {
 	 * implements conjunction of atoms that is an argument for the role name.
 	 */
 
-	private HashMap<String, Atom> children;
+	private Map<String, Atom> children;
 
 	final private String name;
 
@@ -50,7 +50,7 @@ public class Atom {
 	 * @param r
 	 * @param argchild
 	 */
-	public Atom(String n, boolean r, HashMap<String, Atom> argchild) {
+	public Atom(String n, boolean r, Map<String, Atom> argchild) {
 
 		name = n;
 		children = argchild;
@@ -59,12 +59,12 @@ public class Atom {
 	}
 
 	/**
-	 * Returns the hash map representing a conjunction of atoms, which is an
-	 * argument for a role name in an existential atom.
+	 * Returns the map representing a conjunction of atoms, which is an argument
+	 * for a role name in an existential atom.
 	 * 
 	 * @return the hash map representing a conjunction of atoms
 	 */
-	public HashMap<String, Atom> getChildren() {
+	public Map<String, Atom> getChildren() {
 
 		if (root) {
 			return children;

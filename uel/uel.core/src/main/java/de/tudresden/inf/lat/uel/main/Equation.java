@@ -1,6 +1,7 @@
 package de.tudresden.inf.lat.uel.main;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import de.tudresden.inf.lat.uel.parser.KRSSKeyword;
 
@@ -17,12 +18,12 @@ public class Equation {
 	 * Left side of equation. Hash map with keys names of the atoms and values
 	 * the atoms.
 	 */
-	private HashMap<String, Atom> left;
+	private Map<String, Atom> left;
 	/**
 	 * Right side of equation Hash map with keys names of the atoms and values
 	 * the atoms.
 	 */
-	private HashMap<String, Atom> right;
+	private Map<String, Atom> right;
 
 	/**
 	 * Constructor initializes two hash maps for the left and right side of
@@ -43,7 +44,7 @@ public class Equation {
 	 * @param list2
 	 *            hash map with keys names and values atoms
 	 */
-	public Equation(HashMap<String, Atom> list1, HashMap<String, Atom> list2) {
+	public Equation(Map<String, Atom> list1, Map<String, Atom> list2) {
 		left = list1;
 		right = list2;
 	}
@@ -61,7 +62,7 @@ public class Equation {
 	 * 
 	 * @return the left side of the equation
 	 */
-	public HashMap<String, Atom> getLeft() {
+	public Map<String, Atom> getLeft() {
 
 		return left;
 	}
@@ -72,7 +73,7 @@ public class Equation {
 	 * 
 	 * @return the right side of the equation
 	 */
-	public HashMap<String, Atom> getRight() {
+	public Map<String, Atom> getRight() {
 
 		return right;
 	}
@@ -189,7 +190,7 @@ public class Equation {
 	 * 
 	 * @param list
 	 */
-	public void setLeft(HashMap<String, Atom> list) {
+	public void setLeft(Map<String, Atom> list) {
 
 		left = list;
 	}
@@ -202,7 +203,7 @@ public class Equation {
 	 * 
 	 * @param list
 	 */
-	public void setRight(HashMap<String, Atom> list) {
+	public void setRight(Map<String, Atom> list) {
 
 		right = list;
 	}
