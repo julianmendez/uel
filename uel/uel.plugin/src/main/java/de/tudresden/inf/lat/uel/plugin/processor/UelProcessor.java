@@ -6,12 +6,14 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
 import org.semanticweb.owlapi.io.OWLRendererException;
 import org.semanticweb.owlapi.model.OWLOntology;
 
+import de.tudresden.inf.lat.uel.main.Atom;
 import de.tudresden.inf.lat.uel.main.Equation;
 import de.tudresden.inf.lat.uel.main.Goal;
 import de.tudresden.inf.lat.uel.main.Sat4jSolver;
@@ -99,24 +101,35 @@ public class UelProcessor {
 	}
 
 	private Goal createGoal(Ontology ont, Set<String> input, Set<String> vars) {
-		StringBuffer sbuf = new StringBuffer();
+		List<Equation> equationList = new ArrayList<Equation>();
 		for (String cls : input) {
-			Equation eqDef = ont.getDefinition(cls);
-			Equation eqPrimDef = ont.getPrimitiveDefinition(cls);
-			Equation eq = eqDef != null ? eqDef : eqPrimDef;
-			if (eq != null) {
-				sbuf.append(eq.toString());
-				sbuf.append("\n");
+			Equation equation = ont.getDefinition(cls);
+			if (equation == null) {
+				equation = ont.getPrimitiveDefinition(cls);
+			}
+			if (equation != null) {
+				equationList.add(equation);
 			}
 		}
 
 		Goal ret = new Goal(ont);
 		try {
-			ret.initialize(sbuf.toString(), vars);
+			ret.initialize(equationList, createMainEquation(input), vars);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
+
 		return ret;
+	}
+
+	private Equation createMainEquation(Set<String> input) {
+		Iterator<String> inputIt = input.iterator();
+		Atom left = new Atom(inputIt.next(), false);
+		Atom right = new Atom(inputIt.next(), false);
+		Equation mainEquation = new Equation();
+		mainEquation.addToLeft(left);
+		mainEquation.addToRight(right);
+		return mainEquation;
 	}
 
 	public Ontology createOntology(OWLOntology owlOntology) {

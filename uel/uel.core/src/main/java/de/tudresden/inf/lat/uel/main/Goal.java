@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.Set;
 
 import de.tudresden.inf.lat.uel.ontmanager.Ontology;
-import de.tudresden.inf.lat.uel.parser.ReaderAndParser;
 
 /**
  * 
@@ -58,8 +57,6 @@ public class Goal {
 	private int nbrVar = 0;
 
 	private Ontology ontology = null;
-
-	private ReaderAndParser readerAndParser = new ReaderAndParser();
 
 	/**
 	 * variables is a hash map implementing all concept names which are treated
@@ -248,10 +245,13 @@ public class Goal {
 		}
 	}
 
-	private void initialize(String inputStr, boolean test, Writer output,
-			Set<String> vars) throws IOException {
+	private void initialize(List<Equation> list, Equation mainEq, boolean test,
+			Writer output, Set<String> vars) throws IOException {
 
-		readerAndParser.read(inputStr, this);
+		setMainEquation(mainEq);
+		for (Equation eq : list) {
+			addFlatten(eq);
+		}
 
 		if (test) {
 
@@ -295,9 +295,9 @@ public class Goal {
 		}
 	}
 
-	public void initialize(String inputStr, Set<String> vars)
-			throws IOException {
-		initialize(inputStr, false, null, vars);
+	public void initialize(List<Equation> equationList, Equation mainEq,
+			Set<String> vars) throws IOException {
+		initialize(equationList, mainEq, false, null, vars);
 	}
 
 	/**
@@ -310,15 +310,18 @@ public class Goal {
 	 * 
 	 * Then all variables, constants and existential atoms are identified.
 	 * 
-	 * @param inputStr
-	 *            input string
+	 * @param equationList
+	 *            list of equations
 	 * @param output
 	 *            output
+	 * @param vars
+	 *            set of variables
 	 * @throws IOException
 	 */
-	public void initializeWithTest(String inputStr, Writer output,
-			Set<String> vars) throws IOException {
-		initialize(inputStr, true, output, vars);
+	public void initializeWithTest(List<Equation> equationList,
+			Equation mainEq, Writer output, Set<String> vars)
+			throws IOException {
+		initialize(equationList, mainEq, true, output, vars);
 	}
 
 	/**

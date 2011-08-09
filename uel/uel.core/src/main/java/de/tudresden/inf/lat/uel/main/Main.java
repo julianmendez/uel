@@ -7,7 +7,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -48,6 +52,31 @@ public class Main {
 	public Main() {
 	}
 
+	private List<Equation> createEquations(Ontology ontology, Set<String> input)
+			throws IOException {
+		List<Equation> ret = new ArrayList<Equation>();
+		for (String cls : input) {
+			Equation equation = ontology.getDefinition(cls);
+			if (equation == null) {
+				equation = ontology.getPrimitiveDefinition(cls);
+			}
+			if (equation != null) {
+				ret.add(equation);
+			}
+		}
+		return ret;
+	}
+
+	private Equation createMainEquation(Set<String> input) {
+		Iterator<String> inputIt = input.iterator();
+		Atom left = new Atom(inputIt.next(), false);
+		Atom right = new Atom(inputIt.next(), false);
+		Equation mainEquation = new Equation();
+		mainEquation.addToLeft(left);
+		mainEquation.addToRight(right);
+		return mainEquation;
+	}
+
 	/**
 	 * This method is used by Main class if the options string is "-h" or "-H"
 	 * or if the options are not valid.
@@ -83,11 +112,19 @@ public class Main {
 		// FIXME this method uses an empty set of variables
 
 		String inputStr = readFile(filename);
+		Ontology ontology = new Ontology();
+		OntologyParser parser = new OntologyParser(ontology);
+		parser.loadOntology(inputStr);
+		Set<String> input = ontology.getDefinitionIds();
+		List<Equation> equationList = createEquations(ontology, input);
+		Equation mainEquation = createMainEquation(input);
+
 		if (unifier.getTest()) {
 			FileWriter output = new FileWriter(filename + ".TBox");
-			goal.initializeWithTest(inputStr, output, new HashSet<String>());
+			goal.initializeWithTest(equationList, mainEquation, output,
+					new HashSet<String>());
 		} else {
-			goal.initialize(inputStr, new HashSet<String>());
+			goal.initialize(equationList, mainEquation, new HashSet<String>());
 		}
 	}
 
