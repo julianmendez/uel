@@ -44,9 +44,16 @@ public class Equation {
 	 *            hash map with keys names and values atoms
 	 */
 	public Equation(HashMap<String, Atom> list1, HashMap<String, Atom> list2) {
-
 		left = list1;
 		right = list2;
+	}
+
+	public void addToLeft(Atom a) {
+		this.left.put(a.getName(), a);
+	}
+
+	public void addToRight(Atom a) {
+		this.right.put(a.getName(), a);
 	}
 
 	/**

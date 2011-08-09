@@ -236,21 +236,10 @@ public class FAtom extends Atom {
 	}
 
 	/**
-	 * If v is true, it defines this atom as a variable
-	 * 
-	 * @param v
-	 */
-	public void setVar(boolean v) {
-
-		var = v;
-
-	}
-
-	/**
 	 * Sets a flat atom to be a system variable. Used at Goal initialization.
 	 * 
 	 */
-	public void sysVar() {
+	public void setSysVar() {
 
 		if (!isRoot()) {
 			sys = true;
@@ -258,6 +247,17 @@ public class FAtom extends Atom {
 			throw new IllegalStateException(
 					"WARNING: cannot change existential atom  into a system variable");
 		}
+
+	}
+
+	/**
+	 * If v is true, it defines this atom as a variable
+	 * 
+	 * @param v
+	 */
+	public void setVar(boolean v) {
+
+		var = v;
 
 	}
 

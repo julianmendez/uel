@@ -27,6 +27,8 @@ import de.tudresden.inf.lat.uel.parser.ReaderAndParser;
 
 public class Goal {
 
+	public static final String VAR_PREFIX = "VAR";
+
 	/**
 	 * allatoms is a hash map implementing all flat atoms in the goal keys are
 	 * names and values are flat atoms
@@ -89,6 +91,10 @@ public class Goal {
 	 *            equation that needs to be flattened
 	 */
 	public void addFlatten(Equation e) {
+		addFlatten(e, false);
+	}
+
+	private void addFlatten(Equation e, boolean primitive) {
 
 		FAtom a;
 		Atom b = null;
@@ -149,9 +155,27 @@ public class Goal {
 
 			}
 
+			if (primitive) {
+				/*
+				 * Adding new variable to the right side
+				 */
+
+				FAtom var = new FAtom(VAR_PREFIX + this.nbrVar, false, true,
+						null);
+				this.nbrVar++;
+				var.setSysVar();
+				this.allatoms.put(var.getName(), var);
+				this.variables.put(var.getName(), var);
+				newequation.addToRight(var);
+			}
+
 			addEquation(newequation);
 
 		}
+	}
+
+	public void addPrimitiveFlatten(Equation e) {
+		addFlatten(e, true);
 	}
 
 	public Map<String, FAtom> getAllAtoms() {
@@ -212,9 +236,16 @@ public class Goal {
 
 			Equation eq = ontology.getDefinition(concept.toString());
 			addFlatten(eq);
-
 		}
+	}
 
+	public void importPrimitiveDefinition(Atom concept) {
+		if (ontology.containsPrimitiveDefinition(concept.toString())
+				&& !variables.containsKey(concept.toString())) {
+
+			Equation eq = ontology.getPrimitiveDefinition(concept.toString());
+			addPrimitiveFlatten(eq);
+		}
 	}
 
 	private void initialize(String inputStr, boolean test, Writer output,
@@ -237,7 +268,12 @@ public class Goal {
 
 		for (String key : variables.keySet()) {
 			variables.get(key).setVar(true);
-			variables.get(key).sysVar();
+			variables.get(key).setSysVar();
+		}
+
+		for (String var : vars) {
+			Atom a = new Atom(var, false);
+			importPrimitiveDefinition(a);
 		}
 
 		for (String key : allatoms.keySet()) {
@@ -256,7 +292,6 @@ public class Goal {
 
 				eatoms.put(key, a);
 			}
-
 		}
 	}
 
@@ -415,6 +450,8 @@ public class Goal {
 	@Override
 	public String toString() {
 		StringBuffer sbuf = new StringBuffer();
+		sbuf.append(this.mainEquation);
+		sbuf.append("\n");
 		for (Equation eq : getEquations()) {
 			sbuf.append(eq.toString());
 			sbuf.append("\n");
