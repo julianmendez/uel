@@ -27,10 +27,14 @@ import org.coode.owlapi.owlxml.renderer.OWLXMLRenderer;
 import org.coode.owlapi.rdf.rdfxml.RDFXMLRenderer;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.io.OWLRendererException;
+import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLClassExpression;
+import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 
 import de.tudresden.inf.lat.uel.ontmanager.Ontology;
 import de.tudresden.inf.lat.uel.plugin.processor.UelProcessor;
@@ -44,6 +48,8 @@ import de.uulm.ecs.ai.owlapi.krssrenderer.KRSS2OWLSyntaxRenderer;
 public class UelController implements ActionListener {
 
 	private static final String actionAcceptVar = "accept var";
+	private static final String actionCheckBoxClassName00 = "class 00 primitive";
+	private static final String actionCheckBoxClassName01 = "class 01 primitive";
 	private static final String actionClass00Selected = "class 00 selected";
 	private static final String actionClass01Selected = "class 01 selected";
 	private static final String actionFirst = "first";
@@ -126,6 +132,10 @@ public class UelController implements ActionListener {
 			executeActionLast();
 		} else if (cmd.equals(actionSave)) {
 			executeActionSave();
+		} else if (cmd.equals(actionCheckBoxClassName00)) {
+			executeActionOntology00Selected();
+		} else if (cmd.equals(actionCheckBoxClassName01)) {
+			executeActionOntology01Selected();
 		} else {
 			throw new IllegalStateException();
 		}
@@ -204,8 +214,9 @@ public class UelController implements ActionListener {
 			String ontologyId = this.ontologyList.get(ontologyIndex);
 			this.ontology00 = this.ontologyMap.get(ontologyId);
 
-			this.classList00 = getClassNames(this.owlOntologyMap
-					.get(ontologyId));
+			this.classList00 = getClassNames(
+					this.owlOntologyMap.get(ontologyId), getView()
+							.isClassName00Primitive());
 			List<String> classNameList = new ArrayList<String>();
 			for (LabelId className : this.classList00) {
 				classNameList.add(className.getLabel());
@@ -229,8 +240,9 @@ public class UelController implements ActionListener {
 			String ontologyId = this.ontologyList.get(ontologyIndex);
 			this.ontology01 = this.ontologyMap.get(ontologyId);
 
-			this.classList01 = getClassNames(this.owlOntologyMap
-					.get(ontologyId));
+			this.classList01 = getClassNames(
+					this.owlOntologyMap.get(ontologyId), getView()
+							.isClassName01Primitive());
 			List<String> classNameList = new ArrayList<String>();
 			for (LabelId className : this.classList01) {
 				classNameList.add(className.getLabel());
@@ -336,22 +348,44 @@ public class UelController implements ActionListener {
 		getView().getUnifierId().setText(initialUnifierIdText);
 	}
 
-	private List<LabelId> getClassNames(OWLOntology ontology) {
+	private List<LabelId> getClassNames(OWLOntology ontology, boolean primitive) {
 		OWLClass nothing = ontology.getOWLOntologyManager().getOWLDataFactory()
 				.getOWLNothing();
 		OWLClass thing = ontology.getOWLOntologyManager().getOWLDataFactory()
 				.getOWLThing();
 
 		Set<OWLClass> set = new TreeSet<OWLClass>();
-		set.addAll(ontology.getClassesInSignature());
+		set.addAll(getDefinedConcepts(ontology, primitive));
 		set.remove(nothing);
 		set.remove(thing);
 
 		List<LabelId> ret = new ArrayList<LabelId>();
-		ret.add(new LabelId(getShortForm(nothing), nothing.toStringID()));
-		ret.add(new LabelId(getShortForm(thing), thing.toStringID()));
 		for (OWLClass cls : set) {
 			ret.add(new LabelId(getShortForm(cls), getId(cls)));
+		}
+		return ret;
+	}
+
+	private Set<OWLClass> getDefinedConcepts(OWLOntology ontology,
+			boolean primitive) {
+		Set<OWLClass> ret = new HashSet<OWLClass>();
+		for (OWLAxiom axiom : ontology.getAxioms()) {
+			if (axiom instanceof OWLEquivalentClassesAxiom) {
+				OWLEquivalentClassesAxiom equivAxiom = (OWLEquivalentClassesAxiom) axiom;
+				for (OWLClassExpression classExpr : equivAxiom
+						.getClassExpressions()) {
+					if (classExpr instanceof OWLClass) {
+						ret.add((OWLClass) classExpr);
+					}
+				}
+			}
+			if (primitive && axiom instanceof OWLSubClassOfAxiom) {
+				OWLSubClassOfAxiom subClassAxiom = (OWLSubClassOfAxiom) axiom;
+				OWLClassExpression classExpr = subClassAxiom.getSubClass();
+				if (classExpr instanceof OWLClass) {
+					ret.add((OWLClass) classExpr);
+				}
+			}
 		}
 		return ret;
 	}
@@ -413,6 +447,10 @@ public class UelController implements ActionListener {
 		getView().addComboBoxClass01Listener(this, actionClass01Selected);
 		getView().addComboBoxOntology00Listener(this, actionOntology00Selected);
 		getView().addComboBoxOntology01Listener(this, actionOntology01Selected);
+		getView().addCheckBoxClassName00Listener(this,
+				actionCheckBoxClassName00);
+		getView().addCheckBoxClassName01Listener(this,
+				actionCheckBoxClassName01);
 
 		reset();
 		reloadOntologies();

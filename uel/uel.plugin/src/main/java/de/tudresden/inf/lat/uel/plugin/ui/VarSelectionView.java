@@ -190,8 +190,10 @@ class VarSelectionView extends JDialog {
 
 		this.listOfVariables = new ArrayList<LabelId>();
 		for (String str : getModel().getVariables()) {
-			this.listOfVariables
-					.add(new LabelId(getModel().getLabel(str), str));
+			if (!getModel().getOriginalVariables().contains(str)) {
+				this.listOfVariables.add(new LabelId(getModel().getLabel(str),
+						str));
+			}
 		}
 		Vector<String> vectorOfLabelsOfVariables = new Vector<String>();
 		for (LabelId elem : this.listOfVariables) {

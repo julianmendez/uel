@@ -20,6 +20,8 @@ public interface Message {
 	public static final String buttonSelectVariables = "Vars";
 	public static final String titleError = "Error";
 	public static final String tooltipAcceptVar = "use the selected entities as variables";
+	public static final String tooltipCheckBoxClassName00 = "shows also concepts with primitive definitions";
+	public static final String tooltipCheckBoxClassName01 = "shows also concepts with primitive definitions";
 	public static final String tooltipComboBoxClassName00 = "first class name to be selected";
 	public static final String tooltipComboBoxClassName01 = "second class name to be selected";
 	public static final String tooltipComboBoxOntology00 = "first ontology to be selected";

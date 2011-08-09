@@ -9,6 +9,7 @@ import java.util.List;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -34,6 +35,8 @@ public class UelView extends JPanel {
 	private JButton buttonSave = new JButton(Message.buttonSave);
 	private JButton buttonSelectVariables = new JButton(
 			Message.buttonSelectVariables);
+	private JCheckBox checkBoxClassName00 = new JCheckBox();
+	private JCheckBox checkBoxClassName01 = new JCheckBox();
 	private JComboBox listClassName00 = new JComboBox();
 	private JComboBox listClassName01 = new JComboBox();
 	private DefaultListModel listmodel = new DefaultListModel();
@@ -143,6 +146,32 @@ public class UelView extends JPanel {
 		this.buttonSelectVariables.setActionCommand(actionCommand);
 	}
 
+	public void addCheckBoxClassName00Listener(ActionListener listener,
+			String actionCommand) {
+		if (listener == null) {
+			throw new IllegalArgumentException("Null argument.");
+		}
+		if (actionCommand == null) {
+			throw new IllegalArgumentException("Null argument.");
+		}
+
+		this.checkBoxClassName00.addActionListener(listener);
+		this.checkBoxClassName00.setActionCommand(actionCommand);
+	}
+
+	public void addCheckBoxClassName01Listener(ActionListener listener,
+			String actionCommand) {
+		if (listener == null) {
+			throw new IllegalArgumentException("Null argument.");
+		}
+		if (actionCommand == null) {
+			throw new IllegalArgumentException("Null argument.");
+		}
+
+		this.checkBoxClassName01.addActionListener(listener);
+		this.checkBoxClassName01.setActionCommand(actionCommand);
+	}
+
 	public void addComboBoxClass00Listener(ActionListener listener,
 			String actionCommand) {
 		if (listener == null) {
@@ -220,6 +249,10 @@ public class UelView extends JPanel {
 		this.listOntologyName00.setMinimumSize(new Dimension(112, 28));
 		ret.add(this.listOntologyName00);
 
+		this.checkBoxClassName00
+				.setToolTipText(Message.tooltipCheckBoxClassName00);
+		ret.add(this.checkBoxClassName00);
+
 		this.listClassName00.setToolTipText(Message.tooltipComboBoxClassName00);
 		this.listClassName00.setPreferredSize(new Dimension(280, 28));
 		this.listClassName00.setMinimumSize(new Dimension(112, 28));
@@ -235,6 +268,10 @@ public class UelView extends JPanel {
 		this.listOntologyName01.setPreferredSize(new Dimension(280, 28));
 		this.listOntologyName01.setMinimumSize(new Dimension(112, 28));
 		ret.add(this.listOntologyName01);
+
+		this.checkBoxClassName00
+				.setToolTipText(Message.tooltipCheckBoxClassName01);
+		ret.add(this.checkBoxClassName01);
 
 		this.listClassName01.setToolTipText(Message.tooltipComboBoxClassName01);
 		this.listClassName01.setPreferredSize(new Dimension(280, 28));
@@ -319,6 +356,14 @@ public class UelView extends JPanel {
 	public void init() {
 		setLayout(new GridBagLayout());
 		add(createControlPanel());
+	}
+
+	public boolean isClassName00Primitive() {
+		return this.checkBoxClassName00.isSelected();
+	}
+
+	public boolean isClassName01Primitive() {
+		return this.checkBoxClassName01.isSelected();
 	}
 
 	public void reloadClassNames00(List<String> list) {
