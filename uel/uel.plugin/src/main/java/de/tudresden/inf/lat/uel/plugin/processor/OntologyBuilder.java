@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import org.semanticweb.owlapi.model.OWLAxiom;
+import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
@@ -51,6 +51,54 @@ public class OntologyBuilder {
 		return ret;
 	}
 
+	private Map<OWLClass, OWLClassExpression> getDefinitions(
+			OWLOntology owlOntology) {
+		Map<OWLClass, OWLClassExpression> definitions = new HashMap<OWLClass, OWLClassExpression>();
+		Set<OWLEquivalentClassesAxiom> setOfAxioms = owlOntology
+				.getAxioms(AxiomType.EQUIVALENT_CLASSES);
+		for (OWLEquivalentClassesAxiom axiom : setOfAxioms) {
+			Set<OWLClassExpression> operands = axiom.getClassExpressions();
+			if (operands.size() == 2) {
+				Iterator<OWLClassExpression> it = operands.iterator();
+				OWLClassExpression first = it.next();
+				OWLClassExpression second = it.next();
+				if (!(first instanceof OWLClass) && second instanceof OWLClass) {
+					OWLClassExpression other = first;
+					first = second;
+					second = other;
+				}
+				if (first instanceof OWLClass && second instanceof OWLClass) {
+					logger.warning("Definition '" + axiom
+							+ "' is ambiguous, including only '" + first
+							+ "':='" + second);
+				}
+				if (first instanceof OWLClass) {
+					definitions.put((OWLClass) first, second);
+				}
+			}
+		}
+		return definitions;
+	}
+
+	private Map<OWLClass, Set<OWLClassExpression>> getPrimitiveDefinitions(
+			OWLOntology owlOntology) {
+		Map<OWLClass, Set<OWLClassExpression>> ret = new HashMap<OWLClass, Set<OWLClassExpression>>();
+		Set<OWLSubClassOfAxiom> setOfAxioms = owlOntology
+				.getAxioms(AxiomType.SUBCLASS_OF);
+		for (OWLSubClassOfAxiom axiom : setOfAxioms) {
+			if (axiom.getSubClass() instanceof OWLClass) {
+				OWLClass definiendum = (OWLClass) axiom.getSubClass();
+				Set<OWLClassExpression> definiensSet = ret.get(definiendum);
+				if (definiensSet == null) {
+					definiensSet = new HashSet<OWLClassExpression>();
+					ret.put(definiendum, definiensSet);
+				}
+				definiensSet.add(axiom.getSuperClass());
+			}
+		}
+		return ret;
+	}
+
 	@Override
 	public int hashCode() {
 		return this.ontology.hashCode();
@@ -61,12 +109,14 @@ public class OntologyBuilder {
 			throw new IllegalArgumentException("Null argument.");
 		}
 
-		for (OWLAxiom axiom : owlOntology.getAxioms()) {
-			if (axiom instanceof OWLSubClassOfAxiom) {
-				processSubClassOf((OWLSubClassOfAxiom) axiom);
-			} else if (axiom instanceof OWLEquivalentClassesAxiom) {
-				processEquivalentClasses((OWLEquivalentClassesAxiom) axiom);
-			}
+		Map<OWLClass, OWLClassExpression> definitions = getDefinitions(owlOntology);
+		for (OWLClass key : definitions.keySet()) {
+			processDefinition(key, definitions.get(key));
+		}
+
+		Map<OWLClass, Set<OWLClassExpression>> primitiveDefinitions = getPrimitiveDefinitions(owlOntology);
+		for (OWLClass key : primitiveDefinitions.keySet()) {
+			processPrimitiveDefinition(key, primitiveDefinitions.get(key));
 		}
 
 		for (OWLClass cls : owlOntology.getClassesInSignature()) {
@@ -76,6 +126,7 @@ public class OntologyBuilder {
 				Atom atom = new Atom(id, false);
 				this.ontology.putPrimitiveDefinition(atom.getName(),
 						makeEquation(atom, new HashSet<Atom>()));
+				processClass(cls);
 			}
 		}
 	}
@@ -112,41 +163,17 @@ public class OntologyBuilder {
 		} else if (classExpr instanceof OWLObjectSomeValuesFrom) {
 			ret = processSomeValuesRestriction((OWLObjectSomeValuesFrom) classExpr);
 		} else {
-			logger.info("Ignoring class expression '" + classExpr + "'.");
+			logger.fine("Ignoring class expression '" + classExpr + "'.");
 		}
 		return ret;
 	}
 
-	private void processEquivalentClasses(OWLEquivalentClassesAxiom axiom) {
-		Set<OWLClassExpression> elements = axiom.getClassExpressions();
-		if (elements.size() == 2) {
-
-			Iterator<OWLClassExpression> it = axiom.getClassExpressions()
-					.iterator();
-			OWLClassExpression class00 = it.next();
-			OWLClassExpression class01 = it.next();
-			if (class00 instanceof OWLClass && class01 instanceof OWLClass) {
-				logger.warning("Definition '" + axiom
-						+ "' is ambiguous, assuming '" + class00 + "':='"
-						+ class01 + "'.");
-			}
-			if (!(class00 instanceof OWLClass) && class01 instanceof OWLClass) {
-				OWLClassExpression t = class00;
-				class00 = class01;
-				class01 = t;
-			}
-			if (class00 instanceof OWLClass) {
-				Atom definiendum = processClassExpression(class00).iterator()
-						.next();
-				Set<Atom> definiens = processClassExpression(class01);
-				this.ontology.putDefinition(definiendum.getName(),
-						makeEquation(definiendum, definiens));
-
-			} else {
-				processClassExpression(class00);
-				processClassExpression(class01);
-			}
-		}
+	private void processDefinition(OWLClass definiendum,
+			OWLClassExpression definiens) {
+		Set<Atom> left = processClass(definiendum);
+		Set<Atom> right = processClassExpression(definiens);
+		this.ontology.putDefinition(left.iterator().next().toString(),
+				makeEquation(left.iterator().next(), right));
 	}
 
 	private Set<Atom> processIntersection(OWLObjectIntersectionOf intersection) {
@@ -155,6 +182,18 @@ public class OntologyBuilder {
 			ret.addAll(processClassExpression(operand));
 		}
 		return ret;
+	}
+
+	private void processPrimitiveDefinition(OWLClass definiendum,
+			Set<OWLClassExpression> definiensSet) {
+		Set<Atom> subClassSet = processClass(definiendum);
+		Set<Atom> superClassSet = new HashSet<Atom>();
+		for (OWLClassExpression clsExpr : definiensSet) {
+			superClassSet.addAll(processClassExpression(clsExpr));
+		}
+		this.ontology.putPrimitiveDefinition(subClassSet.iterator().next()
+				.toString(),
+				makeEquation(subClassSet.iterator().next(), superClassSet));
 	}
 
 	private Set<Atom> processSomeValuesRestriction(
@@ -168,21 +207,10 @@ public class OntologyBuilder {
 		}
 		Atom prop = new Atom(someValuesRestriction.getProperty()
 				.getNamedProperty().toStringID(), true);
-		Atom newAtom = new Atom(prop.getName(), true, map);
+		Atom newAtom = new Atom(prop.toString(), true, map);
 		this.ontology.putAtom(newAtom.toString(), newAtom);
 		ret.add(newAtom);
 		return ret;
-	}
-
-	private void processSubClassOf(OWLSubClassOfAxiom axiom) {
-		Set<Atom> subClassSet = processClassExpression(axiom.getSubClass());
-		Set<Atom> superClassSet = processClassExpression(axiom.getSuperClass());
-
-		if (axiom.getSubClass() instanceof OWLClass) {
-			this.ontology.putPrimitiveDefinition(subClassSet.iterator().next()
-					.getName(),
-					makeEquation(subClassSet.iterator().next(), superClassSet));
-		}
 	}
 
 }
