@@ -33,6 +33,12 @@ public class OntologyBuilder {
 
 	private Ontology ontology = null;
 
+	/**
+	 * Constructs a new ontology builder.
+	 * 
+	 * @param ontology
+	 *            ontology to build
+	 */
 	public OntologyBuilder(Ontology ontology) {
 		if (ontology == null) {
 			throw new IllegalArgumentException("Null argument.");
@@ -53,7 +59,7 @@ public class OntologyBuilder {
 
 	private Map<OWLClass, OWLClassExpression> getDefinitions(
 			OWLOntology owlOntology) {
-		Map<OWLClass, OWLClassExpression> definitions = new HashMap<OWLClass, OWLClassExpression>();
+		Map<OWLClass, OWLClassExpression> ret = new HashMap<OWLClass, OWLClassExpression>();
 		Set<OWLEquivalentClassesAxiom> setOfAxioms = owlOntology
 				.getAxioms(AxiomType.EQUIVALENT_CLASSES);
 		for (OWLEquivalentClassesAxiom axiom : setOfAxioms) {
@@ -73,11 +79,11 @@ public class OntologyBuilder {
 							+ "':='" + second);
 				}
 				if (first instanceof OWLClass) {
-					definitions.put((OWLClass) first, second);
+					ret.put((OWLClass) first, second);
 				}
 			}
 		}
-		return definitions;
+		return ret;
 	}
 
 	private Map<OWLClass, Set<OWLClassExpression>> getPrimitiveDefinitions(
@@ -104,6 +110,12 @@ public class OntologyBuilder {
 		return this.ontology.hashCode();
 	}
 
+	/**
+	 * Loads an OWL ontology.
+	 * 
+	 * @param owlOntology
+	 *            OWL ontology
+	 */
 	public void loadOntology(OWLOntology owlOntology) {
 		if (owlOntology == null) {
 			throw new IllegalArgumentException("Null argument.");
@@ -140,10 +152,10 @@ public class OntologyBuilder {
 			rightMap.put(atom.toString(), atom);
 		}
 
-		Equation equation = new Equation();
-		equation.setLeft(leftMap);
-		equation.setRight(rightMap);
-		return equation;
+		Equation ret = new Equation();
+		ret.setLeft(leftMap);
+		ret.setRight(rightMap);
+		return ret;
 	}
 
 	private Set<Atom> processClass(OWLClass cls) {
