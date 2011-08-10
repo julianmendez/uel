@@ -175,6 +175,23 @@ public class Goal {
 		addFlatten(e, true);
 	}
 
+	@Override
+	public boolean equals(Object o) {
+		boolean ret = false;
+		if (o instanceof Goal) {
+			Goal other = (Goal) o;
+			ret = this.allatoms.equals(other.allatoms)
+					&& this.constants.equals(other.constants)
+					&& this.eatoms.equals(other.eatoms)
+					&& this.equations.equals(other.equations)
+					&& this.mainEquation.equals(other.mainEquation)
+					&& this.variables.equals(other.variables)
+					&& this.ontology.equals(other.ontology)
+					&& this.nbrVar == other.nbrVar;
+		}
+		return ret;
+	}
+
 	public Map<String, FAtom> getAllAtoms() {
 		return allatoms;
 	}
@@ -215,6 +232,11 @@ public class Goal {
 
 	public Map<String, FAtom> getVariables() {
 		return variables;
+	}
+
+	@Override
+	public int hashCode() {
+		return this.ontology.hashCode() + 31 * this.mainEquation.hashCode();
 	}
 
 	/**

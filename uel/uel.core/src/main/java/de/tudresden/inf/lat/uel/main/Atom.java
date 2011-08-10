@@ -24,9 +24,9 @@ public class Atom {
 
 	private Map<String, Atom> children;
 
-	final private String name;
+	private final String name;
 
-	final private boolean root;
+	private final boolean root;
 
 	/**
 	 * Constructor used by the constructor of FAtom. n is a name of an atom and
@@ -58,6 +58,17 @@ public class Atom {
 
 	}
 
+	@Override
+	public boolean equals(Object o) {
+		boolean ret = false;
+		if (o instanceof Atom) {
+			Atom other = (Atom) o;
+			ret = this.name.equals(other.name) && this.root == other.root
+					&& this.children.equals(other.children);
+		}
+		return ret;
+	}
+
 	/**
 	 * Returns the map representing a conjunction of atoms, which is an argument
 	 * for a role name in an existential atom.
@@ -86,6 +97,11 @@ public class Atom {
 	public String getName() {
 
 		return name;
+	}
+
+	@Override
+	public int hashCode() {
+		return this.name.hashCode();
 	}
 
 	/**

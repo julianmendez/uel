@@ -50,6 +50,18 @@ public class Literal {
 		kind = letter;
 	}
 
+	@Override
+	public boolean equals(Object o) {
+		boolean ret = false;
+		if (o instanceof Literal) {
+			Literal other = (Literal) o;
+			ret = this.value == other.value && this.kind == other.kind
+					&& this.first.equals(other.first)
+					&& this.second.equals(other.second);
+		}
+		return ret;
+	}
+
 	public String getFirst() {
 		return first;
 
@@ -66,6 +78,11 @@ public class Literal {
 	 */
 	public boolean getValue() {
 		return value;
+	}
+
+	@Override
+	public int hashCode() {
+		return this.first.hashCode() + 31 * this.second.hashCode();
 	}
 
 	public boolean isOrder() {

@@ -30,10 +30,8 @@ public class Equation {
 	 * equation.
 	 */
 	public Equation() {
-
 		left = new HashMap<String, Atom>();
 		right = new HashMap<String, Atom>();
-
 	}
 
 	/**
@@ -57,13 +55,23 @@ public class Equation {
 		this.right.put(a.getName(), a);
 	}
 
+	@Override
+	public boolean equals(Object o) {
+		boolean ret = false;
+		if (o instanceof Equation) {
+			Equation other = (Equation) o;
+			ret = this.left.equals(other.left)
+					&& this.right.equals(other.right);
+		}
+		return ret;
+	}
+
 	/**
 	 * Returns the left side of the equation as the hash map of names and atoms.
 	 * 
 	 * @return the left side of the equation
 	 */
 	public Map<String, Atom> getLeft() {
-
 		return left;
 	}
 
@@ -74,8 +82,12 @@ public class Equation {
 	 * @return the right side of the equation
 	 */
 	public Map<String, Atom> getRight() {
-
 		return right;
+	}
+
+	@Override
+	public int hashCode() {
+		return this.left.hashCode() + 31 * this.right.hashCode();
 	}
 
 	/**

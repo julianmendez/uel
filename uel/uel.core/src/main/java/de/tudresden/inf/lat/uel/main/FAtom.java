@@ -134,6 +134,20 @@ public class FAtom extends Atom {
 
 	}
 
+	@Override
+	public boolean equals(Object o) {
+		boolean ret = false;
+		if (o instanceof FAtom) {
+			FAtom other = (FAtom) o;
+			ret = this.sys == other.sys && this.var == other.var
+					&& this.S.equals(other.S);
+			ret = ret
+					&& ((this.child == null && other.child == null) || (this.child != null && this.child
+							.equals(other.child)));
+		}
+		return ret;
+	}
+
 	/**
 	 * Returns an argument in the flat atom, which is an existential
 	 * restriction. Otherwise it returns null.
@@ -150,6 +164,11 @@ public class FAtom extends Atom {
 
 	public Collection<FAtom> getS() {
 		return this.S;
+	}
+
+	@Override
+	public int hashCode() {
+		return this.S.hashCode();
 	}
 
 	/**
@@ -263,9 +282,7 @@ public class FAtom extends Atom {
 
 	@Override
 	public String toString() {
-
 		StringBuilder str = new StringBuilder(this.getName());
-
 		if (child != null) {
 
 			str = str.insert(0,

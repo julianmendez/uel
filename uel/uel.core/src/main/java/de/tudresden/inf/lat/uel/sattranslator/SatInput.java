@@ -10,7 +10,6 @@ import java.util.TreeSet;
  * An object of this class represents a SAT input file.
  * 
  * @author Julian Mendez
- * 
  */
 public class SatInput {
 
@@ -62,6 +61,22 @@ public class SatInput {
 	public void clear() {
 		this.clauses.clear();
 		this.lastId = 0;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		boolean ret = false;
+		if (o instanceof SatInput) {
+			SatInput other = (SatInput) o;
+			ret = this.clauses.equals(other.clauses)
+					&& this.lastId == other.lastId;
+		}
+		return ret;
+	}
+
+	@Override
+	public int hashCode() {
+		return this.clauses.hashCode();
 	}
 
 	@Override

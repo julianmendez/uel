@@ -24,6 +24,25 @@ public class OntologyParser {
 		this.ontology = ontology;
 	}
 
+	@Override
+	public boolean equals(Object o) {
+		boolean ret = false;
+		if (o instanceof OntologyParser) {
+			OntologyParser other = (OntologyParser) o;
+			ret = this.ontology.equals(other.ontology);
+		}
+		return ret;
+	}
+
+	/*
+	 * parsing the right side of the equation:
+	 */
+
+	@Override
+	public int hashCode() {
+		return this.ontology.hashCode();
+	}
+
 	/**
 	 * Method to load ontology from a reader containing definitions in the krss
 	 * format.
@@ -100,10 +119,6 @@ public class OntologyParser {
 		}
 
 	}
-
-	/*
-	 * parsing the right side of the equation:
-	 */
 
 	private HashMap<String, Atom> parse(StreamTokenizer str) throws IOException {
 
@@ -394,6 +409,11 @@ public class OntologyParser {
 
 		ontology.putPrimitiveDefinition(concept, equation);
 
+	}
+
+	@Override
+	public String toString() {
+		return this.ontology.toString();
 	}
 
 }
