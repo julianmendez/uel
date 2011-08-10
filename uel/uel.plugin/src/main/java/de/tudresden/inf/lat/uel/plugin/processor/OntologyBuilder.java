@@ -16,9 +16,9 @@ import org.semanticweb.owlapi.model.OWLObjectSomeValuesFrom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 
-import de.tudresden.inf.lat.uel.main.Atom;
-import de.tudresden.inf.lat.uel.main.Equation;
-import de.tudresden.inf.lat.uel.ontmanager.Ontology;
+import de.tudresden.inf.lat.uel.core.type.Atom;
+import de.tudresden.inf.lat.uel.core.type.Equation;
+import de.tudresden.inf.lat.uel.core.type.Ontology;
 
 /**
  * An object implementing this class can build a UEL ontology using an OWL

@@ -1,8 +1,7 @@
-package de.tudresden.inf.lat.uel.main;
+package de.tudresden.inf.lat.uel.plugin.main;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,9 +14,18 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import de.tudresden.inf.lat.uel.infhandler.OutputStreamHandler;
-import de.tudresden.inf.lat.uel.ontmanager.Ontology;
-import de.tudresden.inf.lat.uel.ontmanager.OntologyParser;
+import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyCreationException;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
+
+import de.tudresden.inf.lat.uel.core.log.OutputStreamHandler;
+import de.tudresden.inf.lat.uel.core.sat.MiniSatSolver;
+import de.tudresden.inf.lat.uel.core.type.Atom;
+import de.tudresden.inf.lat.uel.core.type.Equation;
+import de.tudresden.inf.lat.uel.core.type.Goal;
+import de.tudresden.inf.lat.uel.core.type.Ontology;
+import de.tudresden.inf.lat.uel.plugin.processor.OntologyBuilder;
 
 /**
  * This class starts a unifier from the command line.
@@ -25,7 +33,7 @@ import de.tudresden.inf.lat.uel.ontmanager.OntologyParser;
  * @author Barbara Morawska
  * 
  */
-public class Main {
+public class MainConsole {
 
 	private static final Logger logger = Logger.getLogger(Main.class.getName());
 	private static final String unifSuffix = ".unif";
@@ -44,12 +52,12 @@ public class Main {
 	 */
 
 	public static void main(String[] args) throws IOException {
-		(new Main()).run(args);
+		(new MainConsole()).run(args);
 	}
 
 	private int maxNbr = 0;
 
-	public Main() {
+	public MainConsole() {
 	}
 
 	private List<Equation> createEquations(Ontology ontology, Set<String> input)
@@ -111,10 +119,7 @@ public class Main {
 			throws IOException {
 		// FIXME this method uses an empty set of variables
 
-		String inputStr = readFile(filename);
-		Ontology ontology = new Ontology();
-		OntologyParser parser = new OntologyParser(ontology);
-		parser.loadOntology(inputStr);
+		Ontology ontology = loadOntology(new File(filename));
 		Set<String> input = ontology.getDefinitionIds();
 		List<Equation> equationList = createEquations(ontology, input);
 		Equation mainEquation = createMainEquation(input);
@@ -126,6 +131,22 @@ public class Main {
 		} else {
 			goal.initialize(equationList, mainEquation, new HashSet<String>());
 		}
+	}
+
+	private Ontology loadOntology(File file) throws IOException {
+		OWLOntologyManager owlOntologyManager = OWLManager
+				.createOWLOntologyManager();
+		OWLOntology owlOntology = null;
+		try {
+			owlOntology = owlOntologyManager
+					.loadOntologyFromOntologyDocument(file);
+		} catch (OWLOntologyCreationException e) {
+			throw new IOException(e);
+		}
+		Ontology ret = new Ontology();
+		OntologyBuilder builder = new OntologyBuilder(ret);
+		builder.loadOntology(owlOntology);
+		return ret;
 	}
 
 	/**
@@ -181,20 +202,6 @@ public class Main {
 
 	}
 
-	public String readFile(String filename) throws IOException {
-		BufferedReader reader = new BufferedReader(new FileReader(filename));
-		StringBuffer sbuf = new StringBuffer();
-		String line = "";
-		while (line != null) {
-			line = reader.readLine();
-			if (line != null) {
-				sbuf.append(line);
-				sbuf.append("\n");
-			}
-		}
-		return sbuf.toString();
-	}
-
 	public void run(String[] args) throws IOException {
 		Unifier unifier = new Unifier(new MiniSatSolver());
 		Ontology ontology = new Ontology();
@@ -212,9 +219,7 @@ public class Main {
 		} else if (args.length > 1 && args[0].startsWith("-")) {
 
 			if (args.length == 3) {
-				OntologyParser parser = new OntologyParser(ontology);
-				parser.loadOntology(readFile(args[2]));
-
+				ontology = loadOntology(new File(args[2]));
 			}
 
 			String argument = args[0].substring(1);
@@ -266,8 +271,7 @@ public class Main {
 			}
 
 		} else if (args.length == 2 && !args[0].startsWith("-")) {
-			OntologyParser parser = new OntologyParser(ontology);
-			parser.loadOntology(readFile(args[1]));
+			ontology = loadOntology(new File(args[1]));
 
 			initialize(goal, unifier, args[0]);
 			unifier.unify0(goal);

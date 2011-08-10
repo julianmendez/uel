@@ -1,9 +1,7 @@
-package de.tudresden.inf.lat.uel.main;
+package de.tudresden.inf.lat.uel.core.type;
 
 import java.util.ArrayList;
 import java.util.Collection;
-
-import de.tudresden.inf.lat.uel.parser.KRSSKeyword;
 
 /**
  * 

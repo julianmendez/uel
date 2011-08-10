@@ -1,4 +1,4 @@
-package de.tudresden.inf.lat.uel.sattranslator;
+package de.tudresden.inf.lat.uel.core.sat;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -16,11 +16,11 @@ import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import de.tudresden.inf.lat.uel.main.Equation;
-import de.tudresden.inf.lat.uel.main.FAtom;
-import de.tudresden.inf.lat.uel.main.Goal;
-import de.tudresden.inf.lat.uel.main.Literal;
-import de.tudresden.inf.lat.uel.parser.KRSSKeyword;
+import de.tudresden.inf.lat.uel.core.type.Equation;
+import de.tudresden.inf.lat.uel.core.type.FAtom;
+import de.tudresden.inf.lat.uel.core.type.Goal;
+import de.tudresden.inf.lat.uel.core.type.KRSSKeyword;
+import de.tudresden.inf.lat.uel.core.type.Literal;
 
 /**
  * 

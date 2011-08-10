@@ -36,7 +36,7 @@ import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 
-import de.tudresden.inf.lat.uel.ontmanager.Ontology;
+import de.tudresden.inf.lat.uel.core.type.Ontology;
 import de.tudresden.inf.lat.uel.plugin.processor.UelProcessor;
 import de.uulm.ecs.ai.owlapi.krssrenderer.KRSS2OWLSyntaxRenderer;
 

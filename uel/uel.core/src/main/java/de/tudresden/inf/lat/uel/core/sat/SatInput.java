@@ -1,4 +1,4 @@
-package de.tudresden.inf.lat.uel.sattranslator;
+package de.tudresden.inf.lat.uel.core.sat;
 
 import java.util.Collection;
 import java.util.HashSet;

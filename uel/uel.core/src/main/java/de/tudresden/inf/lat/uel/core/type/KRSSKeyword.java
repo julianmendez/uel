@@ -1,4 +1,4 @@
-package de.tudresden.inf.lat.uel.parser;
+package de.tudresden.inf.lat.uel.core.type;
 
 public interface KRSSKeyword {
 

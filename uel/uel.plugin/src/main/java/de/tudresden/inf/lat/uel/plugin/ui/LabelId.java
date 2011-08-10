@@ -21,7 +21,7 @@ class LabelId implements Comparable<LabelId> {
 
 	@Override
 	public int compareTo(LabelId o) {
-		if (o== null) {
+		if (o == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
 

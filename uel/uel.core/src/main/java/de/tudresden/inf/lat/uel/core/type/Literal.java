@@ -1,4 +1,4 @@
-package de.tudresden.inf.lat.uel.main;
+package de.tudresden.inf.lat.uel.core.type;
 
 /**
  * This class implements dis-subsumptions between atoms in the goal and order

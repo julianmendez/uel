@@ -1,12 +1,9 @@
-package de.tudresden.inf.lat.uel.ontmanager;
+package de.tudresden.inf.lat.uel.core.type;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
-
-import de.tudresden.inf.lat.uel.main.Atom;
-import de.tudresden.inf.lat.uel.main.Equation;
 
 /**
  * An ontology is a set of definitions.

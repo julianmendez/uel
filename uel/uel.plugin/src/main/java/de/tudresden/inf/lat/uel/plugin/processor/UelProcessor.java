@@ -10,19 +10,16 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.semanticweb.owlapi.io.OWLRendererException;
 import org.semanticweb.owlapi.model.OWLOntology;
 
-import de.tudresden.inf.lat.uel.main.Atom;
-import de.tudresden.inf.lat.uel.main.Equation;
-import de.tudresden.inf.lat.uel.main.Goal;
-import de.tudresden.inf.lat.uel.main.Sat4jSolver;
-import de.tudresden.inf.lat.uel.main.Solver;
-import de.tudresden.inf.lat.uel.ontmanager.Ontology;
-import de.tudresden.inf.lat.uel.ontmanager.OntologyParser;
-import de.tudresden.inf.lat.uel.sattranslator.SatInput;
-import de.tudresden.inf.lat.uel.sattranslator.Translator;
-import de.uulm.ecs.ai.owlapi.krssrenderer.KRSS2OWLSyntaxRenderer;
+import de.tudresden.inf.lat.uel.core.sat.Sat4jSolver;
+import de.tudresden.inf.lat.uel.core.sat.SatInput;
+import de.tudresden.inf.lat.uel.core.sat.Solver;
+import de.tudresden.inf.lat.uel.core.sat.Translator;
+import de.tudresden.inf.lat.uel.core.type.Atom;
+import de.tudresden.inf.lat.uel.core.type.Equation;
+import de.tudresden.inf.lat.uel.core.type.Goal;
+import de.tudresden.inf.lat.uel.core.type.Ontology;
 
 /**
  * This class connects with UEL.
@@ -137,24 +134,9 @@ public class UelProcessor {
 			throw new IllegalArgumentException("Null argument.");
 		}
 
-		StringWriter writer = new StringWriter();
-		KRSS2OWLSyntaxRenderer renderer = new KRSS2OWLSyntaxRenderer(
-				owlOntology.getOWLOntologyManager());
-		try {
-			renderer.render(owlOntology, writer);
-		} catch (OWLRendererException e) {
-			throw new RuntimeException(e);
-		}
-		writer.flush();
-		String inputStr = writer.toString();
-
 		Ontology ret = new Ontology();
-		try {
-			OntologyParser parser = new OntologyParser(ret);
-			parser.loadOntology(inputStr);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+		OntologyBuilder builder = new OntologyBuilder(ret);
+		builder.loadOntology(owlOntology);
 		return ret;
 	}
 

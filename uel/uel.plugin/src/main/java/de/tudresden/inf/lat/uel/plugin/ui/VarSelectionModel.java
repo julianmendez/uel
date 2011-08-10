@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import de.tudresden.inf.lat.uel.ontmanager.Ontology;
+import de.tudresden.inf.lat.uel.core.type.Ontology;
 
 class VarSelectionModel {
 
@@ -15,7 +15,6 @@ class VarSelectionModel {
 	private Ontology ontology = null;
 	private Set<String> setOfConstants = new TreeSet<String>();
 	private Set<String> setOfOriginalVariables = new TreeSet<String>();
-
 	private Set<String> setOfVariables = new TreeSet<String>();
 
 	public VarSelectionModel(Set<String> originalVariables,

@@ -1,4 +1,4 @@
-package de.tudresden.inf.lat.uel.main;
+package de.tudresden.inf.lat.uel.core.type;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -9,8 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import de.tudresden.inf.lat.uel.ontmanager.Ontology;
 
 /**
  * 

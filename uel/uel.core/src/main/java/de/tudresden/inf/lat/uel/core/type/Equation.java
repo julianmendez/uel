@@ -1,9 +1,7 @@
-package de.tudresden.inf.lat.uel.main;
+package de.tudresden.inf.lat.uel.core.type;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import de.tudresden.inf.lat.uel.parser.KRSSKeyword;
 
 /**
  * This class implements equation as two hash maps of atoms. It is used by Goal

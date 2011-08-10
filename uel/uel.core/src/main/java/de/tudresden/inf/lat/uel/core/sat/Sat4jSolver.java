@@ -1,4 +1,4 @@
-package de.tudresden.inf.lat.uel.main;
+package de.tudresden.inf.lat.uel.core.sat;
 
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;

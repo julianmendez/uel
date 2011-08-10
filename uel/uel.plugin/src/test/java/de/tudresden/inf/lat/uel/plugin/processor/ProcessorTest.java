@@ -21,7 +21,7 @@ import org.semanticweb.owlapi.reasoner.Node;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 
 import de.tudresden.inf.lat.jcel.owlapi.main.JcelReasoner;
-import de.tudresden.inf.lat.uel.main.Goal;
+import de.tudresden.inf.lat.uel.core.type.Goal;
 
 public class ProcessorTest extends TestCase {
 

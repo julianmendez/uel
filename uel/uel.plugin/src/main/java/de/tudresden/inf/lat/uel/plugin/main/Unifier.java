@@ -1,4 +1,4 @@
-package de.tudresden.inf.lat.uel.main;
+package de.tudresden.inf.lat.uel.plugin.main;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -10,8 +10,10 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import de.tudresden.inf.lat.uel.sattranslator.SatInput;
-import de.tudresden.inf.lat.uel.sattranslator.Translator;
+import de.tudresden.inf.lat.uel.core.sat.SatInput;
+import de.tudresden.inf.lat.uel.core.sat.Solver;
+import de.tudresden.inf.lat.uel.core.sat.Translator;
+import de.tudresden.inf.lat.uel.core.type.Goal;
 
 /**
  * This class calls provides variations of unification procedure depending on
