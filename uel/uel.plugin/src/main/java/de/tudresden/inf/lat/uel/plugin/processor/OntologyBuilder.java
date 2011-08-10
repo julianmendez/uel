@@ -41,6 +41,21 @@ public class OntologyBuilder {
 		this.ontology = ontology;
 	}
 
+	@Override
+	public boolean equals(Object o) {
+		boolean ret = false;
+		if (o instanceof OntologyBuilder) {
+			OntologyBuilder other = (OntologyBuilder) o;
+			ret = this.ontology.equals(other.ontology);
+		}
+		return ret;
+	}
+
+	@Override
+	public int hashCode() {
+		return this.ontology.hashCode();
+	}
+
 	public void loadOntology(OWLOntology owlOntology) {
 		if (owlOntology == null) {
 			throw new IllegalArgumentException("Null argument.");
@@ -67,11 +82,11 @@ public class OntologyBuilder {
 
 	private Equation makeEquation(Atom definiendum, Set<Atom> definiens) {
 		Map<String, Atom> leftMap = new HashMap<String, Atom>();
-		leftMap.put(definiendum.getName(), definiendum);
+		leftMap.put(definiendum.toString(), definiendum);
 
 		Map<String, Atom> rightMap = new HashMap<String, Atom>();
 		for (Atom atom : definiens) {
-			rightMap.put(atom.getName(), atom);
+			rightMap.put(atom.toString(), atom);
 		}
 
 		Equation equation = new Equation();
@@ -84,7 +99,7 @@ public class OntologyBuilder {
 		Set<Atom> ret = new HashSet<Atom>();
 		Atom newAtom = new Atom(cls.toStringID(), false);
 		ret.add(newAtom);
-		this.ontology.putAtom(newAtom.getName(), newAtom);
+		this.ontology.putAtom(newAtom.toString(), newAtom);
 		return ret;
 	}
 
@@ -149,7 +164,7 @@ public class OntologyBuilder {
 		Set<Atom> atomSet = processClassExpression(someValuesRestriction
 				.getFiller());
 		for (Atom atom : atomSet) {
-			map.put(atom.getName(), atom);
+			map.put(atom.toString(), atom);
 		}
 		Atom prop = new Atom(someValuesRestriction.getProperty()
 				.getNamedProperty().toStringID(), true);
