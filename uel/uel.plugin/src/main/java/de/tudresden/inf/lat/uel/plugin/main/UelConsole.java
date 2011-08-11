@@ -31,9 +31,8 @@ import de.tudresden.inf.lat.uel.plugin.processor.OntologyBuilder;
  * This class starts a unifier from the command line.
  * 
  * @author Barbara Morawska
- * 
  */
-public class MainConsole {
+public class UelConsole {
 
 	private static final Logger logger = Logger.getLogger(Main.class.getName());
 	private static final String unifSuffix = ".unif";
@@ -52,12 +51,12 @@ public class MainConsole {
 	 */
 
 	public static void main(String[] args) throws IOException {
-		(new MainConsole()).run(args);
+		(new UelConsole()).run(args);
 	}
 
 	private int maxNbr = 0;
 
-	public MainConsole() {
+	public UelConsole() {
 	}
 
 	private List<Equation> createEquations(Ontology ontology, Set<String> input)

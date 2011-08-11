@@ -20,10 +20,8 @@ import de.tudresden.inf.lat.uel.core.type.Goal;
  * the input and output required.
  * 
  * @author Barbara Morawska
- * 
  */
-
-public class Unifier {
+class Unifier {
 
 	private static final Logger logger = Logger.getLogger(Unifier.class
 			.getName());
