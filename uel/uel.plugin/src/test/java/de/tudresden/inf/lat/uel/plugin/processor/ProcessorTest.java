@@ -22,14 +22,19 @@ import org.semanticweb.owlapi.reasoner.OWLReasoner;
 
 import de.tudresden.inf.lat.jcel.owlapi.main.JcelReasoner;
 import de.tudresden.inf.lat.uel.core.type.Goal;
+import de.tudresden.inf.lat.uel.core.type.Ontology;
 
 public class ProcessorTest extends TestCase {
 
-	private static final String ontology01 = "src/test/resources/testOntology-01.krss";
-	private static final String ontology02 = "src/test/resources/testOntology-02.krss";
-	private static final String ontology03 = "src/test/resources/testOntology-03.krss";
-	private static final String ontology04 = "src/test/resources/testOntology-04.krss";
-	private static final String ontology05 = "src/test/resources/testOntology-05.krss";
+	private static final String apath = "src/test/resources/";
+	// private static final Logger logger = Logger.getLogger(ProcessorTest.class
+	// .getName());
+	private static final String ontology01 = apath + "testOntology-01.krss";
+	private static final String ontology02 = apath + "testOntology-02.krss";
+	private static final String ontology03 = apath + "testOntology-03.krss";
+	private static final String ontology04 = apath + "testOntology-04.krss";
+	private static final String ontology05 = apath + "testOntology-05.krss";
+	private static final String ontology06 = apath + "testOntology-06.krss";
 
 	private OWLOntology createOntology(InputStream input)
 			throws OWLOntologyCreationException {
@@ -79,16 +84,23 @@ public class ProcessorTest extends TestCase {
 		tryOntology(ontology05, varNames);
 	}
 
+	public void test06() throws OWLOntologyCreationException, IOException {
+		Set<String> varNames = new HashSet<String>();
+		varNames.add("A1");
+		varNames.add("A2");
+		tryOntology(ontology06, varNames);
+	}
+
 	private void tryOntology(String ontologyName, Set<String> varNames)
 			throws OWLOntologyCreationException, IOException {
 		Map<String, OWLClass> idClassMap = new HashMap<String, OWLClass>();
 		UelProcessor processor = new UelProcessor();
 		{
-			OWLOntology ontology = createOntology(new FileInputStream(
+			OWLOntology owlOntology = createOntology(new FileInputStream(
 					ontologyName));
-			processor.loadOntology(processor.createOntology(ontology));
-
-			Set<OWLClass> clsSet = ontology.getClassesInSignature();
+			Ontology ontology = processor.createOntology(owlOntology);
+			processor.loadOntology(ontology);
+			Set<OWLClass> clsSet = owlOntology.getClassesInSignature();
 			for (OWLClass cls : clsSet) {
 				idClassMap.put(cls.getIRI().getFragment(), cls);
 			}
