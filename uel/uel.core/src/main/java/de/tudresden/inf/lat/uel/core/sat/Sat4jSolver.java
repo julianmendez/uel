@@ -15,6 +15,8 @@ import org.sat4j.specs.TimeoutException;
 
 /**
  * An object of this class uses the Sat4j solver to solve a SAT problem.
+ * 
+ * @author Julian Mendez
  */
 public class Sat4jSolver implements Solver {
 

@@ -9,6 +9,8 @@ import java.io.PrintWriter;
 
 /**
  * An object of this class uses the MiniSat solver to solve a SAT problem.
+ * 
+ * @author Julian Mendez
  */
 public class MiniSatSolver implements Solver {
 

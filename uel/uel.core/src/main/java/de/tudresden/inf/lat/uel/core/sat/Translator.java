@@ -23,57 +23,59 @@ import de.tudresden.inf.lat.uel.core.type.KRSSKeyword;
 import de.tudresden.inf.lat.uel.core.type.Literal;
 
 /**
- * 
  * This class performs reduction of goal equations to propositional clauses. The
  * reduction is explained in F. Baader, B. Morawska,
  * "SAT Encoding of Unification in EL", LPAR 2010.
  * 
- * 
  * It has also the methods to translate an output of a sat solver to a unifier.
  * 
- * 
  * @author Barbara Morawska
- * 
  */
 
 public class Translator {
 
 	private static final String minus = " -";
+	public static final String NOT_UNIFIABLE = "NOT UNIFIABLE / NO MORE UNIFIERS";
 	private static final String space = " ";
 	private static final String zero = " 0";
 
 	private Goal goal;
 	private Integer identificator = 1;
 
-	/*
-	 * Literals are all dis-subsumptions between atoms in the goal the first
-	 * hash map maps them to unique numbers.
-	 */
-
-	/*
+	/**
 	 * Identifiers are numbers, each number uniquely identifies a literal, i.e.
 	 * a subsumption.
 	 */
 	private HashMap<Integer, Literal> identifiers = new HashMap<Integer, Literal>();
 
+	/**
+	 * Literals are all dis-subsumptions between atoms in the goal the first
+	 * hash map maps them to unique numbers.
+	 */
 	private HashMap<String, Integer> literals = new HashMap<String, Integer>();
 
 	/**
-	 * 
 	 * Update is a string of numbers or numbers preceded with "-" encoding the
 	 * negation of the computed unifier. This is needed for computation of the
-	 * next unifier.
-	 * 
-	 * 
 	 */
-
 	private StringBuilder update = new StringBuilder("");
 
+	/**
+	 * Constructs a new translator.
+	 * 
+	 * @param g
+	 *            goal
+	 */
 	public Translator(Goal g) {
 		goal = g;
 		setLiterals();
 	}
 
+	/**
+	 * Returns the literals.
+	 * 
+	 * @return the literals
+	 */
 	public Map<String, Integer> getLiterals() {
 		return this.literals;
 	}
@@ -109,9 +111,9 @@ public class Translator {
 		return update;
 	}
 
-	/*
-	 * Method used by UEL to reset string Update values for literals and S(X)
-	 * for each X, before the next unifier is computed.
+	/**
+	 * Resets string update values for literals and S(X) for each X, before the
+	 * next unifier is computed.
 	 */
 	public void reset() {
 
@@ -131,10 +133,9 @@ public class Translator {
 
 	}
 
-	/*
-	 * 
-	 * Method to create dis-subsumptions and order literals from all pairs of
-	 * atoms of the goal
+	/**
+	 * Creates dis-subsumptions and order literals from all pairs of atoms of
+	 * the goal
 	 */
 	private void setLiterals() {
 
@@ -186,11 +187,10 @@ public class Translator {
 
 	}
 
-	/*
-	 * This method is the same as toTBox but it does not overwrite result.
-	 * Instead it appends a unifier to the existing file <result>
+	/**
+	 * This method is the same as toTBox but it does not overwrite the result.
+	 * Instead, it appends a unifier to the writer.
 	 */
-
 	private void toCNFWithoutHeader(Writer infile) {
 
 		PrintWriter out = new PrintWriter(new BufferedWriter(infile));
@@ -653,9 +653,9 @@ public class Translator {
 
 	}
 
-	/*
-	 * This method is the same as toTBox, but does not write a unifier to file
-	 * <result>
+	/**
+	 * This method is the same as <code>toTBox(Reader, Writer)</code>, but does
+	 * not write a unifier.
 	 */
 	public boolean toTBox(Reader outfile) throws IOException {
 
@@ -767,15 +767,16 @@ public class Translator {
 	}
 
 	/**
-	 * This method reads a file <code>outfile</code> which contains an output
-	 * from SAT solver i.e. UNSAT or SAT with the list of true literals. If the
-	 * file contains SAT and the list of true literals, the method translates it
-	 * to a TBox, which is written to the file <code>result</code> and returns
-	 * "true". Otherwise, it writes "NOT UNIFIABLE" to file <code>result</code>
-	 * and returns "false".
+	 * Reads a reader <code>outfile</code> which contains an output from SAT
+	 * solver i.e. UNSAT or SAT with the list of true literals. If the file
+	 * contains SAT and the list of true literals, the method translates it to a
+	 * TBox, which is written to the writer <code>result</code> and returns
+	 * "true". Otherwise, it writes "NOT UNIFIABLE" and returns "false".
 	 * 
 	 * @param outfile
+	 *            reader containing the SAT solver output
 	 * @param result
+	 *            the result
 	 * @throws IOException
 	 * @return <code>true</code> if and only if the output of the SAT solver
 	 *         contains SAT.
@@ -806,7 +807,7 @@ public class Translator {
 
 			PrintWriter out = new PrintWriter(new BufferedWriter(result));
 
-			out.println("NOT UNIFIABLE / NO MORE UNIFIERS");
+			out.println(NOT_UNIFIABLE);
 
 			out.flush();
 

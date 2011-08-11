@@ -19,6 +19,13 @@ public class OutputStreamHandler extends Handler {
 	private BufferedWriter output = null;
 	private Date start = null;
 
+	/**
+	 * Constructs a new output stream handler.
+	 * 
+	 * @param output
+	 *            output stream
+	 * @throws IOException
+	 */
 	public OutputStreamHandler(OutputStream output) throws IOException {
 		if (output == null) {
 			throw new IllegalArgumentException("Null argument.");
