@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import de.tudresden.inf.lat.uel.core.type.Equation;
 import de.tudresden.inf.lat.uel.core.type.Ontology;
 
 class VarSelectionModel {
@@ -89,10 +90,26 @@ class VarSelectionModel {
 
 	private Set<String> getSymbols(String name) {
 		Set<String> currentSet = getOntology().getDefinitionSymbols(name);
-		if (currentSet.isEmpty()) {
+		if (currentSet.isEmpty() && this.setOfOriginalVariables.contains(name)) {
 			currentSet = getOntology().getPrimitiveDefinitionSymbols(name);
 		}
-		return currentSet;
+
+		Set<String> visited = new HashSet<String>();
+		Set<String> toVisit = new HashSet<String>();
+		toVisit.addAll(currentSet);
+		Set<String> ret = new HashSet<String>();
+		while (!toVisit.isEmpty()) {
+			String elem = toVisit.iterator().next();
+			visited.add(elem);
+			toVisit.removeAll(visited);
+			Equation def = getOntology().getDefinition(elem);
+			if (def != null) {
+				toVisit.addAll(getOntology().getDefinitionSymbols(elem));
+			} else {
+				ret.add(elem);
+			}
+		}
+		return ret;
 	}
 
 	public Set<String> getVariables() {
