@@ -3,6 +3,7 @@ package de.tudresden.inf.lat.uel.core.type;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -55,6 +56,19 @@ public class Ontology {
 		return ret;
 	}
 
+	private Set<String> findSymbols(Atom e) {
+		Set<String> ret = new HashSet<String>();
+		if (e.isRoot()) {
+			Map<String, Atom> children = e.getChildren();
+			for (Atom atom : children.values()) {
+				ret.addAll(findSymbols(atom));
+			}
+		} else {
+			ret.add(e.toString());
+		}
+		return ret;
+	}
+
 	public Atom getAtom(String concept) {
 		return this.atoms.get(concept);
 	}
@@ -100,7 +114,7 @@ public class Ontology {
 	private Set<String> getSymbols(Equation equation) {
 		Set<String> ret = new HashSet<String>();
 		for (Atom e : equation.getRight().values()) {
-			ret.add(e.getName());
+			ret.addAll(findSymbols(e));
 		}
 		return ret;
 	}
