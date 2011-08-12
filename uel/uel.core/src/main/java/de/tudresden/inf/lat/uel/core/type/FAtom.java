@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 /**
- * 
  * This class extends Atom. It implements a flat atom, hence an atom which is
  * either a concept name or an existential restriction with a concept name as an
  * argument.
@@ -14,16 +13,14 @@ import java.util.Collection;
  * goal.
  * 
  * @author Barbara Morawska
- * 
  */
-
 public class FAtom extends Atom {
 
 	public static final String VAR_PREFIX = "VAR";
 
 	private FAtom child = null;
 	private Collection<FAtom> S = new ArrayList<FAtom>();
-	private boolean sys = false;
+	private boolean userVariable = false;
 	private boolean var = false;
 
 	/**
@@ -137,8 +134,8 @@ public class FAtom extends Atom {
 		boolean ret = false;
 		if (o instanceof FAtom) {
 			FAtom other = (FAtom) o;
-			ret = this.sys == other.sys && this.var == other.var
-					&& this.S.equals(other.S);
+			ret = this.userVariable == other.userVariable
+					&& this.var == other.var && this.S.equals(other.S);
 			ret = ret
 					&& ((this.child == null && other.child == null) || (this.child != null && this.child
 							.equals(other.child)));
@@ -185,9 +182,9 @@ public class FAtom extends Atom {
 	 * @return <code>true</code> if and only if this flat atom is a system
 	 *         variable
 	 */
-	public boolean isSys() {
+	public boolean isUserVariable() {
 
-		return sys;
+		return userVariable;
 
 	}
 
@@ -219,7 +216,8 @@ public class FAtom extends Atom {
 
 		} else if (S.size() == 1) {
 
-			sbuf.append(S.iterator().next().toString());
+			FAtom atom = S.iterator().next();
+			sbuf.append(printSubstitution(atom));
 
 		} else {
 
@@ -229,12 +227,28 @@ public class FAtom extends Atom {
 
 			for (FAtom atom : S) {
 				sbuf.append(KRSSKeyword.blank);
-				sbuf.append(atom.toString());
+				sbuf.append(printSubstitution(atom));
 				sbuf.append(KRSSKeyword.blank);
 			}
 
 			sbuf.append(KRSSKeyword.blank);
 			sbuf.append(KRSSKeyword.close);
+		}
+		return sbuf.toString();
+	}
+
+	private String printSubstitution(FAtom atom) {
+		StringBuffer sbuf = new StringBuffer();
+		if (atom.isRoot() && !atom.getChild().isUserVariable()) {
+			sbuf.append(KRSSKeyword.open);
+			sbuf.append(KRSSKeyword.some);
+			sbuf.append(KRSSKeyword.blank);
+			sbuf.append(atom.getName());
+			sbuf.append(KRSSKeyword.blank);
+			sbuf.append(atom.getChild().printS());
+			sbuf.append(KRSSKeyword.close);
+		} else {
+			sbuf.append(atom.toString());
 		}
 		return sbuf.toString();
 	}
@@ -256,13 +270,13 @@ public class FAtom extends Atom {
 	 * Sets a flat atom to be a system variable. Used at Goal initialization.
 	 * 
 	 */
-	public void setSysVar() {
+	public void setUserVariable(boolean value) {
 
 		if (!isRoot()) {
-			sys = true;
+			userVariable = value;
 		} else {
 			throw new IllegalStateException(
-					"WARNING: cannot change existential atom  into a system variable");
+					"WARNING: cannot change existential atom into a system variable");
 		}
 
 	}
@@ -273,9 +287,7 @@ public class FAtom extends Atom {
 	 * @param v
 	 */
 	public void setVar(boolean v) {
-
 		var = v;
-
 	}
 
 	@Override

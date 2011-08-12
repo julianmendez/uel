@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * 
  * This class implements a goal of unification, i.e., a set of equations between
  * concept terms with variables.
  * 
@@ -19,9 +18,7 @@ import java.util.Set;
  * objects.
  * 
  * @author Barbara Morawska
- * 
  */
-
 public class Goal {
 
 	public static final String VAR_PREFIX = "VAR";
@@ -158,7 +155,6 @@ public class Goal {
 				FAtom var = new FAtom(VAR_PREFIX + this.nbrVar, false, true,
 						null);
 				this.nbrVar++;
-				var.setSysVar();
 				this.allatoms.put(var.getName(), var);
 				this.variables.put(var.getName(), var);
 				newequation.addToRight(var);
@@ -288,7 +284,6 @@ public class Goal {
 
 		for (String key : variables.keySet()) {
 			variables.get(key).setVar(true);
-			variables.get(key).setSysVar();
 		}
 
 		for (String var : vars) {
@@ -300,9 +295,10 @@ public class Goal {
 
 			FAtom a = allatoms.get(key);
 
-			if (!variables.containsKey(key) && vars.contains(a.getName())) {
+			if (vars.contains(a.getName())) {
 
 				a.setVar(true);
+				a.setUserVariable(true);
 				variables.put(key, a);
 			} else if (!variables.containsKey(key) && !a.isRoot()) {
 

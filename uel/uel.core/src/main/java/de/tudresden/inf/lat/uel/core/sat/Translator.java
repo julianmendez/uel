@@ -31,7 +31,6 @@ import de.tudresden.inf.lat.uel.core.type.Literal;
  * 
  * @author Barbara Morawska
  */
-
 public class Translator {
 
 	private static final String minus = " -";
@@ -724,7 +723,7 @@ public class Translator {
 									.addToS((FAtom) goal.getConstants().get(
 											name2));
 
-							if (!goal.getVariables().get(name1).isSys()) {
+							if (goal.getVariables().get(name1).isUserVariable()) {
 								update.append(i + space);
 							}
 
@@ -734,7 +733,7 @@ public class Translator {
 									.get(name1)
 									.addToS((FAtom) goal.getEAtoms().get(name2));
 
-							if (!goal.getVariables().get(name1).isSys()) {
+							if (goal.getVariables().get(name1).isUserVariable()) {
 								update.append(i + space);
 							}
 						}
@@ -743,7 +742,7 @@ public class Translator {
 				} else if (identifiers.get(i).isSubsumption()) {
 
 					if (goal.getVariables().containsKey(name1)
-							&& !goal.getVariables().get(name1).isSys()) {
+							&& goal.getVariables().get(name1).isUserVariable()) {
 						if (goal.getConstants().containsKey(name2)) {
 
 							update.append("-" + i + space);
@@ -790,7 +789,7 @@ public class Translator {
 
 			for (String variable : goal.getVariables().keySet()) {
 
-				if (!goal.getVariables().get(variable).isSys()) {
+				if (goal.getVariables().get(variable).isUserVariable()) {
 					out.print(KRSSKeyword.open + KRSSKeyword.define_concept
 							+ KRSSKeyword.blank);
 					out.print(variable + space);
@@ -818,7 +817,7 @@ public class Translator {
 
 	private void updateWithNegations() {
 		for (FAtom var : goal.getVariables().values()) {
-			if (!var.isSys()) {
+			if (var.isUserVariable()) {
 				for (FAtom atom : goal.getAllAtoms().values()) {
 					if (atom.isCons() || atom.isRoot()) {
 						Literal lit = Literal.newSubsumption(var.toString(),
