@@ -27,14 +27,18 @@ import de.tudresden.inf.lat.uel.core.type.Ontology;
 public class ProcessorTest extends TestCase {
 
 	private static final String apath = "src/test/resources/";
+
 	// private static final Logger logger = Logger.getLogger(ProcessorTest.class
 	// .getName());
+
 	private static final String ontology01 = apath + "testOntology-01.krss";
 	private static final String ontology02 = apath + "testOntology-02.krss";
 	private static final String ontology03 = apath + "testOntology-03.krss";
 	private static final String ontology04 = apath + "testOntology-04.krss";
 	private static final String ontology05 = apath + "testOntology-05.krss";
 	private static final String ontology06 = apath + "testOntology-06.krss";
+	private static final String ontology07 = apath + "testOntology-07.krss";
+	private static final String ontology08 = apath + "testOntology-08.krss";
 
 	private OWLOntology createOntology(InputStream input)
 			throws OWLOntologyCreationException {
@@ -89,6 +93,23 @@ public class ProcessorTest extends TestCase {
 		varNames.add("A1");
 		varNames.add("A2");
 		tryOntology(ontology06, varNames);
+	}
+
+	public void test07() throws OWLOntologyCreationException, IOException {
+		Set<String> varNames = new HashSet<String>();
+		varNames.add("A1");
+		varNames.add("A2");
+		tryOntology(ontology07, varNames);
+	}
+
+	public void test08() throws OWLOntologyCreationException, IOException {
+		Set<String> varNames = new HashSet<String>();
+		varNames.add("A1");
+		varNames.add("A2");
+		varNames.add("A3");
+		varNames.add("A4");
+		varNames.add("A5");
+		tryOntology(ontology08, varNames);
 	}
 
 	private void tryOntology(String ontologyName, Set<String> varNames)
