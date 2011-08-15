@@ -17,7 +17,12 @@ public interface Message {
 	public static final String buttonPrevious = "<";
 	public static final String buttonRejectVar = "Cancel";
 	public static final String buttonSave = "Save";
+	public static final String buttonSaveGoal = "Save";
 	public static final String buttonSelectVariables = "Vars";
+	public static final String buttonShowStatInfo = "Stat";
+	public static final String lblAllVarCount = "all variables";
+	public static final String lblClauseCount = "clauses";
+	public static final String lblLiteralCount = "literals";
 	public static final String titleError = "Error";
 	public static final String tooltipAcceptVar = "use the selected entities as variables";
 	public static final String tooltipCheckBoxClassName00 = "shows also concepts with primitive definitions";
@@ -27,6 +32,7 @@ public interface Message {
 	public static final String tooltipComboBoxOntology00 = "first ontology to be selected";
 	public static final String tooltipComboBoxOntology01 = "second ontology to be selected";
 	public static final String tooltipFirst = "shows the first unifier";
+	public static final String tooltipGoal = "goal";
 	public static final String tooltipLast = "computes all unifiers and shows the last unifier";
 	public static final String tooltipMakeCons = "defines the selected items as constants";
 	public static final String tooltipMakeVar = "defines the selected items as variables";
@@ -35,7 +41,12 @@ public interface Message {
 	public static final String tooltipPrevious = "shows the previous unifier";
 	public static final String tooltipRejectVar = "cancels this selection of variables";
 	public static final String tooltipSave = "saves the current unifier into a file";
+	public static final String tooltipSaveGoal = "saves the goal to a file";
 	public static final String tooltipSelectVariables = "gets candidates for variables";
+	public static final String tooltipShowStatInfo = "shows statistical information before computing the first unifier";
+	public static final String tooltipTextAllVarCount = "number of variables";
+	public static final String tooltipTextClauseCount = "number of clauses";
+	public static final String tooltipTextLiteralCount = "number of literals";
 	public static final String tooltipUnifier = "unifier";
 	public static final String tooltipUnifierId = "unifier id";
 

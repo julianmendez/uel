@@ -1,6 +1,7 @@
 package de.tudresden.inf.lat.uel.core.sat;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -52,7 +53,7 @@ public class SatInput {
 		while (stok.hasMoreTokens()) {
 			litSet.add(Integer.parseInt(stok.nextToken()));
 		}
-		return add(litSet);
+		return add(Collections.unmodifiableSet(litSet));
 	}
 
 	/**
@@ -72,6 +73,10 @@ public class SatInput {
 					&& this.lastId == other.lastId;
 		}
 		return ret;
+	}
+
+	public Set<Set<Integer>> getClauses() {
+		return Collections.unmodifiableSet(this.clauses);
 	}
 
 	@Override

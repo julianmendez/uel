@@ -4,12 +4,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringReader;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -23,9 +21,6 @@ import java.util.TreeSet;
 import javax.swing.DefaultListModel;
 import javax.swing.JFileChooser;
 
-import org.coode.owlapi.owlxml.renderer.OWLXMLRenderer;
-import org.coode.owlapi.rdf.rdfxml.RDFXMLRenderer;
-import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.io.OWLRendererException;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
@@ -36,9 +31,12 @@ import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 
+import de.tudresden.inf.lat.uel.core.sat.SatInput;
+import de.tudresden.inf.lat.uel.core.sat.Translator;
+import de.tudresden.inf.lat.uel.core.type.Goal;
+import de.tudresden.inf.lat.uel.core.type.KRSSKeyword;
 import de.tudresden.inf.lat.uel.core.type.Ontology;
 import de.tudresden.inf.lat.uel.plugin.processor.UelProcessor;
-import de.uulm.ecs.ai.owlapi.krssrenderer.KRSS2OWLSyntaxRenderer;
 
 /**
  * This class is a controller for UEL.
@@ -62,9 +60,7 @@ public class UelController implements ActionListener {
 	private static final String actionRejectVar = "reject var";
 	private static final String actionSave = "save";
 	private static final String actionSelectVariables = "get var candidate";
-	private static final String extension_krss = ".krss";
-	private static final String extension_owl = ".owl";
-	private static final String extension_rdf = ".rdf";
+	private static final String actionShowStatInfo = "show statistic info";
 	private static final String initialUnifierIdText = " 0 ";
 
 	private boolean allUnifiersFound = false;
@@ -79,8 +75,10 @@ public class UelController implements ActionListener {
 	private OWLOntologyManager owlOntologyManager = null;
 	private Map<String, OWLOntology> owlOntologyMap = new HashMap<String, OWLOntology>();
 	private Map<OWLClass, String> shortFormMap = new HashMap<OWLClass, String>();
+	private StatInfo statInfo = null;
 	private int unifierIndex = -1;
 	private VarSelectionController varWindow = null;
+
 	private UelView view = null;
 
 	public UelController(UelView panel, OWLOntologyManager ontologyManager) {
@@ -136,6 +134,8 @@ public class UelController implements ActionListener {
 			executeActionOntology00Selected();
 		} else if (cmd.equals(actionCheckBoxClassName01)) {
 			executeActionOntology01Selected();
+		} else if (cmd.equals(actionShowStatInfo)) {
+			executeActionShowStatInfo();
 		} else {
 			throw new IllegalStateException();
 		}
@@ -146,8 +146,23 @@ public class UelController implements ActionListener {
 		getModel().addAll(this.varWindow.getView().getModel().getVariables());
 		this.varWindow.close();
 
+		if (getModel().getUnifierList().isEmpty()) {
+			Set<String> classSet = new HashSet<String>();
+			classSet.add(this.classList00.get(
+					getView().getSelectedClassName00()).getId());
+			classSet.add(this.classList01.get(
+					getView().getSelectedClassName01()).getId());
+			Goal g = getModel().configure(classSet);
+			Translator translator = getModel().getTranslator();
+			SatInput satInput = translator.getSatInput();
+			this.statInfo = new StatInfo(g, translator.getLiterals().keySet()
+					.size(), satInput.getClauses().size(), this.mapIdLabel);
+		}
+
 		setUnifierButtons(false);
 		getView().setButtonNextEnabled(true);
+		getView().setButtonShowStatInfoEnabled(true);
+
 	}
 
 	private void executeActionClass00Selected() {
@@ -301,13 +316,16 @@ public class UelController implements ActionListener {
 			try {
 				String unifier = getModel().getUnifierList().get(
 						this.unifierIndex);
-				OWLOntology owlOntology = parseUnifier(unifier);
-				if (file.getName().endsWith(extension_rdf)) {
-					unifier = this.renderRDF(owlOntology);
-				} else if (file.getName().endsWith(extension_owl)) {
-					unifier = this.renderOWL(owlOntology);
-				} else if (file.getName().endsWith(extension_krss)) {
-					unifier = this.renderKRSS(owlOntology);
+				OntologyRenderer renderer = new OntologyRenderer();
+				OWLOntology owlOntology = renderer.parseKRSS(unifier);
+				if (file.getName().endsWith(OntologyRenderer.EXTENSION_RDF)) {
+					unifier = renderer.renderRDF(owlOntology);
+				} else if (file.getName().endsWith(
+						OntologyRenderer.EXTENSION_OWL)) {
+					unifier = renderer.renderOWL(owlOntology);
+				} else if (file.getName().endsWith(
+						OntologyRenderer.EXTENSION_KRSS)) {
+					unifier = renderer.renderKRSS(owlOntology);
 				}
 
 				BufferedWriter writer = new BufferedWriter(new FileWriter(file));
@@ -322,7 +340,6 @@ public class UelController implements ActionListener {
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
-
 		}
 	}
 
@@ -346,6 +363,12 @@ public class UelController implements ActionListener {
 		this.unifierIndex = -1;
 		this.allUnifiersFound = false;
 		getView().getUnifierId().setText(initialUnifierIdText);
+	}
+
+	private void executeActionShowStatInfo() {
+		StatInfoController statInfoWindow = new StatInfoController(
+				new StatInfoView(this.statInfo));
+		statInfoWindow.open();
 	}
 
 	private List<LabelId> getClassNames(OWLOntology ontology, boolean primitive) {
@@ -451,6 +474,7 @@ public class UelController implements ActionListener {
 				actionCheckBoxClassName00);
 		getView().addCheckBoxClassName01Listener(this,
 				actionCheckBoxClassName01);
+		getView().addButtonShowStatInfoListener(this, actionShowStatInfo);
 
 		reset();
 		reloadOntologies();
@@ -481,14 +505,6 @@ public class UelController implements ActionListener {
 			this.ontologyList.addAll(set);
 			getView().reloadOntologies(this.ontologyList);
 		}
-	}
-
-	private OWLOntology parseUnifier(String krss)
-			throws OWLOntologyCreationException {
-		OWLOntologyManager ontologyManager = OWLManager
-				.createOWLOntologyManager();
-		ByteArrayInputStream input = new ByteArrayInputStream(krss.getBytes());
-		return ontologyManager.loadOntologyFromOntologyDocument(input);
 	}
 
 	private void processMapIdClass(OWLOntology ontology) {
@@ -523,35 +539,6 @@ public class UelController implements ActionListener {
 		executeActionOntology01Selected();
 	}
 
-	private String renderKRSS(OWLOntology owlOntology)
-			throws OWLRendererException {
-		StringWriter writer = new StringWriter();
-		KRSS2OWLSyntaxRenderer renderer = new KRSS2OWLSyntaxRenderer(
-				owlOntology.getOWLOntologyManager());
-		renderer.render(owlOntology, writer);
-		writer.flush();
-		return writer.toString();
-	}
-
-	private String renderOWL(OWLOntology owlOntology)
-			throws OWLRendererException {
-		StringWriter writer = new StringWriter();
-		OWLXMLRenderer renderer = new OWLXMLRenderer(
-				owlOntology.getOWLOntologyManager());
-		renderer.render(owlOntology, writer);
-		writer.flush();
-		return writer.toString();
-	}
-
-	private String renderRDF(OWLOntology owlOntology) throws IOException {
-		StringWriter writer = new StringWriter();
-		RDFXMLRenderer renderer = new RDFXMLRenderer(
-				owlOntology.getOWLOntologyManager(), owlOntology, writer);
-		renderer.render();
-		writer.flush();
-		return writer.toString();
-	}
-
 	public void reset() {
 		setUnifierButtons(false);
 
@@ -579,6 +566,7 @@ public class UelController implements ActionListener {
 		getView().setButtonNextEnabled(b);
 		getView().setButtonLastEnabled(b);
 		getView().setButtonSaveEnabled(b);
+		getView().setButtonShowStatInfoEnabled(b);
 	}
 
 	private String showUnifier(String str) {
@@ -592,18 +580,13 @@ public class UelController implements ActionListener {
 					StringTokenizer stok = new StringTokenizer(line);
 					while (stok.hasMoreTokens()) {
 						String token = stok.nextToken();
-						OWLClass cls = this.mapIdClass.get(token);
-						if (cls != null) {
-							ret.append(getLabel(token));
-						} else {
-							ret.append(token);
-						}
+						ret.append(getLabel(token));
 						if (stok.hasMoreTokens()) {
-							ret.append(" ");
+							ret.append(KRSSKeyword.blank);
 						}
 					}
 				}
-				ret.append("\n");
+				ret.append(KRSSKeyword.newLine);
 			}
 		} catch (IOException e) {
 			throw new IllegalStateException(e);

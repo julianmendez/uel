@@ -35,6 +35,7 @@ public class UelView extends JPanel {
 	private JButton buttonSave = new JButton(Message.buttonSave);
 	private JButton buttonSelectVariables = new JButton(
 			Message.buttonSelectVariables);
+	private JButton buttonShowStatInfo = new JButton(Message.buttonShowStatInfo);
 	private JCheckBox checkBoxClassName00 = new JCheckBox();
 	private JCheckBox checkBoxClassName01 = new JCheckBox();
 	private JComboBox listClassName00 = new JComboBox();
@@ -144,6 +145,19 @@ public class UelView extends JPanel {
 
 		this.buttonSelectVariables.addActionListener(listener);
 		this.buttonSelectVariables.setActionCommand(actionCommand);
+	}
+
+	public void addButtonShowStatInfoListener(ActionListener listener,
+			String actionCommand) {
+		if (listener == null) {
+			throw new IllegalArgumentException("Null argument.");
+		}
+		if (actionCommand == null) {
+			throw new IllegalArgumentException("Null argument.");
+		}
+
+		this.buttonShowStatInfo.addActionListener(listener);
+		this.buttonShowStatInfo.setActionCommand(actionCommand);
 	}
 
 	public void addCheckBoxClassName00Listener(ActionListener listener,
@@ -317,6 +331,9 @@ public class UelView extends JPanel {
 		this.buttonSave.setToolTipText(Message.tooltipSave);
 		smallPanel.add(this.buttonSave);
 
+		this.buttonShowStatInfo.setToolTipText(Message.tooltipShowStatInfo);
+		smallPanel.add(this.buttonShowStatInfo);
+
 		ret.add(smallPanel);
 		return ret;
 	}
@@ -429,6 +446,10 @@ public class UelView extends JPanel {
 
 	public void setButtonSelectVariablesEnabled(boolean b) {
 		this.buttonSelectVariables.setEnabled(b);
+	}
+
+	public void setButtonShowStatInfoEnabled(boolean b) {
+		this.buttonShowStatInfo.setEnabled(b);
 	}
 
 	public void setComboBoxClassName00Enabled(boolean b) {

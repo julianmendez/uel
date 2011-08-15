@@ -148,6 +148,10 @@ public class UelProcessor {
 		return this.ontology;
 	}
 
+	public Translator getTranslator() {
+		return this.translator;
+	}
+
 	public List<String> getUnifierList() {
 		return Collections.unmodifiableList(this.unifierList);
 	}
