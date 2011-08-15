@@ -167,7 +167,7 @@ public class OntologyBuilder {
 	}
 
 	private Set<Atom> processClassExpression(OWLClassExpression classExpr) {
-		Set<Atom> ret = null;
+		Set<Atom> ret = new HashSet<Atom>();
 		if (classExpr instanceof OWLClass) {
 			ret = processClass((OWLClass) classExpr);
 		} else if (classExpr instanceof OWLObjectIntersectionOf) {
@@ -175,7 +175,7 @@ public class OntologyBuilder {
 		} else if (classExpr instanceof OWLObjectSomeValuesFrom) {
 			ret = processSomeValuesRestriction((OWLObjectSomeValuesFrom) classExpr);
 		} else {
-			logger.fine("Ignoring class expression '" + classExpr + "'.");
+			logger.warning("Ignoring class expression '" + classExpr + "'.");
 		}
 		return ret;
 	}
