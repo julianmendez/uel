@@ -21,6 +21,8 @@ import de.tudresden.inf.lat.uel.core.type.FAtom;
 import de.tudresden.inf.lat.uel.core.type.Goal;
 import de.tudresden.inf.lat.uel.core.type.KRSSKeyword;
 import de.tudresden.inf.lat.uel.core.type.Literal;
+import de.tudresden.inf.lat.uel.core.type.OrderLiteral;
+import de.tudresden.inf.lat.uel.core.type.SubsumptionLiteral;
 
 /**
  * This class performs reduction of goal equations to propositional clauses. The
@@ -153,7 +155,7 @@ public class Translator {
 			for (String key2 : goal.getAllAtoms().keySet()) {
 
 				second = key2;
-				literal = Literal.newSubsumption(first, second);
+				literal = new SubsumptionLiteral(first, second);
 
 				literals.put(literal.toString(), identificator);
 				identifiers.put(identificator, literal);
@@ -174,7 +176,7 @@ public class Translator {
 
 				second = key2;
 
-				literal = Literal.newOrder(first, second);
+				literal = new OrderLiteral(first, second);
 
 				literals.put(literal.toString(), identificator);
 				identifiers.put(identificator, literal);
@@ -224,7 +226,7 @@ public class Translator {
 					for (String key3 : e.getRight().keySet()) {
 						for (String key2 : e.getLeft().keySet()) {
 
-							Literal lit2 = Literal.newSubsumption(key2, key1);
+							Literal lit2 = new SubsumptionLiteral(key2, key1);
 
 							out.print(minus);
 							out.print(literals.get(lit2.toString()));
@@ -232,7 +234,7 @@ public class Translator {
 
 						}
 
-						Literal lit3 = Literal.newSubsumption(key3, key1);
+						Literal lit3 = new SubsumptionLiteral(key3, key1);
 
 						out.print(space + literals.get(lit3.toString()));
 						out.println(zero);
@@ -246,7 +248,7 @@ public class Translator {
 					for (String key2 : e.getLeft().keySet()) {
 						for (String key3 : e.getRight().keySet()) {
 
-							Literal lit2 = Literal.newSubsumption(key3, key1);
+							Literal lit2 = new SubsumptionLiteral(key3, key1);
 
 							out.print(minus);
 							out.print(literals.get(lit2.toString()));
@@ -254,7 +256,7 @@ public class Translator {
 
 						}
 
-						Literal lit3 = Literal.newSubsumption(key2, key1);
+						Literal lit3 = new SubsumptionLiteral(key2, key1);
 
 						out.print(literals.get(lit3.toString()));
 						out.println(zero);
@@ -269,7 +271,7 @@ public class Translator {
 					 */
 
 					for (String key2 : e.getLeft().keySet()) {
-						Literal lit4 = Literal.newSubsumption(key2, key1);
+						Literal lit4 = new SubsumptionLiteral(key2, key1);
 
 						out.print(minus);
 						out.print(literals.get(lit4.toString()));
@@ -286,7 +288,7 @@ public class Translator {
 					 */
 
 					for (String key3 : e.getRight().keySet()) {
-						Literal lit5 = Literal.newSubsumption(key3, key1);
+						Literal lit5 = new SubsumptionLiteral(key3, key1);
 
 						out.print(minus);
 						out.print(literals.get(lit5.toString()));
@@ -316,7 +318,7 @@ public class Translator {
 					for (String key3 : e.getRight().keySet()) {
 						for (String key2 : e.getLeft().keySet()) {
 
-							Literal lit2 = Literal.newSubsumption(key2, key1);
+							Literal lit2 = new SubsumptionLiteral(key2, key1);
 
 							out.print(minus);
 							out.print(literals.get(lit2.toString()));
@@ -324,7 +326,7 @@ public class Translator {
 
 						}
 
-						Literal lit3 = Literal.newSubsumption(key3, key1);
+						Literal lit3 = new SubsumptionLiteral(key3, key1);
 
 						out.print(literals.get(lit3.toString()));
 						out.println(zero);
@@ -338,14 +340,14 @@ public class Translator {
 					for (String key2 : e.getLeft().keySet()) {
 						for (String key3 : e.getRight().keySet()) {
 
-							Literal lit2 = Literal.newSubsumption(key3, key1);
+							Literal lit2 = new SubsumptionLiteral(key3, key1);
 
 							out.print(minus);
 							out.print(literals.get(lit2.toString()));
 							out.print(space);
 						}
 
-						Literal lit3 = Literal.newSubsumption(key2, key1);
+						Literal lit3 = new SubsumptionLiteral(key2, key1);
 
 						out.print(literals.get(lit3.toString()));
 						out.println(zero);
@@ -362,7 +364,7 @@ public class Translator {
 					 */
 
 					for (String key2 : e.getLeft().keySet()) {
-						Literal lit4 = Literal.newSubsumption(key2, key1);
+						Literal lit4 = new SubsumptionLiteral(key2, key1);
 
 						out.print(minus);
 						out.print(literals.get(lit4.toString()));
@@ -383,7 +385,7 @@ public class Translator {
 					 */
 
 					for (String key3 : e.getRight().keySet()) {
-						Literal lit5 = Literal.newSubsumption(key3, key1);
+						Literal lit5 = new SubsumptionLiteral(key3, key1);
 
 						out.print(minus);
 						out.print(literals.get(lit5.toString()));
@@ -411,7 +413,7 @@ public class Translator {
 				if (!key2.equalsIgnoreCase(KRSSKeyword.top)
 						&& (!key1.equals(key2))) {
 
-					Literal lit = Literal.newSubsumption(key1, key2);
+					Literal lit = new SubsumptionLiteral(key1, key2);
 
 					out.print(literals.get(lit.toString()));
 
@@ -443,7 +445,7 @@ public class Translator {
 
 					if (!role1.equals(role2)) {
 
-						Literal lit = Literal.newSubsumption(key1, key2);
+						Literal lit = new SubsumptionLiteral(key1, key2);
 
 						out.print(literals.get(lit.toString()));
 
@@ -464,10 +466,10 @@ public class Translator {
 
 						if (!child1name.equals(child2name)) {
 
-							Literal lit1 = Literal.newSubsumption(child1name,
+							Literal lit1 = new SubsumptionLiteral(child1name,
 									child2name);
 
-							Literal lit2 = Literal.newSubsumption(key1, key2);
+							Literal lit2 = new SubsumptionLiteral(key1, key2);
 
 							out.print(minus);
 							out.print(literals.get(lit1.toString()));
@@ -497,7 +499,7 @@ public class Translator {
 
 			for (String key2 : goal.getEAtoms().keySet()) {
 
-				Literal lit = Literal.newSubsumption(key1, key2);
+				Literal lit = new SubsumptionLiteral(key1, key2);
 
 				out.print(literals.get(lit.toString()));
 
@@ -505,7 +507,7 @@ public class Translator {
 
 				if (!key1.equalsIgnoreCase(KRSSKeyword.top)) {
 
-					Literal lit1 = Literal.newSubsumption(key2, key1);
+					Literal lit1 = new SubsumptionLiteral(key2, key1);
 
 					out.print(literals.get(lit1.toString()));
 
@@ -524,7 +526,7 @@ public class Translator {
 		 */
 		for (String key1 : goal.getVariables().keySet()) {
 
-			Literal lit = Literal.newOrder(key1, key1);
+			Literal lit = new OrderLiteral(key1, key1);
 
 			out.print(minus);
 			out.print(literals.get(lit.toString()));
@@ -549,11 +551,11 @@ public class Translator {
 
 					if (!key1.equals(key2) && !key2.equals(key3)) {
 
-						Literal lit1 = Literal.newOrder(key1, key2);
+						Literal lit1 = new OrderLiteral(key1, key2);
 
-						Literal lit2 = Literal.newOrder(key2, key3);
+						Literal lit2 = new OrderLiteral(key2, key3);
 
-						Literal lit3 = Literal.newOrder(key1, key3);
+						Literal lit3 = new OrderLiteral(key1, key3);
 
 						out.print(minus);
 						out.print(literals.get(lit1.toString()));
@@ -592,11 +594,11 @@ public class Translator {
 					if (!key1.equals(key2) && !key1.equals(key3)
 							&& !key2.equals(key3)) {
 
-						Literal lit1 = Literal.newSubsumption(key1, key2);
+						Literal lit1 = new SubsumptionLiteral(key1, key2);
 
-						Literal lit2 = Literal.newSubsumption(key2, key3);
+						Literal lit2 = new SubsumptionLiteral(key2, key3);
 
-						Literal lit3 = Literal.newSubsumption(key1, key3);
+						Literal lit3 = new SubsumptionLiteral(key1, key3);
 
 						out.print(minus);
 						out.print(literals.get(lit3.toString()));
@@ -630,9 +632,9 @@ public class Translator {
 
 				for (String key2 : goal.getVariables().keySet()) {
 
-					Literal lit1 = Literal.newOrder(key2, child.getName());
+					Literal lit1 = new OrderLiteral(key2, child.getName());
 
-					Literal lit2 = Literal.newSubsumption(key2, key1);
+					Literal lit2 = new SubsumptionLiteral(key2, key1);
 
 					out.print(literals.get(lit1.toString()));
 					out.print(space);
@@ -820,7 +822,7 @@ public class Translator {
 			if (var.isUserVariable()) {
 				for (FAtom atom : goal.getAllAtoms().values()) {
 					if (atom.isCons() || atom.isRoot()) {
-						Literal lit = Literal.newSubsumption(var.toString(),
+						Literal lit = new SubsumptionLiteral(var.toString(),
 								atom.toString());
 						int i = literals.get(lit.toString());
 						update.append("-" + i + space);
