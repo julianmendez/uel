@@ -1,5 +1,9 @@
 package de.tudresden.inf.lat.uel.plugin.ui;
 
+/**
+ * 
+ * @author Julian Mendez
+ */
 class LabelId implements Comparable<LabelId> {
 
 	private int hashCode = 0;

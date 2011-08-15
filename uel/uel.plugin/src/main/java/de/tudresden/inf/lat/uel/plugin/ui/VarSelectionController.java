@@ -5,6 +5,10 @@ import java.awt.event.ActionListener;
 
 import javax.swing.WindowConstants;
 
+/**
+ * 
+ * @author Julian Mendez
+ */
 class VarSelectionController implements ActionListener {
 
 	private static final String BUTTON_CONS = "make constant";

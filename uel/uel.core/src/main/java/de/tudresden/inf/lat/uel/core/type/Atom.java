@@ -6,12 +6,8 @@ import java.util.Map;
  * This class implement an object atom. Atom is a concept term, which is not a
  * conjunction. Hence atom can be a concept name or an existential restriction.
  * 
- * 
- * 
- * @author morawska
- * 
+ * @author Barbara Morawska
  */
-
 public class Atom {
 
 	/*

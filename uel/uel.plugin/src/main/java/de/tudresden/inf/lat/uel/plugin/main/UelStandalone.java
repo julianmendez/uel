@@ -13,6 +13,10 @@ import de.tudresden.inf.lat.uel.plugin.processor.UelProcessor;
 import de.tudresden.inf.lat.uel.plugin.ui.UelController;
 import de.tudresden.inf.lat.uel.plugin.ui.UelView;
 
+/**
+ * 
+ * @author Julian Mendez
+ */
 public class UelStandalone {
 
 	public static void main(String[] args) throws IOException,

@@ -12,10 +12,7 @@ package de.tudresden.inf.lat.uel.core.type;
  * 
  * Used in Translator.
  * 
- * 
- * 
  * @author Barbara Morawska
- * 
  */
 public class Literal {
 

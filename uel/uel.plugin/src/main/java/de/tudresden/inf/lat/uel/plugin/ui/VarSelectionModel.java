@@ -10,6 +10,10 @@ import java.util.TreeSet;
 import de.tudresden.inf.lat.uel.core.type.Equation;
 import de.tudresden.inf.lat.uel.core.type.Ontology;
 
+/**
+ * 
+ * @author Julian Mendez
+ */
 class VarSelectionModel {
 
 	private Map<String, String> idLabelMap = new HashMap<String, String>();

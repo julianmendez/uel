@@ -8,7 +8,6 @@ import java.util.Map;
  * and FAtom.
  * 
  * @author Barbara Morawska
- * 
  */
 public class Equation {
 

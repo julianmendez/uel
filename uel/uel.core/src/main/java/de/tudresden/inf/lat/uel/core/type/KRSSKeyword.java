@@ -1,5 +1,9 @@
 package de.tudresden.inf.lat.uel.core.type;
 
+/**
+ * 
+ * @author Julian Mendez
+ */
 public interface KRSSKeyword {
 
 	public static final String and = "and";

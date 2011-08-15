@@ -15,6 +15,10 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+/**
+ * 
+ * @author Julian Mendez
+ */
 class VarSelectionView extends JDialog {
 
 	private static final long serialVersionUID = 1742164773153032359L;
