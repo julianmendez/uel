@@ -202,8 +202,23 @@ public class Goal {
 	 * @return the list of goal equations
 	 */
 	public List<Equation> getEquations() {
-
 		return equations;
+	}
+
+	/**
+	 * Returns a string representation of the equations, excluding the main
+	 * equation.
+	 * 
+	 * @return a string representation of the equations, excluding the main
+	 *         equation
+	 */
+	public String getGoalEquations() {
+		StringBuffer sbuf = new StringBuffer();
+		for (Equation eq : getEquations()) {
+			sbuf.append(eq.toString());
+			sbuf.append("\n");
+		}
+		return sbuf.toString();
 	}
 
 	public Equation getMainEquation() {
@@ -422,10 +437,7 @@ public class Goal {
 		StringBuffer sbuf = new StringBuffer();
 		sbuf.append(this.mainEquation);
 		sbuf.append("\n");
-		for (Equation eq : getEquations()) {
-			sbuf.append(eq.toString());
-			sbuf.append("\n");
-		}
+		sbuf.append(getGoalEquations());
 		return sbuf.toString();
 	}
 

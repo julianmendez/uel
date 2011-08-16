@@ -131,7 +131,7 @@ class StatInfoView extends JDialog {
 		StringBuffer ret = new StringBuffer();
 		try {
 			BufferedReader reader = new BufferedReader(new StringReader(
-					str.replace(KRSSKeyword.close, KRSSKeyword.blank
+					str.replace(KRSSKeyword.close, KRSSKeyword.space
 							+ KRSSKeyword.close)));
 			String line = new String();
 			while (line != null) {
@@ -142,7 +142,7 @@ class StatInfoView extends JDialog {
 						String token = stok.nextToken();
 						ret.append(getModel().getLabel(token));
 						if (stok.hasMoreTokens()) {
-							ret.append(KRSSKeyword.blank);
+							ret.append(KRSSKeyword.space);
 						}
 					}
 				}

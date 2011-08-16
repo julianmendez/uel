@@ -16,6 +16,7 @@ public class Equation {
 	 * the atoms.
 	 */
 	private Map<String, Atom> left;
+
 	/**
 	 * Right side of equation Hash map with keys names of the atoms and values
 	 * the atoms.
@@ -153,19 +154,19 @@ public class Equation {
 		StringBuffer sbuf = new StringBuffer();
 		sbuf.append(KRSSKeyword.open);
 		sbuf.append(KRSSKeyword.define_concept);
-		sbuf.append(KRSSKeyword.blank);
+		sbuf.append(KRSSKeyword.space);
 		sbuf.append(left.keySet().iterator().next());
 		if (right.keySet().size() > 1) {
-			sbuf.append(KRSSKeyword.blank);
+			sbuf.append(KRSSKeyword.space);
 			sbuf.append(KRSSKeyword.open);
 			sbuf.append(KRSSKeyword.and);
 			for (String concept : right.keySet()) {
-				sbuf.append(KRSSKeyword.blank);
+				sbuf.append(KRSSKeyword.space);
 				sbuf.append(right.get(concept));
 			}
 			sbuf.append(KRSSKeyword.close);
 		} else if (right.keySet().size() == 1) {
-			sbuf.append(KRSSKeyword.blank);
+			sbuf.append(KRSSKeyword.space);
 			sbuf.append(right.get(right.keySet().iterator().next()));
 		}
 		sbuf.append(KRSSKeyword.close);

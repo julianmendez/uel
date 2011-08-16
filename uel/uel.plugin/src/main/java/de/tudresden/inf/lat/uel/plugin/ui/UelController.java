@@ -582,7 +582,7 @@ public class UelController implements ActionListener {
 						String token = stok.nextToken();
 						ret.append(getLabel(token));
 						if (stok.hasMoreTokens()) {
-							ret.append(KRSSKeyword.blank);
+							ret.append(KRSSKeyword.space);
 						}
 					}
 				}

@@ -213,7 +213,7 @@ public class FAtom extends Atom {
 		if (S.isEmpty()) {
 
 			sbuf.append(KRSSKeyword.top);
-			sbuf.append(KRSSKeyword.blank);
+			sbuf.append(KRSSKeyword.space);
 
 		} else if (S.size() == 1) {
 
@@ -224,15 +224,15 @@ public class FAtom extends Atom {
 
 			sbuf.append(KRSSKeyword.open);
 			sbuf.append(KRSSKeyword.and);
-			sbuf.append(KRSSKeyword.blank);
+			sbuf.append(KRSSKeyword.space);
 
 			for (FAtom atom : S) {
-				sbuf.append(KRSSKeyword.blank);
+				sbuf.append(KRSSKeyword.space);
 				sbuf.append(printSubstitution(atom));
-				sbuf.append(KRSSKeyword.blank);
+				sbuf.append(KRSSKeyword.space);
 			}
 
-			sbuf.append(KRSSKeyword.blank);
+			sbuf.append(KRSSKeyword.space);
 			sbuf.append(KRSSKeyword.close);
 		}
 		return sbuf.toString();
@@ -243,10 +243,15 @@ public class FAtom extends Atom {
 		if (atom.isRoot() && !atom.getChild().isUserVariable()) {
 			sbuf.append(KRSSKeyword.open);
 			sbuf.append(KRSSKeyword.some);
-			sbuf.append(KRSSKeyword.blank);
+			sbuf.append(KRSSKeyword.space);
 			sbuf.append(atom.getName());
-			sbuf.append(KRSSKeyword.blank);
-			sbuf.append(atom.getChild().printS());
+			sbuf.append(KRSSKeyword.space);
+			FAtom child = atom.getChild();
+			if (child.isVar() && !child.isUserVariable()) {
+				sbuf.append(child.printS());
+			} else {
+				sbuf.append(child.getName());
+			}
 			sbuf.append(KRSSKeyword.close);
 		} else {
 			sbuf.append(atom.toString());
@@ -297,9 +302,9 @@ public class FAtom extends Atom {
 		if (child != null) {
 
 			str = str.insert(0,
-					(KRSSKeyword.open + KRSSKeyword.some + KRSSKeyword.blank));
+					(KRSSKeyword.open + KRSSKeyword.some + KRSSKeyword.space));
 
-			str.append(KRSSKeyword.blank);
+			str.append(KRSSKeyword.space);
 			str.append(child.toString());
 			str.append(KRSSKeyword.close);
 		}

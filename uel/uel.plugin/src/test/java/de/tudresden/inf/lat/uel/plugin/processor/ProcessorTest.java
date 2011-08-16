@@ -172,7 +172,7 @@ public class ProcessorTest extends TestCase {
 		}
 
 		List<String> unifiers = processor.getUnifierList();
-		String goalStr = goal.toString();
+		String goalStr = goal.getGoalEquations();
 
 		for (String unifier : unifiers) {
 			String extendedOntology = goalStr + unifier;

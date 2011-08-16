@@ -130,17 +130,6 @@ public class OntologyBuilder {
 		for (OWLClass key : primitiveDefinitions.keySet()) {
 			processPrimitiveDefinition(key, primitiveDefinitions.get(key));
 		}
-
-		for (OWLClass cls : owlOntology.getClassesInSignature()) {
-			String id = cls.toStringID();
-			if (this.ontology.getDefinition(id) == null
-					&& this.ontology.getPrimitiveDefinition(id) == null) {
-				Atom atom = new Atom(id, false);
-				this.ontology.putPrimitiveDefinition(atom.getName(),
-						makeEquation(atom, new HashSet<Atom>()));
-				processClass(cls);
-			}
-		}
 	}
 
 	private Equation makeEquation(Atom definiendum, Set<Atom> definiens) {

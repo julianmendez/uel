@@ -790,15 +790,14 @@ public class Translator {
 			PrintWriter out = new PrintWriter(new BufferedWriter(result));
 
 			for (String variable : goal.getVariables().keySet()) {
-
 				if (goal.getVariables().get(variable).isUserVariable()) {
 					out.print(KRSSKeyword.open + KRSSKeyword.define_concept
-							+ KRSSKeyword.blank);
-					out.print(variable + space);
+							+ KRSSKeyword.space);
+					out.print(variable + KRSSKeyword.space);
 
 					out.print(goal.getVariables().get(variable).printS());
-					out.println(KRSSKeyword.blank + KRSSKeyword.close
-							+ KRSSKeyword.blank);
+					out.println(KRSSKeyword.space + KRSSKeyword.close
+							+ KRSSKeyword.space);
 				}
 			}
 
