@@ -22,6 +22,12 @@ public class Sat4jSolver implements Solver {
 
 	public static final int timeout = 3600;
 
+	/**
+	 * Constructs a new solver.
+	 */
+	public Sat4jSolver() {
+	}
+
 	@Override
 	public String solve(String input) throws IOException {
 		ByteArrayInputStream satinputInputStream = new ByteArrayInputStream(

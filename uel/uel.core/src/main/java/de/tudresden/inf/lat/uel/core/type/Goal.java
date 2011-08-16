@@ -57,6 +57,12 @@ public class Goal {
 	 */
 	private Map<String, FAtom> variables = new HashMap<String, FAtom>();
 
+	/**
+	 * Constructs a new goal based on a specified ontology.
+	 * 
+	 * @param ont
+	 *            an ontology
+	 */
 	public Goal(Ontology ont) {
 		ontology = ont;
 	}

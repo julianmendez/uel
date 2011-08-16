@@ -1,6 +1,8 @@
 package de.tudresden.inf.lat.uel.core.type;
 
 /**
+ * This interface contains the main required keywords of KRSS (Knowledge
+ * Representation System Specification).
  * 
  * @author Julian Mendez
  */

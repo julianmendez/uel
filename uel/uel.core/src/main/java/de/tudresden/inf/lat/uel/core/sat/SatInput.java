@@ -18,6 +18,9 @@ public class SatInput {
 	private Set<Set<Integer>> clauses = new HashSet<Set<Integer>>();
 	private Integer lastId = 0;
 
+	/**
+	 * Constructs a new SAT input.
+	 */
 	public SatInput() {
 	}
 
@@ -57,7 +60,7 @@ public class SatInput {
 	}
 
 	/**
-	 * Clears the clause set.
+	 * Clears the set of clauses.
 	 */
 	public void clear() {
 		this.clauses.clear();
@@ -75,6 +78,11 @@ public class SatInput {
 		return ret;
 	}
 
+	/**
+	 * Returns the clauses.
+	 * 
+	 * @return the clauses
+	 */
 	public Set<Set<Integer>> getClauses() {
 		return Collections.unmodifiableSet(this.clauses);
 	}

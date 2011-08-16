@@ -28,11 +28,13 @@ public class Atom {
 	private final boolean root;
 
 	/**
-	 * Constructor used by the constructor of FAtom. n is a name of an atom and
-	 * r is true if the atom is an existential restriction.
+	 * Constructs a new atom.
 	 * 
 	 * @param n
+	 *            name of the atom
 	 * @param r
+	 *            <code>true</code> if and only if the atom is an existential
+	 *            restriction
 	 */
 	public Atom(String n, boolean r) {
 		name = n;
@@ -40,14 +42,16 @@ public class Atom {
 	}
 
 	/**
-	 * Constructor used by ReaderAndParser and Ontology to construct a non-flat
-	 * atom. n is the name of the atom r is true if the atom is an existential
-	 * restriction argchild is the conjunction of atoms, which is an argument
-	 * for the role name when r is true
+	 * Constructs a new atom.
 	 * 
 	 * @param n
+	 *            the name of the atom
 	 * @param r
+	 *            <code>true</code> if and only if the atom is an existential
+	 *            restriction
 	 * @param argchild
+	 *            conjunction of atoms, which is an argument for the role name
+	 *            when r is true
 	 */
 	public Atom(String n, boolean r, Map<String, Atom> argchild) {
 		name = n;

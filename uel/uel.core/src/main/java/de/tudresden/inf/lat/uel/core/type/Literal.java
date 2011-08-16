@@ -1,16 +1,11 @@
 package de.tudresden.inf.lat.uel.core.type;
 
 /**
- * This class implements dis-subsumptions between atoms in the goal and order
- * literals between variables in the goal.
- * 
- * A literal is defined by first and second argument (strings) kind
- * (dis-subsumption or order literal). A literal has a value which by default is
- * false, which in the case of subsumptions means that the subsumption is false,
- * hence the dis-subsumption is true. A valuation obtained from a SAT solver by
- * Unifier can change this value.
- * 
- * Used in Translator.
+ * A literal is defined by two strings and it can be a dis-subsumption or an
+ * order literal. A literal has a value which by default is false, which in the
+ * case of subsumptions means that the subsumption is false, hence the
+ * dis-subsumption is true. A valuation obtained from a SAT solver can change
+ * this value.
  * 
  * @author Barbara Morawska
  */

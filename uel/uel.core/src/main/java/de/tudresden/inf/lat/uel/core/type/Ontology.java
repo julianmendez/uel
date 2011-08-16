@@ -22,23 +22,53 @@ public class Ontology {
 
 	private HashMap<String, Equation> primitiveDefinitions = new HashMap<String, Equation>();
 
+	/**
+	 * Constructs a new empty ontology.
+	 */
 	public Ontology() {
 	}
 
+	/**
+	 * Clears the ontology.
+	 */
 	public void clear() {
 		this.atoms.clear();
 		this.definitions.clear();
 		this.primitiveDefinitions.clear();
 	}
 
+	/**
+	 * Tells whether this ontology contains the specified atom.
+	 * 
+	 * @param name
+	 *            atom name
+	 * @return <code>true</code> if and only if this ontology contains the
+	 *         specified atom
+	 */
 	public boolean containsAtom(String name) {
 		return this.atoms.containsKey(name);
 	}
 
+	/**
+	 * Tells whether this ontology contains the specified definition.
+	 * 
+	 * @param name
+	 *            definition identifier
+	 * @return <code>true</code> if and only if this ontology contains the
+	 *         specified definition
+	 */
 	public boolean containsDefinition(String name) {
 		return this.definitions.containsKey(name);
 	}
 
+	/**
+	 * Tells whether this ontology contains the specified primitive definition.
+	 * 
+	 * @param name
+	 *            primitive definition identifier
+	 * @return <code>true</code> if and only if this ontology contains the
+	 *         specified primitive definition
+	 */
 	public boolean containsPrimitiveDefinition(String name) {
 		return this.primitiveDefinitions.containsKey(name);
 	}

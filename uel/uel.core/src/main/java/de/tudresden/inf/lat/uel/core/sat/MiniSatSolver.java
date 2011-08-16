@@ -18,6 +18,12 @@ public class MiniSatSolver implements Solver {
 	private static final String tempPrefix = "uelMiniSat";
 	private static final String tempSuffix = ".tmp";
 
+	/**
+	 * Constructs a new solver.
+	 */
+	public MiniSatSolver() {
+	}
+
 	private void runMiniSat(File satinput, File satoutput) throws IOException {
 		try {
 			ProcessBuilder pb = new ProcessBuilder(minisatCommand,
@@ -30,6 +36,7 @@ public class MiniSatSolver implements Solver {
 		}
 	}
 
+	@Override
 	public String solve(String input) throws IOException {
 		String ret = null;
 		File satinput = File.createTempFile(tempPrefix, tempSuffix);

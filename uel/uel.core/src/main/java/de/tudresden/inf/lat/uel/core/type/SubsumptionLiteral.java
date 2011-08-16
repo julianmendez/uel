@@ -1,6 +1,7 @@
 package de.tudresden.inf.lat.uel.core.type;
 
 /**
+ * An object implementing this class is a dis-subsumption.
  * 
  * @author Barbara Morawska
  */
