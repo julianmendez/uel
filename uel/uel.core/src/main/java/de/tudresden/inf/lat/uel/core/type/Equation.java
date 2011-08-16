@@ -4,8 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * This class implements equation as two hash maps of atoms. It is used by Goal
- * and FAtom.
+ * This class implements an equation as two hash maps of atoms.
  * 
  * @author Barbara Morawska
  */
@@ -24,33 +23,31 @@ public class Equation {
 	private Map<String, Atom> right;
 
 	/**
-	 * Constructor initializes two hash maps for the left and right side of
-	 * equation.
+	 * Constructs an equation given two atoms.
+	 * 
+	 * @param leftAtom
+	 *            atom on the left-hand side
+	 * @param rightAtom
+	 *            atom on the right-hand side
 	 */
-	public Equation() {
+	public Equation(Atom leftAtom, Atom rightAtom) {
 		left = new HashMap<String, Atom>();
+		left.put(leftAtom.getName(), leftAtom);
 		right = new HashMap<String, Atom>();
+		right.put(rightAtom.getName(), rightAtom);
 	}
 
 	/**
-	 * Constructor defines an equation given two hash maps of atoms.
+	 * Constructs an equation given two hash maps of atoms.
 	 * 
-	 * @param list1
+	 * @param leftPart
 	 *            hash map with keys names and values atoms
-	 * @param list2
+	 * @param rightPart
 	 *            hash map with keys names and values atoms
 	 */
-	public Equation(Map<String, Atom> list1, Map<String, Atom> list2) {
-		left = list1;
-		right = list2;
-	}
-
-	public void addToLeft(Atom a) {
-		this.left.put(a.getName(), a);
-	}
-
-	public void addToRight(Atom a) {
-		this.right.put(a.getName(), a);
+	public Equation(Map<String, Atom> leftPart, Map<String, Atom> rightPart) {
+		left = leftPart;
+		right = rightPart;
 	}
 
 	@Override
@@ -97,7 +94,7 @@ public class Equation {
 		StringBuffer sbuf = new StringBuffer();
 		if (left != null && right != null) {
 
-			sbuf.append("From Equation: left side is -- ");
+			sbuf.append("left side: ");
 
 			for (String concept : left.keySet()) {
 
@@ -106,7 +103,7 @@ public class Equation {
 			}
 
 			sbuf.append("\n");
-			sbuf.append("From Equation: right side is -- ");
+			sbuf.append("right side: ");
 
 			for (String concept : right.keySet()) {
 
@@ -121,32 +118,6 @@ public class Equation {
 
 		}
 		return sbuf.toString();
-	}
-
-	/**
-	 * Sets the left side of the equation to the hash map <code>list</code> with
-	 * keys names and values atoms.
-	 * 
-	 * Not used in UEL.
-	 * 
-	 * @param list
-	 */
-	public void setLeft(Map<String, Atom> list) {
-
-		left = list;
-	}
-
-	/**
-	 * Sets the right side of the equation to the hash map <code>list</code>
-	 * with keys names and values atoms.
-	 * 
-	 * Used in FAtom
-	 * 
-	 * @param list
-	 */
-	public void setRight(Map<String, Atom> list) {
-
-		right = list;
 	}
 
 	@Override

@@ -2,6 +2,8 @@ package de.tudresden.inf.lat.uel.core.type;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * This class extends Atom. It implements a flat atom, hence an atom which is
@@ -46,16 +48,15 @@ public class FAtom extends Atom {
 			FAtom b = null;
 			String newvar = VAR_PREFIX + goal.getNbrVar();
 
-			Equation eq = new Equation();
-
 			b = new FAtom(newvar, false, true, null);
 
 			goal.setNbrVar(goal.getNbrVar() + 1);
 
 			child = b;
 
-			eq.getLeft().put(b.toString(), b);
-			eq.setRight(atom.getChildren());
+			Map<String, Atom> bMap = new HashMap<String, Atom>();
+			bMap.put(b.toString(), b);
+			Equation eq = new Equation(bMap, atom.getChildren());
 
 			goal.addFlatten(eq);
 

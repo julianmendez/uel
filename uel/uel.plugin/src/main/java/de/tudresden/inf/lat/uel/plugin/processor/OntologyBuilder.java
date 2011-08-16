@@ -141,9 +141,7 @@ public class OntologyBuilder {
 			rightMap.put(atom.toString(), atom);
 		}
 
-		Equation ret = new Equation();
-		ret.setLeft(leftMap);
-		ret.setRight(rightMap);
+		Equation ret = new Equation(leftMap, rightMap);
 		return ret;
 	}
 

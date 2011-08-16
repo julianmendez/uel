@@ -88,7 +88,6 @@ public class Goal {
 
 		FAtom a;
 		Atom b = null;
-		Equation newequation = new Equation();
 
 		if (e.getLeft().size() != 1) {
 
@@ -115,6 +114,9 @@ public class Goal {
 
 		} else {
 
+			Map<String, Atom> leftPart = new HashMap<String, Atom>();
+			Map<String, Atom> rightPart = new HashMap<String, Atom>();
+
 			a = new FAtom(null, b);
 
 			a.setVar(true);
@@ -122,7 +124,7 @@ public class Goal {
 			variables.put(a.toString(), a);
 			allatoms.put(a.toString(), a);
 
-			newequation.getLeft().put(a.toString(), a);
+			leftPart.put(a.toString(), a);
 
 			/*
 			 * FLATTENING
@@ -134,12 +136,11 @@ public class Goal {
 
 				if (allatoms.containsKey(a.toString())) {
 
-					newequation.getRight().put(a.toString(),
-							allatoms.get(a.toString()));
+					rightPart.put(a.toString(), allatoms.get(a.toString()));
 
 				} else {
 
-					newequation.getRight().put(a.toString(), a);
+					rightPart.put(a.toString(), a);
 
 				}
 
@@ -155,10 +156,10 @@ public class Goal {
 				this.nbrVar++;
 				this.allatoms.put(var.getName(), var);
 				this.variables.put(var.getName(), var);
-				newequation.addToRight(var);
+				rightPart.put(var.getName(), var);
 			}
 
-			addEquation(newequation);
+			addEquation(new Equation(leftPart, rightPart));
 
 		}
 	}
@@ -282,10 +283,7 @@ public class Goal {
 	private void initialize(List<Equation> list, FAtom left, FAtom right,
 			Writer output, Set<String> vars) throws IOException {
 
-		Equation mainEquation = new Equation();
-		mainEquation.addToLeft(left);
-		mainEquation.addToRight(right);
-		setMainEquation(mainEquation);
+		setMainEquation(new Equation(left, right));
 		for (Equation eq : list) {
 			addFlatten(eq);
 		}
