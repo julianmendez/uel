@@ -21,8 +21,8 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
 
 import de.tudresden.inf.lat.uel.core.log.OutputStreamHandler;
 import de.tudresden.inf.lat.uel.core.sat.MiniSatSolver;
-import de.tudresden.inf.lat.uel.core.type.Atom;
 import de.tudresden.inf.lat.uel.core.type.Equation;
+import de.tudresden.inf.lat.uel.core.type.FAtom;
 import de.tudresden.inf.lat.uel.core.type.Goal;
 import de.tudresden.inf.lat.uel.core.type.Ontology;
 import de.tudresden.inf.lat.uel.plugin.processor.OntologyBuilder;
@@ -74,16 +74,6 @@ public class UelConsole {
 		return ret;
 	}
 
-	private Equation createMainEquation(Set<String> input) {
-		Iterator<String> inputIt = input.iterator();
-		Atom left = new Atom(inputIt.next(), false);
-		Atom right = new Atom(inputIt.next(), false);
-		Equation mainEquation = new Equation();
-		mainEquation.addToLeft(left);
-		mainEquation.addToRight(right);
-		return mainEquation;
-	}
-
 	/**
 	 * This method is used by Main class if the options string is "-h" or "-H"
 	 * or if the options are not valid.
@@ -121,15 +111,10 @@ public class UelConsole {
 		Ontology ontology = loadOntology(new File(filename));
 		Set<String> input = ontology.getDefinitionIds();
 		List<Equation> equationList = createEquations(ontology, input);
-		Equation mainEquation = createMainEquation(input);
-
-		if (unifier.getTest()) {
-			FileWriter output = new FileWriter(filename + ".TBox");
-			goal.initializeWithTest(equationList, mainEquation, output,
-					new HashSet<String>());
-		} else {
-			goal.initialize(equationList, mainEquation, new HashSet<String>());
-		}
+		Iterator<String> inputIt = input.iterator();
+		FAtom left = new FAtom(inputIt.next(), false, true, null);
+		FAtom right = new FAtom(inputIt.next(), false, true, null);
+		goal.initialize(equationList, left, right, new HashSet<String>());
 	}
 
 	private Ontology loadOntology(File file) throws IOException {

@@ -1,8 +1,6 @@
 package de.tudresden.inf.lat.uel.core.type;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -261,25 +259,20 @@ public class Goal {
 		}
 	}
 
-	private void initialize(List<Equation> list, Equation mainEq, boolean test,
+	public void initialize(List<Equation> equationList, FAtom left,
+			FAtom right, Set<String> vars) throws IOException {
+		initialize(equationList, left, right, null, vars);
+	}
+
+	private void initialize(List<Equation> list, FAtom left, FAtom right,
 			Writer output, Set<String> vars) throws IOException {
 
-		setMainEquation(mainEq);
+		Equation mainEquation = new Equation();
+		mainEquation.addToLeft(left);
+		mainEquation.addToRight(right);
+		setMainEquation(mainEquation);
 		for (Equation eq : list) {
 			addFlatten(eq);
-		}
-
-		if (test) {
-
-			PrintWriter writer = new PrintWriter(new BufferedWriter(output));
-
-			for (Equation eq : equations) {
-
-				writer.print(eq.printFDefinition());
-
-			}
-			writer.flush();
-
 		}
 
 		for (String key : variables.keySet()) {
@@ -298,7 +291,7 @@ public class Goal {
 			if (vars.contains(a.getName())) {
 
 				a.setVar(true);
-				a.setUserVariable(true);
+				a.setUserVariable(!a.equals(left) && !a.equals(right));
 				variables.put(key, a);
 			} else if (!variables.containsKey(key) && !a.isRoot()) {
 
@@ -309,35 +302,6 @@ public class Goal {
 				eatoms.put(key, a);
 			}
 		}
-	}
-
-	public void initialize(List<Equation> equationList, Equation mainEq,
-			Set<String> vars) throws IOException {
-		initialize(equationList, mainEq, false, null, vars);
-	}
-
-	/**
-	 * This method initializes the goal using a reader containing unification
-	 * problem. The method calls ReaderAndParser to parse and flatten goal
-	 * equations.
-	 * 
-	 * Then if variable Unifier.text is true, all equations are written to a
-	 * writer.
-	 * 
-	 * Then all variables, constants and existential atoms are identified.
-	 * 
-	 * @param equationList
-	 *            list of equations
-	 * @param output
-	 *            output
-	 * @param vars
-	 *            set of variables
-	 * @throws IOException
-	 */
-	public void initializeWithTest(List<Equation> equationList,
-			Equation mainEq, Writer output, Set<String> vars)
-			throws IOException {
-		initialize(equationList, mainEq, true, output, vars);
 	}
 
 	/**
@@ -372,19 +336,6 @@ public class Goal {
 		}
 		sbuf.append("\n");
 		return sbuf.toString();
-	}
-
-	/**
-	 * This method is not used by UEL. It is here for testing purposes. Prints
-	 * all equations of the goal to a Print Writer out.
-	 * 
-	 * @param out
-	 */
-	public void printDefinitions(PrintWriter out) {
-		for (Equation eq : equations) {
-			out.print(eq.printFDefinition());
-			out.println();
-		}
 	}
 
 	/**

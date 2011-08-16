@@ -134,7 +134,8 @@ public class FAtom extends Atom {
 		boolean ret = false;
 		if (o instanceof FAtom) {
 			FAtom other = (FAtom) o;
-			ret = this.userVariable == other.userVariable
+			ret = super.equals(other)
+					&& this.userVariable == other.userVariable
 					&& this.var == other.var && this.S.equals(other.S);
 			ret = ret
 					&& ((this.child == null && other.child == null) || (this.child != null && this.child

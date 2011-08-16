@@ -16,8 +16,8 @@ import de.tudresden.inf.lat.uel.core.sat.Sat4jSolver;
 import de.tudresden.inf.lat.uel.core.sat.SatInput;
 import de.tudresden.inf.lat.uel.core.sat.Solver;
 import de.tudresden.inf.lat.uel.core.sat.Translator;
-import de.tudresden.inf.lat.uel.core.type.Atom;
 import de.tudresden.inf.lat.uel.core.type.Equation;
+import de.tudresden.inf.lat.uel.core.type.FAtom;
 import de.tudresden.inf.lat.uel.core.type.Goal;
 import de.tudresden.inf.lat.uel.core.type.Ontology;
 
@@ -111,22 +111,15 @@ public class UelProcessor {
 
 		Goal ret = new Goal(ont);
 		try {
-			ret.initialize(equationList, createMainEquation(input), vars);
+			Iterator<String> inputIt = input.iterator();
+			FAtom left = new FAtom(inputIt.next(), false, true, null);
+			FAtom right = new FAtom(inputIt.next(), false, true, null);
+			ret.initialize(equationList, left, right, vars);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 
 		return ret;
-	}
-
-	private Equation createMainEquation(Set<String> input) {
-		Iterator<String> inputIt = input.iterator();
-		Atom left = new Atom(inputIt.next(), false);
-		Atom right = new Atom(inputIt.next(), false);
-		Equation mainEquation = new Equation();
-		mainEquation.addToLeft(left);
-		mainEquation.addToRight(right);
-		return mainEquation;
 	}
 
 	public Ontology createOntology(OWLOntology owlOntology) {
