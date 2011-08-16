@@ -132,7 +132,8 @@ public class OntologyBuilder {
 		}
 	}
 
-	private Equation makeEquation(Atom definiendum, Set<Atom> definiens) {
+	private Equation makeEquation(Atom definiendum, Set<Atom> definiens,
+			boolean primitive) {
 		Map<String, Atom> leftMap = new HashMap<String, Atom>();
 		leftMap.put(definiendum.toString(), definiendum);
 
@@ -141,7 +142,7 @@ public class OntologyBuilder {
 			rightMap.put(atom.toString(), atom);
 		}
 
-		Equation ret = new Equation(leftMap, rightMap);
+		Equation ret = new Equation(leftMap, rightMap, primitive);
 		return ret;
 	}
 
@@ -172,7 +173,7 @@ public class OntologyBuilder {
 		Set<Atom> left = processClass(definiendum);
 		Set<Atom> right = processClassExpression(definiens);
 		this.ontology.putDefinition(left.iterator().next().toString(),
-				makeEquation(left.iterator().next(), right));
+				makeEquation(left.iterator().next(), right, false));
 	}
 
 	private Set<Atom> processIntersection(OWLObjectIntersectionOf intersection) {
@@ -190,9 +191,11 @@ public class OntologyBuilder {
 		for (OWLClassExpression clsExpr : definiensSet) {
 			superClassSet.addAll(processClassExpression(clsExpr));
 		}
-		this.ontology.putPrimitiveDefinition(subClassSet.iterator().next()
-				.toString(),
-				makeEquation(subClassSet.iterator().next(), superClassSet));
+		this.ontology
+				.putPrimitiveDefinition(
+						subClassSet.iterator().next().toString(),
+						makeEquation(subClassSet.iterator().next(),
+								superClassSet, true));
 	}
 
 	private Set<Atom> processSomeValuesRestriction(

@@ -159,7 +159,7 @@ public class Goal {
 				rightPart.put(var.getName(), var);
 			}
 
-			addEquation(new Equation(leftPart, rightPart));
+			addEquation(new Equation(leftPart, rightPart, false));
 
 		}
 	}
@@ -283,7 +283,7 @@ public class Goal {
 	private void initialize(List<Equation> list, FAtom left, FAtom right,
 			Writer output, Set<String> vars) throws IOException {
 
-		setMainEquation(new Equation(left, right));
+		setMainEquation(new Equation(left, right, false));
 		for (Equation eq : list) {
 			addFlatten(eq);
 		}

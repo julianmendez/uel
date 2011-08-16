@@ -16,6 +16,8 @@ public class Equation {
 	 */
 	private Map<String, Atom> left;
 
+	private boolean primitive = false;
+
 	/**
 	 * Right side of equation Hash map with keys names of the atoms and values
 	 * the atoms.
@@ -29,12 +31,15 @@ public class Equation {
 	 *            atom on the left-hand side
 	 * @param rightAtom
 	 *            atom on the right-hand side
+	 * @param prim
+	 *            whether this is primitive
 	 */
-	public Equation(Atom leftAtom, Atom rightAtom) {
+	public Equation(Atom leftAtom, Atom rightAtom, boolean prim) {
 		left = new HashMap<String, Atom>();
 		left.put(leftAtom.getName(), leftAtom);
 		right = new HashMap<String, Atom>();
 		right.put(rightAtom.getName(), rightAtom);
+		primitive = prim;
 	}
 
 	/**
@@ -44,10 +49,14 @@ public class Equation {
 	 *            hash map with keys names and values atoms
 	 * @param rightPart
 	 *            hash map with keys names and values atoms
+	 * @param prim
+	 *            whether this is primitive
 	 */
-	public Equation(Map<String, Atom> leftPart, Map<String, Atom> rightPart) {
+	public Equation(Map<String, Atom> leftPart, Map<String, Atom> rightPart,
+			boolean prim) {
 		left = leftPart;
 		right = rightPart;
+		primitive = prim;
 	}
 
 	@Override
@@ -56,7 +65,8 @@ public class Equation {
 		if (o instanceof Equation) {
 			Equation other = (Equation) o;
 			ret = this.left.equals(other.left)
-					&& this.right.equals(other.right);
+					&& this.right.equals(other.right)
+					&& this.primitive == other.primitive;
 		}
 		return ret;
 	}
@@ -86,6 +96,15 @@ public class Equation {
 	}
 
 	/**
+	 * Tells whether this equation is primitive.
+	 * 
+	 * @return <code>true</code> if and only if this equation if primitive
+	 */
+	public boolean isPrimitive() {
+		return primitive;
+	}
+
+	/**
 	 * This method is defined for testing purposes only. It is used by printing
 	 * method of Goal.
 	 */
@@ -94,6 +113,9 @@ public class Equation {
 		StringBuffer sbuf = new StringBuffer();
 		if (left != null && right != null) {
 
+			if (primitive) {
+				sbuf.append("(primitive) ");
+			}
 			sbuf.append("left side: ");
 
 			for (String concept : left.keySet()) {
@@ -124,7 +146,11 @@ public class Equation {
 	public String toString() {
 		StringBuffer sbuf = new StringBuffer();
 		sbuf.append(KRSSKeyword.open);
-		sbuf.append(KRSSKeyword.define_concept);
+		if (primitive) {
+			sbuf.append(KRSSKeyword.define_primitive_concept);
+		} else {
+			sbuf.append(KRSSKeyword.define_concept);
+		}
 		sbuf.append(KRSSKeyword.space);
 		sbuf.append(left.keySet().iterator().next());
 		if (right.keySet().size() > 1) {

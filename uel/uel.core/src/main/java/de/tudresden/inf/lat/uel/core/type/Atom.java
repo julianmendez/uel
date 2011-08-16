@@ -1,6 +1,7 @@
 package de.tudresden.inf.lat.uel.core.type;
 
 import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  * This class implement an object atom. Atom is a concept term, which is not a
@@ -9,6 +10,8 @@ import java.util.Map;
  * @author Barbara Morawska
  */
 public class Atom {
+
+	private static final Logger logger = Logger.getLogger(Atom.class.getName());
 
 	/*
 	 * Atom has a name. If it is a concept name, this concept name is the
@@ -47,11 +50,9 @@ public class Atom {
 	 * @param argchild
 	 */
 	public Atom(String n, boolean r, Map<String, Atom> argchild) {
-
 		name = n;
 		children = argchild;
 		root = r;
-
 	}
 
 	@Override
@@ -74,17 +75,13 @@ public class Atom {
 	 * @return the hash map representing a conjunction of atoms
 	 */
 	public Map<String, Atom> getChildren() {
-
+		Map<String, Atom> ret = null;
 		if (root) {
-			return children;
+			ret = children;
 		} else {
-
-			System.out
-					.println("WARNING: Cannot return children of a variable or constant");
-
-			return null;
+			logger.warning("WARNING: Cannot return children of a variable or constant");
 		}
-
+		return ret;
 	}
 
 	/**
@@ -93,7 +90,6 @@ public class Atom {
 	 * @return name of the atom
 	 */
 	public String getName() {
-
 		return name;
 	}
 
@@ -108,28 +104,19 @@ public class Atom {
 	 * @return <code>true</code> if and only if the atom is flat
 	 */
 	public boolean isFlat() {
-
 		boolean test = true;
-
 		if (isRoot()) {
-
 			if (children.size() == 1) {
-
 				for (String key : children.keySet()) {
-
 					if (children.get(key).isRoot()) {
 						test = false;
 					}
-
 				}
-
 			} else {
 				test = false;
 			}
-
 		}
 		return test;
-
 	}
 
 	/**
@@ -139,28 +126,21 @@ public class Atom {
 	 *         restriction
 	 */
 	public boolean isRoot() {
-
 		return root;
 	}
 
 	@Override
 	public String toString() {
-
 		StringBuilder str = new StringBuilder(name);
-
 		if (children != null) {
 			str.append("[");
 			for (String atom : children.keySet()) {
-
 				str.append(children.get(atom).toString());
-
 				str.append("  ");
 			}
 			str.append("]");
 		}
-
 		return str.toString();
-
 	}
 
 }

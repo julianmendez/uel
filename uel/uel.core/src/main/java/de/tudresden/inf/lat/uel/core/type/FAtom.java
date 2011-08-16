@@ -56,9 +56,7 @@ public class FAtom extends Atom {
 
 			Map<String, Atom> bMap = new HashMap<String, Atom>();
 			bMap.put(b.toString(), b);
-			Equation eq = new Equation(bMap, atom.getChildren());
-
-			goal.addFlatten(eq);
+			goal.addFlatten(new Equation(bMap, atom.getChildren(), false));
 
 		} else {
 
