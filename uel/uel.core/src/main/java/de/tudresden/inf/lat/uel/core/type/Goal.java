@@ -74,23 +74,17 @@ public class Goal {
 	 *            equation
 	 */
 	public void addEquation(Equation e) {
-
 		equations.add(e);
-
 	}
 
 	/**
-	 * This method is used by ReaderAndParser.read and importDefinition to
-	 * flatten an equation and to add it to the list of goal equations
+	 * This method is to flatten an equation and to add it to the list of goal
+	 * equations
 	 * 
 	 * @param e
 	 *            equation that needs to be flattened
 	 */
 	public void addFlatten(Equation e) {
-		addFlatten(e, false);
-	}
-
-	private void addFlatten(Equation e, boolean primitive) {
 
 		FAtom a;
 		Atom b = null;
@@ -152,7 +146,7 @@ public class Goal {
 
 			}
 
-			if (primitive) {
+			if (e.isPrimitive()) {
 				/*
 				 * Adding new variable to the right side
 				 */
@@ -168,10 +162,6 @@ public class Goal {
 			addEquation(new Equation(leftPart, rightPart, false));
 
 		}
-	}
-
-	public void addPrimitiveFlatten(Equation e) {
-		addFlatten(e, true);
 	}
 
 	@Override
@@ -277,7 +267,7 @@ public class Goal {
 				&& !variables.containsKey(concept.toString())) {
 
 			Equation eq = ontology.getPrimitiveDefinition(concept.toString());
-			addPrimitiveFlatten(eq);
+			addFlatten(eq);
 		}
 	}
 
