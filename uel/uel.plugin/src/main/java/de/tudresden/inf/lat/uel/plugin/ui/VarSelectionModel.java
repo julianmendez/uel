@@ -44,7 +44,8 @@ class VarSelectionModel {
 	private Set<String> computeConstants(Set<String> variables) {
 		Set<String> ret = new TreeSet<String>();
 		for (String name : variables) {
-			ret.addAll(getSymbols(name));
+			ret.addAll(getRecursiveDefinitionSymbols(name));
+			ret.addAll(getRecursivePrimitiveDefinitionSymbols(name));
 		}
 		ret.removeAll(variables);
 		return ret;
@@ -60,7 +61,8 @@ class VarSelectionModel {
 			String var = toVisit.iterator().next();
 			visited.add(var);
 			if (currentVariables.contains(var)) {
-				toVisit.addAll(getSymbols(var));
+				toVisit.addAll(getRecursiveDefinitionSymbols(var));
+				toVisit.addAll(getRecursivePrimitiveDefinitionSymbols(var));
 				ret.add(var);
 			}
 			toVisit.removeAll(visited);
@@ -92,7 +94,7 @@ class VarSelectionModel {
 		return Collections.unmodifiableSet(this.setOfOriginalVariables);
 	}
 
-	private Set<String> getSymbols(String name) {
+	private Set<String> getRecursiveDefinitionSymbols(String name) {
 		Set<String> currentSet = getOntology().getDefinitionSymbols(name);
 		if (currentSet.isEmpty() && this.setOfOriginalVariables.contains(name)) {
 			currentSet = getOntology().getPrimitiveDefinitionSymbols(name);
@@ -107,11 +109,21 @@ class VarSelectionModel {
 			visited.add(elem);
 			toVisit.removeAll(visited);
 			Equation def = getOntology().getDefinition(elem);
-			if (def != null) {
-				toVisit.addAll(getOntology().getDefinitionSymbols(elem));
-			} else {
+			if (def == null) {
 				ret.add(elem);
+			} else {
+				toVisit.addAll(getOntology().getDefinitionSymbols(elem));
 			}
+		}
+		return ret;
+	}
+
+	private Set<String> getRecursivePrimitiveDefinitionSymbols(String name) {
+		Set<String> defSymbols = getRecursiveDefinitionSymbols(name);
+		defSymbols.retainAll(this.setOfVariables);
+		Set<String> ret = new HashSet<String>();
+		for (String symbol : defSymbols) {
+			ret.addAll(getOntology().getPrimitiveDefinitionSymbols(symbol));
 		}
 		return ret;
 	}
