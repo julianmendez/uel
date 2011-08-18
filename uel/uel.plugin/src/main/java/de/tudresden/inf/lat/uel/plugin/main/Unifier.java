@@ -105,7 +105,7 @@ class Unifier {
 	 */
 	public boolean unify(Translator translator, Writer result)
 			throws IOException {
-		String res = solver.solve(translator.getSatInput().toString());
+		String res = solver.solve(translator.getSatInput());
 
 		StringReader satoutputReader = new StringReader(res);
 		boolean response = translator.toTBox(satoutputReader, result);
@@ -131,7 +131,7 @@ class Unifier {
 
 		Translator translator = new Translator(goal);
 
-		String satoutputStr = solver.solve(translator.getSatInput().toString());
+		String satoutputStr = solver.solve(translator.getSatInput());
 
 		Pattern answer = Pattern.compile("^" + Solver.msgSat);
 		BufferedReader reader = new BufferedReader(new StringReader(
@@ -190,7 +190,7 @@ class Unifier {
 				numberofsolutions++;
 
 				satinput.add(translator.getUpdate().toString());
-				String satoutputStr = solver.solve(satinput.toString());
+				String satoutputStr = solver.solve(satinput);
 
 				translator.reset();
 
@@ -257,7 +257,7 @@ class Unifier {
 				numberofsolutions++;
 
 				satinput.add(translator.getUpdate().toString());
-				String satoutputStr = solver.solve(satinput.toString());
+				String satoutputStr = solver.solve(satinput);
 
 				translator.reset();
 				unifiable = translator.toTBox(new StringReader(satoutputStr),
@@ -314,7 +314,7 @@ class Unifier {
 
 		while (unifiable) {
 
-			String satoutputStr = solver.solve(satinput.toString());
+			String satoutputStr = solver.solve(satinput);
 
 			StringReader satoutputReader = new StringReader(satoutputStr);
 			if (translator.toTBox(satoutputReader)) {
@@ -323,7 +323,7 @@ class Unifier {
 				numberofsolutions++;
 
 				satinput.add(translator.getUpdate().toString());
-				satoutputStr = solver.solve(satinput.toString());
+				satoutputStr = solver.solve(satinput);
 
 				translator.reset();
 
@@ -421,7 +421,7 @@ class Unifier {
 				numberofsolutions++;
 
 				satinput.add(translator.getUpdate().toString());
-				String satoutputStr = solver.solve(satinput.toString());
+				String satoutputStr = solver.solve(satinput);
 
 				translator.reset();
 

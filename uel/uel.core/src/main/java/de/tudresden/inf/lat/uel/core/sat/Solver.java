@@ -29,6 +29,6 @@ public interface Solver {
 	 *         (unsatisfiable), and, if satisfiable, a model.
 	 * @throws IOException
 	 */
-	public String solve(String input) throws IOException;
+	public String solve(SatInput input) throws IOException;
 
 }

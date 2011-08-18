@@ -29,9 +29,9 @@ public class Sat4jSolver implements Solver {
 	}
 
 	@Override
-	public String solve(String input) throws IOException {
+	public String solve(SatInput input) throws IOException {
 		ByteArrayInputStream satinputInputStream = new ByteArrayInputStream(
-				input.getBytes());
+				input.toString().getBytes());
 		StringWriter satoutputWriter = new StringWriter();
 
 		ISolver solver = SolverFactory.newDefault();

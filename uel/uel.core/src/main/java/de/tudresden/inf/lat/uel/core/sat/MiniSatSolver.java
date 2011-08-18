@@ -37,13 +37,13 @@ public class MiniSatSolver implements Solver {
 	}
 
 	@Override
-	public String solve(String input) throws IOException {
+	public String solve(SatInput input) throws IOException {
 		String ret = null;
 		File satinput = File.createTempFile(tempPrefix, tempSuffix);
 		File satoutput = File.createTempFile(tempPrefix, tempSuffix);
 
 		PrintWriter satinputWriter = new PrintWriter(new FileWriter(satinput));
-		satinputWriter.println(input);
+		satinputWriter.println(input.toString());
 		satinputWriter.flush();
 		satinputWriter.close();
 

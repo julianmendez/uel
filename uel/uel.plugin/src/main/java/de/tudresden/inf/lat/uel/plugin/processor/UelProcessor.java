@@ -72,7 +72,7 @@ public class UelProcessor {
 			} else {
 				this.satinput.add(this.translator.getUpdate().toString());
 			}
-			satoutputStr = solver.solve(this.satinput.toString());
+			satoutputStr = solver.solve(this.satinput);
 			this.translator.reset();
 			unifiable = this.translator.toTBox(new StringReader(satoutputStr),
 					result);
