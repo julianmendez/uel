@@ -22,7 +22,6 @@ import org.semanticweb.owlapi.reasoner.OWLReasoner;
 
 import de.tudresden.inf.lat.jcel.owlapi.main.JcelReasoner;
 import de.tudresden.inf.lat.uel.core.type.Goal;
-import de.tudresden.inf.lat.uel.core.type.Ontology;
 
 public class ProcessorTest extends TestCase {
 
@@ -148,8 +147,7 @@ public class ProcessorTest extends TestCase {
 		{
 			OWLOntology owlOntology = createOntology(new FileInputStream(
 					ontologyName));
-			Ontology ontology = processor.createOntology(owlOntology);
-			processor.loadOntology(ontology);
+			processor.loadOntology(owlOntology);
 			Set<OWLClass> clsSet = owlOntology.getClassesInSignature();
 			for (OWLClass cls : clsSet) {
 				idClassMap.put(cls.getIRI().getFragment(), cls);

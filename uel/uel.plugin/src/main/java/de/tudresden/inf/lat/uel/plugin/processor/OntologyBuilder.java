@@ -19,10 +19,11 @@ import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 import de.tudresden.inf.lat.uel.core.type.Atom;
 import de.tudresden.inf.lat.uel.core.type.Equation;
 import de.tudresden.inf.lat.uel.core.type.Ontology;
+import de.tudresden.inf.lat.uel.core.type.OntologyImpl;
 
 /**
- * An object implementing this class can build a UEL ontology using an OWL
- * ontology.
+ * An object implementing this class has convenience methods used to build a UEL
+ * ontology using an OWL ontology.
  * 
  * @author Julian Mendez
  */
@@ -31,34 +32,48 @@ public class OntologyBuilder {
 	private static final Logger logger = Logger.getLogger(OntologyBuilder.class
 			.getName());
 
-	private Ontology ontology = null;
-
 	/**
-	 * Constructs a new ontology builder.
+	 * Returns a new UEL ontology using an OWL ontology.
 	 * 
-	 * @param ontology
-	 *            ontology to build
+	 * @param owlOntology
+	 *            OWL ontology
+	 * @return a new UEL ontology using an OWL ontology
 	 */
-	public OntologyBuilder(Ontology ontology) {
-		if (ontology == null) {
+	public Ontology createOntology(OWLOntology owlOntology) {
+		if (owlOntology == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
 
-		this.ontology = ontology;
-	}
+		OntologyImpl ret = new OntologyImpl();
+		Map<OWLClass, OWLClassExpression> definitions = getDefinitions(owlOntology);
+		for (OWLClass key : definitions.keySet()) {
+			ret.putDefinition(getName(key),
+					processDefinition(key, definitions.get(key)));
+		}
 
-	@Override
-	public boolean equals(Object o) {
-		boolean ret = false;
-		if (o instanceof OntologyBuilder) {
-			OntologyBuilder other = (OntologyBuilder) o;
-			ret = this.ontology.equals(other.ontology);
+		Map<OWLClass, Set<OWLClassExpression>> primitiveDefinitions = getPrimitiveDefinitions(owlOntology);
+		for (OWLClass key : primitiveDefinitions.keySet()) {
+			ret.putDefinition(
+					getName(key),
+					processPrimitiveDefinition(key,
+							primitiveDefinitions.get(key)));
 		}
 		return ret;
 	}
 
-	private Map<OWLClass, OWLClassExpression> getDefinitions(
+	/**
+	 * Returns all the definitions present in an OWL ontology.
+	 * 
+	 * @param owlOntology
+	 *            OWL ontology
+	 * @return all definitions present in an OWL ontology
+	 */
+	public Map<OWLClass, OWLClassExpression> getDefinitions(
 			OWLOntology owlOntology) {
+		if (owlOntology == null) {
+			throw new IllegalArgumentException("Null argument.");
+		}
+
 		Map<OWLClass, OWLClassExpression> ret = new HashMap<OWLClass, OWLClassExpression>();
 		Set<OWLEquivalentClassesAxiom> setOfAxioms = owlOntology
 				.getAxioms(AxiomType.EQUIVALENT_CLASSES);
@@ -86,8 +101,34 @@ public class OntologyBuilder {
 		return ret;
 	}
 
-	private Map<OWLClass, Set<OWLClassExpression>> getPrimitiveDefinitions(
+	/**
+	 * Returns the name given to an OWL class in UEL.
+	 * 
+	 * @param cls
+	 *            an OWL class
+	 * @return the name given to an OWL class in UEL
+	 */
+	public String getName(OWLClass cls) {
+		if (cls == null) {
+			throw new IllegalArgumentException("Null argument.");
+		}
+
+		return processClass(cls).iterator().next().toString();
+	}
+
+	/**
+	 * Returns all the primitive definitions present in an OWL ontology.
+	 * 
+	 * @param owlOntology
+	 *            OWL ontology
+	 * @return all the primitive definitions present in an OWL ontology
+	 */
+	public Map<OWLClass, Set<OWLClassExpression>> getPrimitiveDefinitions(
 			OWLOntology owlOntology) {
+		if (owlOntology == null) {
+			throw new IllegalArgumentException("Null argument.");
+		}
+
 		Map<OWLClass, Set<OWLClassExpression>> ret = new HashMap<OWLClass, Set<OWLClassExpression>>();
 		Set<OWLSubClassOfAxiom> setOfAxioms = owlOntology
 				.getAxioms(AxiomType.SUBCLASS_OF);
@@ -105,35 +146,15 @@ public class OntologyBuilder {
 		return ret;
 	}
 
-	@Override
-	public int hashCode() {
-		return this.ontology.hashCode();
-	}
-
-	/**
-	 * Loads an OWL ontology.
-	 * 
-	 * @param owlOntology
-	 *            OWL ontology
-	 */
-	public void loadOntology(OWLOntology owlOntology) {
-		if (owlOntology == null) {
+	public Equation makeEquation(Atom definiendum, Set<Atom> definiens,
+			boolean primitive) {
+		if (definiendum == null) {
+			throw new IllegalArgumentException("Null argument.");
+		}
+		if (definiens == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
 
-		Map<OWLClass, OWLClassExpression> definitions = getDefinitions(owlOntology);
-		for (OWLClass key : definitions.keySet()) {
-			processDefinition(key, definitions.get(key));
-		}
-
-		Map<OWLClass, Set<OWLClassExpression>> primitiveDefinitions = getPrimitiveDefinitions(owlOntology);
-		for (OWLClass key : primitiveDefinitions.keySet()) {
-			processPrimitiveDefinition(key, primitiveDefinitions.get(key));
-		}
-	}
-
-	private Equation makeEquation(Atom definiendum, Set<Atom> definiens,
-			boolean primitive) {
 		Map<String, Atom> leftMap = new HashMap<String, Atom>();
 		leftMap.put(definiendum.toString(), definiendum);
 
@@ -142,15 +163,13 @@ public class OntologyBuilder {
 			rightMap.put(atom.toString(), atom);
 		}
 
-		Equation ret = new Equation(leftMap, rightMap, primitive);
-		return ret;
+		return new Equation(leftMap, rightMap, primitive);
 	}
 
 	private Set<Atom> processClass(OWLClass cls) {
 		Set<Atom> ret = new HashSet<Atom>();
 		Atom newAtom = new Atom(cls.toStringID(), false);
 		ret.add(newAtom);
-		this.ontology.putAtom(newAtom.toString(), newAtom);
 		return ret;
 	}
 
@@ -168,12 +187,18 @@ public class OntologyBuilder {
 		return ret;
 	}
 
-	private void processDefinition(OWLClass definiendum,
+	public Equation processDefinition(OWLClass definiendum,
 			OWLClassExpression definiens) {
+		if (definiendum == null) {
+			throw new IllegalArgumentException("Null argument.");
+		}
+		if (definiens == null) {
+			throw new IllegalArgumentException("Null argument.");
+		}
+
 		Set<Atom> left = processClass(definiendum);
 		Set<Atom> right = processClassExpression(definiens);
-		this.ontology.putDefinition(left.iterator().next().toString(),
-				makeEquation(left.iterator().next(), right, false));
+		return makeEquation(left.iterator().next(), right, false);
 	}
 
 	private Set<Atom> processIntersection(OWLObjectIntersectionOf intersection) {
@@ -184,18 +209,34 @@ public class OntologyBuilder {
 		return ret;
 	}
 
-	private void processPrimitiveDefinition(OWLClass definiendum,
+	public Map<String, OWLClass> processNames(Set<OWLClass> set) {
+		if (set == null) {
+			throw new IllegalArgumentException("Null argument.");
+		}
+
+		Map<String, OWLClass> ret = new HashMap<String, OWLClass>();
+		for (OWLClass cls : set) {
+			ret.put(getName(cls), cls);
+		}
+		return ret;
+	}
+
+	public Equation processPrimitiveDefinition(OWLClass definiendum,
 			Set<OWLClassExpression> definiensSet) {
+		if (definiendum == null) {
+			throw new IllegalArgumentException("Null argument.");
+		}
+
+		if (definiensSet == null) {
+			throw new IllegalArgumentException("Null argument.");
+		}
+
 		Set<Atom> subClassSet = processClass(definiendum);
 		Set<Atom> superClassSet = new HashSet<Atom>();
 		for (OWLClassExpression clsExpr : definiensSet) {
 			superClassSet.addAll(processClassExpression(clsExpr));
 		}
-		this.ontology
-				.putPrimitiveDefinition(
-						subClassSet.iterator().next().toString(),
-						makeEquation(subClassSet.iterator().next(),
-								superClassSet, true));
+		return makeEquation(subClassSet.iterator().next(), superClassSet, true);
 	}
 
 	private Set<Atom> processSomeValuesRestriction(
@@ -210,7 +251,6 @@ public class OntologyBuilder {
 		Atom prop = new Atom(someValuesRestriction.getProperty()
 				.getNamedProperty().toStringID(), true);
 		Atom newAtom = new Atom(prop.toString(), true, map);
-		this.ontology.putAtom(newAtom.toString(), newAtom);
 		ret.add(newAtom);
 		return ret;
 	}

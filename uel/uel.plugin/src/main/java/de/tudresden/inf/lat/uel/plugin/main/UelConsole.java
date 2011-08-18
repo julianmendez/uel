@@ -25,6 +25,7 @@ import de.tudresden.inf.lat.uel.core.type.Equation;
 import de.tudresden.inf.lat.uel.core.type.FAtom;
 import de.tudresden.inf.lat.uel.core.type.Goal;
 import de.tudresden.inf.lat.uel.core.type.Ontology;
+import de.tudresden.inf.lat.uel.core.type.OntologyImpl;
 import de.tudresden.inf.lat.uel.plugin.processor.OntologyBuilder;
 
 /**
@@ -34,7 +35,8 @@ import de.tudresden.inf.lat.uel.plugin.processor.OntologyBuilder;
  */
 public class UelConsole {
 
-	private static final Logger logger = Logger.getLogger(Main.class.getName());
+	private static final Logger logger = Logger.getLogger(UelConsole.class
+			.getName());
 	private static final String unifSuffix = ".unif";
 
 	/**
@@ -127,10 +129,8 @@ public class UelConsole {
 		} catch (OWLOntologyCreationException e) {
 			throw new IOException(e);
 		}
-		Ontology ret = new Ontology();
-		OntologyBuilder builder = new OntologyBuilder(ret);
-		builder.loadOntology(owlOntology);
-		return ret;
+		OntologyBuilder builder = new OntologyBuilder();
+		return builder.createOntology(owlOntology);
 	}
 
 	/**
@@ -188,7 +188,7 @@ public class UelConsole {
 
 	public void run(String[] args) throws IOException {
 		Unifier unifier = new Unifier(new MiniSatSolver());
-		Ontology ontology = new Ontology();
+		Ontology ontology = new OntologyImpl();
 		Goal goal = new Goal(ontology);
 
 		logger.setLevel(Level.INFO);

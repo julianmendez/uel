@@ -22,19 +22,23 @@ import de.tudresden.inf.lat.uel.core.type.Goal;
 import de.tudresden.inf.lat.uel.core.type.Ontology;
 
 /**
- * This class connects with UEL.
+ * An object implementing this class connects with the UEL core and uses it to
+ * unify.
  * 
  * @author Julian Mendez
  */
 public class UelProcessor {
 
 	private Set<String> candidates = new HashSet<String>();
-	private Ontology ontology = new Ontology();
+	private DynamicOntology ontology = new DynamicOntology();
 	private SatInput satinput = null;
 	private Translator translator = null;
 	private List<String> unifierList = new ArrayList<String>();
 	private Set<String> unifierSet = new HashSet<String>();
 
+	/**
+	 * Constructs a new processor.
+	 */
 	public UelProcessor() {
 	}
 
@@ -122,17 +126,6 @@ public class UelProcessor {
 		return ret;
 	}
 
-	public Ontology createOntology(OWLOntology owlOntology) {
-		if (owlOntology == null) {
-			throw new IllegalArgumentException("Null argument.");
-		}
-
-		Ontology ret = new Ontology();
-		OntologyBuilder builder = new OntologyBuilder(ret);
-		builder.loadOntology(owlOntology);
-		return ret;
-	}
-
 	public Set<String> getCandidates() {
 		return Collections.unmodifiableSet(this.candidates);
 	}
@@ -149,8 +142,8 @@ public class UelProcessor {
 		return Collections.unmodifiableList(this.unifierList);
 	}
 
-	public void loadOntology(Ontology ontology) {
-		this.ontology.merge(ontology);
+	public void loadOntology(OWLOntology ontology) {
+		this.ontology.load(ontology);
 	}
 
 }

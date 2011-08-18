@@ -1,6 +1,8 @@
 package de.tudresden.inf.lat.uel.core.type;
 
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 /**
@@ -95,6 +97,24 @@ public class Atom {
 	 */
 	public String getName() {
 		return name;
+	}
+
+	/**
+	 * Returns the symbols in this atom.
+	 * 
+	 * @return the symbols in this atom
+	 */
+	public Set<String> getSymbols() {
+		Set<String> ret = new HashSet<String>();
+		if (isRoot()) {
+			Map<String, Atom> children = getChildren();
+			for (Atom atom : children.values()) {
+				ret.addAll(atom.getSymbols());
+			}
+		} else {
+			ret.add(toString());
+		}
+		return ret;
 	}
 
 	@Override

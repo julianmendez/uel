@@ -35,11 +35,11 @@ import de.tudresden.inf.lat.uel.core.sat.SatInput;
 import de.tudresden.inf.lat.uel.core.sat.Translator;
 import de.tudresden.inf.lat.uel.core.type.Goal;
 import de.tudresden.inf.lat.uel.core.type.KRSSKeyword;
-import de.tudresden.inf.lat.uel.core.type.Ontology;
 import de.tudresden.inf.lat.uel.plugin.processor.UelProcessor;
 
 /**
- * This class is a controller for UEL.
+ * This class is a controller for the main panel of UEL's graphical user
+ * interface.
  * 
  * @author Julian Mendez
  */
@@ -68,19 +68,25 @@ public class UelController implements ActionListener {
 	private List<LabelId> classList01 = null;
 	private Map<String, OWLClass> mapIdClass = new HashMap<String, OWLClass>();
 	private Map<String, String> mapIdLabel = new HashMap<String, String>();
-	private Ontology ontology00 = null;
-	private Ontology ontology01 = null;
 	private List<String> ontologyList = new ArrayList<String>();
-	private Map<String, Ontology> ontologyMap = new HashMap<String, Ontology>();
+	private OWLOntology owlOntology00 = null;
+	private OWLOntology owlOntology01 = null;
 	private OWLOntologyManager owlOntologyManager = null;
 	private Map<String, OWLOntology> owlOntologyMap = new HashMap<String, OWLOntology>();
 	private Map<OWLClass, String> shortFormMap = new HashMap<OWLClass, String>();
 	private StatInfo statInfo = null;
 	private int unifierIndex = -1;
 	private VarSelectionController varWindow = null;
-
 	private UelView view = null;
 
+	/**
+	 * Constructs a new controller.
+	 * 
+	 * @param panel
+	 *            panel to be controlled
+	 * @param ontologyManager
+	 *            an OWL ontology manager
+	 */
 	public UelController(UelView panel, OWLOntologyManager ontologyManager) {
 		if (panel == null) {
 			throw new IllegalArgumentException("Null argument.");
@@ -94,9 +100,6 @@ public class UelController implements ActionListener {
 		init();
 	}
 
-	/**
-	 * Action handler.
-	 */
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e == null) {
@@ -227,7 +230,7 @@ public class UelController implements ActionListener {
 			setUnifierButtons(false);
 
 			String ontologyId = this.ontologyList.get(ontologyIndex);
-			this.ontology00 = this.ontologyMap.get(ontologyId);
+			this.owlOntology00 = this.owlOntologyMap.get(ontologyId);
 
 			this.classList00 = getClassNames(
 					this.owlOntologyMap.get(ontologyId), getView()
@@ -253,7 +256,7 @@ public class UelController implements ActionListener {
 			setUnifierButtons(false);
 
 			String ontologyId = this.ontologyList.get(ontologyIndex);
-			this.ontology01 = this.ontologyMap.get(ontologyId);
+			this.owlOntology01 = this.owlOntologyMap.get(ontologyId);
 
 			this.classList01 = getClassNames(
 					this.owlOntologyMap.get(ontologyId), getView()
@@ -347,8 +350,8 @@ public class UelController implements ActionListener {
 		setUnifierButtons(false);
 
 		getModel().clearOntology();
-		getModel().loadOntology(this.ontology00);
-		getModel().loadOntology(this.ontology01);
+		getModel().loadOntology(this.owlOntology00);
+		getModel().loadOntology(this.owlOntology01);
 
 		Set<String> classSet = new HashSet<String>();
 		classSet.add(this.classList00.get(getView().getSelectedClassName00())
@@ -494,9 +497,7 @@ public class UelController implements ActionListener {
 
 	private void loadOntology(OWLOntology owlOntology) {
 		String ontologyId = owlOntology.getOntologyID().toString();
-		if (!this.ontologyMap.containsKey(ontologyId)) {
-			this.ontologyMap.put(ontologyId,
-					getModel().createOntology(owlOntology));
+		if (!this.owlOntologyMap.containsKey(ontologyId)) {
 			this.owlOntologyMap.put(ontologyId, owlOntology);
 			processMapIdClass(owlOntology);
 			Set<String> set = new TreeSet<String>();

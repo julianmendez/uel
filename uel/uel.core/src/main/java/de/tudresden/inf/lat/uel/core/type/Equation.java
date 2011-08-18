@@ -1,7 +1,9 @@
 package de.tudresden.inf.lat.uel.core.type;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * This class implements an equation as two hash maps of atoms.
@@ -90,6 +92,19 @@ public class Equation {
 		return right;
 	}
 
+	/**
+	 * Returns the symbols in the right-hand side of the equation.
+	 * 
+	 * @return the symbols in the right-hand side of the equation.
+	 */
+	public Set<String> getSymbolsInRight() {
+		Set<String> ret = new HashSet<String>();
+		for (Atom atom : getRight().values()) {
+			ret.addAll(atom.getSymbols());
+		}
+		return ret;
+	}
+
 	@Override
 	public int hashCode() {
 		return this.left.hashCode() + 31 * this.right.hashCode();
@@ -109,35 +124,25 @@ public class Equation {
 	 * method of Goal.
 	 */
 	public String printEquation() {
-
 		StringBuffer sbuf = new StringBuffer();
 		if (left != null && right != null) {
-
 			if (primitive) {
 				sbuf.append("(primitive) ");
 			}
 			sbuf.append("left side: ");
-
 			for (String concept : left.keySet()) {
-
 				sbuf.append(left.get(concept));
 				sbuf.append(" | ");
 			}
-
 			sbuf.append("\n");
 			sbuf.append("right side: ");
-
 			for (String concept : right.keySet()) {
-
 				sbuf.append(right.get(concept));
 				sbuf.append(" | ");
 			}
-
 			sbuf.append("\n");
 		} else {
-
 			throw new RuntimeException("Error: equation is empty");
-
 		}
 		return sbuf.toString();
 	}
