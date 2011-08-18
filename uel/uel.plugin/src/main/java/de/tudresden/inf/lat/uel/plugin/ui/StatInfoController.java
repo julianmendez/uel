@@ -42,6 +42,11 @@ class StatInfoController implements ActionListener {
 		}
 	}
 
+	public void close() {
+		getView().setVisible(false);
+		getView().dispose();
+	}
+
 	private void executeSaveGoal() {
 		JFileChooser fileChooser = new JFileChooser();
 		int returnVal = fileChooser.showSaveDialog(getView());

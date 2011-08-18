@@ -3,8 +3,6 @@ package de.tudresden.inf.lat.uel.plugin.ui;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.WindowConstants;
-
 /**
  * 
  * @author Julian Mendez
@@ -86,7 +84,6 @@ class VarSelectionController implements ActionListener {
 	private void init() {
 		getView().addMakeConsButtonListener(this, BUTTON_CONS);
 		getView().addMakeVarButtonListener(this, BUTTON_VAR);
-		getView().setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 	}
 
 	public void open() {

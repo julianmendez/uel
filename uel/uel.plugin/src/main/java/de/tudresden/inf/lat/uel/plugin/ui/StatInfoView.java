@@ -17,6 +17,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.WindowConstants;
 
 import de.tudresden.inf.lat.uel.core.type.KRSSKeyword;
 
@@ -36,7 +37,7 @@ class StatInfoView extends JDialog {
 	private JTextArea textSysVarCount = null;
 
 	public StatInfoView(StatInfo info) {
-		super(new Frame(), "Statistical information", true);
+		super((Frame) null, "Statistical information", true);
 
 		if (info == null) {
 			throw new IllegalArgumentException("Null argument.");
@@ -125,6 +126,7 @@ class StatInfoView extends JDialog {
 		setMinimumSize(new Dimension(200, 200));
 		setLayout(new GridBagLayout());
 		getContentPane().add(createMainPanel());
+		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 	}
 
 	private String showGoal(String str) {

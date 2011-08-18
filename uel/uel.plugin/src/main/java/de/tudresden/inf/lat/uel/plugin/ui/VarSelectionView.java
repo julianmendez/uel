@@ -14,6 +14,7 @@ import javax.swing.JDialog;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.WindowConstants;
 
 /**
  * 
@@ -34,7 +35,7 @@ class VarSelectionView extends JDialog {
 	private JButton rejectVarButton = null;
 
 	public VarSelectionView(VarSelectionModel m) {
-		super(new Frame(), "Variable selection", true);
+		super((Frame) null, "Variable selection", true);
 
 		if (m == null) {
 			throw new IllegalArgumentException("Null argument.");
@@ -177,6 +178,7 @@ class VarSelectionView extends JDialog {
 		setMinimumSize(new Dimension(200, 200));
 		setLayout(new GridBagLayout());
 		getContentPane().add(createMainPanel());
+		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 	}
 
 	public void updateLists() {
