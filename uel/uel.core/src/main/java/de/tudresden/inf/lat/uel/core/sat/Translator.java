@@ -20,6 +20,7 @@ import de.tudresden.inf.lat.uel.core.type.Goal;
 import de.tudresden.inf.lat.uel.core.type.KRSSKeyword;
 import de.tudresden.inf.lat.uel.core.type.Literal;
 import de.tudresden.inf.lat.uel.core.type.OrderLiteral;
+import de.tudresden.inf.lat.uel.core.type.SubsumptionLiteral;
 
 /**
  * This class performs reduction of goal equations to propositional clauses. The
@@ -32,7 +33,6 @@ import de.tudresden.inf.lat.uel.core.type.OrderLiteral;
  */
 public class Translator {
 
-	private static final Integer minus = -1;
 	public static final String NOT_UNIFIABLE = "NOT UNIFIABLE / NO MORE UNIFIERS";
 
 	private Goal goal;
@@ -43,6 +43,8 @@ public class Translator {
 	 * a dissubsumption.
 	 */
 	private HashMap<Integer, Literal> identifiers = new HashMap<Integer, Literal>();
+
+	private boolean invertLiteral = false;
 
 	/**
 	 * Literals are all dis-subsumptions between atoms in the goal the first
@@ -67,6 +69,12 @@ public class Translator {
 		setLiterals();
 	}
 
+	public Translator(Goal g, boolean inv) {
+		goal = g;
+		invertLiteral = inv;
+		setLiterals();
+	}
+
 	/**
 	 * Returns the literals.
 	 * 
@@ -74,6 +82,24 @@ public class Translator {
 	 */
 	public Map<String, Integer> getLiterals() {
 		return this.literals;
+	}
+
+	private int getMinusLiteralId(Literal literal) {
+		int val = literals.get(literal.toString());
+		return invertLiteral ? val : (-1) * val;
+	}
+
+	private int getMinusOrderLiteral(String left, String right) {
+		return (-1) * getOrderLiteral(left, right);
+	}
+
+	private int getMinusSubOrDissubLiteral(String left, String right) {
+		return (-1) * getSubOrDissubLiteral(left, right);
+	}
+
+	private int getOrderLiteral(String left, String right) {
+		Literal literal = new OrderLiteral(left, right);
+		return literals.get(literal.toString());
 	}
 
 	/**
@@ -117,16 +143,10 @@ public class Translator {
 
 					for (String key3 : e.getRight().keySet()) {
 						for (String key2 : e.getLeft().keySet()) {
-
-							Literal lit2 = new DissubsumptionLiteral(key2, key1);
-
-							clause.add(minus * literals.get(lit2.toString()));
-
+							clause.add(getMinusSubOrDissubLiteral(key2, key1));
 						}
 
-						Literal lit3 = new DissubsumptionLiteral(key3, key1);
-
-						clause.add(literals.get(lit3.toString()));
+						clause.add(getSubOrDissubLiteral(key3, key1));
 						ret.add(clause);
 						clause.clear();
 
@@ -138,16 +158,10 @@ public class Translator {
 
 					for (String key2 : e.getLeft().keySet()) {
 						for (String key3 : e.getRight().keySet()) {
-
-							Literal lit2 = new DissubsumptionLiteral(key3, key1);
-
-							clause.add(minus * literals.get(lit2.toString()));
-
+							clause.add(getMinusSubOrDissubLiteral(key3, key1));
 						}
 
-						Literal lit3 = new DissubsumptionLiteral(key2, key1);
-
-						clause.add(literals.get(lit3.toString()));
+						clause.add(getSubOrDissubLiteral(key2, key1));
 						ret.add(clause);
 						clause.clear();
 
@@ -161,10 +175,7 @@ public class Translator {
 					 */
 
 					for (String key2 : e.getLeft().keySet()) {
-						Literal lit4 = new DissubsumptionLiteral(key2, key1);
-
-						clause.add(minus * literals.get(lit4.toString()));
-
+						clause.add(getMinusSubOrDissubLiteral(key2, key1));
 					}
 					ret.add(clause);
 					clause.clear();
@@ -177,10 +188,7 @@ public class Translator {
 					 */
 
 					for (String key3 : e.getRight().keySet()) {
-						Literal lit5 = new DissubsumptionLiteral(key3, key1);
-
-						clause.add(minus * literals.get(lit5.toString()));
-
+						clause.add(getMinusSubOrDissubLiteral(key3, key1));
 					}
 					ret.add(clause);
 					clause.clear();
@@ -205,16 +213,9 @@ public class Translator {
 
 					for (String key3 : e.getRight().keySet()) {
 						for (String key2 : e.getLeft().keySet()) {
-
-							Literal lit2 = new DissubsumptionLiteral(key2, key1);
-
-							clause.add(minus * literals.get(lit2.toString()));
-
+							clause.add(getMinusSubOrDissubLiteral(key2, key1));
 						}
-
-						Literal lit3 = new DissubsumptionLiteral(key3, key1);
-
-						clause.add(literals.get(lit3.toString()));
+						clause.add(getSubOrDissubLiteral(key3, key1));
 						ret.add(clause);
 						clause.clear();
 
@@ -226,15 +227,9 @@ public class Translator {
 
 					for (String key2 : e.getLeft().keySet()) {
 						for (String key3 : e.getRight().keySet()) {
-
-							Literal lit2 = new DissubsumptionLiteral(key3, key1);
-
-							clause.add(minus * literals.get(lit2.toString()));
+							clause.add(getMinusSubOrDissubLiteral(key3, key1));
 						}
-
-						Literal lit3 = new DissubsumptionLiteral(key2, key1);
-
-						clause.add(literals.get(lit3.toString()));
+						clause.add(getSubOrDissubLiteral(key2, key1));
 						ret.add(clause);
 						clause.clear();
 
@@ -250,9 +245,7 @@ public class Translator {
 					 */
 
 					for (String key2 : e.getLeft().keySet()) {
-						Literal lit4 = new DissubsumptionLiteral(key2, key1);
-
-						clause.add(minus * literals.get(lit4.toString()));
+						clause.add(getMinusSubOrDissubLiteral(key2, key1));
 
 					}
 					ret.add(clause);
@@ -270,10 +263,7 @@ public class Translator {
 					 */
 
 					for (String key3 : e.getRight().keySet()) {
-						Literal lit5 = new DissubsumptionLiteral(key3, key1);
-
-						clause.add(minus * literals.get(lit5.toString()));
-
+						clause.add(getMinusSubOrDissubLiteral(key3, key1));
 					}
 					ret.add(clause);
 					clause.clear();
@@ -296,10 +286,7 @@ public class Translator {
 
 				if (!key2.equalsIgnoreCase(KRSSKeyword.top)
 						&& (!key1.equals(key2))) {
-
-					Literal lit = new DissubsumptionLiteral(key1, key2);
-
-					clause.add(literals.get(lit.toString()));
+					clause.add(getSubOrDissubLiteral(key1, key2));
 
 					ret.add(clause);
 					clause.clear();
@@ -329,10 +316,7 @@ public class Translator {
 					 */
 
 					if (!role1.equals(role2)) {
-
-						Literal lit = new DissubsumptionLiteral(key1, key2);
-
-						clause.add(literals.get(lit.toString()));
+						clause.add(getSubOrDissubLiteral(key1, key2));
 
 						ret.add(clause);
 						clause.clear();
@@ -349,15 +333,9 @@ public class Translator {
 						String child2name = child2.getName();
 
 						if (!child1name.equals(child2name)) {
-
-							Literal lit1 = new DissubsumptionLiteral(
-									child1name, child2name);
-
-							Literal lit2 = new DissubsumptionLiteral(key1, key2);
-
-							clause.add(minus * literals.get(lit1.toString()));
-
-							clause.add(literals.get(lit2.toString()));
+							clause.add(getMinusSubOrDissubLiteral(child1name,
+									child2name));
+							clause.add(getSubOrDissubLiteral(key1, key2));
 
 							ret.add(clause);
 							clause.clear();
@@ -380,19 +358,13 @@ public class Translator {
 		for (String key1 : goal.getConstants().keySet()) {
 
 			for (String key2 : goal.getEAtoms().keySet()) {
-
-				Literal lit = new DissubsumptionLiteral(key1, key2);
-
-				clause.add(literals.get(lit.toString()));
+				clause.add(getSubOrDissubLiteral(key1, key2));
 
 				ret.add(clause);
 				clause.clear();
 
 				if (!key1.equalsIgnoreCase(KRSSKeyword.top)) {
-
-					Literal lit1 = new DissubsumptionLiteral(key2, key1);
-
-					clause.add(literals.get(lit1.toString()));
+					clause.add(getSubOrDissubLiteral(key2, key1));
 
 					ret.add(clause);
 					clause.clear();
@@ -409,10 +381,7 @@ public class Translator {
 		 * Reflexivity for order literals
 		 */
 		for (String key1 : goal.getVariables().keySet()) {
-
-			Literal lit = new OrderLiteral(key1, key1);
-
-			clause.add(minus * literals.get(lit.toString()));
+			clause.add(getMinusOrderLiteral(key1, key1));
 
 			ret.add(clause);
 			clause.clear();
@@ -434,17 +403,9 @@ public class Translator {
 
 					if (!key1.equals(key2) && !key2.equals(key3)) {
 
-						Literal lit1 = new OrderLiteral(key1, key2);
-
-						Literal lit2 = new OrderLiteral(key2, key3);
-
-						Literal lit3 = new OrderLiteral(key1, key3);
-
-						clause.add(minus * literals.get(lit1.toString()));
-
-						clause.add(minus * literals.get(lit2.toString()));
-
-						clause.add(literals.get(lit3.toString()));
+						clause.add(getMinusOrderLiteral(key1, key2));
+						clause.add(getMinusOrderLiteral(key2, key3));
+						clause.add(getOrderLiteral(key1, key3));
 
 						ret.add(clause);
 						clause.clear();
@@ -472,18 +433,9 @@ public class Translator {
 
 					if (!key1.equals(key2) && !key1.equals(key3)
 							&& !key2.equals(key3)) {
-
-						Literal lit1 = new DissubsumptionLiteral(key1, key2);
-
-						Literal lit2 = new DissubsumptionLiteral(key2, key3);
-
-						Literal lit3 = new DissubsumptionLiteral(key1, key3);
-
-						clause.add(minus * literals.get(lit3.toString()));
-
-						clause.add(literals.get(lit1.toString()));
-
-						clause.add(literals.get(lit2.toString()));
+						clause.add(getSubOrDissubLiteral(key1, key2));
+						clause.add(getSubOrDissubLiteral(key2, key3));
+						clause.add(getMinusSubOrDissubLiteral(key1, key3));
 
 						ret.add(clause);
 						clause.clear();
@@ -508,13 +460,9 @@ public class Translator {
 
 				for (String key2 : goal.getVariables().keySet()) {
 
-					Literal lit1 = new OrderLiteral(key2, child.getName());
+					clause.add(getOrderLiteral(key2, child.getName()));
 
-					Literal lit2 = new DissubsumptionLiteral(key2, key1);
-
-					clause.add(literals.get(lit1.toString()));
-
-					clause.add(literals.get(lit2.toString()));
+					clause.add(getSubOrDissubLiteral(key2, key1));
 
 					ret.add(clause);
 					clause.clear();
@@ -527,6 +475,13 @@ public class Translator {
 
 		return ret;
 
+	}
+
+	private int getSubOrDissubLiteral(String left, String right) {
+		Literal literal = invertLiteral ? new SubsumptionLiteral(left, right)
+				: new DissubsumptionLiteral(left, right);
+		int val = literals.get(literal.toString());
+		return invertLiteral ? (-1) * val : val;
 	}
 
 	public Set<Integer> getUpdate() {
@@ -576,7 +531,8 @@ public class Translator {
 			for (String key2 : goal.getAllAtoms().keySet()) {
 
 				second = key2;
-				literal = new DissubsumptionLiteral(first, second);
+				literal = invertLiteral ? new SubsumptionLiteral(first, second)
+						: new DissubsumptionLiteral(first, second);
 
 				literals.put(literal.toString(), identificator);
 				identifiers.put(identificator, literal);
@@ -674,17 +630,18 @@ public class Translator {
 						}
 					}
 
-				} else if (identifiers.get(i).isDissubsumption()) {
+				} else if (identifiers.get(i).isDissubsumption()
+						|| identifiers.get(i).isSubsumption()) {
 
 					if (goal.getVariables().containsKey(name1)
 							&& goal.getVariables().get(name1).isUserVariable()) {
 						if (goal.getConstants().containsKey(name2)) {
 
-							update.add(minus * i);
+							update.add(getMinusLiteralId(identifiers.get(i)));
 
 						} else if (goal.getEAtoms().containsKey(name2)) {
 
-							update.add(minus * i);
+							update.add(getMinusLiteralId(identifiers.get(i)));
 						}
 					}
 
@@ -754,10 +711,8 @@ public class Translator {
 			if (var.isUserVariable()) {
 				for (FAtom atom : goal.getAllAtoms().values()) {
 					if (atom.isCons() || atom.isRoot()) {
-						Literal lit = new DissubsumptionLiteral(var.toString(),
-								atom.toString());
-						int i = literals.get(lit.toString());
-						update.add(minus * i);
+						update.add(getMinusSubOrDissubLiteral(var.toString(),
+								atom.toString()));
 					}
 				}
 			}

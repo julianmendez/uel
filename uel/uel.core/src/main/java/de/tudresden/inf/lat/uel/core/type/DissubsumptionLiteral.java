@@ -79,7 +79,7 @@ public class DissubsumptionLiteral implements Literal {
 
 	@Override
 	public String toString() {
-		StringBuilder str = new StringBuilder("(");
+		StringBuilder str = new StringBuilder("-(");
 		str.append(first.toString());
 		str.append(",");
 		str.append(second.toString());
