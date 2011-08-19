@@ -70,7 +70,7 @@ public class UelProcessor {
 			if (getUnifierList().isEmpty()) {
 				this.satinput = this.translator.getSatInput();
 			} else {
-				this.satinput.add(this.translator.getUpdate().toString());
+				this.satinput.add(this.translator.getUpdate());
 			}
 			satoutputStr = solver.solve(this.satinput);
 			this.translator.reset();

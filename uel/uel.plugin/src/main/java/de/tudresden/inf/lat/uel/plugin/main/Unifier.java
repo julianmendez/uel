@@ -189,7 +189,7 @@ class Unifier {
 
 				numberofsolutions++;
 
-				satinput.add(translator.getUpdate().toString());
+				satinput.add(translator.getUpdate());
 				String satoutputStr = solver.solve(satinput);
 
 				translator.reset();
@@ -256,7 +256,7 @@ class Unifier {
 
 				numberofsolutions++;
 
-				satinput.add(translator.getUpdate().toString());
+				satinput.add(translator.getUpdate());
 				String satoutputStr = solver.solve(satinput);
 
 				translator.reset();
@@ -322,7 +322,7 @@ class Unifier {
 				message = true;
 				numberofsolutions++;
 
-				satinput.add(translator.getUpdate().toString());
+				satinput.add(translator.getUpdate());
 				satoutputStr = solver.solve(satinput);
 
 				translator.reset();
@@ -420,7 +420,7 @@ class Unifier {
 
 				numberofsolutions++;
 
-				satinput.add(translator.getUpdate().toString());
+				satinput.add(translator.getUpdate());
 				String satoutputStr = solver.solve(satinput);
 
 				translator.reset();

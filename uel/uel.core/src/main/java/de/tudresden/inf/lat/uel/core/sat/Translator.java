@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.Writer;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -35,7 +36,6 @@ public class Translator {
 
 	private static final Integer minus = -1;
 	public static final String NOT_UNIFIABLE = "NOT UNIFIABLE / NO MORE UNIFIERS";
-	private static final String space = " ";
 
 	private Goal goal;
 	private Integer identificator = 1;
@@ -56,7 +56,7 @@ public class Translator {
 	 * Update is a string of numbers or numbers preceded with "-" encoding the
 	 * negation of the computed unifier. This is needed for computation of the
 	 */
-	private StringBuilder update = new StringBuilder("");
+	private Set<Integer> update = new HashSet<Integer>();
 
 	/**
 	 * Constructs a new translator.
@@ -533,8 +533,8 @@ public class Translator {
 
 	}
 
-	public StringBuilder getUpdate() {
-		return update;
+	public Set<Integer> getUpdate() {
+		return Collections.unmodifiableSet(update);
 	}
 
 	/**
@@ -543,7 +543,7 @@ public class Translator {
 	 */
 	public void reset() {
 
-		update = new StringBuilder("");
+		update.clear();
 
 		for (Integer key : identifiers.keySet()) {
 
@@ -685,7 +685,7 @@ public class Translator {
 											name2));
 
 							if (goal.getVariables().get(name1).isUserVariable()) {
-								update.append(i + space);
+								update.add(i);
 							}
 
 						} else if (goal.getEAtoms().containsKey(name2)) {
@@ -695,7 +695,7 @@ public class Translator {
 									.addToS((FAtom) goal.getEAtoms().get(name2));
 
 							if (goal.getVariables().get(name1).isUserVariable()) {
-								update.append(i + space);
+								update.add(i);
 							}
 						}
 					}
@@ -706,18 +706,18 @@ public class Translator {
 							&& goal.getVariables().get(name1).isUserVariable()) {
 						if (goal.getConstants().containsKey(name2)) {
 
-							update.append("-" + i + space);
+							update.add(minus * i);
 
 						} else if (goal.getEAtoms().containsKey(name2)) {
 
-							update.append("-" + i + space);
+							update.add(minus * i);
 						}
 					}
 
 				}
 
 			}
-			if (update.length() == 0) {
+			if (update.size() == 0) {
 				updateWithNegations();
 			}
 		}
@@ -783,7 +783,7 @@ public class Translator {
 						Literal lit = new SubsumptionLiteral(var.toString(),
 								atom.toString());
 						int i = literals.get(lit.toString());
-						update.append("-" + i + space);
+						update.add(minus * i);
 					}
 				}
 			}

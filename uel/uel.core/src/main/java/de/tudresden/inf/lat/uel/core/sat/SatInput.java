@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.StringTokenizer;
 import java.util.TreeSet;
 
 /**
@@ -45,21 +44,6 @@ public class SatInput {
 			}
 		}
 		return ret;
-	}
-
-	/**
-	 * Adds a new clause parsing a string containing integer numbers.
-	 * 
-	 * @param clause
-	 *            line representing the clause
-	 */
-	public boolean add(String clause) {
-		StringTokenizer stok = new StringTokenizer(clause);
-		Set<Integer> litSet = new HashSet<Integer>();
-		while (stok.hasMoreTokens()) {
-			litSet.add(Integer.parseInt(stok.nextToken()));
-		}
-		return add(litSet);
 	}
 
 	/**
