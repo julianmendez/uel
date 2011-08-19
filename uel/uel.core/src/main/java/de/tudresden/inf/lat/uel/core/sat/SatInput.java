@@ -14,7 +14,10 @@ import java.util.TreeSet;
  */
 public class SatInput {
 
-	private static final String P_CNF = "p cnf ";
+	private static final String newLine = "\n";
+	private static final String P_CNF = "p cnf";
+	private static final String space = " ";
+
 	private Set<Set<Integer>> clauses = new HashSet<Set<Integer>>();
 	private Integer lastId = 0;
 
@@ -92,23 +95,33 @@ public class SatInput {
 		return this.clauses.hashCode();
 	}
 
-	@Override
-	public String toString() {
+	/**
+	 * Returns a string that has the DIMACS CNF format.
+	 * 
+	 * @return a string that has the DIMACS CNF format
+	 */
+	public String toCNF() {
 		StringBuffer sbuf = new StringBuffer();
 		sbuf.append(P_CNF);
+		sbuf.append(space);
 		sbuf.append(this.lastId);
-		sbuf.append(" ");
+		sbuf.append(space);
 		sbuf.append(this.clauses.size());
-		sbuf.append("\n");
+		sbuf.append(newLine);
 		for (Set<Integer> clause : this.clauses) {
 			for (Integer literal : clause) {
 				sbuf.append(literal);
-				sbuf.append(" ");
+				sbuf.append(space);
 			}
 			sbuf.append(0);
-			sbuf.append("\n");
+			sbuf.append(newLine);
 		}
 		return sbuf.toString();
+	}
+
+	@Override
+	public String toString() {
+		return toCNF();
 	}
 
 	private boolean updateLastId(Set<Integer> newSet) {

@@ -43,7 +43,7 @@ public class MiniSatSolver implements Solver {
 		File satoutput = File.createTempFile(tempPrefix, tempSuffix);
 
 		PrintWriter satinputWriter = new PrintWriter(new FileWriter(satinput));
-		satinputWriter.println(input.toString());
+		satinputWriter.println(input.toCNF());
 		satinputWriter.flush();
 		satinputWriter.close();
 
