@@ -5,8 +5,6 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Reader;
-import java.io.StringReader;
-import java.io.StringWriter;
 import java.io.Writer;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -35,10 +33,9 @@ import de.tudresden.inf.lat.uel.core.type.SubsumptionLiteral;
  */
 public class Translator {
 
-	private static final String minus = " -";
+	private static final Integer minus = -1;
 	public static final String NOT_UNIFIABLE = "NOT UNIFIABLE / NO MORE UNIFIERS";
 	private static final String space = " ";
-	private static final String zero = " 0";
 
 	private Goal goal;
 	private Integer identificator = 1;
@@ -89,23 +86,7 @@ public class Translator {
 	 * clause in DIMACS format: 1 -3 0
 	 */
 	public SatInput getSatInput() {
-		StringWriter writer = new StringWriter();
-		toCNFWithoutHeader(writer);
-		SatInput ret = new SatInput();
-		BufferedReader reader = new BufferedReader(new StringReader(
-				writer.toString()));
-		String line = "";
-		while (line != null) {
-			try {
-				line = reader.readLine();
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
-			if (line != null) {
-				ret.add(line);
-			}
-		}
-		return ret;
+		return toCNFWithoutHeader();
 	}
 
 	public StringBuilder getUpdate() {
@@ -192,9 +173,10 @@ public class Translator {
 	 * This method is the same as toTBox but it does not overwrite the result.
 	 * Instead, it appends a unifier to the writer.
 	 */
-	private void toCNFWithoutHeader(Writer infile) {
+	private SatInput toCNFWithoutHeader() {
 
-		PrintWriter out = new PrintWriter(new BufferedWriter(infile));
+		SatInput ret = new SatInput();
+		Set<Integer> clause = new HashSet<Integer>();
 
 		/*
 		 * 
@@ -228,16 +210,15 @@ public class Translator {
 
 							Literal lit2 = new SubsumptionLiteral(key2, key1);
 
-							out.print(minus);
-							out.print(literals.get(lit2.toString()));
-							out.print(space);
+							clause.add(minus * literals.get(lit2.toString()));
 
 						}
 
 						Literal lit3 = new SubsumptionLiteral(key3, key1);
 
-						out.print(space + literals.get(lit3.toString()));
-						out.println(zero);
+						clause.add(literals.get(lit3.toString()));
+						ret.add(clause);
+						clause.clear();
 
 					}
 
@@ -250,16 +231,15 @@ public class Translator {
 
 							Literal lit2 = new SubsumptionLiteral(key3, key1);
 
-							out.print(minus);
-							out.print(literals.get(lit2.toString()));
-							out.print(space);
+							clause.add(minus * literals.get(lit2.toString()));
 
 						}
 
 						Literal lit3 = new SubsumptionLiteral(key2, key1);
 
-						out.print(literals.get(lit3.toString()));
-						out.println(zero);
+						clause.add(literals.get(lit3.toString()));
+						ret.add(clause);
+						clause.clear();
 
 					}
 
@@ -273,12 +253,11 @@ public class Translator {
 					for (String key2 : e.getLeft().keySet()) {
 						Literal lit4 = new SubsumptionLiteral(key2, key1);
 
-						out.print(minus);
-						out.print(literals.get(lit4.toString()));
-						out.print(space);
+						clause.add(minus * literals.get(lit4.toString()));
 
 					}
-					out.println(zero);
+					ret.add(clause);
+					clause.clear();
 
 				} else if (e.getLeft().containsKey(key1)
 						&& !e.getRight().containsKey(key1)) {
@@ -290,12 +269,11 @@ public class Translator {
 					for (String key3 : e.getRight().keySet()) {
 						Literal lit5 = new SubsumptionLiteral(key3, key1);
 
-						out.print(minus);
-						out.print(literals.get(lit5.toString()));
-						out.print(space);
+						clause.add(minus * literals.get(lit5.toString()));
 
 					}
-					out.println(zero);
+					ret.add(clause);
+					clause.clear();
 
 				}
 			}
@@ -320,16 +298,15 @@ public class Translator {
 
 							Literal lit2 = new SubsumptionLiteral(key2, key1);
 
-							out.print(minus);
-							out.print(literals.get(lit2.toString()));
-							out.print(space);
+							clause.add(minus * literals.get(lit2.toString()));
 
 						}
 
 						Literal lit3 = new SubsumptionLiteral(key3, key1);
 
-						out.print(literals.get(lit3.toString()));
-						out.println(zero);
+						clause.add(literals.get(lit3.toString()));
+						ret.add(clause);
+						clause.clear();
 
 					}
 
@@ -342,15 +319,14 @@ public class Translator {
 
 							Literal lit2 = new SubsumptionLiteral(key3, key1);
 
-							out.print(minus);
-							out.print(literals.get(lit2.toString()));
-							out.print(space);
+							clause.add(minus * literals.get(lit2.toString()));
 						}
 
 						Literal lit3 = new SubsumptionLiteral(key2, key1);
 
-						out.print(literals.get(lit3.toString()));
-						out.println(zero);
+						clause.add(literals.get(lit3.toString()));
+						ret.add(clause);
+						clause.clear();
 
 					}
 
@@ -366,12 +342,11 @@ public class Translator {
 					for (String key2 : e.getLeft().keySet()) {
 						Literal lit4 = new SubsumptionLiteral(key2, key1);
 
-						out.print(minus);
-						out.print(literals.get(lit4.toString()));
-						out.print(space);
+						clause.add(minus * literals.get(lit4.toString()));
 
 					}
-					out.println(zero);
+					ret.add(clause);
+					clause.clear();
 
 					// end of outer if; key1 is not on the left, ask if it
 					// is on the right
@@ -387,12 +362,11 @@ public class Translator {
 					for (String key3 : e.getRight().keySet()) {
 						Literal lit5 = new SubsumptionLiteral(key3, key1);
 
-						out.print(minus);
-						out.print(literals.get(lit5.toString()));
-						out.print(space);
+						clause.add(minus * literals.get(lit5.toString()));
 
 					}
-					out.println(zero);
+					ret.add(clause);
+					clause.clear();
 
 				}
 			}
@@ -415,9 +389,10 @@ public class Translator {
 
 					Literal lit = new SubsumptionLiteral(key1, key2);
 
-					out.print(literals.get(lit.toString()));
+					clause.add(literals.get(lit.toString()));
 
-					out.println(zero);
+					ret.add(clause);
+					clause.clear();
 
 				}
 
@@ -447,9 +422,10 @@ public class Translator {
 
 						Literal lit = new SubsumptionLiteral(key1, key2);
 
-						out.print(literals.get(lit.toString()));
+						clause.add(literals.get(lit.toString()));
 
-						out.println(zero);
+						ret.add(clause);
+						clause.clear();
 
 						/*
 						 * if the roles are equal, then clause in Step 2.3
@@ -471,14 +447,12 @@ public class Translator {
 
 							Literal lit2 = new SubsumptionLiteral(key1, key2);
 
-							out.print(minus);
-							out.print(literals.get(lit1.toString()));
-							out.print(space);
+							clause.add(minus * literals.get(lit1.toString()));
 
-							out.print(literals.get(lit2.toString()));
-							out.print(space);
+							clause.add(literals.get(lit2.toString()));
 
-							out.println(zero);
+							ret.add(clause);
+							clause.clear();
 
 						}
 
@@ -501,17 +475,19 @@ public class Translator {
 
 				Literal lit = new SubsumptionLiteral(key1, key2);
 
-				out.print(literals.get(lit.toString()));
+				clause.add(literals.get(lit.toString()));
 
-				out.println(zero);
+				ret.add(clause);
+				clause.clear();
 
 				if (!key1.equalsIgnoreCase(KRSSKeyword.top)) {
 
 					Literal lit1 = new SubsumptionLiteral(key2, key1);
 
-					out.print(literals.get(lit1.toString()));
+					clause.add(literals.get(lit1.toString()));
 
-					out.println(zero);
+					ret.add(clause);
+					clause.clear();
 
 				}
 
@@ -528,11 +504,10 @@ public class Translator {
 
 			Literal lit = new OrderLiteral(key1, key1);
 
-			out.print(minus);
-			out.print(literals.get(lit.toString()));
-			out.print(space);
+			clause.add(minus * literals.get(lit.toString()));
 
-			out.println(zero);
+			ret.add(clause);
+			clause.clear();
 
 		}// end of clauses in step 2.5
 
@@ -557,18 +532,14 @@ public class Translator {
 
 						Literal lit3 = new OrderLiteral(key1, key3);
 
-						out.print(minus);
-						out.print(literals.get(lit1.toString()));
-						out.print(space);
+						clause.add(minus * literals.get(lit1.toString()));
 
-						out.print(minus);
-						out.print(literals.get(lit2.toString()));
-						out.print(space);
+						clause.add(minus * literals.get(lit2.toString()));
 
-						out.print(literals.get(lit3.toString()));
-						out.print(space);
+						clause.add(literals.get(lit3.toString()));
 
-						out.println(zero);
+						ret.add(clause);
+						clause.clear();
 
 					}
 
@@ -600,17 +571,14 @@ public class Translator {
 
 						Literal lit3 = new SubsumptionLiteral(key1, key3);
 
-						out.print(minus);
-						out.print(literals.get(lit3.toString()));
-						out.print(space);
+						clause.add(minus * literals.get(lit3.toString()));
 
-						out.print(literals.get(lit1.toString()));
-						out.print(space);
+						clause.add(literals.get(lit1.toString()));
 
-						out.print(literals.get(lit2.toString()));
-						out.print(space);
+						clause.add(literals.get(lit2.toString()));
 
-						out.println(zero);
+						ret.add(clause);
+						clause.clear();
 
 					}
 
@@ -636,13 +604,12 @@ public class Translator {
 
 					Literal lit2 = new SubsumptionLiteral(key2, key1);
 
-					out.print(literals.get(lit1.toString()));
-					out.print(space);
+					clause.add(literals.get(lit1.toString()));
 
-					out.print(literals.get(lit2.toString()));
-					out.print(space);
+					clause.add(literals.get(lit2.toString()));
 
-					out.println(zero);
+					ret.add(clause);
+					clause.clear();
 
 				}
 
@@ -650,7 +617,7 @@ public class Translator {
 
 		}
 
-		out.flush();
+		return ret;
 
 	}
 

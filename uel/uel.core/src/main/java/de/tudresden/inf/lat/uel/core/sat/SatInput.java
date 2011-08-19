@@ -39,7 +39,7 @@ public class SatInput {
 		newSet.addAll(clause);
 		newSet.remove(0);
 		if (!newSet.isEmpty()) {
-			ret = this.clauses.add(newSet);
+			ret = this.clauses.add(Collections.unmodifiableSet(newSet));
 			if (ret) {
 				updateLastId(newSet);
 			}
@@ -59,7 +59,7 @@ public class SatInput {
 		while (stok.hasMoreTokens()) {
 			litSet.add(Integer.parseInt(stok.nextToken()));
 		}
-		return add(Collections.unmodifiableSet(litSet));
+		return add(litSet);
 	}
 
 	/**
