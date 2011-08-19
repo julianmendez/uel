@@ -86,94 +86,6 @@ public class Translator {
 	 * clause in DIMACS format: 1 -3 0
 	 */
 	public SatInput getSatInput() {
-		return toCNFWithoutHeader();
-	}
-
-	public StringBuilder getUpdate() {
-		return update;
-	}
-
-	/**
-	 * Resets string update values for literals and S(X) for each X, before the
-	 * next unifier is computed.
-	 */
-	public void reset() {
-
-		update = new StringBuilder("");
-
-		for (Integer key : identifiers.keySet()) {
-
-			identifiers.get(key).setValue(false);
-
-		}
-
-		for (String var : goal.getVariables().keySet()) {
-
-			goal.getVariables().get(var).resetS();
-
-		}
-
-	}
-
-	/**
-	 * Creates dis-subsumptions and order literals from all pairs of atoms of
-	 * the goal
-	 */
-	private void setLiterals() {
-
-		String first;
-		String second;
-		Literal literal;
-
-		/*
-		 * Literals for dis-subsumptions
-		 */
-
-		for (String key1 : goal.getAllAtoms().keySet()) {
-
-			first = key1;
-
-			for (String key2 : goal.getAllAtoms().keySet()) {
-
-				second = key2;
-				literal = new SubsumptionLiteral(first, second);
-
-				literals.put(literal.toString(), identificator);
-				identifiers.put(identificator, literal);
-				identificator++;
-			}
-		}
-
-		/*
-		 * 
-		 * Literals for order on variables
-		 */
-
-		for (String key1 : goal.getVariables().keySet()) {
-
-			first = key1;
-
-			for (String key2 : goal.getVariables().keySet()) {
-
-				second = key2;
-
-				literal = new OrderLiteral(first, second);
-
-				literals.put(literal.toString(), identificator);
-				identifiers.put(identificator, literal);
-				identificator++;
-
-			}
-
-		}
-
-	}
-
-	/**
-	 * This method is the same as toTBox but it does not overwrite the result.
-	 * Instead, it appends a unifier to the writer.
-	 */
-	private SatInput toCNFWithoutHeader() {
 
 		SatInput ret = new SatInput();
 		Set<Integer> clause = new HashSet<Integer>();
@@ -618,6 +530,86 @@ public class Translator {
 		}
 
 		return ret;
+
+	}
+
+	public StringBuilder getUpdate() {
+		return update;
+	}
+
+	/**
+	 * Resets string update values for literals and S(X) for each X, before the
+	 * next unifier is computed.
+	 */
+	public void reset() {
+
+		update = new StringBuilder("");
+
+		for (Integer key : identifiers.keySet()) {
+
+			identifiers.get(key).setValue(false);
+
+		}
+
+		for (String var : goal.getVariables().keySet()) {
+
+			goal.getVariables().get(var).resetS();
+
+		}
+
+	}
+
+	/**
+	 * Creates dis-subsumptions and order literals from all pairs of atoms of
+	 * the goal
+	 */
+	private void setLiterals() {
+
+		String first;
+		String second;
+		Literal literal;
+
+		/*
+		 * Literals for dis-subsumptions
+		 */
+
+		for (String key1 : goal.getAllAtoms().keySet()) {
+
+			first = key1;
+
+			for (String key2 : goal.getAllAtoms().keySet()) {
+
+				second = key2;
+				literal = new SubsumptionLiteral(first, second);
+
+				literals.put(literal.toString(), identificator);
+				identifiers.put(identificator, literal);
+				identificator++;
+			}
+		}
+
+		/*
+		 * 
+		 * Literals for order on variables
+		 */
+
+		for (String key1 : goal.getVariables().keySet()) {
+
+			first = key1;
+
+			for (String key2 : goal.getVariables().keySet()) {
+
+				second = key2;
+
+				literal = new OrderLiteral(first, second);
+
+				literals.put(literal.toString(), identificator);
+				identifiers.put(identificator, literal);
+				identificator++;
+
+			}
+
+		}
 
 	}
 
