@@ -75,6 +75,10 @@ public class Translator {
 		setLiterals();
 	}
 
+	private Integer getLiteralId(Integer val) {
+		return invertLiteral ? (-1) * val : val;
+	}
+
 	/**
 	 * Returns the literals.
 	 * 
@@ -84,8 +88,7 @@ public class Translator {
 		return this.literals;
 	}
 
-	private int getMinusLiteralId(Literal literal) {
-		int val = literals.get(literal.toString());
+	private int getMinusLiteralId(int val) {
 		return invertLiteral ? val : (-1) * val;
 	}
 
@@ -588,7 +591,7 @@ public class Translator {
 				if (currentLiteral < 0) {
 					Integer i = (-1) * currentLiteral;
 					Literal literal = identifiers.get(i);
-					if (literal.isDissubsumption()) {
+					if (literal.isDissubsumption() || literal.isSubsumption()) {
 						literal.setValue(false);
 					}
 				} else if (currentLiteral > 0) {
@@ -606,8 +609,10 @@ public class Translator {
 				String name1 = identifiers.get(i).getFirst();
 				String name2 = identifiers.get(i).getSecond();
 
-				if (!identifiers.get(i).getValue()
-						&& identifiers.get(i).isDissubsumption()) {
+				if ((!identifiers.get(i).getValue() && identifiers.get(i)
+						.isDissubsumption())
+						|| (identifiers.get(i).getValue() && identifiers.get(i)
+								.isSubsumption())) {
 
 					if (goal.getVariables().containsKey(name1)) {
 						if (goal.getConstants().containsKey(name2)) {
@@ -616,7 +621,7 @@ public class Translator {
 									.addToS(goal.getConstants().get(name2));
 
 							if (goal.getVariables().get(name1).isUserVariable()) {
-								update.add(i);
+								update.add(getLiteralId(i));
 							}
 
 						} else if (goal.getEAtoms().containsKey(name2)) {
@@ -625,7 +630,7 @@ public class Translator {
 									.addToS(goal.getEAtoms().get(name2));
 
 							if (goal.getVariables().get(name1).isUserVariable()) {
-								update.add(i);
+								update.add(getLiteralId(i));
 							}
 						}
 					}
@@ -637,11 +642,11 @@ public class Translator {
 							&& goal.getVariables().get(name1).isUserVariable()) {
 						if (goal.getConstants().containsKey(name2)) {
 
-							update.add(getMinusLiteralId(identifiers.get(i)));
+							update.add(getMinusLiteralId(i));
 
 						} else if (goal.getEAtoms().containsKey(name2)) {
 
-							update.add(getMinusLiteralId(identifiers.get(i)));
+							update.add(getMinusLiteralId(i));
 						}
 					}
 
