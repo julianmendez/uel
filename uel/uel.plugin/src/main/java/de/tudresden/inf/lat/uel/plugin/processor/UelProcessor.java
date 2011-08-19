@@ -97,7 +97,7 @@ public class UelProcessor {
 		}
 
 		Goal ret = createGoal(this.ontology, input, this.candidates);
-		this.translator = new Translator(ret);
+		this.translator = new Translator(ret, true);
 		return ret;
 	}
 
