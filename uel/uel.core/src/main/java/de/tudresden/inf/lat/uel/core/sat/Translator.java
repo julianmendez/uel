@@ -42,7 +42,7 @@ public class Translator {
 
 	/**
 	 * Identifiers are numbers, each number uniquely identifies a literal, i.e.
-	 * a subsumption.
+	 * a dissubsumption.
 	 */
 	private HashMap<Integer, Literal> identifiers = new HashMap<Integer, Literal>();
 
@@ -53,8 +53,8 @@ public class Translator {
 	private HashMap<String, Integer> literals = new HashMap<String, Integer>();
 
 	/**
-	 * Update is a string of numbers or numbers preceded with "-" encoding the
-	 * negation of the computed unifier. This is needed for computation of the
+	 * Update is a set of numbers or numbers encoding the negation of the
+	 * computed unifier. This is needed for computation of the
 	 */
 	private Set<Integer> update = new HashSet<Integer>();
 
@@ -344,10 +344,8 @@ public class Translator {
 						 */
 					} else {
 
-						FAtom child1 = (FAtom) goal.getEAtoms().get(key1)
-								.getChild();
-						FAtom child2 = (FAtom) goal.getEAtoms().get(key2)
-								.getChild();
+						FAtom child1 = goal.getEAtoms().get(key1).getChild();
+						FAtom child2 = goal.getEAtoms().get(key2).getChild();
 
 						String child1name = child1.getName();
 						String child2name = child2.getName();
@@ -505,8 +503,8 @@ public class Translator {
 
 		for (String key1 : goal.getEAtoms().keySet()) {
 
-			FAtom eatom = (FAtom) goal.getEAtoms().get(key1);
-			FAtom child = (FAtom) eatom.getChild();
+			FAtom eatom = goal.getEAtoms().get(key1);
+			FAtom child = eatom.getChild();
 
 			if (child.isVar()) {
 
@@ -656,9 +654,10 @@ public class Translator {
 
 					Integer i = Integer.parseInt(token.toString());
 
-					Literal literal = (Literal) identifiers.get(i);
-
-					literal.setValue(true);
+					Literal literal = identifiers.get(i);
+					if (literal.isDissubsumption()) {
+						literal.setValue(true);
+					}
 
 				}
 
@@ -679,10 +678,8 @@ public class Translator {
 					if (goal.getVariables().containsKey(name1)) {
 						if (goal.getConstants().containsKey(name2)) {
 
-							goal.getVariables()
-									.get(name1)
-									.addToS((FAtom) goal.getConstants().get(
-											name2));
+							goal.getVariables().get(name1)
+									.addToS(goal.getConstants().get(name2));
 
 							if (goal.getVariables().get(name1).isUserVariable()) {
 								update.add(i);
@@ -690,9 +687,8 @@ public class Translator {
 
 						} else if (goal.getEAtoms().containsKey(name2)) {
 
-							goal.getVariables()
-									.get(name1)
-									.addToS((FAtom) goal.getEAtoms().get(name2));
+							goal.getVariables().get(name1)
+									.addToS(goal.getEAtoms().get(name2));
 
 							if (goal.getVariables().get(name1).isUserVariable()) {
 								update.add(i);

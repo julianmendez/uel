@@ -13,7 +13,7 @@ public class DissubsumptionLiteral implements Literal {
 	private boolean value = false;
 
 	/**
-	 * Constructs a subsumption literal given two names.
+	 * Constructs a dissubsumption literal given two names.
 	 * 
 	 * @param one
 	 *            first component
