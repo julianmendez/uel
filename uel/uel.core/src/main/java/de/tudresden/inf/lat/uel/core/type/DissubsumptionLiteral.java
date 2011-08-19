@@ -5,7 +5,7 @@ package de.tudresden.inf.lat.uel.core.type;
  * 
  * @author Barbara Morawska
  */
-public class SubsumptionLiteral implements Literal {
+public class DissubsumptionLiteral implements Literal {
 
 	private final String first;
 	private int hashCode = 0;
@@ -20,7 +20,7 @@ public class SubsumptionLiteral implements Literal {
 	 * @param two
 	 *            second component
 	 */
-	public SubsumptionLiteral(String one, String two) {
+	public DissubsumptionLiteral(String one, String two) {
 		first = one;
 		second = two;
 		hashCode = one.hashCode() + 31 * two.hashCode();
@@ -29,8 +29,8 @@ public class SubsumptionLiteral implements Literal {
 	@Override
 	public boolean equals(Object o) {
 		boolean ret = false;
-		if (o instanceof SubsumptionLiteral) {
-			SubsumptionLiteral other = (SubsumptionLiteral) o;
+		if (o instanceof DissubsumptionLiteral) {
+			DissubsumptionLiteral other = (DissubsumptionLiteral) o;
 			ret = this.value == other.value && this.first.equals(other.first)
 					&& this.second.equals(other.second);
 		}
@@ -58,13 +58,13 @@ public class SubsumptionLiteral implements Literal {
 	}
 
 	@Override
-	public boolean isOrder() {
-		return false;
+	public boolean isDissubsumption() {
+		return true;
 	}
 
 	@Override
-	public boolean isSubsumption() {
-		return true;
+	public boolean isOrder() {
+		return false;
 	}
 
 	@Override

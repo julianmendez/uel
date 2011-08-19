@@ -58,13 +58,13 @@ public class OrderLiteral implements Literal {
 	}
 
 	@Override
-	public boolean isOrder() {
-		return true;
+	public boolean isDissubsumption() {
+		return false;
 	}
 
 	@Override
-	public boolean isSubsumption() {
-		return false;
+	public boolean isOrder() {
+		return true;
 	}
 
 	@Override

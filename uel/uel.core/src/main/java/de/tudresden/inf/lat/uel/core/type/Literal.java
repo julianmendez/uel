@@ -33,18 +33,18 @@ public interface Literal {
 	public boolean getValue();
 
 	/**
+	 * Tells whether this literal is a subsumption literal.
+	 * 
+	 * @return <code>true</code> if and only if this is an subsumption literal
+	 */
+	public boolean isDissubsumption();
+
+	/**
 	 * Tells whether this literal is an order literal.
 	 * 
 	 * @return <code>true</code> if and only if this is an order literal
 	 */
 	public boolean isOrder();
-
-	/**
-	 * Tells whether this literal is a subsumption literal.
-	 * 
-	 * @return <code>true</code> if and only if this is an subsumption literal
-	 */
-	public boolean isSubsumption();
 
 	/**
 	 * Sets the value <code>t</code> for the literal.
