@@ -18,7 +18,6 @@ import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 
 import de.tudresden.inf.lat.uel.core.type.Atom;
 import de.tudresden.inf.lat.uel.core.type.Equation;
-import de.tudresden.inf.lat.uel.core.type.Ontology;
 import de.tudresden.inf.lat.uel.core.type.OntologyImpl;
 
 /**
@@ -39,7 +38,7 @@ public class OntologyBuilder {
 	 *            OWL ontology
 	 * @return a new UEL ontology using an OWL ontology
 	 */
-	public Ontology createOntology(OWLOntology owlOntology) {
+	public OntologyImpl createOntology(OWLOntology owlOntology) {
 		if (owlOntology == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}

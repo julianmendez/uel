@@ -96,7 +96,7 @@ class VarSelectionModel {
 
 	private Set<String> getRecursiveDefinitionSymbols(String name) {
 		Set<String> currentSet = getOntology().getDefinitionSymbols(name);
-		if (currentSet.isEmpty() && this.setOfOriginalVariables.contains(name)) {
+		if (currentSet.isEmpty() && this.setOfVariables.contains(name)) {
 			currentSet = getOntology().getPrimitiveDefinitionSymbols(name);
 		}
 
