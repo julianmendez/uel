@@ -1,11 +1,11 @@
 package de.tudresden.inf.lat.uel.core.type;
 
 /**
- * An object implementing this class is a dis-subsumption.
+ * An object implementing this class is a subsumption.
  * 
  * @author Barbara Morawska
  */
-public class DissubsumptionLiteral implements Literal {
+public class SubsumptionLiteral implements Literal {
 
 	private final String first;
 	private int hashCode = 0;
@@ -20,7 +20,7 @@ public class DissubsumptionLiteral implements Literal {
 	 * @param two
 	 *            second component
 	 */
-	public DissubsumptionLiteral(String one, String two) {
+	public SubsumptionLiteral(String one, String two) {
 		first = one;
 		second = two;
 		hashCode = one.hashCode() + 31 * two.hashCode();
@@ -29,8 +29,8 @@ public class DissubsumptionLiteral implements Literal {
 	@Override
 	public boolean equals(Object o) {
 		boolean ret = false;
-		if (o instanceof DissubsumptionLiteral) {
-			DissubsumptionLiteral other = (DissubsumptionLiteral) o;
+		if (o instanceof SubsumptionLiteral) {
+			SubsumptionLiteral other = (SubsumptionLiteral) o;
 			ret = this.value == other.value && this.first.equals(other.first)
 					&& this.second.equals(other.second);
 		}
@@ -59,7 +59,7 @@ public class DissubsumptionLiteral implements Literal {
 
 	@Override
 	public boolean isDissubsumption() {
-		return true;
+		return false;
 	}
 
 	@Override
@@ -69,7 +69,7 @@ public class DissubsumptionLiteral implements Literal {
 
 	@Override
 	public boolean isSubsumption() {
-		return false;
+		return true;
 	}
 
 	@Override

@@ -68,6 +68,11 @@ public class OrderLiteral implements Literal {
 	}
 
 	@Override
+	public boolean isSubsumption() {
+		return false;
+	}
+
+	@Override
 	public void setValue(boolean t) {
 		value = t;
 	}
