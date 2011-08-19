@@ -633,11 +633,11 @@ public class Translator {
 					Integer i = (-1) * currentLiteral;
 					Literal literal = identifiers.get(i);
 					if (literal.isDissubsumption()) {
-						literal.setValue(true);
+						literal.setValue(false);
 					}
 				} else if (currentLiteral > 0) {
 					Literal literal = identifiers.get(currentLiteral);
-					literal.setValue(false);
+					literal.setValue(true);
 				}
 			}
 
@@ -650,7 +650,7 @@ public class Translator {
 				String name1 = identifiers.get(i).getFirst();
 				String name2 = identifiers.get(i).getSecond();
 
-				if (identifiers.get(i).getValue()
+				if (!identifiers.get(i).getValue()
 						&& identifiers.get(i).isDissubsumption()) {
 
 					if (goal.getVariables().containsKey(name1)) {
