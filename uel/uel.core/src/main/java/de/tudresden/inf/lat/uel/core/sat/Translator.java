@@ -12,8 +12,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import de.tudresden.inf.lat.uel.core.type.DissubsumptionLiteral;
 import de.tudresden.inf.lat.uel.core.type.Equation;
@@ -617,50 +615,30 @@ public class Translator {
 	 */
 	public boolean toTBox(Reader outfile) throws IOException {
 
-		Pattern answer = Pattern.compile("^SAT");
-		Matcher manswer;
-		String line;
 		boolean response = false;
-
 		BufferedReader reader = new BufferedReader(outfile);
-
-		line = reader.readLine();
-
-		manswer = answer.matcher(line);
+		String line = reader.readLine();
 
 		/*
 		 * if SAT is in the beginning of the file
 		 */
-		if (manswer.find()) {
-
+		if (line.startsWith(Solver.msgSat)) {
 			response = true;
-
-			Pattern sign = Pattern.compile("^-");
-			Matcher msign;
-
 			line = reader.readLine();
 			StringTokenizer st = new StringTokenizer(line);
 
-			StringBuilder token;
-
 			while (st.hasMoreTokens()) {
-
-				token = new StringBuilder(st.nextToken());
-				msign = sign.matcher(token);
-
-				if (msign.find()) {
-
-					token = token.delete(0, msign.end());
-
-					Integer i = Integer.parseInt(token.toString());
-
+				Integer currentLiteral = Integer.parseInt(st.nextToken());
+				if (currentLiteral < 0) {
+					Integer i = (-1) * currentLiteral;
 					Literal literal = identifiers.get(i);
 					if (literal.isDissubsumption()) {
 						literal.setValue(true);
 					}
-
+				} else if (currentLiteral > 0) {
+					Literal literal = identifiers.get(currentLiteral);
+					literal.setValue(false);
 				}
-
 			}
 
 			/*
