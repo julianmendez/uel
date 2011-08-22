@@ -47,6 +47,21 @@ public class SatInput {
 	}
 
 	/**
+	 * Adds a set of new clauses. Empty clauses are ignored.
+	 * 
+	 * @param clauses
+	 *            set of new clauses
+	 */
+	public boolean addAll(Set<Set<Integer>> clauses) {
+		boolean ret = false;
+		for (Set<Integer> clause : clauses) {
+			boolean changed = add(clause);
+			ret = ret || changed;
+		}
+		return ret;
+	}
+
+	/**
 	 * Clears the set of clauses.
 	 */
 	public void clear() {

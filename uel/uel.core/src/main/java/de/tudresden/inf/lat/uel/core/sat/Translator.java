@@ -113,170 +113,236 @@ public class Translator {
 	 * clause in DIMACS format: 1 -3 0
 	 */
 	public SatInput getSatInput() {
-
 		SatInput ret = new SatInput();
 
-		/*
-		 * 
-		 * Clauses created in Step 1
-		 */
+		ret.addAll(runStep1().getClauses());
+		ret.addAll(runStep2_1().getClauses());
+		ret.addAll(runSteps2_2_N_2_3().getClauses());
+		ret.addAll(runStep2_4().getClauses());
+		ret.addAll(runStep2_5().getClauses());
+		ret.addAll(runStep3_1_r().getClauses());
+		ret.addAll(runStep3_1_t().getClauses());
+		ret.addAll(runStep3_2().getClauses());
+
+		return ret;
+	}
+
+	private int getSubOrDissubLiteral(String left, String right) {
+		Literal literal = invertLiteral ? new SubsumptionLiteral(left, right)
+				: new DissubsumptionLiteral(left, right);
+		int val = literals.get(literal.toString());
+		return invertLiteral ? (-1) * val : val;
+	}
+
+	public Set<Integer> getUpdate() {
+		return Collections.unmodifiableSet(update);
+	}
+
+	/**
+	 * Resets string update values for literals and S(X) for each X, before the
+	 * next unifier is computed.
+	 */
+	public void reset() {
+
+		update.clear();
+
+		for (Integer key : identifiers.keySet()) {
+
+			identifiers.get(key).setValue(false);
+
+		}
+
+		for (String var : goal.getVariables().keySet()) {
+
+			goal.getVariables().get(var).resetS();
+
+		}
+
+	}
+
+	/**
+	 * Clauses created in Step 1
+	 */
+	private SatInput runStep1() {
+		SatInput ret = new SatInput();
+
 		Set<Equation> equations = new HashSet<Equation>();
 		equations.addAll(goal.getEquations());
 		equations.add(goal.getMainEquation());
 
 		for (Equation e : equations) {
-
-			/*
-			 * Step 1 for constants
-			 */
-
-			for (String key1 : goal.getConstants().keySet()) {
-
-				if (!e.getLeft().containsKey(key1)
-						&& !e.getRight().containsKey(key1)) {
-
-					/*
-					 * constant not in the equation
-					 * 
-					 * 
-					 * 
-					 * one side of an equation
-					 */
-
-					for (String key3 : e.getRight().keySet()) {
-						Set<Integer> clause = new HashSet<Integer>();
-
-						for (String key2 : e.getLeft().keySet()) {
-							clause.add(getMinusSubOrDissubLiteral(key2, key1));
-						}
-
-						clause.add(getSubOrDissubLiteral(key3, key1));
-						ret.add(clause);
-					}
-
-					/*
-					 * another side of an equation
-					 */
-
-					for (String key2 : e.getLeft().keySet()) {
-						Set<Integer> clause = new HashSet<Integer>();
-
-						for (String key3 : e.getRight().keySet()) {
-							clause.add(getMinusSubOrDissubLiteral(key3, key1));
-						}
-
-						clause.add(getSubOrDissubLiteral(key2, key1));
-						ret.add(clause);
-					}
-
-				} else if (!e.getLeft().containsKey(key1)
-						&& e.getRight().containsKey(key1)) {
-
-					/*
-					 * constant of the right but not on the left
-					 */
-
-					Set<Integer> clause = new HashSet<Integer>();
-
-					for (String key2 : e.getLeft().keySet()) {
-						clause.add(getMinusSubOrDissubLiteral(key2, key1));
-					}
-					ret.add(clause);
-
-				} else if (e.getLeft().containsKey(key1)
-						&& !e.getRight().containsKey(key1)) {
-
-					/*
-					 * constant on the left but not on the right
-					 */
-
-					Set<Integer> clause = new HashSet<Integer>();
-
-					for (String key3 : e.getRight().keySet()) {
-						clause.add(getMinusSubOrDissubLiteral(key3, key1));
-					}
-					ret.add(clause);
-				}
-			}
-
-			/*
-			 * Step 1 for existential atoms
-			 */
-
-			for (String key1 : goal.getEAtoms().keySet()) {
-
-				if (!e.getLeft().containsKey(key1)
-						&& !e.getRight().containsKey(key1)) {
-
-					/*
-					 * atom not in the equation
-					 * 
-					 * one side of equation
-					 */
-
-					for (String key3 : e.getRight().keySet()) {
-						Set<Integer> clause = new HashSet<Integer>();
-
-						for (String key2 : e.getLeft().keySet()) {
-							clause.add(getMinusSubOrDissubLiteral(key2, key1));
-						}
-						clause.add(getSubOrDissubLiteral(key3, key1));
-						ret.add(clause);
-					}
-
-					/*
-					 * another side of the equation
-					 */
-
-					for (String key2 : e.getLeft().keySet()) {
-						Set<Integer> clause = new HashSet<Integer>();
-
-						for (String key3 : e.getRight().keySet()) {
-							clause.add(getMinusSubOrDissubLiteral(key3, key1));
-						}
-						clause.add(getSubOrDissubLiteral(key2, key1));
-						ret.add(clause);
-					}
-
-				} else if (!e.getLeft().containsKey(key1)
-						&& e.getRight().containsKey(key1)) {
-
-					/*
-					 * 
-					 * existential atom on the right but not on the left side of
-					 * an equation
-					 */
-
-					Set<Integer> clause = new HashSet<Integer>();
-
-					for (String key2 : e.getLeft().keySet()) {
-						clause.add(getMinusSubOrDissubLiteral(key2, key1));
-
-					}
-					ret.add(clause);
-
-					// end of outer if; key1 is not on the left, ask if it
-					// is on the right
-				} else if (e.getLeft().containsKey(key1)
-						&& !e.getRight().containsKey(key1)) {
-
-					/*
-					 * 
-					 * existential atom on the left but not on the right side of
-					 * equation
-					 */
-
-					Set<Integer> clause = new HashSet<Integer>();
-
-					for (String key3 : e.getRight().keySet()) {
-						clause.add(getMinusSubOrDissubLiteral(key3, key1));
-					}
-					ret.add(clause);
-
-				}
-			}
-
+			ret.addAll(runStep1ForConstants(e).getClauses());
+			ret.addAll(runStep1ForExistentialAtoms(e).getClauses());
 		}
+
+		return ret;
+	}
+
+	/**
+	 * Step 1 for constants
+	 * 
+	 * @param e
+	 *            equation
+	 */
+	private SatInput runStep1ForConstants(Equation e) {
+		SatInput ret = new SatInput();
+
+		for (String key1 : goal.getConstants().keySet()) {
+
+			if (!e.getLeft().containsKey(key1)
+					&& !e.getRight().containsKey(key1)) {
+
+				/*
+				 * constant not in the equation
+				 * 
+				 * one side of an equation
+				 */
+
+				for (String key3 : e.getRight().keySet()) {
+					Set<Integer> clause = new HashSet<Integer>();
+
+					for (String key2 : e.getLeft().keySet()) {
+						clause.add(getMinusSubOrDissubLiteral(key2, key1));
+					}
+
+					clause.add(getSubOrDissubLiteral(key3, key1));
+					ret.add(clause);
+				}
+
+				/*
+				 * another side of an equation
+				 */
+
+				for (String key2 : e.getLeft().keySet()) {
+					Set<Integer> clause = new HashSet<Integer>();
+
+					for (String key3 : e.getRight().keySet()) {
+						clause.add(getMinusSubOrDissubLiteral(key3, key1));
+					}
+
+					clause.add(getSubOrDissubLiteral(key2, key1));
+					ret.add(clause);
+				}
+
+			} else if (!e.getLeft().containsKey(key1)
+					&& e.getRight().containsKey(key1)) {
+
+				/*
+				 * constant of the right but not on the left
+				 */
+
+				Set<Integer> clause = new HashSet<Integer>();
+
+				for (String key2 : e.getLeft().keySet()) {
+					clause.add(getMinusSubOrDissubLiteral(key2, key1));
+				}
+				ret.add(clause);
+
+			} else if (e.getLeft().containsKey(key1)
+					&& !e.getRight().containsKey(key1)) {
+
+				/*
+				 * constant on the left but not on the right
+				 */
+
+				Set<Integer> clause = new HashSet<Integer>();
+
+				for (String key3 : e.getRight().keySet()) {
+					clause.add(getMinusSubOrDissubLiteral(key3, key1));
+				}
+				ret.add(clause);
+			}
+		}
+
+		return ret;
+	}
+
+	/**
+	 * Step 1 for existential atoms
+	 * 
+	 * @param e
+	 *            equation
+	 */
+	private SatInput runStep1ForExistentialAtoms(Equation e) {
+		SatInput ret = new SatInput();
+
+		for (String key1 : goal.getEAtoms().keySet()) {
+
+			if (!e.getLeft().containsKey(key1)
+					&& !e.getRight().containsKey(key1)) {
+
+				/*
+				 * atom not in the equation
+				 * 
+				 * one side of equation
+				 */
+
+				for (String key3 : e.getRight().keySet()) {
+					Set<Integer> clause = new HashSet<Integer>();
+
+					for (String key2 : e.getLeft().keySet()) {
+						clause.add(getMinusSubOrDissubLiteral(key2, key1));
+					}
+					clause.add(getSubOrDissubLiteral(key3, key1));
+					ret.add(clause);
+				}
+
+				/*
+				 * another side of the equation
+				 */
+
+				for (String key2 : e.getLeft().keySet()) {
+					Set<Integer> clause = new HashSet<Integer>();
+
+					for (String key3 : e.getRight().keySet()) {
+						clause.add(getMinusSubOrDissubLiteral(key3, key1));
+					}
+					clause.add(getSubOrDissubLiteral(key2, key1));
+					ret.add(clause);
+				}
+
+			} else if (!e.getLeft().containsKey(key1)
+					&& e.getRight().containsKey(key1)) {
+
+				/*
+				 * existential atom on the right but not on the left side of an
+				 * equation
+				 */
+
+				Set<Integer> clause = new HashSet<Integer>();
+
+				for (String key2 : e.getLeft().keySet()) {
+					clause.add(getMinusSubOrDissubLiteral(key2, key1));
+
+				}
+				ret.add(clause);
+
+				// end of outer if; key1 is not on the left, ask if it
+				// is on the right
+			} else if (e.getLeft().containsKey(key1)
+					&& !e.getRight().containsKey(key1)) {
+
+				/*
+				 * existential atom on the left but not on the right side of
+				 * equation
+				 */
+
+				Set<Integer> clause = new HashSet<Integer>();
+
+				for (String key3 : e.getRight().keySet()) {
+					clause.add(getMinusSubOrDissubLiteral(key3, key1));
+				}
+				ret.add(clause);
+
+			}
+		}
+
+		return ret;
+	}
+
+	private SatInput runStep2_1() {
+		SatInput ret = new SatInput();
+
 		/*
 		 * 
 		 * Clauses created in Step 2.
@@ -302,10 +368,157 @@ public class Translator {
 
 		}
 
-		/*
-		 * 
-		 * Step 2.2 and Step 2.3
-		 */
+		return ret;
+	}
+
+	/**
+	 * Step 2.4
+	 */
+	private SatInput runStep2_4() {
+
+		SatInput ret = new SatInput();
+
+		for (String key1 : goal.getConstants().keySet()) {
+
+			for (String key2 : goal.getEAtoms().keySet()) {
+				{
+					Set<Integer> clause = new HashSet<Integer>();
+
+					clause.add(getSubOrDissubLiteral(key1, key2));
+
+					ret.add(clause);
+				}
+				if (!key1.equalsIgnoreCase(KRSSKeyword.top)) {
+					Set<Integer> clause = new HashSet<Integer>();
+
+					clause.add(getSubOrDissubLiteral(key2, key1));
+
+					ret.add(clause);
+
+				}
+
+			}
+
+		}
+		return ret;
+	}
+
+	/**
+	 * Step 2.5
+	 * 
+	 * Transitivity of dis-subsumption
+	 */
+	private SatInput runStep2_5() {
+		SatInput ret = new SatInput();
+
+		for (String key1 : goal.getAllAtoms().keySet()) {
+
+			for (String key2 : goal.getAllAtoms().keySet()) {
+
+				for (String key3 : goal.getAllAtoms().keySet()) {
+
+					if (!key1.equals(key2) && !key1.equals(key3)
+							&& !key2.equals(key3)) {
+						Set<Integer> clause = new HashSet<Integer>();
+
+						clause.add(getSubOrDissubLiteral(key1, key2));
+						clause.add(getSubOrDissubLiteral(key2, key3));
+						clause.add(getMinusSubOrDissubLiteral(key1, key3));
+
+						ret.add(clause);
+					}
+
+				}
+			}
+		}
+		return ret;
+	}
+
+	/**
+	 * Step 3.1
+	 * 
+	 * Reflexivity for order literals
+	 */
+	private SatInput runStep3_1_r() {
+		SatInput ret = new SatInput();
+
+		for (String key1 : goal.getVariables().keySet()) {
+			Set<Integer> clause = new HashSet<Integer>();
+
+			clause.add(getMinusOrderLiteral(key1, key1));
+
+			ret.add(clause);
+		}
+		return ret;
+	}
+
+	/**
+	 * Step 3.1
+	 * 
+	 * Transitivity for order literals
+	 */
+	private SatInput runStep3_1_t() {
+		SatInput ret = new SatInput();
+
+		for (String key1 : goal.getVariables().keySet()) {
+
+			for (String key2 : goal.getVariables().keySet()) {
+
+				for (String key3 : goal.getVariables().keySet()) {
+
+					if (!key1.equals(key2) && !key2.equals(key3)) {
+
+						Set<Integer> clause = new HashSet<Integer>();
+
+						clause.add(getMinusOrderLiteral(key1, key2));
+						clause.add(getMinusOrderLiteral(key2, key3));
+						clause.add(getOrderLiteral(key1, key3));
+
+						ret.add(clause);
+					}
+
+				}
+
+			}
+
+		}
+		return ret;
+	}
+
+	/**
+	 * Step 3.2 Disjunction between order literals and dis-subsumption
+	 */
+	private SatInput runStep3_2() {
+		SatInput ret = new SatInput();
+
+		for (String key1 : goal.getEAtoms().keySet()) {
+
+			FAtom eatom = goal.getEAtoms().get(key1);
+			FAtom child = eatom.getChild();
+
+			if (child.isVar()) {
+
+				for (String key2 : goal.getVariables().keySet()) {
+
+					Set<Integer> clause = new HashSet<Integer>();
+
+					clause.add(getOrderLiteral(key2, child.getName()));
+
+					clause.add(getSubOrDissubLiteral(key2, key1));
+
+					ret.add(clause);
+				}
+			}
+		}
+
+		return ret;
+	}
+
+	/**
+	 * Step 2.2 and Step 2.3
+	 */
+	private SatInput runSteps2_2_N_2_3() {
+		SatInput ret = new SatInput();
 
 		for (String key1 : goal.getEAtoms().keySet()) {
 
@@ -355,168 +568,7 @@ public class Translator {
 			}
 
 		}
-
-		/*
-		 * 
-		 * Step 2.4
-		 */
-
-		for (String key1 : goal.getConstants().keySet()) {
-
-			for (String key2 : goal.getEAtoms().keySet()) {
-				{
-					Set<Integer> clause = new HashSet<Integer>();
-
-					clause.add(getSubOrDissubLiteral(key1, key2));
-
-					ret.add(clause);
-				}
-				if (!key1.equalsIgnoreCase(KRSSKeyword.top)) {
-					Set<Integer> clause = new HashSet<Integer>();
-
-					clause.add(getSubOrDissubLiteral(key2, key1));
-
-					ret.add(clause);
-
-				}
-
-			}
-
-		}
-
-		/*
-		 * Step 3.1
-		 * 
-		 * Reflexivity for order literals
-		 */
-		for (String key1 : goal.getVariables().keySet()) {
-			Set<Integer> clause = new HashSet<Integer>();
-
-			clause.add(getMinusOrderLiteral(key1, key1));
-
-			ret.add(clause);
-		}// end of clauses in step 2.5
-
-		/*
-		 * 
-		 * Step 3.1
-		 * 
-		 * Transitivity for order literals
-		 */
-
-		for (String key1 : goal.getVariables().keySet()) {
-
-			for (String key2 : goal.getVariables().keySet()) {
-
-				for (String key3 : goal.getVariables().keySet()) {
-
-					if (!key1.equals(key2) && !key2.equals(key3)) {
-
-						Set<Integer> clause = new HashSet<Integer>();
-
-						clause.add(getMinusOrderLiteral(key1, key2));
-						clause.add(getMinusOrderLiteral(key2, key3));
-						clause.add(getOrderLiteral(key1, key3));
-
-						ret.add(clause);
-					}
-
-				}
-
-			}
-
-		}
-
-		/*
-		 * 
-		 * Step 2.5
-		 * 
-		 * Transitivity of dis-subsumption
-		 */
-
-		for (String key1 : goal.getAllAtoms().keySet()) {
-
-			for (String key2 : goal.getAllAtoms().keySet()) {
-
-				for (String key3 : goal.getAllAtoms().keySet()) {
-
-					if (!key1.equals(key2) && !key1.equals(key3)
-							&& !key2.equals(key3)) {
-						Set<Integer> clause = new HashSet<Integer>();
-
-						clause.add(getSubOrDissubLiteral(key1, key2));
-						clause.add(getSubOrDissubLiteral(key2, key3));
-						clause.add(getMinusSubOrDissubLiteral(key1, key3));
-
-						ret.add(clause);
-					}
-
-				}
-			}
-		}
-
-		/*
-		 * 
-		 * Step 3.2 Disjunction between order literals and dis-subsumption
-		 */
-
-		for (String key1 : goal.getEAtoms().keySet()) {
-
-			FAtom eatom = goal.getEAtoms().get(key1);
-			FAtom child = eatom.getChild();
-
-			if (child.isVar()) {
-
-				for (String key2 : goal.getVariables().keySet()) {
-
-					Set<Integer> clause = new HashSet<Integer>();
-
-					clause.add(getOrderLiteral(key2, child.getName()));
-
-					clause.add(getSubOrDissubLiteral(key2, key1));
-
-					ret.add(clause);
-				}
-
-			}
-
-		}
-
 		return ret;
-
-	}
-
-	private int getSubOrDissubLiteral(String left, String right) {
-		Literal literal = invertLiteral ? new SubsumptionLiteral(left, right)
-				: new DissubsumptionLiteral(left, right);
-		int val = literals.get(literal.toString());
-		return invertLiteral ? (-1) * val : val;
-	}
-
-	public Set<Integer> getUpdate() {
-		return Collections.unmodifiableSet(update);
-	}
-
-	/**
-	 * Resets string update values for literals and S(X) for each X, before the
-	 * next unifier is computed.
-	 */
-	public void reset() {
-
-		update.clear();
-
-		for (Integer key : identifiers.keySet()) {
-
-			identifiers.get(key).setValue(false);
-
-		}
-
-		for (String var : goal.getVariables().keySet()) {
-
-			goal.getVariables().get(var).resetS();
-
-		}
-
 	}
 
 	/**
