@@ -115,7 +115,6 @@ public class Translator {
 	public SatInput getSatInput() {
 
 		SatInput ret = new SatInput();
-		Set<Integer> clause = new HashSet<Integer>();
 
 		/*
 		 * 
@@ -145,14 +144,14 @@ public class Translator {
 					 */
 
 					for (String key3 : e.getRight().keySet()) {
+						Set<Integer> clause = new HashSet<Integer>();
+
 						for (String key2 : e.getLeft().keySet()) {
 							clause.add(getMinusSubOrDissubLiteral(key2, key1));
 						}
 
 						clause.add(getSubOrDissubLiteral(key3, key1));
 						ret.add(clause);
-						clause.clear();
-
 					}
 
 					/*
@@ -160,14 +159,14 @@ public class Translator {
 					 */
 
 					for (String key2 : e.getLeft().keySet()) {
+						Set<Integer> clause = new HashSet<Integer>();
+
 						for (String key3 : e.getRight().keySet()) {
 							clause.add(getMinusSubOrDissubLiteral(key3, key1));
 						}
 
 						clause.add(getSubOrDissubLiteral(key2, key1));
 						ret.add(clause);
-						clause.clear();
-
 					}
 
 				} else if (!e.getLeft().containsKey(key1)
@@ -177,11 +176,12 @@ public class Translator {
 					 * constant of the right but not on the left
 					 */
 
+					Set<Integer> clause = new HashSet<Integer>();
+
 					for (String key2 : e.getLeft().keySet()) {
 						clause.add(getMinusSubOrDissubLiteral(key2, key1));
 					}
 					ret.add(clause);
-					clause.clear();
 
 				} else if (e.getLeft().containsKey(key1)
 						&& !e.getRight().containsKey(key1)) {
@@ -190,12 +190,12 @@ public class Translator {
 					 * constant on the left but not on the right
 					 */
 
+					Set<Integer> clause = new HashSet<Integer>();
+
 					for (String key3 : e.getRight().keySet()) {
 						clause.add(getMinusSubOrDissubLiteral(key3, key1));
 					}
 					ret.add(clause);
-					clause.clear();
-
 				}
 			}
 
@@ -215,13 +215,13 @@ public class Translator {
 					 */
 
 					for (String key3 : e.getRight().keySet()) {
+						Set<Integer> clause = new HashSet<Integer>();
+
 						for (String key2 : e.getLeft().keySet()) {
 							clause.add(getMinusSubOrDissubLiteral(key2, key1));
 						}
 						clause.add(getSubOrDissubLiteral(key3, key1));
 						ret.add(clause);
-						clause.clear();
-
 					}
 
 					/*
@@ -229,13 +229,13 @@ public class Translator {
 					 */
 
 					for (String key2 : e.getLeft().keySet()) {
+						Set<Integer> clause = new HashSet<Integer>();
+
 						for (String key3 : e.getRight().keySet()) {
 							clause.add(getMinusSubOrDissubLiteral(key3, key1));
 						}
 						clause.add(getSubOrDissubLiteral(key2, key1));
 						ret.add(clause);
-						clause.clear();
-
 					}
 
 				} else if (!e.getLeft().containsKey(key1)
@@ -247,12 +247,13 @@ public class Translator {
 					 * an equation
 					 */
 
+					Set<Integer> clause = new HashSet<Integer>();
+
 					for (String key2 : e.getLeft().keySet()) {
 						clause.add(getMinusSubOrDissubLiteral(key2, key1));
 
 					}
 					ret.add(clause);
-					clause.clear();
 
 					// end of outer if; key1 is not on the left, ask if it
 					// is on the right
@@ -265,11 +266,12 @@ public class Translator {
 					 * equation
 					 */
 
+					Set<Integer> clause = new HashSet<Integer>();
+
 					for (String key3 : e.getRight().keySet()) {
 						clause.add(getMinusSubOrDissubLiteral(key3, key1));
 					}
 					ret.add(clause);
-					clause.clear();
 
 				}
 			}
@@ -289,11 +291,11 @@ public class Translator {
 
 				if (!key2.equalsIgnoreCase(KRSSKeyword.top)
 						&& (!key1.equals(key2))) {
+					Set<Integer> clause = new HashSet<Integer>();
+
 					clause.add(getSubOrDissubLiteral(key1, key2));
 
 					ret.add(clause);
-					clause.clear();
-
 				}
 
 			}
@@ -319,10 +321,11 @@ public class Translator {
 					 */
 
 					if (!role1.equals(role2)) {
+						Set<Integer> clause = new HashSet<Integer>();
+
 						clause.add(getSubOrDissubLiteral(key1, key2));
 
 						ret.add(clause);
-						clause.clear();
 
 						/*
 						 * if the roles are equal, then clause in Step 2.3
@@ -336,13 +339,13 @@ public class Translator {
 						String child2name = child2.getName();
 
 						if (!child1name.equals(child2name)) {
+							Set<Integer> clause = new HashSet<Integer>();
+
 							clause.add(getMinusSubOrDissubLiteral(child1name,
 									child2name));
 							clause.add(getSubOrDissubLiteral(key1, key2));
 
 							ret.add(clause);
-							clause.clear();
-
 						}
 
 					}
@@ -361,16 +364,19 @@ public class Translator {
 		for (String key1 : goal.getConstants().keySet()) {
 
 			for (String key2 : goal.getEAtoms().keySet()) {
-				clause.add(getSubOrDissubLiteral(key1, key2));
+				{
+					Set<Integer> clause = new HashSet<Integer>();
 
-				ret.add(clause);
-				clause.clear();
+					clause.add(getSubOrDissubLiteral(key1, key2));
 
+					ret.add(clause);
+				}
 				if (!key1.equalsIgnoreCase(KRSSKeyword.top)) {
+					Set<Integer> clause = new HashSet<Integer>();
+
 					clause.add(getSubOrDissubLiteral(key2, key1));
 
 					ret.add(clause);
-					clause.clear();
 
 				}
 
@@ -384,11 +390,11 @@ public class Translator {
 		 * Reflexivity for order literals
 		 */
 		for (String key1 : goal.getVariables().keySet()) {
+			Set<Integer> clause = new HashSet<Integer>();
+
 			clause.add(getMinusOrderLiteral(key1, key1));
 
 			ret.add(clause);
-			clause.clear();
-
 		}// end of clauses in step 2.5
 
 		/*
@@ -406,13 +412,13 @@ public class Translator {
 
 					if (!key1.equals(key2) && !key2.equals(key3)) {
 
+						Set<Integer> clause = new HashSet<Integer>();
+
 						clause.add(getMinusOrderLiteral(key1, key2));
 						clause.add(getMinusOrderLiteral(key2, key3));
 						clause.add(getOrderLiteral(key1, key3));
 
 						ret.add(clause);
-						clause.clear();
-
 					}
 
 				}
@@ -436,13 +442,13 @@ public class Translator {
 
 					if (!key1.equals(key2) && !key1.equals(key3)
 							&& !key2.equals(key3)) {
+						Set<Integer> clause = new HashSet<Integer>();
+
 						clause.add(getSubOrDissubLiteral(key1, key2));
 						clause.add(getSubOrDissubLiteral(key2, key3));
 						clause.add(getMinusSubOrDissubLiteral(key1, key3));
 
 						ret.add(clause);
-						clause.clear();
-
 					}
 
 				}
@@ -463,13 +469,13 @@ public class Translator {
 
 				for (String key2 : goal.getVariables().keySet()) {
 
+					Set<Integer> clause = new HashSet<Integer>();
+
 					clause.add(getOrderLiteral(key2, child.getName()));
 
 					clause.add(getSubOrDissubLiteral(key2, key1));
 
 					ret.add(clause);
-					clause.clear();
-
 				}
 
 			}
