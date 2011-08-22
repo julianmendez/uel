@@ -19,6 +19,7 @@ import java.util.Set;
  */
 public class Goal {
 
+	public static final String UNDEF_SUFFIX = "_UNDEF";
 	public static final String VAR_PREFIX = "VAR";
 
 	/**
@@ -151,9 +152,9 @@ public class Goal {
 				 * Adding new variable to the right side
 				 */
 
-				FAtom var = new FAtom(VAR_PREFIX + this.nbrVar, false, true,
+				FAtom var = new FAtom(b.getName() + UNDEF_SUFFIX, false, true,
 						null);
-				this.nbrVar++;
+				var.setUserVariable(true);
 				this.allatoms.put(var.getName(), var);
 				this.variables.put(var.getName(), var);
 				rightPart.put(var.getName(), var);
