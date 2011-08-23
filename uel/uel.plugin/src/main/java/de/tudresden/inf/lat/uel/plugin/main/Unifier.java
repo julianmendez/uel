@@ -3,14 +3,12 @@ package de.tudresden.inf.lat.uel.plugin.main;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import de.tudresden.inf.lat.uel.core.sat.SatInput;
+import de.tudresden.inf.lat.uel.core.sat.SatOutput;
 import de.tudresden.inf.lat.uel.core.sat.Solver;
 import de.tudresden.inf.lat.uel.core.sat.Translator;
 import de.tudresden.inf.lat.uel.core.type.Goal;
@@ -104,10 +102,8 @@ class Unifier {
 	 */
 	public boolean unify(Translator translator, Writer result)
 			throws IOException {
-		String res = solver.solve(translator.computeSatInput());
-
-		StringReader satoutputReader = new StringReader(res);
-		boolean response = translator.toTBox(satoutputReader, result);
+		SatOutput satOutput = solver.solve(translator.computeSatInput());
+		boolean response = translator.toTBox(satOutput, result);
 		return response;
 	}
 
@@ -130,15 +126,9 @@ class Unifier {
 
 		Translator translator = new Translator(goal);
 
-		String satoutputStr = solver.solve(translator.computeSatInput());
+		SatOutput satOutput = solver.solve(translator.computeSatInput());
 
-		Pattern answer = Pattern.compile("^" + Solver.msgSat);
-		BufferedReader reader = new BufferedReader(new StringReader(
-				satoutputStr));
-		String line = reader.readLine();
-		Matcher manswer = answer.matcher(line);
-
-		if (manswer.find()) {
+		if (satOutput.isSatisfiable()) {
 			logger.info("UNIFIABLE");
 		} else {
 			logger.info("UNUNIFIABLE");
@@ -189,12 +179,11 @@ class Unifier {
 				numberofsolutions++;
 
 				satinput.add(translator.getUpdate());
-				String satoutputStr = solver.solve(satinput);
+				SatOutput satOutput = solver.solve(satinput);
 
 				translator.reset();
 
-				unifiable = translator.toTBox(new StringReader(satoutputStr),
-						result);
+				unifiable = translator.toTBox(satOutput, result);
 
 				if (unifiable) {
 					logger.info(numberofsolutions + " UNIFIER\n"
@@ -256,11 +245,10 @@ class Unifier {
 				numberofsolutions++;
 
 				satinput.add(translator.getUpdate());
-				String satoutputStr = solver.solve(satinput);
+				SatOutput satOutput = solver.solve(satinput);
 
 				translator.reset();
-				unifiable = translator.toTBox(new StringReader(satoutputStr),
-						result);
+				unifiable = translator.toTBox(satOutput, result);
 
 				if (unifiable) {
 					logger.info(numberofsolutions + " UNIFIER\n"
@@ -313,16 +301,15 @@ class Unifier {
 
 		while (unifiable) {
 
-			String satoutputStr = solver.solve(satinput);
+			SatOutput satOutput = solver.solve(satinput);
 
-			StringReader satoutputReader = new StringReader(satoutputStr);
-			if (translator.toTBox(satoutputReader)) {
+			if (translator.toTBox(satOutput)) {
 
 				message = true;
 				numberofsolutions++;
 
 				satinput.add(translator.getUpdate());
-				satoutputStr = solver.solve(satinput);
+				satOutput = solver.solve(satinput);
 
 				translator.reset();
 
@@ -420,12 +407,11 @@ class Unifier {
 				numberofsolutions++;
 
 				satinput.add(translator.getUpdate());
-				String satoutputStr = solver.solve(satinput);
+				SatOutput satOutput = solver.solve(satinput);
 
 				translator.reset();
 
-				unifiable = translator.toTBox(new StringReader(satoutputStr),
-						result);
+				unifiable = translator.toTBox(satOutput, result);
 
 				if (unifiable) {
 					logger.info(numberofsolutions + " UNIFIER\n"

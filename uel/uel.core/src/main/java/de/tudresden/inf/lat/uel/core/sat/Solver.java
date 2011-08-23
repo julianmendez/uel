@@ -9,26 +9,33 @@ import java.io.IOException;
  */
 public interface Solver {
 
+	public static final Integer END_OF_CLAUSE = 0;
+
+	public static final String NEWLINE = "\n";
+
+	public static final String P_CNF = "p cnf";
+
 	/**
 	 * First string returned by the solver when the SAT problem is satisfiable.
 	 */
-	public static final String msgSat = "SAT";
+	public static final String SAT = "SAT";
 
+	public static final String SPACE = " ";
+	
 	/**
 	 * First string returned by the solver when the SAT problem is not
 	 * satisfiable.
 	 */
-	public static final String msgUnsat = "UNSAT";
+	public static final String UNSAT = "UNSAT";
 
 	/**
 	 * Solves a SAT problem. The input must be in the DIMACS CNF format.
 	 * 
 	 * @param input
 	 *            SAT problem to solve
-	 * @return a line containing either SAT (satisfiable) or UNSAT
-	 *         (unsatisfiable), and, if satisfiable, a model.
+	 * @return an output of a SAT solver
 	 * @throws IOException
 	 */
-	public String solve(SatInput input) throws IOException;
+	public SatOutput solve(SatInput input) throws IOException;
 
 }

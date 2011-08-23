@@ -1,17 +1,14 @@
 package de.tudresden.inf.lat.uel.core.sat;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.Reader;
 import java.io.Writer;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.StringTokenizer;
 import java.util.logging.Logger;
 
 import de.tudresden.inf.lat.uel.core.type.DissubsumptionLiteral;
@@ -68,11 +65,19 @@ public class Translator {
 	 *            goal
 	 */
 	public Translator(Goal g) {
+		if (g == null) {
+			throw new IllegalArgumentException("Null argument.");
+		}
+
 		goal = g;
 		setLiterals();
 	}
 
 	public Translator(Goal g, boolean inv) {
+		if (g == null) {
+			throw new IllegalArgumentException("Null argument.");
+		}
+
 		goal = g;
 		invertLiteral = inv;
 		setLiterals();
@@ -640,22 +645,16 @@ public class Translator {
 	 * This method is the same as <code>toTBox(Reader, Writer)</code>, but does
 	 * not write a unifier.
 	 */
-	public boolean toTBox(Reader outfile) throws IOException {
+	public boolean toTBox(SatOutput output) throws IOException {
+		if (output == null) {
+			throw new IllegalArgumentException("Null argument.");
+		}
 
 		boolean response = false;
-		BufferedReader reader = new BufferedReader(outfile);
-		String line = reader.readLine();
 
-		/*
-		 * if SAT is in the beginning of the file
-		 */
-		if (line.startsWith(Solver.msgSat)) {
+		if (output.isSatisfiable()) {
 			response = true;
-			line = reader.readLine();
-			StringTokenizer st = new StringTokenizer(line);
-
-			while (st.hasMoreTokens()) {
-				Integer currentLiteral = Integer.parseInt(st.nextToken());
+			for (Integer currentLiteral : output.getOutput()) {
 				if (currentLiteral < 0) {
 					Integer i = (-1) * currentLiteral;
 					Literal literal = identifiers.get(i);
@@ -740,16 +739,20 @@ public class Translator {
 	 * TBox, which is written to the writer <code>result</code> and returns
 	 * "true". Otherwise, it writes "NOT UNIFIABLE" and returns "false".
 	 * 
-	 * @param outfile
-	 *            reader containing the SAT solver output
+	 * @param output
+	 *            SAT solver output
 	 * @param result
 	 *            the result
 	 * @throws IOException
 	 * @return <code>true</code> if and only if the output of the SAT solver
 	 *         contains SAT.
 	 */
-	public boolean toTBox(Reader outfile, Writer result) throws IOException {
-		boolean ret = toTBox(outfile);
+	public boolean toTBox(SatOutput output, Writer result) throws IOException {
+		if (output == null) {
+			throw new IllegalArgumentException("Null argument.");
+		}
+
+		boolean ret = toTBox(output);
 
 		if (ret) {
 
@@ -787,8 +790,8 @@ public class Translator {
 			if (var.isUserVariable()) {
 				for (FAtom atom : goal.getAllAtoms().values()) {
 					if (atom.isConstant() || atom.isRoot()) {
-						update.add(getMinusSubOrDissubLiteral(var.toString(),
-								atom.toString()));
+						update.add(getMinusSubOrDissubLiteral(var.getId(),
+								atom.getId()));
 					}
 				}
 			}

@@ -6,6 +6,9 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.StringTokenizer;
 
 /**
  * An object of this class uses the MiniSat solver to solve a SAT problem.
@@ -37,8 +40,11 @@ public class MiniSatSolver implements Solver {
 	}
 
 	@Override
-	public String solve(SatInput input) throws IOException {
-		String ret = null;
+	public SatOutput solve(SatInput input) throws IOException {
+		if (input == null) {
+			throw new IllegalArgumentException("Null argument.");
+		}
+
 		File satinput = File.createTempFile(tempPrefix, tempSuffix);
 		File satoutput = File.createTempFile(tempPrefix, tempSuffix);
 
@@ -51,21 +57,23 @@ public class MiniSatSolver implements Solver {
 
 		BufferedReader satoutputReader = new BufferedReader(new FileReader(
 				satoutput));
-		StringBuffer sbuf = new StringBuffer();
-		String line = "";
-		while (line != null) {
-			line = satoutputReader.readLine();
-			if (line != null) {
-				sbuf.append(line);
-				sbuf.append("\n");
+		String line = satoutputReader.readLine();
+		boolean satisfiable = false;
+		Set<Integer> clause = new HashSet<Integer>();
+		if (line.trim().equals(Solver.SAT)) {
+			satisfiable = true;
+			StringTokenizer stok = new StringTokenizer(
+					satoutputReader.readLine());
+			while (stok.hasMoreTokens()) {
+				clause.add(Integer.parseInt(stok.nextToken()));
 			}
+			clause.remove(Solver.END_OF_CLAUSE);
 		}
-		ret = sbuf.toString();
 
 		satinput.delete();
 		satoutput.delete();
 
-		return ret;
+		return new SatOutput(satisfiable, clause);
 	}
 
 }

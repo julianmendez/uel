@@ -1,7 +1,6 @@
 package de.tudresden.inf.lat.uel.plugin.processor;
 
 import java.io.IOException;
-import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,6 +13,7 @@ import org.semanticweb.owlapi.model.OWLOntology;
 
 import de.tudresden.inf.lat.uel.core.sat.Sat4jSolver;
 import de.tudresden.inf.lat.uel.core.sat.SatInput;
+import de.tudresden.inf.lat.uel.core.sat.SatOutput;
 import de.tudresden.inf.lat.uel.core.sat.Solver;
 import de.tudresden.inf.lat.uel.core.sat.Translator;
 import de.tudresden.inf.lat.uel.core.type.Equation;
@@ -65,14 +65,14 @@ public class UelProcessor {
 		boolean unifiable = false;
 		Solver solver = new Sat4jSolver();
 		StringWriter result = new StringWriter();
-		String satoutputStr = null;
+		SatOutput satoutput = null;
 		try {
 			if (!getUnifierList().isEmpty()) {
 				this.satinput.add(this.translator.getUpdate());
 			}
-			satoutputStr = solver.solve(this.satinput);
+			satoutput = solver.solve(this.satinput);
 			this.translator.reset();
-			unifiable = this.translator.toTBox(new StringReader(satoutputStr),
+			unifiable = this.translator.toTBox(satoutput,
 					result);
 		} catch (IOException e) {
 			throw new RuntimeException(e);

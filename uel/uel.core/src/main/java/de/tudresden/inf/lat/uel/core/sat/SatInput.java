@@ -15,11 +15,6 @@ import java.util.TreeSet;
  */
 public class SatInput {
 
-	private static final Integer END_OF_CLAUSE = 0;
-	private static final String newLine = "\n";
-	private static final String P_CNF = "p cnf";
-	private static final String space = " ";
-
 	private Set<Collection<Integer>> clauses = new HashSet<Collection<Integer>>();
 	private Integer lastId = 0;
 
@@ -36,10 +31,14 @@ public class SatInput {
 	 *            new clause
 	 */
 	public boolean add(Collection<Integer> clause) {
+		if (clause == null) {
+			throw new IllegalArgumentException("Null argument.");
+		}
+
 		boolean ret = false;
 		Set<Integer> newSet = new TreeSet<Integer>();
 		newSet.addAll(clause);
-		newSet.remove(END_OF_CLAUSE);
+		newSet.remove(Solver.END_OF_CLAUSE);
 		if (!newSet.isEmpty()) {
 			List<Integer> newList = new ArrayList<Integer>();
 			newList.addAll(newSet);
@@ -58,6 +57,10 @@ public class SatInput {
 	 *            set of new clauses
 	 */
 	public boolean addAll(Set<? extends Collection<Integer>> clauses) {
+		if (clauses == null) {
+			throw new IllegalArgumentException("Null argument.");
+		}
+
 		boolean ret = false;
 		for (Collection<Integer> clause : clauses) {
 			boolean changed = add(clause);
@@ -106,19 +109,19 @@ public class SatInput {
 	 */
 	public String toCNF() {
 		StringBuffer sbuf = new StringBuffer();
-		sbuf.append(P_CNF);
-		sbuf.append(space);
+		sbuf.append(Solver.P_CNF);
+		sbuf.append(Solver.SPACE);
 		sbuf.append(this.lastId);
-		sbuf.append(space);
+		sbuf.append(Solver.SPACE);
 		sbuf.append(this.clauses.size());
-		sbuf.append(newLine);
+		sbuf.append(Solver.NEWLINE);
 		for (Collection<Integer> clause : this.clauses) {
 			for (Integer literal : clause) {
 				sbuf.append(literal);
-				sbuf.append(space);
+				sbuf.append(Solver.SPACE);
 			}
-			sbuf.append(END_OF_CLAUSE);
-			sbuf.append(newLine);
+			sbuf.append(Solver.END_OF_CLAUSE);
+			sbuf.append(Solver.NEWLINE);
 		}
 		return sbuf.toString();
 	}

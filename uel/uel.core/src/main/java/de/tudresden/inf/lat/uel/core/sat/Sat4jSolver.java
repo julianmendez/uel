@@ -1,9 +1,9 @@
 package de.tudresden.inf.lat.uel.core.sat;
 
-import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.StringWriter;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.sat4j.minisat.SolverFactory;
 import org.sat4j.reader.DimacsReader;
@@ -29,41 +29,37 @@ public class Sat4jSolver implements Solver {
 	}
 
 	@Override
-	public String solve(SatInput input) throws IOException {
+	public SatOutput solve(SatInput input) throws IOException {
+		if (input == null) {
+			throw new IllegalArgumentException("Null argument.");
+		}
+
 		ByteArrayInputStream satinputInputStream = new ByteArrayInputStream(
 				input.toCNF().getBytes());
-		StringWriter satoutputWriter = new StringWriter();
-
 		ISolver solver = SolverFactory.newDefault();
 		solver.setTimeout(timeout);
-		DimacsReader reader = new DimacsReader(solver);
+		boolean satisfiable = false;
+		Set<Integer> clause = new TreeSet<Integer>();
 		try {
+			DimacsReader reader = new DimacsReader(solver);
 			IProblem problem = reader.parseInstance(satinputInputStream);
-			if (problem.isSatisfiable()) {
-				BufferedWriter output = new BufferedWriter(satoutputWriter);
-				output.write(msgSat);
-				output.newLine();
-				output.write(reader.decode(problem.model()));
-				output.newLine();
-				output.flush();
-			} else {
-				BufferedWriter output = new BufferedWriter(satoutputWriter);
-				output.write(msgUnsat);
-				output.newLine();
-				output.flush();
+			satisfiable = problem.isSatisfiable();
+			if (satisfiable) {
+				int[] model = problem.model();
+				for (Integer e : model) {
+					clause.add(e);
+				}
+				clause.remove(Solver.END_OF_CLAUSE);
 			}
 		} catch (ContradictionException e) {
-			BufferedWriter output = new BufferedWriter(satoutputWriter);
-			output.write(msgUnsat);
-			output.newLine();
-			output.flush();
+			// unsatisfiable
 		} catch (ParseFormatException e) {
 			throw new RuntimeException(e);
 		} catch (TimeoutException e) {
 			throw new RuntimeException(e);
 		}
 
-		return satoutputWriter.toString();
+		return new SatOutput(satisfiable, clause);
 	}
 
 }

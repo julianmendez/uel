@@ -17,7 +17,7 @@ import java.util.logging.LogRecord;
 public class OutputStreamHandler extends Handler {
 
 	private BufferedWriter output = null;
-	private Date start = null;
+	private Long start = null;
 
 	/**
 	 * Constructs a new output stream handler.
@@ -32,7 +32,7 @@ public class OutputStreamHandler extends Handler {
 		}
 
 		this.output = new BufferedWriter(new OutputStreamWriter(output));
-		this.start = new Date();
+		this.start = new Date().getTime();
 	}
 
 	@Override
@@ -53,8 +53,15 @@ public class OutputStreamHandler extends Handler {
 	 *            original message
 	 * @return the new message
 	 */
-	private String createMessage(String originalMessage) {
-		long difference = (new Date()).getTime() - this.start.getTime();
+	public String createMessage(String originalMessage) {
+		if (originalMessage == null) {
+			throw new IllegalArgumentException("Null argument.");
+		}
+
+		if (start == null) {
+			start = new Date().getTime();
+		}
+		long difference = (new Date()).getTime() - this.start;
 		long totalMemory = Runtime.getRuntime().totalMemory() / 1048576;
 		long freeMemory = Runtime.getRuntime().freeMemory() / 1048576;
 		StringBuffer sbuf = new StringBuffer();
