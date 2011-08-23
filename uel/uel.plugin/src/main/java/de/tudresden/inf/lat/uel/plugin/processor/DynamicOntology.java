@@ -84,20 +84,6 @@ public class DynamicOntology implements Ontology {
 	}
 
 	@Override
-	public Set<String> getDefinitionSymbols(String name) {
-		if (name == null) {
-			throw new IllegalArgumentException("Null argument.");
-		}
-
-		Set<String> ret = new HashSet<String>();
-		Equation equation = getDefinition(name);
-		if (equation != null) {
-			ret.addAll(equation.getSymbolsInRight());
-		}
-		return Collections.unmodifiableSet(ret);
-	}
-
-	@Override
 	public Equation getPrimitiveDefinition(String name) {
 		if (name == null) {
 			throw new IllegalArgumentException("Null argument.");
@@ -114,20 +100,6 @@ public class DynamicOntology implements Ontology {
 			}
 		}
 		return ret;
-	}
-
-	@Override
-	public Set<String> getPrimitiveDefinitionSymbols(String name) {
-		if (name == null) {
-			throw new IllegalArgumentException("Null argument.");
-		}
-
-		Set<String> ret = new HashSet<String>();
-		Equation equation = getPrimitiveDefinition(name);
-		if (equation != null) {
-			ret.addAll(equation.getSymbolsInRight());
-		}
-		return Collections.unmodifiableSet(ret);
 	}
 
 	/**

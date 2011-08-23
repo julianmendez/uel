@@ -27,7 +27,6 @@ class Unifier {
 			.getName());
 
 	private int numberofsolutions = 0;
-
 	private Solver solver = null;
 	private boolean test = false;
 
@@ -105,7 +104,7 @@ class Unifier {
 	 */
 	public boolean unify(Translator translator, Writer result)
 			throws IOException {
-		String res = solver.solve(translator.getSatInput());
+		String res = solver.solve(translator.computeSatInput());
 
 		StringReader satoutputReader = new StringReader(res);
 		boolean response = translator.toTBox(satoutputReader, result);
@@ -131,7 +130,7 @@ class Unifier {
 
 		Translator translator = new Translator(goal);
 
-		String satoutputStr = solver.solve(translator.getSatInput());
+		String satoutputStr = solver.solve(translator.computeSatInput());
 
 		Pattern answer = Pattern.compile("^" + Solver.msgSat);
 		BufferedReader reader = new BufferedReader(new StringReader(
@@ -178,7 +177,7 @@ class Unifier {
 
 		boolean unifiable = unify(translator, result);
 
-		SatInput satinput = translator.getSatInput();
+		SatInput satinput = translator.computeSatInput();
 
 		if (unifiable) {
 			logger.info("UNIFIABLE\n" + "Unifier stored in file.");
@@ -244,7 +243,7 @@ class Unifier {
 
 		boolean unifiable = unify(translator, result);
 
-		SatInput satinput = translator.getSatInput();
+		SatInput satinput = translator.computeSatInput();
 
 		if (unifiable) {
 
@@ -310,7 +309,7 @@ class Unifier {
 
 		numberofsolutions = 0;
 
-		SatInput satinput = translator.getSatInput();
+		SatInput satinput = translator.computeSatInput();
 
 		while (unifiable) {
 
@@ -409,7 +408,7 @@ class Unifier {
 
 		boolean unifiable = unify(translator, result);
 
-		SatInput satinput = translator.getSatInput();
+		SatInput satinput = translator.computeSatInput();
 
 		if (unifiable) {
 

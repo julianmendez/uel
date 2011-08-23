@@ -1,0 +1,6 @@
+(define-concept x#C (and x#B1 x#B5))
+(define-primitive-concept x#D (and x#A))
+
+(define-primitive-concept x#B1 x#B3)
+(define-primitive-concept x#B2 x#B4)
+

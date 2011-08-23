@@ -1,8 +1,10 @@
 package de.tudresden.inf.lat.uel.core.sat;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -13,11 +15,12 @@ import java.util.TreeSet;
  */
 public class SatInput {
 
+	private static final Integer END_OF_CLAUSE = 0;
 	private static final String newLine = "\n";
 	private static final String P_CNF = "p cnf";
 	private static final String space = " ";
 
-	private Set<Set<Integer>> clauses = new HashSet<Set<Integer>>();
+	private Set<Collection<Integer>> clauses = new HashSet<Collection<Integer>>();
 	private Integer lastId = 0;
 
 	/**
@@ -36,11 +39,13 @@ public class SatInput {
 		boolean ret = false;
 		Set<Integer> newSet = new TreeSet<Integer>();
 		newSet.addAll(clause);
-		newSet.remove(0);
+		newSet.remove(END_OF_CLAUSE);
 		if (!newSet.isEmpty()) {
-			ret = this.clauses.add(Collections.unmodifiableSet(newSet));
+			List<Integer> newList = new ArrayList<Integer>();
+			newList.addAll(newSet);
+			ret = this.clauses.add(Collections.unmodifiableCollection(newList));
 			if (ret) {
-				updateLastId(newSet);
+				updateLastId(newList);
 			}
 		}
 		return ret;
@@ -52,9 +57,9 @@ public class SatInput {
 	 * @param clauses
 	 *            set of new clauses
 	 */
-	public boolean addAll(Set<Set<Integer>> clauses) {
+	public boolean addAll(Set<? extends Collection<Integer>> clauses) {
 		boolean ret = false;
-		for (Set<Integer> clause : clauses) {
+		for (Collection<Integer> clause : clauses) {
 			boolean changed = add(clause);
 			ret = ret || changed;
 		}
@@ -85,7 +90,7 @@ public class SatInput {
 	 * 
 	 * @return the clauses
 	 */
-	public Set<Set<Integer>> getClauses() {
+	public Set<Collection<Integer>> getClauses() {
 		return Collections.unmodifiableSet(this.clauses);
 	}
 
@@ -107,12 +112,12 @@ public class SatInput {
 		sbuf.append(space);
 		sbuf.append(this.clauses.size());
 		sbuf.append(newLine);
-		for (Set<Integer> clause : this.clauses) {
+		for (Collection<Integer> clause : this.clauses) {
 			for (Integer literal : clause) {
 				sbuf.append(literal);
 				sbuf.append(space);
 			}
-			sbuf.append(0);
+			sbuf.append(END_OF_CLAUSE);
 			sbuf.append(newLine);
 		}
 		return sbuf.toString();
@@ -123,7 +128,7 @@ public class SatInput {
 		return toCNF();
 	}
 
-	private boolean updateLastId(Set<Integer> newSet) {
+	private boolean updateLastId(Collection<Integer> newSet) {
 		boolean ret = false;
 		for (Integer elem : newSet) {
 			Integer absElem = elem < 0 ? (-1) * elem : elem;

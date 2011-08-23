@@ -1,9 +1,7 @@
 package de.tudresden.inf.lat.uel.core.type;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * This class implements an equation as two hash maps of atoms.
@@ -90,19 +88,6 @@ public class Equation {
 	 */
 	public Map<String, Atom> getRight() {
 		return right;
-	}
-
-	/**
-	 * Returns the symbols in the right-hand side of the equation.
-	 * 
-	 * @return the symbols in the right-hand side of the equation.
-	 */
-	public Set<String> getSymbolsInRight() {
-		Set<String> ret = new HashSet<String>();
-		for (Atom atom : getRight().values()) {
-			ret.addAll(atom.getSymbols());
-		}
-		return ret;
 	}
 
 	@Override

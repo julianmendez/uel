@@ -31,7 +31,6 @@ import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 
-import de.tudresden.inf.lat.uel.core.sat.SatInput;
 import de.tudresden.inf.lat.uel.core.sat.Translator;
 import de.tudresden.inf.lat.uel.core.type.Goal;
 import de.tudresden.inf.lat.uel.core.type.KRSSKeyword;
@@ -145,21 +144,19 @@ public class UelController implements ActionListener {
 	}
 
 	private void executeActionAcceptVar() {
-		getModel().clearCandidates();
-		getModel().addAll(this.varWindow.getView().getModel().getVariables());
-		this.varWindow.close();
-
 		if (getModel().getUnifierList().isEmpty()) {
-			Set<String> classSet = new HashSet<String>();
-			classSet.add(this.classList00.get(
-					getView().getSelectedClassName00()).getId());
-			classSet.add(this.classList01.get(
-					getView().getSelectedClassName01()).getId());
-			Goal g = getModel().configure(classSet);
+			Goal g = this.varWindow.getView().getModel().getGoal();
+			getModel().clearCandidates();
+			getModel().addAll(
+					this.varWindow.getView().getModel().getVariables());
+			this.varWindow.close();
+
+			getModel().createTranslator(g);
 			Translator translator = getModel().getTranslator();
-			SatInput satInput = translator.getSatInput();
+			getModel().computeSatInput();
 			this.statInfo = new StatInfo(g, translator.getLiterals().keySet()
-					.size(), satInput.getClauses().size(), this.mapIdLabel);
+					.size(), getModel().getSatInput().getClauses().size(),
+					this.mapIdLabel);
 		}
 
 		setUnifierButtons(false);
@@ -201,14 +198,6 @@ public class UelController implements ActionListener {
 	private void executeActionNext() {
 		setUnifierButtons(true);
 
-		if (getModel().getUnifierList().isEmpty()) {
-			Set<String> classSet = new HashSet<String>();
-			classSet.add(this.classList00.get(
-					getView().getSelectedClassName00()).getId());
-			classSet.add(this.classList01.get(
-					getView().getSelectedClassName01()).getId());
-			getModel().configure(classSet);
-		}
 		this.unifierIndex++;
 		if (this.unifierIndex >= getModel().getUnifierList().size()) {
 			int previousSize = getModel().getUnifierList().size();
@@ -358,8 +347,11 @@ public class UelController implements ActionListener {
 				.getId());
 		classSet.add(this.classList01.get(getView().getSelectedClassName01())
 				.getId());
+
+		Goal goal = getModel().configure(classSet);
+
 		try {
-			this.varWindow = initVarWindow(classSet);
+			this.varWindow = initVarWindow(classSet, goal);
 			this.varWindow.open();
 		} catch (RuntimeException e) {
 		}
@@ -486,10 +478,11 @@ public class UelController implements ActionListener {
 		executeActionOntology01Selected(0);
 	}
 
-	private VarSelectionController initVarWindow(Set<String> originalVariables) {
+	private VarSelectionController initVarWindow(Set<String> originalVariables,
+			Goal goal) {
 		VarSelectionController ret = new VarSelectionController(
 				new VarSelectionView(new VarSelectionModel(originalVariables,
-						this.mapIdLabel, getModel().getOntology())));
+						this.mapIdLabel, goal)));
 		ret.addAcceptVarButtonListener(this, actionAcceptVar);
 		ret.addRejectVarButtonListener(this, actionRejectVar);
 		return ret;

@@ -52,7 +52,7 @@ public class OntologyBuilder {
 
 		Map<OWLClass, Set<OWLClassExpression>> primitiveDefinitions = getPrimitiveDefinitions(owlOntology);
 		for (OWLClass key : primitiveDefinitions.keySet()) {
-			ret.putDefinition(
+			ret.putPrimitiveDefinition(
 					getName(key),
 					processPrimitiveDefinition(key,
 							primitiveDefinitions.get(key)));
@@ -116,11 +116,13 @@ public class OntologyBuilder {
 	}
 
 	/**
-	 * Returns all the primitive definitions present in an OWL ontology.
+	 * Returns all the primitive definitions present in an OWL ontology unless
+	 * OWL Thing is the super class.
 	 * 
 	 * @param owlOntology
 	 *            OWL ontology
-	 * @return all the primitive definitions present in an OWL ontology
+	 * @return all the primitive definitions present in an OWL ontology unless
+	 *         OWL Thing is the super class
 	 */
 	public Map<OWLClass, Set<OWLClassExpression>> getPrimitiveDefinitions(
 			OWLOntology owlOntology) {
@@ -132,14 +134,16 @@ public class OntologyBuilder {
 		Set<OWLSubClassOfAxiom> setOfAxioms = owlOntology
 				.getAxioms(AxiomType.SUBCLASS_OF);
 		for (OWLSubClassOfAxiom axiom : setOfAxioms) {
-			if (axiom.getSubClass() instanceof OWLClass) {
-				OWLClass definiendum = (OWLClass) axiom.getSubClass();
-				Set<OWLClassExpression> definiensSet = ret.get(definiendum);
-				if (definiensSet == null) {
-					definiensSet = new HashSet<OWLClassExpression>();
-					ret.put(definiendum, definiensSet);
+			if (!axiom.getSuperClass().isOWLThing()) {
+				if (axiom.getSubClass() instanceof OWLClass) {
+					OWLClass definiendum = (OWLClass) axiom.getSubClass();
+					Set<OWLClassExpression> definiensSet = ret.get(definiendum);
+					if (definiensSet == null) {
+						definiensSet = new HashSet<OWLClassExpression>();
+						ret.put(definiendum, definiensSet);
+					}
+					definiensSet.add(axiom.getSuperClass());
 				}
-				definiensSet.add(axiom.getSuperClass());
 			}
 		}
 		return ret;

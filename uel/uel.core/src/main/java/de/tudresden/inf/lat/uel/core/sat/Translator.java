@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.logging.Logger;
 
 import de.tudresden.inf.lat.uel.core.type.DissubsumptionLiteral;
 import de.tudresden.inf.lat.uel.core.type.Equation;
@@ -33,6 +34,8 @@ import de.tudresden.inf.lat.uel.core.type.SubsumptionLiteral;
  */
 public class Translator {
 
+	private static final Logger logger = Logger.getLogger(Translator.class
+			.getName());
 	public static final String NOT_UNIFIABLE = "NOT UNIFIABLE / NO MORE UNIFIERS";
 
 	private Goal goal;
@@ -42,7 +45,7 @@ public class Translator {
 	 * Identifiers are numbers, each number uniquely identifies a literal, i.e.
 	 * a dissubsumption.
 	 */
-	private HashMap<Integer, Literal> identifiers = new HashMap<Integer, Literal>();
+	private Map<Integer, Literal> identifiers = new HashMap<Integer, Literal>();
 
 	private boolean invertLiteral = false;
 
@@ -50,7 +53,7 @@ public class Translator {
 	 * Literals are all dis-subsumptions between atoms in the goal the first
 	 * hash map maps them to unique numbers.
 	 */
-	private HashMap<String, Integer> literals = new HashMap<String, Integer>();
+	private Map<String, Integer> literals = new HashMap<String, Integer>();
 
 	/**
 	 * Update is a set of numbers or numbers encoding the negation of the
@@ -73,6 +76,47 @@ public class Translator {
 		goal = g;
 		invertLiteral = inv;
 		setLiterals();
+	}
+
+	/**
+	 * This method encodes equations into propositional clauses in DIMACS CNF
+	 * format, i.e. positive literal is represented by a positive number and a
+	 * negative literal is represented by a corresponding negative number. Each
+	 * clause is on one line. The end of a clause is marked by 0. Example of a
+	 * clause in DIMACS format: 1 -3 0
+	 */
+	public SatInput computeSatInput() {
+		SatInput ret = new SatInput();
+
+		logger.finer("computing SAT input ...");
+
+		logger.finer("running step 1 ...");
+		ret.addAll(runStep1().getClauses());
+
+		logger.finer("running step 2.1 ...");
+		ret.addAll(runStep2_1().getClauses());
+
+		logger.finer("running steps 2.2 and 2.3 ...");
+		ret.addAll(runSteps2_2_N_2_3().getClauses());
+
+		logger.finer("running step 2.4 ...");
+		ret.addAll(runStep2_4().getClauses());
+
+		logger.finer("running step 2.5 ...");
+		ret.addAll(runStep2_5().getClauses());
+
+		logger.finer("running step 3.1 reflexivity ...");
+		ret.addAll(runStep3_1_r().getClauses());
+
+		logger.finer("running step 3.1 transitivity ...");
+		ret.addAll(runStep3_1_t().getClauses());
+
+		logger.finer("running step 3.2 ...");
+		ret.addAll(runStep3_2().getClauses());
+
+		logger.finer("SAT input computed.");
+
+		return ret;
 	}
 
 	private Integer getLiteralId(Integer val) {
@@ -105,28 +149,6 @@ public class Translator {
 		return literals.get(literal.toString());
 	}
 
-	/**
-	 * This method encodes equations into propositional clauses in DIMACS CNF
-	 * format, i.e. positive literal is represented by a positive number and a
-	 * negative literal is represented by a corresponding negative number. Each
-	 * clause is on one line. The end of a clause is marked by 0. Example of a
-	 * clause in DIMACS format: 1 -3 0
-	 */
-	public SatInput getSatInput() {
-		SatInput ret = new SatInput();
-
-		ret.addAll(runStep1().getClauses());
-		ret.addAll(runStep2_1().getClauses());
-		ret.addAll(runSteps2_2_N_2_3().getClauses());
-		ret.addAll(runStep2_4().getClauses());
-		ret.addAll(runStep2_5().getClauses());
-		ret.addAll(runStep3_1_r().getClauses());
-		ret.addAll(runStep3_1_t().getClauses());
-		ret.addAll(runStep3_2().getClauses());
-
-		return ret;
-	}
-
 	private int getSubOrDissubLiteral(String left, String right) {
 		Literal literal = invertLiteral ? new SubsumptionLiteral(left, right)
 				: new DissubsumptionLiteral(left, right);
@@ -147,17 +169,12 @@ public class Translator {
 		update.clear();
 
 		for (Integer key : identifiers.keySet()) {
-
 			identifiers.get(key).setValue(false);
-
 		}
 
-		for (String var : goal.getVariables().keySet()) {
-
-			goal.getVariables().get(var).resetS();
-
+		for (String var : goal.getVariables()) {
+			goal.getAllAtoms().get(var).resetSetOfSubsumers();
 		}
-
 	}
 
 	/**
@@ -187,7 +204,7 @@ public class Translator {
 	private SatInput runStep1ForConstants(Equation e) {
 		SatInput ret = new SatInput();
 
-		for (String key1 : goal.getConstants().keySet()) {
+		for (String key1 : goal.getConstants()) {
 
 			if (!e.getLeft().containsKey(key1)
 					&& !e.getRight().containsKey(key1)) {
@@ -266,7 +283,7 @@ public class Translator {
 	private SatInput runStep1ForExistentialAtoms(Equation e) {
 		SatInput ret = new SatInput();
 
-		for (String key1 : goal.getEAtoms().keySet()) {
+		for (String key1 : goal.getEAtoms()) {
 
 			if (!e.getLeft().containsKey(key1)
 					&& !e.getRight().containsKey(key1)) {
@@ -340,20 +357,15 @@ public class Translator {
 		return ret;
 	}
 
+	/**
+	 * Step 2.1
+	 */
 	private SatInput runStep2_1() {
 		SatInput ret = new SatInput();
 
-		/*
-		 * 
-		 * Clauses created in Step 2.
-		 * 
-		 * 
-		 * Step 2.1
-		 */
+		for (String key1 : goal.getConstants()) {
 
-		for (String key1 : goal.getConstants().keySet()) {
-
-			for (String key2 : goal.getConstants().keySet()) {
+			for (String key2 : goal.getConstants()) {
 
 				if (!key2.equalsIgnoreCase(KRSSKeyword.top)
 						&& (!key1.equals(key2))) {
@@ -375,12 +387,11 @@ public class Translator {
 	 * Step 2.4
 	 */
 	private SatInput runStep2_4() {
-
 		SatInput ret = new SatInput();
 
-		for (String key1 : goal.getConstants().keySet()) {
+		for (String key1 : goal.getConstants()) {
 
-			for (String key2 : goal.getEAtoms().keySet()) {
+			for (String key2 : goal.getEAtoms()) {
 				{
 					Set<Integer> clause = new HashSet<Integer>();
 
@@ -415,19 +426,19 @@ public class Translator {
 
 			for (String key2 : goal.getAllAtoms().keySet()) {
 
-				for (String key3 : goal.getAllAtoms().keySet()) {
+				if (!key1.equals(key2)) {
+					for (String key3 : goal.getAllAtoms().keySet()) {
 
-					if (!key1.equals(key2) && !key1.equals(key3)
-							&& !key2.equals(key3)) {
-						Set<Integer> clause = new HashSet<Integer>();
+						if (!key1.equals(key3) && !key2.equals(key3)) {
+							Set<Integer> clause = new HashSet<Integer>();
 
-						clause.add(getSubOrDissubLiteral(key1, key2));
-						clause.add(getSubOrDissubLiteral(key2, key3));
-						clause.add(getMinusSubOrDissubLiteral(key1, key3));
+							clause.add(getSubOrDissubLiteral(key1, key2));
+							clause.add(getSubOrDissubLiteral(key2, key3));
+							clause.add(getMinusSubOrDissubLiteral(key1, key3));
 
-						ret.add(clause);
+							ret.add(clause);
+						}
 					}
-
 				}
 			}
 		}
@@ -442,7 +453,7 @@ public class Translator {
 	private SatInput runStep3_1_r() {
 		SatInput ret = new SatInput();
 
-		for (String key1 : goal.getVariables().keySet()) {
+		for (String key1 : goal.getVariables()) {
 			Set<Integer> clause = new HashSet<Integer>();
 
 			clause.add(getMinusOrderLiteral(key1, key1));
@@ -460,11 +471,11 @@ public class Translator {
 	private SatInput runStep3_1_t() {
 		SatInput ret = new SatInput();
 
-		for (String key1 : goal.getVariables().keySet()) {
+		for (String key1 : goal.getVariables()) {
 
-			for (String key2 : goal.getVariables().keySet()) {
+			for (String key2 : goal.getVariables()) {
 
-				for (String key3 : goal.getVariables().keySet()) {
+				for (String key3 : goal.getVariables()) {
 
 					if (!key1.equals(key2) && !key2.equals(key3)) {
 
@@ -491,14 +502,14 @@ public class Translator {
 	private SatInput runStep3_2() {
 		SatInput ret = new SatInput();
 
-		for (String key1 : goal.getEAtoms().keySet()) {
+		for (String key1 : goal.getEAtoms()) {
 
-			FAtom eatom = goal.getEAtoms().get(key1);
+			FAtom eatom = goal.getAllAtoms().get(key1);
 			FAtom child = eatom.getChild();
 
-			if (child.isVar()) {
+			if (child.isVariable()) {
 
-				for (String key2 : goal.getVariables().keySet()) {
+				for (String key2 : goal.getVariables()) {
 
 					Set<Integer> clause = new HashSet<Integer>();
 
@@ -520,14 +531,14 @@ public class Translator {
 	private SatInput runSteps2_2_N_2_3() {
 		SatInput ret = new SatInput();
 
-		for (String key1 : goal.getEAtoms().keySet()) {
+		for (String key1 : goal.getEAtoms()) {
 
-			for (String key2 : goal.getEAtoms().keySet()) {
+			for (String key2 : goal.getEAtoms()) {
 
 				if (!key1.equals(key2)) {
 
-					String role1 = goal.getEAtoms().get(key1).getName();
-					String role2 = goal.getEAtoms().get(key2).getName();
+					String role1 = goal.getAllAtoms().get(key1).getName();
+					String role2 = goal.getAllAtoms().get(key2).getName();
 
 					/*
 					 * if roles are not equal, then Step 2.2
@@ -545,8 +556,8 @@ public class Translator {
 						 */
 					} else {
 
-						FAtom child1 = goal.getEAtoms().get(key1).getChild();
-						FAtom child2 = goal.getEAtoms().get(key2).getChild();
+						FAtom child1 = goal.getAllAtoms().get(key1).getChild();
+						FAtom child2 = goal.getAllAtoms().get(key2).getChild();
 
 						String child1name = child1.getName();
 						String child2name = child2.getName();
@@ -606,11 +617,11 @@ public class Translator {
 		 * Literals for order on variables
 		 */
 
-		for (String key1 : goal.getVariables().keySet()) {
+		for (String key1 : goal.getVariables()) {
 
 			first = key1;
 
-			for (String key2 : goal.getVariables().keySet()) {
+			for (String key2 : goal.getVariables()) {
 
 				second = key2;
 
@@ -623,7 +634,6 @@ public class Translator {
 			}
 
 		}
-
 	}
 
 	/**
@@ -672,22 +682,26 @@ public class Translator {
 						|| (identifiers.get(i).getValue() && identifiers.get(i)
 								.isSubsumption())) {
 
-					if (goal.getVariables().containsKey(name1)) {
-						if (goal.getConstants().containsKey(name2)) {
+					if (goal.getVariables().contains(name1)) {
+						if (goal.getConstants().contains(name2)) {
 
-							goal.getVariables().get(name1)
-									.addToS(goal.getConstants().get(name2));
+							goal.getAllAtoms()
+									.get(name1)
+									.addToSetOfSubsumers(
+											goal.getAllAtoms().get(name2));
 
-							if (goal.getVariables().get(name1).isUserVariable()) {
+							if (goal.getAllAtoms().get(name1).isUserVariable()) {
 								update.add(getLiteralId(i));
 							}
 
-						} else if (goal.getEAtoms().containsKey(name2)) {
+						} else if (goal.getEAtoms().contains(name2)) {
 
-							goal.getVariables().get(name1)
-									.addToS(goal.getEAtoms().get(name2));
+							goal.getAllAtoms()
+									.get(name1)
+									.addToSetOfSubsumers(
+											goal.getAllAtoms().get(name2));
 
-							if (goal.getVariables().get(name1).isUserVariable()) {
+							if (goal.getAllAtoms().get(name1).isUserVariable()) {
 								update.add(getLiteralId(i));
 							}
 						}
@@ -696,13 +710,13 @@ public class Translator {
 				} else if (identifiers.get(i).isDissubsumption()
 						|| identifiers.get(i).isSubsumption()) {
 
-					if (goal.getVariables().containsKey(name1)
-							&& goal.getVariables().get(name1).isUserVariable()) {
-						if (goal.getConstants().containsKey(name2)) {
+					if (goal.getVariables().contains(name1)
+							&& goal.getAllAtoms().get(name1).isUserVariable()) {
+						if (goal.getConstants().contains(name2)) {
 
 							update.add(getMinusLiteralId(i));
 
-						} else if (goal.getEAtoms().containsKey(name2)) {
+						} else if (goal.getEAtoms().contains(name2)) {
 
 							update.add(getMinusLiteralId(i));
 						}
@@ -717,7 +731,6 @@ public class Translator {
 		}
 
 		return response;
-
 	}
 
 	/**
@@ -742,13 +755,14 @@ public class Translator {
 
 			PrintWriter out = new PrintWriter(new BufferedWriter(result));
 
-			for (String variable : goal.getVariables().keySet()) {
-				if (goal.getVariables().get(variable).isUserVariable()) {
+			for (String variable : goal.getVariables()) {
+				if (goal.getAllAtoms().get(variable).isUserVariable()) {
 					out.print(KRSSKeyword.open + KRSSKeyword.define_concept
 							+ KRSSKeyword.space);
 					out.print(variable + KRSSKeyword.space);
 
-					out.print(goal.getVariables().get(variable).printS());
+					out.print(goal.getAllAtoms().get(variable)
+							.printSetOfSubsumers());
 					out.println(KRSSKeyword.space + KRSSKeyword.close
 							+ KRSSKeyword.space);
 				}
@@ -759,9 +773,7 @@ public class Translator {
 		} else {
 
 			PrintWriter out = new PrintWriter(new BufferedWriter(result));
-
 			out.println(NOT_UNIFIABLE);
-
 			out.flush();
 
 		}
@@ -770,10 +782,11 @@ public class Translator {
 	}
 
 	private void updateWithNegations() {
-		for (FAtom var : goal.getVariables().values()) {
+		for (String key : goal.getVariables()) {
+			FAtom var = goal.getAllAtoms().get(key);
 			if (var.isUserVariable()) {
 				for (FAtom atom : goal.getAllAtoms().values()) {
-					if (atom.isCons() || atom.isRoot()) {
+					if (atom.isConstant() || atom.isRoot()) {
 						update.add(getMinusSubOrDissubLiteral(var.toString(),
 								atom.toString()));
 					}

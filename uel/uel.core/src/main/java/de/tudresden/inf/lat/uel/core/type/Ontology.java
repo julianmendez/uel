@@ -22,6 +22,8 @@ public interface Ontology {
 
 	/**
 	 * Tells whether this ontology contains the specified primitive definition.
+	 * The ontology ignores any primitive definition when the right-hand side is
+	 * top.
 	 * 
 	 * @param name
 	 *            primitive definition identifier
@@ -49,30 +51,13 @@ public interface Ontology {
 	public Set<String> getDefinitionIds();
 
 	/**
-	 * Returns the symbols in definitions of a specified concept name.
-	 * 
-	 * @param name
-	 *            concept name
-	 * @return the symbols in definitions of a specified concept name
-	 */
-	public Set<String> getDefinitionSymbols(String name);
-
-	/**
-	 * Returns the primitive definition for a given concept name.
+	 * Returns the primitive definition for a given concept name. The ontology
+	 * ignores any primitive definition when the right-hand side is top.
 	 * 
 	 * @param name
 	 *            concept name
 	 * @return the definitions for a given concept name
 	 */
 	public Equation getPrimitiveDefinition(String name);
-
-	/**
-	 * Returns the symbols in primitive definitions of a specified concept name.
-	 * 
-	 * @param name
-	 *            concept name
-	 * @return the symbols in primitive definitions of a specified concept name
-	 */
-	public Set<String> getPrimitiveDefinitionSymbols(String name);
 
 }

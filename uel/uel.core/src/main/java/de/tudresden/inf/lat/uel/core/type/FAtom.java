@@ -21,7 +21,8 @@ public class FAtom extends Atom {
 	public static final String VAR_PREFIX = "VAR";
 
 	private FAtom child = null;
-	private Collection<FAtom> S = new ArrayList<FAtom>();
+	private String id = null;
+	private Collection<FAtom> setOfSubsumers = new ArrayList<FAtom>();
 	private boolean userVariable = false;
 	private boolean var = false;
 
@@ -40,8 +41,9 @@ public class FAtom extends Atom {
 
 		if (!atom.isRoot()) {
 			child = null;
+			updateId();
 
-			goal.importDefinition(atom);
+			goal.importAnyDefinition(atom);
 
 		} else if (!atom.isFlat()) {
 
@@ -53,6 +55,7 @@ public class FAtom extends Atom {
 			goal.setNbrVar(goal.getNbrVar() + 1);
 
 			child = b;
+			updateId();
 
 			Map<String, Atom> bMap = new HashMap<String, Atom>();
 			bMap.put(b.toString(), b);
@@ -63,14 +66,11 @@ public class FAtom extends Atom {
 			for (String key : atom.getChildren().keySet()) {
 
 				if (goal.getAllAtoms().containsKey(key)) {
-
 					child = goal.getAllAtoms().get(key);
-
 				} else {
-
 					child = new FAtom(atom.getChildren().get(key), goal);
-
 				}
+				updateId();
 			}
 		}
 
@@ -79,7 +79,6 @@ public class FAtom extends Atom {
 			goal.getAllAtoms().put(this.toString(), this);
 
 		}
-
 	}
 
 	/**
@@ -95,6 +94,7 @@ public class FAtom extends Atom {
 	public FAtom(FAtom c, Atom atom) {
 		super(atom.getName(), atom.isRoot());
 		child = c;
+		updateId();
 	}
 
 	/**
@@ -114,6 +114,7 @@ public class FAtom extends Atom {
 		super(name, r);
 		var = v;
 		child = arg;
+		updateId();
 	}
 
 	/**
@@ -122,10 +123,8 @@ public class FAtom extends Atom {
 	 * 
 	 * @param atom
 	 */
-	public void addToS(FAtom atom) {
-
-		S.add((FAtom) atom);
-
+	public void addToSetOfSubsumers(FAtom atom) {
+		setOfSubsumers.add((FAtom) atom);
 	}
 
 	@Override
@@ -135,7 +134,8 @@ public class FAtom extends Atom {
 			FAtom other = (FAtom) o;
 			ret = super.equals(other)
 					&& this.userVariable == other.userVariable
-					&& this.var == other.var && this.S.equals(other.S);
+					&& this.var == other.var
+					&& this.setOfSubsumers.equals(other.setOfSubsumers);
 			ret = ret
 					&& ((this.child == null && other.child == null) || (this.child != null && this.child
 							.equals(other.child)));
@@ -153,17 +153,20 @@ public class FAtom extends Atom {
 	 *         restriction; otherwise it returns null
 	 */
 	public FAtom getChild() {
-
 		return child;
 	}
 
-	public Collection<FAtom> getS() {
-		return this.S;
+	public String getId() {
+		return this.id;
+	}
+
+	public Collection<FAtom> getSetOfSubsumers() {
+		return this.setOfSubsumers;
 	}
 
 	@Override
 	public int hashCode() {
-		return this.S.hashCode();
+		return this.setOfSubsumers.hashCode();
 	}
 
 	/**
@@ -171,8 +174,7 @@ public class FAtom extends Atom {
 	 * 
 	 * @return <code>true</code> if and only if this atoms is a constant
 	 */
-	public boolean isCons() {
-
+	public boolean isConstant() {
 		return !(var || this.isRoot());
 	}
 
@@ -183,9 +185,7 @@ public class FAtom extends Atom {
 	 *         variable
 	 */
 	public boolean isUserVariable() {
-
 		return userVariable;
-
 	}
 
 	/**
@@ -193,10 +193,8 @@ public class FAtom extends Atom {
 	 * 
 	 * @return <code>true</code> if and only if a flat atom is a variable
 	 */
-	public boolean isVar() {
-
+	public boolean isVariable() {
 		return var;
-
 	}
 
 	/**
@@ -205,18 +203,18 @@ public class FAtom extends Atom {
 	 * 
 	 * @return the string representation of a substitution set
 	 */
-	public String printS() {
+	public String printSetOfSubsumers() {
 
 		StringBuffer sbuf = new StringBuffer();
 
-		if (S.isEmpty()) {
+		if (setOfSubsumers.isEmpty()) {
 
 			sbuf.append(KRSSKeyword.top);
 			sbuf.append(KRSSKeyword.space);
 
-		} else if (S.size() == 1) {
+		} else if (setOfSubsumers.size() == 1) {
 
-			FAtom atom = S.iterator().next();
+			FAtom atom = setOfSubsumers.iterator().next();
 			sbuf.append(printSubstitution(atom));
 
 		} else {
@@ -225,7 +223,7 @@ public class FAtom extends Atom {
 			sbuf.append(KRSSKeyword.and);
 			sbuf.append(KRSSKeyword.space);
 
-			for (FAtom atom : S) {
+			for (FAtom atom : setOfSubsumers) {
 				sbuf.append(KRSSKeyword.space);
 				sbuf.append(printSubstitution(atom));
 				sbuf.append(KRSSKeyword.space);
@@ -246,8 +244,8 @@ public class FAtom extends Atom {
 			sbuf.append(atom.getName());
 			sbuf.append(KRSSKeyword.space);
 			FAtom child = atom.getChild();
-			if (child.isVar() && !child.isUserVariable()) {
-				sbuf.append(child.printS());
+			if (child.isVariable() && !child.isUserVariable()) {
+				sbuf.append(child.printSetOfSubsumers());
 			} else {
 				sbuf.append(child.getName());
 			}
@@ -265,10 +263,8 @@ public class FAtom extends Atom {
 	 * Used in Translator
 	 * 
 	 */
-	public void resetS() {
-
-		S = new ArrayList<FAtom>();
-
+	public void resetSetOfSubsumers() {
+		setOfSubsumers = new ArrayList<FAtom>();
 	}
 
 	/**
@@ -276,7 +272,6 @@ public class FAtom extends Atom {
 	 * 
 	 */
 	public void setUserVariable(boolean value) {
-
 		if (!isRoot()) {
 			userVariable = value;
 		} else {
@@ -291,12 +286,16 @@ public class FAtom extends Atom {
 	 * 
 	 * @param v
 	 */
-	public void setVar(boolean v) {
+	public void setVariable(boolean v) {
 		var = v;
 	}
 
 	@Override
 	public String toString() {
+		return getId();
+	}
+
+	private void updateId() {
 		StringBuilder str = new StringBuilder(this.getName());
 		if (child != null) {
 
@@ -307,7 +306,7 @@ public class FAtom extends Atom {
 			str.append(child.toString());
 			str.append(KRSSKeyword.close);
 		}
-		return str.toString();
+		this.id = str.toString();
 	}
 
 }

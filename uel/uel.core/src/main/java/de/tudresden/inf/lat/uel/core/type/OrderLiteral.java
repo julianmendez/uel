@@ -9,6 +9,7 @@ public class OrderLiteral implements Literal {
 
 	private final String first;
 	private int hashCode = 0;
+	private String id = null;
 	private final String second;
 	private boolean value = false;
 
@@ -24,6 +25,7 @@ public class OrderLiteral implements Literal {
 		first = one;
 		second = two;
 		hashCode = one.hashCode() + 31 * two.hashCode();
+		updateId();
 	}
 
 	@Override
@@ -79,12 +81,16 @@ public class OrderLiteral implements Literal {
 
 	@Override
 	public String toString() {
+		return this.id;
+	}
+
+	private void updateId() {
 		StringBuilder str = new StringBuilder("(");
-		str.append(first.toString());
+		str.append(first);
 		str.append(">");
-		str.append(second.toString());
+		str.append(second);
 		str.append(")");
-		return str.toString();
+		this.id = str.toString();
 	}
 
 }

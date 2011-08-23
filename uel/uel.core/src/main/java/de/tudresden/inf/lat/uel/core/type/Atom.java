@@ -1,8 +1,6 @@
 package de.tudresden.inf.lat.uel.core.type;
 
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Logger;
 
 /**
@@ -24,9 +22,8 @@ public class Atom {
 	 */
 
 	private Map<String, Atom> children;
-
+	private String id = null;
 	private final String name;
-
 	private final boolean root;
 
 	/**
@@ -41,6 +38,7 @@ public class Atom {
 	public Atom(String n, boolean r) {
 		name = n;
 		root = r;
+		updateId();
 	}
 
 	/**
@@ -59,6 +57,7 @@ public class Atom {
 		name = n;
 		children = argchild;
 		root = r;
+		updateId();
 	}
 
 	@Override
@@ -90,6 +89,10 @@ public class Atom {
 		return ret;
 	}
 
+	public String getId() {
+		return this.id;
+	}
+
 	/**
 	 * Returns name of the atom.
 	 * 
@@ -97,24 +100,6 @@ public class Atom {
 	 */
 	public String getName() {
 		return name;
-	}
-
-	/**
-	 * Returns the symbols in this atom.
-	 * 
-	 * @return the symbols in this atom
-	 */
-	public Set<String> getSymbols() {
-		Set<String> ret = new HashSet<String>();
-		if (isRoot()) {
-			Map<String, Atom> children = getChildren();
-			for (Atom atom : children.values()) {
-				ret.addAll(atom.getSymbols());
-			}
-		} else {
-			ret.add(toString());
-		}
-		return ret;
 	}
 
 	@Override
@@ -155,6 +140,10 @@ public class Atom {
 
 	@Override
 	public String toString() {
+		return getId();
+	}
+
+	private void updateId() {
 		StringBuilder str = new StringBuilder(name);
 		if (children != null) {
 			str.append("[");
@@ -164,7 +153,7 @@ public class Atom {
 			}
 			str.append("]");
 		}
-		return str.toString();
+		id = str.toString();
 	}
 
 }

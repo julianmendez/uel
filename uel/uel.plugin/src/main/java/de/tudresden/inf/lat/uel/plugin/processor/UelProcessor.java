@@ -67,9 +67,7 @@ public class UelProcessor {
 		StringWriter result = new StringWriter();
 		String satoutputStr = null;
 		try {
-			if (getUnifierList().isEmpty()) {
-				this.satinput = this.translator.getSatInput();
-			} else {
+			if (!getUnifierList().isEmpty()) {
 				this.satinput.add(this.translator.getUpdate());
 			}
 			satoutputStr = solver.solve(this.satinput);
@@ -91,14 +89,16 @@ public class UelProcessor {
 		return unifiable;
 	}
 
+	public void computeSatInput() {
+		this.satinput = this.translator.computeSatInput();
+	}
+
 	public Goal configure(Set<String> input) {
 		if (input == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
 
-		Goal ret = createGoal(this.ontology, input, this.candidates);
-		this.translator = new Translator(ret, true);
-		return ret;
+		return createGoal(this.ontology, input, this.candidates);
 	}
 
 	private Goal createGoal(Ontology ont, Set<String> input, Set<String> vars) {
@@ -126,12 +126,20 @@ public class UelProcessor {
 		return ret;
 	}
 
+	public void createTranslator(Goal g) {
+		this.translator = new Translator(g, true);
+	}
+
 	public Set<String> getCandidates() {
 		return Collections.unmodifiableSet(this.candidates);
 	}
 
 	public Ontology getOntology() {
 		return this.ontology;
+	}
+
+	public SatInput getSatInput() {
+		return this.satinput;
 	}
 
 	public Translator getTranslator() {

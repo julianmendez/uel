@@ -43,6 +43,7 @@ public class ProcessorTest extends TestCase {
 	private static final String ontology11 = apath + "testOntology-11.krss";
 	private static final String ontology12 = apath + "testOntology-12.krss";
 	private static final String ontology13 = apath + "testOntology-13.krss";
+	private static final String ontology14 = apath + "testOntology-14.krss";
 
 	private OWLOntology createOntology(InputStream input)
 			throws OWLOntologyCreationException {
@@ -64,24 +65,24 @@ public class ProcessorTest extends TestCase {
 		Set<String> varNames = new HashSet<String>();
 		varNames.add("A1");
 		varNames.add("A4");
-		tryOntology(ontology01, varNames);
+		tryOntology(ontology01, varNames, 16);
 	}
 
 	public void test02() throws OWLOntologyCreationException, IOException {
 		Set<String> varNames = new HashSet<String>();
 		varNames.add("A1");
 		varNames.add("A4");
-		tryOntology(ontology02, varNames);
+		tryOntology(ontology02, varNames, 64);
 	}
 
 	public void test03() throws OWLOntologyCreationException, IOException {
 		Set<String> varNames = new HashSet<String>();
 		varNames.add("Z");
-		tryOntology(ontology03, varNames);
+		tryOntology(ontology03, varNames, 1);
 	}
 
 	public void test04() throws OWLOntologyCreationException, IOException {
-		tryOntology(ontology04, new HashSet<String>());
+		tryOntology(ontology04, new HashSet<String>(), 0);
 	}
 
 	public void test05() throws OWLOntologyCreationException, IOException {
@@ -89,21 +90,21 @@ public class ProcessorTest extends TestCase {
 		varNames.add("A");
 		varNames.add("A1");
 		varNames.add("A2");
-		tryOntology(ontology05, varNames);
+		tryOntology(ontology05, varNames, 32);
 	}
 
 	public void test06() throws OWLOntologyCreationException, IOException {
 		Set<String> varNames = new HashSet<String>();
 		varNames.add("A1");
 		varNames.add("A2");
-		tryOntology(ontology06, varNames);
+		tryOntology(ontology06, varNames, 3);
 	}
 
 	public void test07() throws OWLOntologyCreationException, IOException {
 		Set<String> varNames = new HashSet<String>();
 		varNames.add("A1");
 		varNames.add("A2");
-		tryOntology(ontology07, varNames);
+		tryOntology(ontology07, varNames, 0);
 	}
 
 	public void test08() throws OWLOntologyCreationException, IOException {
@@ -113,42 +114,50 @@ public class ProcessorTest extends TestCase {
 		varNames.add("A3");
 		varNames.add("A4");
 		varNames.add("A5");
-		tryOntology(ontology08, varNames);
+		tryOntology(ontology08, varNames, 153);
 	}
 
 	public void test09() throws OWLOntologyCreationException, IOException {
 		Set<String> varNames = new HashSet<String>();
 		varNames.add("A1");
 		varNames.add("A2");
-		tryOntology(ontology09, varNames);
+		tryOntology(ontology09, varNames, 0);
 	}
 
 	public void test10() throws OWLOntologyCreationException, IOException {
 		Set<String> varNames = new HashSet<String>();
 		varNames.add("A1");
 		varNames.add("A3");
-		tryOntology(ontology10, varNames);
+		tryOntology(ontology10, varNames, 3);
 	}
 
 	public void test11() throws OWLOntologyCreationException, IOException {
 		Set<String> varNames = new HashSet<String>();
-		tryOntology(ontology11, varNames);
+		tryOntology(ontology11, varNames, 1);
 	}
 
 	public void test12() throws OWLOntologyCreationException, IOException {
 		Set<String> varNames = new HashSet<String>();
 		varNames.add("A2");
-		tryOntology(ontology12, varNames);
+		tryOntology(ontology12, varNames, 1);
 	}
 
 	public void test13() throws OWLOntologyCreationException, IOException {
 		Set<String> varNames = new HashSet<String>();
 		varNames.add("B2");
-		tryOntology(ontology13, varNames);
+		tryOntology(ontology13, varNames, 0);
 	}
 
-	private void tryOntology(String ontologyName, Set<String> varNames)
-			throws OWLOntologyCreationException, IOException {
+	public void test14() throws OWLOntologyCreationException, IOException {
+		Set<String> varNames = new HashSet<String>();
+		varNames.add("A");
+		varNames.add("B5");
+		tryOntology(ontology14, varNames, 8);
+	}
+
+	private void tryOntology(String ontologyName, Set<String> varNames,
+			Integer numberOfUnifiers) throws OWLOntologyCreationException,
+			IOException {
 		Map<String, OWLClass> idClassMap = new HashMap<String, OWLClass>();
 		UelProcessor processor = new UelProcessor();
 		{
@@ -170,6 +179,8 @@ public class ProcessorTest extends TestCase {
 		input.add(idClassMap.get("C").toStringID());
 		input.add(idClassMap.get("D").toStringID());
 		Goal goal = processor.configure(input);
+		processor.createTranslator(goal);
+		processor.computeSatInput();
 
 		boolean hasUnifiers = true;
 		while (hasUnifiers) {
@@ -177,6 +188,8 @@ public class ProcessorTest extends TestCase {
 		}
 
 		List<String> unifiers = processor.getUnifierList();
+		assertEquals((Integer) numberOfUnifiers, (Integer) unifiers.size());
+
 		String goalStr = goal.getGoalEquations();
 
 		for (String unifier : unifiers) {

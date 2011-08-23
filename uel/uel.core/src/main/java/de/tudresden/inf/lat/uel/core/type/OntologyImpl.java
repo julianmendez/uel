@@ -2,7 +2,6 @@ package de.tudresden.inf.lat.uel.core.type;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -67,32 +66,12 @@ public class OntologyImpl implements Ontology {
 	}
 
 	@Override
-	public Set<String> getDefinitionSymbols(String name) {
-		Set<String> ret = new HashSet<String>();
-		Equation equation = getDefinition(name);
-		if (equation != null) {
-			ret.addAll(equation.getSymbolsInRight());
-		}
-		return Collections.unmodifiableSet(ret);
-	}
-
-	@Override
 	public Equation getPrimitiveDefinition(String name) {
 		return primitiveDefinitions.get(name);
 	}
 
 	public Set<String> getPrimitiveDefinitionIds() {
 		return Collections.unmodifiableSet(this.primitiveDefinitions.keySet());
-	}
-
-	@Override
-	public Set<String> getPrimitiveDefinitionSymbols(String name) {
-		Set<String> ret = new HashSet<String>();
-		Equation equation = getPrimitiveDefinition(name);
-		if (equation != null) {
-			ret.addAll(equation.getSymbolsInRight());
-		}
-		return Collections.unmodifiableSet(ret);
 	}
 
 	@Override

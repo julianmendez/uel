@@ -3,10 +3,13 @@ package de.tudresden.inf.lat.uel.core.type;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 
 /**
  * This class implements a goal of unification, i.e., a set of equations between
@@ -19,26 +22,27 @@ import java.util.Set;
  */
 public class Goal {
 
+	private static final Logger logger = Logger.getLogger(Goal.class.getName());
 	public static final String UNDEF_SUFFIX = "_UNDEF";
 	public static final String VAR_PREFIX = "VAR";
 
 	/**
-	 * allatoms is a hash map implementing all flat atoms in the goal keys are
+	 * allAtoms is a hash map implementing all flat atoms in the goal keys are
 	 * names and values are flat atoms
 	 */
-	private Map<String, FAtom> allatoms = new HashMap<String, FAtom>();
+	private Map<String, FAtom> allAtoms = new HashMap<String, FAtom>();
 
 	/**
 	 * constants is a hash map implementing all constant concept names in the
 	 * goal. keys are names and values are flat atoms
 	 */
-	private Map<String, FAtom> constants = new HashMap<String, FAtom>();
+	private Set<String> constants = new HashSet<String>();
 
 	/**
 	 * eatoms is a hash map implementing all flat existential restrictions keys
 	 * are names and values are flat atoms
 	 */
-	private Map<String, FAtom> eatoms = new HashMap<String, FAtom>();
+	private Set<String> eatoms = new HashSet<String>();
 
 	/**
 	 * equations is a list containing all goal equations
@@ -56,7 +60,7 @@ public class Goal {
 	 * variables is a hash map implementing all concept names which are treated
 	 * as variables keys are names and values are flat atoms
 	 */
-	private Map<String, FAtom> variables = new HashMap<String, FAtom>();
+	private Set<String> variables = new HashSet<String>();
 
 	/**
 	 * Constructs a new goal based on a specified ontology.
@@ -107,11 +111,10 @@ public class Goal {
 
 		}
 
-		if (variables.containsKey(b.getName())) {
+		if (variables.contains(b.getName())) {
 
-			System.out
-					.println("Warning: This definition was already added to the goal"
-							+ b.getName());
+			logger.warning("Warning: This definition was already added to the goal "
+					+ b.getName());
 
 		} else {
 
@@ -120,12 +123,12 @@ public class Goal {
 
 			a = new FAtom(null, b);
 
-			a.setVar(true);
+			a.setVariable(true);
 
-			variables.put(a.toString(), a);
-			allatoms.put(a.toString(), a);
+			variables.add(a.getId());
+			allAtoms.put(a.getId(), a);
 
-			leftPart.put(a.toString(), a);
+			leftPart.put(a.getId(), a);
 
 			/*
 			 * FLATTENING
@@ -135,13 +138,13 @@ public class Goal {
 
 				a = new FAtom(e.getRight().get(key), this);
 
-				if (allatoms.containsKey(a.toString())) {
+				if (allAtoms.containsKey(a.getId())) {
 
-					rightPart.put(a.toString(), allatoms.get(a.toString()));
+					rightPart.put(a.getId(), allAtoms.get(a.getId()));
 
 				} else {
 
-					rightPart.put(a.toString(), a);
+					rightPart.put(a.getId(), a);
 
 				}
 
@@ -152,12 +155,12 @@ public class Goal {
 				 * Adding new variable to the right side
 				 */
 
-				FAtom var = new FAtom(b.getName() + UNDEF_SUFFIX, false, true,
+				FAtom var = new FAtom(b.getId() + UNDEF_SUFFIX, false, false,
 						null);
-				var.setUserVariable(true);
-				this.allatoms.put(var.getName(), var);
-				this.variables.put(var.getName(), var);
-				rightPart.put(var.getName(), var);
+				var.setUserVariable(false);
+				this.allAtoms.put(var.getId(), var);
+				this.constants.add(var.getId());
+				rightPart.put(var.getId(), var);
 			}
 
 			addEquation(new Equation(leftPart, rightPart, false));
@@ -170,7 +173,7 @@ public class Goal {
 		boolean ret = false;
 		if (o instanceof Goal) {
 			Goal other = (Goal) o;
-			ret = this.allatoms.equals(other.allatoms)
+			ret = this.allAtoms.equals(other.allAtoms)
 					&& this.constants.equals(other.constants)
 					&& this.eatoms.equals(other.eatoms)
 					&& this.equations.equals(other.equations)
@@ -183,15 +186,15 @@ public class Goal {
 	}
 
 	public Map<String, FAtom> getAllAtoms() {
-		return allatoms;
+		return allAtoms;
 	}
 
-	public Map<String, FAtom> getConstants() {
-		return constants;
+	public Set<String> getConstants() {
+		return Collections.unmodifiableSet(constants);
 	}
 
-	public Map<String, FAtom> getEAtoms() {
-		return eatoms;
+	public Set<String> getEAtoms() {
+		return Collections.unmodifiableSet(eatoms);
 	}
 
 	/**
@@ -235,8 +238,8 @@ public class Goal {
 		return nbrVar;
 	}
 
-	public Map<String, FAtom> getVariables() {
-		return variables;
+	public Set<String> getVariables() {
+		return Collections.unmodifiableSet(variables);
 	}
 
 	@Override
@@ -254,21 +257,16 @@ public class Goal {
 	 * @param concept
 	 *            concept
 	 */
-	public void importDefinition(Atom concept) {
-		if (ontology.containsDefinition(concept.toString())
-				&& !variables.containsKey(concept.toString())) {
+	public void importAnyDefinition(Atom concept) {
+		if (!variables.contains(concept.getId())) {
 
-			Equation eq = ontology.getDefinition(concept.toString());
-			addFlatten(eq);
-		}
-	}
+			if (ontology.containsDefinition(concept.getId())) {
+				addFlatten(ontology.getDefinition(concept.getId()));
 
-	public void importPrimitiveDefinition(Atom concept) {
-		if (ontology.containsPrimitiveDefinition(concept.toString())
-				&& !variables.containsKey(concept.toString())) {
+			} else if (ontology.containsPrimitiveDefinition(concept.getId())) {
+				addFlatten(ontology.getPrimitiveDefinition(concept.getId()));
 
-			Equation eq = ontology.getPrimitiveDefinition(concept.toString());
-			addFlatten(eq);
+			}
 		}
 	}
 
@@ -285,32 +283,57 @@ public class Goal {
 			addFlatten(eq);
 		}
 
-		for (String key : variables.keySet()) {
-			variables.get(key).setVar(true);
+		for (String key : variables) {
+			allAtoms.get(key).setVariable(true);
 		}
 
-		for (String var : vars) {
-			Atom a = new Atom(var, false);
-			importPrimitiveDefinition(a);
-		}
+		for (String key : allAtoms.keySet()) {
 
-		for (String key : allatoms.keySet()) {
-
-			FAtom a = allatoms.get(key);
+			FAtom a = allAtoms.get(key);
 
 			if (vars.contains(a.getName())) {
 
-				a.setVar(true);
+				a.setVariable(true);
 				a.setUserVariable(!a.equals(left) && !a.equals(right));
-				variables.put(key, a);
-			} else if (!variables.containsKey(key) && !a.isRoot()) {
+				variables.add(key);
+			} else if (!variables.contains(key) && !a.isRoot()) {
 
-				constants.put(key, a);
+				constants.add(key);
 
 			} else if (a.isRoot()) {
 
-				eatoms.put(key, a);
+				eatoms.add(key);
 			}
+		}
+	}
+
+	public void makeConstant(String id) {
+		if (this.variables.contains(id)) {
+			this.variables.remove(id);
+			this.constants.add(id);
+			this.allAtoms.get(id).setUserVariable(false);
+			this.allAtoms.get(id).setVariable(false);
+		}
+	}
+
+	public void makeConstants(Set<String> set) {
+		for (String elem : set) {
+			makeConstant(elem);
+		}
+	}
+
+	public void makeVariable(String id) {
+		if (this.constants.contains(id)) {
+			this.constants.remove(id);
+			this.variables.add(id);
+			this.allAtoms.get(id).setUserVariable(true);
+			this.allAtoms.get(id).setVariable(true);
+		}
+	}
+
+	public void makeVariables(Set<String> set) {
+		for (String elem : set) {
+			makeVariable(elem);
 		}
 	}
 
@@ -321,10 +344,10 @@ public class Goal {
 	 */
 	public String printAllAtoms() {
 		StringBuffer sbuf = new StringBuffer();
-		sbuf.append("From goal all atoms (" + allatoms.size());
+		sbuf.append("From goal all atoms (" + allAtoms.size());
 		sbuf.append("):\n");
-		for (String key : allatoms.keySet()) {
-			sbuf.append(allatoms.get(key));
+		for (String key : allAtoms.keySet()) {
+			sbuf.append(allAtoms.get(key));
 			sbuf.append(" | ");
 		}
 		sbuf.append("\n");
@@ -340,8 +363,8 @@ public class Goal {
 		StringBuffer sbuf = new StringBuffer();
 		sbuf.append("From goal all constants(" + constants.size());
 		sbuf.append("):\n");
-		for (String key : constants.keySet()) {
-			sbuf.append(constants.get(key));
+		for (String key : constants) {
+			sbuf.append(allAtoms.get(key));
 			sbuf.append(" | ");
 		}
 		sbuf.append("\n");
@@ -357,8 +380,8 @@ public class Goal {
 		StringBuffer sbuf = new StringBuffer();
 		sbuf.append("From goal all existential restrictions (" + eatoms.size());
 		sbuf.append("):\n");
-		for (String key : eatoms.keySet()) {
-			sbuf.append(eatoms.get(key));
+		for (String key : eatoms) {
+			sbuf.append(allAtoms.get(key));
 			sbuf.append(" | ");
 		}
 		sbuf.append("\n");
@@ -385,10 +408,11 @@ public class Goal {
 
 	public String printSubsumers() {
 		StringBuffer sbuf = new StringBuffer();
-		for (FAtom var : getVariables().values()) {
+		for (String key : getVariables()) {
+			FAtom var = allAtoms.get(key);
 			sbuf.append(var);
 			sbuf.append(":");
-			sbuf.append(var.getS());
+			sbuf.append(var.getSetOfSubsumers());
 			sbuf.append("\n");
 		}
 		return sbuf.toString();
@@ -403,8 +427,8 @@ public class Goal {
 		StringBuffer sbuf = new StringBuffer();
 		sbuf.append("From goal all variables: (" + variables.size());
 		sbuf.append("):\n");
-		for (String key : variables.keySet()) {
-			sbuf.append(variables.get(key));
+		for (String key : variables) {
+			sbuf.append(allAtoms.get(key));
 			sbuf.append(" | ");
 		}
 		sbuf.append("\n");
