@@ -1,9 +1,6 @@
 package de.tudresden.inf.lat.uel.core.sat;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.Writer;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -33,9 +30,9 @@ public class Translator {
 
 	private static final Logger logger = Logger.getLogger(Translator.class
 			.getName());
-	public static final String NOT_UNIFIABLE = "NOT UNIFIABLE / NO MORE UNIFIERS";
 
 	private Goal goal;
+
 	private Integer identificator = 1;
 
 	/**
@@ -163,6 +160,27 @@ public class Translator {
 
 	public Set<Integer> getUpdate() {
 		return Collections.unmodifiableSet(update);
+	}
+
+	private String getUpdatedUnifier() {
+		StringBuffer sbuf = new StringBuffer();
+		for (String variable : goal.getVariables()) {
+			if (goal.getAllAtoms().get(variable).isUserVariable()) {
+				sbuf.append(KRSSKeyword.open);
+				sbuf.append(KRSSKeyword.define_concept);
+				sbuf.append(KRSSKeyword.space);
+				sbuf.append(variable);
+				sbuf.append(KRSSKeyword.space);
+				sbuf.append(goal.getAllAtoms().get(variable)
+						.printSetOfSubsumers());
+				sbuf.append(KRSSKeyword.space);
+				sbuf.append(KRSSKeyword.close);
+				sbuf.append(KRSSKeyword.space);
+				sbuf.append(KRSSKeyword.newLine);
+			}
+		}
+
+		return sbuf.toString();
 	}
 
 	/**
@@ -641,95 +659,23 @@ public class Translator {
 		}
 	}
 
-	/**
-	 * This method is the same as <code>toTBox(Reader, Writer)</code>, but does
-	 * not write a unifier.
-	 */
-	public boolean toTBox(SatOutput output) throws IOException {
-		if (output == null) {
+	private void setValuesForLiterals(Set<Integer> val) {
+		if (val == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
 
-		boolean response = false;
-
-		if (output.isSatisfiable()) {
-			response = true;
-			for (Integer currentLiteral : output.getOutput()) {
-				if (currentLiteral < 0) {
-					Integer i = (-1) * currentLiteral;
-					Literal literal = identifiers.get(i);
-					if (literal.isDissubsumption() || literal.isSubsumption()) {
-						literal.setValue(false);
-					}
-				} else if (currentLiteral > 0) {
-					Literal literal = identifiers.get(currentLiteral);
-					literal.setValue(true);
+		for (Integer currentLiteral : val) {
+			if (currentLiteral < 0) {
+				Integer i = (-1) * currentLiteral;
+				Literal literal = identifiers.get(i);
+				if (literal.isDissubsumption() || literal.isSubsumption()) {
+					literal.setValue(false);
 				}
-			}
-
-			/*
-			 * Define S_X for each variable X
-			 */
-
-			for (Integer i : identifiers.keySet()) {
-
-				String name1 = identifiers.get(i).getFirst();
-				String name2 = identifiers.get(i).getSecond();
-
-				if ((!identifiers.get(i).getValue() && identifiers.get(i)
-						.isDissubsumption())
-						|| (identifiers.get(i).getValue() && identifiers.get(i)
-								.isSubsumption())) {
-
-					if (goal.getVariables().contains(name1)) {
-						if (goal.getConstants().contains(name2)) {
-
-							goal.getAllAtoms()
-									.get(name1)
-									.addToSetOfSubsumers(
-											goal.getAllAtoms().get(name2));
-
-							if (goal.getAllAtoms().get(name1).isUserVariable()) {
-								update.add(getLiteralId(i));
-							}
-
-						} else if (goal.getEAtoms().contains(name2)) {
-
-							goal.getAllAtoms()
-									.get(name1)
-									.addToSetOfSubsumers(
-											goal.getAllAtoms().get(name2));
-
-							if (goal.getAllAtoms().get(name1).isUserVariable()) {
-								update.add(getLiteralId(i));
-							}
-						}
-					}
-
-				} else if (identifiers.get(i).isDissubsumption()
-						|| identifiers.get(i).isSubsumption()) {
-
-					if (goal.getVariables().contains(name1)
-							&& goal.getAllAtoms().get(name1).isUserVariable()) {
-						if (goal.getConstants().contains(name2)) {
-
-							update.add(getMinusLiteralId(i));
-
-						} else if (goal.getEAtoms().contains(name2)) {
-
-							update.add(getMinusLiteralId(i));
-						}
-					}
-
-				}
-
-			}
-			if (update.size() == 0) {
-				updateWithNegations();
+			} else if (currentLiteral > 0) {
+				Literal literal = identifiers.get(currentLiteral);
+				literal.setValue(true);
 			}
 		}
-
-		return response;
 	}
 
 	/**
@@ -747,41 +693,73 @@ public class Translator {
 	 * @return <code>true</code> if and only if the output of the SAT solver
 	 *         contains SAT.
 	 */
-	public boolean toTBox(SatOutput output, Writer result) throws IOException {
-		if (output == null) {
-			throw new IllegalArgumentException("Null argument.");
-		}
+	public String toTBox(Set<Integer> val) {
+		setValuesForLiterals(val);
+		updateTBox();
+		return getUpdatedUnifier();
+	}
 
-		boolean ret = toTBox(output);
+	private void updateTBox() {
+		/*
+		 * Define S_X for each variable X
+		 */
 
-		if (ret) {
+		for (Integer i : identifiers.keySet()) {
 
-			PrintWriter out = new PrintWriter(new BufferedWriter(result));
+			String name1 = identifiers.get(i).getFirst();
+			String name2 = identifiers.get(i).getSecond();
 
-			for (String variable : goal.getVariables()) {
-				if (goal.getAllAtoms().get(variable).isUserVariable()) {
-					out.print(KRSSKeyword.open + KRSSKeyword.define_concept
-							+ KRSSKeyword.space);
-					out.print(variable + KRSSKeyword.space);
+			if ((!identifiers.get(i).getValue() && identifiers.get(i)
+					.isDissubsumption())
+					|| (identifiers.get(i).getValue() && identifiers.get(i)
+							.isSubsumption())) {
 
-					out.print(goal.getAllAtoms().get(variable)
-							.printSetOfSubsumers());
-					out.println(KRSSKeyword.space + KRSSKeyword.close
-							+ KRSSKeyword.space);
+				if (goal.getVariables().contains(name1)) {
+					if (goal.getConstants().contains(name2)) {
+
+						goal.getAllAtoms()
+								.get(name1)
+								.addToSetOfSubsumers(
+										goal.getAllAtoms().get(name2));
+
+						if (goal.getAllAtoms().get(name1).isUserVariable()) {
+							update.add(getLiteralId(i));
+						}
+
+					} else if (goal.getEAtoms().contains(name2)) {
+
+						goal.getAllAtoms()
+								.get(name1)
+								.addToSetOfSubsumers(
+										goal.getAllAtoms().get(name2));
+
+						if (goal.getAllAtoms().get(name1).isUserVariable()) {
+							update.add(getLiteralId(i));
+						}
+					}
 				}
+
+			} else if (identifiers.get(i).isDissubsumption()
+					|| identifiers.get(i).isSubsumption()) {
+
+				if (goal.getVariables().contains(name1)
+						&& goal.getAllAtoms().get(name1).isUserVariable()) {
+					if (goal.getConstants().contains(name2)) {
+
+						update.add(getMinusLiteralId(i));
+
+					} else if (goal.getEAtoms().contains(name2)) {
+
+						update.add(getMinusLiteralId(i));
+					}
+				}
+
 			}
 
-			out.flush();
-
-		} else {
-
-			PrintWriter out = new PrintWriter(new BufferedWriter(result));
-			out.println(NOT_UNIFIABLE);
-			out.flush();
-
 		}
-
-		return ret;
+		if (update.size() == 0) {
+			updateWithNegations();
+		}
 	}
 
 	private void updateWithNegations() {

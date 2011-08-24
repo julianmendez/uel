@@ -23,6 +23,9 @@ class Unifier {
 
 	private static final Logger logger = Logger.getLogger(Unifier.class
 			.getName());
+	private static final String NO_MORE_UNIFIERS = "NO MORE UNIFIERS";
+	private static final String NOT_UNIFIABLE = "NOT UNIFIABLE";
+	private static final String UNIFIABLE = "UNIFIABLE";
 
 	private int numberofsolutions = 0;
 	private Solver solver = null;
@@ -103,8 +106,10 @@ class Unifier {
 	public boolean unify(Translator translator, Writer result)
 			throws IOException {
 		SatOutput satOutput = solver.solve(translator.computeSatInput());
-		boolean response = translator.toTBox(satOutput, result);
-		return response;
+		if (satOutput.isSatisfiable()) {
+			result.write(translator.toTBox(satOutput.getOutput()));
+		}
+		return satOutput.isSatisfiable();
 	}
 
 	/**
@@ -129,9 +134,9 @@ class Unifier {
 		SatOutput satOutput = solver.solve(translator.computeSatInput());
 
 		if (satOutput.isSatisfiable()) {
-			logger.info("UNIFIABLE");
+			logger.info(UNIFIABLE);
 		} else {
-			logger.info("UNUNIFIABLE");
+			logger.info(NOT_UNIFIABLE);
 		}
 	}
 
@@ -170,7 +175,7 @@ class Unifier {
 		SatInput satinput = translator.computeSatInput();
 
 		if (unifiable) {
-			logger.info("UNIFIABLE\n" + "Unifier stored in file.");
+			logger.info(UNIFIABLE + "\nUnifier stored in file.");
 
 			boolean test = questionYN();
 
@@ -183,22 +188,23 @@ class Unifier {
 
 				translator.reset();
 
-				unifiable = translator.toTBox(satOutput, result);
-
+				unifiable = satOutput.isSatisfiable();
 				if (unifiable) {
+					result.write(translator.toTBox(satOutput.getOutput()));
+
 					logger.info(numberofsolutions + " UNIFIER\n"
 							+ "Unifier appended to file.");
 
 					test = questionYN();
 				} else {
-					logger.info("NO MORE UNIFIERS");
+					logger.info(NO_MORE_UNIFIERS);
 				}
 
 			}
 
 			logger.info("Have a good day!");
 		} else {
-			logger.info("UNUNIFIABLE");
+			logger.info(NOT_UNIFIABLE);
 		}
 		return result.toString();
 	}
@@ -236,7 +242,7 @@ class Unifier {
 
 		if (unifiable) {
 
-			logger.info("UNIFIABLE\n" + "Unifier stored in file.");
+			logger.info(UNIFIABLE + "\n" + "Unifier stored in file.");
 
 			nbrUnifiers++;
 
@@ -248,21 +254,22 @@ class Unifier {
 				SatOutput satOutput = solver.solve(satinput);
 
 				translator.reset();
-				unifiable = translator.toTBox(satOutput, result);
-
+				unifiable = satOutput.isSatisfiable();
 				if (unifiable) {
+					result.write(translator.toTBox(satOutput.getOutput()));
+
 					logger.info(numberofsolutions + " UNIFIER\n"
 							+ "Unifier stored in file.");
 					nbrUnifiers++;
 
 				} else {
-					logger.info("NO MORE UNIFIERS");
+					logger.info(NO_MORE_UNIFIERS);
 				}
 			}
 
 			logger.info("Have a good day!");
 		} else {
-			logger.info("UNUNIFIABLE");
+			logger.info(NOT_UNIFIABLE);
 		}
 
 		return result.toString();
@@ -277,8 +284,8 @@ class Unifier {
 	 * of flat equations with variables. (If the ontology file is provided, it
 	 * loads ontology definitions too).
 	 * 
-	 * If the goal is ununifiable, then it writes UNUNIFIABLE to the output file
-	 * and to the stdout.
+	 * If the goal is not unifiable, then it writes NOT UNIFIABLE to the output
+	 * file and to the stdout.
 	 * 
 	 * If the goal is unifiable, then it writes UNIFIABLE to stdout and computes
 	 * the number of all local unifiers.
@@ -303,7 +310,8 @@ class Unifier {
 
 			SatOutput satOutput = solver.solve(satinput);
 
-			if (translator.toTBox(satOutput)) {
+			if (satOutput.isSatisfiable()) {
+				translator.toTBox(satOutput.getOutput());
 
 				message = true;
 				numberofsolutions++;
@@ -321,9 +329,10 @@ class Unifier {
 		}
 
 		if (message) {
-			logger.info("UNIFIABLE\n" + numberofsolutions + " unifiers found");
+			logger.info(UNIFIABLE + "\n" + numberofsolutions
+					+ " unifiers found");
 		} else {
-			logger.info("UNUNIFIABLE");
+			logger.info(NOT_UNIFIABLE);
 		}
 	}
 
@@ -357,9 +366,9 @@ class Unifier {
 		Translator translator = new Translator(goal);
 
 		if (unify(translator, result)) {
-			logger.info("UNIFIABLE\n" + "Unifier stored in file.");
+			logger.info(UNIFIABLE + "\n" + "Unifier stored in file.");
 		} else {
-			logger.info("UNUNIFIABLE");
+			logger.info(NOT_UNIFIABLE);
 		}
 
 		return result.toString();
@@ -400,7 +409,7 @@ class Unifier {
 		if (unifiable) {
 
 			numberofsolutions++;
-			logger.info("UNIFIABLE\n" + "Unifier stored in file.");
+			logger.info(UNIFIABLE + "\n" + "Unifier stored in file.");
 
 			while (unifiable) {
 
@@ -411,20 +420,22 @@ class Unifier {
 
 				translator.reset();
 
-				unifiable = translator.toTBox(satOutput, result);
+				unifiable = satOutput.isSatisfiable();
 
 				if (unifiable) {
+					result.write(translator.toTBox(satOutput.getOutput()));
+
 					logger.info(numberofsolutions + " UNIFIER\n"
 							+ "Unifier appended to " + result.toString());
 				} else {
-					logger.info("NO MORE UNIFIERS");
+					logger.info(NO_MORE_UNIFIERS);
 				}
 
 			}
 
 			logger.info("Have a good day!");
 		} else {
-			logger.info("UNUNIFIABLE");
+			logger.info(NOT_UNIFIABLE);
 		}
 
 		return result.toString();

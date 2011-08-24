@@ -1,7 +1,6 @@
 package de.tudresden.inf.lat.uel.plugin.processor;
 
 import java.io.IOException;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -64,27 +63,25 @@ public class UelProcessor {
 	public boolean computeNextUnifier() {
 		boolean unifiable = false;
 		Solver solver = new Sat4jSolver();
-		StringWriter result = new StringWriter();
+		String result = null;
 		SatOutput satoutput = null;
 		try {
 			if (!getUnifierList().isEmpty()) {
 				this.satinput.add(this.translator.getUpdate());
 			}
 			satoutput = solver.solve(this.satinput);
+			unifiable = satoutput.isSatisfiable();
 			this.translator.reset();
-			unifiable = this.translator.toTBox(satoutput,
-					result);
+			result = this.translator.toTBox(satoutput.getOutput());
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-		result.flush();
-		String res = result.toString();
-		if (this.unifierSet.contains(res)) {
+		if (this.unifierSet.contains(result)) {
 			unifiable = false;
 		}
 		if (unifiable) {
-			this.unifierList.add(res);
-			this.unifierSet.add(res);
+			this.unifierList.add(result);
+			this.unifierSet.add(result);
 		}
 		return unifiable;
 	}
