@@ -1,6 +1,5 @@
 package de.tudresden.inf.lat.uel.core.sat;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -679,19 +678,12 @@ public class Translator {
 	}
 
 	/**
-	 * Reads a reader <code>outfile</code> which contains an output from SAT
-	 * solver i.e. UNSAT or SAT with the list of true literals. If the file
-	 * contains SAT and the list of true literals, the method translates it to a
-	 * TBox, which is written to the writer <code>result</code> and returns
-	 * "true". Otherwise, it writes "NOT UNIFIABLE" and returns "false".
+	 * Updates the translator with the SAT solver output, returning a new
+	 * unifier.
 	 * 
-	 * @param output
+	 * @param val
 	 *            SAT solver output
-	 * @param result
-	 *            the result
-	 * @throws IOException
-	 * @return <code>true</code> if and only if the output of the SAT solver
-	 *         contains SAT.
+	 * @return a new unifier.
 	 */
 	public String toTBox(Set<Integer> val) {
 		setValuesForLiterals(val);
