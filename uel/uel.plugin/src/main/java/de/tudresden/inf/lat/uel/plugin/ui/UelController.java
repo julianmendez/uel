@@ -9,6 +9,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -32,6 +33,9 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 
 import de.tudresden.inf.lat.uel.core.sat.Translator;
+import de.tudresden.inf.lat.uel.core.type.Atom;
+import de.tudresden.inf.lat.uel.core.type.Equation;
+import de.tudresden.inf.lat.uel.core.type.FAtom;
 import de.tudresden.inf.lat.uel.core.type.Goal;
 import de.tudresden.inf.lat.uel.core.type.KRSSKeyword;
 import de.tudresden.inf.lat.uel.plugin.processor.UelProcessor;
@@ -306,8 +310,8 @@ public class UelController implements ActionListener {
 		}
 		if (file != null) {
 			try {
-				String unifier = getModel().getUnifierList().get(
-						this.unifierIndex);
+				String unifier = toKRSS(getModel().getUnifierList().get(
+						this.unifierIndex));
 				OntologyRenderer renderer = new OntologyRenderer();
 				OWLOntology owlOntology = renderer.parseKRSS(unifier);
 				if (file.getName().endsWith(OntologyRenderer.EXTENSION_RDF)) {
@@ -501,6 +505,65 @@ public class UelController implements ActionListener {
 		}
 	}
 
+	/**
+	 * Prints a substitution set (i.e. a set of atoms) as a conjunction of atoms
+	 * in the krss format. Used in Translator.
+	 * 
+	 * @return the string representation of a substitution set
+	 */
+	public String printSetOfSubsumers(Collection<FAtom> setOfSubsumers) {
+
+		StringBuffer sbuf = new StringBuffer();
+
+		if (setOfSubsumers.isEmpty()) {
+
+			sbuf.append(KRSSKeyword.top);
+			sbuf.append(KRSSKeyword.space);
+
+		} else if (setOfSubsumers.size() == 1) {
+
+			FAtom atom = setOfSubsumers.iterator().next();
+			sbuf.append(printSubstitution(atom));
+
+		} else {
+
+			sbuf.append(KRSSKeyword.open);
+			sbuf.append(KRSSKeyword.and);
+			sbuf.append(KRSSKeyword.space);
+
+			for (FAtom atom : setOfSubsumers) {
+				sbuf.append(KRSSKeyword.space);
+				sbuf.append(printSubstitution(atom));
+				sbuf.append(KRSSKeyword.space);
+			}
+
+			sbuf.append(KRSSKeyword.space);
+			sbuf.append(KRSSKeyword.close);
+		}
+		return sbuf.toString();
+	}
+
+	private String printSubstitution(FAtom atom) {
+		StringBuffer sbuf = new StringBuffer();
+		if (atom.isRoot() && !atom.getChild().isUserVariable()) {
+			sbuf.append(KRSSKeyword.open);
+			sbuf.append(KRSSKeyword.some);
+			sbuf.append(KRSSKeyword.space);
+			sbuf.append(atom.getName());
+			sbuf.append(KRSSKeyword.space);
+			FAtom child = atom.getChild();
+			if (child.isVariable() && !child.isUserVariable()) {
+				sbuf.append(printSetOfSubsumers(child.getSetOfSubsumers()));
+			} else {
+				sbuf.append(child.getName());
+			}
+			sbuf.append(KRSSKeyword.close);
+		} else {
+			sbuf.append(atom.toString());
+		}
+		return sbuf.toString();
+	}
+
 	private void processMapIdClass(OWLOntology ontology) {
 		Set<OWLClass> set = ontology.getClassesInSignature();
 		for (OWLClass cls : set) {
@@ -588,11 +651,40 @@ public class UelController implements ActionListener {
 		return ret.toString();
 	}
 
+	public String toKRSS(Set<Equation> set) {
+		Set<Equation> unif = new TreeSet<Equation>();
+		unif.addAll(set);
+		StringBuffer sbuf = new StringBuffer();
+		for (Equation eq : set) {
+			Map<String, Atom> leftPart = eq.getLeft();
+			Map<String, Atom> rightPart = eq.getRight();
+
+			Set<FAtom> right = new HashSet<FAtom>();
+			for (Atom at : rightPart.values()) {
+				right.add((FAtom) at);
+			}
+
+			sbuf.append(KRSSKeyword.open);
+			sbuf.append(KRSSKeyword.define_concept);
+			sbuf.append(KRSSKeyword.space);
+			sbuf.append(leftPart.keySet().iterator().next());
+			sbuf.append(KRSSKeyword.space);
+
+			sbuf.append(printSetOfSubsumers(right));
+			sbuf.append(KRSSKeyword.space);
+			sbuf.append(KRSSKeyword.close);
+			sbuf.append(KRSSKeyword.space);
+			sbuf.append(KRSSKeyword.newLine);
+		}
+		return sbuf.toString();
+
+	}
+
 	private void updateUnifier() {
 		if (getModel().getUnifierList().size() > 0) {
 			getView().getUnifier().setText(
-					showUnifier(getModel().getUnifierList().get(
-							this.unifierIndex)));
+					showUnifier(toKRSS(getModel().getUnifierList().get(
+							this.unifierIndex))));
 		} else {
 			getView().getUnifier().setText("[not unifiable]");
 		}

@@ -21,7 +21,10 @@ import org.semanticweb.owlapi.reasoner.Node;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 
 import de.tudresden.inf.lat.jcel.owlapi.main.JcelReasoner;
+import de.tudresden.inf.lat.uel.core.type.Equation;
 import de.tudresden.inf.lat.uel.core.type.Goal;
+import de.tudresden.inf.lat.uel.plugin.ui.UelController;
+import de.tudresden.inf.lat.uel.plugin.ui.UelView;
 
 public class ProcessorTest extends TestCase {
 
@@ -111,10 +114,9 @@ public class ProcessorTest extends TestCase {
 		Set<String> varNames = new HashSet<String>();
 		varNames.add("A1");
 		varNames.add("A2");
-		varNames.add("A3");
 		varNames.add("A4");
-		varNames.add("A5");
-		tryOntology(ontology08, varNames, 153);
+		// including repetitions
+		tryOntology(ontology08, varNames, 1040);
 	}
 
 	public void test09() throws OWLOntologyCreationException, IOException {
@@ -160,15 +162,15 @@ public class ProcessorTest extends TestCase {
 			IOException {
 		Map<String, OWLClass> idClassMap = new HashMap<String, OWLClass>();
 		UelProcessor processor = new UelProcessor();
-		{
-			OWLOntology owlOntology = createOntology(new FileInputStream(
-					ontologyName));
-			processor.loadOntology(owlOntology);
-			Set<OWLClass> clsSet = owlOntology.getClassesInSignature();
-			for (OWLClass cls : clsSet) {
-				idClassMap.put(cls.getIRI().getFragment(), cls);
-			}
+
+		OWLOntology owlOntology = createOntology(new FileInputStream(
+				ontologyName));
+		processor.loadOntology(owlOntology);
+		Set<OWLClass> clsSet = owlOntology.getClassesInSignature();
+		for (OWLClass cls : clsSet) {
+			idClassMap.put(cls.getIRI().getFragment(), cls);
 		}
+
 		Set<String> variables = new HashSet<String>();
 		for (String var : varNames) {
 			variables.add(idClassMap.get(var).toStringID());
@@ -187,19 +189,24 @@ public class ProcessorTest extends TestCase {
 			hasUnifiers = processor.computeNextUnifier();
 		}
 
-		List<String> unifiers = processor.getUnifierList();
-		assertEquals((Integer) numberOfUnifiers, (Integer) unifiers.size());
-
+		List<Set<Equation>> unifiers = processor.getUnifierList();
 		String goalStr = goal.getGoalEquations();
 
-		for (String unifier : unifiers) {
-			String extendedOntology = goalStr + unifier;
+		UelController controller = new UelController(new UelView(processor),
+				owlOntology.getOWLOntologyManager());
+
+		for (Set<Equation> unifier : unifiers) {
+			String str = controller.toKRSS(unifier);
+			String extendedOntology = goalStr + str;
+
 			OWLReasoner reasoner = createReasoner(extendedOntology);
 			Node<OWLClass> node = reasoner.getEquivalentClasses(idClassMap
 					.get("C"));
 			OWLClass elem = idClassMap.get("D");
 			assertTrue(node.contains(elem));
 		}
+
+		assertEquals((Integer) numberOfUnifiers, (Integer) unifiers.size());
 	}
 
 }

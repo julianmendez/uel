@@ -1,12 +1,15 @@
 package de.tudresden.inf.lat.uel.core.sat;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.logging.Logger;
 
+import de.tudresden.inf.lat.uel.core.type.Atom;
 import de.tudresden.inf.lat.uel.core.type.DissubsumptionLiteral;
 import de.tudresden.inf.lat.uel.core.type.Equation;
 import de.tudresden.inf.lat.uel.core.type.FAtom;
@@ -120,8 +123,25 @@ public class Translator {
 		return ret;
 	}
 
-	private Integer getLiteralId(Integer val) {
-		return invertLiteral ? (-1) * val : val;
+	private Set<Integer> createUpdate() {
+		Set<Integer> ret = new HashSet<Integer>();
+		Set<String> set = new HashSet<String>();
+		set.addAll(goal.getConstants());
+		set.addAll(goal.getEAtoms());
+		for (String name : goal.getVariables()) {
+			FAtom atom = goal.getAllAtoms().get(name);
+			if (atom.isUserVariable()) {
+				for (String otherName : set) {
+					Literal lit = this.invertLiteral ? new SubsumptionLiteral(
+							name, otherName) : new DissubsumptionLiteral(name,
+							otherName);
+					Integer litId = literals.get(lit.toString());
+					ret.add(identifiers.get(litId).getValue() ? litId : (-1)
+							* litId);
+				}
+			}
+		}
+		return ret;
 	}
 
 	/**
@@ -131,10 +151,6 @@ public class Translator {
 	 */
 	public Map<String, Integer> getLiterals() {
 		return this.literals;
-	}
-
-	private int getMinusLiteralId(int val) {
-		return invertLiteral ? val : (-1) * val;
 	}
 
 	private int getMinusOrderLiteral(String left, String right) {
@@ -161,25 +177,28 @@ public class Translator {
 		return Collections.unmodifiableSet(update);
 	}
 
-	private String getUpdatedUnifier() {
-		StringBuffer sbuf = new StringBuffer();
+	private Set<Equation> getUpdatedUnifier() {
+		Set<Equation> ret = new HashSet<Equation>();
+
 		for (String variable : goal.getVariables()) {
 			if (goal.getAllAtoms().get(variable).isUserVariable()) {
-				sbuf.append(KRSSKeyword.open);
-				sbuf.append(KRSSKeyword.define_concept);
-				sbuf.append(KRSSKeyword.space);
-				sbuf.append(variable);
-				sbuf.append(KRSSKeyword.space);
-				sbuf.append(goal.getAllAtoms().get(variable)
-						.printSetOfSubsumers());
-				sbuf.append(KRSSKeyword.space);
-				sbuf.append(KRSSKeyword.close);
-				sbuf.append(KRSSKeyword.space);
-				sbuf.append(KRSSKeyword.newLine);
+
+				Map<String, Atom> leftPart = new HashMap<String, Atom>();
+				leftPart.put(variable, goal.getAllAtoms().get(variable));
+
+				Map<String, Atom> rightPart = new HashMap<String, Atom>();
+				Collection<FAtom> setOfSubsumers = goal.getAllAtoms()
+						.get(variable).getSetOfSubsumers();
+				for (FAtom subsumer : setOfSubsumers) {
+					rightPart.put(subsumer.getId(),
+							goal.getAllAtoms().get(subsumer.getId()));
+				}
+
+				ret.add(new Equation(leftPart, rightPart, false));
 			}
 		}
 
-		return sbuf.toString();
+		return ret;
 	}
 
 	/**
@@ -685,10 +704,17 @@ public class Translator {
 	 *            SAT solver output
 	 * @return a new unifier.
 	 */
-	public String toTBox(Set<Integer> val) {
+	public Set<Equation> toTBox(Set<Integer> val) {
 		setValuesForLiterals(val);
 		updateTBox();
-		return getUpdatedUnifier();
+		Set<Integer> newClause = createUpdate();
+		Set<Integer> invertedClause = new TreeSet<Integer>();
+		for (Integer e : newClause) {
+			invertedClause.add((-1) * e);
+		}
+		update = invertedClause;
+		Set<Equation> ret = getUpdatedUnifier();
+		return Collections.unmodifiableSet(ret);
 	}
 
 	private void updateTBox() {
@@ -701,68 +727,50 @@ public class Translator {
 			String name1 = identifiers.get(i).getFirst();
 			String name2 = identifiers.get(i).getSecond();
 
-			if ((!identifiers.get(i).getValue() && identifiers.get(i)
-					.isDissubsumption())
-					|| (identifiers.get(i).getValue() && identifiers.get(i)
-							.isSubsumption())) {
+			if (identifiers.get(i).isDissubsumption()) {
 
-				if (goal.getVariables().contains(name1)) {
-					if (goal.getConstants().contains(name2)) {
+				if (!identifiers.get(i).getValue()) {
 
-						goal.getAllAtoms()
-								.get(name1)
-								.addToSetOfSubsumers(
-										goal.getAllAtoms().get(name2));
+					if (goal.getVariables().contains(name1)) {
+						if (goal.getConstants().contains(name2)) {
 
-						if (goal.getAllAtoms().get(name1).isUserVariable()) {
-							update.add(getLiteralId(i));
-						}
+							goal.getAllAtoms()
+									.get(name1)
+									.addToSetOfSubsumers(
+											goal.getAllAtoms().get(name2));
 
-					} else if (goal.getEAtoms().contains(name2)) {
+						} else if (goal.getEAtoms().contains(name2)) {
 
-						goal.getAllAtoms()
-								.get(name1)
-								.addToSetOfSubsumers(
-										goal.getAllAtoms().get(name2));
-
-						if (goal.getAllAtoms().get(name1).isUserVariable()) {
-							update.add(getLiteralId(i));
+							goal.getAllAtoms()
+									.get(name1)
+									.addToSetOfSubsumers(
+											goal.getAllAtoms().get(name2));
 						}
 					}
+				} else if (identifiers.get(i).getValue()) {
+					// nothing
 				}
+			} else if (identifiers.get(i).isSubsumption()) {
+				if (identifiers.get(i).getValue()) {
 
-			} else if (identifiers.get(i).isDissubsumption()
-					|| identifiers.get(i).isSubsumption()) {
+					if (goal.getVariables().contains(name1)) {
+						if (goal.getConstants().contains(name2)) {
 
-				if (goal.getVariables().contains(name1)
-						&& goal.getAllAtoms().get(name1).isUserVariable()) {
-					if (goal.getConstants().contains(name2)) {
+							goal.getAllAtoms()
+									.get(name1)
+									.addToSetOfSubsumers(
+											goal.getAllAtoms().get(name2));
 
-						update.add(getMinusLiteralId(i));
+						} else if (goal.getEAtoms().contains(name2)) {
 
-					} else if (goal.getEAtoms().contains(name2)) {
+							goal.getAllAtoms()
+									.get(name1)
+									.addToSetOfSubsumers(
+											goal.getAllAtoms().get(name2));
 
-						update.add(getMinusLiteralId(i));
+						}
 					}
-				}
 
-			}
-
-		}
-		if (update.size() == 0) {
-			updateWithNegations();
-		}
-	}
-
-	private void updateWithNegations() {
-		for (String key : goal.getVariables()) {
-			FAtom var = goal.getAllAtoms().get(key);
-			if (var.isUserVariable()) {
-				for (FAtom atom : goal.getAllAtoms().values()) {
-					if (atom.isConstant() || atom.isRoot()) {
-						update.add(getMinusSubOrDissubLiteral(var.getId(),
-								atom.getId()));
-					}
 				}
 			}
 		}

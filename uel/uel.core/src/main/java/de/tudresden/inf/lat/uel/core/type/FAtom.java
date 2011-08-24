@@ -198,65 +198,6 @@ public class FAtom extends Atom {
 	}
 
 	/**
-	 * Prints a substitution set (i.e. a set of atoms) as a conjunction of atoms
-	 * in the krss format. Used in Translator.
-	 * 
-	 * @return the string representation of a substitution set
-	 */
-	public String printSetOfSubsumers() {
-
-		StringBuffer sbuf = new StringBuffer();
-
-		if (setOfSubsumers.isEmpty()) {
-
-			sbuf.append(KRSSKeyword.top);
-			sbuf.append(KRSSKeyword.space);
-
-		} else if (setOfSubsumers.size() == 1) {
-
-			FAtom atom = setOfSubsumers.iterator().next();
-			sbuf.append(printSubstitution(atom));
-
-		} else {
-
-			sbuf.append(KRSSKeyword.open);
-			sbuf.append(KRSSKeyword.and);
-			sbuf.append(KRSSKeyword.space);
-
-			for (FAtom atom : setOfSubsumers) {
-				sbuf.append(KRSSKeyword.space);
-				sbuf.append(printSubstitution(atom));
-				sbuf.append(KRSSKeyword.space);
-			}
-
-			sbuf.append(KRSSKeyword.space);
-			sbuf.append(KRSSKeyword.close);
-		}
-		return sbuf.toString();
-	}
-
-	private String printSubstitution(FAtom atom) {
-		StringBuffer sbuf = new StringBuffer();
-		if (atom.isRoot() && !atom.getChild().isUserVariable()) {
-			sbuf.append(KRSSKeyword.open);
-			sbuf.append(KRSSKeyword.some);
-			sbuf.append(KRSSKeyword.space);
-			sbuf.append(atom.getName());
-			sbuf.append(KRSSKeyword.space);
-			FAtom child = atom.getChild();
-			if (child.isVariable() && !child.isUserVariable()) {
-				sbuf.append(child.printSetOfSubsumers());
-			} else {
-				sbuf.append(child.getName());
-			}
-			sbuf.append(KRSSKeyword.close);
-		} else {
-			sbuf.append(atom.toString());
-		}
-		return sbuf.toString();
-	}
-
-	/**
 	 * Resets substitution set of a variable. This is necessary to be able to
 	 * compute new substitution
 	 * 

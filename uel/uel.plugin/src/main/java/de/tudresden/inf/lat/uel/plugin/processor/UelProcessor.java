@@ -32,8 +32,8 @@ public class UelProcessor {
 	private DynamicOntology ontology = new DynamicOntology();
 	private SatInput satinput = null;
 	private Translator translator = null;
-	private List<String> unifierList = new ArrayList<String>();
-	private Set<String> unifierSet = new HashSet<String>();
+	private List<Set<Equation>> unifierList = new ArrayList<Set<Equation>>();
+	private Set<Set<Equation>> unifierSet = new HashSet<Set<Equation>>();
 
 	/**
 	 * Constructs a new processor.
@@ -60,30 +60,41 @@ public class UelProcessor {
 		this.unifierSet.clear();
 	}
 
+	/**
+	 * Computes the next unifier. This unifier can be equivalent to another one
+	 * already computed.
+	 * 
+	 * @return <code>true</code> if and only if more unifiers can be computed
+	 */
 	public boolean computeNextUnifier() {
-		boolean unifiable = false;
+		boolean hasMoreUnifiers = true;
 		Solver solver = new Sat4jSolver();
-		String result = null;
+		Set<Equation> result = null;
 		SatOutput satoutput = null;
 		try {
 			if (!getUnifierList().isEmpty()) {
-				this.satinput.add(this.translator.getUpdate());
+				Set<Integer> update = this.translator.getUpdate();
+				if (update.isEmpty()) {
+					hasMoreUnifiers = false;
+				} else {
+					this.satinput.add(update);
+				}
 			}
 			satoutput = solver.solve(this.satinput);
-			unifiable = satoutput.isSatisfiable();
+			boolean unifiable = satoutput.isSatisfiable();
+			hasMoreUnifiers = hasMoreUnifiers && unifiable;
 			this.translator.reset();
-			result = this.translator.toTBox(satoutput.getOutput());
+			if (unifiable) {
+				result = this.translator.toTBox(satoutput.getOutput());
+			}
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-		if (this.unifierSet.contains(result)) {
-			unifiable = false;
-		}
-		if (unifiable) {
+		if (result != null && !this.unifierSet.contains(result)) {
 			this.unifierList.add(result);
 			this.unifierSet.add(result);
 		}
-		return unifiable;
+		return hasMoreUnifiers;
 	}
 
 	public void computeSatInput() {
@@ -143,7 +154,7 @@ public class UelProcessor {
 		return this.translator;
 	}
 
-	public List<String> getUnifierList() {
+	public List<Set<Equation>> getUnifierList() {
 		return Collections.unmodifiableList(this.unifierList);
 	}
 
