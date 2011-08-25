@@ -65,7 +65,8 @@ public class Atom {
 		boolean ret = false;
 		if (o instanceof Atom) {
 			Atom other = (Atom) o;
-			ret = this.name.equals(other.name) && this.root == other.root;
+			ret = this.id.equals(other.id) && this.name.equals(other.name)
+					&& this.root == other.root;
 			ret = ret
 					&& ((this.children == null && other.children == null) || (this.children != null && this.children
 							.equals(other.children)));

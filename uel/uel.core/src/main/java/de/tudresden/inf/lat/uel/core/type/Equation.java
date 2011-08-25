@@ -1,62 +1,64 @@
 package de.tudresden.inf.lat.uel.core.type;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
- * This class implements an equation as two hash maps of atoms.
+ * An object implementing this class is an equation.
  * 
- * @author Barbara Morawska
+ * @author Julian Mendez
  */
 public class Equation {
 
-	/**
-	 * Left side of equation. Hash map with keys names of the atoms and values
-	 * the atoms.
-	 */
-	private Map<String, Atom> left;
-
+	private Integer left = null;
 	private boolean primitive = false;
+	private Set<Integer> right = null;
 
 	/**
-	 * Right side of equation Hash map with keys names of the atoms and values
-	 * the atoms.
-	 */
-	private Map<String, Atom> right;
-
-	/**
-	 * Constructs an equation given two atoms.
+	 * Constructs a new equation given two atoms.
 	 * 
 	 * @param leftAtom
-	 *            atom on the left-hand side
+	 *            an atom identifier
 	 * @param rightAtom
-	 *            atom on the right-hand side
+	 *            an atom identifier
 	 * @param prim
-	 *            whether this is primitive
+	 *            whether this is a primitive equation
 	 */
-	public Equation(Atom leftAtom, Atom rightAtom, boolean prim) {
-		left = new HashMap<String, Atom>();
-		left.put(leftAtom.getName(), leftAtom);
-		right = new HashMap<String, Atom>();
-		right.put(rightAtom.getName(), rightAtom);
-		primitive = prim;
+	public Equation(Integer leftAtom, Integer rightAtom, boolean prim) {
+		if (leftAtom == null) {
+			throw new IllegalArgumentException("Null argument.");
+		}
+		if (rightAtom == null) {
+			throw new IllegalArgumentException("Null argument.");
+		}
+
+		this.left = leftAtom;
+		this.right = new HashSet<Integer>();
+		this.right.add(rightAtom);
+		this.primitive = prim;
 	}
 
 	/**
-	 * Constructs an equation given two hash maps of atoms.
+	 * Constructs a new equation.
 	 * 
-	 * @param leftPart
-	 *            hash map with keys names and values atoms
+	 * @param leftAtom
+	 *            an atom identifier
 	 * @param rightPart
-	 *            hash map with keys names and values atoms
+	 *            a conjunction of atoms identifiers
 	 * @param prim
-	 *            whether this is primitive
+	 *            whether this is a primitive equation
 	 */
-	public Equation(Map<String, Atom> leftPart, Map<String, Atom> rightPart,
-			boolean prim) {
-		left = leftPart;
-		right = rightPart;
-		primitive = prim;
+	public Equation(Integer leftAtom, Set<Integer> rightPart, boolean prim) {
+		if (leftAtom == null) {
+			throw new IllegalArgumentException("Null argument.");
+		}
+		if (rightPart == null) {
+			throw new IllegalArgumentException("Null argument.");
+		}
+
+		this.left = leftAtom;
+		this.right = rightPart;
+		this.primitive = prim;
 	}
 
 	@Override
@@ -64,30 +66,29 @@ public class Equation {
 		boolean ret = false;
 		if (o instanceof Equation) {
 			Equation other = (Equation) o;
-			ret = this.left.equals(other.left)
-					&& this.right.equals(other.right)
-					&& this.primitive == other.primitive;
+			ret = this.primitive == other.primitive
+					&& this.left.equals(other.left)
+					&& this.right.equals(other.right);
 		}
 		return ret;
 	}
 
 	/**
-	 * Returns the left side of the equation as the hash map of names and atoms.
+	 * Returns the left-hand side of the equation, which is an atom identifier.
 	 * 
-	 * @return the left side of the equation
+	 * @return the left-hand side of the equation
 	 */
-	public Map<String, Atom> getLeft() {
-		return left;
+	public Integer getLeft() {
+		return this.left;
 	}
 
 	/**
-	 * Returns the right side of the equation as the hash map of names and
-	 * atoms.
+	 * Returns the right-hand side of the equation as a set of atom identifiers.
 	 * 
-	 * @return the right side of the equation
+	 * @return the right-hand side of the equation
 	 */
-	public Map<String, Atom> getRight() {
-		return right;
+	public Set<Integer> getRight() {
+		return this.right;
 	}
 
 	@Override
@@ -101,60 +102,32 @@ public class Equation {
 	 * @return <code>true</code> if and only if this equation if primitive
 	 */
 	public boolean isPrimitive() {
-		return primitive;
-	}
-
-	/**
-	 * This method is defined for testing purposes only. It is used by printing
-	 * method of Goal.
-	 */
-	public String printEquation() {
-		StringBuffer sbuf = new StringBuffer();
-		if (left != null && right != null) {
-			if (primitive) {
-				sbuf.append("(primitive) ");
-			}
-			sbuf.append("left side: ");
-			for (String concept : left.keySet()) {
-				sbuf.append(left.get(concept));
-				sbuf.append(" | ");
-			}
-			sbuf.append("\n");
-			sbuf.append("right side: ");
-			for (String concept : right.keySet()) {
-				sbuf.append(right.get(concept));
-				sbuf.append(" | ");
-			}
-			sbuf.append("\n");
-		} else {
-			throw new RuntimeException("Error: equation is empty");
-		}
-		return sbuf.toString();
+		return this.primitive;
 	}
 
 	@Override
 	public String toString() {
 		StringBuffer sbuf = new StringBuffer();
 		sbuf.append(KRSSKeyword.open);
-		if (primitive) {
+		if (isPrimitive()) {
 			sbuf.append(KRSSKeyword.define_primitive_concept);
 		} else {
 			sbuf.append(KRSSKeyword.define_concept);
 		}
 		sbuf.append(KRSSKeyword.space);
-		sbuf.append(left.keySet().iterator().next());
-		if (right.keySet().size() > 1) {
+		sbuf.append(getLeft());
+		if (getRight().size() > 1) {
 			sbuf.append(KRSSKeyword.space);
 			sbuf.append(KRSSKeyword.open);
 			sbuf.append(KRSSKeyword.and);
-			for (String concept : right.keySet()) {
+			for (Integer conceptId : getRight()) {
 				sbuf.append(KRSSKeyword.space);
-				sbuf.append(right.get(concept));
+				sbuf.append(conceptId);
 			}
 			sbuf.append(KRSSKeyword.close);
-		} else if (right.keySet().size() == 1) {
+		} else if (getRight().size() == 1) {
 			sbuf.append(KRSSKeyword.space);
-			sbuf.append(right.get(right.keySet().iterator().next()));
+			sbuf.append(getRight().iterator().next());
 		}
 		sbuf.append(KRSSKeyword.close);
 		return sbuf.toString();

@@ -18,6 +18,7 @@ import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 
 import de.tudresden.inf.lat.uel.core.type.Atom;
 import de.tudresden.inf.lat.uel.core.type.Equation;
+import de.tudresden.inf.lat.uel.core.type.IndexedSet;
 import de.tudresden.inf.lat.uel.core.type.OntologyImpl;
 
 /**
@@ -30,6 +31,16 @@ public class OntologyBuilder {
 
 	private static final Logger logger = Logger.getLogger(OntologyBuilder.class
 			.getName());
+
+	private IndexedSet<Atom> atomManager = null;
+
+	public OntologyBuilder(IndexedSet<Atom> manager) {
+		if (manager == null) {
+			throw new IllegalArgumentException("Null argument.");
+		}
+
+		this.atomManager = manager;
+	}
 
 	/**
 	 * Returns a new UEL ontology using an OWL ontology.
@@ -58,6 +69,10 @@ public class OntologyBuilder {
 							primitiveDefinitions.get(key)));
 		}
 		return ret;
+	}
+
+	public IndexedSet<Atom> getAtomManager() {
+		return this.atomManager;
 	}
 
 	/**
@@ -158,15 +173,14 @@ public class OntologyBuilder {
 			throw new IllegalArgumentException("Null argument.");
 		}
 
-		Map<String, Atom> leftMap = new HashMap<String, Atom>();
-		leftMap.put(definiendum.toString(), definiendum);
+		Integer definiendumId = getAtomManager().addAndGetIndex(definiendum);
 
-		Map<String, Atom> rightMap = new HashMap<String, Atom>();
+		Set<Integer> definiensIds = new HashSet<Integer>();
 		for (Atom atom : definiens) {
-			rightMap.put(atom.toString(), atom);
+			definiensIds.add(getAtomManager().addAndGetIndex(atom));
 		}
 
-		return new Equation(leftMap, rightMap, primitive);
+		return new Equation(definiendumId, definiensIds, primitive);
 	}
 
 	private Set<Atom> processClass(OWLClass cls) {

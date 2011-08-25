@@ -652,22 +652,21 @@ public class UelController implements ActionListener {
 	}
 
 	public String toKRSS(Set<Equation> set) {
-		Set<Equation> unif = new TreeSet<Equation>();
+		Set<Equation> unif = new HashSet<Equation>();
 		unif.addAll(set);
 		StringBuffer sbuf = new StringBuffer();
 		for (Equation eq : set) {
-			Map<String, Atom> leftPart = eq.getLeft();
-			Map<String, Atom> rightPart = eq.getRight();
+			Atom leftPart = getModel().getAtomManager().get(eq.getLeft());
 
 			Set<FAtom> right = new HashSet<FAtom>();
-			for (Atom at : rightPart.values()) {
-				right.add((FAtom) at);
+			for (Integer atomId : eq.getRight()) {
+				right.add((FAtom) getModel().getAtomManager().get(atomId));
 			}
 
 			sbuf.append(KRSSKeyword.open);
 			sbuf.append(KRSSKeyword.define_concept);
 			sbuf.append(KRSSKeyword.space);
-			sbuf.append(leftPart.keySet().iterator().next());
+			sbuf.append(leftPart.getId());
 			sbuf.append(KRSSKeyword.space);
 
 			sbuf.append(printSetOfSubsumers(right));

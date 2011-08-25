@@ -23,12 +23,18 @@ public class DynamicOntology implements Ontology {
 
 	private Map<OWLClass, OWLClassExpression> definitions = new HashMap<OWLClass, OWLClassExpression>();
 	private Map<String, OWLClass> nameMap = new HashMap<String, OWLClass>();
+	private OntologyBuilder ontologyBuilder = null;
 	private Map<OWLClass, Set<OWLClassExpression>> primitiveDefinitions = new HashMap<OWLClass, Set<OWLClassExpression>>();
 
 	/**
 	 * Constructs a new dynamic ontology.
 	 */
-	public DynamicOntology() {
+	public DynamicOntology(OntologyBuilder builder) {
+		if (builder == null) {
+			throw new IllegalArgumentException("Null argument.");
+		}
+
+		this.ontologyBuilder = builder;
 	}
 
 	/**
@@ -66,13 +72,12 @@ public class DynamicOntology implements Ontology {
 			throw new IllegalArgumentException("Null argument.");
 		}
 
-		OntologyBuilder adapter = new OntologyBuilder();
 		Equation ret = null;
 		OWLClass cls = this.nameMap.get(name);
 		if (cls != null) {
 			OWLClassExpression clExpr = this.definitions.get(cls);
 			if (clExpr != null) {
-				ret = adapter.processDefinition(cls, clExpr);
+				ret = getOntologyBuilder().processDefinition(cls, clExpr);
 			}
 		}
 		return ret;
@@ -83,6 +88,10 @@ public class DynamicOntology implements Ontology {
 		return Collections.unmodifiableSet(nameMap.keySet());
 	}
 
+	public OntologyBuilder getOntologyBuilder() {
+		return this.ontologyBuilder;
+	}
+
 	@Override
 	public Equation getPrimitiveDefinition(String name) {
 		if (name == null) {
@@ -90,13 +99,13 @@ public class DynamicOntology implements Ontology {
 		}
 
 		Equation ret = null;
-		OntologyBuilder adapter = new OntologyBuilder();
 		OWLClass cls = this.nameMap.get(name);
 		if (cls != null) {
 			Set<OWLClassExpression> clExprSet = this.primitiveDefinitions
 					.get(cls);
 			if (clExprSet != null) {
-				ret = adapter.processPrimitiveDefinition(cls, clExprSet);
+				ret = getOntologyBuilder().processPrimitiveDefinition(cls,
+						clExprSet);
 			}
 		}
 		return ret;
@@ -113,14 +122,14 @@ public class DynamicOntology implements Ontology {
 			throw new IllegalArgumentException("Null argument.");
 		}
 
-		OntologyBuilder adapter = new OntologyBuilder();
-		this.definitions.putAll(adapter.getDefinitions(owlOntology));
-		this.primitiveDefinitions.putAll(adapter
+		this.definitions.putAll(getOntologyBuilder()
+				.getDefinitions(owlOntology));
+		this.primitiveDefinitions.putAll(getOntologyBuilder()
 				.getPrimitiveDefinitions(owlOntology));
 		Set<OWLClass> toVisit = new HashSet<OWLClass>();
 		toVisit.addAll(this.definitions.keySet());
 		toVisit.addAll(this.primitiveDefinitions.keySet());
-		this.nameMap.putAll(adapter.processNames(toVisit));
+		this.nameMap.putAll(getOntologyBuilder().processNames(toVisit));
 	}
 
 	@Override

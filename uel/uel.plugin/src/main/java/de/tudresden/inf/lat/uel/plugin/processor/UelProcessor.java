@@ -15,9 +15,11 @@ import de.tudresden.inf.lat.uel.core.sat.SatInput;
 import de.tudresden.inf.lat.uel.core.sat.SatOutput;
 import de.tudresden.inf.lat.uel.core.sat.Solver;
 import de.tudresden.inf.lat.uel.core.sat.Translator;
+import de.tudresden.inf.lat.uel.core.type.Atom;
 import de.tudresden.inf.lat.uel.core.type.Equation;
 import de.tudresden.inf.lat.uel.core.type.FAtom;
 import de.tudresden.inf.lat.uel.core.type.Goal;
+import de.tudresden.inf.lat.uel.core.type.IndexedSet;
 import de.tudresden.inf.lat.uel.core.type.Ontology;
 
 /**
@@ -28,8 +30,9 @@ import de.tudresden.inf.lat.uel.core.type.Ontology;
  */
 public class UelProcessor {
 
+	private IndexedSet<Atom> atomManager = new IndexedSet<Atom>();
 	private Set<String> candidates = new HashSet<String>();
-	private DynamicOntology ontology = new DynamicOntology();
+	private DynamicOntology ontology = null;
 	private SatInput satinput = null;
 	private Translator translator = null;
 	private List<Set<Equation>> unifierList = new ArrayList<Set<Equation>>();
@@ -39,6 +42,8 @@ public class UelProcessor {
 	 * Constructs a new processor.
 	 */
 	public UelProcessor() {
+		this.ontology = new DynamicOntology(new OntologyBuilder(
+				getAtomManager()));
 	}
 
 	public void addAll(Set<String> set) {
@@ -121,7 +126,7 @@ public class UelProcessor {
 			}
 		}
 
-		Goal ret = new Goal(ont);
+		Goal ret = new Goal(ont, getAtomManager());
 		try {
 			Iterator<String> inputIt = input.iterator();
 			FAtom left = new FAtom(inputIt.next(), false, true, null);
@@ -136,6 +141,10 @@ public class UelProcessor {
 
 	public void createTranslator(Goal g) {
 		this.translator = new Translator(g, true);
+	}
+
+	public IndexedSet<Atom> getAtomManager() {
+		return this.atomManager;
 	}
 
 	public Set<String> getCandidates() {

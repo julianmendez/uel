@@ -183,18 +183,20 @@ public class Translator {
 		for (String variable : goal.getVariables()) {
 			if (goal.getAllAtoms().get(variable).isUserVariable()) {
 
-				Map<String, Atom> leftPart = new HashMap<String, Atom>();
-				leftPart.put(variable, goal.getAllAtoms().get(variable));
+				Atom leftPart = goal.getAllAtoms().get(variable);
+				Integer leftPartId = goal.getAtomManager()
+						.addAndGetIndex(leftPart);
 
-				Map<String, Atom> rightPart = new HashMap<String, Atom>();
+				Set<Integer> rightPartIds = new HashSet<Integer>();
 				Collection<FAtom> setOfSubsumers = goal.getAllAtoms()
 						.get(variable).getSetOfSubsumers();
 				for (FAtom subsumer : setOfSubsumers) {
-					rightPart.put(subsumer.getId(),
-							goal.getAllAtoms().get(subsumer.getId()));
+					Atom newAtom = goal.getAllAtoms().get(subsumer.getId());
+					rightPartIds
+							.add(goal.getAtomManager().addAndGetIndex(newAtom));
 				}
 
-				ret.add(new Equation(leftPart, rightPart, false));
+				ret.add(new Equation(leftPartId, rightPartIds, false));
 			}
 		}
 
@@ -245,10 +247,16 @@ public class Translator {
 	private SatInput runStep1ForConstants(Equation e) {
 		SatInput ret = new SatInput();
 
+		String leftAtomName = goal.getAtomManager().get(e.getLeft())
+				.getId();
+		Set<String> rightAtomNames = new HashSet<String>();
+		for (Integer atomId : e.getRight()) {
+			rightAtomNames.add(goal.getAtomManager().get(atomId).getId());
+		}
+
 		for (String key1 : goal.getConstants()) {
 
-			if (!e.getLeft().containsKey(key1)
-					&& !e.getRight().containsKey(key1)) {
+			if (!leftAtomName.equals(key1) && !rightAtomNames.contains(key1)) {
 
 				/*
 				 * constant not in the equation
@@ -256,12 +264,11 @@ public class Translator {
 				 * one side of an equation
 				 */
 
-				for (String key3 : e.getRight().keySet()) {
+				for (String key3 : rightAtomNames) {
 					Set<Integer> clause = new HashSet<Integer>();
 
-					for (String key2 : e.getLeft().keySet()) {
-						clause.add(getMinusSubOrDissubLiteral(key2, key1));
-					}
+					String key2 = leftAtomName;
+					clause.add(getMinusSubOrDissubLiteral(key2, key1));
 
 					clause.add(getSubOrDissubLiteral(key3, key1));
 					ret.add(clause);
@@ -271,19 +278,18 @@ public class Translator {
 				 * another side of an equation
 				 */
 
-				for (String key2 : e.getLeft().keySet()) {
-					Set<Integer> clause = new HashSet<Integer>();
+				String key2 = leftAtomName;
+				Set<Integer> clause = new HashSet<Integer>();
 
-					for (String key3 : e.getRight().keySet()) {
-						clause.add(getMinusSubOrDissubLiteral(key3, key1));
-					}
-
-					clause.add(getSubOrDissubLiteral(key2, key1));
-					ret.add(clause);
+				for (String key3 : rightAtomNames) {
+					clause.add(getMinusSubOrDissubLiteral(key3, key1));
 				}
 
-			} else if (!e.getLeft().containsKey(key1)
-					&& e.getRight().containsKey(key1)) {
+				clause.add(getSubOrDissubLiteral(key2, key1));
+				ret.add(clause);
+
+			} else if (!leftAtomName.equals(key1)
+					&& rightAtomNames.contains(key1)) {
 
 				/*
 				 * constant of the right but not on the left
@@ -291,13 +297,13 @@ public class Translator {
 
 				Set<Integer> clause = new HashSet<Integer>();
 
-				for (String key2 : e.getLeft().keySet()) {
-					clause.add(getMinusSubOrDissubLiteral(key2, key1));
-				}
+				String key2 = leftAtomName;
+				clause.add(getMinusSubOrDissubLiteral(key2, key1));
+
 				ret.add(clause);
 
-			} else if (e.getLeft().containsKey(key1)
-					&& !e.getRight().containsKey(key1)) {
+			} else if (leftAtomName.equals(key1)
+					&& !rightAtomNames.contains(key1)) {
 
 				/*
 				 * constant on the left but not on the right
@@ -305,7 +311,7 @@ public class Translator {
 
 				Set<Integer> clause = new HashSet<Integer>();
 
-				for (String key3 : e.getRight().keySet()) {
+				for (String key3 : rightAtomNames) {
 					clause.add(getMinusSubOrDissubLiteral(key3, key1));
 				}
 				ret.add(clause);
@@ -324,10 +330,16 @@ public class Translator {
 	private SatInput runStep1ForExistentialAtoms(Equation e) {
 		SatInput ret = new SatInput();
 
+		String leftAtomName = goal.getAtomManager().get(e.getLeft())
+				.getId();
+		Set<String> rightAtomNames = new HashSet<String>();
+		for (Integer atomId : e.getRight()) {
+			rightAtomNames.add(goal.getAtomManager().get(atomId).getId());
+		}
+
 		for (String key1 : goal.getEAtoms()) {
 
-			if (!e.getLeft().containsKey(key1)
-					&& !e.getRight().containsKey(key1)) {
+			if (!leftAtomName.equals(key1) && !rightAtomNames.contains(key1)) {
 
 				/*
 				 * atom not in the equation
@@ -335,12 +347,12 @@ public class Translator {
 				 * one side of equation
 				 */
 
-				for (String key3 : e.getRight().keySet()) {
+				for (String key3 : rightAtomNames) {
 					Set<Integer> clause = new HashSet<Integer>();
 
-					for (String key2 : e.getLeft().keySet()) {
-						clause.add(getMinusSubOrDissubLiteral(key2, key1));
-					}
+					String key2 = leftAtomName;
+					clause.add(getMinusSubOrDissubLiteral(key2, key1));
+
 					clause.add(getSubOrDissubLiteral(key3, key1));
 					ret.add(clause);
 				}
@@ -349,18 +361,17 @@ public class Translator {
 				 * another side of the equation
 				 */
 
-				for (String key2 : e.getLeft().keySet()) {
-					Set<Integer> clause = new HashSet<Integer>();
+				String key2 = leftAtomName;
+				Set<Integer> clause = new HashSet<Integer>();
 
-					for (String key3 : e.getRight().keySet()) {
-						clause.add(getMinusSubOrDissubLiteral(key3, key1));
-					}
-					clause.add(getSubOrDissubLiteral(key2, key1));
-					ret.add(clause);
+				for (String key3 : rightAtomNames) {
+					clause.add(getMinusSubOrDissubLiteral(key3, key1));
 				}
+				clause.add(getSubOrDissubLiteral(key2, key1));
+				ret.add(clause);
 
-			} else if (!e.getLeft().containsKey(key1)
-					&& e.getRight().containsKey(key1)) {
+			} else if (!leftAtomName.equals(key1)
+					&& rightAtomNames.contains(key1)) {
 
 				/*
 				 * existential atom on the right but not on the left side of an
@@ -369,16 +380,15 @@ public class Translator {
 
 				Set<Integer> clause = new HashSet<Integer>();
 
-				for (String key2 : e.getLeft().keySet()) {
-					clause.add(getMinusSubOrDissubLiteral(key2, key1));
+				String key2 = leftAtomName;
+				clause.add(getMinusSubOrDissubLiteral(key2, key1));
 
-				}
 				ret.add(clause);
 
 				// end of outer if; key1 is not on the left, ask if it
 				// is on the right
-			} else if (e.getLeft().containsKey(key1)
-					&& !e.getRight().containsKey(key1)) {
+			} else if (leftAtomName.equals(key1)
+					&& !rightAtomNames.contains(key1)) {
 
 				/*
 				 * existential atom on the left but not on the right side of
@@ -387,7 +397,7 @@ public class Translator {
 
 				Set<Integer> clause = new HashSet<Integer>();
 
-				for (String key3 : e.getRight().keySet()) {
+				for (String key3 : rightAtomNames) {
 					clause.add(getMinusSubOrDissubLiteral(key3, key1));
 				}
 				ret.add(clause);

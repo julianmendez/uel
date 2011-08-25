@@ -32,6 +32,8 @@ public class Goal {
 	 */
 	private Map<String, FAtom> allAtoms = new HashMap<String, FAtom>();
 
+	private IndexedSet<Atom> atomManager = null;
+
 	/**
 	 * constants is a hash map implementing all constant concept names in the
 	 * goal. keys are names and values are flat atoms
@@ -68,8 +70,9 @@ public class Goal {
 	 * @param ont
 	 *            an ontology
 	 */
-	public Goal(Ontology ont) {
+	public Goal(Ontology ont, IndexedSet<Atom> manager) {
 		ontology = ont;
+		this.atomManager = manager;
 	}
 
 	/**
@@ -92,17 +95,7 @@ public class Goal {
 	public void addFlatten(Equation e) {
 
 		FAtom a;
-		Atom b = null;
-
-		if (e.getLeft().size() != 1) {
-
-			throw new RuntimeException(" Wrong format of this definition ");
-
-		}
-
-		for (String key : e.getLeft().keySet()) {
-			b = e.getLeft().get(key);
-		}
+		Atom b = getAtomManager().get(e.getLeft());
 
 		if (b.isRoot()) {
 
@@ -118,8 +111,7 @@ public class Goal {
 
 		} else {
 
-			Map<String, Atom> leftPart = new HashMap<String, Atom>();
-			Map<String, Atom> rightPart = new HashMap<String, Atom>();
+			Set<Atom> rightPart = new HashSet<Atom>();
 
 			a = new FAtom(null, b);
 
@@ -128,23 +120,23 @@ public class Goal {
 			variables.add(a.getId());
 			allAtoms.put(a.getId(), a);
 
-			leftPart.put(a.getId(), a);
+			Atom leftPart = a;
 
 			/*
 			 * FLATTENING
 			 */
 
-			for (String key : e.getRight().keySet()) {
+			for (Integer atomId : e.getRight()) {
 
-				a = new FAtom(e.getRight().get(key), this);
+				a = new FAtom(getAtomManager().get(atomId), this);
 
 				if (allAtoms.containsKey(a.getId())) {
 
-					rightPart.put(a.getId(), allAtoms.get(a.getId()));
+					rightPart.add(allAtoms.get(a.getId()));
 
 				} else {
 
-					rightPart.put(a.getId(), a);
+					rightPart.add(a);
 
 				}
 
@@ -160,10 +152,16 @@ public class Goal {
 				var.setUserVariable(false);
 				this.allAtoms.put(var.getId(), var);
 				this.constants.add(var.getId());
-				rightPart.put(var.getId(), var);
+				rightPart.add(var);
 			}
 
-			addEquation(new Equation(leftPart, rightPart, false));
+			Integer leftPartId = getAtomManager().addAndGetIndex(leftPart);
+			Set<Integer> rightPartIds = new HashSet<Integer>();
+			for (Atom elem : rightPart) {
+				rightPartIds.add(getAtomManager().addAndGetIndex(elem));
+			}
+
+			addEquation(new Equation(leftPartId, rightPartIds, false));
 
 		}
 	}
@@ -187,6 +185,10 @@ public class Goal {
 
 	public Map<String, FAtom> getAllAtoms() {
 		return allAtoms;
+	}
+
+	public IndexedSet<Atom> getAtomManager() {
+		return this.atomManager;
 	}
 
 	public Set<String> getConstants() {
@@ -216,7 +218,30 @@ public class Goal {
 	public String getGoalEquations() {
 		StringBuffer sbuf = new StringBuffer();
 		for (Equation eq : getEquations()) {
-			sbuf.append(eq.toString());
+
+			sbuf.append(KRSSKeyword.open);
+			if (eq.isPrimitive()) {
+				sbuf.append(KRSSKeyword.define_primitive_concept);
+			} else {
+				sbuf.append(KRSSKeyword.define_concept);
+			}
+			sbuf.append(KRSSKeyword.space);
+			sbuf.append(getAtomManager().get(eq.getLeft()));
+			if (eq.getRight().size() > 1) {
+				sbuf.append(KRSSKeyword.space);
+				sbuf.append(KRSSKeyword.open);
+				sbuf.append(KRSSKeyword.and);
+				for (Integer conceptId : eq.getRight()) {
+					sbuf.append(KRSSKeyword.space);
+					sbuf.append(getAtomManager().get(conceptId).getId());
+				}
+				sbuf.append(KRSSKeyword.close);
+			} else if (eq.getRight().size() == 1) {
+				sbuf.append(KRSSKeyword.space);
+				sbuf.append(getAtomManager().get(
+						eq.getRight().iterator().next()).getId());
+			}
+			sbuf.append(KRSSKeyword.close);
 			sbuf.append("\n");
 		}
 		return sbuf.toString();
@@ -278,7 +303,8 @@ public class Goal {
 	private void initialize(List<Equation> list, FAtom left, FAtom right,
 			Writer output, Set<String> vars) throws IOException {
 
-		setMainEquation(new Equation(left, right, false));
+		setMainEquation(new Equation(getAtomManager().addAndGetIndex(left),
+				getAtomManager().addAndGetIndex(right), false));
 		for (Equation eq : list) {
 			addFlatten(eq);
 		}
@@ -335,104 +361,6 @@ public class Goal {
 		for (String elem : set) {
 			makeVariable(elem);
 		}
-	}
-
-	/**
-	 * This method is not used by UEL. It is here for testing purposes. Prints
-	 * all atoms of the goal.
-	 * 
-	 */
-	public String printAllAtoms() {
-		StringBuffer sbuf = new StringBuffer();
-		sbuf.append("From goal all atoms (" + allAtoms.size());
-		sbuf.append("):\n");
-		for (String key : allAtoms.keySet()) {
-			sbuf.append(allAtoms.get(key));
-			sbuf.append(" | ");
-		}
-		sbuf.append("\n");
-		return sbuf.toString();
-	}
-
-	/**
-	 * This method is not used by UEL. It is here for testing purposes. Prints
-	 * all constants of the goal.
-	 * 
-	 */
-	public String printConstants() {
-		StringBuffer sbuf = new StringBuffer();
-		sbuf.append("From goal all constants(" + constants.size());
-		sbuf.append("):\n");
-		for (String key : constants) {
-			sbuf.append(allAtoms.get(key));
-			sbuf.append(" | ");
-		}
-		sbuf.append("\n");
-		return sbuf.toString();
-	}
-
-	/**
-	 * This method is not used by UEL. It is here for testing purposes. Prints
-	 * all existential atoms of the goal.
-	 * 
-	 */
-	public String printEatoms() {
-		StringBuffer sbuf = new StringBuffer();
-		sbuf.append("From goal all existential restrictions (" + eatoms.size());
-		sbuf.append("):\n");
-		for (String key : eatoms) {
-			sbuf.append(allAtoms.get(key));
-			sbuf.append(" | ");
-		}
-		sbuf.append("\n");
-		return sbuf.toString();
-	}
-
-	/**
-	 * This method is not used by UEL. It is here for testing purposes. Prints
-	 * all equations of the goal.
-	 * 
-	 */
-	public String printGoal() {
-		StringBuffer sbuf = new StringBuffer();
-		int i = 0;
-		for (Equation e : equations) {
-			sbuf.append("Goal equation nr." + i);
-			sbuf.append(":");
-			sbuf.append(e.printEquation());
-			sbuf.append("\n");
-			i++;
-		}
-		return sbuf.toString();
-	}
-
-	public String printSubsumers() {
-		StringBuffer sbuf = new StringBuffer();
-		for (String key : getVariables()) {
-			FAtom var = allAtoms.get(key);
-			sbuf.append(var);
-			sbuf.append(":");
-			sbuf.append(var.getSetOfSubsumers());
-			sbuf.append("\n");
-		}
-		return sbuf.toString();
-	}
-
-	/**
-	 * This method is not used by UEL. It is here for testing purposes. Prints
-	 * all variables of the goal.
-	 * 
-	 */
-	public String printVariables() {
-		StringBuffer sbuf = new StringBuffer();
-		sbuf.append("From goal all variables: (" + variables.size());
-		sbuf.append("):\n");
-		for (String key : variables) {
-			sbuf.append(allAtoms.get(key));
-			sbuf.append(" | ");
-		}
-		sbuf.append("\n");
-		return sbuf.toString();
 	}
 
 	public void setMainEquation(Equation equation) {

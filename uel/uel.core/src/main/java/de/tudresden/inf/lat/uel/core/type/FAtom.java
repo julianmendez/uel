@@ -2,8 +2,8 @@ package de.tudresden.inf.lat.uel.core.type;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * This class extends Atom. It implements a flat atom, hence an atom which is
@@ -57,9 +57,12 @@ public class FAtom extends Atom {
 			child = b;
 			updateId();
 
-			Map<String, Atom> bMap = new HashMap<String, Atom>();
-			bMap.put(b.toString(), b);
-			goal.addFlatten(new Equation(bMap, atom.getChildren(), false));
+			Set<Integer> rightPart = new HashSet<Integer>();
+			for (Atom at : atom.getChildren().values()) {
+				rightPart.add(goal.getAtomManager().addAndGetIndex(at));
+			}
+			goal.addFlatten(new Equation(goal.getAtomManager().addAndGetIndex(b),
+					rightPart, false));
 
 		} else {
 
