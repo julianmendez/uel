@@ -51,7 +51,12 @@ class VarSelectionModel {
 
 		String ret = this.idLabelMap.get(id);
 		if (ret == null) {
-			ret = id;
+			int p = id.indexOf("#");
+			if (p != -1) {
+				ret = id.substring(p + 1);
+			} else {
+				ret = id;
+			}
 		}
 		return ret;
 	}

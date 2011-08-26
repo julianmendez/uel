@@ -23,6 +23,7 @@ import javax.swing.DefaultListModel;
 import javax.swing.JFileChooser;
 
 import org.semanticweb.owlapi.io.OWLRendererException;
+import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
@@ -437,7 +438,8 @@ public class UelController implements ActionListener {
 	private String getShortForm(OWLClass cls) {
 		String ret = this.shortFormMap.get(cls);
 		if (ret == null) {
-			ret = cls.toStringID();
+			IRI iri = cls.getIRI();
+			ret = iri.getFragment();
 		}
 		return ret;
 	}
