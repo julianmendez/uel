@@ -24,9 +24,94 @@ import de.tudresden.inf.lat.uel.core.type.SubsumptionLiteral;
  * reduction is explained in F. Baader, B. Morawska,
  * "SAT Encoding of Unification in EL", LPAR 2010.
  * 
- * It has also the methods to translate an output of a sat solver to a unifier.
+ * This algorithm is explained below:
+ * 
+ * <div> Given a flat <i>EL</i>-unification problem &Gamma;, the set C(&Gamma;)
+ * consists of the following clauses:
+ * 
+ * <ul>
+ * <li>(1) Translation of the equations of &Gamma;. For every equation
+ * A<sub>1</sub> &#8851; &hellip; &#8851; A<sub>m</sub> &equiv;<sup>?</sup>
+ * B<sub>1</sub> &#8851; &hellip; &#8851; B<sub>n</sub> of &Gamma;, we create
+ * the following Horn clauses, which express that any atom that occurs as a
+ * top-level conjunct on one side of an equivalence must subsume a top-level
+ * conjunct on the other side:
+ * 
+ * <ul>
+ * <li>1. For every non-variable atom C &isin; {A<sub>1</sub>, &hellip; ,
+ * A<sub>m</sub>}:<br />
+ * [B<sub>1</sub> &#8930; C] &and; &hellip; &and; [B<sub>n</sub> &#8930; C]
+ * &rarr;</li>
+ * 
+ * <li>2. For every non-variable atom C &isin; {B<sub>1</sub>, &hellip; ,
+ * B<sub>n</sub>}:<br />
+ * [A<sub>1</sub> &#8930; C] &and; &hellip; &and; [A<sub>m</sub> &#8930; C]
+ * &rarr;</li>
+ * 
+ * <li>3. For every non-variable atom C of &Gamma; s.t. C &notin;
+ * {A<sub>1</sub>, &hellip; A<sub>m</sub>, B<sub>1</sub>, &hellip;,
+ * B<sub>n</sub>}:<br />
+ * [A<sub>1</sub> &#8930; C] &and; &hellip; &and; [A<sub>m</sub> &#8930; C]
+ * &rarr; [B<sub>j</sub> &#8930; C] for j = 1, &hellip;, n<br />
+ * [B<sub>1</sub> &#8930; C] &and; &hellip; &and; [B<sub>n</sub> &#8930; C]
+ * &rarr; [A<sub>i</sub> &#8930; C] for i = 1, &hellip;, m</li>
+ * </ul>
+ * </li>
+ * 
+ * <li>(2) Translation of the relevant properties of subsumption in <i>EL</i>.
+ * 
+ * <ul>
+ * <li>1. For every pair of distinct concept constants A, B occurring in
+ * &Gamma;, we say that A cannot be subsumed by B:<br />
+ * &rarr; [A &#8930; B]</li>
+ * 
+ * <li>2. For every pair of distinct role names r, s and atoms
+ * &exist;r<i>.</i>A, &exist;s<i>.</i>B of &Gamma;, we say that
+ * &exist;r<i>.</i>A cannot be subsumed by &exist;s<i>.</i>B:<br />
+ * &rarr; [&exist;r<i>.</i>A &#8930; &exist;s<i>.</i>B]</li>
+ * 
+ * <li>3. For every pair &exist;r<i>.</i>A, &exist;r<i>.</i>B of atoms of
+ * &Gamma;, we say that &exist;r<i>.</i>A can only be subsumed by
+ * &exist;r<i>.</i>B if A is already subsumed by B:<br />
+ * [A &#8930; B] &rarr; [&exist;r<i>.</i>A &#8930; &exist;r<i>.</i>B]</li>
+ * 
+ * <li>4. For every concept constant A and every atom &exist;r<i>.</i>B of
+ * &Gamma;, we say that A and &exist;r<i>.</i>B are not in a subsumption
+ * relationship<br />
+ * &rarr; [A &#8930; &exist;r<i>.</i>B] and &rarr; [&exist;r<i>.</i>B &#8930; A]
+ * </li>
+ * 
+ * <li>5. Transitivity of subsumption is expressed using the non-Horn clauses:<br />
+ * [C<sub>1</sub> &#8930; C<sub>3</sub>] &rarr; [C<sub>1</sub> &#8930;
+ * C<sub>2</sub>] &or; [C<sub>2</sub> &#8930; C<sub>3</sub>] where
+ * C<sub>1</sub>, C<sub>2</sub>, C<sub>3</sub> are atoms of &Gamma;.<br />
+ * </li>
+ * </ul>
+ * Note that there are further properties that hold for subsumption in <i>EL</i>
+ * (e.g., the fact that A &#8849; B implies &exist;r<i>.</i>A &#8849;
+ * &exist;r<i>.</i>B), but that are not needed to ensure soundness of our
+ * translation.</li>
+ * 
+ * <li>(3) Translation of the relevant properties of &gt;.
+ * 
+ * <ul>
+ * <li>1. Transitivity and irreexivity of &gt; can be expressed using the Horn
+ * clauses:<br />
+ * [X &gt; X] &rarr; and [X &gt; Y] &and; [Y &gt; Z] &rarr; [X &gt; Z],<br />
+ * where X, Y, Z are concept variables occurring in &Gamma;.</li>
+ * 
+ * <li>2. The connection between this order and the order &gt;<sub>&sigma;</sub>
+ * is expressed using the non-Horn clauses:<br />
+ * &rarr; [X &gt; Y] &or; [X &#8930; &exist;r<i>.</i>Y],<br />
+ * where X, Y are concept variables occurring in &Gamma; and &exist;r<i>.</i>Y
+ * is an atom of &Gamma;.</li>
+ * </ul>
+ * </li>
+ * </ul>
+ * </div>
  * 
  * @author Barbara Morawska
+ * @author Julian Mendez
  */
 public class Translator {
 
@@ -184,16 +269,16 @@ public class Translator {
 			if (goal.getAllAtoms().get(variable).isUserVariable()) {
 
 				Atom leftPart = goal.getAllAtoms().get(variable);
-				Integer leftPartId = goal.getAtomManager()
-						.addAndGetIndex(leftPart);
+				Integer leftPartId = goal.getAtomManager().addAndGetIndex(
+						leftPart);
 
 				Set<Integer> rightPartIds = new HashSet<Integer>();
 				Collection<FAtom> setOfSubsumers = goal.getAllAtoms()
 						.get(variable).getSetOfSubsumers();
 				for (FAtom subsumer : setOfSubsumers) {
 					Atom newAtom = goal.getAllAtoms().get(subsumer.getId());
-					rightPartIds
-							.add(goal.getAtomManager().addAndGetIndex(newAtom));
+					rightPartIds.add(goal.getAtomManager().addAndGetIndex(
+							newAtom));
 				}
 
 				ret.add(new Equation(leftPartId, rightPartIds, false));
@@ -247,8 +332,7 @@ public class Translator {
 	private SatInput runStep1ForConstants(Equation e) {
 		SatInput ret = new SatInput();
 
-		String leftAtomName = goal.getAtomManager().get(e.getLeft())
-				.getId();
+		String leftAtomName = goal.getAtomManager().get(e.getLeft()).getId();
 		Set<String> rightAtomNames = new HashSet<String>();
 		for (Integer atomId : e.getRight()) {
 			rightAtomNames.add(goal.getAtomManager().get(atomId).getId());
@@ -330,8 +414,7 @@ public class Translator {
 	private SatInput runStep1ForExistentialAtoms(Equation e) {
 		SatInput ret = new SatInput();
 
-		String leftAtomName = goal.getAtomManager().get(e.getLeft())
-				.getId();
+		String leftAtomName = goal.getAtomManager().get(e.getLeft()).getId();
 		Set<String> rightAtomNames = new HashSet<String>();
 		for (Integer atomId : e.getRight()) {
 			rightAtomNames.add(goal.getAtomManager().get(atomId).getId());
