@@ -38,13 +38,13 @@ public class Goal {
 	 * constants is a hash map implementing all constant concept names in the
 	 * goal. keys are names and values are flat atoms
 	 */
-	private Set<String> constants = new HashSet<String>();
+	private Set<Integer> constants = new HashSet<Integer>();
 
 	/**
 	 * eatoms is a hash map implementing all flat existential restrictions keys
 	 * are names and values are flat atoms
 	 */
-	private Set<String> eatoms = new HashSet<String>();
+	private Set<Integer> eatoms = new HashSet<Integer>();
 
 	/**
 	 * equations is a list containing all goal equations
@@ -62,7 +62,7 @@ public class Goal {
 	 * variables is a hash map implementing all concept names which are treated
 	 * as variables keys are names and values are flat atoms
 	 */
-	private Set<String> variables = new HashSet<String>();
+	private Set<Integer> variables = new HashSet<Integer>();
 
 	/**
 	 * Constructs a new goal based on a specified ontology.
@@ -117,7 +117,7 @@ public class Goal {
 
 			a.setVariable(true);
 
-			variables.add(a.getId());
+			variables.add(getAtomManager().addAndGetIndex(a));
 			allAtoms.put(a.getId(), a);
 
 			Atom leftPart = a;
@@ -151,7 +151,7 @@ public class Goal {
 						null);
 				var.setUserVariable(false);
 				this.allAtoms.put(var.getId(), var);
-				this.constants.add(var.getId());
+				this.constants.add(getAtomManager().addAndGetIndex(var));
 				rightPart.add(var);
 			}
 
@@ -192,11 +192,11 @@ public class Goal {
 	}
 
 	public Set<String> getConstants() {
-		return Collections.unmodifiableSet(constants);
+		return Collections.unmodifiableSet(toAtomNames(constants));
 	}
 
 	public Set<String> getEAtoms() {
-		return Collections.unmodifiableSet(eatoms);
+		return Collections.unmodifiableSet(toAtomNames(eatoms));
 	}
 
 	/**
@@ -219,30 +219,7 @@ public class Goal {
 		StringBuffer sbuf = new StringBuffer();
 		for (Equation eq : getEquations()) {
 
-			sbuf.append(KRSSKeyword.open);
-			if (eq.isPrimitive()) {
-				sbuf.append(KRSSKeyword.define_primitive_concept);
-			} else {
-				sbuf.append(KRSSKeyword.define_concept);
-			}
-			sbuf.append(KRSSKeyword.space);
-			sbuf.append(getAtomManager().get(eq.getLeft()));
-			if (eq.getRight().size() > 1) {
-				sbuf.append(KRSSKeyword.space);
-				sbuf.append(KRSSKeyword.open);
-				sbuf.append(KRSSKeyword.and);
-				for (Integer conceptId : eq.getRight()) {
-					sbuf.append(KRSSKeyword.space);
-					sbuf.append(getAtomManager().get(conceptId).getId());
-				}
-				sbuf.append(KRSSKeyword.close);
-			} else if (eq.getRight().size() == 1) {
-				sbuf.append(KRSSKeyword.space);
-				sbuf.append(getAtomManager().get(
-						eq.getRight().iterator().next()).getId());
-			}
-			sbuf.append(KRSSKeyword.close);
-			sbuf.append("\n");
+			sbuf.append(toString(eq));
 		}
 		return sbuf.toString();
 	}
@@ -264,7 +241,7 @@ public class Goal {
 	}
 
 	public Set<String> getVariables() {
-		return Collections.unmodifiableSet(variables);
+		return Collections.unmodifiableSet(toAtomNames(variables));
 	}
 
 	@Override
@@ -295,13 +272,13 @@ public class Goal {
 		}
 	}
 
-	public void initialize(List<Equation> equationList, FAtom left,
-			FAtom right, Set<String> vars) throws IOException {
-		initialize(equationList, left, right, null, vars);
+	public void initialize(List<Equation> equationList, FAtom left, FAtom right)
+			throws IOException {
+		initialize(equationList, left, right, null);
 	}
 
 	private void initialize(List<Equation> list, FAtom left, FAtom right,
-			Writer output, Set<String> vars) throws IOException {
+			Writer output) throws IOException {
 
 		setMainEquation(new Equation(getAtomManager().addAndGetIndex(left),
 				getAtomManager().addAndGetIndex(right), false));
@@ -309,57 +286,43 @@ public class Goal {
 			addFlatten(eq);
 		}
 
-		for (String key : variables) {
+		for (Integer atomId : variables) {
+			String key = getAtomManager().get(atomId).getId();
 			allAtoms.get(key).setVariable(true);
 		}
 
 		for (String key : allAtoms.keySet()) {
-
 			FAtom a = allAtoms.get(key);
+			Integer id = getAtomManager().addAndGetIndex(a);
 
-			if (vars.contains(a.getName())) {
-
-				a.setVariable(true);
-				a.setUserVariable(!a.equals(left) && !a.equals(right));
-				variables.add(key);
-			} else if (!variables.contains(key) && !a.isRoot()) {
-
-				constants.add(key);
+			if (!variables.contains(id) && !a.isRoot()) {
+				constants.add(getAtomManager().addAndGetIndex(a));
 
 			} else if (a.isRoot()) {
-
-				eatoms.add(key);
+				eatoms.add(getAtomManager().addAndGetIndex(a));
 			}
 		}
 	}
 
-	public void makeConstant(String id) {
+	public void makeConstant(String name) {
+		FAtom atom = this.allAtoms.get(name);
+		Integer id = getAtomManager().addAndGetIndex(atom);
 		if (this.variables.contains(id)) {
 			this.variables.remove(id);
 			this.constants.add(id);
-			this.allAtoms.get(id).setUserVariable(false);
-			this.allAtoms.get(id).setVariable(false);
+			atom.setUserVariable(false);
+			atom.setVariable(false);
 		}
 	}
 
-	public void makeConstants(Set<String> set) {
-		for (String elem : set) {
-			makeConstant(elem);
-		}
-	}
-
-	public void makeVariable(String id) {
+	public void makeVariable(String name) {
+		FAtom atom = this.allAtoms.get(name);
+		Integer id = getAtomManager().addAndGetIndex(atom);
 		if (this.constants.contains(id)) {
 			this.constants.remove(id);
 			this.variables.add(id);
-			this.allAtoms.get(id).setUserVariable(true);
-			this.allAtoms.get(id).setVariable(true);
-		}
-	}
-
-	public void makeVariables(Set<String> set) {
-		for (String elem : set) {
-			makeVariable(elem);
+			atom.setUserVariable(true);
+			atom.setVariable(true);
 		}
 	}
 
@@ -379,12 +342,48 @@ public class Goal {
 		nbrVar = nbrV;
 	}
 
+	private Set<String> toAtomNames(Set<Integer> set) {
+		Set<String> ret = new HashSet<String>();
+		for (Integer elem : set) {
+			ret.add(getAtomManager().get(elem).getId());
+		}
+		return ret;
+	}
+
 	@Override
 	public String toString() {
 		StringBuffer sbuf = new StringBuffer();
-		sbuf.append(this.mainEquation);
-		sbuf.append("\n");
+		sbuf.append(toString(this.mainEquation));
 		sbuf.append(getGoalEquations());
+		return sbuf.toString();
+	}
+
+	private String toString(Equation eq) {
+		StringBuffer sbuf = new StringBuffer();
+		sbuf.append(KRSSKeyword.open);
+		if (eq.isPrimitive()) {
+			sbuf.append(KRSSKeyword.define_primitive_concept);
+		} else {
+			sbuf.append(KRSSKeyword.define_concept);
+		}
+		sbuf.append(KRSSKeyword.space);
+		sbuf.append(getAtomManager().get(eq.getLeft()));
+		if (eq.getRight().size() > 1) {
+			sbuf.append(KRSSKeyword.space);
+			sbuf.append(KRSSKeyword.open);
+			sbuf.append(KRSSKeyword.and);
+			for (Integer conceptId : eq.getRight()) {
+				sbuf.append(KRSSKeyword.space);
+				sbuf.append(getAtomManager().get(conceptId).getId());
+			}
+			sbuf.append(KRSSKeyword.close);
+		} else if (eq.getRight().size() == 1) {
+			sbuf.append(KRSSKeyword.space);
+			sbuf.append(getAtomManager().get(eq.getRight().iterator().next())
+					.getId());
+		}
+		sbuf.append(KRSSKeyword.close);
+		sbuf.append("\n");
 		return sbuf.toString();
 	}
 

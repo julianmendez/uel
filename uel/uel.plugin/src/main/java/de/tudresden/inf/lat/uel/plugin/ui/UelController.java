@@ -150,9 +150,6 @@ public class UelController implements ActionListener {
 	private void executeActionAcceptVar() {
 		if (getModel().getUnifierList().isEmpty()) {
 			Goal g = this.varWindow.getView().getModel().getGoal();
-			getModel().clearCandidates();
-			getModel().addAll(
-					this.varWindow.getView().getModel().getVariables());
 			this.varWindow.close();
 
 			getModel().createTranslator(g);

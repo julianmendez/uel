@@ -171,16 +171,15 @@ public class ProcessorTest extends TestCase {
 			idClassMap.put(cls.getIRI().getFragment(), cls);
 		}
 
-		Set<String> variables = new HashSet<String>();
-		for (String var : varNames) {
-			variables.add(idClassMap.get(var).toStringID());
-		}
-		processor.addAll(variables);
-
 		Set<String> input = new HashSet<String>();
 		input.add(idClassMap.get("C").toStringID());
 		input.add(idClassMap.get("D").toStringID());
 		Goal goal = processor.configure(input);
+
+		for (String var : varNames) {
+			goal.makeVariable(idClassMap.get(var).toStringID());
+		}
+
 		processor.createTranslator(goal);
 		processor.computeSatInput();
 

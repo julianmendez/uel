@@ -31,7 +31,6 @@ import de.tudresden.inf.lat.uel.core.type.Ontology;
 public class UelProcessor {
 
 	private IndexedSet<Atom> atomManager = new IndexedSet<Atom>();
-	private Set<String> candidates = new HashSet<String>();
 	private DynamicOntology ontology = null;
 	private SatInput satinput = null;
 	private Translator translator = null;
@@ -46,21 +45,8 @@ public class UelProcessor {
 				getAtomManager()));
 	}
 
-	public void addAll(Set<String> set) {
-		if (set == null) {
-			throw new IllegalArgumentException("Null argument.");
-		}
-
-		this.candidates.addAll(set);
-	}
-
-	public void clearCandidates() {
-		this.candidates.clear();
-	}
-
 	public void clearOntology() {
 		this.ontology.clear();
-		this.candidates.clear();
 		this.unifierList.clear();
 		this.unifierSet.clear();
 	}
@@ -111,10 +97,10 @@ public class UelProcessor {
 			throw new IllegalArgumentException("Null argument.");
 		}
 
-		return createGoal(this.ontology, input, this.candidates);
+		return createGoal(this.ontology, input);
 	}
 
-	private Goal createGoal(Ontology ont, Set<String> input, Set<String> vars) {
+	private Goal createGoal(Ontology ont, Set<String> input) {
 		List<Equation> equationList = new ArrayList<Equation>();
 		for (String cls : input) {
 			Equation equation = ont.getDefinition(cls);
@@ -131,7 +117,7 @@ public class UelProcessor {
 			Iterator<String> inputIt = input.iterator();
 			FAtom left = new FAtom(inputIt.next(), false, true, null);
 			FAtom right = new FAtom(inputIt.next(), false, true, null);
-			ret.initialize(equationList, left, right, vars);
+			ret.initialize(equationList, left, right);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
@@ -145,10 +131,6 @@ public class UelProcessor {
 
 	public IndexedSet<Atom> getAtomManager() {
 		return this.atomManager;
-	}
-
-	public Set<String> getCandidates() {
-		return Collections.unmodifiableSet(this.candidates);
 	}
 
 	public Ontology getOntology() {
