@@ -11,7 +11,6 @@ public class OrderLiteral implements Literal {
 	private int hashCode = 0;
 	private String id = null;
 	private final String second;
-	private boolean value = false;
 
 	/**
 	 * Constructs an order literal given two names.
@@ -33,7 +32,7 @@ public class OrderLiteral implements Literal {
 		boolean ret = false;
 		if (o instanceof OrderLiteral) {
 			OrderLiteral other = (OrderLiteral) o;
-			ret = this.value == other.value && this.first.equals(other.first)
+			ret = this.first.equals(other.first)
 					&& this.second.equals(other.second);
 		}
 		return ret;
@@ -47,11 +46,6 @@ public class OrderLiteral implements Literal {
 	@Override
 	public String getSecond() {
 		return second;
-	}
-
-	@Override
-	public boolean getValue() {
-		return value;
 	}
 
 	@Override
@@ -72,11 +66,6 @@ public class OrderLiteral implements Literal {
 	@Override
 	public boolean isSubsumption() {
 		return false;
-	}
-
-	@Override
-	public void setValue(boolean t) {
-		value = t;
 	}
 
 	@Override

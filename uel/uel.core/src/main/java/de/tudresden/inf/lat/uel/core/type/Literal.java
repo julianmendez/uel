@@ -26,13 +26,6 @@ public interface Literal {
 	public String getSecond();
 
 	/**
-	 * Returns the value of literal.
-	 * 
-	 * @return the value
-	 */
-	public boolean getValue();
-
-	/**
 	 * Tells whether this literal is a dissubsumption literal.
 	 * 
 	 * @return <code>true</code> if and only if this is an dissubsumption
@@ -53,13 +46,5 @@ public interface Literal {
 	 * @return <code>true</code> if and only if this is an subsumption literal
 	 */
 	public boolean isSubsumption();
-
-	/**
-	 * Sets the value <code>t</code> for the literal.
-	 * 
-	 * @param t
-	 *            the value for this literal
-	 */
-	public void setValue(boolean t);
 
 }

@@ -134,7 +134,9 @@ public class Translator {
 	 * Literals are all dis-subsumptions between atoms in the goal the first
 	 * hash map maps them to unique numbers.
 	 */
-	private Map<String, Integer> literals = new HashMap<String, Integer>();
+	private Map<Literal, Integer> literals = new HashMap<Literal, Integer>();
+
+	private Set<Integer> trueLiterals = new HashSet<Integer>();
 
 	/**
 	 * Update is a set of numbers or numbers encoding the negation of the
@@ -217,12 +219,12 @@ public class Translator {
 			FAtom atom = goal.getAllAtoms().get(name);
 			if (atom.isUserVariable()) {
 				for (String otherName : set) {
-					Literal lit = this.invertLiteral ? new SubsumptionLiteral(
+					Literal literal = this.invertLiteral ? new SubsumptionLiteral(
 							name, otherName) : new DissubsumptionLiteral(name,
 							otherName);
-					Integer litId = literals.get(lit.toString());
-					ret.add(identifiers.get(litId).getValue() ? litId : (-1)
-							* litId);
+					Integer literalId = literals.get(literal);
+					ret.add(getLiteralValue(literalId) ? literalId : (-1)
+							* literalId);
 				}
 			}
 		}
@@ -234,8 +236,16 @@ public class Translator {
 	 * 
 	 * @return the literals
 	 */
-	public Map<String, Integer> getLiterals() {
+	public Map<Literal, Integer> getLiterals() {
 		return this.literals;
+	}
+
+	public boolean getLiteralValue(Integer literalId) {
+		if (literalId == null) {
+			throw new IllegalArgumentException("Null argument.");
+		}
+
+		return this.trueLiterals.contains(literalId);
 	}
 
 	private int getMinusOrderLiteral(String left, String right) {
@@ -248,13 +258,13 @@ public class Translator {
 
 	private int getOrderLiteral(String left, String right) {
 		Literal literal = new OrderLiteral(left, right);
-		return literals.get(literal.toString());
+		return literals.get(literal);
 	}
 
 	private int getSubOrDissubLiteral(String left, String right) {
 		Literal literal = invertLiteral ? new SubsumptionLiteral(left, right)
 				: new DissubsumptionLiteral(left, right);
-		int val = literals.get(literal.toString());
+		int val = literals.get(literal);
 		return invertLiteral ? (-1) * val : val;
 	}
 
@@ -297,7 +307,7 @@ public class Translator {
 		update.clear();
 
 		for (Integer key : identifiers.keySet()) {
-			identifiers.get(key).setValue(false);
+			setLiteralValue(key, false);
 		}
 
 		for (String var : goal.getVariables()) {
@@ -740,7 +750,7 @@ public class Translator {
 				literal = invertLiteral ? new SubsumptionLiteral(first, second)
 						: new DissubsumptionLiteral(first, second);
 
-				literals.put(literal.toString(), identificator);
+				literals.put(literal, identificator);
 				identifiers.put(identificator, literal);
 				identificator++;
 			}
@@ -761,12 +771,24 @@ public class Translator {
 
 				literal = new OrderLiteral(first, second);
 
-				literals.put(literal.toString(), identificator);
+				literals.put(literal, identificator);
 				identifiers.put(identificator, literal);
 				identificator++;
 
 			}
 
+		}
+	}
+
+	public void setLiteralValue(Integer literalId, boolean value) {
+		if (literalId == null) {
+			throw new IllegalArgumentException("Null argument.");
+		}
+
+		if (value) {
+			this.trueLiterals.add(literalId);
+		} else if (this.trueLiterals.contains(literalId)) {
+			this.trueLiterals.remove(literalId);
 		}
 	}
 
@@ -780,11 +802,10 @@ public class Translator {
 				Integer i = (-1) * currentLiteral;
 				Literal literal = identifiers.get(i);
 				if (literal.isDissubsumption() || literal.isSubsumption()) {
-					literal.setValue(false);
+					setLiteralValue(i, false);
 				}
 			} else if (currentLiteral > 0) {
-				Literal literal = identifiers.get(currentLiteral);
-				literal.setValue(true);
+				setLiteralValue(currentLiteral, true);
 			}
 		}
 	}
@@ -822,7 +843,7 @@ public class Translator {
 
 			if (identifiers.get(i).isDissubsumption()) {
 
-				if (!identifiers.get(i).getValue()) {
+				if (!getLiteralValue(i)) {
 
 					if (goal.getVariables().contains(name1)) {
 						if (goal.getConstants().contains(name2)) {
@@ -840,11 +861,9 @@ public class Translator {
 											goal.getAllAtoms().get(name2));
 						}
 					}
-				} else if (identifiers.get(i).getValue()) {
-					// nothing
 				}
 			} else if (identifiers.get(i).isSubsumption()) {
-				if (identifiers.get(i).getValue()) {
+				if (getLiteralValue(i)) {
 
 					if (goal.getVariables().contains(name1)) {
 						if (goal.getConstants().contains(name2)) {
