@@ -259,15 +259,11 @@ public class OntologyBuilder {
 	private Set<Atom> processSomeValuesRestriction(
 			OWLObjectSomeValuesFrom someValuesRestriction) {
 		Set<Atom> ret = new HashSet<Atom>();
-		Map<String, Atom> map = new HashMap<String, Atom>();
 		Set<Atom> atomSet = processClassExpression(someValuesRestriction
 				.getFiller());
-		for (Atom atom : atomSet) {
-			map.put(atom.toString(), atom);
-		}
 		Atom prop = new Atom(someValuesRestriction.getProperty()
 				.getNamedProperty().toStringID(), true);
-		Atom newAtom = new Atom(prop.toString(), true, map);
+		Atom newAtom = new Atom(prop.toString(), true, atomSet);
 		ret.add(newAtom);
 		return ret;
 	}

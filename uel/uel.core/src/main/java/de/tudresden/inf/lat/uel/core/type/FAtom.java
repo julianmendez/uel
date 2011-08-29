@@ -58,20 +58,20 @@ public class FAtom extends Atom {
 			updateId();
 
 			Set<Integer> rightPart = new HashSet<Integer>();
-			for (Atom at : atom.getChildren().values()) {
+			for (Atom at : atom.getChildren()) {
 				rightPart.add(goal.getAtomManager().addAndGetIndex(at));
 			}
-			goal.addFlatten(new Equation(goal.getAtomManager().addAndGetIndex(b),
-					rightPart, false));
+			goal.addFlatten(new Equation(goal.getAtomManager()
+					.addAndGetIndex(b), rightPart, false));
 
 		} else {
 
-			for (String key : atom.getChildren().keySet()) {
-
+			for (Atom at : atom.getChildren()) {
+				String key = at.getId();
 				if (goal.getAllAtoms().containsKey(key)) {
 					child = goal.getAllAtoms().get(key);
 				} else {
-					child = new FAtom(atom.getChildren().get(key), goal);
+					child = new FAtom(at, goal);
 				}
 				updateId();
 			}

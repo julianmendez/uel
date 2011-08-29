@@ -1,6 +1,6 @@
 package de.tudresden.inf.lat.uel.core.type;
 
-import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 /**
@@ -21,7 +21,7 @@ public class Atom {
 	 * implements conjunction of atoms that is an argument for the role name.
 	 */
 
-	private Map<String, Atom> children;
+	private Set<Atom> children;
 	private String id = null;
 	private final String name;
 	private final boolean root;
@@ -53,7 +53,7 @@ public class Atom {
 	 *            conjunction of atoms, which is an argument for the role name
 	 *            when r is true
 	 */
-	public Atom(String n, boolean r, Map<String, Atom> argchild) {
+	public Atom(String n, boolean r, Set<Atom> argchild) {
 		name = n;
 		children = argchild;
 		root = r;
@@ -80,8 +80,8 @@ public class Atom {
 	 * 
 	 * @return the hash map representing a conjunction of atoms
 	 */
-	public Map<String, Atom> getChildren() {
-		Map<String, Atom> ret = null;
+	public Set<Atom> getChildren() {
+		Set<Atom> ret = null;
 		if (root) {
 			ret = children;
 		} else {
@@ -117,8 +117,8 @@ public class Atom {
 		boolean test = true;
 		if (isRoot()) {
 			if (children.size() == 1) {
-				for (String key : children.keySet()) {
-					if (children.get(key).isRoot()) {
+				for (Atom atom : children) {
+					if (atom.isRoot()) {
 						test = false;
 					}
 				}
@@ -148,8 +148,8 @@ public class Atom {
 		StringBuilder str = new StringBuilder(name);
 		if (children != null) {
 			str.append("[");
-			for (String atom : children.keySet()) {
-				str.append(children.get(atom).toString());
+			for (Atom atom : children) {
+				str.append(atom.toString());
 				str.append("  ");
 			}
 			str.append("]");
