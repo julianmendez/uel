@@ -2,6 +2,7 @@ package de.tudresden.inf.lat.uel.core.type;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -90,6 +91,10 @@ public class IndexedSet<T> implements Set<T> {
 			ret = -1;
 		}
 		return ret;
+	}
+
+	public Collection<Integer> getIndices() {
+		return Collections.unmodifiableCollection(this.map.values());
 	}
 
 	@Override

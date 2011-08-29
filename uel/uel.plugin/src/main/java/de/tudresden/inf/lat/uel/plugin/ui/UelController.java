@@ -156,8 +156,8 @@ public class UelController implements ActionListener {
 			getModel().createTranslator(g);
 			Translator translator = getModel().getTranslator();
 			getModel().computeSatInput();
-			this.statInfo = new StatInfo(g, translator.getLiterals().keySet()
-					.size(), getModel().getSatInput().getClauses().size(),
+			this.statInfo = new StatInfo(g, translator.getLiterals().size(),
+					getModel().getSatInput().getClauses().size(),
 					this.mapIdLabel);
 		}
 

@@ -2,9 +2,7 @@ package de.tudresden.inf.lat.uel.core.sat;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.logging.Logger;
@@ -14,6 +12,7 @@ import de.tudresden.inf.lat.uel.core.type.DissubsumptionLiteral;
 import de.tudresden.inf.lat.uel.core.type.Equation;
 import de.tudresden.inf.lat.uel.core.type.FAtom;
 import de.tudresden.inf.lat.uel.core.type.Goal;
+import de.tudresden.inf.lat.uel.core.type.IndexedSet;
 import de.tudresden.inf.lat.uel.core.type.KRSSKeyword;
 import de.tudresden.inf.lat.uel.core.type.Literal;
 import de.tudresden.inf.lat.uel.core.type.OrderLiteral;
@@ -120,21 +119,9 @@ public class Translator {
 
 	private Goal goal;
 
-	private Integer identificator = 1;
-
-	/**
-	 * Identifiers are numbers, each number uniquely identifies a literal, i.e.
-	 * a dissubsumption.
-	 */
-	private Map<Integer, Literal> identifiers = new HashMap<Integer, Literal>();
-
 	private boolean invertLiteral = false;
 
-	/**
-	 * Literals are all dis-subsumptions between atoms in the goal the first
-	 * hash map maps them to unique numbers.
-	 */
-	private Map<Literal, Integer> literals = new HashMap<Literal, Integer>();
+	private IndexedSet<Literal> literalManager = new IndexedSet<Literal>();
 
 	private Set<Integer> trueLiterals = new HashSet<Integer>();
 
@@ -222,7 +209,7 @@ public class Translator {
 					Literal literal = this.invertLiteral ? new SubsumptionLiteral(
 							name, otherName) : new DissubsumptionLiteral(name,
 							otherName);
-					Integer literalId = literals.get(literal);
+					Integer literalId = literalManager.addAndGetIndex(literal);
 					ret.add(getLiteralValue(literalId) ? literalId : (-1)
 							* literalId);
 				}
@@ -236,8 +223,8 @@ public class Translator {
 	 * 
 	 * @return the literals
 	 */
-	public Map<Literal, Integer> getLiterals() {
-		return this.literals;
+	public Set<Literal> getLiterals() {
+		return Collections.unmodifiableSet(this.literalManager);
 	}
 
 	public boolean getLiteralValue(Integer literalId) {
@@ -258,13 +245,13 @@ public class Translator {
 
 	private int getOrderLiteral(String left, String right) {
 		Literal literal = new OrderLiteral(left, right);
-		return literals.get(literal);
+		return literalManager.addAndGetIndex(literal);
 	}
 
 	private int getSubOrDissubLiteral(String left, String right) {
 		Literal literal = invertLiteral ? new SubsumptionLiteral(left, right)
 				: new DissubsumptionLiteral(left, right);
-		int val = literals.get(literal);
+		int val = literalManager.addAndGetIndex(literal);
 		return invertLiteral ? (-1) * val : val;
 	}
 
@@ -306,7 +293,7 @@ public class Translator {
 
 		update.clear();
 
-		for (Integer key : identifiers.keySet()) {
+		for (Integer key : literalManager.getIndices()) {
 			setLiteralValue(key, false);
 		}
 
@@ -750,9 +737,7 @@ public class Translator {
 				literal = invertLiteral ? new SubsumptionLiteral(first, second)
 						: new DissubsumptionLiteral(first, second);
 
-				literals.put(literal, identificator);
-				identifiers.put(identificator, literal);
-				identificator++;
+				literalManager.add(literal);
 			}
 		}
 
@@ -771,10 +756,7 @@ public class Translator {
 
 				literal = new OrderLiteral(first, second);
 
-				literals.put(literal, identificator);
-				identifiers.put(identificator, literal);
-				identificator++;
-
+				literalManager.add(literal);
 			}
 
 		}
@@ -800,7 +782,7 @@ public class Translator {
 		for (Integer currentLiteral : val) {
 			if (currentLiteral < 0) {
 				Integer i = (-1) * currentLiteral;
-				Literal literal = identifiers.get(i);
+				Literal literal = literalManager.get(i);
 				if (literal.isDissubsumption() || literal.isSubsumption()) {
 					setLiteralValue(i, false);
 				}
@@ -836,12 +818,12 @@ public class Translator {
 		 * Define S_X for each variable X
 		 */
 
-		for (Integer i : identifiers.keySet()) {
+		for (Integer i : literalManager.getIndices()) {
 
-			String name1 = identifiers.get(i).getFirst();
-			String name2 = identifiers.get(i).getSecond();
+			String name1 = literalManager.get(i).getFirst();
+			String name2 = literalManager.get(i).getSecond();
 
-			if (identifiers.get(i).isDissubsumption()) {
+			if (literalManager.get(i).isDissubsumption()) {
 
 				if (!getLiteralValue(i)) {
 
@@ -862,7 +844,7 @@ public class Translator {
 						}
 					}
 				}
-			} else if (identifiers.get(i).isSubsumption()) {
+			} else if (literalManager.get(i).isSubsumption()) {
 				if (getLiteralValue(i)) {
 
 					if (goal.getVariables().contains(name1)) {
