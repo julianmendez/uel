@@ -45,7 +45,9 @@ public class DynamicOntology implements Ontology {
 	public void clear() {
 		this.nameMap.clear();
 		this.definitions.clear();
+		this.definitionCache.clear();
 		this.primitiveDefinitions.clear();
+		this.primitiveDefinitionCache.clear();
 	}
 
 	@Override
