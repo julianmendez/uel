@@ -44,6 +44,7 @@ public class Atom {
 	public Atom(Atom c, Atom atom) {
 		init(atom.getName(), atom.isRoot());
 		child = c;
+		updateId();
 	}
 
 	/*
@@ -110,6 +111,7 @@ public class Atom {
 			goal.getAllAtoms().put(this.toString(), this);
 
 		}
+		updateId();
 	}
 
 	/**
@@ -123,6 +125,7 @@ public class Atom {
 	 */
 	public Atom(String str, boolean r) {
 		init(str, r);
+		updateId();
 	}
 
 	/**
@@ -142,6 +145,7 @@ public class Atom {
 		init(str, r);
 		var = v;
 		child = arg;
+		updateId();
 	}
 
 	/**
@@ -159,6 +163,7 @@ public class Atom {
 	public Atom(String str, boolean r, Set<Atom> argchild) {
 		init(str, r);
 		children = argchild;
+		updateId();
 	}
 
 	/**
@@ -244,7 +249,6 @@ public class Atom {
 	private void init(String n, boolean r) {
 		name = n;
 		root = r;
-		updateId();
 	}
 
 	/**
