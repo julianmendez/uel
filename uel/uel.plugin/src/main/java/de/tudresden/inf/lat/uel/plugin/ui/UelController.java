@@ -36,7 +36,6 @@ import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 import de.tudresden.inf.lat.uel.core.sat.Translator;
 import de.tudresden.inf.lat.uel.core.type.Atom;
 import de.tudresden.inf.lat.uel.core.type.Equation;
-import de.tudresden.inf.lat.uel.core.type.FAtom;
 import de.tudresden.inf.lat.uel.core.type.Goal;
 import de.tudresden.inf.lat.uel.core.type.KRSSKeyword;
 import de.tudresden.inf.lat.uel.plugin.processor.UelProcessor;
@@ -510,7 +509,7 @@ public class UelController implements ActionListener {
 	 * 
 	 * @return the string representation of a substitution set
 	 */
-	public String printSetOfSubsumers(Collection<FAtom> setOfSubsumers) {
+	public String printSetOfSubsumers(Collection<Atom> setOfSubsumers) {
 
 		StringBuffer sbuf = new StringBuffer();
 
@@ -521,7 +520,7 @@ public class UelController implements ActionListener {
 
 		} else if (setOfSubsumers.size() == 1) {
 
-			FAtom atom = setOfSubsumers.iterator().next();
+			Atom atom = setOfSubsumers.iterator().next();
 			sbuf.append(printSubstitution(atom));
 
 		} else {
@@ -530,7 +529,7 @@ public class UelController implements ActionListener {
 			sbuf.append(KRSSKeyword.and);
 			sbuf.append(KRSSKeyword.space);
 
-			for (FAtom atom : setOfSubsumers) {
+			for (Atom atom : setOfSubsumers) {
 				sbuf.append(KRSSKeyword.space);
 				sbuf.append(printSubstitution(atom));
 				sbuf.append(KRSSKeyword.space);
@@ -542,7 +541,7 @@ public class UelController implements ActionListener {
 		return sbuf.toString();
 	}
 
-	private String printSubstitution(FAtom atom) {
+	private String printSubstitution(Atom atom) {
 		StringBuffer sbuf = new StringBuffer();
 		if (atom.isRoot() && !atom.getChild().isUserVariable()) {
 			sbuf.append(KRSSKeyword.open);
@@ -550,7 +549,7 @@ public class UelController implements ActionListener {
 			sbuf.append(KRSSKeyword.space);
 			sbuf.append(atom.getName());
 			sbuf.append(KRSSKeyword.space);
-			FAtom child = atom.getChild();
+			Atom child = atom.getChild();
 			if (child.isVariable() && !child.isUserVariable()) {
 				sbuf.append(printSetOfSubsumers(child.getSetOfSubsumers()));
 			} else {
@@ -657,9 +656,9 @@ public class UelController implements ActionListener {
 		for (Equation eq : set) {
 			Atom leftPart = getModel().getAtomManager().get(eq.getLeft());
 
-			Set<FAtom> right = new HashSet<FAtom>();
+			Set<Atom> right = new HashSet<Atom>();
 			for (Integer atomId : eq.getRight()) {
-				right.add((FAtom) getModel().getAtomManager().get(atomId));
+				right.add((Atom) getModel().getAtomManager().get(atomId));
 			}
 
 			sbuf.append(KRSSKeyword.open);

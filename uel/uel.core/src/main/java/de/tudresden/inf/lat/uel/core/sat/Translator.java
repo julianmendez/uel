@@ -10,7 +10,6 @@ import java.util.logging.Logger;
 import de.tudresden.inf.lat.uel.core.type.Atom;
 import de.tudresden.inf.lat.uel.core.type.DissubsumptionLiteral;
 import de.tudresden.inf.lat.uel.core.type.Equation;
-import de.tudresden.inf.lat.uel.core.type.FAtom;
 import de.tudresden.inf.lat.uel.core.type.Goal;
 import de.tudresden.inf.lat.uel.core.type.IndexedSet;
 import de.tudresden.inf.lat.uel.core.type.KRSSKeyword;
@@ -203,7 +202,7 @@ public class Translator {
 		set.addAll(goal.getConstants());
 		set.addAll(goal.getEAtoms());
 		for (String name : goal.getVariables()) {
-			FAtom atom = goal.getAllAtoms().get(name);
+			Atom atom = goal.getAllAtoms().get(name);
 			if (atom.isUserVariable()) {
 				for (String otherName : set) {
 					Literal literal = this.invertLiteral ? new SubsumptionLiteral(
@@ -270,9 +269,9 @@ public class Translator {
 						leftPart);
 
 				Set<Integer> rightPartIds = new HashSet<Integer>();
-				Collection<FAtom> setOfSubsumers = goal.getAllAtoms()
+				Collection<Atom> setOfSubsumers = goal.getAllAtoms()
 						.get(variable).getSetOfSubsumers();
-				for (FAtom subsumer : setOfSubsumers) {
+				for (Atom subsumer : setOfSubsumers) {
 					Atom newAtom = goal.getAllAtoms().get(subsumer.getId());
 					rightPartIds.add(goal.getAtomManager().addAndGetIndex(
 							newAtom));
@@ -635,8 +634,8 @@ public class Translator {
 
 		for (String key1 : goal.getEAtoms()) {
 
-			FAtom eatom = goal.getAllAtoms().get(key1);
-			FAtom child = eatom.getChild();
+			Atom eatom = goal.getAllAtoms().get(key1);
+			Atom child = eatom.getChild();
 
 			if (child.isVariable()) {
 
@@ -687,8 +686,8 @@ public class Translator {
 						 */
 					} else {
 
-						FAtom child1 = goal.getAllAtoms().get(key1).getChild();
-						FAtom child2 = goal.getAllAtoms().get(key2).getChild();
+						Atom child1 = goal.getAllAtoms().get(key1).getChild();
+						Atom child2 = goal.getAllAtoms().get(key2).getChild();
 
 						String child1name = child1.getName();
 						String child2name = child2.getName();

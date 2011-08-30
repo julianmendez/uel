@@ -30,7 +30,7 @@ public class Goal {
 	 * allAtoms is a hash map implementing all flat atoms in the goal keys are
 	 * names and values are flat atoms
 	 */
-	private Map<String, FAtom> allAtoms = new HashMap<String, FAtom>();
+	private Map<String, Atom> allAtoms = new HashMap<String, Atom>();
 
 	private IndexedSet<Atom> atomManager = null;
 
@@ -94,7 +94,7 @@ public class Goal {
 	 */
 	public void addFlatten(Equation e) {
 
-		FAtom a;
+		Atom a;
 		Atom b = getAtomManager().get(e.getLeft());
 
 		if (b.isRoot()) {
@@ -113,7 +113,7 @@ public class Goal {
 
 			Set<Atom> rightPart = new HashSet<Atom>();
 
-			a = new FAtom(null, b);
+			a = new Atom(null, b);
 
 			a.setVariable(true);
 
@@ -128,7 +128,7 @@ public class Goal {
 
 			for (Integer atomId : e.getRight()) {
 
-				a = new FAtom(getAtomManager().get(atomId), this);
+				a = new Atom(getAtomManager().get(atomId), this);
 
 				if (allAtoms.containsKey(a.getId())) {
 
@@ -147,7 +147,7 @@ public class Goal {
 				 * Adding new variable to the right side
 				 */
 
-				FAtom var = new FAtom(b.getId() + UNDEF_SUFFIX, false, false,
+				Atom var = new Atom(b.getId() + UNDEF_SUFFIX, false, false,
 						null);
 				var.setUserVariable(false);
 				this.allAtoms.put(var.getId(), var);
@@ -183,7 +183,7 @@ public class Goal {
 		return ret;
 	}
 
-	public Map<String, FAtom> getAllAtoms() {
+	public Map<String, Atom> getAllAtoms() {
 		return allAtoms;
 	}
 
@@ -272,12 +272,12 @@ public class Goal {
 		}
 	}
 
-	public void initialize(List<Equation> equationList, FAtom left, FAtom right)
+	public void initialize(List<Equation> equationList, Atom left, Atom right)
 			throws IOException {
 		initialize(equationList, left, right, null);
 	}
 
-	private void initialize(List<Equation> list, FAtom left, FAtom right,
+	private void initialize(List<Equation> list, Atom left, Atom right,
 			Writer output) throws IOException {
 
 		setMainEquation(new Equation(getAtomManager().addAndGetIndex(left),
@@ -292,7 +292,7 @@ public class Goal {
 		}
 
 		for (String key : allAtoms.keySet()) {
-			FAtom a = allAtoms.get(key);
+			Atom a = allAtoms.get(key);
 			Integer id = getAtomManager().addAndGetIndex(a);
 
 			if (!variables.contains(id) && !a.isRoot()) {
@@ -305,7 +305,7 @@ public class Goal {
 	}
 
 	public void makeConstant(String name) {
-		FAtom atom = this.allAtoms.get(name);
+		Atom atom = this.allAtoms.get(name);
 		Integer id = getAtomManager().addAndGetIndex(atom);
 		if (this.variables.contains(id)) {
 			this.variables.remove(id);
@@ -316,7 +316,7 @@ public class Goal {
 	}
 
 	public void makeVariable(String name) {
-		FAtom atom = this.allAtoms.get(name);
+		Atom atom = this.allAtoms.get(name);
 		Integer id = getAtomManager().addAndGetIndex(atom);
 		if (this.constants.contains(id)) {
 			this.constants.remove(id);
