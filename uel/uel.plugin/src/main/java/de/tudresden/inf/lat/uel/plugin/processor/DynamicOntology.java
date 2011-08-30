@@ -21,9 +21,11 @@ import de.tudresden.inf.lat.uel.core.type.Ontology;
  */
 public class DynamicOntology implements Ontology {
 
+	private Map<String, Equation> definitionCache = new HashMap<String, Equation>();
 	private Map<OWLClass, OWLClassExpression> definitions = new HashMap<OWLClass, OWLClassExpression>();
 	private Map<String, OWLClass> nameMap = new HashMap<String, OWLClass>();
 	private OntologyBuilder ontologyBuilder = null;
+	private Map<String, Equation> primitiveDefinitionCache = new HashMap<String, Equation>();
 	private Map<OWLClass, Set<OWLClassExpression>> primitiveDefinitions = new HashMap<OWLClass, Set<OWLClassExpression>>();
 
 	/**
@@ -72,14 +74,18 @@ public class DynamicOntology implements Ontology {
 			throw new IllegalArgumentException("Null argument.");
 		}
 
-		Equation ret = null;
-		OWLClass cls = this.nameMap.get(name);
-		if (cls != null) {
-			OWLClassExpression clExpr = this.definitions.get(cls);
-			if (clExpr != null) {
-				ret = getOntologyBuilder().processDefinition(cls, clExpr);
+		Equation ret = this.definitionCache.get(name);
+		if (ret == null) {
+			OWLClass cls = this.nameMap.get(name);
+			if (cls != null) {
+				OWLClassExpression clExpr = this.definitions.get(cls);
+				if (clExpr != null) {
+					ret = getOntologyBuilder().processDefinition(cls, clExpr);
+					this.definitionCache.put(name, ret);
+				}
 			}
 		}
+
 		return ret;
 	}
 
@@ -98,14 +104,17 @@ public class DynamicOntology implements Ontology {
 			throw new IllegalArgumentException("Null argument.");
 		}
 
-		Equation ret = null;
-		OWLClass cls = this.nameMap.get(name);
-		if (cls != null) {
-			Set<OWLClassExpression> clExprSet = this.primitiveDefinitions
-					.get(cls);
-			if (clExprSet != null) {
-				ret = getOntologyBuilder().processPrimitiveDefinition(cls,
-						clExprSet);
+		Equation ret = this.primitiveDefinitionCache.get(name);
+		if (ret == null) {
+			OWLClass cls = this.nameMap.get(name);
+			if (cls != null) {
+				Set<OWLClassExpression> clExprSet = this.primitiveDefinitions
+						.get(cls);
+				if (clExprSet != null) {
+					ret = getOntologyBuilder().processPrimitiveDefinition(cls,
+							clExprSet);
+					this.primitiveDefinitionCache.put(name, ret);
+				}
 			}
 		}
 		return ret;
