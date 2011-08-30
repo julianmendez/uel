@@ -2,8 +2,6 @@ package de.tudresden.inf.lat.uel.core.type;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Set;
-import java.util.logging.Logger;
 
 /**
  * This class extends Atom. It implements a flat atom, hence an atom which is
@@ -18,11 +16,7 @@ import java.util.logging.Logger;
  */
 public class Atom {
 
-	private static final Logger logger = Logger.getLogger(Atom.class.getName());
-	public static final String VAR_PREFIX = "VAR";
-
 	private Atom child = null;
-	private Set<Atom> children;
 	private String id = null;
 	private String name;
 	private boolean root;
@@ -89,24 +83,6 @@ public class Atom {
 	}
 
 	/**
-	 * Constructs a new atom.
-	 * 
-	 * @param str
-	 *            the name of the atom
-	 * @param r
-	 *            <code>true</code> if and only if the atom is an existential
-	 *            restriction
-	 * @param argchild
-	 *            conjunction of atoms, which is an argument for the role name
-	 *            when r is true
-	 */
-	public Atom(String str, boolean r, Set<Atom> argchild) {
-		init(str, r);
-		children = argchild;
-		updateId();
-	}
-
-	/**
 	 * Adds a flat atom to a substitution set Used in Translator, to define
 	 * substitution for variables.
 	 * 
@@ -126,9 +102,7 @@ public class Atom {
 					&& this.name.equals(other.name)
 					&& this.setOfSubsumers.equals(other.setOfSubsumers)
 					&& ((this.child == null && other.child == null) || (this.child != null && this.child
-							.equals(other.child)))
-					&& ((this.children == null && other.children == null) || (this.child != null && this.child
-							.equals(other.children)));
+							.equals(other.child)));
 		}
 		return ret;
 	}
@@ -144,22 +118,6 @@ public class Atom {
 	 */
 	public Atom getChild() {
 		return child;
-	}
-
-	/**
-	 * Returns the map representing a conjunction of atoms, which is an argument
-	 * for a role name in an existential atom.
-	 * 
-	 * @return the hash map representing a conjunction of atoms
-	 */
-	public Set<Atom> getChildren() {
-		Set<Atom> ret = null;
-		if (root) {
-			ret = children;
-		} else {
-			logger.warning("WARNING: Cannot return children of a variable or constant");
-		}
-		return ret;
 	}
 
 	public String getId() {
@@ -196,27 +154,6 @@ public class Atom {
 	 */
 	public boolean isConstant() {
 		return !(var || this.isRoot());
-	}
-
-	/**
-	 * Checks if the atom is flat. Used by the constructor FAtom(Atom).
-	 * 
-	 * @return <code>true</code> if and only if the atom is flat
-	 */
-	public boolean isFlat() {
-		boolean test = true;
-		if (isRoot()) {
-			if (children.size() == 1) {
-				for (Atom atom : children) {
-					if (atom.isRoot()) {
-						test = false;
-					}
-				}
-			} else {
-				test = false;
-			}
-		}
-		return test;
 	}
 
 	/**
