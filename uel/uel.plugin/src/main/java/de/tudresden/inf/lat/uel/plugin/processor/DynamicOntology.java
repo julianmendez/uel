@@ -82,8 +82,9 @@ public class DynamicOntology implements Ontology {
 			if (cls != null) {
 				OWLClassExpression clExpr = this.definitions.get(cls);
 				if (clExpr != null) {
-					ret = getOntologyBuilder().processDefinition(cls, clExpr);
-					this.definitionCache.put(name, ret);
+					updateCache(getOntologyBuilder().processDefinition(cls,
+							clExpr));
+					ret = this.definitionCache.get(name);
 				}
 			}
 		}
@@ -113,9 +114,9 @@ public class DynamicOntology implements Ontology {
 				Set<OWLClassExpression> clExprSet = this.primitiveDefinitions
 						.get(cls);
 				if (clExprSet != null) {
-					ret = getOntologyBuilder().processPrimitiveDefinition(cls,
-							clExprSet);
-					this.primitiveDefinitionCache.put(name, ret);
+					updateCache(getOntologyBuilder()
+							.processPrimitiveDefinition(cls, clExprSet));
+					ret = this.primitiveDefinitionCache.get(name);
 				}
 			}
 		}
@@ -153,6 +154,18 @@ public class DynamicOntology implements Ontology {
 		sbuf.append(this.primitiveDefinitions.toString());
 		sbuf.append("\n");
 		return sbuf.toString();
+	}
+
+	private void updateCache(Set<Equation> equations) {
+		for (Equation equation : equations) {
+			String name = this.ontologyBuilder.getAtomManager()
+					.get(equation.getLeft()).getId();
+			if (equation.isPrimitive()) {
+				this.primitiveDefinitionCache.put(name, equation);
+			} else {
+				this.definitionCache.put(name, equation);
+			}
+		}
 	}
 
 }

@@ -56,17 +56,24 @@ public class OntologyBuilder {
 
 		OntologyImpl ret = new OntologyImpl();
 		Map<OWLClass, OWLClassExpression> definitions = getDefinitions(owlOntology);
+		Set<Equation> setOfEquations = new HashSet<Equation>();
 		for (OWLClass key : definitions.keySet()) {
-			ret.putDefinition(getName(key),
-					processDefinition(key, definitions.get(key)));
+			setOfEquations.addAll(processDefinition(key, definitions.get(key)));
 		}
 
 		Map<OWLClass, Set<OWLClassExpression>> primitiveDefinitions = getPrimitiveDefinitions(owlOntology);
 		for (OWLClass key : primitiveDefinitions.keySet()) {
-			ret.putPrimitiveDefinition(
-					getName(key),
-					processPrimitiveDefinition(key,
-							primitiveDefinitions.get(key)));
+			setOfEquations.addAll(processPrimitiveDefinition(key,
+					primitiveDefinitions.get(key)));
+		}
+
+		for (Equation eq : setOfEquations) {
+			String name = getAtomManager().get(eq.getLeft()).getId();
+			if (eq.isPrimitive()) {
+				ret.putPrimitiveDefinition(name, eq);
+			} else {
+				ret.putDefinition(name, eq);
+			}
 		}
 		return ret;
 	}
@@ -204,7 +211,7 @@ public class OntologyBuilder {
 		return ret;
 	}
 
-	public Equation processDefinition(OWLClass definiendum,
+	public Set<Equation> processDefinition(OWLClass definiendum,
 			OWLClassExpression definiens) {
 		if (definiendum == null) {
 			throw new IllegalArgumentException("Null argument.");
@@ -215,7 +222,9 @@ public class OntologyBuilder {
 
 		Set<Atom> left = processClass(definiendum);
 		Set<Atom> right = processClassExpression(definiens);
-		return makeEquation(left.iterator().next(), right, false);
+		Set<Equation> ret = new HashSet<Equation>();
+		ret.add(makeEquation(left.iterator().next(), right, false));
+		return ret;
 	}
 
 	private Set<Atom> processIntersection(OWLObjectIntersectionOf intersection) {
@@ -238,7 +247,7 @@ public class OntologyBuilder {
 		return ret;
 	}
 
-	public Equation processPrimitiveDefinition(OWLClass definiendum,
+	public Set<Equation> processPrimitiveDefinition(OWLClass definiendum,
 			Set<OWLClassExpression> definiensSet) {
 		if (definiendum == null) {
 			throw new IllegalArgumentException("Null argument.");
@@ -253,7 +262,9 @@ public class OntologyBuilder {
 		for (OWLClassExpression clsExpr : definiensSet) {
 			superClassSet.addAll(processClassExpression(clsExpr));
 		}
-		return makeEquation(subClassSet.iterator().next(), superClassSet, true);
+		Set<Equation> ret = new HashSet<Equation>();
+		ret.add(makeEquation(subClassSet.iterator().next(), superClassSet, true));
+		return ret;
 	}
 
 	private Set<Atom> processSomeValuesRestriction(
