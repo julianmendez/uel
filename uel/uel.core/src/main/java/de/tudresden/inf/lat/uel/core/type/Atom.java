@@ -2,7 +2,6 @@ package de.tudresden.inf.lat.uel.core.type;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -54,65 +53,6 @@ public class Atom {
 	 * the variable <code>root</code> is true and the hash map children
 	 * implements conjunction of atoms that is an argument for the role name.
 	 */
-
-	/**
-	 * Constructor of flat atom which takes a non-flat atom, flattens it:
-	 * introduces new variable, adds an equation to the goal, checks for
-	 * additional definitions in the ontology, if ontology is loaded, and
-	 * flattens them and adds to the goal.
-	 * 
-	 * Flattening is recursive.
-	 * 
-	 * @param atom
-	 */
-	public Atom(Atom atom, Goal goal) {
-		init(atom.getName(), atom.isRoot());
-
-		if (!atom.isRoot()) {
-			child = null;
-			updateId();
-
-			goal.importAnyDefinition(atom);
-
-		} else if (!atom.isFlat()) {
-
-			Atom b = null;
-			String newvar = VAR_PREFIX + goal.getNbrVar();
-
-			b = new Atom(newvar, false, true, null);
-
-			goal.setNbrVar(goal.getNbrVar() + 1);
-
-			child = b;
-			updateId();
-
-			Set<Integer> rightPart = new HashSet<Integer>();
-			for (Atom at : atom.getChildren()) {
-				rightPart.add(goal.getAtomManager().addAndGetIndex(at));
-			}
-			goal.addFlatten(new Equation(goal.getAtomManager()
-					.addAndGetIndex(b), rightPart, false));
-
-		} else {
-
-			for (Atom at : atom.getChildren()) {
-				String key = at.getId();
-				if (goal.getAllAtoms().containsKey(key)) {
-					child = goal.getAllAtoms().get(key);
-				} else {
-					child = new Atom(at, goal);
-				}
-				updateId();
-			}
-		}
-
-		if (!goal.getAllAtoms().containsKey(this.toString())) {
-
-			goal.getAllAtoms().put(this.toString(), this);
-
-		}
-		updateId();
-	}
 
 	/**
 	 * Constructs a new atom.
@@ -182,9 +122,7 @@ public class Atom {
 		if (o instanceof Atom) {
 			Atom other = (Atom) o;
 
-			ret = this.userVariable == other.userVariable
-					&& this.var == other.var
-					&& this.root == other.root
+			ret = this.root == other.root
 					&& this.name.equals(other.name)
 					&& this.setOfSubsumers.equals(other.setOfSubsumers)
 					&& ((this.child == null && other.child == null) || (this.child != null && this.child

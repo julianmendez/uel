@@ -75,7 +75,7 @@ public class ProcessorTest extends TestCase {
 		Set<String> varNames = new HashSet<String>();
 		varNames.add("A1");
 		varNames.add("A4");
-		tryOntology(ontology02, varNames, 64);
+		tryOntology(ontology02, varNames, 256);
 	}
 
 	public void test03() throws OWLOntologyCreationException, IOException {
@@ -154,7 +154,7 @@ public class ProcessorTest extends TestCase {
 		Set<String> varNames = new HashSet<String>();
 		varNames.add("A");
 		varNames.add("B5");
-		tryOntology(ontology14, varNames, 8);
+		tryOntology(ontology14, varNames, 16);
 	}
 
 	private void tryOntology(String ontologyName, Set<String> varNames,

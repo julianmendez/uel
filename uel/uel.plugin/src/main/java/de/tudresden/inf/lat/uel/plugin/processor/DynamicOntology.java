@@ -56,8 +56,13 @@ public class DynamicOntology implements Ontology {
 			throw new IllegalArgumentException("Null argument.");
 		}
 
-		OWLClass cls = this.nameMap.get(name);
-		return this.definitions.get(cls) != null;
+		boolean ret = true;
+		Equation eq = this.definitionCache.get(name);
+		if (eq == null) {
+			OWLClass cls = this.nameMap.get(name);
+			ret = this.definitions.get(cls) != null;
+		}
+		return ret;
 	}
 
 	@Override
@@ -66,8 +71,13 @@ public class DynamicOntology implements Ontology {
 			throw new IllegalArgumentException("Null argument.");
 		}
 
-		OWLClass cls = this.nameMap.get(name);
-		return this.primitiveDefinitions.get(cls) != null;
+		boolean ret = true;
+		Equation eq = this.primitiveDefinitionCache.get(name);
+		if (eq == null) {
+			OWLClass cls = this.nameMap.get(name);
+			ret = this.primitiveDefinitions.get(cls) != null;
+		}
+		return ret;
 	}
 
 	@Override

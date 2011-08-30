@@ -71,7 +71,7 @@ public class Goal {
 	 *            an ontology
 	 */
 	public Goal(Ontology ont, IndexedSet<Atom> manager) {
-		ontology = ont;
+		this.ontology = ont;
 		this.atomManager = manager;
 	}
 
@@ -94,8 +94,10 @@ public class Goal {
 	 */
 	public void addFlatten(Equation e) {
 
-		Atom a;
 		Atom b = getAtomManager().get(e.getLeft());
+		b.setVariable(true);
+		b.setUserVariable(false);
+		variables.add(e.getLeft());
 
 		if (b.isRoot()) {
 
@@ -111,35 +113,16 @@ public class Goal {
 
 		} else {
 
-			Set<Atom> rightPart = new HashSet<Atom>();
-
-			a = new Atom(null, b);
-
-			a.setVariable(true);
-
-			variables.add(getAtomManager().addAndGetIndex(a));
-			allAtoms.put(a.getId(), a);
-
-			Atom leftPart = a;
+			Equation newEquation = e;
 
 			/*
-			 * FLATTENING
+			 * exploring ontology
 			 */
 
 			for (Integer atomId : e.getRight()) {
 
-				a = new Atom(getAtomManager().get(atomId), this);
-
-				if (allAtoms.containsKey(a.getId())) {
-
-					rightPart.add(allAtoms.get(a.getId()));
-
-				} else {
-
-					rightPart.add(a);
-
-				}
-
+				Atom a = getAtomManager().get(atomId);
+				exportDefinitions(a);
 			}
 
 			if (e.isPrimitive()) {
@@ -150,18 +133,18 @@ public class Goal {
 				Atom var = new Atom(b.getId() + UNDEF_SUFFIX, false, false,
 						null);
 				var.setUserVariable(false);
+				getAtomManager().add(var);
 				this.allAtoms.put(var.getId(), var);
-				this.constants.add(getAtomManager().addAndGetIndex(var));
-				rightPart.add(var);
+				Integer varId = getAtomManager().addAndGetIndex(var);
+				this.constants.add(varId);
+
+				Set<Integer> newRightSet = new HashSet<Integer>();
+				newRightSet.addAll(e.getRight());
+				newRightSet.add(varId);
+				newEquation = new Equation(e.getLeft(), newRightSet, false);
 			}
 
-			Integer leftPartId = getAtomManager().addAndGetIndex(leftPart);
-			Set<Integer> rightPartIds = new HashSet<Integer>();
-			for (Atom elem : rightPart) {
-				rightPartIds.add(getAtomManager().addAndGetIndex(elem));
-			}
-
-			addEquation(new Equation(leftPartId, rightPartIds, false));
+			addEquation(newEquation);
 
 		}
 	}
@@ -181,6 +164,14 @@ public class Goal {
 					&& this.nbrVar == other.nbrVar;
 		}
 		return ret;
+	}
+
+	public void exportDefinitions(Atom a) {
+		if (!a.isRoot()) {
+			importAnyDefinition(a);
+		} else {
+			importAnyDefinition(a.getChild());
+		}
 	}
 
 	public Map<String, Atom> getAllAtoms() {
@@ -260,15 +251,12 @@ public class Goal {
 	 *            concept
 	 */
 	public void importAnyDefinition(Atom concept) {
-		if (!variables.contains(concept.getId())) {
+		if (ontology.containsDefinition(concept.getId())) {
+			addFlatten(ontology.getDefinition(concept.getId()));
 
-			if (ontology.containsDefinition(concept.getId())) {
-				addFlatten(ontology.getDefinition(concept.getId()));
+		} else if (ontology.containsPrimitiveDefinition(concept.getId())) {
+			addFlatten(ontology.getPrimitiveDefinition(concept.getId()));
 
-			} else if (ontology.containsPrimitiveDefinition(concept.getId())) {
-				addFlatten(ontology.getPrimitiveDefinition(concept.getId()));
-
-			}
 		}
 	}
 
@@ -284,6 +272,14 @@ public class Goal {
 				getAtomManager().addAndGetIndex(right), false));
 		for (Equation eq : list) {
 			addFlatten(eq);
+		}
+
+		for (Integer atomId : getAtomManager().getIndices()) {
+			Atom atom = getAtomManager().get(atomId);
+			allAtoms.put(atom.getId(), atom);
+			if (atom.isVariable()) {
+				variables.add(atomId);
+			}
 		}
 
 		for (Integer atomId : variables) {
