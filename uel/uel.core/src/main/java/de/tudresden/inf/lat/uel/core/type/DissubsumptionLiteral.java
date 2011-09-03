@@ -9,7 +9,6 @@ public class DissubsumptionLiteral implements Literal {
 
 	private final String first;
 	private int hashCode = 0;
-	private String id = null;
 	private final String second;
 
 	/**
@@ -21,10 +20,16 @@ public class DissubsumptionLiteral implements Literal {
 	 *            second component
 	 */
 	public DissubsumptionLiteral(String one, String two) {
+		if (one == null) {
+			throw new IllegalArgumentException("Null argument.");
+		}
+		if (two == null) {
+			throw new IllegalArgumentException("Null argument.");
+		}
+
 		first = one;
 		second = two;
 		hashCode = one.hashCode() + 31 * two.hashCode();
-		updateId();
 	}
 
 	@Override
@@ -70,16 +75,12 @@ public class DissubsumptionLiteral implements Literal {
 
 	@Override
 	public String toString() {
-		return this.id;
-	}
-
-	private void updateId() {
-		StringBuilder str = new StringBuilder("-(");
-		str.append(first);
-		str.append(",");
-		str.append(second);
-		str.append(")");
-		this.id = str.toString();
+		StringBuilder sbuf = new StringBuilder("(");
+		sbuf.append(first);
+		sbuf.append(" dissub ");
+		sbuf.append(second);
+		sbuf.append(")");
+		return sbuf.toString();
 	}
 
 }
