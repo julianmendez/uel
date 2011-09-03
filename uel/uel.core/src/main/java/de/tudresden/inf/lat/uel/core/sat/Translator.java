@@ -236,18 +236,12 @@ public class Translator {
 		return this.trueLiterals.contains(literalId);
 	}
 
-	private int getMinusOrderLiteral(String left, String right) {
-		return (-1) * getOrderLiteral(left, right);
+	private Integer getMinusOrderLiteral(Integer atomId1, Integer atomId2) {
+		return (-1) * getOrderLiteral(atomId1, atomId2);
 	}
 
 	private Integer getMinusSubOrDissubLiteral(Integer atomId1, Integer atomId2) {
-		String atomName1 = getNameForAtomId(atomId1);
-		String atomName2 = getNameForAtomId(atomId2);
-		return getMinusSubOrDissubLiteral(atomName1, atomName2);
-	}
-
-	private int getMinusSubOrDissubLiteral(String left, String right) {
-		return (-1) * getSubOrDissubLiteral(left, right);
+		return (-1) * getSubOrDissubLiteral(atomId1, atomId2);
 	}
 
 	private String getNameForAtomId(Integer atomId) {
@@ -262,20 +256,17 @@ public class Translator {
 		return ret;
 	}
 
-	private int getOrderLiteral(String left, String right) {
-		Literal literal = new OrderLiteral(left, right);
+	private Integer getOrderLiteral(Integer atomId1, Integer atomId2) {
+		Literal literal = new OrderLiteral(getNameForAtomId(atomId1),
+				getNameForAtomId(atomId2));
 		return literalManager.addAndGetIndex(literal);
 	}
 
 	private Integer getSubOrDissubLiteral(Integer atomId1, Integer atomId2) {
-		String atomName1 = getNameForAtomId(atomId1);
-		String atomName2 = getNameForAtomId(atomId2);
-		return getSubOrDissubLiteral(atomName1, atomName2);
-	}
-
-	private int getSubOrDissubLiteral(String left, String right) {
-		Literal literal = invertLiteral ? new SubsumptionLiteral(left, right)
-				: new DissubsumptionLiteral(left, right);
+		Literal literal = invertLiteral ? new SubsumptionLiteral(
+				getNameForAtomId(atomId1), getNameForAtomId(atomId2))
+				: new DissubsumptionLiteral(getNameForAtomId(atomId1),
+						getNameForAtomId(atomId2));
 		int val = literalManager.addAndGetIndex(literal);
 		return invertLiteral ? (-1) * val : val;
 	}
@@ -301,6 +292,10 @@ public class Translator {
 		}
 
 		return ret;
+	}
+
+	private boolean isTop(Integer atomId) {
+		return getNameForAtomId(atomId).equalsIgnoreCase(KRSSKeyword.top);
 	}
 
 	/**
@@ -487,17 +482,12 @@ public class Translator {
 		SatInput ret = new SatInput();
 
 		for (Integer atomId1 : goal.getConstants()) {
-			String key1 = getNameForAtomId(atomId1);
 
 			for (Integer atomId2 : goal.getConstants()) {
-				String key2 = getNameForAtomId(atomId2);
 
-				if (!key2.equalsIgnoreCase(KRSSKeyword.top)
-						&& (!key1.equals(key2))) {
+				if (!isTop(atomId2) && (!atomId1.equals(atomId2))) {
 					Set<Integer> clause = new HashSet<Integer>();
-
-					clause.add(getSubOrDissubLiteral(key1, key2));
-
+					clause.add(getSubOrDissubLiteral(atomId1, atomId2));
 					ret.add(clause);
 				}
 
@@ -515,24 +505,18 @@ public class Translator {
 		SatInput ret = new SatInput();
 
 		for (Integer atomId1 : goal.getConstants()) {
-			String key1 = getNameForAtomId(atomId1);
 
 			for (Integer atomId2 : goal.getEAtoms()) {
-				String key2 = getNameForAtomId(atomId2);
 				{
 					Set<Integer> clause = new HashSet<Integer>();
-
-					clause.add(getSubOrDissubLiteral(key1, key2));
-
+					clause.add(getSubOrDissubLiteral(atomId1, atomId2));
 					ret.add(clause);
 				}
-				if (!key1.equalsIgnoreCase(KRSSKeyword.top)) {
+
+				if (!isTop(atomId1)) {
 					Set<Integer> clause = new HashSet<Integer>();
-
-					clause.add(getSubOrDissubLiteral(key2, key1));
-
+					clause.add(getSubOrDissubLiteral(atomId2, atomId1));
 					ret.add(clause);
-
 				}
 
 			}
@@ -549,20 +533,20 @@ public class Translator {
 	private SatInput runStep2_5() {
 		SatInput ret = new SatInput();
 
-		for (String key1 : goal.getAllAtoms().keySet()) {
+		for (Integer atomId1 : goal.getAtomManager().getIndices()) {
 
-			for (String key2 : goal.getAllAtoms().keySet()) {
+			for (Integer atomId2 : goal.getAtomManager().getIndices()) {
 
-				if (!key1.equals(key2)) {
-					for (String key3 : goal.getAllAtoms().keySet()) {
+				if (!atomId1.equals(atomId2)) {
+					for (Integer atomId3 : goal.getAtomManager().getIndices()) {
 
-						if (!key1.equals(key3) && !key2.equals(key3)) {
+						if (!atomId1.equals(atomId3)
+								&& !atomId2.equals(atomId3)) {
 							Set<Integer> clause = new HashSet<Integer>();
-
-							clause.add(getSubOrDissubLiteral(key1, key2));
-							clause.add(getSubOrDissubLiteral(key2, key3));
-							clause.add(getMinusSubOrDissubLiteral(key1, key3));
-
+							clause.add(getSubOrDissubLiteral(atomId1, atomId2));
+							clause.add(getSubOrDissubLiteral(atomId2, atomId3));
+							clause.add(getMinusSubOrDissubLiteral(atomId1,
+									atomId3));
 							ret.add(clause);
 						}
 					}
@@ -579,14 +563,9 @@ public class Translator {
 	 */
 	private SatInput runStep3_1_r() {
 		SatInput ret = new SatInput();
-
 		for (Integer atomId1 : goal.getVariables()) {
-			String key1 = getNameForAtomId(atomId1);
-
 			Set<Integer> clause = new HashSet<Integer>();
-
-			clause.add(getMinusOrderLiteral(key1, key1));
-
+			clause.add(getMinusOrderLiteral(atomId1, atomId1));
 			ret.add(clause);
 		}
 		return ret;
@@ -601,22 +580,17 @@ public class Translator {
 		SatInput ret = new SatInput();
 
 		for (Integer atomId1 : goal.getVariables()) {
-			String key1 = getNameForAtomId(atomId1);
 
 			for (Integer atomId2 : goal.getVariables()) {
-				String key2 = getNameForAtomId(atomId2);
 
 				for (Integer atomId3 : goal.getVariables()) {
-					String key3 = getNameForAtomId(atomId3);
 
-					if (!key1.equals(key2) && !key2.equals(key3)) {
+					if (!atomId1.equals(atomId2) && !atomId2.equals(atomId3)) {
 
 						Set<Integer> clause = new HashSet<Integer>();
-
-						clause.add(getMinusOrderLiteral(key1, key2));
-						clause.add(getMinusOrderLiteral(key2, key3));
-						clause.add(getOrderLiteral(key1, key3));
-
+						clause.add(getMinusOrderLiteral(atomId1, atomId2));
+						clause.add(getMinusOrderLiteral(atomId2, atomId3));
+						clause.add(getOrderLiteral(atomId1, atomId3));
 						ret.add(clause);
 					}
 
@@ -635,22 +609,18 @@ public class Translator {
 		SatInput ret = new SatInput();
 
 		for (Integer atomId1 : goal.getEAtoms()) {
-			String key1 = getNameForAtomId(atomId1);
 
-			Atom eatom = goal.getAllAtoms().get(key1);
+			Atom eatom = goal.getAtomManager().get(atomId1);
 			Atom child = eatom.getChild();
 
 			if (child.isVariable()) {
 
 				for (Integer atomId2 : goal.getVariables()) {
-					String key2 = getNameForAtomId(atomId2);
-
 					Set<Integer> clause = new HashSet<Integer>();
-
-					clause.add(getOrderLiteral(key2, child.getName()));
-
-					clause.add(getSubOrDissubLiteral(key2, key1));
-
+					Integer childId = goal.getAtomManager().addAndGetIndex(
+							child);
+					clause.add(getOrderLiteral(atomId2, childId));
+					clause.add(getSubOrDissubLiteral(atomId2, atomId1));
 					ret.add(clause);
 				}
 			}
@@ -666,15 +636,13 @@ public class Translator {
 		SatInput ret = new SatInput();
 
 		for (Integer atomId1 : goal.getEAtoms()) {
-			String key1 = getNameForAtomId(atomId1);
 
 			for (Integer atomId2 : goal.getEAtoms()) {
-				String key2 = getNameForAtomId(atomId2);
 
-				if (!key1.equals(key2)) {
+				if (!atomId1.equals(atomId2)) {
 
-					String role1 = goal.getAllAtoms().get(key1).getName();
-					String role2 = goal.getAllAtoms().get(key2).getName();
+					String role1 = goal.getAtomManager().get(atomId1).getName();
+					String role2 = goal.getAtomManager().get(atomId2).getName();
 
 					/*
 					 * if roles are not equal, then Step 2.2
@@ -682,9 +650,7 @@ public class Translator {
 
 					if (!role1.equals(role2)) {
 						Set<Integer> clause = new HashSet<Integer>();
-
-						clause.add(getSubOrDissubLiteral(key1, key2));
-
+						clause.add(getSubOrDissubLiteral(atomId1, atomId2));
 						ret.add(clause);
 
 						/*
@@ -692,19 +658,21 @@ public class Translator {
 						 */
 					} else {
 
-						Atom child1 = goal.getAllAtoms().get(key1).getChild();
-						Atom child2 = goal.getAllAtoms().get(key2).getChild();
+						Atom child1 = goal.getAtomManager().get(atomId1)
+								.getChild();
+						Integer child1Id = goal.getAtomManager()
+								.addAndGetIndex(child1);
 
-						String child1name = child1.getName();
-						String child2name = child2.getName();
+						Atom child2 = goal.getAtomManager().get(atomId2)
+								.getChild();
+						Integer child2Id = goal.getAtomManager()
+								.addAndGetIndex(child2);
 
-						if (!child1name.equals(child2name)) {
+						if (!child1Id.equals(child2Id)) {
 							Set<Integer> clause = new HashSet<Integer>();
-
-							clause.add(getMinusSubOrDissubLiteral(child1name,
-									child2name));
-							clause.add(getSubOrDissubLiteral(key1, key2));
-
+							clause.add(getMinusSubOrDissubLiteral(child1Id,
+									child2Id));
+							clause.add(getSubOrDissubLiteral(atomId1, atomId2));
 							ret.add(clause);
 						}
 
@@ -724,23 +692,16 @@ public class Translator {
 	 */
 	private void setLiterals() {
 
-		String first;
-		String second;
-		Literal literal;
-
 		/*
 		 * Literals for dis-subsumptions
 		 */
 
-		for (String key1 : goal.getAllAtoms().keySet()) {
-
-			first = key1;
-
-			for (String key2 : goal.getAllAtoms().keySet()) {
-
-				second = key2;
-				literal = invertLiteral ? new SubsumptionLiteral(first, second)
-						: new DissubsumptionLiteral(first, second);
+		for (Integer atomId1 : goal.getAtomManager().getIndices()) {
+			for (Integer atomId2 : goal.getAtomManager().getIndices()) {
+				Literal literal = invertLiteral ? new SubsumptionLiteral(
+						getNameForAtomId(atomId1), getNameForAtomId(atomId2))
+						: new DissubsumptionLiteral(getNameForAtomId(atomId1),
+								getNameForAtomId(atomId2));
 
 				literalManager.add(literal);
 			}
@@ -752,16 +713,11 @@ public class Translator {
 		 */
 
 		for (Integer atomId1 : goal.getVariables()) {
-			first = getNameForAtomId(atomId1);
-
 			for (Integer atomId2 : goal.getVariables()) {
-				second = getNameForAtomId(atomId2);
-
-				literal = new OrderLiteral(first, second);
-
+				Literal literal = new OrderLiteral(getNameForAtomId(atomId1),
+						getNameForAtomId(atomId2));
 				literalManager.add(literal);
 			}
-
 		}
 	}
 
