@@ -232,7 +232,7 @@ public class Atom {
 					(KRSSKeyword.open + KRSSKeyword.some + KRSSKeyword.space));
 
 			str.append(KRSSKeyword.space);
-			str.append(child.toString());
+			str.append(child.getId());
 			str.append(KRSSKeyword.close);
 		}
 		this.id = str.toString();
