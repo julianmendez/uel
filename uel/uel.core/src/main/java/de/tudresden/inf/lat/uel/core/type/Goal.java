@@ -251,11 +251,12 @@ public class Goal {
 	 *            concept
 	 */
 	public void importAnyDefinition(Atom concept) {
-		if (ontology.containsDefinition(concept.getId())) {
-			addFlatten(ontology.getDefinition(concept.getId()));
+		Integer conceptId = getAtomManager().addAndGetIndex(concept);
+		if (ontology.containsDefinition(conceptId)) {
+			addFlatten(ontology.getDefinition(conceptId));
 
-		} else if (ontology.containsPrimitiveDefinition(concept.getId())) {
-			addFlatten(ontology.getPrimitiveDefinition(concept.getId()));
+		} else if (ontology.containsPrimitiveDefinition(conceptId)) {
+			addFlatten(ontology.getPrimitiveDefinition(conceptId));
 
 		}
 	}

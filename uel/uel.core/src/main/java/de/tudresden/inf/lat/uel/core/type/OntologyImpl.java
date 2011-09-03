@@ -15,9 +15,9 @@ public class OntologyImpl implements Ontology {
 	/**
 	 * The flattened definitions stored by the defined concepts.
 	 */
-	private Map<String, Equation> definitions = new HashMap<String, Equation>();
+	private Map<Integer, Equation> definitions = new HashMap<Integer, Equation>();
 
-	private Map<String, Equation> primitiveDefinitions = new HashMap<String, Equation>();
+	private Map<Integer, Equation> primitiveDefinitions = new HashMap<Integer, Equation>();
 
 	/**
 	 * Constructs a new empty ontology.
@@ -34,13 +34,13 @@ public class OntologyImpl implements Ontology {
 	}
 
 	@Override
-	public boolean containsDefinition(String name) {
-		return this.definitions.containsKey(name);
+	public boolean containsDefinition(Integer id) {
+		return this.definitions.containsKey(id);
 	}
 
 	@Override
-	public boolean containsPrimitiveDefinition(String name) {
-		return this.primitiveDefinitions.containsKey(name);
+	public boolean containsPrimitiveDefinition(Integer id) {
+		return this.primitiveDefinitions.containsKey(id);
 	}
 
 	@Override
@@ -56,21 +56,21 @@ public class OntologyImpl implements Ontology {
 	}
 
 	@Override
-	public Equation getDefinition(String name) {
-		return definitions.get(name);
+	public Equation getDefinition(Integer id) {
+		return definitions.get(id);
 	}
 
 	@Override
-	public Set<String> getDefinitionIds() {
+	public Set<Integer> getDefinitionIds() {
 		return Collections.unmodifiableSet(this.definitions.keySet());
 	}
 
 	@Override
-	public Equation getPrimitiveDefinition(String name) {
-		return primitiveDefinitions.get(name);
+	public Equation getPrimitiveDefinition(Integer id) {
+		return primitiveDefinitions.get(id);
 	}
 
-	public Set<String> getPrimitiveDefinitionIds() {
+	public Set<Integer> getPrimitiveDefinitionIds() {
 		return Collections.unmodifiableSet(this.primitiveDefinitions.keySet());
 	}
 
@@ -84,11 +84,11 @@ public class OntologyImpl implements Ontology {
 		this.primitiveDefinitions.putAll(other.primitiveDefinitions);
 	}
 
-	public void putDefinition(String name, Equation equation) {
+	public void putDefinition(Integer name, Equation equation) {
 		this.definitions.put(name, equation);
 	}
 
-	public void putPrimitiveDefinition(String name, Equation equation) {
+	public void putPrimitiveDefinition(Integer name, Equation equation) {
 		this.primitiveDefinitions.put(name, equation);
 	}
 

@@ -93,14 +93,29 @@ public class OntologyBuilder {
 		}
 
 		for (Equation eq : setOfEquations) {
-			String name = getAtomManager().get(eq.getLeft()).getId();
 			if (eq.isPrimitive()) {
-				ret.putPrimitiveDefinition(name, eq);
+				ret.putPrimitiveDefinition(eq.getLeft(), eq);
 			} else {
-				ret.putDefinition(name, eq);
+				ret.putDefinition(eq.getLeft(), eq);
 			}
 		}
 		return ret;
+	}
+
+	/**
+	 * Returns the name given to an OWL class in UEL.
+	 * 
+	 * @param cls
+	 *            an OWL class
+	 * @return the name given to an OWL class in UEL
+	 */
+	public Integer getAtomId(OWLClass cls) {
+		if (cls == null) {
+			throw new IllegalArgumentException("Null argument.");
+		}
+
+		Atom atom = processClass(cls).iterator().next();
+		return getAtomManager().addAndGetIndex(atom);
 	}
 
 	public IndexedSet<Atom> getAtomManager() {
@@ -145,21 +160,6 @@ public class OntologyBuilder {
 			}
 		}
 		return ret;
-	}
-
-	/**
-	 * Returns the name given to an OWL class in UEL.
-	 * 
-	 * @param cls
-	 *            an OWL class
-	 * @return the name given to an OWL class in UEL
-	 */
-	public String getName(OWLClass cls) {
-		if (cls == null) {
-			throw new IllegalArgumentException("Null argument.");
-		}
-
-		return processClass(cls).iterator().next().toString();
 	}
 
 	/**
@@ -267,14 +267,14 @@ public class OntologyBuilder {
 		return ret;
 	}
 
-	public Map<String, OWLClass> processNames(Set<OWLClass> set) {
+	public Map<Integer, OWLClass> processNames(Set<OWLClass> set) {
 		if (set == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
 
-		Map<String, OWLClass> ret = new HashMap<String, OWLClass>();
+		Map<Integer, OWLClass> ret = new HashMap<Integer, OWLClass>();
 		for (OWLClass cls : set) {
-			ret.put(getName(cls), cls);
+			ret.put(getAtomId(cls), cls);
 		}
 		return ret;
 	}

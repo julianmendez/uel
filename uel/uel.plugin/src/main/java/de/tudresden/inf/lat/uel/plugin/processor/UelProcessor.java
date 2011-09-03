@@ -101,13 +101,17 @@ public class UelProcessor {
 
 	private Goal createGoal(Ontology ont, Set<String> input) {
 		List<Equation> equationList = new ArrayList<Equation>();
-		for (String cls : input) {
-			Equation equation = ont.getDefinition(cls);
-			if (equation == null) {
-				equation = ont.getPrimitiveDefinition(cls);
-			}
-			if (equation != null) {
-				equationList.add(equation);
+		for (Integer atomId : ont.getDefinitionIds()) {
+			Atom atom = getAtomManager().get(atomId);
+			if (input.contains(atom.getId())) {
+
+				Equation equation = ont.getDefinition(atomId);
+				if (equation == null) {
+					equation = ont.getPrimitiveDefinition(atomId);
+				}
+				if (equation != null) {
+					equationList.add(equation);
+				}
 			}
 		}
 
