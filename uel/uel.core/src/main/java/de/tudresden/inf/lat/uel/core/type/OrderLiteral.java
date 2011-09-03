@@ -7,9 +7,9 @@ package de.tudresden.inf.lat.uel.core.type;
  */
 public class OrderLiteral implements Literal {
 
-	private final String first;
+	private final Integer first;
 	private int hashCode = 0;
-	private final String second;
+	private final Integer second;
 
 	/**
 	 * Constructs an order literal given two names.
@@ -19,7 +19,7 @@ public class OrderLiteral implements Literal {
 	 * @param two
 	 *            second component
 	 */
-	public OrderLiteral(String one, String two) {
+	public OrderLiteral(Integer one, Integer two) {
 		if (one == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
@@ -44,12 +44,12 @@ public class OrderLiteral implements Literal {
 	}
 
 	@Override
-	public String getFirst() {
+	public Integer getFirst() {
 		return first;
 	}
 
 	@Override
-	public String getSecond() {
+	public Integer getSecond() {
 		return second;
 	}
 

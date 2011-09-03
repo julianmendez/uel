@@ -7,9 +7,9 @@ package de.tudresden.inf.lat.uel.core.type;
  */
 public class DissubsumptionLiteral implements Literal {
 
-	private final String first;
+	private final Integer first;
 	private int hashCode = 0;
-	private final String second;
+	private final Integer second;
 
 	/**
 	 * Constructs a dissubsumption literal given two names.
@@ -19,7 +19,7 @@ public class DissubsumptionLiteral implements Literal {
 	 * @param two
 	 *            second component
 	 */
-	public DissubsumptionLiteral(String one, String two) {
+	public DissubsumptionLiteral(Integer one, Integer two) {
 		if (one == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
@@ -44,12 +44,12 @@ public class DissubsumptionLiteral implements Literal {
 	}
 
 	@Override
-	public String getFirst() {
+	public Integer getFirst() {
 		return first;
 	}
 
 	@Override
-	public String getSecond() {
+	public Integer getSecond() {
 		return second;
 	}
 

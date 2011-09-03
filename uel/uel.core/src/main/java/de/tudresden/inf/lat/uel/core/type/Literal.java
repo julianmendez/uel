@@ -16,14 +16,14 @@ public interface Literal {
 	 * 
 	 * @return the first component
 	 */
-	public String getFirst();
+	public Integer getFirst();
 
 	/**
 	 * Returns the second component.
 	 * 
 	 * @return the second component
 	 */
-	public String getSecond();
+	public Integer getSecond();
 
 	/**
 	 * Tells whether this literal is a dissubsumption literal.

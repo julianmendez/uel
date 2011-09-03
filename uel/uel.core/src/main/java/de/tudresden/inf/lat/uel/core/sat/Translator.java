@@ -205,11 +205,10 @@ public class Translator {
 			Atom firstAtom = goal.getAtomManager().get(firstAtomId);
 			if (firstAtom.isUserVariable()) {
 				for (Integer secondAtomId : set) {
-					Atom secondAtom = goal.getAtomManager().get(secondAtomId);
 					Literal literal = this.invertLiteral ? new SubsumptionLiteral(
-							firstAtom.getId(), secondAtom.getId())
-							: new DissubsumptionLiteral(firstAtom.getId(),
-									secondAtom.getId());
+							firstAtomId, secondAtomId)
+							: new DissubsumptionLiteral(firstAtomId,
+									secondAtomId);
 					Integer literalId = literalManager.addAndGetIndex(literal);
 					ret.add(getLiteralValue(literalId) ? literalId : (-1)
 							* literalId);
@@ -257,16 +256,13 @@ public class Translator {
 	}
 
 	private Integer getOrderLiteral(Integer atomId1, Integer atomId2) {
-		Literal literal = new OrderLiteral(getNameForAtomId(atomId1),
-				getNameForAtomId(atomId2));
+		Literal literal = new OrderLiteral(atomId1, atomId2);
 		return literalManager.addAndGetIndex(literal);
 	}
 
 	private Integer getSubOrDissubLiteral(Integer atomId1, Integer atomId2) {
-		Literal literal = invertLiteral ? new SubsumptionLiteral(
-				getNameForAtomId(atomId1), getNameForAtomId(atomId2))
-				: new DissubsumptionLiteral(getNameForAtomId(atomId1),
-						getNameForAtomId(atomId2));
+		Literal literal = invertLiteral ? new SubsumptionLiteral(atomId1,
+				atomId2) : new DissubsumptionLiteral(atomId1, atomId2);
 		int val = literalManager.addAndGetIndex(literal);
 		return invertLiteral ? (-1) * val : val;
 	}
@@ -699,9 +695,8 @@ public class Translator {
 		for (Integer atomId1 : goal.getAtomManager().getIndices()) {
 			for (Integer atomId2 : goal.getAtomManager().getIndices()) {
 				Literal literal = invertLiteral ? new SubsumptionLiteral(
-						getNameForAtomId(atomId1), getNameForAtomId(atomId2))
-						: new DissubsumptionLiteral(getNameForAtomId(atomId1),
-								getNameForAtomId(atomId2));
+						atomId1, atomId2) : new DissubsumptionLiteral(atomId1,
+						atomId2);
 
 				literalManager.add(literal);
 			}
@@ -714,8 +709,7 @@ public class Translator {
 
 		for (Integer atomId1 : goal.getVariables()) {
 			for (Integer atomId2 : goal.getVariables()) {
-				Literal literal = new OrderLiteral(getNameForAtomId(atomId1),
-						getNameForAtomId(atomId2));
+				Literal literal = new OrderLiteral(atomId1, atomId2);
 				literalManager.add(literal);
 			}
 		}
@@ -779,10 +773,10 @@ public class Translator {
 
 		for (Integer i : literalManager.getIndices()) {
 
-			String name1 = literalManager.get(i).getFirst();
+			String name1 = getNameForAtomId(literalManager.get(i).getFirst());
 			Atom atom1 = goal.getAllAtoms().get(name1);
 
-			String name2 = literalManager.get(i).getSecond();
+			String name2 = getNameForAtomId(literalManager.get(i).getSecond());
 			Atom atom2 = goal.getAllAtoms().get(name2);
 
 			if (literalManager.get(i).isDissubsumption()) {
