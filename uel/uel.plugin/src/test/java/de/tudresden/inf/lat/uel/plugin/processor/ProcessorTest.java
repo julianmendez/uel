@@ -21,6 +21,7 @@ import org.semanticweb.owlapi.reasoner.Node;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 
 import de.tudresden.inf.lat.jcel.owlapi.main.JcelReasoner;
+import de.tudresden.inf.lat.uel.core.type.Atom;
 import de.tudresden.inf.lat.uel.core.type.Equation;
 import de.tudresden.inf.lat.uel.core.type.Goal;
 import de.tudresden.inf.lat.uel.plugin.ui.UelController;
@@ -177,7 +178,10 @@ public class ProcessorTest extends TestCase {
 		Goal goal = processor.configure(input);
 
 		for (String var : varNames) {
-			goal.makeVariable(idClassMap.get(var).toStringID());
+			Atom atom = goal.getAllAtoms()
+					.get(idClassMap.get(var).toStringID());
+			Integer atomId = goal.getAtomManager().addAndGetIndex(atom);
+			goal.makeVariable(atomId);
 		}
 
 		processor.createTranslator(goal);

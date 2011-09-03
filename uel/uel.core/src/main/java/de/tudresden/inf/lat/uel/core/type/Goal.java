@@ -300,23 +300,21 @@ public class Goal {
 		}
 	}
 
-	public void makeConstant(String name) {
-		Atom atom = this.allAtoms.get(name);
-		Integer id = getAtomManager().addAndGetIndex(atom);
-		if (this.variables.contains(id)) {
-			this.variables.remove(id);
-			this.constants.add(id);
+	public void makeConstant(Integer atomId) {
+		Atom atom = getAtomManager().get(atomId);
+		if (this.variables.contains(atomId)) {
+			this.variables.remove(atomId);
+			this.constants.add(atomId);
 			atom.setUserVariable(false);
 			atom.setVariable(false);
 		}
 	}
 
-	public void makeVariable(String name) {
-		Atom atom = this.allAtoms.get(name);
-		Integer id = getAtomManager().addAndGetIndex(atom);
-		if (this.constants.contains(id)) {
-			this.constants.remove(id);
-			this.variables.add(id);
+	public void makeVariable(Integer atomId) {
+		Atom atom = getAtomManager().get(atomId);
+		if (this.constants.contains(atomId)) {
+			this.constants.remove(atomId);
+			this.variables.add(atomId);
 			atom.setUserVariable(true);
 			atom.setVariable(true);
 		}

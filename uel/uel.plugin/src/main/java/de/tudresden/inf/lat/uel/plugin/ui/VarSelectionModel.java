@@ -86,7 +86,9 @@ class VarSelectionModel {
 			throw new IllegalArgumentException("Null argument.");
 		}
 
-		this.goal.makeConstant(id);
+		Atom atom = this.goal.getAllAtoms().get(id);
+		Integer atomId = this.goal.getAtomManager().addAndGetIndex(atom);
+		this.goal.makeConstant(atomId);
 	}
 
 	public void makeVariable(String id) {
@@ -94,7 +96,9 @@ class VarSelectionModel {
 			throw new IllegalArgumentException("Null argument.");
 		}
 
-		this.goal.makeVariable(id);
+		Atom atom = this.goal.getAllAtoms().get(id);
+		Integer atomId = this.goal.getAtomManager().addAndGetIndex(atom);
+		this.goal.makeVariable(atomId);
 	}
 
 }
