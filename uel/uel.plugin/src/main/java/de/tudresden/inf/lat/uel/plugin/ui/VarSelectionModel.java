@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import de.tudresden.inf.lat.uel.core.type.Atom;
 import de.tudresden.inf.lat.uel.core.type.Goal;
 
 /**
@@ -37,7 +38,11 @@ class VarSelectionModel {
 	}
 
 	public Set<String> getConstants() {
-		return Collections.unmodifiableSet(this.goal.getConstants());
+		Set<String> ret = new HashSet<String>();
+		for (Integer atomId : this.goal.getConstants()) {
+			ret.add(this.goal.getAtomManager().get(atomId).getId());
+		}
+		return Collections.unmodifiableSet(ret);
 	}
 
 	public Goal getGoal() {
@@ -67,9 +72,10 @@ class VarSelectionModel {
 
 	public Set<String> getVariables() {
 		Set<String> ret = new HashSet<String>();
-		for (String str : getGoal().getVariables()) {
-			if (getGoal().getAllAtoms().get(str).isUserVariable()) {
-				ret.add(str);
+		for (Integer atomId : getGoal().getVariables()) {
+			Atom atom = getGoal().getAtomManager().get(atomId);
+			if (atom.isUserVariable()) {
+				ret.add(atom.getId());
 			}
 		}
 		return Collections.unmodifiableSet(ret);

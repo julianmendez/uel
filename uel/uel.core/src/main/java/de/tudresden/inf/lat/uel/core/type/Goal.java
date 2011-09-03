@@ -182,12 +182,12 @@ public class Goal {
 		return this.atomManager;
 	}
 
-	public Set<String> getConstants() {
-		return Collections.unmodifiableSet(toAtomNames(constants));
+	public Set<Integer> getConstants() {
+		return Collections.unmodifiableSet(constants);
 	}
 
-	public Set<String> getEAtoms() {
-		return Collections.unmodifiableSet(toAtomNames(eatoms));
+	public Set<Integer> getEAtoms() {
+		return Collections.unmodifiableSet(eatoms);
 	}
 
 	/**
@@ -231,8 +231,8 @@ public class Goal {
 		return nbrVar;
 	}
 
-	public Set<String> getVariables() {
-		return Collections.unmodifiableSet(toAtomNames(variables));
+	public Set<Integer> getVariables() {
+		return Collections.unmodifiableSet(variables);
 	}
 
 	@Override
@@ -336,14 +336,6 @@ public class Goal {
 	 */
 	public void setNbrVar(int nbrV) {
 		nbrVar = nbrV;
-	}
-
-	private Set<String> toAtomNames(Set<Integer> set) {
-		Set<String> ret = new HashSet<String>();
-		for (Integer elem : set) {
-			ret.add(getAtomManager().get(elem).getId());
-		}
-		return ret;
 	}
 
 	@Override
