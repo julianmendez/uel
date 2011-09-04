@@ -14,7 +14,6 @@ import de.tudresden.inf.lat.uel.core.type.DissubsumptionLiteral;
 import de.tudresden.inf.lat.uel.core.type.Equation;
 import de.tudresden.inf.lat.uel.core.type.Goal;
 import de.tudresden.inf.lat.uel.core.type.IndexedSet;
-import de.tudresden.inf.lat.uel.core.type.KRSSKeyword;
 import de.tudresden.inf.lat.uel.core.type.Literal;
 import de.tudresden.inf.lat.uel.core.type.OrderLiteral;
 import de.tudresden.inf.lat.uel.core.type.SubsumptionLiteral;
@@ -257,10 +256,6 @@ public class Translator {
 		return (-1) * getSubOrDissubLiteral(atomId1, atomId2);
 	}
 
-	private String getNameForAtomId(Integer atomId) {
-		return goal.getAtomManager().get(atomId).getId();
-	}
-
 	private Integer getOrderLiteral(Integer atomId1, Integer atomId2) {
 		Literal literal = new OrderLiteral(atomId1, atomId2);
 		return literalManager.addAndGetIndex(literal);
@@ -307,7 +302,8 @@ public class Translator {
 	}
 
 	private boolean isTop(Integer atomId) {
-		return getNameForAtomId(atomId).equalsIgnoreCase(KRSSKeyword.top);
+		Atom atom = goal.getAtomManager().get(atomId);
+		return (atom.isConceptName() && atom.asConceptName().isTop());
 	}
 
 	/**

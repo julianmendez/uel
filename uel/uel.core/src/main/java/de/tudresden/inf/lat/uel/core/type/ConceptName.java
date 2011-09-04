@@ -1,13 +1,16 @@
 package de.tudresden.inf.lat.uel.core.type;
 
 /**
- * An object of this class is a concept name.
+ * An object of this class is a concept name or TOP.
  * 
  * @author Julian Mendez
  */
 public class ConceptName implements Atom {
 
+	public static final String topKeyword = KRSSKeyword.top;
+
 	private final String name;
+	private final boolean top;
 	private boolean userVariable = false;
 	private boolean variable = false;
 
@@ -25,6 +28,7 @@ public class ConceptName implements Atom {
 		}
 
 		this.name = str;
+		this.top = str.equalsIgnoreCase(topKeyword);
 		this.variable = isVar;
 	}
 
@@ -80,6 +84,15 @@ public class ConceptName implements Atom {
 	@Override
 	public boolean isExistentialRestriction() {
 		return false;
+	}
+
+	/**
+	 * Tells whether this concept is TOP.
+	 * 
+	 * @return <code>true</code> if and only if this concept is TOP
+	 */
+	public boolean isTop() {
+		return this.top;
 	}
 
 	/**
