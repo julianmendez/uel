@@ -543,7 +543,7 @@ public class UelController implements ActionListener {
 
 	private String printSubstitution(Atom atom) {
 		StringBuffer sbuf = new StringBuffer();
-		if (atom.isRoot() && !atom.getChild().isUserVariable()) {
+		if (atom.isExistential() && !atom.getChild().isUserVariable()) {
 			sbuf.append(KRSSKeyword.open);
 			sbuf.append(KRSSKeyword.some);
 			sbuf.append(KRSSKeyword.space);

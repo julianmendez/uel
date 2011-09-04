@@ -312,7 +312,7 @@ public class OntologyBuilder {
 				.getNamedProperty().toStringID();
 		if (atomSet.size() == 1) {
 			Atom atom = atomSet.iterator().next();
-			if (!atom.isRoot()) {
+			if (!atom.isExistential()) {
 				newAtom = new Atom(newAtomName, true, false, atom);
 				getAtomManager().add(newAtom);
 			} else {

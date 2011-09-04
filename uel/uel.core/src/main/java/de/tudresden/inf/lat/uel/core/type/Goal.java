@@ -99,7 +99,7 @@ public class Goal {
 		b.setUserVariable(false);
 		variables.add(e.getLeft());
 
-		if (b.isRoot()) {
+		if (b.isExistential()) {
 
 			throw new RuntimeException(
 					" Definition should not have an existential restriction on its left side ");
@@ -167,7 +167,7 @@ public class Goal {
 	}
 
 	public void exportDefinitions(Atom a) {
-		if (!a.isRoot()) {
+		if (!a.isExistential()) {
 			importAnyDefinition(a);
 		} else {
 			importAnyDefinition(a.getChild());
@@ -292,10 +292,10 @@ public class Goal {
 			Atom a = allAtoms.get(key);
 			Integer id = getAtomManager().addAndGetIndex(a);
 
-			if (!variables.contains(id) && !a.isRoot()) {
+			if (!variables.contains(id) && !a.isExistential()) {
 				constants.add(getAtomManager().addAndGetIndex(a));
 
-			} else if (a.isRoot()) {
+			} else if (a.isExistential()) {
 				eatoms.add(getAtomManager().addAndGetIndex(a));
 			}
 		}

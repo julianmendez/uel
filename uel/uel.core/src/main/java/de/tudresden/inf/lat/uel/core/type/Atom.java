@@ -19,10 +19,10 @@ public class Atom {
 	private Atom child = null;
 	private String id = null;
 	private String name;
-	private boolean root;
+	private boolean existential;
 	private Collection<Atom> setOfSubsumers = new ArrayList<Atom>();
 	private boolean userVariable = false;
-	private boolean var = false;
+	private boolean variable = false;
 
 	/**
 	 * Constructor of flat atom (used in flattening Goal.addAndFlatten)
@@ -35,7 +35,7 @@ public class Atom {
 	 * @param c
 	 */
 	public Atom(Atom c, Atom atom) {
-		init(atom.getName(), atom.isRoot());
+		init(atom.getName(), atom.isExistential());
 		child = c;
 		updateId();
 	}
@@ -77,7 +77,7 @@ public class Atom {
 	 */
 	public Atom(String str, boolean r, boolean v, Atom arg) {
 		init(str, r);
-		var = v;
+		variable = v;
 		child = arg;
 		updateId();
 	}
@@ -98,7 +98,7 @@ public class Atom {
 		if (o instanceof Atom) {
 			Atom other = (Atom) o;
 
-			ret = this.root == other.root
+			ret = this.existential == other.existential
 					&& this.name.equals(other.name)
 					&& this.setOfSubsumers.equals(other.setOfSubsumers)
 					&& ((this.child == null && other.child == null) || (this.child != null && this.child
@@ -144,7 +144,7 @@ public class Atom {
 
 	private void init(String n, boolean r) {
 		name = n;
-		root = r;
+		existential = r;
 	}
 
 	/**
@@ -153,7 +153,7 @@ public class Atom {
 	 * @return <code>true</code> if and only if this atoms is a constant
 	 */
 	public boolean isConstant() {
-		return !(var || this.isRoot());
+		return !(variable || this.isExistential());
 	}
 
 	/**
@@ -162,8 +162,8 @@ public class Atom {
 	 * @return <code>true</code> if and only if the atom is an existential
 	 *         restriction
 	 */
-	public boolean isRoot() {
-		return root;
+	public boolean isExistential() {
+		return existential;
 	}
 
 	/**
@@ -182,7 +182,7 @@ public class Atom {
 	 * @return <code>true</code> if and only if a flat atom is a variable
 	 */
 	public boolean isVariable() {
-		return var;
+		return variable;
 	}
 
 	/**
@@ -201,7 +201,7 @@ public class Atom {
 	 * 
 	 */
 	public void setUserVariable(boolean value) {
-		if (!isRoot()) {
+		if (!isExistential()) {
 			userVariable = value;
 		} else {
 			throw new IllegalStateException(
@@ -216,7 +216,7 @@ public class Atom {
 	 * @param v
 	 */
 	public void setVariable(boolean v) {
-		var = v;
+		variable = v;
 	}
 
 	@Override
