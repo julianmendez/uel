@@ -1,12 +1,10 @@
 package de.tudresden.inf.lat.uel.plugin.main;
 
 import java.awt.Dimension;
-import java.io.IOException;
 
 import javax.swing.JFrame;
 
 import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 
 import de.tudresden.inf.lat.uel.plugin.processor.UelProcessor;
@@ -19,8 +17,7 @@ import de.tudresden.inf.lat.uel.plugin.ui.UelView;
  */
 public class UelStandalone {
 
-	public static void main(String[] args) throws IOException,
-			OWLOntologyCreationException {
+	public static void main(String[] args) {
 		OWLOntologyManager ontologyManager = OWLManager
 				.createOWLOntologyManager();
 		UelController controller = new UelController(new UelView(

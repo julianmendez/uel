@@ -7,7 +7,6 @@ import java.util.Map;
 import org.protege.editor.owl.model.OWLModelManager;
 import org.protege.editor.owl.ui.renderer.OWLModelManagerEntityRenderer;
 import org.semanticweb.owlapi.model.OWLClass;
-import org.semanticweb.owlapi.model.OWLException;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyChange;
 import org.semanticweb.owlapi.model.OWLOntologyChangeListener;
@@ -82,8 +81,7 @@ public class UelStarter implements OWLOntologyChangeListener,
 	}
 
 	@Override
-	public void ontologiesChanged(List<? extends OWLOntologyChange> change)
-			throws OWLException {
+	public void ontologiesChanged(List<? extends OWLOntologyChange> change) {
 		if (change == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}

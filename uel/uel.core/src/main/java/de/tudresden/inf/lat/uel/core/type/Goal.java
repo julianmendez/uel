@@ -1,7 +1,5 @@
 package de.tudresden.inf.lat.uel.core.type;
 
-import java.io.IOException;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -246,13 +244,7 @@ public class Goal {
 		}
 	}
 
-	public void initialize(List<Equation> equationList, Atom left, Atom right)
-			throws IOException {
-		initialize(equationList, left, right, null);
-	}
-
-	private void initialize(List<Equation> list, Atom left, Atom right,
-			Writer output) throws IOException {
+	public void initialize(List<Equation> list, Atom left, Atom right) {
 
 		setMainEquation(new Equation(getAtomManager().addAndGetIndex(left),
 				getAtomManager().addAndGetIndex(right), false));

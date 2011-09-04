@@ -116,14 +116,10 @@ public class UelProcessor {
 		}
 
 		Goal ret = new Goal(ont, getAtomManager());
-		try {
-			Iterator<String> inputIt = input.iterator();
-			Atom left = new Atom(inputIt.next(), false, true, null);
-			Atom right = new Atom(inputIt.next(), false, true, null);
-			ret.initialize(equationList, left, right);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+		Iterator<String> inputIt = input.iterator();
+		Atom left = new Atom(inputIt.next(), false, true, null);
+		Atom right = new Atom(inputIt.next(), false, true, null);
+		ret.initialize(equationList, left, right);
 
 		return ret;
 	}

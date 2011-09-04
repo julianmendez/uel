@@ -108,17 +108,29 @@ public class IndexedSet<T> implements Set<T> {
 	}
 
 	@Override
-	public boolean remove(Object arg0) {
+	public boolean remove(Object element) {
+		if (element == null) {
+			throw new NullPointerException();
+		}
+
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public boolean removeAll(Collection<?> arg0) {
+	public boolean removeAll(Collection<?> elements) {
+		if (elements == null) {
+			throw new NullPointerException();
+		}
+
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public boolean retainAll(Collection<?> arg0) {
+	public boolean retainAll(Collection<?> elements) {
+		if (elements == null) {
+			throw new NullPointerException();
+		}
+
 		throw new UnsupportedOperationException();
 	}
 

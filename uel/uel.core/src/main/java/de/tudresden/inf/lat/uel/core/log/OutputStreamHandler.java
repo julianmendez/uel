@@ -24,9 +24,8 @@ public class OutputStreamHandler extends Handler {
 	 * 
 	 * @param output
 	 *            output stream
-	 * @throws IOException
 	 */
-	public OutputStreamHandler(OutputStream output) throws IOException {
+	public OutputStreamHandler(OutputStream output) {
 		if (output == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}

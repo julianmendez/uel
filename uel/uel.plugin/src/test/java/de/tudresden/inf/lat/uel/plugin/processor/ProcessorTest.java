@@ -209,7 +209,7 @@ public class ProcessorTest extends TestCase {
 			assertTrue(node.contains(elem));
 		}
 
-		assertEquals((Integer) numberOfUnifiers, (Integer) unifiers.size());
+		assertEquals(numberOfUnifiers, (Integer) unifiers.size());
 	}
 
 }
