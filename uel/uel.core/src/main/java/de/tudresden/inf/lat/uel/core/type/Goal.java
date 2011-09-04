@@ -54,8 +54,6 @@ public class Goal {
 
 	private Equation mainEquation = null;
 
-	private int nbrVar = 0;
-
 	private Ontology ontology = null;
 
 	/**
@@ -160,8 +158,7 @@ public class Goal {
 					&& this.equations.equals(other.equations)
 					&& this.mainEquation.equals(other.mainEquation)
 					&& this.variables.equals(other.variables)
-					&& this.ontology.equals(other.ontology)
-					&& this.nbrVar == other.nbrVar;
+					&& this.ontology.equals(other.ontology);
 		}
 		return ret;
 	}
@@ -217,18 +214,6 @@ public class Goal {
 
 	public Equation getMainEquation() {
 		return mainEquation;
-	}
-
-	/**
-	 * This method is used by a constructor of a flat atom
-	 * <code>FAtom(Atom)</code> from atom. This requires to introduce a new
-	 * variable. New variables are identified by unique numbers. The next unique
-	 * number is stored in <code>nbrVar</code>.
-	 * 
-	 * @return nbrVar
-	 */
-	public int getNbrVar() {
-		return nbrVar;
 	}
 
 	public Set<Integer> getVariables() {
@@ -323,18 +308,6 @@ public class Goal {
 
 	public void setMainEquation(Equation equation) {
 		this.mainEquation = equation;
-	}
-
-	/**
-	 * This method is used by a constructor of a flat atom
-	 * <code>FAtom(Atom)</code> from atom. This requires to introduce a new
-	 * variable. New variables are identified by unique numbers. The next unique
-	 * number is stored in <code>nbrVar</code>.
-	 * 
-	 * @param nbrV
-	 */
-	public void setNbrVar(int nbrV) {
-		nbrVar = nbrV;
 	}
 
 	@Override

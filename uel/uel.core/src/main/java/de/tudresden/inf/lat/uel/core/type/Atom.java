@@ -89,7 +89,7 @@ public class Atom {
 	 * @param atom
 	 */
 	public void addToSetOfSubsumers(Atom atom) {
-		setOfSubsumers.add((Atom) atom);
+		setOfSubsumers.add(atom);
 	}
 
 	@Override

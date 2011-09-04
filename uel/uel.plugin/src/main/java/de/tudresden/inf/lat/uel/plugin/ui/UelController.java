@@ -658,7 +658,7 @@ public class UelController implements ActionListener {
 
 			Set<Atom> right = new HashSet<Atom>();
 			for (Integer atomId : eq.getRight()) {
-				right.add((Atom) getModel().getAtomManager().get(atomId));
+				right.add(getModel().getAtomManager().get(atomId));
 			}
 
 			sbuf.append(KRSSKeyword.open);
