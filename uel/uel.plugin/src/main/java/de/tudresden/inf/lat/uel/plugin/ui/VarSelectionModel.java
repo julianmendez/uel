@@ -37,6 +37,17 @@ class VarSelectionModel {
 		this.goal = g;
 	}
 
+	private Integer getAtomId(String atomName) {
+		Integer ret = null;
+		for (Integer currentAtomId : this.goal.getAtomManager().getIndices()) {
+			Atom currentAtom = this.goal.getAtomManager().get(currentAtomId);
+			if (currentAtom.getId().equals(atomName)) {
+				ret = currentAtomId;
+			}
+		}
+		return ret;
+	}
+
 	public Set<String> getConstants() {
 		Set<String> ret = new HashSet<String>();
 		for (Integer atomId : this.goal.getConstants()) {
@@ -86,8 +97,10 @@ class VarSelectionModel {
 			throw new IllegalArgumentException("Null argument.");
 		}
 
-		Atom atom = this.goal.getAllAtoms().get(id);
-		Integer atomId = this.goal.getAtomManager().addAndGetIndex(atom);
+		Integer atomId = getAtomId(id);
+		if (atomId == null) {
+			throw new IllegalArgumentException("Unkown atom.");
+		}
 		this.goal.makeConstant(atomId);
 	}
 
@@ -96,8 +109,10 @@ class VarSelectionModel {
 			throw new IllegalArgumentException("Null argument.");
 		}
 
-		Atom atom = this.goal.getAllAtoms().get(id);
-		Integer atomId = this.goal.getAtomManager().addAndGetIndex(atom);
+		Integer atomId = getAtomId(id);
+		if (atomId == null) {
+			throw new IllegalArgumentException("Unkown atom.");
+		}
 		this.goal.makeVariable(atomId);
 	}
 

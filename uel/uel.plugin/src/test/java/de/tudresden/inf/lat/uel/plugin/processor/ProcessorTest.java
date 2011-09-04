@@ -65,6 +65,17 @@ public class ProcessorTest extends TestCase {
 		return reasoner;
 	}
 
+	private Integer getAtomId(Goal goal, String atomName) {
+		Integer ret = null;
+		for (Integer currentAtomId : goal.getAtomManager().getIndices()) {
+			Atom currentAtom = goal.getAtomManager().get(currentAtomId);
+			if (currentAtom.getId().equals(atomName)) {
+				ret = currentAtomId;
+			}
+		}
+		return ret;
+	}
+
 	public void test01() throws OWLOntologyCreationException, IOException {
 		Set<String> varNames = new HashSet<String>();
 		varNames.add("A1");
@@ -178,9 +189,7 @@ public class ProcessorTest extends TestCase {
 		Goal goal = processor.configure(input);
 
 		for (String var : varNames) {
-			Atom atom = goal.getAllAtoms()
-					.get(idClassMap.get(var).toStringID());
-			Integer atomId = goal.getAtomManager().addAndGetIndex(atom);
+			Integer atomId = getAtomId(goal, idClassMap.get(var).toStringID());
 			goal.makeVariable(atomId);
 		}
 

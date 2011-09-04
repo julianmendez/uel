@@ -2,10 +2,8 @@ package de.tudresden.inf.lat.uel.core.type;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -21,14 +19,9 @@ import java.util.logging.Logger;
 public class Goal {
 
 	private static final Logger logger = Logger.getLogger(Goal.class.getName());
+
 	public static final String UNDEF_SUFFIX = "_UNDEF";
 	public static final String VAR_PREFIX = "VAR";
-
-	/**
-	 * allAtoms is a hash map implementing all flat atoms in the goal keys are
-	 * names and values are flat atoms
-	 */
-	private Map<String, Atom> allAtoms = new HashMap<String, Atom>();
 
 	private IndexedSet<Atom> atomManager = null;
 
@@ -127,7 +120,6 @@ public class Goal {
 						false);
 				var.setUserVariable(false);
 				getAtomManager().add(var);
-				this.allAtoms.put(var.getId(), var);
 				Integer varId = getAtomManager().addAndGetIndex(var);
 				this.constants.add(varId);
 
@@ -147,8 +139,7 @@ public class Goal {
 		boolean ret = false;
 		if (o instanceof Goal) {
 			Goal other = (Goal) o;
-			ret = this.allAtoms.equals(other.allAtoms)
-					&& this.constants.equals(other.constants)
+			ret = this.constants.equals(other.constants)
 					&& this.eatoms.equals(other.eatoms)
 					&& this.equations.equals(other.equations)
 					&& this.mainEquation.equals(other.mainEquation)
@@ -164,10 +155,6 @@ public class Goal {
 		} else if (a.isExistentialRestriction()) {
 			importAnyDefinition(a.asExistentialRestriction().getChild());
 		}
-	}
-
-	public Map<String, Atom> getAllAtoms() {
-		return allAtoms;
 	}
 
 	public IndexedSet<Atom> getAtomManager() {
@@ -251,23 +238,21 @@ public class Goal {
 
 		for (Integer atomId : getAtomManager().getIndices()) {
 			Atom atom = getAtomManager().get(atomId);
-			allAtoms.put(atom.getId(), atom);
 			if (atom.isConceptName() && atom.asConceptName().isVariable()) {
 				variables.add(atomId);
 			}
 		}
 
 		for (Integer atomId : variables) {
-			String key = getAtomManager().get(atomId).getId();
-			Atom atom = allAtoms.get(key);
+			Atom atom = getAtomManager().get(atomId);
 			if (!atom.isConceptName()) {
 				throw new IllegalStateException();
 			}
 			atom.asConceptName().setVariable(true);
 		}
 
-		for (String key : allAtoms.keySet()) {
-			Atom a = allAtoms.get(key);
+		for (Integer atomId : getAtomManager().getIndices()) {
+			Atom a = getAtomManager().get(atomId);
 			Integer id = getAtomManager().addAndGetIndex(a);
 
 			if (!variables.contains(id) && !a.isExistentialRestriction()) {
