@@ -1,11 +1,9 @@
 package de.tudresden.inf.lat.uel.core.sat;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -126,7 +124,7 @@ public class Translator {
 
 	private IndexedSet<Literal> literalManager = new IndexedSet<Literal>();
 
-	private Map<Atom, List<Atom>> subsumers = new HashMap<Atom, List<Atom>>();
+	private Map<Integer, Set<Integer>> subsumers = new HashMap<Integer, Set<Integer>>();
 
 	private Set<Integer> trueLiterals = new HashSet<Integer>();
 
@@ -161,13 +159,13 @@ public class Translator {
 		setLiterals();
 	}
 
-	private boolean addToSetOfSubsumers(Atom atom1, Atom atom2) {
-		List<Atom> ret = this.subsumers.get(atom1);
+	private boolean addToSetOfSubsumers(Integer atomId1, Integer atomId2) {
+		Set<Integer> ret = this.subsumers.get(atomId1);
 		if (ret == null) {
-			ret = new ArrayList<Atom>();
-			this.subsumers.put(atom1, ret);
+			ret = new HashSet<Integer>();
+			this.subsumers.put(atomId1, ret);
 		}
-		return ret.add(atom2);
+		return ret.add(atomId2);
 	}
 
 	/**
@@ -263,26 +261,18 @@ public class Translator {
 		return goal.getAtomManager().get(atomId).getId();
 	}
 
-	private Set<String> getNamesForAtomIds(Set<Integer> set) {
-		Set<String> ret = new HashSet<String>();
-		for (Integer atomId : set) {
-			ret.add(getNameForAtomId(atomId));
-		}
-		return ret;
-	}
-
 	private Integer getOrderLiteral(Integer atomId1, Integer atomId2) {
 		Literal literal = new OrderLiteral(atomId1, atomId2);
 		return literalManager.addAndGetIndex(literal);
 	}
 
-	public Collection<Atom> getSetOfSubsumers(Atom atom) {
-		List<Atom> ret = this.subsumers.get(atom);
-		if (ret == null) {
-			ret = new ArrayList<Atom>();
-			this.subsumers.put(atom, ret);
+	public Collection<Integer> getSetOfSubsumers(Integer atomId) {
+		Set<Integer> list = this.subsumers.get(atomId);
+		if (list == null) {
+			list = new HashSet<Integer>();
+			this.subsumers.put(atomId, list);
 		}
-		return Collections.unmodifiableCollection(ret);
+		return Collections.unmodifiableCollection(list);
 	}
 
 	private Integer getSubOrDissubLiteral(Integer atomId1, Integer atomId2) {
@@ -303,9 +293,9 @@ public class Translator {
 			if (leftPart.isConceptName()
 					&& leftPart.asConceptName().isUserVariable()) {
 				Set<Integer> rightPartIds = new HashSet<Integer>();
-				Collection<Atom> setOfSubsumers = getSetOfSubsumers(leftPart);
-				for (Atom subsumer : setOfSubsumers) {
-					Atom newAtom = goal.getAllAtoms().get(subsumer.getId());
+				Collection<Integer> setOfSubsumers = getSetOfSubsumers(leftPartId);
+				for (Integer subsumerId : setOfSubsumers) {
+					Atom newAtom = goal.getAtomManager().get(subsumerId);
 					rightPartIds.add(goal.getAtomManager().addAndGetIndex(
 							newAtom));
 				}
@@ -333,18 +323,17 @@ public class Translator {
 		}
 
 		for (Integer atomId : goal.getVariables()) {
-			Atom atom = goal.getAtomManager().get(atomId);
-			resetSetOfSubsumers(atom);
+			resetSetOfSubsumers(atomId);
 		}
 	}
 
-	private void resetSetOfSubsumers(Atom atom) {
-		List<Atom> ret = this.subsumers.get(atom);
-		if (ret == null) {
-			ret = new ArrayList<Atom>();
-			this.subsumers.put(atom, ret);
+	private void resetSetOfSubsumers(Integer atomId) {
+		Set<Integer> list = this.subsumers.get(atomId);
+		if (list == null) {
+			list = new HashSet<Integer>();
+			this.subsumers.put(atomId, list);
 		}
-		ret.clear();
+		list.clear();
 	}
 
 	/**
@@ -819,42 +808,29 @@ public class Translator {
 
 		for (Integer i : literalManager.getIndices()) {
 
-			String name1 = getNameForAtomId(literalManager.get(i).getFirst());
-			Atom atom1 = goal.getAllAtoms().get(name1);
-
-			String name2 = getNameForAtomId(literalManager.get(i).getSecond());
-			Atom atom2 = goal.getAllAtoms().get(name2);
+			Integer atomId1 = literalManager.get(i).getFirst();
+			Integer atomId2 = literalManager.get(i).getSecond();
 
 			if (literalManager.get(i).isDissubsumption()) {
 
 				if (!getLiteralValue(i)) {
 
-					if (getNamesForAtomIds(goal.getVariables()).contains(name1)) {
-						if (getNamesForAtomIds(goal.getConstants()).contains(
-								name2)) {
-
-							addToSetOfSubsumers(atom1, atom2);
-
-						} else if (getNamesForAtomIds(goal.getEAtoms())
-								.contains(name2)) {
-
-							addToSetOfSubsumers(atom1, atom2);
+					if (goal.getVariables().contains(atomId1)) {
+						if (goal.getConstants().contains(atomId2)) {
+							addToSetOfSubsumers(atomId1, atomId2);
+						} else if (goal.getEAtoms().contains(atomId2)) {
+							addToSetOfSubsumers(atomId1, atomId2);
 						}
 					}
 				}
 			} else if (literalManager.get(i).isSubsumption()) {
 				if (getLiteralValue(i)) {
 
-					if (getNamesForAtomIds(goal.getVariables()).contains(name1)) {
-						if (getNamesForAtomIds(goal.getConstants()).contains(
-								name2)) {
-
-							addToSetOfSubsumers(atom1, atom2);
-
-						} else if (getNamesForAtomIds(goal.getEAtoms())
-								.contains(name2)) {
-
-							addToSetOfSubsumers(atom1, atom2);
+					if (goal.getVariables().contains(atomId1)) {
+						if (goal.getConstants().contains(atomId2)) {
+							addToSetOfSubsumers(atomId1, atomId2);
+						} else if (goal.getEAtoms().contains(atomId2)) {
+							addToSetOfSubsumers(atomId1, atomId2);
 						}
 					}
 

@@ -434,6 +434,17 @@ public class UelController implements ActionListener {
 		return this.owlOntologyManager;
 	}
 
+	private Collection<Atom> getSetOfSubsumers(Atom atom) {
+		Collection<Integer> list = getModel().getTranslator()
+				.getSetOfSubsumers(
+						getModel().getAtomManager().addAndGetIndex(atom));
+		List<Atom> ret = new ArrayList<Atom>();
+		for (Integer id : list) {
+			ret.add(getModel().getAtomManager().get(id));
+		}
+		return ret;
+	}
+
 	private String getShortForm(OWLClass cls) {
 		String ret = this.shortFormMap.get(cls);
 		if (ret == null) {
@@ -555,8 +566,8 @@ public class UelController implements ActionListener {
 			Atom child = atom.asExistentialRestriction().getChild();
 			if (child.isConceptName() && child.asConceptName().isVariable()
 					&& !child.asConceptName().isUserVariable()) {
-				sbuf.append(printSetOfSubsumers(getModel().getTranslator()
-						.getSetOfSubsumers(child.asConceptName())));
+				sbuf.append(printSetOfSubsumers(getSetOfSubsumers(child
+						.asConceptName())));
 			} else {
 				sbuf.append(child.getName());
 			}
