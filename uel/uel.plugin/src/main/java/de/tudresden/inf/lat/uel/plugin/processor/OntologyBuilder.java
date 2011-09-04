@@ -17,7 +17,9 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 
 import de.tudresden.inf.lat.uel.core.type.Atom;
+import de.tudresden.inf.lat.uel.core.type.ConceptName;
 import de.tudresden.inf.lat.uel.core.type.Equation;
+import de.tudresden.inf.lat.uel.core.type.ExistentialRestriction;
 import de.tudresden.inf.lat.uel.core.type.IndexedSet;
 import de.tudresden.inf.lat.uel.core.type.OntologyImpl;
 
@@ -47,7 +49,8 @@ public class OntologyBuilder {
 	private Atom createFlattenAtom(String newAtomName, Set<Atom> atomSet,
 			Set<Equation> newEquations) {
 		Atom child = createNewAtom();
-		Atom newAtom = new Atom(newAtomName, true, false, child);
+		ExistentialRestriction newAtom = new ExistentialRestriction(
+				newAtomName, child);
 		Integer childId = getAtomManager().addAndGetIndex(child);
 		Set<Integer> atomIdSet = new HashSet<Integer>();
 		for (Atom a : atomSet) {
@@ -62,7 +65,7 @@ public class OntologyBuilder {
 	private Atom createNewAtom() {
 		String str = freshConstantPrefix + freshConstantIndex;
 		freshConstantIndex++;
-		Atom ret = new Atom(str, false, true, null);
+		ConceptName ret = new ConceptName(str, true);
 		getAtomManager().add(ret);
 		return ret;
 	}
@@ -217,7 +220,7 @@ public class OntologyBuilder {
 
 	private Set<Atom> processClass(OWLClass cls) {
 		Set<Atom> ret = new HashSet<Atom>();
-		Atom newAtom = new Atom(cls.toStringID(), false);
+		ConceptName newAtom = new ConceptName(cls.toStringID(), false);
 		getAtomManager().add(newAtom);
 		ret.add(newAtom);
 		return ret;
@@ -312,8 +315,8 @@ public class OntologyBuilder {
 				.getNamedProperty().toStringID();
 		if (atomSet.size() == 1) {
 			Atom atom = atomSet.iterator().next();
-			if (!atom.isExistential()) {
-				newAtom = new Atom(newAtomName, true, false, atom);
+			if (!atom.isExistentialRestriction()) {
+				newAtom = new ExistentialRestriction(newAtomName, atom);
 				getAtomManager().add(newAtom);
 			} else {
 				newAtom = createFlattenAtom(newAtomName, atomSet, newEquations);

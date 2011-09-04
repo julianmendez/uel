@@ -16,6 +16,7 @@ import de.tudresden.inf.lat.uel.core.sat.SatOutput;
 import de.tudresden.inf.lat.uel.core.sat.Solver;
 import de.tudresden.inf.lat.uel.core.sat.Translator;
 import de.tudresden.inf.lat.uel.core.type.Atom;
+import de.tudresden.inf.lat.uel.core.type.ConceptName;
 import de.tudresden.inf.lat.uel.core.type.Equation;
 import de.tudresden.inf.lat.uel.core.type.Goal;
 import de.tudresden.inf.lat.uel.core.type.IndexedSet;
@@ -117,8 +118,8 @@ public class UelProcessor {
 
 		Goal ret = new Goal(ont, getAtomManager());
 		Iterator<String> inputIt = input.iterator();
-		Atom left = new Atom(inputIt.next(), false, true, null);
-		Atom right = new Atom(inputIt.next(), false, true, null);
+		ConceptName left = new ConceptName(inputIt.next(), true);
+		ConceptName right = new ConceptName(inputIt.next(), true);
 		ret.initialize(equationList, left, right);
 
 		return ret;

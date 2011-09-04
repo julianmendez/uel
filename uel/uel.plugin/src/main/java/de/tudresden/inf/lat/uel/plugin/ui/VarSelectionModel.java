@@ -74,7 +74,7 @@ class VarSelectionModel {
 		Set<String> ret = new HashSet<String>();
 		for (Integer atomId : getGoal().getVariables()) {
 			Atom atom = getGoal().getAtomManager().get(atomId);
-			if (atom.isUserVariable()) {
+			if (atom.isConceptName() && atom.asConceptName().isUserVariable()) {
 				ret.add(atom.getId());
 			}
 		}

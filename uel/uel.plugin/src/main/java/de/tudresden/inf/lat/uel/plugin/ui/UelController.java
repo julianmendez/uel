@@ -543,21 +543,26 @@ public class UelController implements ActionListener {
 
 	private String printSubstitution(Atom atom) {
 		StringBuffer sbuf = new StringBuffer();
-		if (atom.isExistential() && !atom.getChild().isUserVariable()) {
+		if (atom.isExistentialRestriction()
+				&& !(atom.asExistentialRestriction().getChild().isConceptName() && atom
+						.asExistentialRestriction().getChild().asConceptName()
+						.isUserVariable())) {
 			sbuf.append(KRSSKeyword.open);
 			sbuf.append(KRSSKeyword.some);
 			sbuf.append(KRSSKeyword.space);
 			sbuf.append(atom.getName());
 			sbuf.append(KRSSKeyword.space);
-			Atom child = atom.getChild();
-			if (child.isVariable() && !child.isUserVariable()) {
-				sbuf.append(printSetOfSubsumers(child.getSetOfSubsumers()));
+			Atom child = atom.asExistentialRestriction().getChild();
+			if (child.isConceptName() && child.asConceptName().isVariable()
+					&& !child.asConceptName().isUserVariable()) {
+				sbuf.append(printSetOfSubsumers(getModel().getTranslator()
+						.getSetOfSubsumers(child.asConceptName())));
 			} else {
 				sbuf.append(child.getName());
 			}
 			sbuf.append(KRSSKeyword.close);
 		} else {
-			sbuf.append(atom.toString());
+			sbuf.append(atom.getId());
 		}
 		return sbuf.toString();
 	}

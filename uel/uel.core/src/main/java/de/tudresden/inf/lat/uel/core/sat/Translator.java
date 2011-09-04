@@ -1,8 +1,12 @@
 package de.tudresden.inf.lat.uel.core.sat;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.logging.Logger;
@@ -122,6 +126,8 @@ public class Translator {
 
 	private IndexedSet<Literal> literalManager = new IndexedSet<Literal>();
 
+	private Map<Atom, List<Atom>> subsumers = new HashMap<Atom, List<Atom>>();
+
 	private Set<Integer> trueLiterals = new HashSet<Integer>();
 
 	/**
@@ -153,6 +159,15 @@ public class Translator {
 		goal = g;
 		invertLiteral = inv;
 		setLiterals();
+	}
+
+	private boolean addToSetOfSubsumers(Atom atom1, Atom atom2) {
+		List<Atom> ret = this.subsumers.get(atom1);
+		if (ret == null) {
+			ret = new ArrayList<Atom>();
+			this.subsumers.put(atom1, ret);
+		}
+		return ret.add(atom2);
 	}
 
 	/**
@@ -203,7 +218,8 @@ public class Translator {
 		set.addAll(goal.getEAtoms());
 		for (Integer firstAtomId : goal.getVariables()) {
 			Atom firstAtom = goal.getAtomManager().get(firstAtomId);
-			if (firstAtom.isUserVariable()) {
+			if (firstAtom.isConceptName()
+					&& firstAtom.asConceptName().isUserVariable()) {
 				for (Integer secondAtomId : set) {
 					Literal literal = this.invertLiteral ? new SubsumptionLiteral(
 							firstAtomId, secondAtomId)
@@ -260,6 +276,15 @@ public class Translator {
 		return literalManager.addAndGetIndex(literal);
 	}
 
+	public Collection<Atom> getSetOfSubsumers(Atom atom) {
+		List<Atom> ret = this.subsumers.get(atom);
+		if (ret == null) {
+			ret = new ArrayList<Atom>();
+			this.subsumers.put(atom, ret);
+		}
+		return Collections.unmodifiableCollection(ret);
+	}
+
 	private Integer getSubOrDissubLiteral(Integer atomId1, Integer atomId2) {
 		Literal literal = invertLiteral ? new SubsumptionLiteral(atomId1,
 				atomId2) : new DissubsumptionLiteral(atomId1, atomId2);
@@ -275,9 +300,10 @@ public class Translator {
 		Set<Equation> ret = new HashSet<Equation>();
 		for (Integer leftPartId : goal.getVariables()) {
 			Atom leftPart = goal.getAtomManager().get(leftPartId);
-			if (leftPart.isUserVariable()) {
+			if (leftPart.isConceptName()
+					&& leftPart.asConceptName().isUserVariable()) {
 				Set<Integer> rightPartIds = new HashSet<Integer>();
-				Collection<Atom> setOfSubsumers = leftPart.getSetOfSubsumers();
+				Collection<Atom> setOfSubsumers = getSetOfSubsumers(leftPart);
 				for (Atom subsumer : setOfSubsumers) {
 					Atom newAtom = goal.getAllAtoms().get(subsumer.getId());
 					rightPartIds.add(goal.getAtomManager().addAndGetIndex(
@@ -307,8 +333,18 @@ public class Translator {
 		}
 
 		for (Integer atomId : goal.getVariables()) {
-			goal.getAtomManager().get(atomId).resetSetOfSubsumers();
+			Atom atom = goal.getAtomManager().get(atomId);
+			resetSetOfSubsumers(atom);
 		}
+	}
+
+	private void resetSetOfSubsumers(Atom atom) {
+		List<Atom> ret = this.subsumers.get(atom);
+		if (ret == null) {
+			ret = new ArrayList<Atom>();
+			this.subsumers.put(atom, ret);
+		}
+		ret.clear();
 	}
 
 	/**
@@ -607,9 +643,12 @@ public class Translator {
 		for (Integer atomId1 : goal.getEAtoms()) {
 
 			Atom eatom = goal.getAtomManager().get(atomId1);
-			Atom child = eatom.getChild();
+			if (!eatom.isExistentialRestriction()) {
+				throw new IllegalStateException();
+			}
+			Atom child = eatom.asExistentialRestriction().getChild();
 
-			if (child.isVariable()) {
+			if (child.isConceptName() && child.asConceptName().isVariable()) {
 
 				for (Integer atomId2 : goal.getVariables()) {
 					Set<Integer> clause = new HashSet<Integer>();
@@ -653,13 +692,20 @@ public class Translator {
 						 * if the roles are equal, then clause in Step 2.3
 						 */
 					} else {
+						Atom atom1 = goal.getAtomManager().get(atomId1);
+						Atom atom2 = goal.getAtomManager().get(atomId2);
 
-						Atom child1 = goal.getAtomManager().get(atomId1)
+						if (!atom1.isExistentialRestriction()
+								|| !atom2.isExistentialRestriction()) {
+							throw new IllegalStateException();
+						}
+
+						Atom child1 = atom1.asExistentialRestriction()
 								.getChild();
 						Integer child1Id = goal.getAtomManager()
 								.addAndGetIndex(child1);
 
-						Atom child2 = goal.getAtomManager().get(atomId2)
+						Atom child2 = atom2.asExistentialRestriction()
 								.getChild();
 						Integer child2Id = goal.getAtomManager()
 								.addAndGetIndex(child2);
@@ -787,12 +833,12 @@ public class Translator {
 						if (getNamesForAtomIds(goal.getConstants()).contains(
 								name2)) {
 
-							atom1.addToSetOfSubsumers(atom2);
+							addToSetOfSubsumers(atom1, atom2);
 
 						} else if (getNamesForAtomIds(goal.getEAtoms())
 								.contains(name2)) {
 
-							atom1.addToSetOfSubsumers(atom2);
+							addToSetOfSubsumers(atom1, atom2);
 						}
 					}
 				}
@@ -803,13 +849,12 @@ public class Translator {
 						if (getNamesForAtomIds(goal.getConstants()).contains(
 								name2)) {
 
-							atom1.addToSetOfSubsumers(atom2);
+							addToSetOfSubsumers(atom1, atom2);
 
 						} else if (getNamesForAtomIds(goal.getEAtoms())
 								.contains(name2)) {
 
-							atom1.addToSetOfSubsumers(atom2);
-
+							addToSetOfSubsumers(atom1, atom2);
 						}
 					}
 
@@ -817,4 +862,5 @@ public class Translator {
 			}
 		}
 	}
+
 }

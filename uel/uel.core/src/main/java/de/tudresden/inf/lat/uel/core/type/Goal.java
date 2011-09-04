@@ -90,17 +90,14 @@ public class Goal {
 	 */
 	public void addFlatten(Equation e) {
 
-		Atom b = getAtomManager().get(e.getLeft());
+		Atom leftAtom = getAtomManager().get(e.getLeft());
+		if (!leftAtom.isConceptName()) {
+			throw new IllegalStateException();
+		}
+		ConceptName b = leftAtom.asConceptName();
 		b.setVariable(true);
 		b.setUserVariable(false);
 		variables.add(e.getLeft());
-
-		if (b.isExistential()) {
-
-			throw new RuntimeException(
-					" Definition should not have an existential restriction on its left side ");
-
-		}
 
 		if (variables.contains(b.getName())) {
 
@@ -126,8 +123,8 @@ public class Goal {
 				 * Adding new variable to the right side
 				 */
 
-				Atom var = new Atom(b.getId() + UNDEF_SUFFIX, false, false,
-						null);
+				ConceptName var = new ConceptName(b.getId() + UNDEF_SUFFIX,
+						false);
 				var.setUserVariable(false);
 				getAtomManager().add(var);
 				this.allAtoms.put(var.getId(), var);
@@ -162,10 +159,10 @@ public class Goal {
 	}
 
 	public void exportDefinitions(Atom a) {
-		if (!a.isExistential()) {
+		if (!a.isExistentialRestriction()) {
 			importAnyDefinition(a);
-		} else {
-			importAnyDefinition(a.getChild());
+		} else if (a.isExistentialRestriction()) {
+			importAnyDefinition(a.asExistentialRestriction().getChild());
 		}
 	}
 
@@ -255,24 +252,28 @@ public class Goal {
 		for (Integer atomId : getAtomManager().getIndices()) {
 			Atom atom = getAtomManager().get(atomId);
 			allAtoms.put(atom.getId(), atom);
-			if (atom.isVariable()) {
+			if (atom.isConceptName() && atom.asConceptName().isVariable()) {
 				variables.add(atomId);
 			}
 		}
 
 		for (Integer atomId : variables) {
 			String key = getAtomManager().get(atomId).getId();
-			allAtoms.get(key).setVariable(true);
+			Atom atom = allAtoms.get(key);
+			if (!atom.isConceptName()) {
+				throw new IllegalStateException();
+			}
+			atom.asConceptName().setVariable(true);
 		}
 
 		for (String key : allAtoms.keySet()) {
 			Atom a = allAtoms.get(key);
 			Integer id = getAtomManager().addAndGetIndex(a);
 
-			if (!variables.contains(id) && !a.isExistential()) {
+			if (!variables.contains(id) && !a.isExistentialRestriction()) {
 				constants.add(getAtomManager().addAndGetIndex(a));
 
-			} else if (a.isExistential()) {
+			} else if (a.isExistentialRestriction()) {
 				eatoms.add(getAtomManager().addAndGetIndex(a));
 			}
 		}
@@ -280,21 +281,33 @@ public class Goal {
 
 	public void makeConstant(Integer atomId) {
 		Atom atom = getAtomManager().get(atomId);
+		if (!atom.isConceptName()) {
+			throw new IllegalArgumentException(
+					"Argument is not a concept name identifier: '" + atomId
+							+ "'.");
+		}
+		ConceptName conceptName = atom.asConceptName();
 		if (this.variables.contains(atomId)) {
 			this.variables.remove(atomId);
 			this.constants.add(atomId);
-			atom.setUserVariable(false);
-			atom.setVariable(false);
+			conceptName.setUserVariable(false);
+			conceptName.setVariable(false);
 		}
 	}
 
 	public void makeVariable(Integer atomId) {
 		Atom atom = getAtomManager().get(atomId);
+		if (!atom.isConceptName()) {
+			throw new IllegalArgumentException(
+					"Argument is not a concept name identifier: '" + atomId
+							+ "'.");
+		}
+		ConceptName conceptName = atom.asConceptName();
 		if (this.constants.contains(atomId)) {
 			this.constants.remove(atomId);
 			this.variables.add(atomId);
-			atom.setUserVariable(true);
-			atom.setVariable(true);
+			conceptName.setUserVariable(true);
+			conceptName.setVariable(true);
 		}
 	}
 
