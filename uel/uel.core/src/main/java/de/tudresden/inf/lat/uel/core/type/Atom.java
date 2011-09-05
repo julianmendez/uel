@@ -10,7 +10,8 @@ public interface Atom {
 	/**
 	 * Returns the atom as a concept name.
 	 * 
-	 * @throw ClassCastException if the atom is not a concept name
+	 * @throws ClassCastException
+	 *             if the atom is not a concept name
 	 * @return the atom as a concept name
 	 */
 	public ConceptName asConceptName();
@@ -18,7 +19,8 @@ public interface Atom {
 	/**
 	 * Returns the atom as an existential restriction.
 	 * 
-	 * @throw ClassCastException if the atom is not an existential restriction
+	 * @throws ClassCastException
+	 *             if the atom is not an existential restriction
 	 * @return the atom as an existential restriction
 	 */
 	public ExistentialRestriction asExistentialRestriction();
