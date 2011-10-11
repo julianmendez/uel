@@ -48,7 +48,7 @@ public class OntologyBuilder {
 
 	private Atom createFlattenAtom(String newAtomName, Set<Atom> atomSet,
 			Set<Equation> newEquations) {
-		Atom child = createNewAtom();
+		ConceptName child = createNewAtom();
 		ExistentialRestriction newAtom = new ExistentialRestriction(
 				newAtomName, child);
 		Integer childId = getAtomManager().addAndGetIndex(child);
@@ -62,7 +62,7 @@ public class OntologyBuilder {
 		return newAtom;
 	}
 
-	private Atom createNewAtom() {
+	private ConceptName createNewAtom() {
 		String str = freshConstantPrefix + freshConstantIndex;
 		freshConstantIndex++;
 		ConceptName ret = new ConceptName(str, true);
@@ -315,8 +315,9 @@ public class OntologyBuilder {
 				.getNamedProperty().toStringID();
 		if (atomSet.size() == 1) {
 			Atom atom = atomSet.iterator().next();
-			if (!atom.isExistentialRestriction()) {
-				newAtom = new ExistentialRestriction(newAtomName, atom);
+			if (atom.isConceptName()) {
+				ConceptName concept = atom.asConceptName();
+				newAtom = new ExistentialRestriction(newAtomName, concept);
 				getAtomManager().add(newAtom);
 			} else {
 				newAtom = createFlattenAtom(newAtomName, atomSet, newEquations);

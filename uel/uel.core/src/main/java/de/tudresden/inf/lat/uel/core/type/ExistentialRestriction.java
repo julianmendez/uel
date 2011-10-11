@@ -7,7 +7,7 @@ package de.tudresden.inf.lat.uel.core.type;
  */
 public class ExistentialRestriction implements Atom {
 
-	private final Atom child;
+	private final ConceptName child;
 	private final String id;
 	private final String name;
 
@@ -19,7 +19,7 @@ public class ExistentialRestriction implements Atom {
 	 * @param ch
 	 *            child
 	 */
-	public ExistentialRestriction(String str, Atom ch) {
+	public ExistentialRestriction(String str, ConceptName ch) {
 		this.name = str;
 		this.child = ch;
 		this.id = updateId();
@@ -40,7 +40,6 @@ public class ExistentialRestriction implements Atom {
 		boolean ret = false;
 		if (o instanceof ExistentialRestriction) {
 			ExistentialRestriction other = (ExistentialRestriction) o;
-
 			ret = this.name.equals(other.name)
 					&& ((this.child == null && other.child == null) || (this.child != null && this.child
 							.equals(other.child)));
@@ -57,7 +56,7 @@ public class ExistentialRestriction implements Atom {
 	 * @return an argument in the flat atom, which is an existential
 	 *         restriction; otherwise it returns null
 	 */
-	public Atom getChild() {
+	public ConceptName getChild() {
 		return this.child;
 	}
 

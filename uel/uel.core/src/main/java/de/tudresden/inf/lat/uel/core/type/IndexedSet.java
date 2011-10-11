@@ -153,4 +153,9 @@ public class IndexedSet<T> implements Set<T> {
 		return this.list.toArray(a);
 	}
 
+	@Override
+	public String toString() {
+		return this.list.toString();
+	}
+
 }
