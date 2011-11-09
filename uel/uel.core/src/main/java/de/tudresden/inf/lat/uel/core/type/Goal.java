@@ -233,14 +233,38 @@ public class Goal {
 
 		setMainEquation(new Equation(getAtomManager().addAndGetIndex(left),
 				getAtomManager().addAndGetIndex(right), false));
+
 		for (Equation eq : list) {
 			addFlatten(ontology, eq);
 		}
 
-		for (Integer atomId : getAtomManager().getIndices()) {
+		Set<Integer> usedAtomIds = new HashSet<Integer>();
+		for (Equation eq : this.equations) {
+			usedAtomIds.add(eq.getLeft());
+			usedAtomIds.addAll(eq.getRight());
+		}
+
+		Set<Integer> conceptNameIds = new HashSet<Integer>();
+		for (Integer usedAtomId : usedAtomIds) {
+			Atom atom = getAtomManager().get(usedAtomId);
+			if (atom.isConceptName()) {
+				conceptNameIds.add(usedAtomId);
+			} else if (atom.isExistentialRestriction()) {
+				eatoms.add(usedAtomId);
+				ConceptName child = atom.asExistentialRestriction().getChild();
+				Integer childId = getAtomManager().addAndGetIndex(child);
+				conceptNameIds.add(childId);
+			}
+		}
+
+		for (Integer atomId : conceptNameIds) {
 			Atom atom = getAtomManager().get(atomId);
-			if (atom.isConceptName() && atom.asConceptName().isVariable()) {
-				variables.add(atomId);
+			if (atom.isConceptName()) {
+				if (atom.asConceptName().isVariable()) {
+					variables.add(atomId);
+				} else if (!atom.asConceptName().isVariable()) {
+					constants.add(atomId);
+				}
 			}
 		}
 
@@ -252,17 +276,6 @@ public class Goal {
 			atom.asConceptName().setVariable(true);
 		}
 
-		for (Integer atomId : getAtomManager().getIndices()) {
-			Atom a = getAtomManager().get(atomId);
-			Integer id = getAtomManager().addAndGetIndex(a);
-
-			if (!variables.contains(id) && !a.isExistentialRestriction()) {
-				constants.add(getAtomManager().addAndGetIndex(a));
-
-			} else if (a.isExistentialRestriction()) {
-				eatoms.add(getAtomManager().addAndGetIndex(a));
-			}
-		}
 	}
 
 	public void makeConstant(Integer atomId) {
