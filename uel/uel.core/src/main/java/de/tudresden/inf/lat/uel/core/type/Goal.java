@@ -45,8 +45,6 @@ public class Goal {
 
 	private Equation mainEquation = null;
 
-	private Ontology ontology = null;
-
 	/**
 	 * variables is a hash map implementing all concept names which are treated
 	 * as variables keys are names and values are flat atoms
@@ -59,8 +57,7 @@ public class Goal {
 	 * @param ont
 	 *            an ontology
 	 */
-	public Goal(Ontology ont, IndexedSet<Atom> manager) {
-		this.ontology = ont;
+	public Goal(IndexedSet<Atom> manager) {
 		this.atomManager = manager;
 	}
 
@@ -78,10 +75,12 @@ public class Goal {
 	 * This method is to flatten an equation and to add it to the list of goal
 	 * equations
 	 * 
+	 * @param ontology
+	 *            ontology
 	 * @param e
 	 *            equation that needs to be flattened
 	 */
-	public void addFlatten(Equation e) {
+	public void addFlatten(Ontology ontology, Equation e) {
 
 		Atom leftAtom = getAtomManager().get(e.getLeft());
 		if (!leftAtom.isConceptName()) {
@@ -109,7 +108,7 @@ public class Goal {
 			for (Integer atomId : e.getRight()) {
 
 				Atom a = getAtomManager().get(atomId);
-				exportDefinitions(a);
+				exportDefinitions(ontology, a);
 			}
 
 			if (e.isPrimitive()) {
@@ -144,17 +143,17 @@ public class Goal {
 					&& this.eatoms.equals(other.eatoms)
 					&& this.equations.equals(other.equations)
 					&& this.mainEquation.equals(other.mainEquation)
-					&& this.variables.equals(other.variables)
-					&& this.ontology.equals(other.ontology);
+					&& this.variables.equals(other.variables);
 		}
 		return ret;
 	}
 
-	public void exportDefinitions(Atom a) {
+	public void exportDefinitions(Ontology ontology, Atom a) {
 		if (!a.isExistentialRestriction()) {
-			importAnyDefinition(a);
+			importAnyDefinition(ontology, a);
 		} else if (a.isExistentialRestriction()) {
-			importAnyDefinition(a.asExistentialRestriction().getChild());
+			importAnyDefinition(ontology, a.asExistentialRestriction()
+					.getChild());
 		}
 	}
 
@@ -205,7 +204,7 @@ public class Goal {
 
 	@Override
 	public int hashCode() {
-		return this.ontology.hashCode() + 31 * this.mainEquation.hashCode();
+		return this.mainEquation.hashCode();
 	}
 
 	/**
@@ -218,23 +217,24 @@ public class Goal {
 	 * @param concept
 	 *            concept
 	 */
-	public void importAnyDefinition(Atom concept) {
+	public void importAnyDefinition(Ontology ontology, Atom concept) {
 		Integer conceptId = getAtomManager().addAndGetIndex(concept);
 		if (ontology.containsDefinition(conceptId)) {
-			addFlatten(ontology.getDefinition(conceptId));
+			addFlatten(ontology, ontology.getDefinition(conceptId));
 
 		} else if (ontology.containsPrimitiveDefinition(conceptId)) {
-			addFlatten(ontology.getPrimitiveDefinition(conceptId));
+			addFlatten(ontology, ontology.getPrimitiveDefinition(conceptId));
 
 		}
 	}
 
-	public void initialize(List<Equation> list, Atom left, Atom right) {
+	public void initialize(Ontology ontology, List<Equation> list, Atom left,
+			Atom right) {
 
 		setMainEquation(new Equation(getAtomManager().addAndGetIndex(left),
 				getAtomManager().addAndGetIndex(right), false));
 		for (Equation eq : list) {
-			addFlatten(eq);
+			addFlatten(ontology, eq);
 		}
 
 		for (Integer atomId : getAtomManager().getIndices()) {

@@ -116,11 +116,11 @@ public class UelProcessor {
 			}
 		}
 
-		Goal ret = new Goal(ont, getAtomManager());
+		Goal ret = new Goal(getAtomManager());
 		Iterator<String> inputIt = input.iterator();
 		ConceptName left = new ConceptName(inputIt.next(), true);
 		ConceptName right = new ConceptName(inputIt.next(), true);
-		ret.initialize(equationList, left, right);
+		ret.initialize(ont, equationList, left, right);
 
 		return ret;
 	}
