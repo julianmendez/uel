@@ -39,7 +39,6 @@ public class Goal {
 
 	/**
 	 * equations is a list containing all goal equations
-	 * 
 	 */
 	private List<Equation> equations = new ArrayList<Equation>();
 
@@ -54,8 +53,8 @@ public class Goal {
 	/**
 	 * Constructs a new goal based on a specified ontology.
 	 * 
-	 * @param ont
-	 *            an ontology
+	 * @param manager
+	 *            atom manager
 	 */
 	public Goal(IndexedSet<Atom> manager) {
 		this.atomManager = manager;
@@ -214,6 +213,8 @@ public class Goal {
 	 * <code>concept</code> is a concept name that may be defined in the
 	 * ontology.
 	 * 
+	 * @param ontology
+	 *            ontology
 	 * @param concept
 	 *            concept
 	 */
@@ -228,6 +229,18 @@ public class Goal {
 		}
 	}
 
+	/**
+	 * Initializes this goal.
+	 * 
+	 * @param ontology
+	 *            ontology
+	 * @param list
+	 *            list of equations
+	 * @param left
+	 *            left atom of the main equation
+	 * @param right
+	 *            right atom of the main equation
+	 */
 	public void initialize(Ontology ontology, List<Equation> list, Atom left,
 			Atom right) {
 
