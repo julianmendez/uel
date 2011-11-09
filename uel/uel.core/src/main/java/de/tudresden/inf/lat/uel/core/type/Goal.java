@@ -87,17 +87,18 @@ public class Goal {
 		if (!leftAtom.isConceptName()) {
 			throw new IllegalStateException();
 		}
-		ConceptName b = leftAtom.asConceptName();
-		b.setVariable(true);
-		b.setUserVariable(false);
-		variables.add(e.getLeft());
 
-		if (variables.contains(b.getName())) {
+		if (variables.contains(e.getLeft())) {
 
 			logger.warning("Warning: This definition was already added to the goal "
-					+ b.getName());
+					+ leftAtom.getName());
 
 		} else {
+
+			ConceptName b = leftAtom.asConceptName();
+			b.setVariable(true);
+			b.setUserVariable(false);
+			variables.add(e.getLeft());
 
 			Equation newEquation = e;
 
