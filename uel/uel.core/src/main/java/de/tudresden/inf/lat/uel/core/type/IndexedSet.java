@@ -1,11 +1,9 @@
 package de.tudresden.inf.lat.uel.core.type;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -17,8 +15,9 @@ import java.util.Set;
  */
 public class IndexedSet<T> implements Set<T> {
 
-	private List<T> list = new ArrayList<T>();
+	private Map<Integer, T> invMap = new HashMap<Integer, T>();
 	private Map<T, Integer> map = new HashMap<T, Integer>();
+	private Integer maxIndex = 0;
 
 	/**
 	 * Constructs a new indexed set.
@@ -31,10 +30,20 @@ public class IndexedSet<T> implements Set<T> {
 		if (element == null) {
 			throw new NullPointerException();
 		}
+		return add(element, getMaxIndex() + 1);
+	}
+
+	public boolean add(T element, Integer index) {
+		if (element == null) {
+			throw new NullPointerException();
+		}
 		boolean ret = false;
 		if (!this.map.containsKey(element)) {
-			this.map.put(element, this.list.size());
-			ret = this.list.add(element);
+			this.map.put(element, index);
+			this.invMap.put(index, element);
+			if (maxIndex < index) {
+				maxIndex = index;
+			}
 		}
 		return ret;
 	}
@@ -82,10 +91,10 @@ public class IndexedSet<T> implements Set<T> {
 	}
 
 	public T get(int id) {
-		return this.list.get(id);
+		return this.invMap.get(id);
 	}
 
-	private int getIndex(T atom) {
+	public int getIndex(T atom) {
 		Integer ret = this.map.get(atom);
 		if (ret == null) {
 			ret = -1;
@@ -97,14 +106,18 @@ public class IndexedSet<T> implements Set<T> {
 		return Collections.unmodifiableCollection(this.map.values());
 	}
 
+	public Integer getMaxIndex() {
+		return maxIndex;
+	}
+
 	@Override
 	public boolean isEmpty() {
-		return this.list.isEmpty();
+		return this.invMap.isEmpty();
 	}
 
 	@Override
 	public Iterator<T> iterator() {
-		return this.list.iterator();
+		return this.invMap.values().iterator();
 	}
 
 	@Override
@@ -136,12 +149,12 @@ public class IndexedSet<T> implements Set<T> {
 
 	@Override
 	public int size() {
-		return this.list.size();
+		return this.invMap.size();
 	}
 
 	@Override
 	public Object[] toArray() {
-		return this.list.toArray();
+		return this.invMap.values().toArray();
 	}
 
 	@Override
@@ -150,12 +163,12 @@ public class IndexedSet<T> implements Set<T> {
 			throw new NullPointerException();
 		}
 
-		return this.list.toArray(a);
+		return this.invMap.values().toArray(a);
 	}
 
 	@Override
 	public String toString() {
-		return this.list.toString();
+		return this.invMap.toString();
 	}
 
 }
