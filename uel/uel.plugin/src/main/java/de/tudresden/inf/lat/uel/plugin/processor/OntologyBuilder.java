@@ -21,7 +21,6 @@ import de.tudresden.inf.lat.uel.core.type.ConceptName;
 import de.tudresden.inf.lat.uel.core.type.Equation;
 import de.tudresden.inf.lat.uel.core.type.ExistentialRestriction;
 import de.tudresden.inf.lat.uel.core.type.IndexedSet;
-import de.tudresden.inf.lat.uel.core.type.OntologyImpl;
 
 /**
  * An object implementing this class has convenience methods used to build a UEL
@@ -67,41 +66,6 @@ public class OntologyBuilder {
 		freshConstantIndex++;
 		ConceptName ret = new ConceptName(str, true);
 		getAtomManager().add(ret);
-		return ret;
-	}
-
-	/**
-	 * Returns a new UEL ontology using an OWL ontology.
-	 * 
-	 * @param owlOntology
-	 *            OWL ontology
-	 * @return a new UEL ontology using an OWL ontology
-	 */
-	public OntologyImpl createOntology(OWLOntology owlOntology) {
-		if (owlOntology == null) {
-			throw new IllegalArgumentException("Null argument.");
-		}
-
-		OntologyImpl ret = new OntologyImpl();
-		Map<OWLClass, OWLClassExpression> definitions = getDefinitions(owlOntology);
-		Set<Equation> setOfEquations = new HashSet<Equation>();
-		for (OWLClass key : definitions.keySet()) {
-			setOfEquations.addAll(processDefinition(key, definitions.get(key)));
-		}
-
-		Map<OWLClass, Set<OWLClassExpression>> primitiveDefinitions = getPrimitiveDefinitions(owlOntology);
-		for (OWLClass key : primitiveDefinitions.keySet()) {
-			setOfEquations.addAll(processPrimitiveDefinition(key,
-					primitiveDefinitions.get(key)));
-		}
-
-		for (Equation eq : setOfEquations) {
-			if (eq.isPrimitive()) {
-				ret.putPrimitiveDefinition(eq.getLeft(), eq);
-			} else {
-				ret.putDefinition(eq.getLeft(), eq);
-			}
-		}
 		return ret;
 	}
 
