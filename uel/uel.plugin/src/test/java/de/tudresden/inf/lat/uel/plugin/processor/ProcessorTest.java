@@ -177,7 +177,7 @@ public class ProcessorTest extends TestCase {
 
 		OWLOntology owlOntology = createOntology(new FileInputStream(
 				ontologyName));
-		processor.loadOntology(owlOntology);
+		processor.loadOntology(owlOntology, owlOntology);
 		Set<OWLClass> clsSet = owlOntology.getClassesInSignature();
 		for (OWLClass cls : clsSet) {
 			idClassMap.put(cls.getIRI().getFragment(), cls);
