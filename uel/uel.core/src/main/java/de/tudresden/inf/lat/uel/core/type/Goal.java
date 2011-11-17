@@ -56,8 +56,10 @@ public class Goal {
 	 * @param manager
 	 *            atom manager
 	 */
-	public Goal(IndexedSet<Atom> manager) {
+	public Goal(IndexedSet<Atom> manager, Ontology ont, String leftStr,
+			String rightStr) {
 		this.atomManager = manager;
+		initialize(ont, leftStr, rightStr);
 	}
 
 	/**
@@ -241,13 +243,30 @@ public class Goal {
 	 * @param right
 	 *            right atom of the main equation
 	 */
-	public void initialize(Ontology ontology, List<Equation> list, Atom left,
-			Atom right) {
+	public void initialize(Ontology ontology, String leftStr, String rightStr) {
+
+		ConceptName left = new ConceptName(leftStr, true);
+		ConceptName right = new ConceptName(rightStr, true);
+
+		List<Equation> equationList = new ArrayList<Equation>();
+		for (Integer atomId : ontology.getDefinitionIds()) {
+			Atom atom = getAtomManager().get(atomId);
+			if (leftStr.equals(atom.getId()) || rightStr.equals(atom.getId())) {
+
+				Equation equation = ontology.getDefinition(atomId);
+				if (equation == null) {
+					equation = ontology.getPrimitiveDefinition(atomId);
+				}
+				if (equation != null) {
+					equationList.add(equation);
+				}
+			}
+		}
 
 		setMainEquation(new Equation(getAtomManager().addAndGetIndex(left),
 				getAtomManager().addAndGetIndex(right), false));
 
-		for (Equation eq : list) {
+		for (Equation eq : equationList) {
 			addFlatten(ontology, eq);
 		}
 

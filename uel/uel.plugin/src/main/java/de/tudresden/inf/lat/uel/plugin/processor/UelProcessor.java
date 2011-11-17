@@ -16,7 +16,6 @@ import de.tudresden.inf.lat.uel.core.sat.SatOutput;
 import de.tudresden.inf.lat.uel.core.sat.Solver;
 import de.tudresden.inf.lat.uel.core.sat.Translator;
 import de.tudresden.inf.lat.uel.core.type.Atom;
-import de.tudresden.inf.lat.uel.core.type.ConceptName;
 import de.tudresden.inf.lat.uel.core.type.Equation;
 import de.tudresden.inf.lat.uel.core.type.Goal;
 import de.tudresden.inf.lat.uel.core.type.IndexedSet;
@@ -97,32 +96,11 @@ public class UelProcessor {
 			throw new IllegalArgumentException("Null argument.");
 		}
 
-		return createGoal(this.ontology, input);
-	}
+		Iterator<String> it = input.iterator();
+		String leftStr = it.next();
+		String rightStr = it.next();
 
-	private Goal createGoal(Ontology ont, Set<String> input) {
-		List<Equation> equationList = new ArrayList<Equation>();
-		for (Integer atomId : ont.getDefinitionIds()) {
-			Atom atom = getAtomManager().get(atomId);
-			if (input.contains(atom.getId())) {
-
-				Equation equation = ont.getDefinition(atomId);
-				if (equation == null) {
-					equation = ont.getPrimitiveDefinition(atomId);
-				}
-				if (equation != null) {
-					equationList.add(equation);
-				}
-			}
-		}
-
-		Goal ret = new Goal(getAtomManager());
-		Iterator<String> inputIt = input.iterator();
-		ConceptName left = new ConceptName(inputIt.next(), true);
-		ConceptName right = new ConceptName(inputIt.next(), true);
-		ret.initialize(ont, equationList, left, right);
-
-		return ret;
+		return new Goal(this.atomManager, this.ontology, leftStr, rightStr);
 	}
 
 	public void createTranslator(Goal g) {
