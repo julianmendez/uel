@@ -3,7 +3,6 @@ package de.tudresden.inf.lat.uel.core.type;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.logging.Logger;
 
 /**
  * This class implements a goal of unification, i.e., a set of equations between
@@ -16,7 +15,8 @@ import java.util.logging.Logger;
  */
 public class Goal {
 
-	private static final Logger logger = Logger.getLogger(Goal.class.getName());
+	// private static final Logger logger =
+	// Logger.getLogger(Goal.class.getName());
 
 	public static final String UNDEF_SUFFIX = "_UNDEF";
 	public static final String VAR_PREFIX = "VAR";
@@ -70,69 +70,6 @@ public class Goal {
 		equations.add(e);
 	}
 
-	/**
-	 * This method is to flatten an equation and to add it to the list of goal
-	 * equations
-	 * 
-	 * @param ontology
-	 *            ontology
-	 * @param e
-	 *            equation that needs to be flattened
-	 */
-	public void addFlatten(Ontology ontology, Equation e) {
-
-		Atom leftAtom = getAtomManager().get(e.getLeft());
-		if (!leftAtom.isConceptName()) {
-			throw new IllegalStateException();
-		}
-
-		if (variables.contains(e.getLeft())) {
-
-			logger.warning("Warning: This definition was already added to the goal "
-					+ leftAtom.getName());
-
-		} else {
-
-			ConceptName b = leftAtom.asConceptName();
-			b.setVariable(true);
-			b.setUserVariable(false);
-			variables.add(e.getLeft());
-
-			Equation newEquation = e;
-
-			/*
-			 * exploring ontology
-			 */
-
-			for (Integer atomId : e.getRight()) {
-
-				Atom a = getAtomManager().get(atomId);
-				exportDefinitions(ontology, a);
-			}
-
-			if (e.isPrimitive()) {
-				/*
-				 * Adding new variable to the right side
-				 */
-
-				ConceptName var = new ConceptName(b.getId() + UNDEF_SUFFIX,
-						false);
-				var.setUserVariable(false);
-				getAtomManager().add(var);
-				Integer varId = getAtomManager().addAndGetIndex(var);
-				this.constants.add(varId);
-
-				Set<Integer> newRightSet = new HashSet<Integer>();
-				newRightSet.addAll(e.getRight());
-				newRightSet.add(varId);
-				newEquation = new Equation(e.getLeft(), newRightSet, false);
-			}
-
-			addEquation(newEquation);
-
-		}
-	}
-
 	@Override
 	public boolean equals(Object o) {
 		boolean ret = false;
@@ -145,15 +82,6 @@ public class Goal {
 					&& this.variables.equals(other.variables);
 		}
 		return ret;
-	}
-
-	public void exportDefinitions(Ontology ontology, Atom a) {
-		if (!a.isExistentialRestriction()) {
-			importAnyDefinition(ontology, a);
-		} else if (a.isExistentialRestriction()) {
-			importAnyDefinition(ontology, a.asExistentialRestriction()
-					.getChild());
-		}
 	}
 
 	public IndexedSet<Atom> getAtomManager() {
@@ -207,29 +135,6 @@ public class Goal {
 	}
 
 	/**
-	 * The method used in the flattening method <code>addFlatten</code> to add a
-	 * relevant definition from the ontology to the goal.
-	 * 
-	 * <code>concept</code> is a concept name that may be defined in the
-	 * ontology.
-	 * 
-	 * @param ontology
-	 *            ontology
-	 * @param concept
-	 *            concept
-	 */
-	public void importAnyDefinition(Ontology ontology, Atom concept) {
-		Integer conceptId = getAtomManager().addAndGetIndex(concept);
-		if (ontology.containsDefinition(conceptId)) {
-			addFlatten(ontology, ontology.getDefinition(conceptId));
-
-		} else if (ontology.containsPrimitiveDefinition(conceptId)) {
-			addFlatten(ontology, ontology.getPrimitiveDefinition(conceptId));
-
-		}
-	}
-
-	/**
 	 * Initializes this goal.
 	 * 
 	 * @param ontology
@@ -246,17 +151,34 @@ public class Goal {
 		ConceptName left = new ConceptName(leftStr, true);
 		ConceptName right = new ConceptName(rightStr, true);
 
-		Set<Equation> equationSet = new HashSet<Equation>();
-		Integer leftId = getAtomManager().addAndGetIndex(left);
-		Integer rightId = getAtomManager().addAndGetIndex(right);
-		equationSet.addAll(ontology.getModule(leftId));
-		equationSet.addAll(ontology.getModule(rightId));
+		Set<Equation> newEquationSet = new HashSet<Equation>();
+		{
+			Set<Equation> equationSet = new HashSet<Equation>();
+			Integer leftId = getAtomManager().addAndGetIndex(left);
+			Integer rightId = getAtomManager().addAndGetIndex(right);
+			equationSet.addAll(ontology.getModule(leftId));
+			equationSet.addAll(ontology.getModule(rightId));
 
-		setMainEquation(new Equation(getAtomManager().addAndGetIndex(left),
-				getAtomManager().addAndGetIndex(right), false));
+			setMainEquation(new Equation(getAtomManager().addAndGetIndex(left),
+					getAtomManager().addAndGetIndex(right), false));
 
-		for (Equation eq : equationSet) {
-			addFlatten(ontology, eq);
+			for (Equation eq : equationSet) {
+				if (eq.isPrimitive()) {
+					newEquationSet.add(processPrimitiveDefinition(eq));
+				} else {
+					newEquationSet.add(eq);
+				}
+			}
+		}
+
+		this.equations.addAll(newEquationSet);
+
+		for (Equation eq : this.equations) {
+			Integer atomId = eq.getLeft();
+			variables.add(atomId);
+			ConceptName concept = getAtomManager().get(atomId).asConceptName();
+			concept.setVariable(true);
+			concept.setUserVariable(false);
 		}
 
 		Set<Integer> usedAtomIds = new HashSet<Integer>();
@@ -296,7 +218,6 @@ public class Goal {
 			}
 			atom.asConceptName().setVariable(true);
 		}
-
 	}
 
 	public void makeConstant(Integer atomId) {
@@ -329,6 +250,25 @@ public class Goal {
 			conceptName.setUserVariable(true);
 			conceptName.setVariable(true);
 		}
+	}
+
+	private Equation processPrimitiveDefinition(Equation e) {
+
+		Atom leftAtom = getAtomManager().get(e.getLeft());
+		ConceptName b = leftAtom.asConceptName();
+		// b.setVariable(true);
+		// b.setUserVariable(false);
+		// variables.add(e.getLeft());
+
+		ConceptName var = new ConceptName(b.getId() + UNDEF_SUFFIX, false);
+		var.setUserVariable(false);
+		getAtomManager().add(var);
+		Integer varId = getAtomManager().addAndGetIndex(var);
+
+		Set<Integer> newRightSet = new HashSet<Integer>();
+		newRightSet.addAll(e.getRight());
+		newRightSet.add(varId);
+		return new Equation(e.getLeft(), newRightSet, false);
 	}
 
 	public void setMainEquation(Equation equation) {

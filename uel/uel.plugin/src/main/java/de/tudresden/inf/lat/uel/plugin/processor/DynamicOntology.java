@@ -10,6 +10,7 @@ import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLOntology;
 
+import de.tudresden.inf.lat.uel.core.type.Atom;
 import de.tudresden.inf.lat.uel.core.type.Equation;
 import de.tudresden.inf.lat.uel.core.type.Ontology;
 
@@ -105,6 +106,41 @@ public class DynamicOntology implements Ontology {
 		return Collections.unmodifiableSet(nameMap.keySet());
 	}
 
+	@Override
+	public Set<Equation> getModule(Integer id) {
+		Set<Equation> ret = new HashSet<Equation>();
+		Set<Integer> visited = new HashSet<Integer>();
+		Set<Integer> toVisit = new HashSet<Integer>();
+		toVisit.add(id);
+		while (!toVisit.isEmpty()) {
+			Integer e = toVisit.iterator().next();
+			visited.add(e);
+
+			Equation eq = getDefinition(e);
+			if (eq == null) {
+				eq = getPrimitiveDefinition(e);
+			}
+			if (eq != null) {
+				ret.add(eq);
+				Set<Integer> rightIds = eq.getRight();
+				for (Integer c : rightIds) {
+					Atom atom = this.ontologyBuilder.getAtomManager().get(c);
+					if (atom.isConceptName()) {
+						toVisit.add(c);
+					} else if (atom.isExistentialRestriction()) {
+						Atom child = atom.asExistentialRestriction().getChild();
+						Integer childId = this.ontologyBuilder.getAtomManager()
+								.addAndGetIndex(child);
+						toVisit.add(childId);
+					}
+				}
+			}
+
+			toVisit.removeAll(visited);
+		}
+		return ret;
+	}
+
 	public OntologyBuilder getOntologyBuilder() {
 		return this.ontologyBuilder;
 	}
@@ -170,30 +206,6 @@ public class DynamicOntology implements Ontology {
 				this.definitionCache.put(equation.getLeft(), equation);
 			}
 		}
-	}
-
-	@Override
-	public Set<Equation> getModule(Integer id) {
-		Set<Equation> ret = new HashSet<Equation>();
-		Set<Integer> visited = new HashSet<Integer>();
-		Set<Integer> toVisit = new HashSet<Integer>();
-		toVisit.add(id);
-		while (!toVisit.isEmpty()) {
-			Integer e = toVisit.iterator().next();
-			visited.add(e);
-
-			Equation eq = getDefinition(e);
-			if (eq == null) {
-				eq = getPrimitiveDefinition(e);
-			}
-			if (eq != null) {
-				ret.add(eq);
-				toVisit.addAll(eq.getRight());
-			}
-
-			toVisit.removeAll(visited);
-		}
-		return ret;
 	}
 
 }
