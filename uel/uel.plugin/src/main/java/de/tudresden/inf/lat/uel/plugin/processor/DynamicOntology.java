@@ -170,8 +170,10 @@ public class DynamicOntology implements Ontology {
 	/**
 	 * Loads an OWL ontology.
 	 * 
-	 * @param owlOntology
-	 *            OWL ontology
+	 * @param owlOntology01
+	 *            first OWL ontology
+	 * @param owlOntology02
+	 *            second OWL ontology
 	 */
 	public void load(OWLOntology owlOntology01, OWLOntology owlOntology02) {
 		if (owlOntology01 == null) {

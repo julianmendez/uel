@@ -53,6 +53,12 @@ public class Goal {
 	 * 
 	 * @param manager
 	 *            atom manager
+	 * @param ont
+	 *            ontology
+	 * @param leftStr
+	 *            left atom name of the main equation
+	 * @param rightStr
+	 *            right atom name of the main equation
 	 */
 	public Goal(IndexedSet<Atom> manager, Ontology ont, String leftStr,
 			String rightStr) {
@@ -134,19 +140,7 @@ public class Goal {
 		return this.mainEquation.hashCode();
 	}
 
-	/**
-	 * Initializes this goal.
-	 * 
-	 * @param ontology
-	 *            ontology
-	 * @param list
-	 *            list of equations
-	 * @param left
-	 *            left atom of the main equation
-	 * @param right
-	 *            right atom of the main equation
-	 */
-	public void initialize(Ontology ontology, String leftStr, String rightStr) {
+	private void initialize(Ontology ontology, String leftStr, String rightStr) {
 
 		ConceptName left = new ConceptName(leftStr, true);
 		ConceptName right = new ConceptName(rightStr, true);
