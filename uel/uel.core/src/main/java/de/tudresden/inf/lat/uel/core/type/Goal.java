@@ -1,9 +1,7 @@
 package de.tudresden.inf.lat.uel.core.type;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -40,7 +38,7 @@ public class Goal {
 	/**
 	 * equations is a list containing all goal equations
 	 */
-	private List<Equation> equations = new ArrayList<Equation>();
+	private Set<Equation> equations = new HashSet<Equation>();
 
 	private Equation mainEquation = null;
 
@@ -175,7 +173,7 @@ public class Goal {
 	 * 
 	 * @return the list of goal equations
 	 */
-	public List<Equation> getEquations() {
+	public Set<Equation> getEquations() {
 		return equations;
 	}
 
@@ -248,25 +246,16 @@ public class Goal {
 		ConceptName left = new ConceptName(leftStr, true);
 		ConceptName right = new ConceptName(rightStr, true);
 
-		List<Equation> equationList = new ArrayList<Equation>();
-		for (Integer atomId : ontology.getDefinitionIds()) {
-			Atom atom = getAtomManager().get(atomId);
-			if (leftStr.equals(atom.getId()) || rightStr.equals(atom.getId())) {
-
-				Equation equation = ontology.getDefinition(atomId);
-				if (equation == null) {
-					equation = ontology.getPrimitiveDefinition(atomId);
-				}
-				if (equation != null) {
-					equationList.add(equation);
-				}
-			}
-		}
+		Set<Equation> equationSet = new HashSet<Equation>();
+		Integer leftId = getAtomManager().addAndGetIndex(left);
+		Integer rightId = getAtomManager().addAndGetIndex(right);
+		equationSet.addAll(ontology.getModule(leftId));
+		equationSet.addAll(ontology.getModule(rightId));
 
 		setMainEquation(new Equation(getAtomManager().addAndGetIndex(left),
 				getAtomManager().addAndGetIndex(right), false));
 
-		for (Equation eq : equationList) {
+		for (Equation eq : equationSet) {
 			addFlatten(ontology, eq);
 		}
 
