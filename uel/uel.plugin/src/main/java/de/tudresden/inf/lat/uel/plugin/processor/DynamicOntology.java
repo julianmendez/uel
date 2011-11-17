@@ -172,4 +172,28 @@ public class DynamicOntology implements Ontology {
 		}
 	}
 
+	@Override
+	public Set<Equation> getModule(Integer id) {
+		Set<Equation> ret = new HashSet<Equation>();
+		Set<Integer> visited = new HashSet<Integer>();
+		Set<Integer> toVisit = new HashSet<Integer>();
+		toVisit.add(id);
+		while (!toVisit.isEmpty()) {
+			Integer e = toVisit.iterator().next();
+			visited.add(e);
+
+			Equation eq = getDefinition(e);
+			if (eq == null) {
+				eq = getPrimitiveDefinition(e);
+			}
+			if (eq != null) {
+				ret.add(eq);
+				toVisit.addAll(eq.getRight());
+			}
+
+			toVisit.removeAll(visited);
+		}
+		return ret;
+	}
+
 }
