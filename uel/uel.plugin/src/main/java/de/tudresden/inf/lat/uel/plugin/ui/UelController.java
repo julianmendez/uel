@@ -340,8 +340,7 @@ public class UelController implements ActionListener {
 		setUnifierButtons(false);
 
 		getModel().clearOntology();
-		getModel().loadOntology(this.owlOntology00);
-		getModel().loadOntology(this.owlOntology01);
+		getModel().loadOntology(this.owlOntology00, this.owlOntology01);
 
 		Set<String> classSet = new HashSet<String>();
 		classSet.add(this.classList00.get(getView().getSelectedClassName00())

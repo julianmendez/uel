@@ -22,11 +22,10 @@ import de.tudresden.inf.lat.uel.core.type.Ontology;
 public class DynamicOntology implements Ontology {
 
 	private Map<Integer, Equation> definitionCache = new HashMap<Integer, Equation>();
-	private Map<OWLClass, OWLClassExpression> definitions = new HashMap<OWLClass, OWLClassExpression>();
 	private Map<Integer, OWLClass> nameMap = new HashMap<Integer, OWLClass>();
 	private OntologyBuilder ontologyBuilder = null;
+	private OWLDefinitionSet owlDefinitionSet;
 	private Map<Integer, Equation> primitiveDefinitionCache = new HashMap<Integer, Equation>();
-	private Map<OWLClass, Set<OWLClassExpression>> primitiveDefinitions = new HashMap<OWLClass, Set<OWLClassExpression>>();
 
 	/**
 	 * Constructs a new dynamic ontology.
@@ -44,9 +43,7 @@ public class DynamicOntology implements Ontology {
 	 */
 	public void clear() {
 		this.nameMap.clear();
-		this.definitions.clear();
 		this.definitionCache.clear();
-		this.primitiveDefinitions.clear();
 		this.primitiveDefinitionCache.clear();
 	}
 
@@ -60,7 +57,7 @@ public class DynamicOntology implements Ontology {
 		Equation eq = this.definitionCache.get(id);
 		if (eq == null) {
 			OWLClass cls = this.nameMap.get(id);
-			ret = this.definitions.get(cls) != null;
+			ret = this.owlDefinitionSet.getDefinition(cls) != null;
 		}
 		return ret;
 	}
@@ -75,7 +72,7 @@ public class DynamicOntology implements Ontology {
 		Equation eq = this.primitiveDefinitionCache.get(id);
 		if (eq == null) {
 			OWLClass cls = this.nameMap.get(id);
-			ret = this.primitiveDefinitions.get(cls) != null;
+			ret = this.owlDefinitionSet.getPrimitiveDefinition(cls) != null;
 		}
 		return ret;
 	}
@@ -90,7 +87,8 @@ public class DynamicOntology implements Ontology {
 		if (ret == null) {
 			OWLClass cls = this.nameMap.get(id);
 			if (cls != null) {
-				OWLClassExpression clExpr = this.definitions.get(cls);
+				OWLClassExpression clExpr = this.owlDefinitionSet
+						.getDefinition(cls);
 				if (clExpr != null) {
 					updateCache(getOntologyBuilder().processDefinition(cls,
 							clExpr));
@@ -121,8 +119,8 @@ public class DynamicOntology implements Ontology {
 		if (ret == null) {
 			OWLClass cls = this.nameMap.get(id);
 			if (cls != null) {
-				Set<OWLClassExpression> clExprSet = this.primitiveDefinitions
-						.get(cls);
+				Set<OWLClassExpression> clExprSet = this.owlDefinitionSet
+						.getPrimitiveDefinition(cls);
 				if (clExprSet != null) {
 					updateCache(getOntologyBuilder()
 							.processPrimitiveDefinition(cls, clExprSet));
@@ -139,18 +137,19 @@ public class DynamicOntology implements Ontology {
 	 * @param owlOntology
 	 *            OWL ontology
 	 */
-	public void load(OWLOntology owlOntology) {
-		if (owlOntology == null) {
+	public void load(OWLOntology owlOntology01, OWLOntology owlOntology02) {
+		if (owlOntology01 == null) {
+			throw new IllegalArgumentException("Null argument.");
+		}
+		if (owlOntology02 == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
 
-		this.definitions.putAll(getOntologyBuilder()
-				.getDefinitions(owlOntology));
-		this.primitiveDefinitions.putAll(getOntologyBuilder()
-				.getPrimitiveDefinitions(owlOntology));
+		this.owlDefinitionSet = new OWLDefinitionSet(owlOntology01,
+				owlOntology02);
 		Set<OWLClass> toVisit = new HashSet<OWLClass>();
-		toVisit.addAll(this.definitions.keySet());
-		toVisit.addAll(this.primitiveDefinitions.keySet());
+		toVisit.addAll(this.owlDefinitionSet.getDefinedConcepts());
+		toVisit.addAll(this.owlDefinitionSet.getPrimitiveDefinedConcepts());
 		this.nameMap.putAll(getOntologyBuilder().processNames(toVisit));
 	}
 
@@ -158,10 +157,7 @@ public class DynamicOntology implements Ontology {
 	public String toString() {
 		StringBuffer sbuf = new StringBuffer();
 		sbuf.append("Definitions ");
-		sbuf.append(this.definitions.toString());
-		sbuf.append("\n");
-		sbuf.append("Primitive definitions ");
-		sbuf.append(this.primitiveDefinitions.toString());
+		sbuf.append(this.owlDefinitionSet.toString());
 		sbuf.append("\n");
 		return sbuf.toString();
 	}

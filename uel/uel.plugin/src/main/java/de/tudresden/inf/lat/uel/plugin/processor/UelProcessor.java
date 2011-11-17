@@ -149,8 +149,8 @@ public class UelProcessor {
 		return Collections.unmodifiableList(this.unifierList);
 	}
 
-	public void loadOntology(OWLOntology ontology) {
-		this.ontology.load(ontology);
+	public void loadOntology(OWLOntology ontology01, OWLOntology ontology02) {
+		this.ontology.load(ontology01, ontology02);
 	}
 
 }
