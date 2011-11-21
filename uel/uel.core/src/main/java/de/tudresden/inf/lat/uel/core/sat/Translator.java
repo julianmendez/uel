@@ -550,12 +550,14 @@ public class Translator {
 	private SatInput runStep2_5() {
 		SatInput ret = new SatInput();
 
-		for (Integer atomId1 : goal.getAtomManager().getIndices()) {
+		Collection<Integer> atomIds = goal.getUsedAtomIds();
 
-			for (Integer atomId2 : goal.getAtomManager().getIndices()) {
+		for (Integer atomId1 : atomIds) {
+
+			for (Integer atomId2 : atomIds) {
 
 				if (!atomId1.equals(atomId2)) {
-					for (Integer atomId3 : goal.getAtomManager().getIndices()) {
+					for (Integer atomId3 : atomIds) {
 
 						if (!atomId1.equals(atomId3)
 								&& !atomId2.equals(atomId3)) {
@@ -723,8 +725,8 @@ public class Translator {
 		 * Literals for dis-subsumptions
 		 */
 
-		for (Integer atomId1 : goal.getAtomManager().getIndices()) {
-			for (Integer atomId2 : goal.getAtomManager().getIndices()) {
+		for (Integer atomId1 : goal.getUsedAtomIds()) {
+			for (Integer atomId2 : goal.getUsedAtomIds()) {
 				Literal literal = invertLiteral ? new SubsumptionLiteral(
 						atomId1, atomId2) : new DissubsumptionLiteral(atomId1,
 						atomId2);

@@ -40,7 +40,9 @@ public class Goal {
 	 */
 	private Set<Equation> equations = new HashSet<Equation>();
 
-	private Equation mainEquation = null;
+	private Equation mainEquation;
+
+	private Set<Integer> usedAtomIds;
 
 	/**
 	 * variables is a hash map implementing all concept names which are treated
@@ -131,6 +133,10 @@ public class Goal {
 		return mainEquation;
 	}
 
+	public Set<Integer> getUsedAtomIds() {
+		return this.usedAtomIds;
+	}
+
 	public Set<Integer> getVariables() {
 		return Collections.unmodifiableSet(variables);
 	}
@@ -193,6 +199,8 @@ public class Goal {
 				conceptNameIds.add(childId);
 			}
 		}
+		usedAtomIds.addAll(conceptNameIds);
+		this.usedAtomIds = usedAtomIds;
 
 		for (Integer atomId : conceptNameIds) {
 			Atom atom = getAtomManager().get(atomId);
@@ -212,6 +220,7 @@ public class Goal {
 			}
 			atom.asConceptName().setVariable(true);
 		}
+
 	}
 
 	public void makeConstant(Integer atomId) {
@@ -247,13 +256,8 @@ public class Goal {
 	}
 
 	private Equation processPrimitiveDefinition(Equation e) {
-
 		Atom leftAtom = getAtomManager().get(e.getLeft());
 		ConceptName b = leftAtom.asConceptName();
-		// b.setVariable(true);
-		// b.setUserVariable(false);
-		// variables.add(e.getLeft());
-
 		ConceptName var = new ConceptName(b.getId() + UNDEF_SUFFIX, false);
 		var.setUserVariable(false);
 		getAtomManager().add(var);
