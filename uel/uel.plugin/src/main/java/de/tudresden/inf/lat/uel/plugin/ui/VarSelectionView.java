@@ -31,7 +31,7 @@ class VarSelectionView extends JDialog {
 	private JList listVariables = null;
 	private JButton makeConsButton = null;
 	private JButton makeVarButton = null;
-	private VarSelectionModel model = null;
+	private final VarSelectionModel model;
 	private JButton rejectVarButton = null;
 
 	public VarSelectionView(VarSelectionModel m) {

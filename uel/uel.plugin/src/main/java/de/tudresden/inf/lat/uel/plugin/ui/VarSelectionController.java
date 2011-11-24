@@ -12,7 +12,7 @@ class VarSelectionController implements ActionListener {
 	private static final String BUTTON_CONS = "make constant";
 	private static final String BUTTON_VAR = "make variable";
 
-	private VarSelectionView view = null;
+	private final VarSelectionView view;
 
 	public VarSelectionController(VarSelectionView v) {
 		if (v == null) {

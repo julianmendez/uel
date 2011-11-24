@@ -43,7 +43,7 @@ public class UelView extends JPanel {
 	private DefaultListModel listmodel = new DefaultListModel();
 	private JComboBox listOntologyName00 = new JComboBox();
 	private JComboBox listOntologyName01 = new JComboBox();
-	private UelProcessor model = null;
+	private final UelProcessor model;
 	private JTextArea textUnifier = new JTextArea();
 	private JTextArea textUnifierId = new JTextArea();
 

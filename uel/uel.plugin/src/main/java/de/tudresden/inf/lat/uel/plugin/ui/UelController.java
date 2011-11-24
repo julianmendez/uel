@@ -74,13 +74,13 @@ public class UelController implements ActionListener {
 	private List<String> ontologyList = new ArrayList<String>();
 	private OWLOntology owlOntology00 = null;
 	private OWLOntology owlOntology01 = null;
-	private OWLOntologyManager owlOntologyManager = null;
+	private final OWLOntologyManager owlOntologyManager;
 	private Map<String, OWLOntology> owlOntologyMap = new HashMap<String, OWLOntology>();
 	private Map<OWLClass, String> shortFormMap = new HashMap<OWLClass, String>();
 	private StatInfo statInfo = null;
 	private int unifierIndex = -1;
 	private VarSelectionController varWindow = null;
-	private UelView view = null;
+	private final UelView view;
 
 	/**
 	 * Constructs a new controller.

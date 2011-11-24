@@ -1,7 +1,6 @@
 package de.tudresden.inf.lat.uel.plugin.ui;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -16,8 +15,8 @@ import de.tudresden.inf.lat.uel.core.type.Goal;
  */
 class VarSelectionModel {
 
-	private Goal goal = null;
-	private Map<String, String> idLabelMap = new HashMap<String, String>();
+	private final Goal goal;
+	private final Map<String, String> idLabelMap;
 	private Set<String> setOfOriginalVariables = new TreeSet<String>();
 
 	public VarSelectionModel(Set<String> originalVariables,
