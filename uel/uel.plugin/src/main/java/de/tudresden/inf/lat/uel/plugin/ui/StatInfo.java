@@ -1,6 +1,5 @@
 package de.tudresden.inf.lat.uel.plugin.ui;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import de.tudresden.inf.lat.uel.core.type.Goal;
@@ -11,10 +10,10 @@ import de.tudresden.inf.lat.uel.core.type.Goal;
  */
 public class StatInfo {
 
-	private Integer clauseCount = 0;
-	private Goal goal = null;
-	private Map<String, String> idLabelMap = new HashMap<String, String>();
-	private Integer literalCount = 0;
+	private final Integer clauseCount;
+	private final Goal goal;
+	private final Map<String, String> idLabelMap;
+	private final Integer literalCount;
 
 	public StatInfo(Goal g, int literals, int clauses,
 			Map<String, String> labels) {
@@ -62,6 +61,18 @@ public class StatInfo {
 		}
 
 		String ret = this.idLabelMap.get(id);
+
+		if (ret == null) {
+			if (id.endsWith(Goal.UNDEF_SUFFIX)) {
+				String origId = id.substring(0,
+						id.length() - Goal.UNDEF_SUFFIX.length());
+				ret = this.idLabelMap.get(origId);
+				if (ret != null) {
+					ret += Goal.UNDEF_SUFFIX;
+				}
+			}
+		}
+
 		if (ret == null) {
 			ret = id;
 		}
