@@ -15,13 +15,9 @@ import java.util.Set;
  */
 public class Goal {
 
-	// private static final Logger logger =
-	// Logger.getLogger(Goal.class.getName());
-
 	public static final String UNDEF_SUFFIX = "_UNDEF";
-	public static final String VAR_PREFIX = "VAR";
 
-	private IndexedSet<Atom> atomManager = null;
+	private final IndexedSet<Atom> atomManager;
 
 	/**
 	 * constants is a hash map implementing all constant concept names in the

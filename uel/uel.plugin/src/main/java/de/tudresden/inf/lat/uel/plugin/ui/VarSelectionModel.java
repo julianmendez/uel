@@ -65,6 +65,18 @@ class VarSelectionModel {
 		}
 
 		String ret = this.idLabelMap.get(id);
+
+		if (ret == null) {
+			if (id.endsWith(Goal.UNDEF_SUFFIX)) {
+				String origId = id.substring(0,
+						id.length() - Goal.UNDEF_SUFFIX.length());
+				ret = this.idLabelMap.get(origId);
+				if (ret != null) {
+					ret += Goal.UNDEF_SUFFIX;
+				}
+			}
+		}
+
 		if (ret == null) {
 			int p = id.indexOf("#");
 			if (p != -1) {
@@ -73,6 +85,7 @@ class VarSelectionModel {
 				ret = id;
 			}
 		}
+
 		return ret;
 	}
 
