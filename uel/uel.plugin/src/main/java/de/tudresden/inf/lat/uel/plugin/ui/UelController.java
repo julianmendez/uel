@@ -225,12 +225,8 @@ public class UelController implements ActionListener {
 			this.classList00 = getClassNames(
 					this.owlOntologyMap.get(ontologyId), getView()
 							.isClassName00Primitive());
-			List<String> classNameList = new ArrayList<String>();
-			for (LabelId className : this.classList00) {
-				classNameList.add(className.getLabel());
-			}
 
-			getView().reloadClassNames00(classNameList);
+			getView().reloadClassNames00(this.classList00);
 			getView().setComboBoxClassName00Enabled(true);
 			getView().setButtonSelectVariablesEnabled(true);
 		}
@@ -251,12 +247,8 @@ public class UelController implements ActionListener {
 			this.classList01 = getClassNames(
 					this.owlOntologyMap.get(ontologyId), getView()
 							.isClassName01Primitive());
-			List<String> classNameList = new ArrayList<String>();
-			for (LabelId className : this.classList01) {
-				classNameList.add(className.getLabel());
-			}
 
-			getView().reloadClassNames01(classNameList);
+			getView().reloadClassNames01(this.classList01);
 			getView().setComboBoxClassName01Enabled(true);
 			getView().setButtonSelectVariablesEnabled(true);
 		}
@@ -343,10 +335,8 @@ public class UelController implements ActionListener {
 		getModel().loadOntology(this.owlOntology00, this.owlOntology01);
 
 		Set<String> classSet = new HashSet<String>();
-		classSet.add(this.classList00.get(getView().getSelectedClassName00())
-				.getId());
-		classSet.add(this.classList01.get(getView().getSelectedClassName01())
-				.getId());
+		classSet.add(getView().getSelectedClassName00().getId());
+		classSet.add(getView().getSelectedClassName01().getId());
 
 		Goal goal = getModel().configure(classSet);
 
@@ -449,6 +439,8 @@ public class UelController implements ActionListener {
 		if (ret == null) {
 			IRI iri = cls.getIRI();
 			ret = iri.getFragment();
+		} else if (ret.startsWith("'") && ret.endsWith("'")) {
+			ret = ret.substring(1, ret.length() - 1);
 		}
 		return ret;
 	}

@@ -38,8 +38,8 @@ public class UelView extends JPanel {
 	private JButton buttonShowStatInfo = new JButton(Message.buttonShowStatInfo);
 	private JCheckBox checkBoxClassName00 = new JCheckBox();
 	private JCheckBox checkBoxClassName01 = new JCheckBox();
-	private JComboBox listClassName00 = new JComboBox();
-	private JComboBox listClassName01 = new JComboBox();
+	private JComboBoxOfLabelId listClassName00 = new JComboBoxOfLabelId();
+	private JComboBoxOfLabelId listClassName01 = new JComboBoxOfLabelId();
 	private DefaultListModel listmodel = new DefaultListModel();
 	private JComboBox listOntologyName00 = new JComboBox();
 	private JComboBox listOntologyName01 = new JComboBox();
@@ -346,12 +346,12 @@ public class UelView extends JPanel {
 		return this.model;
 	}
 
-	public int getSelectedClassName00() {
-		return this.listClassName00.getSelectedIndex();
+	public LabelId getSelectedClassName00() {
+		return this.listClassName00.getSelectedElement();
 	}
 
-	public int getSelectedClassName01() {
-		return this.listClassName01.getSelectedIndex();
+	public LabelId getSelectedClassName01() {
+		return this.listClassName01.getSelectedElement();
 	}
 
 	public int getSelectedOntologyName00() {
@@ -383,26 +383,20 @@ public class UelView extends JPanel {
 		return this.checkBoxClassName01.isSelected();
 	}
 
-	public void reloadClassNames00(List<String> list) {
+	public void reloadClassNames00(List<LabelId> list) {
 		if (list == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
 
-		this.listClassName00.removeAllItems();
-		for (String className : list) {
-			this.listClassName00.addItem(className);
-		}
+		this.listClassName00.setItemList(list);
 	}
 
-	public void reloadClassNames01(List<String> list) {
+	public void reloadClassNames01(List<LabelId> list) {
 		if (list == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
 
-		this.listClassName01.removeAllItems();
-		for (String className : list) {
-			this.listClassName01.addItem(className);
-		}
+		this.listClassName01.setItemList(list);
 	}
 
 	public void reloadOntologies(List<String> listOfOntologyNames) {
