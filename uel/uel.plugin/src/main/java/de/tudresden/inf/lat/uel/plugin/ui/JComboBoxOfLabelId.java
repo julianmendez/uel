@@ -16,6 +16,7 @@ public class JComboBoxOfLabelId extends JComboBox {
 	private static final long serialVersionUID = -1589168297784841281L;
 
 	private List<LabelId> list = new ArrayList<LabelId>();
+	private boolean processing = false;
 
 	public JComboBoxOfLabelId() {
 		super();
@@ -25,10 +26,12 @@ public class JComboBoxOfLabelId extends JComboBox {
 
 	@Override
 	public void actionPerformed(ActionEvent event) {
-		String lastText = event.getActionCommand();
-		if (!lastText.equals(getActionCommand())) {
-			int itemIndex = binarySearch(this.list, lastText);
-			this.setSelectedIndex(itemIndex);
+		if (!this.processing) {
+			String lastText = event.getActionCommand();
+			if (!lastText.equals(getActionCommand())) {
+				int itemIndex = binarySearch(this.list, lastText);
+				this.setSelectedIndex(itemIndex);
+			}
 		}
 	}
 
@@ -67,6 +70,7 @@ public class JComboBoxOfLabelId extends JComboBox {
 	}
 
 	public void setItemList(List<LabelId> origList) {
+		this.processing = true;
 		this.list.clear();
 		this.list.addAll(origList);
 		Collections.sort(this.list);
@@ -74,6 +78,7 @@ public class JComboBoxOfLabelId extends JComboBox {
 		for (LabelId label : this.list) {
 			super.addItem(label.getLabel());
 		}
+		this.processing = false;
 	}
 
 }
