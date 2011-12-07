@@ -439,8 +439,6 @@ public class UelController implements ActionListener {
 		if (ret == null) {
 			IRI iri = cls.getIRI();
 			ret = iri.getFragment();
-		} else if (ret.startsWith("'") && ret.endsWith("'")) {
-			ret = ret.substring(1, ret.length() - 1);
 		}
 		return ret;
 	}

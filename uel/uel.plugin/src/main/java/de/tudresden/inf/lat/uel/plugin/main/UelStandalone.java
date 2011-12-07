@@ -5,11 +5,6 @@ import java.awt.Dimension;
 import javax.swing.JFrame;
 
 import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.model.OWLOntologyManager;
-
-import de.tudresden.inf.lat.uel.plugin.processor.UelProcessor;
-import de.tudresden.inf.lat.uel.plugin.ui.UelController;
-import de.tudresden.inf.lat.uel.plugin.ui.UelView;
 
 /**
  * 
@@ -18,13 +13,14 @@ import de.tudresden.inf.lat.uel.plugin.ui.UelView;
 public class UelStandalone {
 
 	public static void main(String[] args) {
-		OWLOntologyManager ontologyManager = OWLManager
-				.createOWLOntologyManager();
-		UelController controller = new UelController(new UelView(
-				new UelProcessor()), ontologyManager);
+		(new UelStandalone()).run();
+	}
 
+	public void run() {
+		UelStarter starter = new UelStarter(
+				OWLManager.createOWLOntologyManager());
 		JFrame frame = new JFrame();
-		frame.add(controller.getView());
+		frame.add(starter.getPanel().getView());
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		frame.setSize(new Dimension(1024, 400));
 		frame.setVisible(true);

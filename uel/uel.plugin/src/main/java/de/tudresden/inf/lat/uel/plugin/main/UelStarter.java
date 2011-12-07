@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.protege.editor.owl.model.OWLModelManager;
 import org.protege.editor.owl.ui.renderer.OWLModelManagerEntityRenderer;
+import org.semanticweb.owlapi.model.OWLAnnotation;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyChange;
@@ -24,17 +25,32 @@ import de.tudresden.inf.lat.uel.plugin.ui.UelView;
 public class UelStarter implements OWLOntologyChangeListener,
 		OWLOntologyLoaderListener {
 
-	private OWLModelManager modelManager = null;
-	private UelController panel = null;
+	private final OWLOntologyManager ontologyManager;
+	private final UelController panel;
+	private OWLModelManagerEntityRenderer renderer = null;
 
-	public UelStarter(OWLModelManager manager) {
+	public UelStarter(OWLModelManager modelManager) {
+		if (modelManager == null) {
+			throw new IllegalArgumentException("Null argument.");
+		}
+
+		this.ontologyManager = modelManager.getOWLOntologyManager();
+		this.panel = new UelController(new UelView(new UelProcessor()),
+				this.ontologyManager);
+		this.renderer = modelManager.getOWLEntityRenderer();
+		getOWLOntologyManager().addOntologyLoaderListener(this);
+		getOWLOntologyManager().addOntologyChangeListener(this);
+		reset();
+	}
+
+	public UelStarter(OWLOntologyManager manager) {
 		if (manager == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
 
-		this.modelManager = manager;
+		this.ontologyManager = manager;
 		this.panel = new UelController(new UelView(new UelProcessor()),
-				this.modelManager.getOWLOntologyManager());
+				this.ontologyManager);
 		getOWLOntologyManager().addOntologyLoaderListener(this);
 		getOWLOntologyManager().addOntologyChangeListener(this);
 		reset();
@@ -42,18 +58,11 @@ public class UelStarter implements OWLOntologyChangeListener,
 
 	private Map<OWLClass, String> createShortFormMap() {
 		Map<OWLClass, String> shortFormMap = new HashMap<OWLClass, String>();
-		OWLModelManagerEntityRenderer renderer = getOWLModelManager()
-				.getOWLEntityRenderer();
-		shortFormMap.put(getOWLModelManager().getOWLDataFactory()
-				.getOWLNothing(), renderer.getShortForm(getOWLModelManager()
-				.getOWLDataFactory().getOWLNothing()));
-		shortFormMap.put(
-				getOWLModelManager().getOWLDataFactory().getOWLThing(),
-				renderer.getShortForm(getOWLModelManager().getOWLDataFactory()
-						.getOWLThing()));
-		for (OWLOntology ontology : getOWLModelManager().getOntologies()) {
+		for (OWLOntology ontology : getOWLOntologyManager().getOntologies()) {
 			for (OWLClass cls : ontology.getClassesInSignature()) {
-				shortFormMap.put(cls, renderer.getShortForm(cls));
+				String shortForm = this.renderer != null ? this.renderer
+						.getShortForm(cls) : getShortForm(cls, ontology);
+				shortFormMap.put(cls, removeQuotes(shortForm));
 			}
 		}
 		return shortFormMap;
@@ -68,16 +77,22 @@ public class UelStarter implements OWLOntologyChangeListener,
 		reset();
 	}
 
-	public OWLModelManager getOWLModelManager() {
-		return this.modelManager;
-	}
-
 	public OWLOntologyManager getOWLOntologyManager() {
-		return getOWLModelManager().getOWLOntologyManager();
+		return this.ontologyManager;
 	}
 
 	public UelController getPanel() {
 		return this.panel;
+	}
+
+	private String getShortForm(OWLClass owlClass, OWLOntology ontology) {
+		String ret = owlClass.getIRI().getFragment();
+		for (OWLAnnotation annotation : owlClass.getAnnotations(ontology)) {
+			if (annotation.getProperty().isLabel()) {
+				ret = annotation.getValue().toString();
+			}
+		}
+		return ret;
 	}
 
 	@Override
@@ -90,6 +105,15 @@ public class UelStarter implements OWLOntologyChangeListener,
 
 	public void removeListeners() {
 		getOWLOntologyManager().removeOntologyChangeListener(this);
+	}
+
+	private String removeQuotes(String str) {
+		String ret = str;
+		if ((str.startsWith("\"") && str.endsWith("\""))
+				|| (str.startsWith("'") && str.endsWith("'"))) {
+			ret = str.substring(1, str.length() - 1);
+		}
+		return ret;
 	}
 
 	public void reset() {
