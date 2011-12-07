@@ -48,6 +48,7 @@ public class ProcessorTest extends TestCase {
 	private static final String ontology12 = apath + "testOntology-12.krss";
 	private static final String ontology13 = apath + "testOntology-13.krss";
 	private static final String ontology14 = apath + "testOntology-14.krss";
+	private static final String ontology15 = apath + "testOntology-15.krss";
 
 	private OWLOntology createOntology(InputStream input)
 			throws OWLOntologyCreationException {
@@ -167,6 +168,11 @@ public class ProcessorTest extends TestCase {
 		varNames.add("A");
 		varNames.add("B5");
 		tryOntology(ontology14, varNames, 8);
+	}
+
+	public void test15() throws OWLOntologyCreationException, IOException {
+		Set<String> varNames = new HashSet<String>();
+		tryOntology(ontology15, varNames, 0);
 	}
 
 	private void tryOntology(String ontologyName, Set<String> varNames,
