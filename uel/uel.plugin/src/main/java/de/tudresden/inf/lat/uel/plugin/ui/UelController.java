@@ -417,9 +417,16 @@ public class UelController implements ActionListener {
 
 	private String getLabel(String candidateId) {
 		String ret = candidateId;
-		OWLClass cls = this.mapIdClass.get(candidateId);
+		if (candidateId.endsWith(Goal.UNDEF_SUFFIX)) {
+			ret = candidateId.substring(0, candidateId.length()
+					- Goal.UNDEF_SUFFIX.length());
+		}
+		OWLClass cls = this.mapIdClass.get(ret);
 		if (cls != null) {
 			ret = getShortForm(cls);
+		}
+		if (candidateId.endsWith(Goal.UNDEF_SUFFIX)) {
+			ret += Goal.UNDEF_SUFFIX;
 		}
 		return ret;
 	}
