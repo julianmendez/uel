@@ -27,9 +27,10 @@ import de.tudresden.inf.lat.uel.core.type.KRSSKeyword;
  */
 class StatInfoView extends JDialog {
 
+	private static final String quotes = "\"";
 	private static final long serialVersionUID = -4153981096827550491L;
 
-	private StatInfo model = null;
+	private final StatInfo model;
 	private JButton saveButton = null;
 	private JTextArea textClauseCount = null;
 	private JTextArea textGoal = null;
@@ -129,11 +130,11 @@ class StatInfoView extends JDialog {
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 	}
 
-	private String showGoal(String str) {
+	private String showLabels(String text) {
 		StringBuffer ret = new StringBuffer();
 		try {
 			BufferedReader reader = new BufferedReader(new StringReader(
-					str.replace(KRSSKeyword.close, KRSSKeyword.space
+					text.replace(KRSSKeyword.close, KRSSKeyword.space
 							+ KRSSKeyword.close)));
 			String line = new String();
 			while (line != null) {
@@ -142,7 +143,14 @@ class StatInfoView extends JDialog {
 					StringTokenizer stok = new StringTokenizer(line);
 					while (stok.hasMoreTokens()) {
 						String token = stok.nextToken();
-						ret.append(getModel().getLabel(token));
+						String label = getModel().getLabel(token);
+						if (label.equals(token)) {
+							ret.append(token);
+						} else {
+							ret.append(quotes);
+							ret.append(label);
+							ret.append(quotes);
+						}
 						if (stok.hasMoreTokens()) {
 							ret.append(KRSSKeyword.space);
 						}
@@ -157,7 +165,7 @@ class StatInfoView extends JDialog {
 	}
 
 	public void update() {
-		this.textGoal.setText(showGoal(getModel().getGoal().toString()));
+		this.textGoal.setText(showLabels(getModel().getGoal().toString()));
 		this.textClauseCount.setText(getModel().getClauseCount().toString());
 		this.textSysVarCount.setText(getModel().getAllVarCount().toString());
 		this.textLiteralCount.setText(getModel().getLiteralCount().toString());

@@ -65,6 +65,7 @@ public class UelController implements ActionListener {
 	private static final String actionSelectVariables = "get var candidate";
 	private static final String actionShowStatInfo = "show statistic info";
 	private static final String initialUnifierIdText = " 0 ";
+	private static final String quotes = "\"";
 
 	private boolean allUnifiersFound = false;
 	private List<LabelId> classList00 = null;
@@ -641,18 +642,27 @@ public class UelController implements ActionListener {
 		getView().setButtonShowStatInfoEnabled(b);
 	}
 
-	private String showUnifier(String str) {
+	private String showLabels(String text) {
 		StringBuffer ret = new StringBuffer();
 		try {
-			BufferedReader reader = new BufferedReader(new StringReader(str));
-			String line = "";
+			BufferedReader reader = new BufferedReader(new StringReader(
+					text.replace(KRSSKeyword.close, KRSSKeyword.space
+							+ KRSSKeyword.close)));
+			String line = new String();
 			while (line != null) {
 				line = reader.readLine();
 				if (line != null) {
 					StringTokenizer stok = new StringTokenizer(line);
 					while (stok.hasMoreTokens()) {
 						String token = stok.nextToken();
-						ret.append(getLabel(token));
+						String label = getLabel(token);
+						if (label.equals(token)) {
+							ret.append(token);
+						} else {
+							ret.append(quotes);
+							ret.append(label);
+							ret.append(quotes);
+						}
 						if (stok.hasMoreTokens()) {
 							ret.append(KRSSKeyword.space);
 						}
@@ -697,7 +707,7 @@ public class UelController implements ActionListener {
 	private void updateUnifier() {
 		if (getModel().getUnifierList().size() > 0) {
 			getView().getUnifier().setText(
-					showUnifier(toKRSS(getModel().getUnifierList().get(
+					showLabels(toKRSS(getModel().getUnifierList().get(
 							this.unifierIndex))));
 		} else {
 			getView().getUnifier().setText("[not unifiable]");
