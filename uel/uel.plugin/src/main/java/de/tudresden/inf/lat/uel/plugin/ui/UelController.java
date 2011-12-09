@@ -169,11 +169,23 @@ public class UelController implements ActionListener {
 	private void executeActionClass00Selected() {
 		setUnifierButtons(false);
 		getView().getUnifier().setText("");
+		try {
+			getView().setToolTipTextClass00(
+					getView().getSelectedClassName00().getId());
+		} catch (ArrayIndexOutOfBoundsException e) {
+			getView().setToolTipTextClass00(Message.tooltipComboBoxClassName00);
+		}
 	}
 
 	private void executeActionClass01Selected() {
 		setUnifierButtons(false);
 		getView().getUnifier().setText("");
+		try {
+			getView().setToolTipTextClass01(
+					getView().getSelectedClassName01().getId());
+		} catch (ArrayIndexOutOfBoundsException e) {
+			getView().setToolTipTextClass01(Message.tooltipComboBoxClassName01);
+		}
 	}
 
 	private void executeActionFirst() {

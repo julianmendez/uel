@@ -208,8 +208,8 @@ public class UelView extends JPanel {
 			throw new IllegalArgumentException("Null argument.");
 		}
 
-		this.listClassName00.addActionListener(listener);
-		this.listClassName00.setActionCommand(actionCommand);
+		this.listClassName01.addActionListener(listener);
+		this.listClassName01.setActionCommand(actionCommand);
 	}
 
 	public void addComboBoxOntology00Listener(ActionListener listener,
@@ -283,7 +283,7 @@ public class UelView extends JPanel {
 		this.listOntologyName01.setMinimumSize(new Dimension(112, 28));
 		ret.add(this.listOntologyName01);
 
-		this.checkBoxClassName00
+		this.checkBoxClassName01
 				.setToolTipText(Message.tooltipCheckBoxClassName01);
 		ret.add(this.checkBoxClassName01);
 
@@ -460,6 +460,22 @@ public class UelView extends JPanel {
 
 	public void setComboBoxOntologyName01Enabled(boolean b) {
 		this.listOntologyName01.setEnabled(b);
+	}
+
+	public void setToolTipTextClass00(String str) {
+		if (str == null) {
+			throw new IllegalArgumentException("Null argument.");
+		}
+
+		this.listClassName00.setToolTipText(str);
+	}
+
+	public void setToolTipTextClass01(String str) {
+		if (str == null) {
+			throw new IllegalArgumentException("Null argument.");
+		}
+
+		this.listClassName01.setToolTipText(str);
 	}
 
 }
