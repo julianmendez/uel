@@ -83,9 +83,13 @@ public class Labeler {
 			line = reader.readLine();
 			if (line != null) {
 				StringTokenizer stok = new StringTokenizer(line, "\t");
-				String key = stok.nextToken();
-				String value = stok.nextToken();
-				ret.put(toXMLEncoding(key), toXMLEncoding(value));
+				if (stok.hasMoreTokens()) {
+					String key = stok.nextToken();
+					if (stok.hasMoreTokens()) {
+						String value = stok.nextToken();
+						ret.put(toXMLEncoding(key), toXMLEncoding(value));
+					}
+				}
 			}
 		}
 		return ret;
