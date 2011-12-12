@@ -38,8 +38,6 @@ public class XMLFlattener {
 		}
 	}
 
-	private Set<String> setOfFields = new TreeSet<String>();
-
 	public XMLFlattener() {
 	}
 
@@ -60,7 +58,8 @@ public class XMLFlattener {
 		return ret;
 	}
 
-	private void preProcessDocument(Document doc) {
+	private Set<String> preProcessDocument(Document doc) {
+		Set<String> ret = new TreeSet<String>();
 		NodeList mainNodeList = doc.getChildNodes();
 		if (mainNodeList.getLength() > 0) {
 			Node mainNode = mainNodeList.item(0);
@@ -69,11 +68,13 @@ public class XMLFlattener {
 			for (int i = 0; i < nodeList.getLength(); i++) {
 				Map<String, String> nodeInfo = new TreeMap<String, String>();
 				processNode("", nodeList.item(i), nodeInfo);
+				ret.addAll(nodeInfo.keySet());
 			}
 		}
+		return ret;
 	}
 
-	private void processDocument(Document doc, Writer writer)
+	private void processDocument(Set<String> keySet, Document doc, Writer writer)
 			throws IOException {
 		NodeList mainNodeList = doc.getChildNodes();
 		if (mainNodeList.getLength() > 0) {
@@ -83,7 +84,7 @@ public class XMLFlattener {
 			for (int i = 0; i < nodeList.getLength(); i++) {
 				Map<String, String> nodeInfo = new TreeMap<String, String>();
 				processNode("", nodeList.item(i), nodeInfo);
-				renderRecord(nodeInfo, writer);
+				renderRecord(keySet, nodeInfo, writer);
 			}
 		}
 	}
@@ -92,11 +93,12 @@ public class XMLFlattener {
 			Map<String, String> nodeInfo) {
 
 		String name = getNodeName(prefix, node, nodeInfo);
-		this.setOfFields.add(name);
 		String value = node.getNodeValue();
 
 		if (value != null) {
-			nodeInfo.put(name, value.trim());
+			if (!value.trim().isEmpty()) {
+				nodeInfo.put(name, value);
+			}
 		}
 
 		if (node.hasAttributes()) {
@@ -114,33 +116,41 @@ public class XMLFlattener {
 		}
 	}
 
-	private void renderHeader(Writer writer) throws IOException {
-		for (String key : this.setOfFields) {
+	private void renderHeader(Set<String> keySet, Writer writer)
+			throws IOException {
+		for (String key : keySet) {
 			writer.write(key.replace(tabSepStr, spaceSepStr) + tabSepStr);
 		}
 		writer.write(newLineSepStr);
 	}
 
-	private void renderRecord(Map<String, String> nodeInfo, Writer writer)
-			throws IOException {
-		for (String key : this.setOfFields) {
+	private void renderRecord(Set<String> keySet, Map<String, String> nodeInfo,
+			Writer writer) throws IOException {
+		StringBuffer sbuf = new StringBuffer();
+		for (String key : keySet) {
 			String value = nodeInfo.get(key);
 			if (value == null) {
 				value = "";
 			}
-			writer.write(value.replace(tabSepStr, spaceSepStr) + tabSepStr);
-		}
-		writer.write(newLineSepStr);
 
+			sbuf.append(value.replace(tabSepStr, spaceSepStr));
+			sbuf.append(tabSepStr);
+		}
+		String line = sbuf.toString();
+		if (!line.trim().isEmpty()) {
+			writer.write(line);
+			writer.write(newLineSepStr);
+		}
 	}
 
 	public void run(File input, File output) throws SAXException, IOException {
-		BufferedWriter writer = new BufferedWriter(new FileWriter(output));
 		DOMParser parser = new DOMParser();
 		parser.parse(input.getCanonicalPath());
-		preProcessDocument(parser.getDocument());
-		renderHeader(writer);
-		processDocument(parser.getDocument(), writer);
+		Set<String> keySet = preProcessDocument(parser.getDocument());
+
+		BufferedWriter writer = new BufferedWriter(new FileWriter(output));
+		renderHeader(keySet, writer);
+		processDocument(keySet, parser.getDocument(), writer);
 		writer.flush();
 	}
 
