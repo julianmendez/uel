@@ -167,6 +167,7 @@ public class UelView extends JPanel {
 
 		this.checkBoxClassName00
 				.setToolTipText(Message.tooltipCheckBoxClassName00);
+		this.checkBoxClassName00.setSelected(true);
 		ret.add(this.checkBoxClassName00);
 
 		this.listClassName00.setToolTipText(Message.tooltipComboBoxClassName00);
@@ -187,6 +188,7 @@ public class UelView extends JPanel {
 
 		this.checkBoxClassName01
 				.setToolTipText(Message.tooltipCheckBoxClassName01);
+		this.checkBoxClassName01.setSelected(true);
 		ret.add(this.checkBoxClassName01);
 
 		this.listClassName01.setToolTipText(Message.tooltipComboBoxClassName01);
