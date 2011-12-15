@@ -30,10 +30,6 @@ import de.tudresden.inf.lat.uel.plugin.ui.UelView;
 public class ProcessorTest extends TestCase {
 
 	private static final String apath = "src/test/resources/";
-
-	// private static final Logger logger = Logger.getLogger(ProcessorTest.class
-	// .getName());
-
 	private static final String ontology01 = apath + "testOntology-01.krss";
 	private static final String ontology02 = apath + "testOntology-02.krss";
 	private static final String ontology03 = apath + "testOntology-03.krss";
@@ -214,7 +210,7 @@ public class ProcessorTest extends TestCase {
 				owlOntology.getOWLOntologyManager());
 
 		for (Set<Equation> unifier : unifiers) {
-			String str = controller.toKRSS(unifier);
+			String str = controller.getUnifier().toKRSS(unifier);
 			String extendedOntology = goalStr + str;
 
 			OWLReasoner reasoner = createReasoner(extendedOntology);

@@ -2,27 +2,18 @@ package de.tudresden.inf.lat.uel.plugin.ui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.StringTokenizer;
 import java.util.TreeSet;
 
-import javax.swing.DefaultListModel;
 import javax.swing.JFileChooser;
 
-import org.semanticweb.owlapi.io.OWLRendererException;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
@@ -34,10 +25,7 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 
 import de.tudresden.inf.lat.uel.core.sat.Translator;
-import de.tudresden.inf.lat.uel.core.type.Atom;
-import de.tudresden.inf.lat.uel.core.type.Equation;
 import de.tudresden.inf.lat.uel.core.type.Goal;
-import de.tudresden.inf.lat.uel.core.type.KRSSKeyword;
 import de.tudresden.inf.lat.uel.plugin.processor.UelProcessor;
 
 /**
@@ -53,21 +41,12 @@ public class UelController implements ActionListener {
 	private static final String actionCheckBoxClassName01 = "class 01 primitive";
 	private static final String actionClass00Selected = "class 00 selected";
 	private static final String actionClass01Selected = "class 01 selected";
-	private static final String actionFirst = "first";
-	private static final String actionLast = "last";
-	private static final String actionNext = "next";
 	private static final String actionOntology00Selected = "ontology 00 selected";
 	private static final String actionOntology01Selected = "ontology 01 selected";
 	private static final String actionOpen = "open";
-	private static final String actionPrevious = "previous";
 	private static final String actionRejectVar = "reject var";
-	private static final String actionSave = "save";
 	private static final String actionSelectVariables = "get var candidate";
-	private static final String actionShowStatInfo = "show statistic info";
-	private static final String initialUnifierIdText = " 0 ";
-	private static final String quotes = "\"";
 
-	private boolean allUnifiersFound = false;
 	private List<LabelId> classList00 = null;
 	private List<LabelId> classList01 = null;
 	private Map<String, OWLClass> mapIdClass = new HashMap<String, OWLClass>();
@@ -78,29 +57,23 @@ public class UelController implements ActionListener {
 	private final OWLOntologyManager owlOntologyManager;
 	private Map<String, OWLOntology> owlOntologyMap = new HashMap<String, OWLOntology>();
 	private Map<OWLClass, String> shortFormMap = new HashMap<OWLClass, String>();
-	private StatInfo statInfo = null;
-	private int unifierIndex = -1;
+	private UnifierController unifierController;
 	private VarSelectionController varWindow = null;
 	private final UelView view;
 
 	/**
 	 * Constructs a new controller.
 	 * 
-	 * @param panel
+	 * @param view
 	 *            panel to be controlled
 	 * @param ontologyManager
 	 *            an OWL ontology manager
 	 */
-	public UelController(UelView panel, OWLOntologyManager ontologyManager) {
-		if (panel == null) {
-			throw new IllegalArgumentException("Null argument.");
-		}
-		if (ontologyManager == null) {
-			throw new IllegalArgumentException("Null argument.");
-		}
-
-		this.view = panel;
+	public UelController(UelView view, OWLOntologyManager ontologyManager) {
+		this.view = view;
 		this.owlOntologyManager = ontologyManager;
+		this.unifierController = new UnifierController(new UnifierView(
+				view.getModel()));
 		init();
 	}
 
@@ -127,22 +100,11 @@ public class UelController implements ActionListener {
 			executeActionAcceptVar();
 		} else if (cmd.equals(actionRejectVar)) {
 			executeActionRejectVar();
-		} else if (cmd.equals(actionFirst)) {
-			executeActionFirst();
-		} else if (cmd.equals(actionPrevious)) {
-			executeActionPrevious();
-		} else if (cmd.equals(actionNext)) {
-			executeActionNext();
-		} else if (cmd.equals(actionLast)) {
-			executeActionLast();
-		} else if (cmd.equals(actionSave)) {
-			executeActionSave();
 		} else if (cmd.equals(actionCheckBoxClassName00)) {
 			executeActionOntology00Selected();
 		} else if (cmd.equals(actionCheckBoxClassName01)) {
 			executeActionOntology01Selected();
-		} else if (cmd.equals(actionShowStatInfo)) {
-			executeActionShowStatInfo();
+
 		} else {
 			throw new IllegalStateException();
 		}
@@ -156,20 +118,23 @@ public class UelController implements ActionListener {
 			getModel().createTranslator(g);
 			Translator translator = getModel().getTranslator();
 			getModel().computeSatInput();
-			this.statInfo = new StatInfo(g, translator.getLiterals().size(),
-					getModel().getSatInput().getClauses().size(),
-					this.mapIdLabel);
+			getUnifier()
+					.setStatInfo(
+							new StatInfo(g, translator.getLiterals().size(),
+									getModel().getSatInput().getClauses()
+											.size(), this.mapIdLabel));
 		}
 
-		setUnifierButtons(false);
-		getView().setButtonNextEnabled(true);
-		getView().setButtonShowStatInfoEnabled(true);
+		getUnifier().getView().setUnifierButtons(false);
+		getUnifier().getView().setButtonNextEnabled(true);
+		getUnifier().getView().setButtonShowStatInfoEnabled(true);
 
+		this.unifierController.getView().setVisible(true);
 	}
 
 	private void executeActionClass00Selected() {
-		setUnifierButtons(false);
-		getView().getUnifier().setText("");
+		getUnifier().getView().setUnifierButtons(false);
+		getUnifier().getView().getUnifier().setText("");
 		try {
 			getView().setToolTipTextClass00(
 					getView().getSelectedClassName00().getId());
@@ -179,8 +144,8 @@ public class UelController implements ActionListener {
 	}
 
 	private void executeActionClass01Selected() {
-		setUnifierButtons(false);
-		getView().getUnifier().setText("");
+		getUnifier().getView().setUnifierButtons(false);
+		getUnifier().getView().getUnifier().setText("");
 		try {
 			getView().setToolTipTextClass01(
 					getView().getSelectedClassName01().getId());
@@ -189,48 +154,13 @@ public class UelController implements ActionListener {
 		}
 	}
 
-	private void executeActionFirst() {
-		setUnifierButtons(true);
-
-		this.unifierIndex = 0;
-		updateUnifier();
-	}
-
-	private void executeActionLast() {
-		while (!this.allUnifiersFound) {
-			int previousSize = getModel().getUnifierList().size();
-			getModel().computeNextUnifier();
-			if (getModel().getUnifierList().size() == previousSize) {
-				this.allUnifiersFound = true;
-				this.unifierIndex = getModel().getUnifierList().size() - 1;
-			}
-		}
-		this.unifierIndex = getModel().getUnifierList().size() - 1;
-		updateUnifier();
-	}
-
-	private void executeActionNext() {
-		setUnifierButtons(true);
-
-		this.unifierIndex++;
-		if (this.unifierIndex >= getModel().getUnifierList().size()) {
-			int previousSize = getModel().getUnifierList().size();
-			getModel().computeNextUnifier();
-			if (getModel().getUnifierList().size() == previousSize) {
-				this.allUnifiersFound = true;
-				this.unifierIndex = getModel().getUnifierList().size() - 1;
-			}
-		}
-		updateUnifier();
-	}
-
 	private void executeActionOntology00Selected() {
 		executeActionOntology00Selected(getView().getSelectedOntologyName00());
 	}
 
 	private void executeActionOntology00Selected(int ontologyIndex) {
 		if (0 <= ontologyIndex && ontologyIndex < this.ontologyList.size()) {
-			setUnifierButtons(false);
+			getUnifier().getView().setUnifierButtons(false);
 
 			String ontologyId = this.ontologyList.get(ontologyIndex);
 			this.owlOntology00 = this.owlOntologyMap.get(ontologyId);
@@ -252,7 +182,7 @@ public class UelController implements ActionListener {
 	private void executeActionOntology01Selected(int ontologyIndex) {
 		if (0 <= ontologyIndex && ontologyIndex < this.ontologyList.size()) {
 
-			setUnifierButtons(false);
+			getUnifier().getView().setUnifierButtons(false);
 
 			String ontologyId = this.ontologyList.get(ontologyIndex);
 			this.owlOntology01 = this.owlOntologyMap.get(ontologyId);
@@ -288,61 +218,13 @@ public class UelController implements ActionListener {
 		}
 	}
 
-	private void executeActionPrevious() {
-		setUnifierButtons(true);
-
-		this.unifierIndex--;
-		if (this.unifierIndex < 0) {
-			this.unifierIndex = 0;
-		}
-		updateUnifier();
-	}
-
 	private void executeActionRejectVar() {
 		this.varWindow.close();
-		setUnifierButtons(false);
-	}
-
-	private void executeActionSave() {
-		JFileChooser fileChooser = new JFileChooser();
-		int returnVal = fileChooser.showSaveDialog(getView());
-		File file = null;
-		if (returnVal == JFileChooser.APPROVE_OPTION) {
-			file = fileChooser.getSelectedFile();
-		}
-		if (file != null) {
-			try {
-				String unifier = toKRSS(getModel().getUnifierList().get(
-						this.unifierIndex));
-				OntologyRenderer renderer = new OntologyRenderer();
-				OWLOntology owlOntology = renderer.parseKRSS(unifier);
-				if (file.getName().endsWith(OntologyRenderer.EXTENSION_RDF)) {
-					unifier = renderer.renderRDF(owlOntology);
-				} else if (file.getName().endsWith(
-						OntologyRenderer.EXTENSION_OWL)) {
-					unifier = renderer.renderOWL(owlOntology);
-				} else if (file.getName().endsWith(
-						OntologyRenderer.EXTENSION_KRSS)) {
-					unifier = renderer.renderKRSS(owlOntology);
-				}
-
-				BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-				if (getModel().getUnifierList().size() > 0) {
-					writer.write(unifier);
-				}
-				writer.flush();
-			} catch (OWLRendererException e) {
-				throw new RuntimeException(e);
-			} catch (OWLOntologyCreationException e) {
-				throw new RuntimeException(e);
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
-		}
+		getUnifier().getView().setUnifierButtons(false);
 	}
 
 	private void executeActionSelectVariables() {
-		setUnifierButtons(false);
+		getUnifier().getView().setUnifierButtons(false);
 
 		getModel().clearOntology();
 		getModel().loadOntology(this.owlOntology00, this.owlOntology01);
@@ -358,15 +240,6 @@ public class UelController implements ActionListener {
 			this.varWindow.open();
 		} catch (RuntimeException e) {
 		}
-		this.unifierIndex = -1;
-		this.allUnifiersFound = false;
-		getView().getUnifierId().setText(initialUnifierIdText);
-	}
-
-	private void executeActionShowStatInfo() {
-		StatInfoController statInfoWindow = new StatInfoController(
-				new StatInfoView(this.statInfo));
-		statInfoWindow.open();
 	}
 
 	private List<LabelId> getClassNames(OWLOntology ontology, boolean primitive) {
@@ -415,43 +288,12 @@ public class UelController implements ActionListener {
 		return cls.getIRI().toURI().toString();
 	}
 
-	private String getLabel(String candidateId) {
-		String ret = candidateId;
-		if (candidateId.endsWith(Goal.UNDEF_SUFFIX)) {
-			ret = candidateId.substring(0, candidateId.length()
-					- Goal.UNDEF_SUFFIX.length());
-		}
-		OWLClass cls = this.mapIdClass.get(ret);
-		if (cls != null) {
-			ret = getShortForm(cls);
-		}
-		if (candidateId.endsWith(Goal.UNDEF_SUFFIX)) {
-			ret += Goal.UNDEF_SUFFIX;
-		}
-		return ret;
-	}
-
-	public DefaultListModel getListModel() {
-		return getView().getListModel();
-	}
-
 	public UelProcessor getModel() {
 		return getView().getModel();
 	}
 
 	public OWLOntologyManager getOWLOntologyManager() {
 		return this.owlOntologyManager;
-	}
-
-	private Collection<Atom> getSetOfSubsumers(Atom atom) {
-		Collection<Integer> list = getModel().getTranslator()
-				.getSetOfSubsumers(
-						getModel().getAtomManager().addAndGetIndex(atom));
-		List<Atom> ret = new ArrayList<Atom>();
-		for (Integer id : list) {
-			ret.add(getModel().getAtomManager().get(id));
-		}
-		return ret;
 	}
 
 	private String getShortForm(OWLClass cls) {
@@ -467,6 +309,10 @@ public class UelController implements ActionListener {
 		return Collections.unmodifiableMap(this.shortFormMap);
 	}
 
+	public UnifierController getUnifier() {
+		return this.unifierController;
+	}
+
 	public UelView getView() {
 		return this.view;
 	}
@@ -478,11 +324,6 @@ public class UelController implements ActionListener {
 	private void init() {
 		getView().addButtonOpenListener(this, actionOpen);
 		getView().addButtonSelectVariablesListener(this, actionSelectVariables);
-		getView().addButtonFirstListener(this, actionFirst);
-		getView().addButtonPreviousListener(this, actionPrevious);
-		getView().addButtonNextListener(this, actionNext);
-		getView().addButtonLastListener(this, actionLast);
-		getView().addButtonSaveListener(this, actionSave);
 		getView().addComboBoxClass00Listener(this, actionClass00Selected);
 		getView().addComboBoxClass01Listener(this, actionClass01Selected);
 		getView().addComboBoxOntology00Listener(this, actionOntology00Selected);
@@ -491,7 +332,6 @@ public class UelController implements ActionListener {
 				actionCheckBoxClassName00);
 		getView().addCheckBoxClassName01Listener(this,
 				actionCheckBoxClassName01);
-		getView().addButtonShowStatInfoListener(this, actionShowStatInfo);
 
 		reset();
 		reloadOntologies();
@@ -521,70 +361,6 @@ public class UelController implements ActionListener {
 			this.ontologyList.addAll(set);
 			getView().reloadOntologies(this.ontologyList);
 		}
-	}
-
-	/**
-	 * Prints a substitution set (i.e. a set of atoms) as a conjunction of atoms
-	 * in the krss format. Used in Translator.
-	 * 
-	 * @return the string representation of a substitution set
-	 */
-	public String printSetOfSubsumers(Collection<Atom> setOfSubsumers) {
-
-		StringBuffer sbuf = new StringBuffer();
-
-		if (setOfSubsumers.isEmpty()) {
-
-			sbuf.append(KRSSKeyword.top);
-			sbuf.append(KRSSKeyword.space);
-
-		} else if (setOfSubsumers.size() == 1) {
-
-			Atom atom = setOfSubsumers.iterator().next();
-			sbuf.append(printSubstitution(atom));
-
-		} else {
-
-			sbuf.append(KRSSKeyword.open);
-			sbuf.append(KRSSKeyword.and);
-			sbuf.append(KRSSKeyword.space);
-
-			for (Atom atom : setOfSubsumers) {
-				sbuf.append(KRSSKeyword.space);
-				sbuf.append(printSubstitution(atom));
-				sbuf.append(KRSSKeyword.space);
-			}
-
-			sbuf.append(KRSSKeyword.space);
-			sbuf.append(KRSSKeyword.close);
-		}
-		return sbuf.toString();
-	}
-
-	private String printSubstitution(Atom atom) {
-		StringBuffer sbuf = new StringBuffer();
-		if (atom.isExistentialRestriction()
-				&& !(atom.asExistentialRestriction().getChild().isConceptName() && atom
-						.asExistentialRestriction().getChild().asConceptName()
-						.isUserVariable())) {
-			sbuf.append(KRSSKeyword.open);
-			sbuf.append(KRSSKeyword.some);
-			sbuf.append(KRSSKeyword.space);
-			sbuf.append(atom.getName());
-			sbuf.append(KRSSKeyword.space);
-			Atom child = atom.asExistentialRestriction().getChild();
-			if (child.isConceptName() && child.asConceptName().isVariable()
-					&& !child.asConceptName().isUserVariable()) {
-				sbuf.append(printSetOfSubsumers(getSetOfSubsumers(child
-						.asConceptName())));
-			} else {
-				sbuf.append(child.getName());
-			}
-			sbuf.append(KRSSKeyword.close);
-		} else {
-			sbuf.append(atom.getId());
-		}
-		return sbuf.toString();
 	}
 
 	private void processMapIdClass(OWLOntology ontology) {
@@ -620,15 +396,11 @@ public class UelController implements ActionListener {
 	}
 
 	public void reset() {
-		setUnifierButtons(false);
-
+		getUnifier().getView().setUnifierButtons(false);
 		getView().setComboBoxClassName00Enabled(false);
 		getView().setComboBoxClassName01Enabled(false);
 		getView().setButtonSelectVariablesEnabled(false);
-		this.unifierIndex = -1;
-		this.allUnifiersFound = false;
-		getView().getUnifier().setText("");
-		getView().getUnifierId().setText(initialUnifierIdText);
+		getUnifier().getView().getUnifier().setText("");
 	}
 
 	public void setShortFormMap(Map<OWLClass, String> map) {
@@ -638,106 +410,6 @@ public class UelController implements ActionListener {
 
 		this.shortFormMap = map;
 		recomputeShortForm();
-	}
-
-	private void setUnifierButtons(boolean b) {
-		getView().setButtonFirstEnabled(b);
-		getView().setButtonPreviousEnabled(b);
-		getView().setButtonNextEnabled(b);
-		getView().setButtonLastEnabled(b);
-		getView().setButtonSaveEnabled(b);
-		getView().setButtonShowStatInfoEnabled(b);
-	}
-
-	private String showLabels(String text) {
-		StringBuffer ret = new StringBuffer();
-		try {
-			BufferedReader reader = new BufferedReader(new StringReader(
-					text.replace(KRSSKeyword.close, KRSSKeyword.space
-							+ KRSSKeyword.close)));
-			String line = new String();
-			while (line != null) {
-				line = reader.readLine();
-				if (line != null) {
-					StringTokenizer stok = new StringTokenizer(line);
-					while (stok.hasMoreTokens()) {
-						String token = stok.nextToken();
-						String label = getLabel(token);
-						if (label.equals(token)) {
-							ret.append(token);
-						} else {
-							ret.append(quotes);
-							ret.append(label);
-							ret.append(quotes);
-						}
-						if (stok.hasMoreTokens()) {
-							ret.append(KRSSKeyword.space);
-						}
-					}
-				}
-				ret.append(KRSSKeyword.newLine);
-			}
-		} catch (IOException e) {
-			throw new IllegalStateException(e);
-		}
-		return ret.toString();
-	}
-
-	public String toKRSS(Set<Equation> set) {
-		Set<Equation> unif = new HashSet<Equation>();
-		unif.addAll(set);
-		StringBuffer sbuf = new StringBuffer();
-		for (Equation eq : set) {
-			Atom leftPart = getModel().getAtomManager().get(eq.getLeft());
-
-			Set<Atom> right = new HashSet<Atom>();
-			for (Integer atomId : eq.getRight()) {
-				right.add(getModel().getAtomManager().get(atomId));
-			}
-
-			sbuf.append(KRSSKeyword.open);
-			sbuf.append(KRSSKeyword.define_concept);
-			sbuf.append(KRSSKeyword.space);
-			sbuf.append(leftPart.getId());
-			sbuf.append(KRSSKeyword.space);
-
-			sbuf.append(printSetOfSubsumers(right));
-			sbuf.append(KRSSKeyword.space);
-			sbuf.append(KRSSKeyword.close);
-			sbuf.append(KRSSKeyword.space);
-			sbuf.append(KRSSKeyword.newLine);
-		}
-		return sbuf.toString();
-
-	}
-
-	private void updateUnifier() {
-		if (getModel().getUnifierList().size() > 0) {
-			getView().getUnifier().setText(
-					showLabels(toKRSS(getModel().getUnifierList().get(
-							this.unifierIndex))));
-		} else {
-			getView().getUnifier().setText("[not unifiable]");
-		}
-		getView().getUnifierId().setText(
-				" "
-						+ (getModel().getUnifierList().isEmpty() ? 0
-								: (this.unifierIndex + 1)) + " ");
-		if (this.unifierIndex == 0) {
-			getView().setButtonPreviousEnabled(false);
-			getView().setButtonFirstEnabled(false);
-		} else {
-			getView().setButtonPreviousEnabled(true);
-			getView().setButtonFirstEnabled(true);
-		}
-		if (this.allUnifiersFound
-				&& this.unifierIndex >= getModel().getUnifierList().size() - 1) {
-			getView().setButtonNextEnabled(false);
-			getView().setButtonLastEnabled(false);
-		} else {
-			getView().setButtonNextEnabled(true);
-			getView().setButtonLastEnabled(true);
-		}
 	}
 
 }

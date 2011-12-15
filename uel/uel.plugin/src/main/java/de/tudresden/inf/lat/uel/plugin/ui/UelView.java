@@ -2,19 +2,15 @@ package de.tudresden.inf.lat.uel.plugin.ui;
 
 import java.awt.Dimension;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.event.ActionListener;
 import java.util.List;
 
 import javax.swing.BoxLayout;
-import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 
 import de.tudresden.inf.lat.uel.plugin.processor.UelProcessor;
 
@@ -27,25 +23,16 @@ public class UelView extends JPanel {
 
 	private static final long serialVersionUID = 9096602357606632334L;
 
-	private JButton buttonFirst = new JButton(Message.buttonFirst);
-	private JButton buttonLast = new JButton(Message.buttonLast);
-	private JButton buttonNext = new JButton(Message.buttonNext);
 	private JButton buttonOpen = new JButton(Message.buttonOpen);
-	private JButton buttonPrevious = new JButton(Message.buttonPrevious);
-	private JButton buttonSave = new JButton(Message.buttonSave);
 	private JButton buttonSelectVariables = new JButton(
 			Message.buttonSelectVariables);
-	private JButton buttonShowStatInfo = new JButton(Message.buttonShowStatInfo);
 	private JCheckBox checkBoxClassName00 = new JCheckBox();
 	private JCheckBox checkBoxClassName01 = new JCheckBox();
 	private JComboBoxOfLabelId listClassName00 = new JComboBoxOfLabelId();
 	private JComboBoxOfLabelId listClassName01 = new JComboBoxOfLabelId();
-	private DefaultListModel listmodel = new DefaultListModel();
 	private JComboBox listOntologyName00 = new JComboBox();
 	private JComboBox listOntologyName01 = new JComboBox();
 	private final UelProcessor model;
-	private JTextArea textUnifier = new JTextArea();
-	private JTextArea textUnifierId = new JTextArea();
 
 	public UelView(UelProcessor processor) {
 		if (processor == null) {
@@ -53,46 +40,7 @@ public class UelView extends JPanel {
 		}
 
 		this.model = processor;
-		init();
-	}
-
-	public void addButtonFirstListener(ActionListener listener,
-			String actionCommand) {
-		if (listener == null) {
-			throw new IllegalArgumentException("Null argument.");
-		}
-		if (actionCommand == null) {
-			throw new IllegalArgumentException("Null argument.");
-		}
-
-		this.buttonFirst.addActionListener(listener);
-		this.buttonFirst.setActionCommand(actionCommand);
-	}
-
-	public void addButtonLastListener(ActionListener listener,
-			String actionCommand) {
-		if (listener == null) {
-			throw new IllegalArgumentException("Null argument.");
-		}
-		if (actionCommand == null) {
-			throw new IllegalArgumentException("Null argument.");
-		}
-
-		this.buttonLast.addActionListener(listener);
-		this.buttonLast.setActionCommand(actionCommand);
-	}
-
-	public void addButtonNextListener(ActionListener listener,
-			String actionCommand) {
-		if (listener == null) {
-			throw new IllegalArgumentException("Null argument.");
-		}
-		if (actionCommand == null) {
-			throw new IllegalArgumentException("Null argument.");
-		}
-
-		this.buttonNext.addActionListener(listener);
-		this.buttonNext.setActionCommand(actionCommand);
+		add(createSelectionPanel());
 	}
 
 	public void addButtonOpenListener(ActionListener listener,
@@ -108,32 +56,6 @@ public class UelView extends JPanel {
 		this.buttonOpen.setActionCommand(actionCommand);
 	}
 
-	public void addButtonPreviousListener(ActionListener listener,
-			String actionCommand) {
-		if (listener == null) {
-			throw new IllegalArgumentException("Null argument.");
-		}
-		if (actionCommand == null) {
-			throw new IllegalArgumentException("Null argument.");
-		}
-
-		this.buttonPrevious.addActionListener(listener);
-		this.buttonPrevious.setActionCommand(actionCommand);
-	}
-
-	public void addButtonSaveListener(ActionListener listener,
-			String actionCommand) {
-		if (listener == null) {
-			throw new IllegalArgumentException("Null argument.");
-		}
-		if (actionCommand == null) {
-			throw new IllegalArgumentException("Null argument.");
-		}
-
-		this.buttonSave.addActionListener(listener);
-		this.buttonSave.setActionCommand(actionCommand);
-	}
-
 	public void addButtonSelectVariablesListener(ActionListener listener,
 			String actionCommand) {
 		if (listener == null) {
@@ -145,19 +67,6 @@ public class UelView extends JPanel {
 
 		this.buttonSelectVariables.addActionListener(listener);
 		this.buttonSelectVariables.setActionCommand(actionCommand);
-	}
-
-	public void addButtonShowStatInfoListener(ActionListener listener,
-			String actionCommand) {
-		if (listener == null) {
-			throw new IllegalArgumentException("Null argument.");
-		}
-		if (actionCommand == null) {
-			throw new IllegalArgumentException("Null argument.");
-		}
-
-		this.buttonShowStatInfo.addActionListener(listener);
-		this.buttonShowStatInfo.setActionCommand(actionCommand);
 	}
 
 	public void addCheckBoxClassName00Listener(ActionListener listener,
@@ -238,13 +147,6 @@ public class UelView extends JPanel {
 		this.listOntologyName01.setActionCommand(actionCommand);
 	}
 
-	private JPanel createControlPanel() {
-		JPanel ret = new JPanel(new GridLayout());
-		ret.add(createSelectionPanel());
-		ret.add(createUnifierPanel());
-		return ret;
-	}
-
 	private JPanel createSelectionPanel() {
 		JPanel ret = new JPanel(new GridBagLayout());
 		ret.setLayout(new BoxLayout(ret, BoxLayout.Y_AXIS));
@@ -295,53 +197,6 @@ public class UelView extends JPanel {
 		return ret;
 	}
 
-	private JPanel createUnifierPanel() {
-		JPanel ret = new JPanel();
-		ret.setLayout(new BoxLayout(ret, BoxLayout.Y_AXIS));
-
-		this.textUnifier.setToolTipText(Message.tooltipUnifier);
-		this.textUnifier.setWrapStyleWord(true);
-		this.textUnifier.setLineWrap(true);
-		this.textUnifier.setEditable(false);
-
-		JScrollPane scrollPane = new JScrollPane(this.textUnifier);
-		scrollPane
-				.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-		scrollPane.setPreferredSize(new Dimension(400, 200));
-		ret.add(scrollPane);
-
-		JPanel smallPanel = new JPanel();
-
-		this.buttonFirst.setToolTipText(Message.tooltipFirst);
-		smallPanel.add(this.buttonFirst);
-
-		this.buttonPrevious.setToolTipText(Message.tooltipPrevious);
-		smallPanel.add(this.buttonPrevious);
-
-		this.textUnifierId.setToolTipText(Message.tooltipUnifierId);
-		this.textUnifierId.setEditable(false);
-		smallPanel.add(this.textUnifierId);
-
-		this.buttonNext.setToolTipText(Message.tooltipNext);
-		smallPanel.add(this.buttonNext);
-
-		this.buttonLast.setToolTipText(Message.tooltipLast);
-		smallPanel.add(this.buttonLast);
-
-		this.buttonSave.setToolTipText(Message.tooltipSave);
-		smallPanel.add(this.buttonSave);
-
-		this.buttonShowStatInfo.setToolTipText(Message.tooltipShowStatInfo);
-		smallPanel.add(this.buttonShowStatInfo);
-
-		ret.add(smallPanel);
-		return ret;
-	}
-
-	public DefaultListModel getListModel() {
-		return this.listmodel;
-	}
-
 	public UelProcessor getModel() {
 		return this.model;
 	}
@@ -360,19 +215,6 @@ public class UelView extends JPanel {
 
 	public int getSelectedOntologyName01() {
 		return this.listOntologyName01.getSelectedIndex();
-	}
-
-	public JTextArea getUnifier() {
-		return this.textUnifier;
-	}
-
-	public JTextArea getUnifierId() {
-		return this.textUnifierId;
-	}
-
-	public void init() {
-		setLayout(new GridBagLayout());
-		add(createControlPanel());
 	}
 
 	public boolean isClassName00Primitive() {
@@ -414,36 +256,12 @@ public class UelView extends JPanel {
 		this.listClassName01.removeAllItems();
 	}
 
-	public void setButtonFirstEnabled(boolean b) {
-		this.buttonFirst.setEnabled(b);
-	}
-
-	public void setButtonLastEnabled(boolean b) {
-		this.buttonLast.setEnabled(b);
-	}
-
 	public void setButtonLoadEnabled(boolean b) {
 		this.buttonOpen.setEnabled(b);
 	}
 
-	public void setButtonNextEnabled(boolean b) {
-		this.buttonNext.setEnabled(b);
-	}
-
-	public void setButtonPreviousEnabled(boolean b) {
-		this.buttonPrevious.setEnabled(b);
-	}
-
-	public void setButtonSaveEnabled(boolean b) {
-		this.buttonSave.setEnabled(b);
-	}
-
 	public void setButtonSelectVariablesEnabled(boolean b) {
 		this.buttonSelectVariables.setEnabled(b);
-	}
-
-	public void setButtonShowStatInfoEnabled(boolean b) {
-		this.buttonShowStatInfo.setEnabled(b);
 	}
 
 	public void setComboBoxClassName00Enabled(boolean b) {
@@ -477,5 +295,4 @@ public class UelView extends JPanel {
 
 		this.listClassName01.setToolTipText(str);
 	}
-
 }

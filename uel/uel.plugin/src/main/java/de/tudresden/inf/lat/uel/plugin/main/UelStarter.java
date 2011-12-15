@@ -35,7 +35,8 @@ public class UelStarter implements OWLOntologyChangeListener,
 		}
 
 		this.ontologyManager = modelManager.getOWLOntologyManager();
-		this.panel = new UelController(new UelView(new UelProcessor()),
+		UelProcessor processor = new UelProcessor();
+		this.panel = new UelController(new UelView(processor),
 				this.ontologyManager);
 		this.renderer = modelManager.getOWLEntityRenderer();
 		getOWLOntologyManager().addOntologyLoaderListener(this);
@@ -49,7 +50,8 @@ public class UelStarter implements OWLOntologyChangeListener,
 		}
 
 		this.ontologyManager = manager;
-		this.panel = new UelController(new UelView(new UelProcessor()),
+		UelProcessor processor = new UelProcessor();
+		this.panel = new UelController(new UelView(processor),
 				this.ontologyManager);
 		getOWLOntologyManager().addOntologyLoaderListener(this);
 		getOWLOntologyManager().addOntologyChangeListener(this);
