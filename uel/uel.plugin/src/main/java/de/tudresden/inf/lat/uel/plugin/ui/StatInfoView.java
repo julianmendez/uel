@@ -110,8 +110,8 @@ class StatInfoView extends JDialog {
 		smallPanel.add(lblClauseCount);
 		smallPanel.add(this.textClauseCount);
 
-		ret.add(goalPanel);
 		ret.add(buttonPanel);
+		ret.add(goalPanel);
 		ret.add(smallPanel);
 
 		return ret;

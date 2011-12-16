@@ -32,7 +32,6 @@ class VarSelectionView extends JDialog {
 	private JButton makeConsButton = null;
 	private JButton makeVarButton = null;
 	private final VarSelectionModel model;
-	private JButton rejectVarButton = null;
 
 	public VarSelectionView(VarSelectionModel m) {
 		super((Frame) null, "Variable selection", true);
@@ -85,19 +84,6 @@ class VarSelectionView extends JDialog {
 		this.makeVarButton.setActionCommand(actionCommand);
 	}
 
-	public void addRejectVarButtonListener(ActionListener listener,
-			String actionCommand) {
-		if (listener == null) {
-			throw new IllegalArgumentException("Null argument.");
-		}
-		if (actionCommand == null) {
-			throw new IllegalArgumentException("Null argument.");
-		}
-
-		this.rejectVarButton.addActionListener(listener);
-		this.rejectVarButton.setActionCommand(actionCommand);
-	}
-
 	private JPanel createMainPanel() {
 		JPanel ret = new JPanel();
 		ret.setLayout(new BoxLayout(ret, BoxLayout.Y_AXIS));
@@ -140,14 +126,8 @@ class VarSelectionView extends JDialog {
 		this.acceptVarButton.setMaximumSize(new Dimension(74, 28));
 		buttonPanel.add(this.acceptVarButton);
 
-		this.rejectVarButton = new JButton(Message.buttonRejectVar);
-		this.rejectVarButton.setToolTipText(Message.tooltipRejectVar);
-		this.rejectVarButton.setMinimumSize(new Dimension(56, 28));
-		this.rejectVarButton.setMaximumSize(new Dimension(74, 28));
-		buttonPanel.add(this.rejectVarButton);
-
-		ret.add(varSelPanel);
 		ret.add(buttonPanel);
+		ret.add(varSelPanel);
 
 		return ret;
 	}

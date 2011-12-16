@@ -44,11 +44,6 @@ class VarSelectionController implements ActionListener {
 
 	}
 
-	public void addRejectVarButtonListener(ActionListener listener,
-			String actionCommand) {
-		getView().addRejectVarButtonListener(listener, actionCommand);
-	}
-
 	public void close() {
 		getView().setVisible(false);
 		getView().dispose();

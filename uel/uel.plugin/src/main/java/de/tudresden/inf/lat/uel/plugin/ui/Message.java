@@ -7,7 +7,7 @@ package de.tudresden.inf.lat.uel.plugin.ui;
  */
 public interface Message {
 
-	public static final String buttonAcceptVar = "OK";
+	public static final String buttonAcceptVar = ">";
 	public static final String buttonFirst = "|<";
 	public static final String buttonLast = ">|";
 	public static final String buttonMakeCons = "<<<";
@@ -15,10 +15,10 @@ public interface Message {
 	public static final String buttonNext = ">";
 	public static final String buttonOpen = "Open";
 	public static final String buttonPrevious = "<";
-	public static final String buttonRejectVar = "Cancel";
+	public static final String buttonRejectVar = "<";
 	public static final String buttonSave = "Save";
 	public static final String buttonSaveGoal = "Save";
-	public static final String buttonSelectVariables = "Vars";
+	public static final String buttonSelectVariables = ">";
 	public static final String buttonShowStatInfo = "Stat";
 	public static final String lblAllVarCount = "all variables";
 	public static final String lblClauseCount = "clauses";

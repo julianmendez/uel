@@ -346,7 +346,6 @@ public class UelController implements ActionListener {
 				new VarSelectionView(new VarSelectionModel(originalVariables,
 						this.mapIdLabel, goal)));
 		ret.addAcceptVarButtonListener(this, actionAcceptVar);
-		ret.addRejectVarButtonListener(this, actionRejectVar);
 		return ret;
 	}
 
