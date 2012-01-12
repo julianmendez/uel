@@ -10,15 +10,20 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import com.sun.org.apache.xerces.internal.parsers.DOMParser;
-
 /**
+ * An object of this class flattens an XML file returning a tab-separated file.
+ * This recognizes a "main node", and creates a row for each sub node of this
+ * main node.
  * 
  * @author Julian Mendez
  */
@@ -31,14 +36,37 @@ public class XMLFlattener {
 	private static final String tabSepStr = "\t";
 	private static final String textStr = "#text";
 
-	public static final void main(String[] args) throws SAXException,
-			IOException {
+	public static final void main(String[] args)
+			throws ParserConfigurationException, SAXException, IOException {
 		if (args.length == 2) {
 			(new XMLFlattener()).run(new File(args[0]), new File(args[1]));
+		} else {
+			System.out
+					.println("two parameters are required:  \n(1) input file name, RDF/OWL file  \n(2) output file name, a tab-separated file");
 		}
 	}
 
+	/**
+	 * Constructs a new XML flattener.
+	 */
 	public XMLFlattener() {
+	}
+
+	private Node getMainNode(Document doc) {
+		NodeList mainNodeList = doc.getChildNodes();
+		int n = mainNodeList.getLength();
+		Node ret = null;
+		if (n > 0) {
+			Node mainNode = mainNodeList.item(0);
+			for (int k = 0; mainNode.getNodeType() != Node.ELEMENT_NODE
+					&& k < n; k++) {
+				mainNode = mainNodeList.item(k);
+			}
+			if (mainNode.getNodeType() == Node.ELEMENT_NODE) {
+				ret = mainNode;
+			}
+		}
+		return ret;
 	}
 
 	private String getNodeName(String prefix, Node node,
@@ -60,11 +88,9 @@ public class XMLFlattener {
 
 	private Set<String> preProcessDocument(Document doc) {
 		Set<String> ret = new TreeSet<String>();
-		NodeList mainNodeList = doc.getChildNodes();
-		if (mainNodeList.getLength() > 0) {
-			Node mainNode = mainNodeList.item(0);
+		Node mainNode = getMainNode(doc);
+		if (mainNode != null) {
 			NodeList nodeList = mainNode.getChildNodes();
-
 			for (int i = 0; i < nodeList.getLength(); i++) {
 				Map<String, String> nodeInfo = new TreeMap<String, String>();
 				processNode("", nodeList.item(i), nodeInfo);
@@ -76,11 +102,9 @@ public class XMLFlattener {
 
 	private void processDocument(Set<String> keySet, Document doc, Writer writer)
 			throws IOException {
-		NodeList mainNodeList = doc.getChildNodes();
-		if (mainNodeList.getLength() > 0) {
-			Node mainNode = mainNodeList.item(0);
+		Node mainNode = getMainNode(doc);
+		if (mainNode != null) {
 			NodeList nodeList = mainNode.getChildNodes();
-
 			for (int i = 0; i < nodeList.getLength(); i++) {
 				Map<String, String> nodeInfo = new TreeMap<String, String>();
 				processNode("", nodeList.item(i), nodeInfo);
@@ -143,14 +167,18 @@ public class XMLFlattener {
 		}
 	}
 
-	public void run(File input, File output) throws SAXException, IOException {
-		DOMParser parser = new DOMParser();
-		parser.parse(input.getCanonicalPath());
-		Set<String> keySet = preProcessDocument(parser.getDocument());
+	public void run(File input, File output)
+			throws ParserConfigurationException, SAXException, IOException {
+		DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory
+				.newInstance();
+		DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
+		Document document = docBuilder.parse(input);
+		document.getDocumentElement().normalize();
 
+		Set<String> keySet = preProcessDocument(document);
 		BufferedWriter writer = new BufferedWriter(new FileWriter(output));
 		renderHeader(keySet, writer);
-		processDocument(keySet, parser.getDocument(), writer);
+		processDocument(keySet, document, writer);
 		writer.flush();
 	}
 
