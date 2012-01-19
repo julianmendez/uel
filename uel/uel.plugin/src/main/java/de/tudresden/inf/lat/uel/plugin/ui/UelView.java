@@ -6,6 +6,7 @@ import java.awt.event.ActionListener;
 import java.util.List;
 
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -23,9 +24,10 @@ public class UelView extends JPanel {
 
 	private static final long serialVersionUID = 9096602357606632334L;
 
-	private JButton buttonOpen = new JButton(Message.buttonOpen);
-	private JButton buttonSelectVariables = new JButton(
-			Message.buttonSelectVariables);
+	private JButton buttonOpen = new JButton(new ImageIcon(this.getClass()
+			.getClassLoader().getResource(Message.iconOpen)));
+	private JButton buttonSelectVariables = new JButton(new ImageIcon(this
+			.getClass().getClassLoader().getResource(Message.iconForward)));
 	private JCheckBox checkBoxClassName00 = new JCheckBox();
 	private JCheckBox checkBoxClassName01 = new JCheckBox();
 	private JComboBoxOfLabelId listClassName00 = new JComboBoxOfLabelId();

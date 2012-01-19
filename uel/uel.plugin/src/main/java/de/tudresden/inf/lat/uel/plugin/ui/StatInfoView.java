@@ -11,6 +11,7 @@ import java.io.StringReader;
 import java.util.StringTokenizer;
 
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -80,7 +81,8 @@ class StatInfoView extends JDialog {
 		goalPanel.add(scrollPaneVars);
 
 		JPanel buttonPanel = new JPanel();
-		this.saveButton = new JButton(Message.buttonSaveGoal);
+		this.saveButton = new JButton(new ImageIcon(this.getClass()
+				.getClassLoader().getResource(Message.iconSave)));
 		this.saveButton.setToolTipText(Message.tooltipSaveGoal);
 		this.saveButton.setMinimumSize(new Dimension(56, 28));
 		this.saveButton.setMaximumSize(new Dimension(74, 28));

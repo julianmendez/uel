@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Vector;
 
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JList;
@@ -120,7 +121,8 @@ class VarSelectionView extends JDialog {
 		this.makeVarButton.setMaximumSize(new Dimension(74, 28));
 		buttonPanel.add(this.makeVarButton);
 
-		this.acceptVarButton = new JButton(Message.buttonAcceptVar);
+		this.acceptVarButton = new JButton(new ImageIcon(this.getClass()
+				.getClassLoader().getResource(Message.iconForward)));
 		this.acceptVarButton.setToolTipText(Message.tooltipAcceptVar);
 		this.acceptVarButton.setMinimumSize(new Dimension(56, 28));
 		this.acceptVarButton.setMaximumSize(new Dimension(74, 28));

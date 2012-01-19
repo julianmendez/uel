@@ -6,6 +6,7 @@ import java.awt.GridBagLayout;
 import java.awt.event.ActionListener;
 
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
@@ -21,10 +22,14 @@ public class UnifierView extends JDialog {
 
 	private JButton buttonFirst = new JButton(Message.buttonFirst);
 	private JButton buttonLast = new JButton(Message.buttonLast);
-	private JButton buttonNext = new JButton(Message.buttonNext);
-	private JButton buttonPrevious = new JButton(Message.buttonPrevious);
-	private JButton buttonSave = new JButton(Message.buttonSave);
-	private JButton buttonShowStatInfo = new JButton(Message.buttonShowStatInfo);
+	private JButton buttonNext = new JButton(new ImageIcon(this.getClass()
+			.getClassLoader().getResource(Message.iconForward)));
+	private JButton buttonPrevious = new JButton(new ImageIcon(this.getClass()
+			.getClassLoader().getResource(Message.iconBack)));
+	private JButton buttonSave = new JButton(new ImageIcon(this.getClass()
+			.getClassLoader().getResource(Message.iconSave)));
+	private JButton buttonShowStatInfo = new JButton(new ImageIcon(this
+			.getClass().getClassLoader().getResource(Message.iconHistory)));
 	private final UelProcessor model;
 	private JTextArea textUnifier = new JTextArea();
 	private JTextArea textUnifierId = new JTextArea();
