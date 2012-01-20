@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -20,8 +19,6 @@ import java.util.StringTokenizer;
 import javax.swing.JFileChooser;
 
 import org.semanticweb.owlapi.io.OWLRendererException;
-import org.semanticweb.owlapi.model.IRI;
-import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 
@@ -46,14 +43,14 @@ public class UnifierController implements ActionListener {
 	private static final String quotes = "\"";
 
 	private boolean allUnifiersFound = false;
-	private Map<String, OWLClass> mapIdClass = new HashMap<String, OWLClass>();
-	private Map<OWLClass, String> shortFormMap = new HashMap<OWLClass, String>();
+	private final Map<String, String> mapIdLabel;
 	private StatInfo statInfo = null;
 	private int unifierIndex = -1;
 	private UnifierView view;
 
-	public UnifierController(UnifierView view) {
+	public UnifierController(UnifierView view, Map<String, String> labels) {
 		this.view = view;
+		this.mapIdLabel = labels;
 		init();
 	}
 
@@ -174,9 +171,10 @@ public class UnifierController implements ActionListener {
 			ret = candidateId.substring(0, candidateId.length()
 					- Goal.UNDEF_SUFFIX.length());
 		}
-		OWLClass cls = this.mapIdClass.get(ret);
-		if (cls != null) {
-			ret = getShortForm(cls);
+
+		String str = this.mapIdLabel.get(ret);
+		if (str != null) {
+			ret = str;
 		}
 		if (candidateId.endsWith(Goal.UNDEF_SUFFIX)) {
 			ret += Goal.UNDEF_SUFFIX;
@@ -195,15 +193,6 @@ public class UnifierController implements ActionListener {
 		List<Atom> ret = new ArrayList<Atom>();
 		for (Integer id : list) {
 			ret.add(getModel().getAtomManager().get(id));
-		}
-		return ret;
-	}
-
-	private String getShortForm(OWLClass cls) {
-		String ret = this.shortFormMap.get(cls);
-		if (ret == null) {
-			IRI iri = cls.getIRI();
-			ret = iri.getFragment();
 		}
 		return ret;
 	}

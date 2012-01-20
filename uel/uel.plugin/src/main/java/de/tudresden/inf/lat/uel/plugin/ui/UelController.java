@@ -73,7 +73,7 @@ public class UelController implements ActionListener {
 		this.view = view;
 		this.owlOntologyManager = ontologyManager;
 		this.unifierController = new UnifierController(new UnifierView(
-				view.getModel()));
+				view.getModel()), this.mapIdLabel);
 		init();
 	}
 

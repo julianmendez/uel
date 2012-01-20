@@ -12,8 +12,8 @@ public class StatInfo {
 
 	private final Integer clauseCount;
 	private final Goal goal;
-	private final Map<String, String> idLabelMap;
 	private final Integer literalCount;
+	private final Map<String, String> mapIdLabel;
 
 	public StatInfo(Goal g, int literals, int clauses,
 			Map<String, String> labels) {
@@ -27,7 +27,7 @@ public class StatInfo {
 		this.goal = g;
 		this.literalCount = literals;
 		this.clauseCount = clauses;
-		this.idLabelMap = labels;
+		this.mapIdLabel = labels;
 	}
 
 	@Override
@@ -60,13 +60,13 @@ public class StatInfo {
 			throw new IllegalArgumentException("Null argument.");
 		}
 
-		String ret = this.idLabelMap.get(id);
+		String ret = this.mapIdLabel.get(id);
 
 		if (ret == null) {
 			if (id.endsWith(Goal.UNDEF_SUFFIX)) {
 				String origId = id.substring(0,
 						id.length() - Goal.UNDEF_SUFFIX.length());
-				ret = this.idLabelMap.get(origId);
+				ret = this.mapIdLabel.get(origId);
 				if (ret != null) {
 					ret += Goal.UNDEF_SUFFIX;
 				}
