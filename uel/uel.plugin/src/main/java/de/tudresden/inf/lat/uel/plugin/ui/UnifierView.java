@@ -130,7 +130,6 @@ public class UnifierView extends JDialog {
 		this.textUnifier.setToolTipText(Message.tooltipUnifier);
 		this.textUnifier.setWrapStyleWord(true);
 		this.textUnifier.setLineWrap(true);
-		this.textUnifier.setEditable(false);
 
 		JPanel smallPanel = new JPanel();
 
@@ -159,7 +158,7 @@ public class UnifierView extends JDialog {
 		JScrollPane scrollPane = new JScrollPane(this.textUnifier);
 		scrollPane
 				.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-		scrollPane.setPreferredSize(new Dimension(400, 200));
+		scrollPane.setPreferredSize(new Dimension(640, 480));
 
 		ret.add(smallPanel);
 		ret.add(scrollPane);
@@ -181,7 +180,7 @@ public class UnifierView extends JDialog {
 
 	private void initFrame() {
 		setLocation(400, 400);
-		setSize(new Dimension(800, 400));
+		setSize(new Dimension(800, 600));
 		setMinimumSize(new Dimension(200, 200));
 		setLayout(new GridBagLayout());
 		getContentPane().add(createUnifierPanel());

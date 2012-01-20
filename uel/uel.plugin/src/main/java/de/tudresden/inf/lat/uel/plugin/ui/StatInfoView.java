@@ -70,11 +70,10 @@ class StatInfoView extends JDialog {
 		this.textGoal.setToolTipText(Message.tooltipGoal);
 		this.textGoal.setWrapStyleWord(true);
 		this.textGoal.setLineWrap(true);
-		this.textGoal.setEditable(false);
 		JScrollPane scrollPaneVars = new JScrollPane(this.textGoal);
 		scrollPaneVars
 				.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-		scrollPaneVars.setPreferredSize(new Dimension(360, 240));
+		scrollPaneVars.setPreferredSize(new Dimension(640, 480));
 
 		JPanel goalPanel = new JPanel();
 		goalPanel.setLayout(new BoxLayout(goalPanel, BoxLayout.X_AXIS));
@@ -125,7 +124,7 @@ class StatInfoView extends JDialog {
 
 	private void initFrame() {
 		setLocation(400, 400);
-		setSize(new Dimension(800, 400));
+		setSize(new Dimension(800, 600));
 		setMinimumSize(new Dimension(200, 200));
 		setLayout(new GridBagLayout());
 		getContentPane().add(createMainPanel());

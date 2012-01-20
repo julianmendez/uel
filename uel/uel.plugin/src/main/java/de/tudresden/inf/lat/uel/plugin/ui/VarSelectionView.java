@@ -94,14 +94,14 @@ class VarSelectionView extends JDialog {
 		JScrollPane scrollPaneCons = new JScrollPane(this.listConstants);
 		scrollPaneCons
 				.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-		scrollPaneCons.setPreferredSize(new Dimension(360, 240));
+		scrollPaneCons.setPreferredSize(new Dimension(360, 480));
 
 		this.listVariables = new JList();
 		this.listVariables.setToolTipText("variables");
 		JScrollPane scrollPaneVars = new JScrollPane(this.listVariables);
 		scrollPaneVars
 				.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-		scrollPaneVars.setPreferredSize(new Dimension(360, 240));
+		scrollPaneVars.setPreferredSize(new Dimension(360, 480));
 
 		JPanel varSelPanel = new JPanel();
 		varSelPanel.setLayout(new BoxLayout(varSelPanel, BoxLayout.X_AXIS));
@@ -156,7 +156,7 @@ class VarSelectionView extends JDialog {
 
 	private void initVarFrame() {
 		setLocation(400, 400);
-		setSize(new Dimension(800, 400));
+		setSize(new Dimension(800, 600));
 		setMinimumSize(new Dimension(200, 200));
 		setLayout(new GridBagLayout());
 		getContentPane().add(createMainPanel());
