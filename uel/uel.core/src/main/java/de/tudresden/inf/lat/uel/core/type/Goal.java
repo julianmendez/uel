@@ -279,6 +279,7 @@ public class Goal {
 
 	private String toString(Equation eq) {
 		StringBuffer sbuf = new StringBuffer();
+		sbuf.append(KRSSKeyword.newLine);
 		sbuf.append(KRSSKeyword.open);
 		if (eq.isPrimitive()) {
 			sbuf.append(KRSSKeyword.define_primitive_concept);

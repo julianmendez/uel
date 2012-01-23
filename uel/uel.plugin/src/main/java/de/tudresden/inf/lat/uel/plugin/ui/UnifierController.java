@@ -328,6 +328,7 @@ public class UnifierController implements ActionListener {
 				right.add(getModel().getAtomManager().get(atomId));
 			}
 
+			sbuf.append(KRSSKeyword.newLine);
 			sbuf.append(KRSSKeyword.open);
 			sbuf.append(KRSSKeyword.define_concept);
 			sbuf.append(KRSSKeyword.space);
