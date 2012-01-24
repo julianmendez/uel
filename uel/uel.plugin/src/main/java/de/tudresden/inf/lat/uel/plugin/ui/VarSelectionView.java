@@ -165,40 +165,43 @@ class VarSelectionView extends JDialog {
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 	}
 
+	private void updateListOfConstants() {
+		Set<LabelId> setOfConstants = new TreeSet<LabelId>();
+		for (String str : getModel().getConstants()) {
+			setOfConstants.add(new LabelId(getModel().getLabel(str), str));
+		}
+		this.listOfConstants = new ArrayList<LabelId>();
+		this.listOfConstants.addAll(setOfConstants);
+
+		Vector<String> vectorOfLabelsOfConstants = new Vector<String>();
+		for (LabelId elem : this.listOfConstants) {
+			vectorOfLabelsOfConstants.add(elem.getLabel());
+		}
+		this.listConstants.setListData(vectorOfLabelsOfConstants);
+		this.listConstants.setSelectedIndices(new int[0]);
+	}
+
+	private void updateListOfVariables() {
+		Set<LabelId> setOfVariables = new TreeSet<LabelId>();
+		for (String str : getModel().getVariables()) {
+			if (!getModel().getOriginalVariables().contains(str)) {
+				setOfVariables.add(new LabelId(getModel().getLabel(str), str));
+			}
+		}
+		this.listOfVariables = new ArrayList<LabelId>();
+		this.listOfVariables.addAll(setOfVariables);
+
+		Vector<String> vectorOfLabelsOfVariables = new Vector<String>();
+		for (LabelId elem : this.listOfVariables) {
+			vectorOfLabelsOfVariables.add(elem.getLabel());
+		}
+		this.listVariables.setListData(vectorOfLabelsOfVariables);
+		this.listVariables.setSelectedIndices(new int[0]);
+	}
+
 	public void updateLists() {
-		{
-			Set<LabelId> setOfConstants = new TreeSet<LabelId>();
-			for (String str : getModel().getConstants()) {
-				setOfConstants.add(new LabelId(getModel().getLabel(str), str));
-			}
-			this.listOfConstants = new ArrayList<LabelId>();
-			this.listOfConstants.addAll(setOfConstants);
-
-			Vector<String> vectorOfLabelsOfConstants = new Vector<String>();
-			for (LabelId elem : this.listOfConstants) {
-				vectorOfLabelsOfConstants.add(elem.getLabel());
-			}
-			this.listConstants.setListData(vectorOfLabelsOfConstants);
-			this.listConstants.setSelectedIndices(new int[0]);
-		}
-		{
-			Set<LabelId> setOfVariables = new TreeSet<LabelId>();
-			for (String str : getModel().getVariables()) {
-				if (!getModel().getOriginalVariables().contains(str)) {
-					setOfVariables.add(new LabelId(getModel().getLabel(str),
-							str));
-				}
-			}
-			this.listOfVariables = new ArrayList<LabelId>();
-			this.listOfVariables.addAll(setOfVariables);
-
-			Vector<String> vectorOfLabelsOfVariables = new Vector<String>();
-			for (LabelId elem : this.listOfVariables) {
-				vectorOfLabelsOfVariables.add(elem.getLabel());
-			}
-			this.listVariables.setListData(vectorOfLabelsOfVariables);
-			this.listVariables.setSelectedIndices(new int[0]);
-		}
+		updateListOfConstants();
+		updateListOfVariables();
 	}
 
 }
