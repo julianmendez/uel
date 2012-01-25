@@ -27,6 +27,8 @@ public interface Message {
 	public static final String iconOpen = "toolbarButtonGraphics/general/Open16.gif";
 	public static final String iconRewind = "toolbarButtonGraphics/media/Rewind16.gif";
 	public static final String iconSave = "toolbarButtonGraphics/general/Save16.gif";
+	public static final String iconStepBack = "toolbarButtonGraphics/media/StepBack16.gif";
+	public static final String iconStepForward = "toolbarButtonGraphics/media/StepForward16.gif";
 	public static final String lblAllVarCount = "all variables";
 	public static final String lblClauseCount = "clauses";
 	public static final String lblLiteralCount = "literals";

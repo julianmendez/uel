@@ -27,13 +27,16 @@ class VarSelectionView extends JDialog {
 
 	private static final long serialVersionUID = 1742164773153032359L;
 
-	private JButton acceptVarButton = null;
+	private final JButton acceptVarButton = new JButton(new ImageIcon(this
+			.getClass().getClassLoader().getResource(Message.iconForward)));
 	private JList listConstants = null;
 	private List<LabelId> listOfConstants = null;
 	private List<LabelId> listOfVariables = null;
 	private JList listVariables = null;
-	private JButton makeConsButton = null;
-	private JButton makeVarButton = null;
+	private final JButton makeConsButton = new JButton(new ImageIcon(this
+			.getClass().getClassLoader().getResource(Message.iconStepBack)));
+	private final JButton makeVarButton = new JButton(new ImageIcon(this
+			.getClass().getClassLoader().getResource(Message.iconStepForward)));;
 	private final VarSelectionModel model;
 
 	public VarSelectionView(VarSelectionModel m) {
@@ -111,20 +114,16 @@ class VarSelectionView extends JDialog {
 		varSelPanel.add(scrollPaneVars);
 
 		JPanel buttonPanel = new JPanel();
-		this.makeConsButton = new JButton(Message.buttonMakeCons);
 		this.makeConsButton.setToolTipText(Message.tooltipMakeCons);
 		this.makeConsButton.setMinimumSize(new Dimension(56, 28));
 		this.makeConsButton.setMaximumSize(new Dimension(74, 28));
 		buttonPanel.add(this.makeConsButton);
 
-		this.makeVarButton = new JButton(Message.buttonMakeVar);
 		this.makeVarButton.setToolTipText(Message.tooltipMakeVar);
 		this.makeVarButton.setMinimumSize(new Dimension(56, 28));
 		this.makeVarButton.setMaximumSize(new Dimension(74, 28));
 		buttonPanel.add(this.makeVarButton);
 
-		this.acceptVarButton = new JButton(new ImageIcon(this.getClass()
-				.getClassLoader().getResource(Message.iconForward)));
 		this.acceptVarButton.setToolTipText(Message.tooltipAcceptVar);
 		this.acceptVarButton.setMinimumSize(new Dimension(56, 28));
 		this.acceptVarButton.setMaximumSize(new Dimension(74, 28));
