@@ -1,13 +1,15 @@
 package de.tudresden.inf.lat.uel.plugin.main;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.protege.editor.owl.model.OWLModelManager;
 import org.protege.editor.owl.ui.renderer.OWLModelManagerEntityRenderer;
 import org.semanticweb.owlapi.model.OWLAnnotation;
-import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyChange;
 import org.semanticweb.owlapi.model.OWLOntologyChangeListener;
@@ -58,13 +60,17 @@ public class UelStarter implements OWLOntologyChangeListener,
 		reset();
 	}
 
-	private Map<OWLClass, String> createShortFormMap() {
-		Map<OWLClass, String> shortFormMap = new HashMap<OWLClass, String>();
+	private Map<OWLEntity, String> createShortFormMap() {
+		Map<OWLEntity, String> shortFormMap = new HashMap<OWLEntity, String>();
 		for (OWLOntology ontology : getOWLOntologyManager().getOntologies()) {
-			for (OWLClass cls : ontology.getClassesInSignature()) {
+			Set<OWLEntity> entities = new HashSet<OWLEntity>();
+			entities.addAll(ontology.getClassesInSignature());
+			entities.addAll(ontology.getObjectPropertiesInSignature());
+
+			for (OWLEntity entity : entities) {
 				String shortForm = this.renderer != null ? this.renderer
-						.getShortForm(cls) : getShortForm(cls, ontology);
-				shortFormMap.put(cls, removeQuotes(shortForm));
+						.getShortForm(entity) : getShortForm(entity, ontology);
+				shortFormMap.put(entity, removeQuotes(shortForm));
 			}
 		}
 		return shortFormMap;
@@ -87,9 +93,9 @@ public class UelStarter implements OWLOntologyChangeListener,
 		return this.panel;
 	}
 
-	private String getShortForm(OWLClass owlClass, OWLOntology ontology) {
-		String ret = owlClass.getIRI().getFragment();
-		for (OWLAnnotation annotation : owlClass.getAnnotations(ontology)) {
+	private String getShortForm(OWLEntity entity, OWLOntology ontology) {
+		String ret = entity.getIRI().getFragment();
+		for (OWLAnnotation annotation : entity.getAnnotations(ontology)) {
 			if (annotation.getProperty().isLabel()) {
 				ret = annotation.getValue().toString();
 			}

@@ -18,6 +18,7 @@ import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
+import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
@@ -56,7 +57,7 @@ public class UelController implements ActionListener {
 	private OWLOntology owlOntology01 = null;
 	private final OWLOntologyManager owlOntologyManager;
 	private Map<String, OWLOntology> owlOntologyMap = new HashMap<String, OWLOntology>();
-	private Map<OWLClass, String> shortFormMap = new HashMap<OWLClass, String>();
+	private Map<OWLEntity, String> shortFormMap = new HashMap<OWLEntity, String>();
 	private UnifierController unifierController;
 	private VarSelectionController varWindow = null;
 	private final UelView view;
@@ -284,8 +285,8 @@ public class UelController implements ActionListener {
 		return ret;
 	}
 
-	private String getId(OWLClass cls) {
-		return cls.getIRI().toURI().toString();
+	private String getId(OWLEntity entity) {
+		return entity.getIRI().toURI().toString();
 	}
 
 	public UelProcessor getModel() {
@@ -296,16 +297,16 @@ public class UelController implements ActionListener {
 		return this.owlOntologyManager;
 	}
 
-	private String getShortForm(OWLClass cls) {
-		String ret = this.shortFormMap.get(cls);
+	private String getShortForm(OWLEntity entity) {
+		String ret = this.shortFormMap.get(entity);
 		if (ret == null) {
-			IRI iri = cls.getIRI();
+			IRI iri = entity.getIRI();
 			ret = iri.getFragment();
 		}
 		return ret;
 	}
 
-	public Map<OWLClass, String> getShortFormMap() {
+	public Map<OWLEntity, String> getShortFormMap() {
 		return Collections.unmodifiableMap(this.shortFormMap);
 	}
 
@@ -379,7 +380,7 @@ public class UelController implements ActionListener {
 
 	private void recomputeShortForm() {
 		this.mapIdLabel.clear();
-		for (OWLClass cls : this.shortFormMap.keySet()) {
+		for (OWLEntity cls : this.shortFormMap.keySet()) {
 			this.mapIdLabel.put(getId(cls), getShortForm(cls));
 		}
 	}
@@ -402,7 +403,7 @@ public class UelController implements ActionListener {
 		getUnifier().getView().getUnifier().setText("");
 	}
 
-	public void setShortFormMap(Map<OWLClass, String> map) {
+	public void setShortFormMap(Map<OWLEntity, String> map) {
 		if (map == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
