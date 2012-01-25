@@ -20,8 +20,10 @@ public class UnifierView extends JDialog {
 
 	private static final long serialVersionUID = 7965907233259580732L;
 
-	private JButton buttonFirst = new JButton(Message.buttonFirst);
-	private JButton buttonLast = new JButton(Message.buttonLast);
+	private JButton buttonFirst = new JButton(new ImageIcon(this.getClass()
+			.getClassLoader().getResource(Message.iconRewind)));
+	private JButton buttonLast = new JButton(new ImageIcon(this.getClass()
+			.getClassLoader().getResource(Message.iconFastForward)));
 	private JButton buttonNext = new JButton(new ImageIcon(this.getClass()
 			.getClassLoader().getResource(Message.iconForward)));
 	private JButton buttonPrevious = new JButton(new ImageIcon(this.getClass()

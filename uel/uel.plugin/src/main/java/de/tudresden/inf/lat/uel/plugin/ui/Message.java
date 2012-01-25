@@ -21,9 +21,11 @@ public interface Message {
 	public static final String buttonSelectVariables = ">";
 	public static final String buttonShowStatInfo = "Stat";
 	public static final String iconBack = "toolbarButtonGraphics/navigation/Back16.gif";
+	public static final String iconFastForward = "toolbarButtonGraphics/media/FastForward16.gif";
 	public static final String iconForward = "toolbarButtonGraphics/navigation/Forward16.gif";
 	public static final String iconHistory = "toolbarButtonGraphics/general/History16.gif";
 	public static final String iconOpen = "toolbarButtonGraphics/general/Open16.gif";
+	public static final String iconRewind = "toolbarButtonGraphics/media/Rewind16.gif";
 	public static final String iconSave = "toolbarButtonGraphics/general/Save16.gif";
 	public static final String lblAllVarCount = "all variables";
 	public static final String lblClauseCount = "clauses";
