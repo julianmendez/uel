@@ -72,6 +72,7 @@ class StatInfoController implements ActionListener {
 				BufferedWriter writer = new BufferedWriter(new FileWriter(file));
 				writer.write(goal);
 				writer.flush();
+				writer.close();
 			} catch (OWLRendererException e) {
 				throw new RuntimeException(e);
 			} catch (OWLOntologyCreationException e) {

@@ -149,6 +149,7 @@ public class UnifierController implements ActionListener {
 					writer.write(unifier);
 				}
 				writer.flush();
+				writer.close();
 			} catch (OWLRendererException e) {
 				throw new RuntimeException(e);
 			} catch (OWLOntologyCreationException e) {
