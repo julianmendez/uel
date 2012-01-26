@@ -73,8 +73,7 @@ public class UelController implements ActionListener {
 	public UelController(UelView view, OWLOntologyManager ontologyManager) {
 		this.view = view;
 		this.owlOntologyManager = ontologyManager;
-		this.unifierController = new UnifierController(new UnifierView(
-				view.getModel()), this.mapIdLabel);
+		resetUnifierController();
 		init();
 	}
 
@@ -105,13 +104,14 @@ public class UelController implements ActionListener {
 			executeActionOntology00Selected();
 		} else if (cmd.equals(actionCheckBoxClassName01)) {
 			executeActionOntology01Selected();
-
 		} else {
 			throw new IllegalStateException();
 		}
 	}
 
 	private void executeActionAcceptVar() {
+		resetUnifierController();
+
 		if (getModel().getUnifierList().isEmpty()) {
 			Goal g = this.varWindow.getView().getModel().getGoal();
 			this.varWindow.close();
@@ -390,11 +390,15 @@ public class UelController implements ActionListener {
 	}
 
 	public void reset() {
-		getUnifier().getView().setUnifierButtons(false);
+		resetUnifierController();
 		getView().setComboBoxClassName00Enabled(false);
 		getView().setComboBoxClassName01Enabled(false);
 		getView().setButtonSelectVariablesEnabled(false);
-		getUnifier().getView().getUnifier().setText("");
+	}
+
+	private void resetUnifierController() {
+		this.unifierController = new UnifierController(new UnifierView(
+				view.getModel()), this.mapIdLabel);
 	}
 
 	public void setShortFormMap(Map<OWLEntity, String> map) {
