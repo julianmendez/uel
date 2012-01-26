@@ -31,7 +31,7 @@ public interface Message {
 	public static final String iconStepForward = "toolbarButtonGraphics/media/StepForward16.gif";
 	public static final String lblAllVarCount = "all variables";
 	public static final String lblClauseCount = "clauses";
-	public static final String lblLiteralCount = "literals";
+	public static final String lblPropositionCount = "propositions";
 	public static final String titleError = "Error";
 	public static final String tooltipAcceptVar = "use the selected entities as variables";
 	public static final String tooltipCheckBoxClassName00 = "shows also concepts with primitive definitions";

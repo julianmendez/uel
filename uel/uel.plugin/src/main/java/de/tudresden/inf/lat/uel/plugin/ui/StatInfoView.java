@@ -92,7 +92,7 @@ class StatInfoView extends JDialog {
 		this.textSysVarCount.setToolTipText(Message.tooltipTextAllVarCount);
 		this.textSysVarCount.setEditable(false);
 
-		JLabel lblLabelCount = new JLabel(Message.lblLiteralCount);
+		JLabel lblLabelCount = new JLabel(Message.lblPropositionCount);
 		this.textLiteralCount = new JTextArea();
 		this.textLiteralCount.setToolTipText(Message.tooltipTextLiteralCount);
 		this.textLiteralCount.setEditable(false);
