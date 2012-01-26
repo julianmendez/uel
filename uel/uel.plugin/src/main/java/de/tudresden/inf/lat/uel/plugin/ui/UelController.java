@@ -167,8 +167,7 @@ public class UelController implements ActionListener {
 			this.owlOntology00 = this.owlOntologyMap.get(ontologyId);
 
 			this.classList00 = getClassNames(
-					this.owlOntologyMap.get(ontologyId), getView()
-							.isClassName00Primitive());
+					this.owlOntologyMap.get(ontologyId), true);
 
 			getView().reloadClassNames00(this.classList00);
 			getView().setComboBoxClassName00Enabled(true);
@@ -189,8 +188,7 @@ public class UelController implements ActionListener {
 			this.owlOntology01 = this.owlOntologyMap.get(ontologyId);
 
 			this.classList01 = getClassNames(
-					this.owlOntologyMap.get(ontologyId), getView()
-							.isClassName01Primitive());
+					this.owlOntologyMap.get(ontologyId), true);
 
 			getView().reloadClassNames01(this.classList01);
 			getView().setComboBoxClassName01Enabled(true);
@@ -329,10 +327,6 @@ public class UelController implements ActionListener {
 		getView().addComboBoxClass01Listener(this, actionClass01Selected);
 		getView().addComboBoxOntology00Listener(this, actionOntology00Selected);
 		getView().addComboBoxOntology01Listener(this, actionOntology01Selected);
-		getView().addCheckBoxClassName00Listener(this,
-				actionCheckBoxClassName00);
-		getView().addCheckBoxClassName01Listener(this,
-				actionCheckBoxClassName01);
 
 		reset();
 		reloadOntologies();
