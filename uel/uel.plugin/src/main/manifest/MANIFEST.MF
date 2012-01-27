@@ -14,7 +14,7 @@ Import-Package: javax.accessibility,
  javax.swing.border,
  org.apache.log4j,
  org.osgi.framework
-Bundle-Version: 1.0.0
+Bundle-Version: 1.0.0.r255
 Bundle-Activator: org.protege.editor.core.plugin.DefaultPluginActivator
 Require-Bundle: org.eclipse.equinox.registry,
  org.eclipse.equinox.common,
