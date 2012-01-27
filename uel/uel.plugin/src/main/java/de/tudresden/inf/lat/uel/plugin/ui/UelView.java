@@ -132,6 +132,11 @@ public class UelView extends JPanel {
 		smallPanel.add(this.buttonSelectVariables);
 		ret.add(smallPanel);
 
+		JLabel gap1 = new JLabel();
+		gap1.setPreferredSize(new Dimension(280, 28));
+		gap1.setMinimumSize(new Dimension(112, 28));
+		ret.add(gap1);
+
 		this.listOntologyName00
 				.setToolTipText(Message.tooltipComboBoxOntology00);
 		this.listOntologyName00.setPreferredSize(new Dimension(280, 28));
@@ -143,10 +148,10 @@ public class UelView extends JPanel {
 		this.listClassName00.setMinimumSize(new Dimension(112, 28));
 		ret.add(this.listClassName00);
 
-		JLabel gap = new JLabel();
-		gap.setPreferredSize(new Dimension(280, 28));
-		gap.setMinimumSize(new Dimension(112, 28));
-		ret.add(gap);
+		JLabel gap2 = new JLabel();
+		gap2.setPreferredSize(new Dimension(280, 28));
+		gap2.setMinimumSize(new Dimension(112, 28));
+		ret.add(gap2);
 
 		this.listOntologyName01
 				.setToolTipText(Message.tooltipComboBoxOntology01);
