@@ -6,7 +6,7 @@ Bundle-Description: UEL Protege plug-in
 Bundle-Vendor: Chair of Automata Theory - TU Dresden
 Bundle-DocURL: http://lat.inf.tu-dresden.de
 Bundle-ClassPath: .,
- lib/uel/uel.core/0.1.0/uel.core-0.1.0.jar,
+ lib/uel/uel.core/1.0.0/uel.core-1.0.0.jar,
  lib/org/sat4j/core/2.3.0/core-2.3.0.jar,
  lib/com/sun/java/jlfgr/1.0/jlfgr-1.0.jar
 Import-Package: javax.accessibility,
@@ -14,7 +14,7 @@ Import-Package: javax.accessibility,
  javax.swing.border,
  org.apache.log4j,
  org.osgi.framework
-Bundle-Version: 0.1.0
+Bundle-Version: 1.0.0
 Bundle-Activator: org.protege.editor.core.plugin.DefaultPluginActivator
 Require-Bundle: org.eclipse.equinox.registry,
  org.eclipse.equinox.common,

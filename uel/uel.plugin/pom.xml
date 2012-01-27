@@ -13,7 +13,7 @@
 
 	<groupId>uel</groupId>
 	<artifactId>uel.plugin</artifactId>
-	<version>0.1.0</version>
+	<version>1.0.0</version>
 	<packaging>jar</packaging>
 
 	<name>uel Protege plug-in</name>
@@ -21,7 +21,7 @@
 	<parent>
 		<groupId>uel</groupId>
 		<artifactId>parent</artifactId>
-		<version>0.1.0</version>
+		<version>1.0.0</version>
 		<relativePath>../uel.jars</relativePath>
 	</parent>
 
@@ -30,7 +30,7 @@
 		<dependency>
 			<groupId>uel</groupId>
 			<artifactId>uel.core</artifactId>
-			<version>0.1.0</version>
+			<version>1.0.0</version>
 		</dependency>
 
 		<dependency>
