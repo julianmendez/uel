@@ -35,8 +35,9 @@
 	<property name="_javadoc.directory" value="${project.build.directory}/site/javadoc" />
 	<property name="_src.javadoc.directory" value="${src.directory}/main/javadoc" />
 
-	<property name="module.0.name" value="uel.core" />
-	<property name="module.1.name" value="uel.plugin" />
+	<property name="module.0.name" value="uel.type" />
+	<property name="module.1.name" value="uel.core" />
+	<property name="module.2.name" value="uel.plugin" />
 
 	<path id="libs.directory">
 		<fileset dir="${_jars.directory}" includes="${dependencies}" />
@@ -83,6 +84,9 @@
 		<antcall target="compilemodule">
 			<param name="module.name" value="${module.1.name}" />
 		</antcall>
+		<antcall target="compilemodule">
+			<param name="module.name" value="${module.2.name}" />
+		</antcall>
 	</target>
 
 	<!-- Compiles all modules and gets their jars. -->
@@ -92,6 +96,9 @@
 		</antcall>
 		<antcall target="getjar">
 			<param name="module.name" value="${module.1.name}" />
+		</antcall>
+		<antcall target="compilemodule">
+			<param name="module.name" value="${module.2.name}" />
 		</antcall>
 	</target>
 

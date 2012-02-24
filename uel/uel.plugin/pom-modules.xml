@@ -15,11 +15,12 @@
 	<groupId>uel</groupId>
 	<artifactId>modules</artifactId>
 	<packaging>pom</packaging>
-	<version>0.1.0</version>
+	<version>1.0.0</version>
 
 	<name>uel</name>
 
 	<modules>
+		<module>../uel.type</module>
 		<module>../uel.core</module>
 		<module>../uel.plugin</module>
 	</modules>

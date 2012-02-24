@@ -29,6 +29,12 @@
 
 		<dependency>
 			<groupId>uel</groupId>
+			<artifactId>uel.type</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>uel</groupId>
 			<artifactId>uel.core</artifactId>
 			<version>1.0.0</version>
 		</dependency>

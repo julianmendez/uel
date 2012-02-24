@@ -14,7 +14,7 @@
 
 	<groupId>uel</groupId>
 	<artifactId>bundle</artifactId>
-	<version>0.1.0</version>
+	<version>1.0.0</version>
 	<packaging>bundle</packaging>
 
 	<name>uel Protege plug-in</name>
@@ -22,7 +22,7 @@
 	<parent>
 		<groupId>uel</groupId>
 		<artifactId>parent</artifactId>
-		<version>0.1.0</version>
+		<version>1.0.0</version>
 		<relativePath>../uel.jars</relativePath>
 	</parent>
 
@@ -50,8 +50,9 @@
 					<instructions>
 						<Include-Resource>
 							{maven-resources}, {maven-dependencies},
-							@target/uel.plugin-0.1.0.jar,
-							lib/uel/uel.core/0.1.0/uel.core-0.1.0.jar=../uel.core/target/uel.core-0.1.0.jar,
+							@target/uel.plugin-1.0.0.jar,
+							lib/uel/uel.type/1.0.0/uel.type-1.0.0.jar=../uel.type/target/uel.type-1.0.0.jar,
+							lib/uel/uel.core/1.0.0/uel.core-1.0.0.jar=../uel.core/target/uel.core-1.0.0.jar,
 							lib/org/sat4j/core/2.3.0/core-2.3.0.jar=../uel.jars/lib/org/sat4j/core/2.3.0/core-2.3.0.jar
 							lib/com/sun/java/jlfgr/1.0/jlfgr-1.0.jar=../uel.jars/lib/com/sun/java/jlfgr/1.0/jlfgr-1.0.jar
 						</Include-Resource>
