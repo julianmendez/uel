@@ -97,7 +97,7 @@
 		<antcall target="getjar">
 			<param name="module.name" value="${module.1.name}" />
 		</antcall>
-		<antcall target="compilemodule">
+		<antcall target="getjar">
 			<param name="module.name" value="${module.2.name}" />
 		</antcall>
 	</target>
