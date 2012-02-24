@@ -10,9 +10,9 @@ import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLOntology;
 
-import de.tudresden.inf.lat.uel.core.type.Atom;
-import de.tudresden.inf.lat.uel.core.type.Equation;
 import de.tudresden.inf.lat.uel.core.type.Ontology;
+import de.tudresden.inf.lat.uel.core.type.SatAtom;
+import de.tudresden.inf.lat.uel.type.api.Equation;
 
 /**
  * An object of this class is a UEL ontology that reuses a previously build OWL
@@ -124,11 +124,12 @@ public class DynamicOntology implements Ontology {
 				ret.add(eq);
 				Set<Integer> rightIds = eq.getRight();
 				for (Integer c : rightIds) {
-					Atom atom = this.ontologyBuilder.getAtomManager().get(c);
+					SatAtom atom = this.ontologyBuilder.getAtomManager().get(c);
 					if (atom.isConceptName()) {
 						toVisit.add(c);
 					} else if (atom.isExistentialRestriction()) {
-						Atom child = atom.asExistentialRestriction().getChild();
+						SatAtom child = atom.asExistentialRestriction()
+								.getChild();
 						Integer childId = this.ontologyBuilder.getAtomManager()
 								.addAndGetIndex(child);
 						toVisit.add(childId);

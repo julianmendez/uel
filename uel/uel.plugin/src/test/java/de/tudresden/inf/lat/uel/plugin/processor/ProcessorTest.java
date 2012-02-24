@@ -21,11 +21,11 @@ import org.semanticweb.owlapi.reasoner.Node;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 
 import de.tudresden.inf.lat.jcel.owlapi.main.JcelReasoner;
-import de.tudresden.inf.lat.uel.core.type.Atom;
-import de.tudresden.inf.lat.uel.core.type.Equation;
 import de.tudresden.inf.lat.uel.core.type.Goal;
+import de.tudresden.inf.lat.uel.core.type.SatAtom;
 import de.tudresden.inf.lat.uel.plugin.ui.UelController;
 import de.tudresden.inf.lat.uel.plugin.ui.UelView;
+import de.tudresden.inf.lat.uel.type.api.Equation;
 
 public class ProcessorTest extends TestCase {
 
@@ -64,8 +64,8 @@ public class ProcessorTest extends TestCase {
 
 	private Integer getAtomId(Goal goal, String atomName) {
 		Integer ret = null;
-		for (Integer currentAtomId : goal.getAtomManager().getIndices()) {
-			Atom currentAtom = goal.getAtomManager().get(currentAtomId);
+		for (Integer currentAtomId : goal.getSatAtomManager().getIndices()) {
+			SatAtom currentAtom = goal.getSatAtomManager().get(currentAtomId);
 			if (currentAtom.getId().equals(atomName)) {
 				ret = currentAtomId;
 			}

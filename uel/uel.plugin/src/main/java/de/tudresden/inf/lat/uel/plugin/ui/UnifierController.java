@@ -22,11 +22,11 @@ import org.semanticweb.owlapi.io.OWLRendererException;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 
-import de.tudresden.inf.lat.uel.core.type.Atom;
-import de.tudresden.inf.lat.uel.core.type.Equation;
 import de.tudresden.inf.lat.uel.core.type.Goal;
-import de.tudresden.inf.lat.uel.core.type.KRSSKeyword;
+import de.tudresden.inf.lat.uel.core.type.SatAtom;
 import de.tudresden.inf.lat.uel.plugin.processor.UelProcessor;
+import de.tudresden.inf.lat.uel.type.api.Equation;
+import de.tudresden.inf.lat.uel.type.cons.KRSSKeyword;
 
 /**
  * 
@@ -187,11 +187,11 @@ public class UnifierController implements ActionListener {
 		return getView().getModel();
 	}
 
-	private Collection<Atom> getSetOfSubsumers(Atom atom) {
+	private Collection<SatAtom> getSetOfSubsumers(SatAtom atom) {
 		Collection<Integer> list = getModel().getTranslator()
 				.getSetOfSubsumers(
 						getModel().getAtomManager().addAndGetIndex(atom));
-		List<Atom> ret = new ArrayList<Atom>();
+		List<SatAtom> ret = new ArrayList<SatAtom>();
 		for (Integer id : list) {
 			ret.add(getModel().getAtomManager().get(id));
 		}
@@ -217,7 +217,7 @@ public class UnifierController implements ActionListener {
 	 * 
 	 * @return the string representation of a substitution set
 	 */
-	public String printSetOfSubsumers(Collection<Atom> setOfSubsumers) {
+	public String printSetOfSubsumers(Collection<SatAtom> setOfSubsumers) {
 
 		StringBuffer sbuf = new StringBuffer();
 
@@ -228,7 +228,7 @@ public class UnifierController implements ActionListener {
 
 		} else if (setOfSubsumers.size() == 1) {
 
-			Atom atom = setOfSubsumers.iterator().next();
+			SatAtom atom = setOfSubsumers.iterator().next();
 			sbuf.append(printSubstitution(atom));
 
 		} else {
@@ -237,7 +237,7 @@ public class UnifierController implements ActionListener {
 			sbuf.append(KRSSKeyword.and);
 			sbuf.append(KRSSKeyword.space);
 
-			for (Atom atom : setOfSubsumers) {
+			for (SatAtom atom : setOfSubsumers) {
 				sbuf.append(KRSSKeyword.space);
 				sbuf.append(printSubstitution(atom));
 				sbuf.append(KRSSKeyword.space);
@@ -249,7 +249,7 @@ public class UnifierController implements ActionListener {
 		return sbuf.toString();
 	}
 
-	private String printSubstitution(Atom atom) {
+	private String printSubstitution(SatAtom atom) {
 		StringBuffer sbuf = new StringBuffer();
 		if (atom.isExistentialRestriction()
 				&& !(atom.asExistentialRestriction().getChild().isConceptName() && atom
@@ -260,7 +260,7 @@ public class UnifierController implements ActionListener {
 			sbuf.append(KRSSKeyword.space);
 			sbuf.append(atom.getName());
 			sbuf.append(KRSSKeyword.space);
-			Atom child = atom.asExistentialRestriction().getChild();
+			SatAtom child = atom.asExistentialRestriction().getChild();
 			if (child.isConceptName() && child.asConceptName().isVariable()
 					&& !child.asConceptName().isUserVariable()) {
 				sbuf.append(printSetOfSubsumers(getSetOfSubsumers(child
@@ -322,9 +322,9 @@ public class UnifierController implements ActionListener {
 		unif.addAll(set);
 		StringBuffer sbuf = new StringBuffer();
 		for (Equation eq : set) {
-			Atom leftPart = getModel().getAtomManager().get(eq.getLeft());
+			SatAtom leftPart = getModel().getAtomManager().get(eq.getLeft());
 
-			Set<Atom> right = new HashSet<Atom>();
+			Set<SatAtom> right = new HashSet<SatAtom>();
 			for (Integer atomId : eq.getRight()) {
 				right.add(getModel().getAtomManager().get(atomId));
 			}

@@ -6,8 +6,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import de.tudresden.inf.lat.uel.core.type.Atom;
 import de.tudresden.inf.lat.uel.core.type.Goal;
+import de.tudresden.inf.lat.uel.core.type.SatAtom;
 
 /**
  * 
@@ -38,8 +38,9 @@ class VarSelectionModel {
 
 	private Integer getAtomId(String atomName) {
 		Integer ret = null;
-		for (Integer currentAtomId : this.goal.getAtomManager().getIndices()) {
-			Atom currentAtom = this.goal.getAtomManager().get(currentAtomId);
+		for (Integer currentAtomId : this.goal.getSatAtomManager().getIndices()) {
+			SatAtom currentAtom = this.goal.getSatAtomManager().get(
+					currentAtomId);
 			if (currentAtom.getId().equals(atomName)) {
 				ret = currentAtomId;
 			}
@@ -50,7 +51,7 @@ class VarSelectionModel {
 	public Set<String> getConstants() {
 		Set<String> ret = new HashSet<String>();
 		for (Integer atomId : this.goal.getConstants()) {
-			ret.add(this.goal.getAtomManager().get(atomId).getId());
+			ret.add(this.goal.getSatAtomManager().get(atomId).getId());
 		}
 		return Collections.unmodifiableSet(ret);
 	}
@@ -96,7 +97,7 @@ class VarSelectionModel {
 	public Set<String> getVariables() {
 		Set<String> ret = new HashSet<String>();
 		for (Integer atomId : getGoal().getVariables()) {
-			Atom atom = getGoal().getAtomManager().get(atomId);
+			SatAtom atom = getGoal().getSatAtomManager().get(atomId);
 			if (atom.isConceptName() && atom.asConceptName().isUserVariable()) {
 				ret.add(atom.getId());
 			}

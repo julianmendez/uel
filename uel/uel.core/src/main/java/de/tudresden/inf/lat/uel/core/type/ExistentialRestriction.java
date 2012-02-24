@@ -1,11 +1,13 @@
 package de.tudresden.inf.lat.uel.core.type;
 
+import de.tudresden.inf.lat.uel.type.cons.KRSSKeyword;
+
 /**
  * An object of this class is an existential restriction.
  * 
  * @author Julian Mendez
  */
-public class ExistentialRestriction implements Atom {
+public class ExistentialRestriction implements SatAtom {
 
 	private final ConceptName child;
 	private final String id;
@@ -102,6 +104,36 @@ public class ExistentialRestriction implements Atom {
 			str.append(KRSSKeyword.close);
 		}
 		return str.toString();
+	}
+
+	@Override
+	public Integer getConceptName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Integer getRole() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public boolean isConstant() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean isGround() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean isVariable() {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 }

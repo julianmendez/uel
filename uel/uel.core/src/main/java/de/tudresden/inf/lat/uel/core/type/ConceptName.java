@@ -1,11 +1,13 @@
 package de.tudresden.inf.lat.uel.core.type;
 
+import de.tudresden.inf.lat.uel.type.cons.KRSSKeyword;
+
 /**
  * An object of this class is a concept name or TOP.
  * 
  * @author Julian Mendez
  */
-public class ConceptName implements Atom {
+public class ConceptName implements SatAtom {
 
 	public static final String topKeyword = KRSSKeyword.top;
 
@@ -134,6 +136,24 @@ public class ConceptName implements Atom {
 	@Override
 	public String toString() {
 		return this.getId();
+	}
+
+	@Override
+	public Integer getConceptName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Integer getRole() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public boolean isGround() {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 }

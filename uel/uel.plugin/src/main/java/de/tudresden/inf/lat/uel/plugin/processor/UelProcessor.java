@@ -15,11 +15,12 @@ import de.tudresden.inf.lat.uel.core.sat.SatInput;
 import de.tudresden.inf.lat.uel.core.sat.SatOutput;
 import de.tudresden.inf.lat.uel.core.sat.Solver;
 import de.tudresden.inf.lat.uel.core.sat.Translator;
-import de.tudresden.inf.lat.uel.core.type.Atom;
-import de.tudresden.inf.lat.uel.core.type.Equation;
 import de.tudresden.inf.lat.uel.core.type.Goal;
-import de.tudresden.inf.lat.uel.core.type.IndexedSet;
 import de.tudresden.inf.lat.uel.core.type.Ontology;
+import de.tudresden.inf.lat.uel.core.type.SatAtom;
+import de.tudresden.inf.lat.uel.type.api.Equation;
+import de.tudresden.inf.lat.uel.type.api.IndexedSet;
+import de.tudresden.inf.lat.uel.type.impl.IndexedSetImpl;
 
 /**
  * An object implementing this class connects with the UEL core and uses it to
@@ -29,7 +30,7 @@ import de.tudresden.inf.lat.uel.core.type.Ontology;
  */
 public class UelProcessor {
 
-	private IndexedSet<Atom> atomManager = new IndexedSet<Atom>();
+	private IndexedSet<SatAtom> atomManager = new IndexedSetImpl<SatAtom>();
 	private DynamicOntology ontology = null;
 	private SatInput satinput = null;
 	private Translator translator = null;
@@ -107,7 +108,7 @@ public class UelProcessor {
 		this.translator = new Translator(g, true);
 	}
 
-	public IndexedSet<Atom> getAtomManager() {
+	public IndexedSet<SatAtom> getAtomManager() {
 		return this.atomManager;
 	}
 

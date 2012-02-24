@@ -2,6 +2,8 @@ package de.tudresden.inf.lat.uel.core.type;
 
 import java.util.Set;
 
+import de.tudresden.inf.lat.uel.type.api.Equation;
+
 /**
  * This interface models an ontology that has only definitions and primitive
  * definitions.

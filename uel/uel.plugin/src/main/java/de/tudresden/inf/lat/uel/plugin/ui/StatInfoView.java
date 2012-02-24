@@ -20,7 +20,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.WindowConstants;
 
-import de.tudresden.inf.lat.uel.core.type.KRSSKeyword;
+import de.tudresden.inf.lat.uel.type.cons.KRSSKeyword;
 
 /**
  * 

@@ -9,14 +9,16 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.logging.Logger;
 
-import de.tudresden.inf.lat.uel.core.type.Atom;
 import de.tudresden.inf.lat.uel.core.type.DissubsumptionLiteral;
-import de.tudresden.inf.lat.uel.core.type.Equation;
 import de.tudresden.inf.lat.uel.core.type.Goal;
-import de.tudresden.inf.lat.uel.core.type.IndexedSet;
 import de.tudresden.inf.lat.uel.core.type.Literal;
 import de.tudresden.inf.lat.uel.core.type.OrderLiteral;
+import de.tudresden.inf.lat.uel.core.type.SatAtom;
 import de.tudresden.inf.lat.uel.core.type.SubsumptionLiteral;
+import de.tudresden.inf.lat.uel.type.api.Equation;
+import de.tudresden.inf.lat.uel.type.api.IndexedSet;
+import de.tudresden.inf.lat.uel.type.impl.EquationImpl;
+import de.tudresden.inf.lat.uel.type.impl.IndexedSetImpl;
 
 /**
  * This class performs reduction of goal equations to propositional clauses. The
@@ -121,7 +123,7 @@ public class Translator {
 
 	private boolean invertLiteral = false;
 
-	private IndexedSet<Literal> literalManager = new IndexedSet<Literal>();
+	private IndexedSet<Literal> literalManager = new IndexedSetImpl<Literal>();
 
 	private Map<Integer, Set<Integer>> subsumers = new HashMap<Integer, Set<Integer>>();
 
@@ -214,7 +216,7 @@ public class Translator {
 		set.addAll(goal.getConstants());
 		set.addAll(goal.getEAtoms());
 		for (Integer firstAtomId : goal.getVariables()) {
-			Atom firstAtom = goal.getAtomManager().get(firstAtomId);
+			SatAtom firstAtom = goal.getSatAtomManager().get(firstAtomId);
 			if (firstAtom.isConceptName()
 					&& firstAtom.asConceptName().isUserVariable()) {
 				for (Integer secondAtomId : set) {
@@ -284,17 +286,17 @@ public class Translator {
 	private Set<Equation> getUpdatedUnifier() {
 		Set<Equation> ret = new HashSet<Equation>();
 		for (Integer leftPartId : goal.getVariables()) {
-			Atom leftPart = goal.getAtomManager().get(leftPartId);
+			SatAtom leftPart = goal.getSatAtomManager().get(leftPartId);
 			if (leftPart.isConceptName()
 					&& leftPart.asConceptName().isUserVariable()) {
 				Set<Integer> rightPartIds = new HashSet<Integer>();
 				Collection<Integer> setOfSubsumers = getSetOfSubsumers(leftPartId);
 				for (Integer subsumerId : setOfSubsumers) {
-					Atom newAtom = goal.getAtomManager().get(subsumerId);
-					rightPartIds.add(goal.getAtomManager().addAndGetIndex(
+					SatAtom newAtom = goal.getSatAtomManager().get(subsumerId);
+					rightPartIds.add(goal.getSatAtomManager().addAndGetIndex(
 							newAtom));
 				}
-				ret.add(new Equation(leftPartId, rightPartIds, false));
+				ret.add(new EquationImpl(leftPartId, rightPartIds, false));
 			}
 		}
 
@@ -302,7 +304,7 @@ public class Translator {
 	}
 
 	private boolean isTop(Integer atomId) {
-		Atom atom = goal.getAtomManager().get(atomId);
+		SatAtom atom = goal.getSatAtomManager().get(atomId);
 		return (atom.isConceptName() && atom.asConceptName().isTop());
 	}
 
@@ -629,17 +631,17 @@ public class Translator {
 
 		for (Integer atomId1 : goal.getEAtoms()) {
 
-			Atom eatom = goal.getAtomManager().get(atomId1);
+			SatAtom eatom = goal.getSatAtomManager().get(atomId1);
 			if (!eatom.isExistentialRestriction()) {
 				throw new IllegalStateException();
 			}
-			Atom child = eatom.asExistentialRestriction().getChild();
+			SatAtom child = eatom.asExistentialRestriction().getChild();
 
 			if (child.isConceptName() && child.asConceptName().isVariable()) {
 
 				for (Integer atomId2 : goal.getVariables()) {
 					Set<Integer> clause = new HashSet<Integer>();
-					Integer childId = goal.getAtomManager().addAndGetIndex(
+					Integer childId = goal.getSatAtomManager().addAndGetIndex(
 							child);
 					clause.add(getOrderLiteral(atomId2, childId));
 					clause.add(getSubOrDissubLiteral(atomId2, atomId1));
@@ -663,8 +665,10 @@ public class Translator {
 
 				if (!atomId1.equals(atomId2)) {
 
-					String role1 = goal.getAtomManager().get(atomId1).getName();
-					String role2 = goal.getAtomManager().get(atomId2).getName();
+					String role1 = goal.getSatAtomManager().get(atomId1)
+							.getName();
+					String role2 = goal.getSatAtomManager().get(atomId2)
+							.getName();
 
 					/*
 					 * if roles are not equal, then Step 2.2
@@ -679,22 +683,22 @@ public class Translator {
 						 * if the roles are equal, then clause in Step 2.3
 						 */
 					} else {
-						Atom atom1 = goal.getAtomManager().get(atomId1);
-						Atom atom2 = goal.getAtomManager().get(atomId2);
+						SatAtom atom1 = goal.getSatAtomManager().get(atomId1);
+						SatAtom atom2 = goal.getSatAtomManager().get(atomId2);
 
 						if (!atom1.isExistentialRestriction()
 								|| !atom2.isExistentialRestriction()) {
 							throw new IllegalStateException();
 						}
 
-						Atom child1 = atom1.asExistentialRestriction()
+						SatAtom child1 = atom1.asExistentialRestriction()
 								.getChild();
-						Integer child1Id = goal.getAtomManager()
+						Integer child1Id = goal.getSatAtomManager()
 								.addAndGetIndex(child1);
 
-						Atom child2 = atom2.asExistentialRestriction()
+						SatAtom child2 = atom2.asExistentialRestriction()
 								.getChild();
-						Integer child2Id = goal.getAtomManager()
+						Integer child2Id = goal.getSatAtomManager()
 								.addAndGetIndex(child2);
 
 						if (!child1Id.equals(child2Id)) {

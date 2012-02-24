@@ -11,11 +11,12 @@ import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLObjectIntersectionOf;
 import org.semanticweb.owlapi.model.OWLObjectSomeValuesFrom;
 
-import de.tudresden.inf.lat.uel.core.type.Atom;
 import de.tudresden.inf.lat.uel.core.type.ConceptName;
-import de.tudresden.inf.lat.uel.core.type.Equation;
 import de.tudresden.inf.lat.uel.core.type.ExistentialRestriction;
-import de.tudresden.inf.lat.uel.core.type.IndexedSet;
+import de.tudresden.inf.lat.uel.core.type.SatAtom;
+import de.tudresden.inf.lat.uel.type.api.Equation;
+import de.tudresden.inf.lat.uel.type.api.IndexedSet;
+import de.tudresden.inf.lat.uel.type.impl.EquationImpl;
 
 /**
  * An object implementing this class has convenience methods used to build a UEL
@@ -29,10 +30,10 @@ public class OntologyBuilder {
 	private static final Logger logger = Logger.getLogger(OntologyBuilder.class
 			.getName());
 
-	private IndexedSet<Atom> atomManager = null;
+	private IndexedSet<SatAtom> atomManager = null;
 	private int freshConstantIndex = 0;
 
-	public OntologyBuilder(IndexedSet<Atom> manager) {
+	public OntologyBuilder(IndexedSet<SatAtom> manager) {
 		if (manager == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
@@ -40,17 +41,17 @@ public class OntologyBuilder {
 		this.atomManager = manager;
 	}
 
-	private Atom createFlattenAtom(String newAtomName, Set<Atom> atomSet,
+	private SatAtom createFlattenAtom(String newAtomName, Set<SatAtom> atomSet,
 			Set<Equation> newEquations) {
 		ConceptName child = createNewAtom();
 		ExistentialRestriction newAtom = new ExistentialRestriction(
 				newAtomName, child);
 		Integer childId = getAtomManager().addAndGetIndex(child);
 		Set<Integer> atomIdSet = new HashSet<Integer>();
-		for (Atom a : atomSet) {
+		for (SatAtom a : atomSet) {
 			atomIdSet.add(getAtomManager().addAndGetIndex(a));
 		}
-		Equation eq = new Equation(childId, atomIdSet, false);
+		Equation eq = new EquationImpl(childId, atomIdSet, false);
 		newEquations.add(eq);
 
 		return newAtom;
@@ -76,15 +77,15 @@ public class OntologyBuilder {
 			throw new IllegalArgumentException("Null argument.");
 		}
 
-		Atom atom = processClass(cls).iterator().next();
+		SatAtom atom = processClass(cls).iterator().next();
 		return getAtomManager().addAndGetIndex(atom);
 	}
 
-	public IndexedSet<Atom> getAtomManager() {
+	public IndexedSet<SatAtom> getAtomManager() {
 		return this.atomManager;
 	}
 
-	public Equation makeEquation(Atom definiendum, Set<Atom> definiens,
+	public Equation makeEquation(SatAtom definiendum, Set<SatAtom> definiens,
 			boolean primitive) {
 		if (definiendum == null) {
 			throw new IllegalArgumentException("Null argument.");
@@ -96,24 +97,24 @@ public class OntologyBuilder {
 		Integer definiendumId = getAtomManager().addAndGetIndex(definiendum);
 
 		Set<Integer> definiensIds = new HashSet<Integer>();
-		for (Atom atom : definiens) {
+		for (SatAtom atom : definiens) {
 			definiensIds.add(getAtomManager().addAndGetIndex(atom));
 		}
 
-		return new Equation(definiendumId, definiensIds, primitive);
+		return new EquationImpl(definiendumId, definiensIds, primitive);
 	}
 
-	private Set<Atom> processClass(OWLClass cls) {
-		Set<Atom> ret = new HashSet<Atom>();
+	private Set<SatAtom> processClass(OWLClass cls) {
+		Set<SatAtom> ret = new HashSet<SatAtom>();
 		ConceptName newAtom = new ConceptName(cls.toStringID(), false);
 		getAtomManager().add(newAtom);
 		ret.add(newAtom);
 		return ret;
 	}
 
-	private Set<Atom> processClassExpression(OWLClassExpression classExpr,
+	private Set<SatAtom> processClassExpression(OWLClassExpression classExpr,
 			Set<Equation> newEquations) {
-		Set<Atom> ret = new HashSet<Atom>();
+		Set<SatAtom> ret = new HashSet<SatAtom>();
 		if (classExpr instanceof OWLClass) {
 			ret = processClass((OWLClass) classExpr);
 		} else if (classExpr instanceof OWLObjectIntersectionOf) {
@@ -138,17 +139,17 @@ public class OntologyBuilder {
 		}
 
 		Set<Equation> newEquations = new HashSet<Equation>();
-		Set<Atom> left = processClass(definiendum);
-		Set<Atom> right = processClassExpression(definiens, newEquations);
+		Set<SatAtom> left = processClass(definiendum);
+		Set<SatAtom> right = processClassExpression(definiens, newEquations);
 		Set<Equation> ret = new HashSet<Equation>();
 		ret.add(makeEquation(left.iterator().next(), right, false));
 		ret.addAll(newEquations);
 		return ret;
 	}
 
-	private Set<Atom> processIntersection(OWLObjectIntersectionOf intersection,
-			Set<Equation> newEquations) {
-		Set<Atom> ret = new HashSet<Atom>();
+	private Set<SatAtom> processIntersection(
+			OWLObjectIntersectionOf intersection, Set<Equation> newEquations) {
+		Set<SatAtom> ret = new HashSet<SatAtom>();
 		for (OWLClassExpression operand : intersection.getOperands()) {
 			ret.addAll(processClassExpression(operand, newEquations));
 		}
@@ -178,8 +179,8 @@ public class OntologyBuilder {
 		}
 
 		Set<Equation> newEquations = new HashSet<Equation>();
-		Set<Atom> subClassSet = processClass(definiendum);
-		Set<Atom> superClassSet = new HashSet<Atom>();
+		Set<SatAtom> subClassSet = processClass(definiendum);
+		Set<SatAtom> superClassSet = new HashSet<SatAtom>();
 		for (OWLClassExpression clsExpr : definiensSet) {
 			superClassSet.addAll(processClassExpression(clsExpr, newEquations));
 		}
@@ -189,17 +190,17 @@ public class OntologyBuilder {
 		return ret;
 	}
 
-	private Set<Atom> processSomeValuesRestriction(
+	private Set<SatAtom> processSomeValuesRestriction(
 			OWLObjectSomeValuesFrom someValuesRestriction,
 			Set<Equation> newEquations) {
-		Set<Atom> ret = new HashSet<Atom>();
-		Set<Atom> atomSet = processClassExpression(
+		Set<SatAtom> ret = new HashSet<SatAtom>();
+		Set<SatAtom> atomSet = processClassExpression(
 				someValuesRestriction.getFiller(), newEquations);
-		Atom newAtom = null;
+		SatAtom newAtom = null;
 		String newAtomName = someValuesRestriction.getProperty()
 				.getNamedProperty().toStringID();
 		if (atomSet.size() == 1) {
-			Atom atom = atomSet.iterator().next();
+			SatAtom atom = atomSet.iterator().next();
 			if (atom.isConceptName()) {
 				ConceptName concept = atom.asConceptName();
 				newAtom = new ExistentialRestriction(newAtomName, concept);

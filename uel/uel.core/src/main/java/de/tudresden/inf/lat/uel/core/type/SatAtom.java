@@ -1,11 +1,13 @@
 package de.tudresden.inf.lat.uel.core.type;
 
+import de.tudresden.inf.lat.uel.type.api.Atom;
+
 /**
  * An atom is either a concept name or an existential restriction.
  * 
  * @author Julian Mendez
  */
-public interface Atom {
+public interface SatAtom extends Atom {
 
 	/**
 	 * Returns the atom as a concept name.
