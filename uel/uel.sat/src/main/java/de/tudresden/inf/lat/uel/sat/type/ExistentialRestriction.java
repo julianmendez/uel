@@ -107,31 +107,22 @@ public class ExistentialRestriction implements SatAtom {
 	}
 
 	@Override
-	public Integer getConceptName() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Integer getRole() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	public boolean isConstant() {
+		// FIXME
 		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	public boolean isGround() {
+		// FIXME
 		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	public boolean isVariable() {
+		// FIXME
 		// TODO Auto-generated method stub
 		return false;
 	}

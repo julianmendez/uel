@@ -11,6 +11,13 @@ import java.util.Set;
 public interface UelInput {
 
 	/**
+	 * Returns the atom manager.
+	 * 
+	 * @return the atom manager
+	 */
+	public IndexedSet<Atom> getAtomManager();
+
+	/**
 	 * Returns the set of flattened equations.
 	 * 
 	 * @return the set of equations
@@ -18,10 +25,10 @@ public interface UelInput {
 	public Set<Equation> getEquations();
 
 	/**
-	 * Returns the atom manager.
+	 * Returns the set of user variables.
 	 * 
-	 * @return the atom manager
+	 * @return the set of user variables
 	 */
-	public IndexedSet<Atom> getAtomManager();
+	public Set<Integer> getUserVariables();
 
 }

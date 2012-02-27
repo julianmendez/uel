@@ -10,20 +10,6 @@ package de.tudresden.inf.lat.uel.type.api;
 public interface Atom {
 
 	/**
-	 * Retrieves the concept name of this flat atom.
-	 * 
-	 * @return the concept name
-	 */
-	public Integer getConceptName();
-
-	/**
-	 * Retrieves the role name of this flat atom.
-	 * 
-	 * @return the role name
-	 */
-	public Integer getRole();
-
-	/**
 	 * Tells whether this flat atom is concept name.
 	 * 
 	 * @return <code>true</code> if and only if this atom has an associated role

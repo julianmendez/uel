@@ -42,7 +42,6 @@ public final class FlatAtom implements Atom {
 	 * Retrieve the role name of this flat atom.
 	 * @return the role name
 	 */
-	@Override
 	public Integer getRole() {
 		return role;
 	}
@@ -51,7 +50,6 @@ public final class FlatAtom implements Atom {
 	 * Retrieve the concept name of this flat atom.
 	 * @return the concept name
 	 */
-	@Override
 	public Integer getConceptName() {
 		return conceptName;
 	}

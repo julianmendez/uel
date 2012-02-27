@@ -327,4 +327,11 @@ public class Goal implements UelInput {
 		return ret;
 	}
 
+	@Override
+	public Set<Integer> getUserVariables() {
+		// FIXME
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

@@ -6,7 +6,7 @@ import java.util.Set;
 /**
  * 
  * @author Julian Mendez
- *
+ * 
  * @param <T>
  */
 public interface IndexedSet<T> extends Set<T> {
