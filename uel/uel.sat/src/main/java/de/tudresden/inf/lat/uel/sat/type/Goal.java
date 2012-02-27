@@ -1,4 +1,4 @@
-package de.tudresden.inf.lat.uel.core.type;
+package de.tudresden.inf.lat.uel.sat.type;
 
 import java.util.Collections;
 import java.util.HashSet;

@@ -11,9 +11,9 @@ import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLObjectIntersectionOf;
 import org.semanticweb.owlapi.model.OWLObjectSomeValuesFrom;
 
-import de.tudresden.inf.lat.uel.core.type.ConceptName;
-import de.tudresden.inf.lat.uel.core.type.ExistentialRestriction;
-import de.tudresden.inf.lat.uel.core.type.SatAtom;
+import de.tudresden.inf.lat.uel.sat.type.ConceptName;
+import de.tudresden.inf.lat.uel.sat.type.ExistentialRestriction;
+import de.tudresden.inf.lat.uel.sat.type.SatAtom;
 import de.tudresden.inf.lat.uel.type.api.Equation;
 import de.tudresden.inf.lat.uel.type.api.IndexedSet;
 import de.tudresden.inf.lat.uel.type.impl.EquationImpl;

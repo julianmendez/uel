@@ -1,11 +1,11 @@
-package de.tudresden.inf.lat.uel.core.type;
+package de.tudresden.inf.lat.uel.sat.type;
 
 /**
- * An object implementing this class is a subsumption.
+ * An object implementing this class is a dis-subsumption.
  * 
  * @author Barbara Morawska
  */
-public class SubsumptionLiteral implements Literal {
+public class DissubsumptionLiteral implements Literal {
 
 	private final Integer first;
 	private int hashCode = 0;
@@ -19,7 +19,7 @@ public class SubsumptionLiteral implements Literal {
 	 * @param two
 	 *            second component
 	 */
-	public SubsumptionLiteral(Integer one, Integer two) {
+	public DissubsumptionLiteral(Integer one, Integer two) {
 		if (one == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
@@ -35,8 +35,8 @@ public class SubsumptionLiteral implements Literal {
 	@Override
 	public boolean equals(Object o) {
 		boolean ret = false;
-		if (o instanceof SubsumptionLiteral) {
-			SubsumptionLiteral other = (SubsumptionLiteral) o;
+		if (o instanceof DissubsumptionLiteral) {
+			DissubsumptionLiteral other = (DissubsumptionLiteral) o;
 			ret = this.first.equals(other.first)
 					&& this.second.equals(other.second);
 		}
@@ -60,7 +60,7 @@ public class SubsumptionLiteral implements Literal {
 
 	@Override
 	public boolean isDissubsumption() {
-		return false;
+		return true;
 	}
 
 	@Override
@@ -70,14 +70,14 @@ public class SubsumptionLiteral implements Literal {
 
 	@Override
 	public boolean isSubsumption() {
-		return true;
+		return false;
 	}
 
 	@Override
 	public String toString() {
 		StringBuilder sbuf = new StringBuilder("(");
 		sbuf.append(first);
-		sbuf.append(" sub ");
+		sbuf.append(" dissub ");
 		sbuf.append(second);
 		sbuf.append(")");
 		return sbuf.toString();

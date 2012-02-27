@@ -1,25 +1,25 @@
-package de.tudresden.inf.lat.uel.core.type;
+package de.tudresden.inf.lat.uel.sat.type;
 
 /**
- * An object implementing this class is a dis-subsumption.
+ * An object implementing this class is an order literal.
  * 
  * @author Barbara Morawska
  */
-public class DissubsumptionLiteral implements Literal {
+public class OrderLiteral implements Literal {
 
 	private final Integer first;
 	private int hashCode = 0;
 	private final Integer second;
 
 	/**
-	 * Constructs a dissubsumption literal given two names.
+	 * Constructs an order literal given two names.
 	 * 
 	 * @param one
 	 *            first component
 	 * @param two
 	 *            second component
 	 */
-	public DissubsumptionLiteral(Integer one, Integer two) {
+	public OrderLiteral(Integer one, Integer two) {
 		if (one == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
@@ -35,8 +35,8 @@ public class DissubsumptionLiteral implements Literal {
 	@Override
 	public boolean equals(Object o) {
 		boolean ret = false;
-		if (o instanceof DissubsumptionLiteral) {
-			DissubsumptionLiteral other = (DissubsumptionLiteral) o;
+		if (o instanceof OrderLiteral) {
+			OrderLiteral other = (OrderLiteral) o;
 			ret = this.first.equals(other.first)
 					&& this.second.equals(other.second);
 		}
@@ -60,12 +60,12 @@ public class DissubsumptionLiteral implements Literal {
 
 	@Override
 	public boolean isDissubsumption() {
-		return true;
+		return false;
 	}
 
 	@Override
 	public boolean isOrder() {
-		return false;
+		return true;
 	}
 
 	@Override
@@ -77,7 +77,7 @@ public class DissubsumptionLiteral implements Literal {
 	public String toString() {
 		StringBuilder sbuf = new StringBuilder("(");
 		sbuf.append(first);
-		sbuf.append(" dissub ");
+		sbuf.append(" > ");
 		sbuf.append(second);
 		sbuf.append(")");
 		return sbuf.toString();

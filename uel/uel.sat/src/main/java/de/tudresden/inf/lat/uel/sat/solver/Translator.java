@@ -1,4 +1,4 @@
-package de.tudresden.inf.lat.uel.core.sat;
+package de.tudresden.inf.lat.uel.sat.solver;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -9,12 +9,12 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.logging.Logger;
 
-import de.tudresden.inf.lat.uel.core.type.DissubsumptionLiteral;
-import de.tudresden.inf.lat.uel.core.type.Goal;
-import de.tudresden.inf.lat.uel.core.type.Literal;
-import de.tudresden.inf.lat.uel.core.type.OrderLiteral;
-import de.tudresden.inf.lat.uel.core.type.SatAtom;
-import de.tudresden.inf.lat.uel.core.type.SubsumptionLiteral;
+import de.tudresden.inf.lat.uel.sat.type.DissubsumptionLiteral;
+import de.tudresden.inf.lat.uel.sat.type.Goal;
+import de.tudresden.inf.lat.uel.sat.type.Literal;
+import de.tudresden.inf.lat.uel.sat.type.OrderLiteral;
+import de.tudresden.inf.lat.uel.sat.type.SatAtom;
+import de.tudresden.inf.lat.uel.sat.type.SubsumptionLiteral;
 import de.tudresden.inf.lat.uel.type.api.Equation;
 import de.tudresden.inf.lat.uel.type.api.IndexedSet;
 import de.tudresden.inf.lat.uel.type.impl.EquationImpl;

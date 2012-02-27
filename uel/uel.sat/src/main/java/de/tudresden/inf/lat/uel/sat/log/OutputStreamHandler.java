@@ -1,4 +1,4 @@
-package de.tudresden.inf.lat.uel.core.log;
+package de.tudresden.inf.lat.uel.sat.log;
 
 import java.io.BufferedWriter;
 import java.io.IOException;

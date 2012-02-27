@@ -1,4 +1,4 @@
-package de.tudresden.inf.lat.uel.core.sat;
+package de.tudresden.inf.lat.uel.sat.solver;
 
 import java.io.BufferedReader;
 import java.io.File;

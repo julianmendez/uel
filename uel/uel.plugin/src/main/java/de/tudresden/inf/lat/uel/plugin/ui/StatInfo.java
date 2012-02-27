@@ -2,7 +2,7 @@ package de.tudresden.inf.lat.uel.plugin.ui;
 
 import java.util.Map;
 
-import de.tudresden.inf.lat.uel.core.type.Goal;
+import de.tudresden.inf.lat.uel.sat.type.Goal;
 
 /**
  * 

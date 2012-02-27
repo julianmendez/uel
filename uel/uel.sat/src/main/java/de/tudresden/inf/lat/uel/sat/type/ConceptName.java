@@ -1,4 +1,4 @@
-package de.tudresden.inf.lat.uel.core.type;
+package de.tudresden.inf.lat.uel.sat.type;
 
 import de.tudresden.inf.lat.uel.type.cons.KRSSKeyword;
 

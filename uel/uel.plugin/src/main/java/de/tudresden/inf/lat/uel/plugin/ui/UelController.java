@@ -25,9 +25,9 @@ import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 
-import de.tudresden.inf.lat.uel.core.sat.Translator;
-import de.tudresden.inf.lat.uel.core.type.Goal;
 import de.tudresden.inf.lat.uel.plugin.processor.UelProcessor;
+import de.tudresden.inf.lat.uel.sat.solver.Translator;
+import de.tudresden.inf.lat.uel.sat.type.Goal;
 
 /**
  * This class is a controller for the main panel of UEL's graphical user
