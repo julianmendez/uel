@@ -49,4 +49,9 @@ public interface Atom {
 	 */
 	public boolean isVariable();
 
+	/**
+	 * Retrieve the concept name of this flat atom.
+	 * @return the concept name
+	 */
+	public Integer getConceptNameId();
 }

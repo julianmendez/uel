@@ -62,22 +62,7 @@ public class ConceptName implements Atom {
 		return true;
 	}
 
-	/**
-	 * Return the 'FlatAtom' object that represents the concept name of this
-	 * atom.
-	 * 
-	 * @return the concept name of this atom encapsulated in an object of type
-	 *         'FlatAtom'
-	 */
-	public ConceptName getChild() {
-		return new ConceptName(conceptNameId, isGround);
-	}
-
-	/**
-	 * Retrieve the concept name of this flat atom.
-	 * 
-	 * @return the concept name
-	 */
+	@Override
 	public Integer getConceptNameId() {
 		return conceptNameId;
 	}
@@ -86,7 +71,7 @@ public class ConceptName implements Atom {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + conceptNameId.hashCode();
+		result = prime * result + conceptNameId;
 		return result;
 	}
 

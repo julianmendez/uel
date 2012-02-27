@@ -66,13 +66,18 @@ public class ExistentialRestriction implements Atom {
 	public Integer getRoleId() {
 		return role;
 	}
+	
+	@Override
+	public Integer getConceptNameId() {
+		return conceptName.getConceptNameId();
+	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + conceptName.hashCode();
-		result = prime * result + role.hashCode();
+		result = prime * result + role;
 		return result;
 	}
 
