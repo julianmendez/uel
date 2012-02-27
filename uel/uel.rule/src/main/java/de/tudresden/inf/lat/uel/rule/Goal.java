@@ -44,15 +44,15 @@ class Goal implements Set<Subsumption> {
 		Set<Subsumption> subsumptions = new HashSet<Subsumption>();
 		for (Equation eq : equations) {
 			// look up atom IDs in the atom manager
-			FlatAtom head = (FlatAtom) atomManager.get(eq.getLeft());
-			List<FlatAtom> body = new ArrayList<FlatAtom>();
+			Atom head = atomManager.get(eq.getLeft());
+			List<Atom> body = new ArrayList<Atom>();
 			for (Integer id : eq.getRight()) {
-				body.add((FlatAtom) atomManager.get(id));
+				body.add(atomManager.get(id));
 			}
 			
 			// create subsumptions representing the equation
 			subsumptions.add(new Subsumption(body, head));
-			for (FlatAtom at : body) {
+			for (Atom at : body) {
 				subsumptions.add(new Subsumption(head, at));
 			}
 		}
@@ -170,29 +170,29 @@ class Goal implements Set<Subsumption> {
 	}
 
 	private void addToIndex(Subsumption sub) {
-		for (FlatAtom at : sub.getBody()) {
+		for (Atom at : sub.getBody()) {
 			if (at.isVariable()) {
-				getOrInitLHSIndex(at.getConceptName()).add(sub);
+				getOrInitLHSIndex(at.getConceptNameId()).add(sub);
 			}
 		}
 		if (sub.getHead().isVariable()) {
-			getOrInitRHSIndex(sub.getHead().getConceptName()).add(sub);
+			getOrInitRHSIndex(sub.getHead().getConceptNameId()).add(sub);
 		}
 	}
 	
 	private void removeFromIndex(Subsumption sub) {
-		for (FlatAtom at : sub.getBody()) {
+		for (Atom at : sub.getBody()) {
 			if (at.isVariable()) {
-				variableLHSIndex.get(at.getConceptName()).remove(sub);
+				variableLHSIndex.get(at.getConceptNameId()).remove(sub);
 			}
 		}
 		if (sub.getHead().isVariable()) {
-			variableRHSIndex.get(sub.getHead().getConceptName()).remove(sub);
+			variableRHSIndex.get(sub.getHead().getConceptNameId()).remove(sub);
 		}
 	}
 
-	private void expand(Subsumption sub, Set<FlatAtom> subsumers, Set<Subsumption> collection) {
-		for (FlatAtom at : subsumers) {
+	private void expand(Subsumption sub, Set<Atom> subsumers, Set<Subsumption> collection) {
+		for (Atom at : subsumers) {
 			Subsumption newSub = new Subsumption(sub.getBody(), at);
 			if (add(newSub)) {
 				// only add the subsumption if it is new
@@ -208,7 +208,7 @@ class Goal implements Set<Subsumption> {
 	 * @param subsumers a set of subsumers of the variable
 	 * @return a set containing the subsumptions added as a result of this operation
 	 */
-	Set<Subsumption> expand(Subsumption sub, Set<FlatAtom> subsumers) {
+	Set<Subsumption> expand(Subsumption sub, Set<Atom> subsumers) {
 		Set<Subsumption> newSubs = new HashSet<Subsumption>();
 		expand(sub, subsumers, newSubs);
 		return newSubs;

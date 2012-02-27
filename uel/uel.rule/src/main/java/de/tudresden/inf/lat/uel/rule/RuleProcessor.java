@@ -4,13 +4,20 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Deque;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import de.tudresden.inf.lat.uel.rule.Rule.Application;
+import de.tudresden.inf.lat.uel.type.api.Atom;
+import de.tudresden.inf.lat.uel.type.api.Equation;
+import de.tudresden.inf.lat.uel.type.api.IndexedSet;
 import de.tudresden.inf.lat.uel.type.api.UelInput;
 import de.tudresden.inf.lat.uel.type.api.UelOutput;
 import de.tudresden.inf.lat.uel.type.api.UelProcessor;
+import de.tudresden.inf.lat.uel.type.impl.EquationImpl;
+import de.tudresden.inf.lat.uel.type.impl.UelOutputImpl;
 
 /**
  * This class is used to solve a unification problem using a rule-based unification algorithm for
@@ -72,6 +79,7 @@ public class RuleProcessor implements UelProcessor {
 		staticEagerRules = new ArrayList<EagerRule>();
 		staticEagerRules.add(new EagerGroundSolvingRule());
 		staticEagerRules.add(new EagerSolving1Rule());
+		staticEagerRules.add(new EagerConflictRule());
 		dynamicEagerRules = new ArrayList<EagerRule>();
 		dynamicEagerRules.add(new EagerSolving2Rule());
 		dynamicEagerRules.add(new EagerExtensionRule());
@@ -112,7 +120,17 @@ public class RuleProcessor implements UelProcessor {
 	}
 	
 	public UelOutput getUnifier() {
-		return new RuleOutput(assignment, input.getAtomManager());
+		// convert current assignment to a set of equations
+		IndexedSet<Atom> atomManager = input.getAtomManager();
+		Set<Equation> equations = new HashSet<Equation>();
+		for (Integer userVar : input.getUserVariables()) {
+			Set<Integer> body = new HashSet<Integer>();
+			for (Atom at : assignment.getSubsumers(atomManager.get(userVar).getConceptNameId())) {
+				body.add(atomManager.addAndGetIndex(at));
+			}
+			equations.add(new EquationImpl(userVar, body, false));
+		}
+		return new UelOutputImpl(atomManager, equations);
 	}
 	
 	private boolean solve() {
@@ -249,7 +267,7 @@ public class RuleProcessor implements UelProcessor {
 	 * @return the result of the rule application or 'null' if no more rule applications are
 	 *         possible
 	 */
-	private Result tryApplyRule(Subsumption sub, Rule rule, Rule.Application previous, Assignment currentAssignment) {
+	private Result tryApplyRule(Subsumption sub, Rule rule, Application previous, Assignment currentAssignment) {
 		Rule.Application next;
 		if (previous == null) {
 			next = rule.getFirstApplication(sub, currentAssignment);
@@ -314,7 +332,7 @@ public class RuleProcessor implements UelProcessor {
 			/* we can assume that all new solved subsumptions have a variable on the right-hand
 			 * side
 			 */
-			Integer var = sub.getHead().getConceptName();
+			Integer var = sub.getHead().getConceptNameId();
 			Set<Subsumption> newSubs = goal.expand(sub, assignment.getSubsumers(var));
 			res.getNewUnsolvedSubsumptions().addAll(newSubs);
 		}

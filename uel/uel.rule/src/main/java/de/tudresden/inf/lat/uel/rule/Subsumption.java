@@ -4,6 +4,8 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+import de.tudresden.inf.lat.uel.type.api.Atom;
+
 /**
  * A class representing a subsumption between a conjunction of flat atoms (body) and a flat atom
  * (head).
@@ -12,8 +14,8 @@ import java.util.List;
  */
 class Subsumption {
 
-	private final List<FlatAtom> body;
-	private final FlatAtom head;
+	private final List<Atom> body;
+	private final Atom head;
 	private boolean solved;
 	
 	/**
@@ -22,7 +24,7 @@ class Subsumption {
 	 * @param body the body of the new subsumption
 	 * @param head the head of the new subsumption
 	 */
-	public Subsumption(List<FlatAtom> body, FlatAtom head) {
+	public Subsumption(List<Atom> body, Atom head) {
 		if ((body == null) || (head == null)) {
 			throw new IllegalArgumentException("Body and head cannot be null.");
 		}
@@ -37,20 +39,20 @@ class Subsumption {
 	 * @param body the body of the new subsumption
 	 * @param head the head of the new subsumption
 	 */
-	public Subsumption(FlatAtom body, FlatAtom head) {
+	public Subsumption(Atom body, Atom head) {
 		if ((body == null) || (head == null)) {
 			throw new IllegalArgumentException("Body and head cannot be null.");
 		}
-		this.body = Arrays.asList(new FlatAtom[]{body});
+		this.body = Arrays.asList(new Atom[]{body});
 		this.head = head;
 		this.solved = false;
 	}
 	
-	List<FlatAtom> getBody() {
+	List<Atom> getBody() {
 		return body;
 	}
 	
-	FlatAtom getHead() {
+	Atom getHead() {
 		return head;
 	}
 	
@@ -63,7 +65,7 @@ class Subsumption {
 	}
 	
 	boolean isGround() {
-		for (FlatAtom at : body) {
+		for (Atom at : body) {
 			if (!at.isGround()) return false;
 		}
 		if (!head.isGround()) return false;
@@ -98,7 +100,7 @@ class Subsumption {
 		if (body.isEmpty()) {
 			buf.append("top");
 		} else {
-			Iterator<FlatAtom> iter = body.iterator();
+			Iterator<Atom> iter = body.iterator();
 			buf.append(iter.next());
 			while (iter.hasNext()) {
 				buf.append(",");

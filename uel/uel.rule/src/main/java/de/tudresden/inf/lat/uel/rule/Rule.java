@@ -26,7 +26,7 @@ abstract class Rule {
 	 * 
 	 * @param sub the subsumption this rule shall be applied to
 	 * @param assign the current assignment
-	 * @param previous the previous rule application returned by 'getFirstApplication' or
+	 * @param previous the previous rule application returned by #getFirstApplication' or
 	 * 'getNextApplication'
 	 * @return a rule application describing the arguments needed to apply this rule or 'null' if
 	 * there are no more ways to apply this rule

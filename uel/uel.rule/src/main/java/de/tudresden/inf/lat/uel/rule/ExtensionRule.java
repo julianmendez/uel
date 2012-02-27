@@ -1,10 +1,12 @@
 package de.tudresden.inf.lat.uel.rule;
 
+import de.tudresden.inf.lat.uel.type.api.Atom;
+
 final class ExtensionRule extends Rule {
 
 	@Override
 	public Application getFirstApplication(Subsumption sub, Assignment assign) {
-		for (FlatAtom at : sub.getBody()) {
+		for (Atom at : sub.getBody()) {
 			if (at.isVariable()) {
 				return new Application(at);
 			}
@@ -33,11 +35,11 @@ final class ExtensionRule extends Rule {
 			throw new IllegalArgumentException("Expected rule application of type ExtensionRule.Application.");
 		}
 		Application appl = (Application) application;
-		if (assign.makesCyclic(appl.at.getConceptName(), sub.getHead())) {
+		if (assign.makesCyclic(appl.at.getConceptNameId(), sub.getHead())) {
 			return new Result(sub, application, false);
 		}
 		Result res = new Result(sub, application);
-		res.getNewSubsumers().add(appl.at.getConceptName(), sub.getHead());
+		res.getNewSubsumers().add(appl.at.getConceptNameId(), sub.getHead());
 		return res;
 	}
 	
@@ -48,9 +50,9 @@ final class ExtensionRule extends Rule {
 	
 	private final class Application extends Rule.Application {
 		
-		protected FlatAtom at;
+		protected Atom at;
 		
-		protected Application(FlatAtom at) {
+		protected Application(Atom at) {
 			this.at = at;
 		}
 		
