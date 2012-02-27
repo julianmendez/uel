@@ -28,7 +28,7 @@ import de.tudresden.inf.lat.uel.type.impl.IndexedSetImpl;
  * 
  * @author Julian Mendez
  */
-public class UelProcessor {
+public class UelModel {
 
 	private IndexedSet<SatAtom> atomManager = new IndexedSetImpl<SatAtom>();
 	private DynamicOntology ontology = null;
@@ -40,7 +40,7 @@ public class UelProcessor {
 	/**
 	 * Constructs a new processor.
 	 */
-	public UelProcessor() {
+	public UelModel() {
 		this.ontology = new DynamicOntology(new OntologyBuilder(
 				getAtomManager()));
 	}

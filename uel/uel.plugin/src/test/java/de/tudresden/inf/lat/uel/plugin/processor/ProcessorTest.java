@@ -175,7 +175,7 @@ public class ProcessorTest extends TestCase {
 			Integer numberOfUnifiers) throws OWLOntologyCreationException,
 			IOException {
 		Map<String, OWLClass> idClassMap = new HashMap<String, OWLClass>();
-		UelProcessor processor = new UelProcessor();
+		UelModel processor = new UelModel();
 
 		OWLOntology owlOntology = createOntology(new FileInputStream(
 				ontologyName));

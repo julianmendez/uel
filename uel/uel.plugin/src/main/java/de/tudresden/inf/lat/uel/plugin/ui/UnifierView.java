@@ -14,7 +14,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.WindowConstants;
 
-import de.tudresden.inf.lat.uel.plugin.processor.UelProcessor;
+import de.tudresden.inf.lat.uel.plugin.processor.UelModel;
 
 public class UnifierView extends JDialog {
 
@@ -32,11 +32,11 @@ public class UnifierView extends JDialog {
 			.getClassLoader().getResource(Message.iconSave)));
 	private JButton buttonShowStatInfo = new JButton(new ImageIcon(this
 			.getClass().getClassLoader().getResource(Message.iconHistory)));
-	private final UelProcessor model;
+	private final UelModel model;
 	private JTextArea textUnifier = new JTextArea();
 	private JTextArea textUnifierId = new JTextArea();
 
-	public UnifierView(UelProcessor processor) {
+	public UnifierView(UelModel processor) {
 		super((Frame) null, "Unifier", true);
 
 		if (processor == null) {
@@ -168,7 +168,7 @@ public class UnifierView extends JDialog {
 		return ret;
 	}
 
-	public UelProcessor getModel() {
+	public UelModel getModel() {
 		return this.model;
 	}
 

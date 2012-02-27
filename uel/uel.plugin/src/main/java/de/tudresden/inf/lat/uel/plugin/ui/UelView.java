@@ -12,7 +12,7 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import de.tudresden.inf.lat.uel.plugin.processor.UelProcessor;
+import de.tudresden.inf.lat.uel.plugin.processor.UelModel;
 
 /**
  * Panel for UEL.
@@ -31,9 +31,9 @@ public class UelView extends JPanel {
 	private JComboBoxOfLabelId listClassName01 = new JComboBoxOfLabelId();
 	private JComboBox listOntologyName00 = new JComboBox();
 	private JComboBox listOntologyName01 = new JComboBox();
-	private final UelProcessor model;
+	private final UelModel model;
 
-	public UelView(UelProcessor processor) {
+	public UelView(UelModel processor) {
 		if (processor == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
@@ -167,7 +167,7 @@ public class UelView extends JPanel {
 		return ret;
 	}
 
-	public UelProcessor getModel() {
+	public UelModel getModel() {
 		return this.model;
 	}
 

@@ -25,7 +25,7 @@ import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 
-import de.tudresden.inf.lat.uel.plugin.processor.UelProcessor;
+import de.tudresden.inf.lat.uel.plugin.processor.UelModel;
 import de.tudresden.inf.lat.uel.sat.solver.Translator;
 import de.tudresden.inf.lat.uel.sat.type.Goal;
 
@@ -287,7 +287,7 @@ public class UelController implements ActionListener {
 		return entity.getIRI().toURI().toString();
 	}
 
-	public UelProcessor getModel() {
+	public UelModel getModel() {
 		return getView().getModel();
 	}
 

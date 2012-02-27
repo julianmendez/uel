@@ -16,7 +16,7 @@ import org.semanticweb.owlapi.model.OWLOntologyChangeListener;
 import org.semanticweb.owlapi.model.OWLOntologyLoaderListener;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 
-import de.tudresden.inf.lat.uel.plugin.processor.UelProcessor;
+import de.tudresden.inf.lat.uel.plugin.processor.UelModel;
 import de.tudresden.inf.lat.uel.plugin.ui.UelController;
 import de.tudresden.inf.lat.uel.plugin.ui.UelView;
 
@@ -37,7 +37,7 @@ public class UelStarter implements OWLOntologyChangeListener,
 		}
 
 		this.ontologyManager = modelManager.getOWLOntologyManager();
-		UelProcessor processor = new UelProcessor();
+		UelModel processor = new UelModel();
 		this.panel = new UelController(new UelView(processor),
 				this.ontologyManager);
 		this.renderer = modelManager.getOWLEntityRenderer();
@@ -52,7 +52,7 @@ public class UelStarter implements OWLOntologyChangeListener,
 		}
 
 		this.ontologyManager = manager;
-		UelProcessor processor = new UelProcessor();
+		UelModel processor = new UelModel();
 		this.panel = new UelController(new UelView(processor),
 				this.ontologyManager);
 		getOWLOntologyManager().addOntologyLoaderListener(this);
