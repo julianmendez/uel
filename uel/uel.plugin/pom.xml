@@ -35,7 +35,7 @@
 
 		<dependency>
 			<groupId>uel</groupId>
-			<artifactId>uel.core</artifactId>
+			<artifactId>uel.sat</artifactId>
 			<version>1.0.0</version>
 		</dependency>
 

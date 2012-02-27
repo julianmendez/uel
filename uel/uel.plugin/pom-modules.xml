@@ -21,7 +21,7 @@
 
 	<modules>
 		<module>../uel.type</module>
-		<module>../uel.core</module>
+		<module>../uel.sat</module>
 		<module>../uel.plugin</module>
 	</modules>
 
