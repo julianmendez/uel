@@ -27,7 +27,7 @@ import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 
 import de.tudresden.inf.lat.uel.plugin.processor.PluginGoal;
 import de.tudresden.inf.lat.uel.plugin.processor.UelModel;
-import de.tudresden.inf.lat.uel.sat.solver.Translator;
+import de.tudresden.inf.lat.uel.sat.solver.SatProcessor;
 import de.tudresden.inf.lat.uel.sat.type.Goal;
 
 /**
@@ -119,7 +119,7 @@ public class UelController implements ActionListener {
 			this.varWindow.close();
 
 			getModel().createTranslator(g);
-			Translator translator = getModel().getTranslator();
+			SatProcessor translator = getModel().getTranslator();
 			getModel().computeSatInput();
 			getUnifier()
 					.setStatInfo(

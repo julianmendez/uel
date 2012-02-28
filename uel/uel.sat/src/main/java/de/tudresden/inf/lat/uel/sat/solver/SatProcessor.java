@@ -114,9 +114,9 @@ import de.tudresden.inf.lat.uel.type.impl.IndexedSetImpl;
  * @author Barbara Morawska
  * @author Julian Mendez
  */
-public class Translator {
+public class SatProcessor {
 
-	private static final Logger logger = Logger.getLogger(Translator.class
+	private static final Logger logger = Logger.getLogger(SatProcessor.class
 			.getName());
 
 	private Goal goal;
@@ -141,7 +141,7 @@ public class Translator {
 	 * @param g
 	 *            goal
 	 */
-	public Translator(Goal g) {
+	public SatProcessor(Goal g) {
 		if (g == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
@@ -150,7 +150,7 @@ public class Translator {
 		setLiterals();
 	}
 
-	public Translator(Goal g, boolean inv) {
+	public SatProcessor(Goal g, boolean inv) {
 		if (g == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}

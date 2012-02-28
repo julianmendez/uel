@@ -14,7 +14,7 @@ import de.tudresden.inf.lat.uel.sat.solver.Sat4jSolver;
 import de.tudresden.inf.lat.uel.sat.solver.SatInput;
 import de.tudresden.inf.lat.uel.sat.solver.SatOutput;
 import de.tudresden.inf.lat.uel.sat.solver.Solver;
-import de.tudresden.inf.lat.uel.sat.solver.Translator;
+import de.tudresden.inf.lat.uel.sat.solver.SatProcessor;
 import de.tudresden.inf.lat.uel.sat.type.Goal;
 import de.tudresden.inf.lat.uel.sat.type.Ontology;
 import de.tudresden.inf.lat.uel.sat.type.SatAtom;
@@ -33,7 +33,7 @@ public class UelModel {
 	private IndexedSet<SatAtom> atomManager = new IndexedSetImpl<SatAtom>();
 	private DynamicOntology ontology = null;
 	private SatInput satinput = null;
-	private Translator translator = null;
+	private SatProcessor translator = null;
 	private List<Set<Equation>> unifierList = new ArrayList<Set<Equation>>();
 	private Set<Set<Equation>> unifierSet = new HashSet<Set<Equation>>();
 
@@ -106,7 +106,7 @@ public class UelModel {
 	}
 
 	public void createTranslator(Goal g) {
-		this.translator = new Translator(g, true);
+		this.translator = new SatProcessor(g, true);
 	}
 
 	public IndexedSet<SatAtom> getAtomManager() {
@@ -121,7 +121,7 @@ public class UelModel {
 		return this.satinput;
 	}
 
-	public Translator getTranslator() {
+	public SatProcessor getTranslator() {
 		return this.translator;
 	}
 
