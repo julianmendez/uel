@@ -188,14 +188,15 @@ public class ProcessorTest extends TestCase {
 		Set<String> input = new HashSet<String>();
 		input.add(idClassMap.get("C").toStringID());
 		input.add(idClassMap.get("D").toStringID());
-		Goal goal = processor.configure(input);
+		PluginGoal goal = processor.configure(input);
 
 		for (String var : varNames) {
-			Integer atomId = getAtomId(goal, idClassMap.get(var).toStringID());
+			Integer atomId = getAtomId(goal.getGoal(), idClassMap.get(var)
+					.toStringID());
 			goal.makeVariable(atomId);
 		}
 
-		processor.createTranslator(goal);
+		processor.createTranslator(goal.getGoal());
 		processor.computeSatInput();
 
 		boolean hasUnifiers = true;
@@ -204,7 +205,7 @@ public class ProcessorTest extends TestCase {
 		}
 
 		List<Set<Equation>> unifiers = processor.getUnifierList();
-		String goalStr = goal.getGoalEquations();
+		String goalStr = goal.getGoal().getGoalEquations();
 
 		UelController controller = new UelController(new UelView(processor),
 				owlOntology.getOWLOntologyManager());

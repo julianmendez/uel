@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import de.tudresden.inf.lat.uel.plugin.processor.PluginGoal;
 import de.tudresden.inf.lat.uel.sat.type.Goal;
 import de.tudresden.inf.lat.uel.sat.type.SatAtom;
 
@@ -15,12 +16,12 @@ import de.tudresden.inf.lat.uel.sat.type.SatAtom;
  */
 class VarSelectionModel {
 
-	private final Goal goal;
 	private final Map<String, String> idLabelMap;
+	private final PluginGoal pluginGoal;
 	private Set<String> setOfOriginalVariables = new TreeSet<String>();
 
 	public VarSelectionModel(Set<String> originalVariables,
-			Map<String, String> labels, Goal g) {
+			Map<String, String> labels, PluginGoal g) {
 		if (originalVariables == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
@@ -33,13 +34,13 @@ class VarSelectionModel {
 
 		this.setOfOriginalVariables.addAll(originalVariables);
 		this.idLabelMap = labels;
-		this.goal = g;
+		this.pluginGoal = g;
 	}
 
 	private Integer getAtomId(String atomName) {
 		Integer ret = null;
-		for (Integer currentAtomId : this.goal.getSatAtomManager().getIndices()) {
-			SatAtom currentAtom = this.goal.getSatAtomManager().get(
+		for (Integer currentAtomId : getGoal().getSatAtomManager().getIndices()) {
+			SatAtom currentAtom = getGoal().getSatAtomManager().get(
 					currentAtomId);
 			if (currentAtom.getId().equals(atomName)) {
 				ret = currentAtomId;
@@ -50,14 +51,14 @@ class VarSelectionModel {
 
 	public Set<String> getConstants() {
 		Set<String> ret = new HashSet<String>();
-		for (Integer atomId : this.goal.getConstants()) {
-			ret.add(this.goal.getSatAtomManager().get(atomId).getId());
+		for (Integer atomId : getGoal().getConstants()) {
+			ret.add(getGoal().getSatAtomManager().get(atomId).getId());
 		}
 		return Collections.unmodifiableSet(ret);
 	}
 
 	public Goal getGoal() {
-		return this.goal;
+		return this.pluginGoal.getGoal();
 	}
 
 	public String getLabel(String id) {
@@ -68,12 +69,12 @@ class VarSelectionModel {
 		String ret = this.idLabelMap.get(id);
 
 		if (ret == null) {
-			if (id.endsWith(Goal.UNDEF_SUFFIX)) {
-				String origId = id.substring(0,
-						id.length() - Goal.UNDEF_SUFFIX.length());
+			if (id.endsWith(PluginGoal.UNDEF_SUFFIX)) {
+				String origId = id.substring(0, id.length()
+						- PluginGoal.UNDEF_SUFFIX.length());
 				ret = this.idLabelMap.get(origId);
 				if (ret != null) {
-					ret += Goal.UNDEF_SUFFIX;
+					ret += PluginGoal.UNDEF_SUFFIX;
 				}
 			}
 		}
@@ -92,6 +93,10 @@ class VarSelectionModel {
 
 	public Set<String> getOriginalVariables() {
 		return Collections.unmodifiableSet(this.setOfOriginalVariables);
+	}
+
+	public PluginGoal getPluginGoal() {
+		return this.pluginGoal;
 	}
 
 	public Set<String> getVariables() {
@@ -114,7 +119,7 @@ class VarSelectionModel {
 		if (atomId == null) {
 			throw new IllegalArgumentException("Unkown atom.");
 		}
-		this.goal.makeConstant(atomId);
+		this.pluginGoal.makeConstant(atomId);
 	}
 
 	public void makeVariable(String id) {
@@ -126,7 +131,7 @@ class VarSelectionModel {
 		if (atomId == null) {
 			throw new IllegalArgumentException("Unkown atom.");
 		}
-		this.goal.makeVariable(atomId);
+		this.pluginGoal.makeVariable(atomId);
 	}
 
 }

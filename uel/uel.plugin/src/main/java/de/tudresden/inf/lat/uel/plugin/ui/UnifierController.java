@@ -22,8 +22,8 @@ import org.semanticweb.owlapi.io.OWLRendererException;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 
+import de.tudresden.inf.lat.uel.plugin.processor.PluginGoal;
 import de.tudresden.inf.lat.uel.plugin.processor.UelModel;
-import de.tudresden.inf.lat.uel.sat.type.Goal;
 import de.tudresden.inf.lat.uel.sat.type.SatAtom;
 import de.tudresden.inf.lat.uel.type.api.Equation;
 import de.tudresden.inf.lat.uel.type.cons.KRSSKeyword;
@@ -168,17 +168,17 @@ public class UnifierController implements ActionListener {
 
 	private String getLabel(String candidateId) {
 		String ret = candidateId;
-		if (candidateId.endsWith(Goal.UNDEF_SUFFIX)) {
+		if (candidateId.endsWith(PluginGoal.UNDEF_SUFFIX)) {
 			ret = candidateId.substring(0, candidateId.length()
-					- Goal.UNDEF_SUFFIX.length());
+					- PluginGoal.UNDEF_SUFFIX.length());
 		}
 
 		String str = this.mapIdLabel.get(ret);
 		if (str != null) {
 			ret = str;
 		}
-		if (candidateId.endsWith(Goal.UNDEF_SUFFIX)) {
-			ret += Goal.UNDEF_SUFFIX;
+		if (candidateId.endsWith(PluginGoal.UNDEF_SUFFIX)) {
+			ret += PluginGoal.UNDEF_SUFFIX;
 		}
 		return ret;
 	}

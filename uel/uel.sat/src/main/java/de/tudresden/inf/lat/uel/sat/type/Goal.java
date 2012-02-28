@@ -9,7 +9,6 @@ import de.tudresden.inf.lat.uel.type.api.Equation;
 import de.tudresden.inf.lat.uel.type.api.IndexedSet;
 import de.tudresden.inf.lat.uel.type.api.UelInput;
 import de.tudresden.inf.lat.uel.type.cons.KRSSKeyword;
-import de.tudresden.inf.lat.uel.type.impl.EquationImpl;
 import de.tudresden.inf.lat.uel.type.impl.IndexedSetImpl;
 
 /**
@@ -23,8 +22,6 @@ import de.tudresden.inf.lat.uel.type.impl.IndexedSetImpl;
  * @author Julian Mendez
  */
 public class Goal implements UelInput {
-
-	public static final String UNDEF_SUFFIX = "_UNDEF";
 
 	private final IndexedSet<SatAtom> atomManager;
 
@@ -47,7 +44,7 @@ public class Goal implements UelInput {
 
 	private Equation mainEquation;
 
-	private Set<Integer> usedAtomIds;
+	private Set<Integer> usedAtomIds = new HashSet<Integer>();
 
 	/**
 	 * variables is a hash map implementing all concept names which are treated
@@ -60,17 +57,17 @@ public class Goal implements UelInput {
 	 * 
 	 * @param manager
 	 *            atom manager
-	 * @param ont
-	 *            ontology
-	 * @param leftStr
-	 *            left atom name of the main equation
-	 * @param rightStr
-	 *            right atom name of the main equation
 	 */
-	public Goal(IndexedSet<SatAtom> manager, Ontology ont, String leftStr,
-			String rightStr) {
+	public Goal(IndexedSet<SatAtom> manager) {
 		this.atomManager = manager;
-		initialize(ont, leftStr, rightStr);
+	}
+
+	public boolean addConstant(Integer atomId) {
+		return this.constants.add(atomId);
+	}
+
+	public boolean addEAtom(Integer atomId) {
+		return this.eatoms.add(atomId);
 	}
 
 	/**
@@ -79,8 +76,16 @@ public class Goal implements UelInput {
 	 * @param e
 	 *            equation
 	 */
-	public void addEquation(Equation e) {
-		equations.add(e);
+	public boolean addEquation(Equation e) {
+		return this.equations.add(e);
+	}
+
+	public boolean addUsedAtomId(Integer atomId) {
+		return this.usedAtomIds.add(atomId);
+	}
+
+	public boolean addVariable(Integer atomId) {
+		return this.variables.add(atomId);
 	}
 
 	@Override
@@ -97,8 +102,13 @@ public class Goal implements UelInput {
 		return ret;
 	}
 
-	public IndexedSet<SatAtom> getSatAtomManager() {
-		return this.atomManager;
+	@Override
+	public IndexedSet<Atom> getAtomManager() {
+		IndexedSet<Atom> ret = new IndexedSetImpl<Atom>();
+		for (SatAtom atom : getSatAtomManager()) {
+			ret.add(atom);
+		}
+		return ret;
 	}
 
 	public Set<Integer> getConstants() {
@@ -138,8 +148,19 @@ public class Goal implements UelInput {
 		return mainEquation;
 	}
 
+	public IndexedSet<SatAtom> getSatAtomManager() {
+		return this.atomManager;
+	}
+
 	public Set<Integer> getUsedAtomIds() {
-		return this.usedAtomIds;
+		return Collections.unmodifiableSet(this.usedAtomIds);
+	}
+
+	@Override
+	public Set<Integer> getUserVariables() {
+		// FIXME
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	public Set<Integer> getVariables() {
@@ -151,129 +172,12 @@ public class Goal implements UelInput {
 		return this.mainEquation.hashCode();
 	}
 
-	private void initialize(Ontology ontology, String leftStr, String rightStr) {
-
-		ConceptName left = new ConceptName(leftStr, true);
-		ConceptName right = new ConceptName(rightStr, true);
-
-		Set<Equation> newEquationSet = new HashSet<Equation>();
-		{
-			Set<Equation> equationSet = new HashSet<Equation>();
-			Integer leftId = getSatAtomManager().addAndGetIndex(left);
-			Integer rightId = getSatAtomManager().addAndGetIndex(right);
-			equationSet.addAll(ontology.getModule(leftId));
-			equationSet.addAll(ontology.getModule(rightId));
-
-			setMainEquation(new EquationImpl(getSatAtomManager()
-					.addAndGetIndex(left), getSatAtomManager().addAndGetIndex(
-					right), false));
-
-			for (Equation eq : equationSet) {
-				if (eq.isPrimitive()) {
-					newEquationSet.add(processPrimitiveDefinition(eq));
-				} else {
-					newEquationSet.add(eq);
-				}
-			}
-		}
-
-		this.equations.addAll(newEquationSet);
-
-		for (Equation eq : this.equations) {
-			Integer atomId = eq.getLeft();
-			variables.add(atomId);
-			ConceptName concept = getSatAtomManager().get(atomId)
-					.asConceptName();
-			concept.setVariable(true);
-			concept.setUserVariable(false);
-		}
-
-		Set<Integer> usedAtomIds = new HashSet<Integer>();
-		for (Equation eq : this.equations) {
-			usedAtomIds.add(eq.getLeft());
-			usedAtomIds.addAll(eq.getRight());
-		}
-
-		Set<Integer> conceptNameIds = new HashSet<Integer>();
-		for (Integer usedAtomId : usedAtomIds) {
-			SatAtom atom = getSatAtomManager().get(usedAtomId);
-			if (atom.isConceptName()) {
-				conceptNameIds.add(usedAtomId);
-			} else if (atom.isExistentialRestriction()) {
-				eatoms.add(usedAtomId);
-				ConceptName child = atom.asExistentialRestriction().getChild();
-				Integer childId = getSatAtomManager().addAndGetIndex(child);
-				conceptNameIds.add(childId);
-			}
-		}
-		usedAtomIds.addAll(conceptNameIds);
-		this.usedAtomIds = usedAtomIds;
-
-		for (Integer atomId : conceptNameIds) {
-			SatAtom atom = getSatAtomManager().get(atomId);
-			if (atom.isConceptName()) {
-				if (atom.asConceptName().isVariable()) {
-					variables.add(atomId);
-				} else if (!atom.asConceptName().isVariable()) {
-					constants.add(atomId);
-				}
-			}
-		}
-
-		for (Integer atomId : variables) {
-			SatAtom atom = getSatAtomManager().get(atomId);
-			if (!atom.isConceptName()) {
-				throw new IllegalStateException();
-			}
-			atom.asConceptName().setVariable(true);
-		}
-
+	public boolean removeConstant(Integer atomId) {
+		return this.constants.remove(atomId);
 	}
 
-	public void makeConstant(Integer atomId) {
-		SatAtom atom = getSatAtomManager().get(atomId);
-		if (!atom.isConceptName()) {
-			throw new IllegalArgumentException(
-					"Argument is not a concept name identifier: '" + atomId
-							+ "'.");
-		}
-		ConceptName conceptName = atom.asConceptName();
-		if (this.variables.contains(atomId)) {
-			this.variables.remove(atomId);
-			this.constants.add(atomId);
-			conceptName.setUserVariable(false);
-			conceptName.setVariable(false);
-		}
-	}
-
-	public void makeVariable(Integer atomId) {
-		SatAtom atom = getSatAtomManager().get(atomId);
-		if (!atom.isConceptName()) {
-			throw new IllegalArgumentException(
-					"Argument is not a concept name identifier: '" + atomId
-							+ "'.");
-		}
-		ConceptName conceptName = atom.asConceptName();
-		if (this.constants.contains(atomId)) {
-			this.constants.remove(atomId);
-			this.variables.add(atomId);
-			conceptName.setUserVariable(true);
-			conceptName.setVariable(true);
-		}
-	}
-
-	private Equation processPrimitiveDefinition(Equation e) {
-		SatAtom leftAtom = getSatAtomManager().get(e.getLeft());
-		ConceptName b = leftAtom.asConceptName();
-		ConceptName var = new ConceptName(b.getId() + UNDEF_SUFFIX, false);
-		var.setUserVariable(false);
-		getSatAtomManager().add(var);
-		Integer varId = getSatAtomManager().addAndGetIndex(var);
-
-		Set<Integer> newRightSet = new HashSet<Integer>();
-		newRightSet.addAll(e.getRight());
-		newRightSet.add(varId);
-		return new EquationImpl(e.getLeft(), newRightSet, false);
+	public boolean removeVariable(Integer atomId) {
+		return this.variables.remove(atomId);
 	}
 
 	public void setMainEquation(Equation equation) {
@@ -316,22 +220,6 @@ public class Goal implements UelInput {
 		sbuf.append(KRSSKeyword.close);
 		sbuf.append("\n");
 		return sbuf.toString();
-	}
-
-	@Override
-	public IndexedSet<Atom> getAtomManager() {
-		IndexedSet<Atom> ret = new IndexedSetImpl<Atom>();
-		for (SatAtom atom : getSatAtomManager()) {
-			ret.add(atom);
-		}
-		return ret;
-	}
-
-	@Override
-	public Set<Integer> getUserVariables() {
-		// FIXME
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 }

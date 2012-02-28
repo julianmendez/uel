@@ -25,6 +25,7 @@ import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 
+import de.tudresden.inf.lat.uel.plugin.processor.PluginGoal;
 import de.tudresden.inf.lat.uel.plugin.processor.UelModel;
 import de.tudresden.inf.lat.uel.sat.solver.Translator;
 import de.tudresden.inf.lat.uel.sat.type.Goal;
@@ -113,7 +114,8 @@ public class UelController implements ActionListener {
 		resetUnifierController();
 
 		if (getModel().getUnifierList().isEmpty()) {
-			Goal g = this.varWindow.getView().getModel().getGoal();
+			Goal g = this.varWindow.getView().getModel().getPluginGoal()
+					.getGoal();
 			this.varWindow.close();
 
 			getModel().createTranslator(g);
@@ -232,7 +234,7 @@ public class UelController implements ActionListener {
 		classSet.add(getView().getSelectedClassName00().getId());
 		classSet.add(getView().getSelectedClassName01().getId());
 
-		Goal goal = getModel().configure(classSet);
+		PluginGoal goal = getModel().configure(classSet);
 
 		try {
 			this.varWindow = initVarWindow(classSet, goal);
@@ -336,7 +338,7 @@ public class UelController implements ActionListener {
 	}
 
 	private VarSelectionController initVarWindow(Set<String> originalVariables,
-			Goal goal) {
+			PluginGoal goal) {
 		VarSelectionController ret = new VarSelectionController(
 				new VarSelectionView(new VarSelectionModel(originalVariables,
 						this.mapIdLabel, goal)));

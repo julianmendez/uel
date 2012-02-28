@@ -92,7 +92,7 @@ public class UelModel {
 		this.satinput = this.translator.computeSatInput();
 	}
 
-	public Goal configure(Set<String> input) {
+	public PluginGoal configure(Set<String> input) {
 		if (input == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
@@ -101,7 +101,8 @@ public class UelModel {
 		String leftStr = it.next();
 		String rightStr = it.next();
 
-		return new Goal(this.atomManager, this.ontology, leftStr, rightStr);
+		return new PluginGoal(this.atomManager, this.ontology, leftStr,
+				rightStr);
 	}
 
 	public void createTranslator(Goal g) {

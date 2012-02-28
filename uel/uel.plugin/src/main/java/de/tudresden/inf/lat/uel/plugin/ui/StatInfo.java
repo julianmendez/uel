@@ -2,6 +2,7 @@ package de.tudresden.inf.lat.uel.plugin.ui;
 
 import java.util.Map;
 
+import de.tudresden.inf.lat.uel.plugin.processor.PluginGoal;
 import de.tudresden.inf.lat.uel.sat.type.Goal;
 
 /**
@@ -63,12 +64,12 @@ public class StatInfo {
 		String ret = this.mapIdLabel.get(id);
 
 		if (ret == null) {
-			if (id.endsWith(Goal.UNDEF_SUFFIX)) {
-				String origId = id.substring(0,
-						id.length() - Goal.UNDEF_SUFFIX.length());
+			if (id.endsWith(PluginGoal.UNDEF_SUFFIX)) {
+				String origId = id.substring(0, id.length()
+						- PluginGoal.UNDEF_SUFFIX.length());
 				ret = this.mapIdLabel.get(origId);
 				if (ret != null) {
-					ret += Goal.UNDEF_SUFFIX;
+					ret += PluginGoal.UNDEF_SUFFIX;
 				}
 			}
 		}
