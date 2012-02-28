@@ -60,7 +60,7 @@ public class PluginGoal {
 	 */
 	public String getGoalEquations() {
 		StringBuffer sbuf = new StringBuffer();
-		for (Equation eq : getGoal().getEquations()) {
+		for (Equation eq : getUelInput().getEquations()) {
 
 			sbuf.append(toString(eq));
 		}
@@ -68,7 +68,7 @@ public class PluginGoal {
 	}
 
 	public Equation getMainEquation() {
-		return getGoal().getMainEquation();
+		return getUelInput().getMainEquation();
 	}
 
 	private IndexedSet<SatAtom> getSatAtomManager() {
@@ -79,13 +79,13 @@ public class PluginGoal {
 		return this.goal;
 	}
 
+	public Set<Integer> getUsedAtomIds() {
+		return getGoal().getUsedAtomIds();
+	}
+
 	public int getVariableSetSize() {
 		// FIXME not implemented
 		return -1;
-	}
-
-	public Set<Integer> getUsedAtomIds() {
-		return getGoal().getUsedAtomIds();
 	}
 
 	private void initialize(Ontology ontology, String leftStr, String rightStr) {
@@ -118,7 +118,7 @@ public class PluginGoal {
 			getGoal().addEquation(eq);
 		}
 
-		for (Equation eq : getGoal().getEquations()) {
+		for (Equation eq : getUelInput().getEquations()) {
 			Integer atomId = eq.getLeft();
 			getGoal().addVariable(atomId);
 			ConceptName concept = getSatAtomManager().get(atomId)
@@ -128,7 +128,7 @@ public class PluginGoal {
 		}
 
 		Set<Integer> usedAtomIds = new HashSet<Integer>();
-		for (Equation eq : getGoal().getEquations()) {
+		for (Equation eq : getUelInput().getEquations()) {
 			usedAtomIds.add(eq.getLeft());
 			usedAtomIds.addAll(eq.getRight());
 		}
@@ -224,7 +224,7 @@ public class PluginGoal {
 	@Override
 	public String toString() {
 		StringBuffer sbuf = new StringBuffer();
-		sbuf.append(toString(getGoal().getMainEquation()));
+		sbuf.append(toString(getUelInput().getMainEquation()));
 		sbuf.append(getGoalEquations());
 		return sbuf.toString();
 	}
