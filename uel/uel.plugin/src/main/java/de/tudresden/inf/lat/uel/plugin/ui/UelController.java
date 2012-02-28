@@ -28,7 +28,6 @@ import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 import de.tudresden.inf.lat.uel.plugin.processor.PluginGoal;
 import de.tudresden.inf.lat.uel.plugin.processor.UelModel;
 import de.tudresden.inf.lat.uel.sat.solver.SatProcessor;
-import de.tudresden.inf.lat.uel.sat.type.Goal;
 
 /**
  * This class is a controller for the main panel of UEL's graphical user
@@ -114,12 +113,12 @@ public class UelController implements ActionListener {
 		resetUnifierController();
 
 		if (getModel().getUnifierList().isEmpty()) {
-			Goal g = this.varWindow.getView().getModel().getPluginGoal()
-					.getGoal();
+			PluginGoal g = this.varWindow.getView().getModel().getPluginGoal();
+
 			this.varWindow.close();
 
-			getModel().createTranslator(g);
-			SatProcessor translator = getModel().getTranslator();
+			getModel().configureUelProcessor(g.getUelInput());
+			SatProcessor translator = getModel().getUelProcessor();
 			getModel().computeSatInput();
 			getUnifier()
 					.setStatInfo(

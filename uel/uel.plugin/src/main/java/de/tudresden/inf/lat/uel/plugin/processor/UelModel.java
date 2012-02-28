@@ -33,7 +33,7 @@ public class UelModel {
 	private IndexedSet<SatAtom> atomManager = new IndexedSetImpl<SatAtom>();
 	private DynamicOntology ontology = null;
 	private SatInput satinput = null;
-	private SatProcessor translator = null;
+	private SatProcessor uelProcessor = null;
 	private List<Set<Equation>> unifierList = new ArrayList<Set<Equation>>();
 	private Set<Set<Equation>> unifierSet = new HashSet<Set<Equation>>();
 
@@ -64,7 +64,7 @@ public class UelModel {
 		SatOutput satoutput = null;
 		try {
 			if (!getUnifierList().isEmpty()) {
-				Set<Integer> update = this.translator.getUpdate();
+				Set<Integer> update = this.uelProcessor.getUpdate();
 				if (update.isEmpty()) {
 					hasMoreUnifiers = false;
 				} else {
@@ -74,9 +74,9 @@ public class UelModel {
 			satoutput = solver.solve(this.satinput);
 			boolean unifiable = satoutput.isSatisfiable();
 			hasMoreUnifiers = hasMoreUnifiers && unifiable;
-			this.translator.reset();
+			this.uelProcessor.reset();
 			if (unifiable) {
-				result = this.translator.toTBox(satoutput.getOutput());
+				result = this.uelProcessor.toTBox(satoutput.getOutput());
 			}
 		} catch (IOException e) {
 			throw new RuntimeException(e);
@@ -89,7 +89,7 @@ public class UelModel {
 	}
 
 	public void computeSatInput() {
-		this.satinput = this.translator.computeSatInput();
+		this.satinput = this.uelProcessor.computeSatInput();
 	}
 
 	public PluginGoal configure(Set<String> input) {
@@ -105,8 +105,8 @@ public class UelModel {
 				rightStr);
 	}
 
-	public void createTranslator(UelInput input) {
-		this.translator = new SatProcessor(this.atomManager, input, true);
+	public void configureUelProcessor(UelInput input) {
+		this.uelProcessor = new SatProcessor(this.atomManager, input, true);
 	}
 
 	public IndexedSet<SatAtom> getAtomManager() {
@@ -121,8 +121,8 @@ public class UelModel {
 		return this.satinput;
 	}
 
-	public SatProcessor getTranslator() {
-		return this.translator;
+	public SatProcessor getUelProcessor() {
+		return this.uelProcessor;
 	}
 
 	public List<Set<Equation>> getUnifierList() {

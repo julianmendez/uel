@@ -196,7 +196,7 @@ public class ProcessorTest extends TestCase {
 			goal.makeVariable(atomId);
 		}
 
-		processor.createTranslator(goal.getGoal());
+		processor.configureUelProcessor(goal.getUelInput());
 		processor.computeSatInput();
 
 		boolean hasUnifiers = true;

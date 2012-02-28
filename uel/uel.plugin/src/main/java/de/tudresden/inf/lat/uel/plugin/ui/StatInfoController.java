@@ -56,7 +56,7 @@ class StatInfoController implements ActionListener {
 		}
 		if (file != null) {
 			try {
-				String goal = getModel().getGoal().toString();
+				String goal = getModel().getPluginGoal().toString();
 				OntologyRenderer renderer = new OntologyRenderer();
 				OWLOntology owlOntology = renderer.parseKRSS(goal);
 				if (file.getName().endsWith(OntologyRenderer.EXTENSION_RDF)) {

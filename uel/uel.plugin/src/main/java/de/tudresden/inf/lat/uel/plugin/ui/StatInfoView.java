@@ -166,7 +166,8 @@ class StatInfoView extends JDialog {
 	}
 
 	public void update() {
-		this.textGoal.setText(showLabels(getModel().getGoal().toString()));
+		this.textGoal
+				.setText(showLabels(getModel().getPluginGoal().toString()));
 		this.textClauseCount.setText(getModel().getClauseCount().toString());
 		this.textSysVarCount.setText(getModel().getAllVarCount().toString());
 		this.textLiteralCount.setText(getModel().getLiteralCount().toString());

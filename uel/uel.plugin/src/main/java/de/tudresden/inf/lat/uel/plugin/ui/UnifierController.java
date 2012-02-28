@@ -188,7 +188,7 @@ public class UnifierController implements ActionListener {
 	}
 
 	private Collection<SatAtom> getSetOfSubsumers(SatAtom atom) {
-		Collection<Integer> list = getModel().getTranslator()
+		Collection<Integer> list = getModel().getUelProcessor()
 				.getSetOfSubsumers(
 						getModel().getAtomManager().addAndGetIndex(atom));
 		List<SatAtom> ret = new ArrayList<SatAtom>();

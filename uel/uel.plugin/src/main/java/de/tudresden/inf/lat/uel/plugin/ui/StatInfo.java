@@ -3,7 +3,6 @@ package de.tudresden.inf.lat.uel.plugin.ui;
 import java.util.Map;
 
 import de.tudresden.inf.lat.uel.plugin.processor.PluginGoal;
-import de.tudresden.inf.lat.uel.sat.type.Goal;
 
 /**
  * 
@@ -12,11 +11,11 @@ import de.tudresden.inf.lat.uel.sat.type.Goal;
 public class StatInfo {
 
 	private final Integer clauseCount;
-	private final Goal goal;
 	private final Integer literalCount;
 	private final Map<String, String> mapIdLabel;
+	private final PluginGoal pluginGoal;
 
-	public StatInfo(Goal g, int literals, int clauses,
+	public StatInfo(PluginGoal g, int literals, int clauses,
 			Map<String, String> labels) {
 		if (g == null) {
 			throw new IllegalArgumentException("Null argument.");
@@ -25,7 +24,7 @@ public class StatInfo {
 			throw new IllegalArgumentException("Null argument.");
 		}
 
-		this.goal = g;
+		this.pluginGoal = g;
 		this.literalCount = literals;
 		this.clauseCount = clauses;
 		this.mapIdLabel = labels;
@@ -36,7 +35,7 @@ public class StatInfo {
 		boolean ret = false;
 		if (o instanceof StatInfo) {
 			StatInfo other = (StatInfo) o;
-			ret = this.goal.equals(other.goal)
+			ret = this.pluginGoal.equals(other.pluginGoal)
 					&& this.literalCount.equals(other.literalCount)
 					&& this.clauseCount.equals(other.clauseCount);
 
@@ -45,15 +44,11 @@ public class StatInfo {
 	}
 
 	public Integer getAllVarCount() {
-		return this.goal.getVariables().size();
+		return this.pluginGoal.getVariableSetSize();
 	}
 
 	public Integer getClauseCount() {
 		return this.clauseCount;
-	}
-
-	public Goal getGoal() {
-		return this.goal;
 	}
 
 	public String getLabel(String id) {
@@ -84,15 +79,19 @@ public class StatInfo {
 		return this.literalCount;
 	}
 
+	public PluginGoal getPluginGoal() {
+		return this.pluginGoal;
+	}
+
 	@Override
 	public int hashCode() {
-		return this.goal.hashCode();
+		return this.pluginGoal.hashCode();
 	}
 
 	@Override
 	public String toString() {
 		StringBuffer sbuf = new StringBuffer();
-		sbuf.append(getGoal());
+		sbuf.append(getPluginGoal());
 		sbuf.append("\n");
 		sbuf.append(getLiteralCount());
 		sbuf.append("\n");
