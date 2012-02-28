@@ -13,13 +13,13 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import de.tudresden.inf.lat.uel.sat.solver.Sat4jSolver;
 import de.tudresden.inf.lat.uel.sat.solver.SatInput;
 import de.tudresden.inf.lat.uel.sat.solver.SatOutput;
-import de.tudresden.inf.lat.uel.sat.solver.Solver;
 import de.tudresden.inf.lat.uel.sat.solver.SatProcessor;
-import de.tudresden.inf.lat.uel.sat.type.Goal;
+import de.tudresden.inf.lat.uel.sat.solver.Solver;
 import de.tudresden.inf.lat.uel.sat.type.Ontology;
 import de.tudresden.inf.lat.uel.sat.type.SatAtom;
 import de.tudresden.inf.lat.uel.type.api.Equation;
 import de.tudresden.inf.lat.uel.type.api.IndexedSet;
+import de.tudresden.inf.lat.uel.type.api.UelInput;
 import de.tudresden.inf.lat.uel.type.impl.IndexedSetImpl;
 
 /**
@@ -105,8 +105,8 @@ public class UelModel {
 				rightStr);
 	}
 
-	public void createTranslator(Goal g) {
-		this.translator = new SatProcessor(g, true);
+	public void createTranslator(UelInput input) {
+		this.translator = new SatProcessor(this.atomManager, input, true);
 	}
 
 	public IndexedSet<SatAtom> getAtomManager() {

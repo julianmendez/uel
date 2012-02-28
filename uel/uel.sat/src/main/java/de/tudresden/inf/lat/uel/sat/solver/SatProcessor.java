@@ -9,7 +9,9 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.logging.Logger;
 
+import de.tudresden.inf.lat.uel.sat.type.ConceptName;
 import de.tudresden.inf.lat.uel.sat.type.DissubsumptionLiteral;
+import de.tudresden.inf.lat.uel.sat.type.ExistentialRestriction;
 import de.tudresden.inf.lat.uel.sat.type.Goal;
 import de.tudresden.inf.lat.uel.sat.type.Literal;
 import de.tudresden.inf.lat.uel.sat.type.OrderLiteral;
@@ -17,6 +19,7 @@ import de.tudresden.inf.lat.uel.sat.type.SatAtom;
 import de.tudresden.inf.lat.uel.sat.type.SubsumptionLiteral;
 import de.tudresden.inf.lat.uel.type.api.Equation;
 import de.tudresden.inf.lat.uel.type.api.IndexedSet;
+import de.tudresden.inf.lat.uel.type.api.UelInput;
 import de.tudresden.inf.lat.uel.type.impl.EquationImpl;
 import de.tudresden.inf.lat.uel.type.impl.IndexedSetImpl;
 
@@ -135,27 +138,22 @@ public class SatProcessor {
 	 */
 	private Set<Integer> update = new HashSet<Integer>();
 
-	/**
-	 * Constructs a new translator.
-	 * 
-	 * @param g
-	 *            goal
-	 */
-	public SatProcessor(Goal g) {
-		if (g == null) {
+	public SatProcessor(IndexedSet<SatAtom> atomManager, UelInput input) {
+		if (input == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
 
-		goal = g;
+		goal = createGoal(atomManager, input);
 		setLiterals();
 	}
 
-	public SatProcessor(Goal g, boolean inv) {
-		if (g == null) {
+	public SatProcessor(IndexedSet<SatAtom> atomManager, UelInput input,
+			boolean inv) {
+		if (input == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
 
-		goal = g;
+		goal = createGoal(atomManager, input);
 		invertLiteral = inv;
 		setLiterals();
 	}
@@ -206,6 +204,51 @@ public class SatProcessor {
 		ret.addAll(runStep3_2().getClauses());
 
 		logger.finer("SAT input computed.");
+
+		return ret;
+	}
+
+	private Goal createGoal(IndexedSet<SatAtom> atomManager, UelInput input) {
+		Goal ret = new Goal(atomManager);
+
+		Set<Integer> usedAtomsIds = new TreeSet<Integer>();
+
+		ret.setMainEquation(input.getMainEquation());
+		usedAtomsIds.add(input.getMainEquation().getLeft());
+		usedAtomsIds.addAll(input.getMainEquation().getRight());
+
+		for (Equation eq : input.getEquations()) {
+			ret.addEquation(eq);
+			usedAtomsIds.add(eq.getLeft());
+			usedAtomsIds.addAll(eq.getRight());
+		}
+
+		{
+			Set<Integer> conceptNameIds = new HashSet<Integer>();
+			for (Integer index : usedAtomsIds) {
+				SatAtom atom = atomManager.get(index);
+				if (atom.isExistentialRestriction()) {
+					ret.addEAtom(index);
+					ConceptName child = ((ExistentialRestriction) atom)
+							.getChild();
+					Integer childId = atomManager.addAndGetIndex(child);
+					conceptNameIds.add(childId);
+				}
+			}
+			usedAtomsIds.addAll(conceptNameIds);
+		}
+
+		for (Integer index : usedAtomsIds) {
+			ret.addUsedAtomId(index);
+			SatAtom atom = atomManager.get(index);
+			if (atom.isConceptName()) {
+				if (atom.isVariable()) {
+					ret.addVariable(index);
+				} else {
+					ret.addConstant(index);
+				}
+			}
+		}
 
 		return ret;
 	}
