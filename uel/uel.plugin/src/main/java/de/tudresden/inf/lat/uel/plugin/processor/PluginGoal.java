@@ -9,6 +9,7 @@ import de.tudresden.inf.lat.uel.sat.type.Ontology;
 import de.tudresden.inf.lat.uel.sat.type.SatAtom;
 import de.tudresden.inf.lat.uel.type.api.Equation;
 import de.tudresden.inf.lat.uel.type.api.IndexedSet;
+import de.tudresden.inf.lat.uel.type.cons.KRSSKeyword;
 import de.tudresden.inf.lat.uel.type.impl.EquationImpl;
 
 /**
@@ -47,6 +48,22 @@ public class PluginGoal {
 
 	public Goal getGoal() {
 		return this.goal;
+	}
+
+	/**
+	 * Returns a string representation of the equations, excluding the main
+	 * equation.
+	 * 
+	 * @return a string representation of the equations, excluding the main
+	 *         equation
+	 */
+	public String getGoalEquations() {
+		StringBuffer sbuf = new StringBuffer();
+		for (Equation eq : getGoal().getEquations()) {
+
+			sbuf.append(toString(eq));
+		}
+		return sbuf.toString();
 	}
 
 	public Equation getMainEquation() {
@@ -196,7 +213,40 @@ public class PluginGoal {
 
 	@Override
 	public String toString() {
-		return getGoal().toString();
+		StringBuffer sbuf = new StringBuffer();
+		sbuf.append(toString(getGoal().getMainEquation()));
+		sbuf.append(getGoalEquations());
+		return sbuf.toString();
+	}
+
+	private String toString(Equation eq) {
+		StringBuffer sbuf = new StringBuffer();
+		sbuf.append(KRSSKeyword.newLine);
+		sbuf.append(KRSSKeyword.open);
+		if (eq.isPrimitive()) {
+			sbuf.append(KRSSKeyword.define_primitive_concept);
+		} else {
+			sbuf.append(KRSSKeyword.define_concept);
+		}
+		sbuf.append(KRSSKeyword.space);
+		sbuf.append(getSatAtomManager().get(eq.getLeft()));
+		if (eq.getRight().size() > 1) {
+			sbuf.append(KRSSKeyword.space);
+			sbuf.append(KRSSKeyword.open);
+			sbuf.append(KRSSKeyword.and);
+			for (Integer conceptId : eq.getRight()) {
+				sbuf.append(KRSSKeyword.space);
+				sbuf.append(getSatAtomManager().get(conceptId).getId());
+			}
+			sbuf.append(KRSSKeyword.close);
+		} else if (eq.getRight().size() == 1) {
+			sbuf.append(KRSSKeyword.space);
+			sbuf.append(getSatAtomManager()
+					.get(eq.getRight().iterator().next()).getId());
+		}
+		sbuf.append(KRSSKeyword.close);
+		sbuf.append("\n");
+		return sbuf.toString();
 	}
 
 }

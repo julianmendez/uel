@@ -205,7 +205,7 @@ public class ProcessorTest extends TestCase {
 		}
 
 		List<Set<Equation>> unifiers = processor.getUnifierList();
-		String goalStr = goal.getGoal().getGoalEquations();
+		String goalStr = goal.getGoalEquations();
 
 		UelController controller = new UelController(new UelView(processor),
 				owlOntology.getOWLOntologyManager());
