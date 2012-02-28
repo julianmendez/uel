@@ -107,6 +107,13 @@ public class ExistentialRestriction implements SatAtom {
 	}
 
 	@Override
+	public Integer getConceptNameId() {
+		// FIXME
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
 	public boolean isConstant() {
 		// FIXME
 		// TODO Auto-generated method stub
