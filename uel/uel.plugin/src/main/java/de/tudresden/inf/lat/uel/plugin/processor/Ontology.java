@@ -1,4 +1,4 @@
-package de.tudresden.inf.lat.uel.sat.type;
+package de.tudresden.inf.lat.uel.plugin.processor;
 
 import java.util.Set;
 

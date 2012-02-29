@@ -4,7 +4,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import de.tudresden.inf.lat.uel.sat.type.ConceptName;
-import de.tudresden.inf.lat.uel.sat.type.Ontology;
 import de.tudresden.inf.lat.uel.sat.type.SatAtom;
 import de.tudresden.inf.lat.uel.type.api.Equation;
 import de.tudresden.inf.lat.uel.type.api.IndexedSet;
