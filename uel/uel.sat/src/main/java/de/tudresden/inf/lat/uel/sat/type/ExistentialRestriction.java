@@ -18,7 +18,6 @@ public class ExistentialRestriction implements SatAtom {
 	private List<AtomChangeListener> changeListener = new ArrayList<AtomChangeListener>();
 	private final ConceptName child;
 	private final String id;
-
 	private final String name;
 
 	/**
@@ -34,6 +33,7 @@ public class ExistentialRestriction implements SatAtom {
 		this.child = ch;
 		this.id = updateId();
 	}
+
 	@Override
 	public boolean addAtomChangeListener(AtomChangeListener o) {
 		return this.changeListener.add(o);
@@ -93,6 +93,10 @@ public class ExistentialRestriction implements SatAtom {
 
 	@Override
 	public String getName() {
+		return this.name;
+	}
+
+	public String getRoleName() {
 		return this.name;
 	}
 

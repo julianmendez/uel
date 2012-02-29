@@ -712,10 +712,13 @@ public class SatProcessor {
 
 				if (!atomId1.equals(atomId2)) {
 
-					String role1 = goal.getSatAtomManager().get(atomId1)
-							.getName();
-					String role2 = goal.getSatAtomManager().get(atomId2)
-							.getName();
+					String role1 = asExistentialRestriction(
+							goal.getSatAtomManager().get(atomId1))
+							.getRoleName();
+
+					String role2 = asExistentialRestriction(
+							goal.getSatAtomManager().get(atomId2))
+							.getRoleName();
 
 					/*
 					 * if roles are not equal, then Step 2.2
