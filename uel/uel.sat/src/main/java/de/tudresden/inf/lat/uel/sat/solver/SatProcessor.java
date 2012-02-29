@@ -139,22 +139,21 @@ public class SatProcessor {
 	 */
 	private Set<Integer> update = new HashSet<Integer>();
 
-	public SatProcessor(IndexedSet<Atom> atomManager, UelInput input) {
+	public SatProcessor(UelInput input) {
 		if (input == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
 
-		goal = createGoal(atomManager, input);
+		goal = createGoal(input);
 		setLiterals();
 	}
 
-	public SatProcessor(IndexedSet<Atom> atomManager, UelInput input,
-			boolean inv) {
+	public SatProcessor(UelInput input, boolean inv) {
 		if (input == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
 
-		goal = createGoal(atomManager, input);
+		goal = createGoal(input);
 		invertLiteral = inv;
 		setLiterals();
 	}
@@ -217,10 +216,11 @@ public class SatProcessor {
 		return ret;
 	}
 
-	private Goal createGoal(IndexedSet<Atom> origAtomManager, UelInput input) {
+	private Goal createGoal(UelInput input) {
 
-		Goal ret = new Goal(origAtomManager);
-		IndexedSet<SatAtom> atomManager = createSatAtomManager(origAtomManager);
+		Goal ret = new Goal(input.getAtomManager());
+		IndexedSet<SatAtom> atomManager = createSatAtomManager(input
+				.getAtomManager());
 
 		Set<Integer> usedAtomsIds = new TreeSet<Integer>();
 

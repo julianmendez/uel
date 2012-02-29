@@ -70,7 +70,7 @@ public class PluginGoalAux implements UelInput {
 	public IndexedSet<Atom> getAtomManager() {
 		IndexedSet<Atom> ret = new IndexedSetImpl<Atom>();
 		for (SatAtom atom : getSatAtomManager()) {
-			ret.add(atom);
+			ret.add(atom, getSatAtomManager().getIndex(atom));
 		}
 		return ret;
 	}

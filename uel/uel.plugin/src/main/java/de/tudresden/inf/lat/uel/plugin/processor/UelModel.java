@@ -16,7 +16,6 @@ import de.tudresden.inf.lat.uel.sat.solver.SatOutput;
 import de.tudresden.inf.lat.uel.sat.solver.SatProcessor;
 import de.tudresden.inf.lat.uel.sat.solver.Solver;
 import de.tudresden.inf.lat.uel.sat.type.SatAtom;
-import de.tudresden.inf.lat.uel.type.api.Atom;
 import de.tudresden.inf.lat.uel.type.api.Equation;
 import de.tudresden.inf.lat.uel.type.api.IndexedSet;
 import de.tudresden.inf.lat.uel.type.api.UelInput;
@@ -106,16 +105,7 @@ public class UelModel {
 	}
 
 	public void configureUelProcessor(UelInput input) {
-		this.uelProcessor = new SatProcessor(
-				createAtomManager(this.atomManager), input, true);
-	}
-
-	private IndexedSet<Atom> createAtomManager(IndexedSet<SatAtom> set) {
-		IndexedSet<Atom> ret = new IndexedSetImpl<Atom>();
-		for (SatAtom atom : set) {
-			ret.add(atom, set.getIndex(atom));
-		}
-		return ret;
+		this.uelProcessor = new SatProcessor(input, true);
 	}
 
 	public IndexedSet<SatAtom> getAtomManager() {
