@@ -167,6 +167,14 @@ public class SatProcessor {
 		return ret.add(atomId2);
 	}
 
+	private ConceptName asConceptName(SatAtom atom) {
+		return (ConceptName) atom;
+	}
+
+	private ExistentialRestriction asExistentialRestriction(SatAtom atom) {
+		return (ExistentialRestriction) atom;
+	}
+
 	/**
 	 * This method encodes equations into propositional clauses in DIMACS CNF
 	 * format, i.e. positive literal is represented by a positive number and a
@@ -257,7 +265,7 @@ public class SatProcessor {
 		for (Integer firstAtomId : goal.getVariables()) {
 			SatAtom firstAtom = goal.getSatAtomManager().get(firstAtomId);
 			if (firstAtom.isConceptName()
-					&& firstAtom.asConceptName().isUserVariable()) {
+					&& isUserVariable(asConceptName(firstAtom))) {
 				for (Integer secondAtomId : set) {
 					Literal literal = this.invertLiteral ? new SubsumptionLiteral(
 							firstAtomId, secondAtomId)
@@ -327,7 +335,7 @@ public class SatProcessor {
 		for (Integer leftPartId : goal.getVariables()) {
 			SatAtom leftPart = goal.getSatAtomManager().get(leftPartId);
 			if (leftPart.isConceptName()
-					&& leftPart.asConceptName().isUserVariable()) {
+					&& isUserVariable(asConceptName(leftPart))) {
 				Set<Integer> rightPartIds = new HashSet<Integer>();
 				Collection<Integer> setOfSubsumers = getSetOfSubsumers(leftPartId);
 				for (Integer subsumerId : setOfSubsumers) {
@@ -344,7 +352,11 @@ public class SatProcessor {
 
 	private boolean isTop(Integer atomId) {
 		SatAtom atom = goal.getSatAtomManager().get(atomId);
-		return (atom.isConceptName() && atom.asConceptName().isTop());
+		return (atom.isConceptName() && asConceptName(atom).isTop());
+	}
+
+	private boolean isUserVariable(ConceptName atom) {
+		return atom.isUserVariable();
 	}
 
 	/**
@@ -670,9 +682,9 @@ public class SatProcessor {
 			if (!eatom.isExistentialRestriction()) {
 				throw new IllegalStateException();
 			}
-			SatAtom child = eatom.asExistentialRestriction().getChild();
+			SatAtom child = asExistentialRestriction(eatom).getChild();
 
-			if (child.isConceptName() && child.asConceptName().isVariable()) {
+			if (child.isConceptName() && asConceptName(child).isVariable()) {
 
 				for (Integer atomId2 : goal.getVariables()) {
 					Set<Integer> clause = new HashSet<Integer>();
@@ -726,12 +738,12 @@ public class SatProcessor {
 							throw new IllegalStateException();
 						}
 
-						SatAtom child1 = atom1.asExistentialRestriction()
+						SatAtom child1 = asExistentialRestriction(atom1)
 								.getChild();
 						Integer child1Id = goal.getSatAtomManager()
 								.addAndGetIndex(child1);
 
-						SatAtom child2 = atom2.asExistentialRestriction()
+						SatAtom child2 = asExistentialRestriction(atom2)
 								.getChild();
 						Integer child2Id = goal.getSatAtomManager()
 								.addAndGetIndex(child2);
