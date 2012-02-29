@@ -17,6 +17,7 @@ import de.tudresden.inf.lat.uel.sat.type.Literal;
 import de.tudresden.inf.lat.uel.sat.type.OrderLiteral;
 import de.tudresden.inf.lat.uel.sat.type.SatAtom;
 import de.tudresden.inf.lat.uel.sat.type.SubsumptionLiteral;
+import de.tudresden.inf.lat.uel.type.api.Atom;
 import de.tudresden.inf.lat.uel.type.api.Equation;
 import de.tudresden.inf.lat.uel.type.api.IndexedSet;
 import de.tudresden.inf.lat.uel.type.api.UelInput;
@@ -138,7 +139,7 @@ public class SatProcessor {
 	 */
 	private Set<Integer> update = new HashSet<Integer>();
 
-	public SatProcessor(IndexedSet<SatAtom> atomManager, UelInput input) {
+	public SatProcessor(IndexedSet<Atom> atomManager, UelInput input) {
 		if (input == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
@@ -147,7 +148,7 @@ public class SatProcessor {
 		setLiterals();
 	}
 
-	public SatProcessor(IndexedSet<SatAtom> atomManager, UelInput input,
+	public SatProcessor(IndexedSet<Atom> atomManager, UelInput input,
 			boolean inv) {
 		if (input == null) {
 			throw new IllegalArgumentException("Null argument.");
@@ -216,8 +217,10 @@ public class SatProcessor {
 		return ret;
 	}
 
-	private Goal createGoal(IndexedSet<SatAtom> atomManager, UelInput input) {
-		Goal ret = new Goal(atomManager);
+	private Goal createGoal(IndexedSet<Atom> origAtomManager, UelInput input) {
+
+		Goal ret = new Goal(origAtomManager);
+		IndexedSet<SatAtom> atomManager = createSatAtomManager(origAtomManager);
 
 		Set<Integer> usedAtomsIds = new TreeSet<Integer>();
 
@@ -254,6 +257,17 @@ public class SatProcessor {
 			}
 		}
 
+		return ret;
+	}
+
+	private IndexedSet<SatAtom> createSatAtomManager(IndexedSet<Atom> set) {
+		IndexedSet<SatAtom> ret = new IndexedSetImpl<SatAtom>();
+		for (Atom atom : set) {
+			if (!(atom instanceof SatAtom)) {
+				throw new IllegalStateException();
+			}
+			ret.add((SatAtom) atom, set.getIndex(atom));
+		}
 		return ret;
 	}
 

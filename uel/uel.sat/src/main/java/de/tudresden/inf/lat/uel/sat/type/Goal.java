@@ -55,8 +55,8 @@ public class Goal implements UelInput {
 	 * @param manager
 	 *            atom manager
 	 */
-	public Goal(IndexedSet<SatAtom> manager) {
-		this.atomManager = manager;
+	public Goal(IndexedSet<Atom> manager) {
+		this.atomManager = createSatAtomManager(manager);
 	}
 
 	public boolean addConstant(Integer atomId) {
@@ -83,6 +83,17 @@ public class Goal implements UelInput {
 
 	public boolean addVariable(Integer atomId) {
 		return this.variables.add(atomId);
+	}
+
+	private IndexedSet<SatAtom> createSatAtomManager(IndexedSet<Atom> set) {
+		IndexedSet<SatAtom> ret = new IndexedSetImpl<SatAtom>();
+		for (Atom atom : set) {
+			if (!(atom instanceof SatAtom)) {
+				throw new IllegalStateException();
+			}
+			ret.add((SatAtom) atom, set.getIndex(atom));
+		}
+		return ret;
 	}
 
 	@Override
