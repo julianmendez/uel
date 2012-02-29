@@ -1,6 +1,14 @@
 package de.tudresden.inf.lat.uel.type.impl;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
 import de.tudresden.inf.lat.uel.type.api.Atom;
+import de.tudresden.inf.lat.uel.type.api.AtomChangeEvent;
+import de.tudresden.inf.lat.uel.type.api.AtomChangeListener;
+import de.tudresden.inf.lat.uel.type.api.AtomChangeType;
 
 /**
  * Represents a flat EL-atom consisting of a concept name.
@@ -14,6 +22,7 @@ public class ConceptName implements Atom {
 		return ret;
 	}
 
+	private List<AtomChangeListener> changeListener = new ArrayList<AtomChangeListener>();
 	private final Integer conceptNameId;
 	private boolean isGround;
 	private boolean isTop = false;
@@ -44,6 +53,11 @@ public class ConceptName implements Atom {
 	}
 
 	@Override
+	public boolean addAtomChangeListener(AtomChangeListener o) {
+		return this.changeListener.add(o);
+	}
+
+	@Override
 	public boolean equals(Object obj) {
 		if (obj == null) {
 			return false;
@@ -60,6 +74,11 @@ public class ConceptName implements Atom {
 			return false;
 		}
 		return true;
+	}
+
+	@Override
+	public Collection<AtomChangeListener> getAtomChangeListeners() {
+		return Collections.unmodifiableCollection(this.changeListener);
 	}
 
 	@Override
@@ -136,14 +155,34 @@ public class ConceptName implements Atom {
 		return !isGround();
 	}
 
+	private void notify(AtomChangeEvent event) {
+		for (AtomChangeListener listener : this.changeListener) {
+			listener.atomTypeChanged(event);
+		}
+	}
+
+	@Override
+	public boolean removeAtomChangeListener(AtomChangeListener o) {
+		return this.changeListener.remove(o);
+	}
+
 	/**
 	 * Set this flat atom as a variable.
 	 * 
-	 * @param b
+	 * @param isVariable
 	 *            true iff this flat atom is variable
 	 */
-	public void setVariable(boolean b) {
-		this.isGround = !b;
+	public void setVariable(boolean isVariable) {
+		boolean wasVariable = isVariable();
+		this.isGround = !isVariable;
+		if (!wasVariable && isVariable) {
+			notify(new AtomChangeEvent(this,
+					AtomChangeType.FROM_CONSTANT_TO_VARIABLE));
+		}
+		if (wasVariable && !isVariable) {
+			notify(new AtomChangeEvent(this,
+					AtomChangeType.FROM_VARIABLE_TO_CONSTANT));
+		}
 	}
 
 	@Override

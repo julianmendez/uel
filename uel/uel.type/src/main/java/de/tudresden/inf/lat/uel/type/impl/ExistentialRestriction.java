@@ -1,6 +1,12 @@
 package de.tudresden.inf.lat.uel.type.impl;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
 import de.tudresden.inf.lat.uel.type.api.Atom;
+import de.tudresden.inf.lat.uel.type.api.AtomChangeListener;
 
 /**
  * Represents a flat EL-atom consisting of a role name and a concept name.
@@ -9,7 +15,9 @@ import de.tudresden.inf.lat.uel.type.api.Atom;
  */
 public class ExistentialRestriction implements Atom {
 
+	private List<AtomChangeListener> changeListener = new ArrayList<AtomChangeListener>();
 	private final ConceptName conceptName;
+
 	private final Integer role;
 
 	/**
@@ -23,6 +31,11 @@ public class ExistentialRestriction implements Atom {
 	public ExistentialRestriction(Integer role, ConceptName child) {
 		this.role = role;
 		this.conceptName = child;
+	}
+
+	@Override
+	public boolean addAtomChangeListener(AtomChangeListener o) {
+		return this.changeListener.add(o);
 	}
 
 	@Override
@@ -47,6 +60,11 @@ public class ExistentialRestriction implements Atom {
 		return true;
 	}
 
+	@Override
+	public Collection<AtomChangeListener> getAtomChangeListeners() {
+		return Collections.unmodifiableCollection(this.changeListener);
+	}
+
 	/**
 	 * Return the 'FlatAtom' object that represents the concept name of this
 	 * atom.
@@ -58,6 +76,11 @@ public class ExistentialRestriction implements Atom {
 		return conceptName;
 	}
 
+	@Override
+	public Integer getConceptNameId() {
+		return conceptName.getConceptNameId();
+	}
+
 	/**
 	 * Retrieve the role name of this flat atom.
 	 * 
@@ -65,11 +88,6 @@ public class ExistentialRestriction implements Atom {
 	 */
 	public Integer getRoleId() {
 		return role;
-	}
-	
-	@Override
-	public Integer getConceptNameId() {
-		return conceptName.getConceptNameId();
 	}
 
 	@Override
@@ -131,6 +149,11 @@ public class ExistentialRestriction implements Atom {
 	@Override
 	public boolean isVariable() {
 		return false;
+	}
+
+	@Override
+	public boolean removeAtomChangeListener(AtomChangeListener o) {
+		return this.changeListener.remove(o);
 	}
 
 	@Override

@@ -1,5 +1,11 @@
 package de.tudresden.inf.lat.uel.sat.type;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
+import de.tudresden.inf.lat.uel.type.api.AtomChangeListener;
 import de.tudresden.inf.lat.uel.type.cons.KRSSKeyword;
 
 /**
@@ -11,9 +17,11 @@ public class ConceptName implements SatAtom {
 
 	public static final String topKeyword = KRSSKeyword.top;
 
+	private List<AtomChangeListener> changeListener = new ArrayList<AtomChangeListener>();
 	private final String name;
 	private final boolean top;
 	private boolean userVariable = false;
+
 	private boolean variable = false;
 
 	/**
@@ -35,6 +43,11 @@ public class ConceptName implements SatAtom {
 	}
 
 	@Override
+	public boolean addAtomChangeListener(AtomChangeListener o) {
+		return this.changeListener.add(o);
+	}
+
+	@Override
 	public ConceptName asConceptName() {
 		return this;
 	}
@@ -52,6 +65,18 @@ public class ConceptName implements SatAtom {
 			ret = this.name.equals(other.name);
 		}
 		return ret;
+	}
+
+	@Override
+	public Collection<AtomChangeListener> getAtomChangeListeners() {
+		return Collections.unmodifiableCollection(this.changeListener);
+	}
+
+	@Override
+	public Integer getConceptNameId() {
+		// FIXME
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override
@@ -88,6 +113,13 @@ public class ConceptName implements SatAtom {
 		return false;
 	}
 
+	@Override
+	public boolean isGround() {
+		// FIXME
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 	/**
 	 * Tells whether this concept is TOP.
 	 * 
@@ -115,6 +147,11 @@ public class ConceptName implements SatAtom {
 	public boolean isVariable() {
 		return this.variable;
 	}
+	
+	@Override
+	public boolean removeAtomChangeListener(AtomChangeListener o) {
+		return this.changeListener.remove(o);
+	}
 
 	/**
 	 * Sets a flat atom to be a system variable. Used at Goal initialization.
@@ -138,18 +175,5 @@ public class ConceptName implements SatAtom {
 		return this.getId();
 	}
 
-	@Override
-	public Integer getConceptNameId() {
-		// FIXME
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public boolean isGround() {
-		// FIXME
-		// TODO Auto-generated method stub
-		return false;
-	}
 
 }

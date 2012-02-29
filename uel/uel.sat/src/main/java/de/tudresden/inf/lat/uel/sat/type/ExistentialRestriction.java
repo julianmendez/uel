@@ -1,5 +1,11 @@
 package de.tudresden.inf.lat.uel.sat.type;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
+import de.tudresden.inf.lat.uel.type.api.AtomChangeListener;
 import de.tudresden.inf.lat.uel.type.cons.KRSSKeyword;
 
 /**
@@ -9,8 +15,10 @@ import de.tudresden.inf.lat.uel.type.cons.KRSSKeyword;
  */
 public class ExistentialRestriction implements SatAtom {
 
+	private List<AtomChangeListener> changeListener = new ArrayList<AtomChangeListener>();
 	private final ConceptName child;
 	private final String id;
+
 	private final String name;
 
 	/**
@@ -25,6 +33,10 @@ public class ExistentialRestriction implements SatAtom {
 		this.name = str;
 		this.child = ch;
 		this.id = updateId();
+	}
+	@Override
+	public boolean addAtomChangeListener(AtomChangeListener o) {
+		return this.changeListener.add(o);
 	}
 
 	@Override
@@ -49,6 +61,11 @@ public class ExistentialRestriction implements SatAtom {
 		return ret;
 	}
 
+	@Override
+	public Collection<AtomChangeListener> getAtomChangeListeners() {
+		return Collections.unmodifiableCollection(this.changeListener);
+	}
+
 	/**
 	 * Returns an argument in the flat atom, which is an existential
 	 * restriction. Otherwise it returns null.
@@ -60,6 +77,13 @@ public class ExistentialRestriction implements SatAtom {
 	 */
 	public ConceptName getChild() {
 		return this.child;
+	}
+
+	@Override
+	public Integer getConceptNameId() {
+		// FIXME
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override
@@ -83,8 +107,34 @@ public class ExistentialRestriction implements SatAtom {
 	}
 
 	@Override
+	public boolean isConstant() {
+		// FIXME
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
 	public boolean isExistentialRestriction() {
 		return true;
+	}
+
+	@Override
+	public boolean isGround() {
+		// FIXME
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean isVariable() {
+		// FIXME
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean removeAtomChangeListener(AtomChangeListener o) {
+		return this.changeListener.remove(o);
 	}
 
 	@Override
@@ -104,34 +154,6 @@ public class ExistentialRestriction implements SatAtom {
 			str.append(KRSSKeyword.close);
 		}
 		return str.toString();
-	}
-
-	@Override
-	public Integer getConceptNameId() {
-		// FIXME
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public boolean isConstant() {
-		// FIXME
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean isGround() {
-		// FIXME
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean isVariable() {
-		// FIXME
-		// TODO Auto-generated method stub
-		return false;
 	}
 
 }
