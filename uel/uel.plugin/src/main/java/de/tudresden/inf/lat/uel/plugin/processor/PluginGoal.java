@@ -29,6 +29,8 @@ public class PluginGoal {
 
 	private final Goal goal;
 
+	private Equation mainEquation;
+
 	/**
 	 * Constructs a new goal based on a specified ontology.
 	 * 
@@ -68,7 +70,7 @@ public class PluginGoal {
 	}
 
 	public Equation getMainEquation() {
-		return getUelInput().getMainEquation();
+		return this.mainEquation;
 	}
 
 	private IndexedSet<SatAtom> getSatAtomManager() {
@@ -114,6 +116,7 @@ public class PluginGoal {
 			}
 		}
 
+		getGoal().addEquation(this.mainEquation);
 		for (Equation eq : newEquationSet) {
 			getGoal().addEquation(eq);
 		}
@@ -218,13 +221,13 @@ public class PluginGoal {
 	}
 
 	public void setMainEquation(Equation equation) {
-		getGoal().setMainEquation(equation);
+		this.mainEquation = equation;
 	}
 
 	@Override
 	public String toString() {
 		StringBuffer sbuf = new StringBuffer();
-		sbuf.append(toString(getUelInput().getMainEquation()));
+		sbuf.append(toString(this.mainEquation));
 		sbuf.append(getGoalEquations());
 		return sbuf.toString();
 	}

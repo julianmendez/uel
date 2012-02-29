@@ -41,8 +41,6 @@ public class Goal implements UelInput {
 	 */
 	private Set<Equation> equations = new HashSet<Equation>();
 
-	private Equation mainEquation;
-
 	private Set<Integer> usedAtomIds = new HashSet<Integer>();
 
 	/**
@@ -95,7 +93,6 @@ public class Goal implements UelInput {
 			ret = this.constants.equals(other.constants)
 					&& this.eatoms.equals(other.eatoms)
 					&& this.equations.equals(other.equations)
-					&& this.mainEquation.equals(other.mainEquation)
 					&& this.variables.equals(other.variables);
 		}
 		return ret;
@@ -127,10 +124,6 @@ public class Goal implements UelInput {
 		return equations;
 	}
 
-	public Equation getMainEquation() {
-		return mainEquation;
-	}
-
 	public IndexedSet<SatAtom> getSatAtomManager() {
 		return this.atomManager;
 	}
@@ -152,7 +145,7 @@ public class Goal implements UelInput {
 
 	@Override
 	public int hashCode() {
-		return this.mainEquation.hashCode();
+		return this.equations.hashCode();
 	}
 
 	public boolean removeConstant(Integer atomId) {
@@ -161,10 +154,6 @@ public class Goal implements UelInput {
 
 	public boolean removeVariable(Integer atomId) {
 		return this.variables.remove(atomId);
-	}
-
-	public void setMainEquation(Equation equation) {
-		this.mainEquation = equation;
 	}
 
 }

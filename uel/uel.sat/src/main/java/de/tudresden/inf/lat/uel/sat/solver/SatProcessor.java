@@ -213,10 +213,6 @@ public class SatProcessor {
 
 		Set<Integer> usedAtomsIds = new TreeSet<Integer>();
 
-		ret.setMainEquation(input.getMainEquation());
-		usedAtomsIds.add(input.getMainEquation().getLeft());
-		usedAtomsIds.addAll(input.getMainEquation().getRight());
-
 		for (Equation eq : input.getEquations()) {
 			ret.addEquation(eq);
 			usedAtomsIds.add(eq.getLeft());
@@ -383,11 +379,7 @@ public class SatProcessor {
 	private SatInput runStep1() {
 		SatInput ret = new SatInput();
 
-		Set<Equation> equations = new HashSet<Equation>();
-		equations.addAll(goal.getEquations());
-		equations.add(goal.getMainEquation());
-
-		for (Equation e : equations) {
+		for (Equation e : goal.getEquations()) {
 			ret.addAll(runStep1ForConstants(e).getClauses());
 			ret.addAll(runStep1ForExistentialAtoms(e).getClauses());
 		}

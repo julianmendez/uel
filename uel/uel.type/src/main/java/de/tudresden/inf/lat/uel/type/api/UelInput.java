@@ -25,13 +25,6 @@ public interface UelInput {
 	public Set<Equation> getEquations();
 
 	/**
-	 * Returns the main equation.
-	 * 
-	 * @return the main equation
-	 */
-	public Equation getMainEquation();
-
-	/**
 	 * Returns the set of user variables.
 	 * 
 	 * @return the set of user variables

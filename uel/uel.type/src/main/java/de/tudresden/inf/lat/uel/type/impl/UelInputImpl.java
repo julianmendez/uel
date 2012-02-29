@@ -15,7 +15,6 @@ public class UelInputImpl implements UelInput {
 
 	private final IndexedSet<Atom> atomManager;
 	private final Set<Equation> equations;
-	private final Equation mainEquation;
 	private final Set<Integer> userVariables;
 
 	/**
@@ -29,7 +28,6 @@ public class UelInputImpl implements UelInput {
 		this.atomManager = manager;
 		this.equations = eq;
 		this.userVariables = set;
-		this.mainEquation = mainEquation;
 	}
 
 	@Override
@@ -40,11 +38,6 @@ public class UelInputImpl implements UelInput {
 	@Override
 	public Set<Equation> getEquations() {
 		return this.equations;
-	}
-
-	@Override
-	public Equation getMainEquation() {
-		return this.mainEquation;
 	}
 
 	@Override
