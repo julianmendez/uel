@@ -4,7 +4,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import de.tudresden.inf.lat.uel.sat.type.ConceptName;
-import de.tudresden.inf.lat.uel.sat.type.Goal;
 import de.tudresden.inf.lat.uel.sat.type.Ontology;
 import de.tudresden.inf.lat.uel.sat.type.SatAtom;
 import de.tudresden.inf.lat.uel.type.api.Equation;
@@ -27,7 +26,7 @@ public class PluginGoal {
 
 	public static final String UNDEF_SUFFIX = "_UNDEF";
 
-	private final Goal goal;
+	private final PluginGoalAux goal;
 
 	private Equation mainEquation;
 
@@ -45,11 +44,11 @@ public class PluginGoal {
 	 */
 	public PluginGoal(IndexedSet<SatAtom> manager, Ontology ont,
 			String leftStr, String rightStr) {
-		this.goal = new Goal(manager);
+		this.goal = new PluginGoalAux(manager);
 		initialize(ont, leftStr, rightStr);
 	}
 
-	public Goal getGoal() {
+	public PluginGoalAux getGoal() {
 		return this.goal;
 	}
 

@@ -7,7 +7,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import de.tudresden.inf.lat.uel.plugin.processor.PluginGoal;
-import de.tudresden.inf.lat.uel.sat.type.Goal;
+import de.tudresden.inf.lat.uel.plugin.processor.PluginGoalAux;
 import de.tudresden.inf.lat.uel.sat.type.SatAtom;
 
 /**
@@ -57,7 +57,7 @@ class VarSelectionModel {
 		return Collections.unmodifiableSet(ret);
 	}
 
-	public Goal getGoal() {
+	public PluginGoalAux getGoal() {
 		return this.pluginGoal.getGoal();
 	}
 
