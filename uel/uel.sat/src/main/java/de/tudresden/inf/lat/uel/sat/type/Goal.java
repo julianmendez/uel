@@ -3,6 +3,7 @@ package de.tudresden.inf.lat.uel.sat.type;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
 import de.tudresden.inf.lat.uel.type.api.Atom;
 import de.tudresden.inf.lat.uel.type.api.Equation;
@@ -55,15 +56,16 @@ public class Goal implements UelInput {
 	 * @param manager
 	 *            atom manager
 	 */
-	public Goal(IndexedSet<Atom> manager) {
-		this.atomManager = createSatAtomManager(manager);
+	public Goal(UelInput input) {
+		this.atomManager = createSatAtomManager(input.getAtomManager());
+		configureGoal(input);
 	}
 
-	public boolean addConstant(Integer atomId) {
+	private boolean addConstant(Integer atomId) {
 		return this.constants.add(atomId);
 	}
 
-	public boolean addEAtom(Integer atomId) {
+	private boolean addEAtom(Integer atomId) {
 		return this.eatoms.add(atomId);
 	}
 
@@ -73,16 +75,54 @@ public class Goal implements UelInput {
 	 * @param e
 	 *            equation
 	 */
-	public boolean addEquation(Equation e) {
+	private boolean addEquation(Equation e) {
 		return this.equations.add(e);
 	}
 
-	public boolean addUsedAtomId(Integer atomId) {
+	private boolean addUsedAtomId(Integer atomId) {
 		return this.usedAtomIds.add(atomId);
 	}
 
-	public boolean addVariable(Integer atomId) {
+	private boolean addVariable(Integer atomId) {
 		return this.variables.add(atomId);
+	}
+
+	private void configureGoal(UelInput input) {
+
+		Set<Integer> usedAtomsIds = new TreeSet<Integer>();
+
+		for (Equation eq : input.getEquations()) {
+			addEquation(eq);
+			usedAtomsIds.add(eq.getLeft());
+			usedAtomsIds.addAll(eq.getRight());
+		}
+
+		{
+			Set<Integer> conceptNameIds = new HashSet<Integer>();
+			for (Integer index : usedAtomsIds) {
+				SatAtom atom = atomManager.get(index);
+				if (atom.isExistentialRestriction()) {
+					addEAtom(index);
+					ConceptName child = ((ExistentialRestriction) atom)
+							.getChild();
+					Integer childId = atomManager.addAndGetIndex(child);
+					conceptNameIds.add(childId);
+				}
+			}
+			usedAtomsIds.addAll(conceptNameIds);
+		}
+
+		for (Integer index : usedAtomsIds) {
+			addUsedAtomId(index);
+			SatAtom atom = atomManager.get(index);
+			if (atom.isConceptName()) {
+				if (atom.isVariable()) {
+					addVariable(index);
+				} else {
+					addConstant(index);
+				}
+			}
+		}
 	}
 
 	private IndexedSet<SatAtom> createSatAtomManager(IndexedSet<Atom> set) {

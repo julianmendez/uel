@@ -17,7 +17,6 @@ import de.tudresden.inf.lat.uel.sat.type.Literal;
 import de.tudresden.inf.lat.uel.sat.type.OrderLiteral;
 import de.tudresden.inf.lat.uel.sat.type.SatAtom;
 import de.tudresden.inf.lat.uel.sat.type.SubsumptionLiteral;
-import de.tudresden.inf.lat.uel.type.api.Atom;
 import de.tudresden.inf.lat.uel.type.api.Equation;
 import de.tudresden.inf.lat.uel.type.api.IndexedSet;
 import de.tudresden.inf.lat.uel.type.api.UelInput;
@@ -144,7 +143,7 @@ public class SatProcessor {
 			throw new IllegalArgumentException("Null argument.");
 		}
 
-		goal = createGoal(input);
+		this.goal = new Goal(input);
 		setLiterals();
 	}
 
@@ -153,8 +152,8 @@ public class SatProcessor {
 			throw new IllegalArgumentException("Null argument.");
 		}
 
-		goal = createGoal(input);
-		invertLiteral = inv;
+		this.goal = new Goal(input);
+		this.invertLiteral = inv;
 		setLiterals();
 	}
 
@@ -213,61 +212,6 @@ public class SatProcessor {
 
 		logger.finer("SAT input computed.");
 
-		return ret;
-	}
-
-	private Goal createGoal(UelInput input) {
-
-		Goal ret = new Goal(input.getAtomManager());
-		IndexedSet<SatAtom> atomManager = createSatAtomManager(input
-				.getAtomManager());
-
-		Set<Integer> usedAtomsIds = new TreeSet<Integer>();
-
-		for (Equation eq : input.getEquations()) {
-			ret.addEquation(eq);
-			usedAtomsIds.add(eq.getLeft());
-			usedAtomsIds.addAll(eq.getRight());
-		}
-
-		{
-			Set<Integer> conceptNameIds = new HashSet<Integer>();
-			for (Integer index : usedAtomsIds) {
-				SatAtom atom = atomManager.get(index);
-				if (atom.isExistentialRestriction()) {
-					ret.addEAtom(index);
-					ConceptName child = ((ExistentialRestriction) atom)
-							.getChild();
-					Integer childId = atomManager.addAndGetIndex(child);
-					conceptNameIds.add(childId);
-				}
-			}
-			usedAtomsIds.addAll(conceptNameIds);
-		}
-
-		for (Integer index : usedAtomsIds) {
-			ret.addUsedAtomId(index);
-			SatAtom atom = atomManager.get(index);
-			if (atom.isConceptName()) {
-				if (atom.isVariable()) {
-					ret.addVariable(index);
-				} else {
-					ret.addConstant(index);
-				}
-			}
-		}
-
-		return ret;
-	}
-
-	private IndexedSet<SatAtom> createSatAtomManager(IndexedSet<Atom> set) {
-		IndexedSet<SatAtom> ret = new IndexedSetImpl<SatAtom>();
-		for (Atom atom : set) {
-			if (!(atom instanceof SatAtom)) {
-				throw new IllegalStateException();
-			}
-			ret.add((SatAtom) atom, set.getIndex(atom));
-		}
 		return ret;
 	}
 
