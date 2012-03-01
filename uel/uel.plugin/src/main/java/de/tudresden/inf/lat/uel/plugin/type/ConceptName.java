@@ -1,4 +1,4 @@
-package de.tudresden.inf.lat.uel.sat.type;
+package de.tudresden.inf.lat.uel.plugin.type;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -13,15 +13,16 @@ import de.tudresden.inf.lat.uel.type.cons.KRSSKeyword;
  * 
  * @author Julian Mendez
  */
-public class ConceptName implements SatAtom {
+public class ConceptName extends de.tudresden.inf.lat.uel.type.impl.ConceptName
+		implements SatAtom {
 
 	public static final String topKeyword = KRSSKeyword.top;
 
 	private List<AtomChangeListener> changeListener = new ArrayList<AtomChangeListener>();
+	private Integer conceptNameId;
 	private final String name;
 	private final boolean top;
 	private boolean userVariable = false;
-
 	private boolean variable = false;
 
 	/**
@@ -33,6 +34,7 @@ public class ConceptName implements SatAtom {
 	 *            <code>true</code> when the concept is a variable
 	 */
 	public ConceptName(String str, boolean isVar) {
+		super(isVar, -1);
 		if (str == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
@@ -74,9 +76,7 @@ public class ConceptName implements SatAtom {
 
 	@Override
 	public Integer getConceptNameId() {
-		// FIXME
-		// TODO Auto-generated method stub
-		return null;
+		return this.conceptNameId;
 	}
 
 	@Override
@@ -115,9 +115,7 @@ public class ConceptName implements SatAtom {
 
 	@Override
 	public boolean isGround() {
-		// FIXME
-		// TODO Auto-generated method stub
-		return false;
+		return !this.variable;
 	}
 
 	/**
@@ -147,10 +145,14 @@ public class ConceptName implements SatAtom {
 	public boolean isVariable() {
 		return this.variable;
 	}
-	
+
 	@Override
 	public boolean removeAtomChangeListener(AtomChangeListener o) {
 		return this.changeListener.remove(o);
+	}
+
+	public void setConceptNameId(Integer id) {
+		this.conceptNameId = id;
 	}
 
 	/**
@@ -174,6 +176,5 @@ public class ConceptName implements SatAtom {
 	public String toString() {
 		return this.getId();
 	}
-
 
 }

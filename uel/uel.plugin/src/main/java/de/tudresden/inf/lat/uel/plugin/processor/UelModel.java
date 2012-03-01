@@ -10,12 +10,12 @@ import java.util.Set;
 
 import org.semanticweb.owlapi.model.OWLOntology;
 
+import de.tudresden.inf.lat.uel.plugin.type.SatAtom;
 import de.tudresden.inf.lat.uel.sat.solver.Sat4jSolver;
 import de.tudresden.inf.lat.uel.sat.solver.SatInput;
 import de.tudresden.inf.lat.uel.sat.solver.SatOutput;
 import de.tudresden.inf.lat.uel.sat.solver.SatProcessor;
 import de.tudresden.inf.lat.uel.sat.solver.Solver;
-import de.tudresden.inf.lat.uel.sat.type.SatAtom;
 import de.tudresden.inf.lat.uel.type.api.Equation;
 import de.tudresden.inf.lat.uel.type.api.IndexedSet;
 import de.tudresden.inf.lat.uel.type.api.UelInput;

@@ -7,8 +7,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import de.tudresden.inf.lat.uel.plugin.processor.PluginGoal;
-import de.tudresden.inf.lat.uel.plugin.processor.PluginGoalAux;
-import de.tudresden.inf.lat.uel.sat.type.SatAtom;
+import de.tudresden.inf.lat.uel.plugin.type.SatAtom;
 
 /**
  * 
@@ -51,14 +50,14 @@ class VarSelectionModel {
 
 	public Set<String> getConstants() {
 		Set<String> ret = new HashSet<String>();
-		for (Integer atomId : getGoal().getConstants()) {
+		for (Integer atomId : getGoal().getGoal().getConstants()) {
 			ret.add(getGoal().getSatAtomManager().get(atomId).getId());
 		}
 		return Collections.unmodifiableSet(ret);
 	}
 
-	public PluginGoalAux getGoal() {
-		return this.pluginGoal.getGoal();
+	public PluginGoal getGoal() {
+		return this.pluginGoal;
 	}
 
 	public String getLabel(String id) {
@@ -101,7 +100,7 @@ class VarSelectionModel {
 
 	public Set<String> getVariables() {
 		Set<String> ret = new HashSet<String>();
-		for (Integer atomId : getGoal().getVariables()) {
+		for (Integer atomId : getGoal().getGoal().getVariables()) {
 			SatAtom atom = getGoal().getSatAtomManager().get(atomId);
 			if (atom.isConceptName() && atom.asConceptName().isUserVariable()) {
 				ret.add(atom.getId());

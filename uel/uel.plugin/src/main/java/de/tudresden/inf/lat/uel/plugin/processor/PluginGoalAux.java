@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import de.tudresden.inf.lat.uel.sat.type.SatAtom;
+import de.tudresden.inf.lat.uel.plugin.type.SatAtom;
 import de.tudresden.inf.lat.uel.type.api.Atom;
 import de.tudresden.inf.lat.uel.type.api.Equation;
 import de.tudresden.inf.lat.uel.type.api.IndexedSet;
@@ -19,13 +19,18 @@ public class PluginGoalAux implements UelInput {
 
 	private final IndexedSet<SatAtom> atomManager;
 
+	private IndexedSet<String> conceptNameSet = new IndexedSetImpl<String>();
+
 	private Set<Integer> constants = new HashSet<Integer>();
 
 	private Set<Integer> eatoms = new HashSet<Integer>();
 
 	private Set<Equation> equations = new HashSet<Equation>();
 
+	private IndexedSet<String> roleNameSet = new IndexedSetImpl<String>();
+
 	private Set<Integer> usedAtomIds = new HashSet<Integer>();
+	private Set<Integer> userVariables = new HashSet<Integer>();
 
 	private Set<Integer> variables = new HashSet<Integer>();
 
@@ -68,11 +73,7 @@ public class PluginGoalAux implements UelInput {
 
 	@Override
 	public IndexedSet<Atom> getAtomManager() {
-		IndexedSet<Atom> ret = new IndexedSetImpl<Atom>();
-		for (SatAtom atom : getSatAtomManager()) {
-			ret.add(atom, getSatAtomManager().getIndex(atom));
-		}
-		return ret;
+		return processSatAtoms(this.atomManager);
 	}
 
 	public Set<Integer> getConstants() {
@@ -87,19 +88,13 @@ public class PluginGoalAux implements UelInput {
 		return equations;
 	}
 
-	public IndexedSet<SatAtom> getSatAtomManager() {
-		return this.atomManager;
-	}
-
 	public Set<Integer> getUsedAtomIds() {
 		return Collections.unmodifiableSet(this.usedAtomIds);
 	}
 
 	@Override
 	public Set<Integer> getUserVariables() {
-		// FIXME
-		// TODO Auto-generated method stub
-		return null;
+		return Collections.unmodifiableSet(this.userVariables);
 	}
 
 	public Set<Integer> getVariables() {
@@ -109,6 +104,36 @@ public class PluginGoalAux implements UelInput {
 	@Override
 	public int hashCode() {
 		return this.equations.hashCode();
+	}
+
+	private IndexedSet<Atom> processSatAtoms(IndexedSet<SatAtom> manager) {
+		IndexedSet<Atom> ret = new IndexedSetImpl<Atom>();
+
+		for (SatAtom atom : manager) {
+			if (atom.isConceptName()) {
+				Integer conceptId = manager.getIndex(atom);
+				this.conceptNameSet.add(atom.getName(), conceptId);
+				atom.asConceptName().setConceptNameId(conceptId);
+				ret.add(atom, conceptId);
+
+				if (atom.asConceptName().isUserVariable()) {
+					this.userVariables.add(conceptId);
+				}
+
+			}
+		}
+
+		for (SatAtom atom : manager) {
+			if (atom.isExistentialRestriction()) {
+				Integer index = manager.getIndex(atom);
+				Integer roleId = this.roleNameSet
+						.addAndGetIndex(atom.getName());
+				atom.asExistentialRestriction().setRoleId(roleId);
+				ret.add(atom, index);
+			}
+		}
+
+		return ret;
 	}
 
 	public boolean removeConstant(Integer atomId) {

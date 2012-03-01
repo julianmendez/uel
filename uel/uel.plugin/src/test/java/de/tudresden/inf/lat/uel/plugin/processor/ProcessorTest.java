@@ -21,9 +21,9 @@ import org.semanticweb.owlapi.reasoner.Node;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 
 import de.tudresden.inf.lat.jcel.owlapi.main.JcelReasoner;
+import de.tudresden.inf.lat.uel.plugin.type.SatAtom;
 import de.tudresden.inf.lat.uel.plugin.ui.UelController;
 import de.tudresden.inf.lat.uel.plugin.ui.UelView;
-import de.tudresden.inf.lat.uel.sat.type.SatAtom;
 import de.tudresden.inf.lat.uel.type.api.Equation;
 
 public class ProcessorTest extends TestCase {
@@ -61,7 +61,7 @@ public class ProcessorTest extends TestCase {
 		return reasoner;
 	}
 
-	private Integer getAtomId(PluginGoalAux goal, String atomName) {
+	private Integer getAtomId(PluginGoal goal, String atomName) {
 		Integer ret = null;
 		for (Integer currentAtomId : goal.getSatAtomManager().getIndices()) {
 			SatAtom currentAtom = goal.getSatAtomManager().get(currentAtomId);
@@ -190,8 +190,7 @@ public class ProcessorTest extends TestCase {
 		PluginGoal goal = processor.configure(input);
 
 		for (String var : varNames) {
-			Integer atomId = getAtomId(goal.getGoal(), idClassMap.get(var)
-					.toStringID());
+			Integer atomId = getAtomId(goal, idClassMap.get(var).toStringID());
 			goal.makeVariable(atomId);
 		}
 

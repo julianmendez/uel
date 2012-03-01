@@ -9,7 +9,8 @@ import de.tudresden.inf.lat.uel.type.api.Atom;
 import de.tudresden.inf.lat.uel.type.api.Equation;
 import de.tudresden.inf.lat.uel.type.api.IndexedSet;
 import de.tudresden.inf.lat.uel.type.api.UelInput;
-import de.tudresden.inf.lat.uel.type.impl.IndexedSetImpl;
+import de.tudresden.inf.lat.uel.type.impl.ConceptName;
+import de.tudresden.inf.lat.uel.type.impl.ExistentialRestriction;
 
 /**
  * This class implements a goal of unification, i.e., a set of equations between
@@ -23,7 +24,7 @@ import de.tudresden.inf.lat.uel.type.impl.IndexedSetImpl;
  */
 public class Goal {
 
-	private final IndexedSet<SatAtom> atomManager;
+	private final IndexedSet<Atom> atomManager;
 
 	/**
 	 * constants is a hash map implementing all constant concept names in the
@@ -54,7 +55,7 @@ public class Goal {
 	 *            atom manager
 	 */
 	public Goal(UelInput input) {
-		this.atomManager = createSatAtomManager(input.getAtomManager());
+		this.atomManager = input.getAtomManager();
 		this.input = input;
 		configureGoal(input);
 	}
@@ -87,7 +88,7 @@ public class Goal {
 		{
 			Set<Integer> conceptNameIds = new HashSet<Integer>();
 			for (Integer index : usedAtomsIds) {
-				SatAtom atom = atomManager.get(index);
+				Atom atom = atomManager.get(index);
 				if (atom.isExistentialRestriction()) {
 					addEAtom(index);
 					ConceptName child = ((ExistentialRestriction) atom)
@@ -101,7 +102,7 @@ public class Goal {
 
 		for (Integer index : usedAtomsIds) {
 			addUsedAtomId(index);
-			SatAtom atom = atomManager.get(index);
+			Atom atom = atomManager.get(index);
 			if (atom.isConceptName()) {
 				if (atom.isVariable()) {
 					addVariable(index);
@@ -110,17 +111,6 @@ public class Goal {
 				}
 			}
 		}
-	}
-
-	private IndexedSet<SatAtom> createSatAtomManager(IndexedSet<Atom> set) {
-		IndexedSet<SatAtom> ret = new IndexedSetImpl<SatAtom>();
-		for (Atom atom : set) {
-			if (!(atom instanceof SatAtom)) {
-				throw new IllegalStateException();
-			}
-			ret.add((SatAtom) atom, set.getIndex(atom));
-		}
-		return ret;
 	}
 
 	@Override
@@ -153,8 +143,12 @@ public class Goal {
 		return this.input.getEquations();
 	}
 
-	public IndexedSet<SatAtom> getSatAtomManager() {
+	public IndexedSet<Atom> getSatAtomManager() {
 		return this.atomManager;
+	}
+
+	public UelInput getUelInput() {
+		return this.input;
 	}
 
 	public Set<Integer> getUsedAtomIds() {

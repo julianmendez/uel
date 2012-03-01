@@ -3,8 +3,8 @@ package de.tudresden.inf.lat.uel.plugin.processor;
 import java.util.HashSet;
 import java.util.Set;
 
-import de.tudresden.inf.lat.uel.sat.type.ConceptName;
-import de.tudresden.inf.lat.uel.sat.type.SatAtom;
+import de.tudresden.inf.lat.uel.plugin.type.ConceptName;
+import de.tudresden.inf.lat.uel.plugin.type.SatAtom;
 import de.tudresden.inf.lat.uel.type.api.Equation;
 import de.tudresden.inf.lat.uel.type.api.IndexedSet;
 import de.tudresden.inf.lat.uel.type.api.UelInput;
@@ -29,6 +29,8 @@ public class PluginGoal {
 
 	private Equation mainEquation;
 
+	private IndexedSet<SatAtom> satAtomManager;
+
 	/**
 	 * Constructs a new goal based on a specified ontology.
 	 * 
@@ -43,6 +45,7 @@ public class PluginGoal {
 	 */
 	public PluginGoal(IndexedSet<SatAtom> manager, Ontology ont,
 			String leftStr, String rightStr) {
+		this.satAtomManager = manager;
 		this.goal = new PluginGoalAux(manager);
 		initialize(ont, leftStr, rightStr);
 	}
@@ -71,8 +74,8 @@ public class PluginGoal {
 		return this.mainEquation;
 	}
 
-	private IndexedSet<SatAtom> getSatAtomManager() {
-		return getGoal().getSatAtomManager();
+	public IndexedSet<SatAtom> getSatAtomManager() {
+		return this.satAtomManager;
 	}
 
 	public UelInput getUelInput() {
@@ -84,8 +87,7 @@ public class PluginGoal {
 	}
 
 	public int getVariableSetSize() {
-		// FIXME not implemented
-		return -1;
+		return this.goal.getVariables().size();
 	}
 
 	private void initialize(Ontology ontology, String leftStr, String rightStr) {

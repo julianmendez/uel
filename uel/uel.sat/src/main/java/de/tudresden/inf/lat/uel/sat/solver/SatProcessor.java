@@ -9,18 +9,18 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.logging.Logger;
 
-import de.tudresden.inf.lat.uel.sat.type.ConceptName;
 import de.tudresden.inf.lat.uel.sat.type.DissubsumptionLiteral;
-import de.tudresden.inf.lat.uel.sat.type.ExistentialRestriction;
 import de.tudresden.inf.lat.uel.sat.type.Goal;
 import de.tudresden.inf.lat.uel.sat.type.Literal;
 import de.tudresden.inf.lat.uel.sat.type.OrderLiteral;
-import de.tudresden.inf.lat.uel.sat.type.SatAtom;
 import de.tudresden.inf.lat.uel.sat.type.SubsumptionLiteral;
+import de.tudresden.inf.lat.uel.type.api.Atom;
 import de.tudresden.inf.lat.uel.type.api.Equation;
 import de.tudresden.inf.lat.uel.type.api.IndexedSet;
 import de.tudresden.inf.lat.uel.type.api.UelInput;
+import de.tudresden.inf.lat.uel.type.impl.ConceptName;
 import de.tudresden.inf.lat.uel.type.impl.EquationImpl;
+import de.tudresden.inf.lat.uel.type.impl.ExistentialRestriction;
 import de.tudresden.inf.lat.uel.type.impl.IndexedSetImpl;
 
 /**
@@ -166,11 +166,11 @@ public class SatProcessor {
 		return ret.add(atomId2);
 	}
 
-	private ConceptName asConceptName(SatAtom atom) {
+	private ConceptName asConceptName(Atom atom) {
 		return (ConceptName) atom;
 	}
 
-	private ExistentialRestriction asExistentialRestriction(SatAtom atom) {
+	private ExistentialRestriction asExistentialRestriction(Atom atom) {
 		return (ExistentialRestriction) atom;
 	}
 
@@ -221,7 +221,7 @@ public class SatProcessor {
 		set.addAll(goal.getConstants());
 		set.addAll(goal.getEAtoms());
 		for (Integer firstAtomId : goal.getVariables()) {
-			SatAtom firstAtom = goal.getSatAtomManager().get(firstAtomId);
+			Atom firstAtom = goal.getSatAtomManager().get(firstAtomId);
 			if (firstAtom.isConceptName()
 					&& isUserVariable(asConceptName(firstAtom))) {
 				for (Integer secondAtomId : set) {
@@ -291,13 +291,13 @@ public class SatProcessor {
 	private Set<Equation> getUpdatedUnifier() {
 		Set<Equation> ret = new HashSet<Equation>();
 		for (Integer leftPartId : goal.getVariables()) {
-			SatAtom leftPart = goal.getSatAtomManager().get(leftPartId);
+			Atom leftPart = goal.getSatAtomManager().get(leftPartId);
 			if (leftPart.isConceptName()
 					&& isUserVariable(asConceptName(leftPart))) {
 				Set<Integer> rightPartIds = new HashSet<Integer>();
 				Collection<Integer> setOfSubsumers = getSetOfSubsumers(leftPartId);
 				for (Integer subsumerId : setOfSubsumers) {
-					SatAtom newAtom = goal.getSatAtomManager().get(subsumerId);
+					Atom newAtom = goal.getSatAtomManager().get(subsumerId);
 					rightPartIds.add(goal.getSatAtomManager().addAndGetIndex(
 							newAtom));
 				}
@@ -309,12 +309,13 @@ public class SatProcessor {
 	}
 
 	private boolean isTop(Integer atomId) {
-		SatAtom atom = goal.getSatAtomManager().get(atomId);
+		Atom atom = goal.getSatAtomManager().get(atomId);
 		return (atom.isConceptName() && asConceptName(atom).isTop());
 	}
 
 	private boolean isUserVariable(ConceptName atom) {
-		return atom.isUserVariable();
+		int index = this.goal.getUelInput().getAtomManager().getIndex(atom);
+		return this.goal.getUelInput().getUserVariables().contains(index);
 	}
 
 	/**
@@ -636,11 +637,11 @@ public class SatProcessor {
 
 		for (Integer atomId1 : goal.getEAtoms()) {
 
-			SatAtom eatom = goal.getSatAtomManager().get(atomId1);
+			Atom eatom = goal.getSatAtomManager().get(atomId1);
 			if (!eatom.isExistentialRestriction()) {
 				throw new IllegalStateException();
 			}
-			SatAtom child = asExistentialRestriction(eatom).getChild();
+			Atom child = asExistentialRestriction(eatom).getChild();
 
 			if (child.isConceptName() && asConceptName(child).isVariable()) {
 
@@ -670,13 +671,11 @@ public class SatProcessor {
 
 				if (!atomId1.equals(atomId2)) {
 
-					String role1 = asExistentialRestriction(
-							goal.getSatAtomManager().get(atomId1))
-							.getRoleName();
+					Integer role1 = asExistentialRestriction(
+							goal.getSatAtomManager().get(atomId1)).getRoleId();
 
-					String role2 = asExistentialRestriction(
-							goal.getSatAtomManager().get(atomId2))
-							.getRoleName();
+					Integer role2 = asExistentialRestriction(
+							goal.getSatAtomManager().get(atomId2)).getRoleId();
 
 					/*
 					 * if roles are not equal, then Step 2.2
@@ -691,20 +690,20 @@ public class SatProcessor {
 						 * if the roles are equal, then clause in Step 2.3
 						 */
 					} else {
-						SatAtom atom1 = goal.getSatAtomManager().get(atomId1);
-						SatAtom atom2 = goal.getSatAtomManager().get(atomId2);
+						Atom atom1 = goal.getSatAtomManager().get(atomId1);
+						Atom atom2 = goal.getSatAtomManager().get(atomId2);
 
 						if (!atom1.isExistentialRestriction()
 								|| !atom2.isExistentialRestriction()) {
 							throw new IllegalStateException();
 						}
 
-						SatAtom child1 = asExistentialRestriction(atom1)
+						Atom child1 = asExistentialRestriction(atom1)
 								.getChild();
 						Integer child1Id = goal.getSatAtomManager()
 								.addAndGetIndex(child1);
 
-						SatAtom child2 = asExistentialRestriction(atom2)
+						Atom child2 = asExistentialRestriction(atom2)
 								.getChild();
 						Integer child2Id = goal.getSatAtomManager()
 								.addAndGetIndex(child2);

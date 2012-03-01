@@ -24,7 +24,7 @@ import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 
 import de.tudresden.inf.lat.uel.plugin.processor.PluginGoal;
 import de.tudresden.inf.lat.uel.plugin.processor.UelModel;
-import de.tudresden.inf.lat.uel.sat.type.SatAtom;
+import de.tudresden.inf.lat.uel.plugin.type.SatAtom;
 import de.tudresden.inf.lat.uel.type.api.Equation;
 import de.tudresden.inf.lat.uel.type.cons.KRSSKeyword;
 

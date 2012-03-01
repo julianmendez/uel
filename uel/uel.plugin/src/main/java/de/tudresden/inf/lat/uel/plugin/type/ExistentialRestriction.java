@@ -1,4 +1,4 @@
-package de.tudresden.inf.lat.uel.sat.type;
+package de.tudresden.inf.lat.uel.plugin.type;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -13,12 +13,15 @@ import de.tudresden.inf.lat.uel.type.cons.KRSSKeyword;
  * 
  * @author Julian Mendez
  */
-public class ExistentialRestriction implements SatAtom {
+public class ExistentialRestriction extends
+		de.tudresden.inf.lat.uel.type.impl.ExistentialRestriction implements
+		SatAtom {
 
 	private List<AtomChangeListener> changeListener = new ArrayList<AtomChangeListener>();
 	private final ConceptName child;
 	private final String id;
 	private final String name;
+	private Integer roleId;
 
 	/**
 	 * Constructs an existential restriction.
@@ -29,6 +32,7 @@ public class ExistentialRestriction implements SatAtom {
 	 *            child
 	 */
 	public ExistentialRestriction(String str, ConceptName ch) {
+		super(-1, ch);
 		this.name = str;
 		this.child = ch;
 		this.id = updateId();
@@ -81,9 +85,7 @@ public class ExistentialRestriction implements SatAtom {
 
 	@Override
 	public Integer getConceptNameId() {
-		// FIXME
-		// TODO Auto-generated method stub
-		return null;
+		return this.child.getConceptNameId();
 	}
 
 	@Override
@@ -94,6 +96,11 @@ public class ExistentialRestriction implements SatAtom {
 	@Override
 	public String getName() {
 		return this.name;
+	}
+
+	@Override
+	public Integer getRoleId() {
+		return this.roleId;
 	}
 
 	public String getRoleName() {
@@ -112,8 +119,6 @@ public class ExistentialRestriction implements SatAtom {
 
 	@Override
 	public boolean isConstant() {
-		// FIXME
-		// TODO Auto-generated method stub
 		return false;
 	}
 
@@ -124,21 +129,21 @@ public class ExistentialRestriction implements SatAtom {
 
 	@Override
 	public boolean isGround() {
-		// FIXME
-		// TODO Auto-generated method stub
-		return false;
+		return this.getChild().isGround();
 	}
 
 	@Override
 	public boolean isVariable() {
-		// FIXME
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	public boolean removeAtomChangeListener(AtomChangeListener o) {
 		return this.changeListener.remove(o);
+	}
+
+	public void setRoleId(Integer id) {
+		this.roleId = id;
 	}
 
 	@Override

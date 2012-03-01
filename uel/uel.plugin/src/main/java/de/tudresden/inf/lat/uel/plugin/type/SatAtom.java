@@ -1,4 +1,4 @@
-package de.tudresden.inf.lat.uel.sat.type;
+package de.tudresden.inf.lat.uel.plugin.type;
 
 import de.tudresden.inf.lat.uel.type.api.Atom;
 
