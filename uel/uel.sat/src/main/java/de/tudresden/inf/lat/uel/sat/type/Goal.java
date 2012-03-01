@@ -21,7 +21,7 @@ import de.tudresden.inf.lat.uel.type.impl.IndexedSetImpl;
  * @author Barbara Morawska
  * @author Julian Mendez
  */
-public class Goal implements UelInput {
+public class Goal {
 
 	private final IndexedSet<SatAtom> atomManager;
 
@@ -37,10 +37,7 @@ public class Goal implements UelInput {
 	 */
 	private Set<Integer> eatoms = new HashSet<Integer>();
 
-	/**
-	 * equations is a list containing all goal equations
-	 */
-	private Set<Equation> equations = new HashSet<Equation>();
+	private final UelInput input;
 
 	private Set<Integer> usedAtomIds = new HashSet<Integer>();
 
@@ -58,6 +55,7 @@ public class Goal implements UelInput {
 	 */
 	public Goal(UelInput input) {
 		this.atomManager = createSatAtomManager(input.getAtomManager());
+		this.input = input;
 		configureGoal(input);
 	}
 
@@ -67,16 +65,6 @@ public class Goal implements UelInput {
 
 	private boolean addEAtom(Integer atomId) {
 		return this.eatoms.add(atomId);
-	}
-
-	/**
-	 * Method to add an equation e to the list of goal equations
-	 * 
-	 * @param e
-	 *            equation
-	 */
-	private boolean addEquation(Equation e) {
-		return this.equations.add(e);
 	}
 
 	private boolean addUsedAtomId(Integer atomId) {
@@ -92,7 +80,6 @@ public class Goal implements UelInput {
 		Set<Integer> usedAtomsIds = new TreeSet<Integer>();
 
 		for (Equation eq : input.getEquations()) {
-			addEquation(eq);
 			usedAtomsIds.add(eq.getLeft());
 			usedAtomsIds.addAll(eq.getRight());
 		}
@@ -138,22 +125,13 @@ public class Goal implements UelInput {
 
 	@Override
 	public boolean equals(Object o) {
-		boolean ret = false;
-		if (o instanceof Goal) {
+		boolean ret = (o == this);
+		if (!ret && o instanceof Goal) {
 			Goal other = (Goal) o;
 			ret = this.constants.equals(other.constants)
 					&& this.eatoms.equals(other.eatoms)
-					&& this.equations.equals(other.equations)
-					&& this.variables.equals(other.variables);
-		}
-		return ret;
-	}
-
-	@Override
-	public IndexedSet<Atom> getAtomManager() {
-		IndexedSet<Atom> ret = new IndexedSetImpl<Atom>();
-		for (SatAtom atom : getSatAtomManager()) {
-			ret.add(atom);
+					&& this.variables.equals(other.variables)
+					&& this.input.equals(other.input);
 		}
 		return ret;
 	}
@@ -172,7 +150,7 @@ public class Goal implements UelInput {
 	 * @return the list of goal equations
 	 */
 	public Set<Equation> getEquations() {
-		return equations;
+		return this.input.getEquations();
 	}
 
 	public IndexedSet<SatAtom> getSatAtomManager() {
@@ -183,28 +161,13 @@ public class Goal implements UelInput {
 		return Collections.unmodifiableSet(this.usedAtomIds);
 	}
 
-	@Override
-	public Set<Integer> getUserVariables() {
-		// FIXME
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 	public Set<Integer> getVariables() {
 		return Collections.unmodifiableSet(variables);
 	}
 
 	@Override
 	public int hashCode() {
-		return this.equations.hashCode();
-	}
-
-	public boolean removeConstant(Integer atomId) {
-		return this.constants.remove(atomId);
-	}
-
-	public boolean removeVariable(Integer atomId) {
-		return this.variables.remove(atomId);
+		return this.input.hashCode();
 	}
 
 }
