@@ -19,7 +19,7 @@ public class ConceptName extends de.tudresden.inf.lat.uel.type.impl.ConceptName
 	public static final String topKeyword = KRSSKeyword.top;
 
 	private List<AtomChangeListener> changeListener = new ArrayList<AtomChangeListener>();
-	private Integer conceptNameId;
+	private Integer conceptNameId = null;
 	private final String name;
 	private final boolean top;
 	private boolean userVariable = false;
@@ -61,10 +61,14 @@ public class ConceptName extends de.tudresden.inf.lat.uel.type.impl.ConceptName
 
 	@Override
 	public boolean equals(Object o) {
-		boolean ret = false;
-		if (o instanceof ConceptName) {
+		boolean ret = (this == o);
+		if (!ret && o instanceof ConceptName) {
 			ConceptName other = (ConceptName) o;
-			ret = this.name.equals(other.name);
+			if (this.conceptNameId != null) {
+				ret = this.conceptNameId.equals(other.conceptNameId);
+			} else {
+				ret = this.name.equals(other.name);
+			}
 		}
 		return ret;
 	}

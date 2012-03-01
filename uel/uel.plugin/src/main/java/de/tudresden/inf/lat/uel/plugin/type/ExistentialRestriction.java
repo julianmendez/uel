@@ -21,7 +21,7 @@ public class ExistentialRestriction extends
 	private final ConceptName child;
 	private final String id;
 	private final String name;
-	private Integer roleId;
+	private Integer roleId = null;
 
 	/**
 	 * Constructs an existential restriction.
@@ -55,10 +55,15 @@ public class ExistentialRestriction extends
 
 	@Override
 	public boolean equals(Object o) {
-		boolean ret = false;
-		if (o instanceof ExistentialRestriction) {
+		boolean ret = (this == o);
+		if (!ret && o instanceof ExistentialRestriction) {
 			ExistentialRestriction other = (ExistentialRestriction) o;
-			ret = this.name.equals(other.name)
+			if (this.roleId != null) {
+				ret = this.roleId.equals(other.roleId);
+			} else {
+				ret = this.name.equals(other.name);
+			}
+			ret = ret
 					&& ((this.child == null && other.child == null) || (this.child != null && this.child
 							.equals(other.child)));
 		}
