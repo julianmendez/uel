@@ -24,7 +24,7 @@ public class UelInputImpl implements UelInput {
 	 *            atom manager
 	 */
 	public UelInputImpl(IndexedSet<Atom> manager, Set<Equation> eq,
-			Set<Integer> set, Equation mainEquation) {
+			Set<Integer> set) {
 		this.atomManager = manager;
 		this.equations = eq;
 		this.userVariables = set;

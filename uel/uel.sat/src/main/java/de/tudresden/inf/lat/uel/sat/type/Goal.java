@@ -51,8 +51,8 @@ public class Goal {
 	/**
 	 * Constructs a new goal based on a specified ontology.
 	 * 
-	 * @param manager
-	 *            atom manager
+	 * @param input
+	 *            UEL input
 	 */
 	public Goal(UelInput input) {
 		this.atomManager = input.getAtomManager();
