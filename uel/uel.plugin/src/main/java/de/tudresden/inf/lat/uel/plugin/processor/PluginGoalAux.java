@@ -15,23 +15,16 @@ import de.tudresden.inf.lat.uel.type.impl.IndexedSetImpl;
  * @author Barbara Morawska
  * @author Julian Mendez
  */
-public class PluginGoalAux implements UelInput {
+class PluginGoalAux implements UelInput {
 
 	private final IndexedSet<SatAtom> atomManager;
-
 	private IndexedSet<String> conceptNameSet = new IndexedSetImpl<String>();
-
 	private Set<Integer> constants = new HashSet<Integer>();
-
 	private Set<Integer> eatoms = new HashSet<Integer>();
-
 	private Set<Equation> equations = new HashSet<Equation>();
-
 	private IndexedSet<String> roleNameSet = new IndexedSetImpl<String>();
-
 	private Set<Integer> usedAtomIds = new HashSet<Integer>();
 	private Set<Integer> userVariables = new HashSet<Integer>();
-
 	private Set<Integer> variables = new HashSet<Integer>();
 
 	public PluginGoalAux(IndexedSet<SatAtom> manager) {

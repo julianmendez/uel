@@ -50,7 +50,7 @@ class VarSelectionModel {
 
 	public Set<String> getConstants() {
 		Set<String> ret = new HashSet<String>();
-		for (Integer atomId : getGoal().getGoal().getConstants()) {
+		for (Integer atomId : getGoal().getConstants()) {
 			ret.add(getGoal().getSatAtomManager().get(atomId).getId());
 		}
 		return Collections.unmodifiableSet(ret);
@@ -100,7 +100,7 @@ class VarSelectionModel {
 
 	public Set<String> getVariables() {
 		Set<String> ret = new HashSet<String>();
-		for (Integer atomId : getGoal().getGoal().getVariables()) {
+		for (Integer atomId : getGoal().getVariables()) {
 			SatAtom atom = getGoal().getSatAtomManager().get(atomId);
 			if (atom.isConceptName() && atom.asConceptName().isUserVariable()) {
 				ret.add(atom.getId());

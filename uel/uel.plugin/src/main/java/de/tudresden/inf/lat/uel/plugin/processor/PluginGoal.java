@@ -262,4 +262,12 @@ public class PluginGoal {
 		return sbuf.toString();
 	}
 
+	public Set<Integer> getVariables() {
+		return this.goal.getVariables();
+	}
+
+	public Set<Integer> getConstants() {
+		return this.goal.getConstants();
+	}
+
 }
