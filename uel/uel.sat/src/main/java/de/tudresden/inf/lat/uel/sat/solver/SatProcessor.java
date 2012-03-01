@@ -23,6 +23,7 @@ import de.tudresden.inf.lat.uel.type.api.UelProcessor;
 import de.tudresden.inf.lat.uel.type.impl.ConceptName;
 import de.tudresden.inf.lat.uel.type.impl.EquationImpl;
 import de.tudresden.inf.lat.uel.type.impl.ExistentialRestriction;
+import de.tudresden.inf.lat.uel.type.impl.ExtendedUelInput;
 import de.tudresden.inf.lat.uel.type.impl.IndexedSetImpl;
 import de.tudresden.inf.lat.uel.type.impl.UelOutputImpl;
 
@@ -125,10 +126,10 @@ public class SatProcessor implements UelProcessor {
 	private static final Logger logger = Logger.getLogger(SatProcessor.class
 			.getName());
 
+	private final ExtendedUelInput extUelInput;
 	private boolean firstTime = true;
 	private boolean invertLiteral = false;
 	private IndexedSet<Literal> literalManager = new IndexedSetImpl<Literal>();
-	private ProcessorAux processorAux;
 	private UelOutput result;
 	private SatInput satinput = null;
 	private Map<Integer, Set<Integer>> subsumers = new HashMap<Integer, Set<Integer>>();
@@ -142,7 +143,7 @@ public class SatProcessor implements UelProcessor {
 		}
 
 		this.uelInput = input;
-		this.processorAux = new ProcessorAux(input);
+		this.extUelInput = new ExtendedUelInput(input);
 		setLiterals();
 	}
 
@@ -152,7 +153,7 @@ public class SatProcessor implements UelProcessor {
 		}
 
 		this.uelInput = input;
-		this.processorAux = new ProcessorAux(input);
+		this.extUelInput = new ExtendedUelInput(input);
 		this.invertLiteral = inv;
 		setLiterals();
 	}
@@ -201,7 +202,7 @@ public class SatProcessor implements UelProcessor {
 		hasMoreUnifiers = hasMoreUnifiers && unifiable;
 		reset();
 		if (unifiable) {
-			this.result = new UelOutputImpl(this.uelInput.getAtomManager(),
+			this.result = new UelOutputImpl(getAtomManager(),
 					toTBox(satoutput.getOutput()));
 		}
 
@@ -256,7 +257,7 @@ public class SatProcessor implements UelProcessor {
 		set.addAll(getConstants());
 		set.addAll(getEAtoms());
 		for (Integer firstAtomId : getVariables()) {
-			Atom firstAtom = getSatAtomManager().get(firstAtomId);
+			Atom firstAtom = getAtomManager().get(firstAtomId);
 			if (firstAtom.isConceptName()
 					&& isUserVariable(asConceptName(firstAtom))) {
 				for (Integer secondAtomId : set) {
@@ -273,12 +274,20 @@ public class SatProcessor implements UelProcessor {
 		return ret;
 	}
 
+	private IndexedSet<Atom> getAtomManager() {
+		return this.extUelInput.getAtomManager();
+	}
+
 	private Set<Integer> getConstants() {
-		return this.processorAux.getConstants();
+		return this.extUelInput.getConstants();
 	}
 
 	private Set<Integer> getEAtoms() {
-		return this.processorAux.getEAtoms();
+		return this.extUelInput.getEAtoms();
+	}
+
+	private Set<Equation> getEquations() {
+		return this.extUelInput.getEquations();
 	}
 
 	@Override
@@ -316,10 +325,6 @@ public class SatProcessor implements UelProcessor {
 		return literalManager.addAndGetIndex(literal);
 	}
 
-	private IndexedSet<Atom> getSatAtomManager() {
-		return this.uelInput.getAtomManager();
-	}
-
 	public Collection<Integer> getSetOfSubsumers(Integer atomId) {
 		Set<Integer> list = this.subsumers.get(atomId);
 		if (list == null) {
@@ -336,10 +341,6 @@ public class SatProcessor implements UelProcessor {
 		return invertLiteral ? (-1) * val : val;
 	}
 
-	private UelInput getUelInput() {
-		return this.uelInput;
-	}
-
 	@Override
 	public UelOutput getUnifier() {
 		return result;
@@ -352,15 +353,14 @@ public class SatProcessor implements UelProcessor {
 	private Set<Equation> getUpdatedUnifier() {
 		Set<Equation> ret = new HashSet<Equation>();
 		for (Integer leftPartId : getVariables()) {
-			Atom leftPart = getSatAtomManager().get(leftPartId);
+			Atom leftPart = getAtomManager().get(leftPartId);
 			if (leftPart.isConceptName()
 					&& isUserVariable(asConceptName(leftPart))) {
 				Set<Integer> rightPartIds = new HashSet<Integer>();
 				Collection<Integer> setOfSubsumers = getSetOfSubsumers(leftPartId);
 				for (Integer subsumerId : setOfSubsumers) {
-					Atom newAtom = getSatAtomManager().get(subsumerId);
-					rightPartIds.add(getSatAtomManager()
-							.addAndGetIndex(newAtom));
+					Atom newAtom = getAtomManager().get(subsumerId);
+					rightPartIds.add(getAtomManager().addAndGetIndex(newAtom));
 				}
 				ret.add(new EquationImpl(leftPartId, rightPartIds, false));
 			}
@@ -370,21 +370,21 @@ public class SatProcessor implements UelProcessor {
 	}
 
 	private Set<Integer> getUsedAtomIds() {
-		return this.processorAux.getUsedAtomIds();
+		return this.extUelInput.getUsedAtomIds();
 	}
 
 	private Set<Integer> getVariables() {
-		return this.processorAux.getVariables();
+		return this.extUelInput.getVariables();
 	}
 
 	private boolean isTop(Integer atomId) {
-		Atom atom = getSatAtomManager().get(atomId);
+		Atom atom = getAtomManager().get(atomId);
 		return (atom.isConceptName() && asConceptName(atom).isTop());
 	}
 
 	private boolean isUserVariable(ConceptName atom) {
-		int index = getUelInput().getAtomManager().getIndex(atom);
-		return getUelInput().getUserVariables().contains(index);
+		int index = getAtomManager().getIndex(atom);
+		return this.extUelInput.getUserVariables().contains(index);
 	}
 
 	/**
@@ -419,7 +419,7 @@ public class SatProcessor implements UelProcessor {
 	private SatInput runStep1() {
 		SatInput ret = new SatInput();
 
-		for (Equation e : this.uelInput.getEquations()) {
+		for (Equation e : getEquations()) {
 			ret.addAll(runStep1ForConstants(e).getClauses());
 			ret.addAll(runStep1ForExistentialAtoms(e).getClauses());
 		}
@@ -706,7 +706,7 @@ public class SatProcessor implements UelProcessor {
 
 		for (Integer atomId1 : getEAtoms()) {
 
-			Atom eatom = getSatAtomManager().get(atomId1);
+			Atom eatom = getAtomManager().get(atomId1);
 			if (!eatom.isExistentialRestriction()) {
 				throw new IllegalStateException();
 			}
@@ -716,7 +716,7 @@ public class SatProcessor implements UelProcessor {
 
 				for (Integer atomId2 : getVariables()) {
 					Set<Integer> clause = new HashSet<Integer>();
-					Integer childId = getSatAtomManager().addAndGetIndex(child);
+					Integer childId = getAtomManager().addAndGetIndex(child);
 					clause.add(getOrderLiteral(atomId2, childId));
 					clause.add(getSubOrDissubLiteral(atomId2, atomId1));
 					ret.add(clause);
@@ -740,10 +740,10 @@ public class SatProcessor implements UelProcessor {
 				if (!atomId1.equals(atomId2)) {
 
 					Integer role1 = asExistentialRestriction(
-							getSatAtomManager().get(atomId1)).getRoleId();
+							getAtomManager().get(atomId1)).getRoleId();
 
 					Integer role2 = asExistentialRestriction(
-							getSatAtomManager().get(atomId2)).getRoleId();
+							getAtomManager().get(atomId2)).getRoleId();
 
 					/*
 					 * if roles are not equal, then Step 2.2
@@ -758,8 +758,8 @@ public class SatProcessor implements UelProcessor {
 						 * if the roles are equal, then clause in Step 2.3
 						 */
 					} else {
-						Atom atom1 = getSatAtomManager().get(atomId1);
-						Atom atom2 = getSatAtomManager().get(atomId2);
+						Atom atom1 = getAtomManager().get(atomId1);
+						Atom atom2 = getAtomManager().get(atomId2);
 
 						if (!atom1.isExistentialRestriction()
 								|| !atom2.isExistentialRestriction()) {
@@ -768,12 +768,12 @@ public class SatProcessor implements UelProcessor {
 
 						Atom child1 = asExistentialRestriction(atom1)
 								.getChild();
-						Integer child1Id = getSatAtomManager().addAndGetIndex(
+						Integer child1Id = getAtomManager().addAndGetIndex(
 								child1);
 
 						Atom child2 = asExistentialRestriction(atom2)
 								.getChild();
-						Integer child2Id = getSatAtomManager().addAndGetIndex(
+						Integer child2Id = getAtomManager().addAndGetIndex(
 								child2);
 
 						if (!child1Id.equals(child2Id)) {

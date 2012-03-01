@@ -1,4 +1,4 @@
-package de.tudresden.inf.lat.uel.sat.solver;
+package de.tudresden.inf.lat.uel.type.impl;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -7,31 +7,26 @@ import java.util.TreeSet;
 
 import de.tudresden.inf.lat.uel.type.api.Atom;
 import de.tudresden.inf.lat.uel.type.api.Equation;
+import de.tudresden.inf.lat.uel.type.api.IndexedSet;
 import de.tudresden.inf.lat.uel.type.api.UelInput;
-import de.tudresden.inf.lat.uel.type.impl.ConceptName;
-import de.tudresden.inf.lat.uel.type.impl.ExistentialRestriction;
 
 /**
- * This class implements a goal of unification, i.e., a set of equations between
- * concept terms with variables.
- * 
- * The goal is unique for the procedure, and should be accessible for most other
- * objects.
+ * This class implements an extended UEL input of unification, i.e., a set of
+ * equations between concept terms with variables.
  * 
  * @author Barbara Morawska
  * @author Julian Mendez
  */
-class ProcessorAux {
+public class ExtendedUelInput implements UelInput {
 
-	private Set<Integer> constants = new HashSet<Integer>();
+	private final Set<Integer> constants = new HashSet<Integer>();
+	private final Set<Integer> eatoms = new HashSet<Integer>();
+	private final UelInput uelInput;
+	private final Set<Integer> usedAtomIds = new HashSet<Integer>();
+	private final Set<Integer> variables = new HashSet<Integer>();
 
-	private Set<Integer> eatoms = new HashSet<Integer>();
-
-	private Set<Integer> usedAtomIds = new HashSet<Integer>();
-
-	private Set<Integer> variables = new HashSet<Integer>();
-
-	public ProcessorAux(UelInput input) {
+	public ExtendedUelInput(UelInput input) {
+		this.uelInput = input;
 		configure(input);
 	}
 
@@ -91,13 +86,19 @@ class ProcessorAux {
 	@Override
 	public boolean equals(Object o) {
 		boolean ret = (this == o);
-		if (!ret && o instanceof ProcessorAux) {
-			ProcessorAux other = (ProcessorAux) o;
+		if (!ret && o instanceof ExtendedUelInput) {
+			ExtendedUelInput other = (ExtendedUelInput) o;
 			ret = this.constants.equals(other.constants)
 					&& this.eatoms.equals(other.eatoms)
-					&& this.variables.equals(other.variables);
+					&& this.variables.equals(other.variables)
+					&& this.usedAtomIds.equals(other.usedAtomIds);
 		}
 		return ret;
+	}
+
+	@Override
+	public IndexedSet<Atom> getAtomManager() {
+		return this.uelInput.getAtomManager();
 	}
 
 	public Set<Integer> getConstants() {
@@ -108,8 +109,18 @@ class ProcessorAux {
 		return Collections.unmodifiableSet(eatoms);
 	}
 
+	@Override
+	public Set<Equation> getEquations() {
+		return this.uelInput.getEquations();
+	}
+
 	public Set<Integer> getUsedAtomIds() {
 		return Collections.unmodifiableSet(this.usedAtomIds);
+	}
+
+	@Override
+	public Set<Integer> getUserVariables() {
+		return this.uelInput.getUserVariables();
 	}
 
 	public Set<Integer> getVariables() {
