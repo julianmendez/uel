@@ -1,6 +1,5 @@
 package de.tudresden.inf.lat.uel.plugin.processor;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -11,14 +10,11 @@ import java.util.Set;
 import org.semanticweb.owlapi.model.OWLOntology;
 
 import de.tudresden.inf.lat.uel.plugin.type.SatAtom;
-import de.tudresden.inf.lat.uel.sat.solver.Sat4jSolver;
-import de.tudresden.inf.lat.uel.sat.solver.SatInput;
-import de.tudresden.inf.lat.uel.sat.solver.SatOutput;
 import de.tudresden.inf.lat.uel.sat.solver.SatProcessor;
-import de.tudresden.inf.lat.uel.sat.solver.Solver;
 import de.tudresden.inf.lat.uel.type.api.Equation;
 import de.tudresden.inf.lat.uel.type.api.IndexedSet;
 import de.tudresden.inf.lat.uel.type.api.UelInput;
+import de.tudresden.inf.lat.uel.type.api.UelProcessor;
 import de.tudresden.inf.lat.uel.type.impl.IndexedSetImpl;
 
 /**
@@ -31,8 +27,7 @@ public class UelModel {
 
 	private IndexedSet<SatAtom> atomManager = new IndexedSetImpl<SatAtom>();
 	private DynamicOntology ontology = null;
-	private SatInput satinput = null;
-	private SatProcessor uelProcessor = null;
+	private UelProcessor uelProcessor = null;
 	private List<Set<Equation>> unifierList = new ArrayList<Set<Equation>>();
 	private Set<Set<Equation>> unifierSet = new HashSet<Set<Equation>>();
 
@@ -42,6 +37,19 @@ public class UelModel {
 	public UelModel() {
 		this.ontology = new DynamicOntology(new OntologyBuilder(
 				getAtomManager()));
+	}
+
+	public boolean computeNextUnifier() {
+		boolean ret = this.uelProcessor.computeNextUnifier();
+		if (ret) {
+			Set<Equation> result = this.uelProcessor.getUnifier()
+					.getEquations();
+			if (result != null && !this.unifierSet.contains(result)) {
+				this.unifierList.add(result);
+				this.unifierSet.add(result);
+			}
+		}
+		return ret;
 	}
 
 	public void clearOntology() {
@@ -56,40 +64,6 @@ public class UelModel {
 	 * 
 	 * @return <code>true</code> if and only if more unifiers can be computed
 	 */
-	public boolean computeNextUnifier() {
-		boolean hasMoreUnifiers = true;
-		Solver solver = new Sat4jSolver();
-		Set<Equation> result = null;
-		SatOutput satoutput = null;
-		try {
-			if (!getUnifierList().isEmpty()) {
-				Set<Integer> update = this.uelProcessor.getUpdate();
-				if (update.isEmpty()) {
-					hasMoreUnifiers = false;
-				} else {
-					this.satinput.add(update);
-				}
-			}
-			satoutput = solver.solve(this.satinput);
-			boolean unifiable = satoutput.isSatisfiable();
-			hasMoreUnifiers = hasMoreUnifiers && unifiable;
-			this.uelProcessor.reset();
-			if (unifiable) {
-				result = this.uelProcessor.toTBox(satoutput.getOutput());
-			}
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-		if (result != null && !this.unifierSet.contains(result)) {
-			this.unifierList.add(result);
-			this.unifierSet.add(result);
-		}
-		return hasMoreUnifiers;
-	}
-
-	public void computeSatInput() {
-		this.satinput = this.uelProcessor.computeSatInput();
-	}
 
 	public PluginGoal configure(Set<String> input) {
 		if (input == null) {
@@ -105,7 +79,7 @@ public class UelModel {
 	}
 
 	public void configureUelProcessor(UelInput input) {
-		this.uelProcessor = new SatProcessor(input, true);
+		this.uelProcessor = new SatProcessor(input);
 	}
 
 	public IndexedSet<SatAtom> getAtomManager() {
@@ -116,11 +90,7 @@ public class UelModel {
 		return this.ontology;
 	}
 
-	public SatInput getSatInput() {
-		return this.satinput;
-	}
-
-	public SatProcessor getUelProcessor() {
+	public UelProcessor getUelProcessor() {
 		return this.uelProcessor;
 	}
 

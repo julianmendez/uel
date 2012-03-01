@@ -195,7 +195,7 @@ public class ProcessorTest extends TestCase {
 		}
 
 		processor.configureUelProcessor(goal.getUelInput());
-		processor.computeSatInput();
+		//processor.computeSatInput();
 
 		boolean hasUnifiers = true;
 		while (hasUnifiers) {

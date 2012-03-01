@@ -8,10 +8,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -188,12 +186,16 @@ public class UnifierController implements ActionListener {
 	}
 
 	private Collection<SatAtom> getSetOfSubsumers(SatAtom atom) {
-		Collection<Integer> list = getModel().getUelProcessor()
-				.getSetOfSubsumers(
-						getModel().getAtomManager().addAndGetIndex(atom));
-		List<SatAtom> ret = new ArrayList<SatAtom>();
-		for (Integer id : list) {
-			ret.add(getModel().getAtomManager().get(id));
+		Set<SatAtom> ret = new HashSet<SatAtom>();
+		Set<Equation> equations = getModel().getUelProcessor().getUnifier()
+				.getEquations();
+		for (Equation equation : equations) {
+			if (equation.getLeft().equals(
+					getModel().getAtomManager().addAndGetIndex(atom))) {
+				for (Integer id : equation.getRight()) {
+					ret.add(getModel().getAtomManager().get(id));
+				}
+			}
 		}
 		return ret;
 	}

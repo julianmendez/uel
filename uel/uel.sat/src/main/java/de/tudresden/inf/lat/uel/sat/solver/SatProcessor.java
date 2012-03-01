@@ -1,5 +1,6 @@
 package de.tudresden.inf.lat.uel.sat.solver;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -18,10 +19,13 @@ import de.tudresden.inf.lat.uel.type.api.Atom;
 import de.tudresden.inf.lat.uel.type.api.Equation;
 import de.tudresden.inf.lat.uel.type.api.IndexedSet;
 import de.tudresden.inf.lat.uel.type.api.UelInput;
+import de.tudresden.inf.lat.uel.type.api.UelOutput;
+import de.tudresden.inf.lat.uel.type.api.UelProcessor;
 import de.tudresden.inf.lat.uel.type.impl.ConceptName;
 import de.tudresden.inf.lat.uel.type.impl.EquationImpl;
 import de.tudresden.inf.lat.uel.type.impl.ExistentialRestriction;
 import de.tudresden.inf.lat.uel.type.impl.IndexedSetImpl;
+import de.tudresden.inf.lat.uel.type.impl.UelOutputImpl;
 
 /**
  * This class performs reduction of goal equations to propositional clauses. The
@@ -117,16 +121,21 @@ import de.tudresden.inf.lat.uel.type.impl.IndexedSetImpl;
  * @author Barbara Morawska
  * @author Julian Mendez
  */
-public class SatProcessor {
+public class SatProcessor implements UelProcessor {
 
 	private static final Logger logger = Logger.getLogger(SatProcessor.class
 			.getName());
+
+	private boolean firstTime = true;
 
 	private Goal goal;
 
 	private boolean invertLiteral = false;
 
 	private IndexedSet<Literal> literalManager = new IndexedSetImpl<Literal>();
+
+	private UelOutput result;
+	private SatInput satinput = null;
 
 	private Map<Integer, Set<Integer>> subsumers = new HashMap<Integer, Set<Integer>>();
 
@@ -172,6 +181,41 @@ public class SatProcessor {
 
 	private ExistentialRestriction asExistentialRestriction(Atom atom) {
 		return (ExistentialRestriction) atom;
+	}
+
+	@Override
+	public boolean computeNextUnifier() {
+		if (this.firstTime) {
+			this.satinput = computeSatInput();
+		}
+		boolean hasMoreUnifiers = true;
+		Solver solver = new Sat4jSolver();
+		SatOutput satoutput = null;
+		if (!this.firstTime) {
+			Set<Integer> update = getUpdate();
+			if (update.isEmpty()) {
+				hasMoreUnifiers = false;
+			} else {
+				this.satinput.add(update);
+			}
+		}
+
+		try {
+			satoutput = solver.solve(this.satinput);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+
+		boolean unifiable = satoutput.isSatisfiable();
+		hasMoreUnifiers = hasMoreUnifiers && unifiable;
+		reset();
+		if (unifiable) {
+			this.result = new UelOutputImpl(this.goal.getUelInput()
+					.getAtomManager(), toTBox(satoutput.getOutput()));
+		}
+
+		this.firstTime = false;
+		return hasMoreUnifiers;
 	}
 
 	/**
@@ -238,6 +282,11 @@ public class SatProcessor {
 		return ret;
 	}
 
+	@Override
+	public UelInput getInput() {
+		return this.goal.getUelInput();
+	}
+
 	/**
 	 * Returns the literals.
 	 * 
@@ -282,6 +331,11 @@ public class SatProcessor {
 				atomId2) : new DissubsumptionLiteral(atomId1, atomId2);
 		int val = literalManager.addAndGetIndex(literal);
 		return invertLiteral ? (-1) * val : val;
+	}
+
+	@Override
+	public UelOutput getUnifier() {
+		return result;
 	}
 
 	public Set<Integer> getUpdate() {
