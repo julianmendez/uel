@@ -45,16 +45,16 @@ public class UelModel {
 	}
 
 	public boolean computeNextUnifier() {
-		boolean ret = this.uelProcessor.computeNextUnifier();
-		if (ret) {
+		while (this.uelProcessor.computeNextUnifier()) {
 			Set<Equation> result = this.uelProcessor.getUnifier()
 					.getEquations();
-			if (result != null && !this.unifierSet.contains(result)) {
+			if (!this.unifierSet.contains(result)) {
 				this.unifierList.add(result);
 				this.unifierSet.add(result);
+				return true;
 			}
 		}
-		return ret;
+		return false;
 	}
 
 	/**
