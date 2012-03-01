@@ -23,7 +23,6 @@ public class ConceptName extends de.tudresden.inf.lat.uel.type.impl.ConceptName
 	private final String name;
 	private final boolean top;
 	private boolean userVariable = false;
-	private boolean variable = false;
 
 	/**
 	 * Constructs a new concept name.
@@ -41,7 +40,6 @@ public class ConceptName extends de.tudresden.inf.lat.uel.type.impl.ConceptName
 
 		this.name = str;
 		this.top = str.equalsIgnoreCase(topKeyword);
-		this.variable = isVar;
 	}
 
 	@Override
@@ -98,30 +96,6 @@ public class ConceptName extends de.tudresden.inf.lat.uel.type.impl.ConceptName
 		return this.name.hashCode();
 	}
 
-	@Override
-	public boolean isConceptName() {
-		return true;
-	}
-
-	/**
-	 * Not used in UEL. Checks if this atom is a constant.
-	 * 
-	 * @return <code>true</code> if and only if this atoms is a constant
-	 */
-	public boolean isConstant() {
-		return !this.variable;
-	}
-
-	@Override
-	public boolean isExistentialRestriction() {
-		return false;
-	}
-
-	@Override
-	public boolean isGround() {
-		return !this.variable;
-	}
-
 	/**
 	 * Tells whether this concept is TOP.
 	 * 
@@ -141,15 +115,6 @@ public class ConceptName extends de.tudresden.inf.lat.uel.type.impl.ConceptName
 		return this.userVariable;
 	}
 
-	/**
-	 * Checks if a flat atom is a variable.
-	 * 
-	 * @return <code>true</code> if and only if a flat atom is a variable
-	 */
-	public boolean isVariable() {
-		return this.variable;
-	}
-
 	@Override
 	public boolean removeAtomChangeListener(AtomChangeListener o) {
 		return this.changeListener.remove(o);
@@ -165,15 +130,6 @@ public class ConceptName extends de.tudresden.inf.lat.uel.type.impl.ConceptName
 	 */
 	public void setUserVariable(boolean value) {
 		this.userVariable = value;
-	}
-
-	/**
-	 * If v is true, it defines this atom as a variable
-	 * 
-	 * @param isVar
-	 */
-	public void setVariable(boolean isVar) {
-		this.variable = isVar;
 	}
 
 	@Override

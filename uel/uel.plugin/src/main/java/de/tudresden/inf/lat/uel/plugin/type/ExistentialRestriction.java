@@ -89,11 +89,6 @@ public class ExistentialRestriction extends
 	}
 
 	@Override
-	public Integer getConceptNameId() {
-		return this.child.getConceptNameId();
-	}
-
-	@Override
 	public String getId() {
 		return this.id;
 	}
@@ -115,31 +110,6 @@ public class ExistentialRestriction extends
 	@Override
 	public int hashCode() {
 		return this.id.hashCode();
-	}
-
-	@Override
-	public boolean isConceptName() {
-		return false;
-	}
-
-	@Override
-	public boolean isConstant() {
-		return false;
-	}
-
-	@Override
-	public boolean isExistentialRestriction() {
-		return true;
-	}
-
-	@Override
-	public boolean isGround() {
-		return this.getChild().isGround();
-	}
-
-	@Override
-	public boolean isVariable() {
-		return false;
 	}
 
 	@Override
