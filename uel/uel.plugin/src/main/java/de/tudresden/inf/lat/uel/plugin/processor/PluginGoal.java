@@ -26,9 +26,7 @@ public class PluginGoal {
 	public static final String UNDEF_SUFFIX = "_UNDEF";
 
 	private final PluginGoalAux goal;
-
 	private Equation mainEquation;
-
 	private IndexedSet<SatAtom> satAtomManager;
 
 	/**
@@ -48,6 +46,10 @@ public class PluginGoal {
 		this.satAtomManager = manager;
 		this.goal = new PluginGoalAux(manager);
 		initialize(ont, leftStr, rightStr);
+	}
+
+	public Set<Integer> getConstants() {
+		return this.goal.getConstants();
 	}
 
 	public PluginGoalAux getGoal() {
@@ -84,6 +86,10 @@ public class PluginGoal {
 
 	public Set<Integer> getUsedAtomIds() {
 		return getGoal().getUsedAtomIds();
+	}
+
+	public Set<Integer> getVariables() {
+		return this.goal.getVariables();
 	}
 
 	public int getVariableSetSize() {
@@ -162,14 +168,6 @@ public class PluginGoal {
 					getGoal().addConstant(atomId);
 				}
 			}
-		}
-
-		for (Integer atomId : goal.getVariables()) {
-			SatAtom atom = getSatAtomManager().get(atomId);
-			if (!atom.isConceptName()) {
-				throw new IllegalStateException();
-			}
-			atom.asConceptName().setVariable(true);
 		}
 
 	}
@@ -260,14 +258,6 @@ public class PluginGoal {
 		sbuf.append(KRSSKeyword.close);
 		sbuf.append("\n");
 		return sbuf.toString();
-	}
-
-	public Set<Integer> getVariables() {
-		return this.goal.getVariables();
-	}
-
-	public Set<Integer> getConstants() {
-		return this.goal.getConstants();
 	}
 
 }
