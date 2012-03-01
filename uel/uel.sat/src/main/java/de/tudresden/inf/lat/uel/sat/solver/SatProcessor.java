@@ -11,7 +11,6 @@ import java.util.TreeSet;
 import java.util.logging.Logger;
 
 import de.tudresden.inf.lat.uel.sat.type.DissubsumptionLiteral;
-import de.tudresden.inf.lat.uel.sat.type.Goal;
 import de.tudresden.inf.lat.uel.sat.type.Literal;
 import de.tudresden.inf.lat.uel.sat.type.OrderLiteral;
 import de.tudresden.inf.lat.uel.sat.type.SubsumptionLiteral;
@@ -127,24 +126,14 @@ public class SatProcessor implements UelProcessor {
 			.getName());
 
 	private boolean firstTime = true;
-
-	private Goal goal;
-
 	private boolean invertLiteral = false;
-
 	private IndexedSet<Literal> literalManager = new IndexedSetImpl<Literal>();
-
+	private ProcessorAux processorAux;
 	private UelOutput result;
 	private SatInput satinput = null;
-
 	private Map<Integer, Set<Integer>> subsumers = new HashMap<Integer, Set<Integer>>();
-
 	private Set<Integer> trueLiterals = new HashSet<Integer>();
-
-	/**
-	 * Update is a set of numbers or numbers encoding the negation of the
-	 * computed unifier. This is needed for computation of the
-	 */
+	private final UelInput uelInput;
 	private Set<Integer> update = new HashSet<Integer>();
 
 	public SatProcessor(UelInput input) {
@@ -152,7 +141,8 @@ public class SatProcessor implements UelProcessor {
 			throw new IllegalArgumentException("Null argument.");
 		}
 
-		this.goal = new Goal(input);
+		this.uelInput = input;
+		this.processorAux = new ProcessorAux(input);
 		setLiterals();
 	}
 
@@ -161,7 +151,8 @@ public class SatProcessor implements UelProcessor {
 			throw new IllegalArgumentException("Null argument.");
 		}
 
-		this.goal = new Goal(input);
+		this.uelInput = input;
+		this.processorAux = new ProcessorAux(input);
 		this.invertLiteral = inv;
 		setLiterals();
 	}
@@ -210,8 +201,8 @@ public class SatProcessor implements UelProcessor {
 		hasMoreUnifiers = hasMoreUnifiers && unifiable;
 		reset();
 		if (unifiable) {
-			this.result = new UelOutputImpl(this.goal.getUelInput()
-					.getAtomManager(), toTBox(satoutput.getOutput()));
+			this.result = new UelOutputImpl(this.uelInput.getAtomManager(),
+					toTBox(satoutput.getOutput()));
 		}
 
 		this.firstTime = false;
@@ -262,10 +253,10 @@ public class SatProcessor implements UelProcessor {
 	private Set<Integer> createUpdate() {
 		Set<Integer> ret = new HashSet<Integer>();
 		Set<Integer> set = new HashSet<Integer>();
-		set.addAll(goal.getConstants());
-		set.addAll(goal.getEAtoms());
-		for (Integer firstAtomId : goal.getVariables()) {
-			Atom firstAtom = goal.getSatAtomManager().get(firstAtomId);
+		set.addAll(getConstants());
+		set.addAll(getEAtoms());
+		for (Integer firstAtomId : getVariables()) {
+			Atom firstAtom = getSatAtomManager().get(firstAtomId);
 			if (firstAtom.isConceptName()
 					&& isUserVariable(asConceptName(firstAtom))) {
 				for (Integer secondAtomId : set) {
@@ -282,9 +273,17 @@ public class SatProcessor implements UelProcessor {
 		return ret;
 	}
 
+	private Set<Integer> getConstants() {
+		return this.processorAux.getConstants();
+	}
+
+	private Set<Integer> getEAtoms() {
+		return this.processorAux.getEAtoms();
+	}
+
 	@Override
 	public UelInput getInput() {
-		return this.goal.getUelInput();
+		return this.uelInput;
 	}
 
 	/**
@@ -317,6 +316,10 @@ public class SatProcessor implements UelProcessor {
 		return literalManager.addAndGetIndex(literal);
 	}
 
+	private IndexedSet<Atom> getSatAtomManager() {
+		return this.uelInput.getAtomManager();
+	}
+
 	public Collection<Integer> getSetOfSubsumers(Integer atomId) {
 		Set<Integer> list = this.subsumers.get(atomId);
 		if (list == null) {
@@ -333,6 +336,10 @@ public class SatProcessor implements UelProcessor {
 		return invertLiteral ? (-1) * val : val;
 	}
 
+	private UelInput getUelInput() {
+		return this.uelInput;
+	}
+
 	@Override
 	public UelOutput getUnifier() {
 		return result;
@@ -344,16 +351,16 @@ public class SatProcessor implements UelProcessor {
 
 	private Set<Equation> getUpdatedUnifier() {
 		Set<Equation> ret = new HashSet<Equation>();
-		for (Integer leftPartId : goal.getVariables()) {
-			Atom leftPart = goal.getSatAtomManager().get(leftPartId);
+		for (Integer leftPartId : getVariables()) {
+			Atom leftPart = getSatAtomManager().get(leftPartId);
 			if (leftPart.isConceptName()
 					&& isUserVariable(asConceptName(leftPart))) {
 				Set<Integer> rightPartIds = new HashSet<Integer>();
 				Collection<Integer> setOfSubsumers = getSetOfSubsumers(leftPartId);
 				for (Integer subsumerId : setOfSubsumers) {
-					Atom newAtom = goal.getSatAtomManager().get(subsumerId);
-					rightPartIds.add(goal.getSatAtomManager().addAndGetIndex(
-							newAtom));
+					Atom newAtom = getSatAtomManager().get(subsumerId);
+					rightPartIds.add(getSatAtomManager()
+							.addAndGetIndex(newAtom));
 				}
 				ret.add(new EquationImpl(leftPartId, rightPartIds, false));
 			}
@@ -362,14 +369,22 @@ public class SatProcessor implements UelProcessor {
 		return ret;
 	}
 
+	private Set<Integer> getUsedAtomIds() {
+		return this.processorAux.getUsedAtomIds();
+	}
+
+	private Set<Integer> getVariables() {
+		return this.processorAux.getVariables();
+	}
+
 	private boolean isTop(Integer atomId) {
-		Atom atom = goal.getSatAtomManager().get(atomId);
+		Atom atom = getSatAtomManager().get(atomId);
 		return (atom.isConceptName() && asConceptName(atom).isTop());
 	}
 
 	private boolean isUserVariable(ConceptName atom) {
-		int index = this.goal.getUelInput().getAtomManager().getIndex(atom);
-		return this.goal.getUelInput().getUserVariables().contains(index);
+		int index = getUelInput().getAtomManager().getIndex(atom);
+		return getUelInput().getUserVariables().contains(index);
 	}
 
 	/**
@@ -384,7 +399,7 @@ public class SatProcessor implements UelProcessor {
 			setLiteralValue(key, false);
 		}
 
-		for (Integer atomId : goal.getVariables()) {
+		for (Integer atomId : getVariables()) {
 			resetSetOfSubsumers(atomId);
 		}
 	}
@@ -404,7 +419,7 @@ public class SatProcessor implements UelProcessor {
 	private SatInput runStep1() {
 		SatInput ret = new SatInput();
 
-		for (Equation e : goal.getEquations()) {
+		for (Equation e : this.uelInput.getEquations()) {
 			ret.addAll(runStep1ForConstants(e).getClauses());
 			ret.addAll(runStep1ForExistentialAtoms(e).getClauses());
 		}
@@ -421,7 +436,7 @@ public class SatProcessor implements UelProcessor {
 	private SatInput runStep1ForConstants(Equation e) {
 		SatInput ret = new SatInput();
 
-		for (Integer atomId1 : goal.getConstants()) {
+		for (Integer atomId1 : getConstants()) {
 
 			if (!e.getLeft().equals(atomId1) && !e.getRight().contains(atomId1)) {
 
@@ -490,7 +505,7 @@ public class SatProcessor implements UelProcessor {
 	private SatInput runStep1ForExistentialAtoms(Equation e) {
 		SatInput ret = new SatInput();
 
-		for (Integer atomId1 : goal.getEAtoms()) {
+		for (Integer atomId1 : getEAtoms()) {
 
 			if (!e.getLeft().equals(atomId1) && !e.getRight().contains(atomId1)) {
 
@@ -560,9 +575,9 @@ public class SatProcessor implements UelProcessor {
 	private SatInput runStep2_1() {
 		SatInput ret = new SatInput();
 
-		for (Integer atomId1 : goal.getConstants()) {
+		for (Integer atomId1 : getConstants()) {
 
-			for (Integer atomId2 : goal.getConstants()) {
+			for (Integer atomId2 : getConstants()) {
 
 				if (!isTop(atomId2) && (!atomId1.equals(atomId2))) {
 					Set<Integer> clause = new HashSet<Integer>();
@@ -583,9 +598,9 @@ public class SatProcessor implements UelProcessor {
 	private SatInput runStep2_4() {
 		SatInput ret = new SatInput();
 
-		for (Integer atomId1 : goal.getConstants()) {
+		for (Integer atomId1 : getConstants()) {
 
-			for (Integer atomId2 : goal.getEAtoms()) {
+			for (Integer atomId2 : getEAtoms()) {
 				{
 					Set<Integer> clause = new HashSet<Integer>();
 					clause.add(getSubOrDissubLiteral(atomId1, atomId2));
@@ -612,7 +627,7 @@ public class SatProcessor implements UelProcessor {
 	private SatInput runStep2_5() {
 		SatInput ret = new SatInput();
 
-		Collection<Integer> atomIds = goal.getUsedAtomIds();
+		Collection<Integer> atomIds = getUsedAtomIds();
 
 		for (Integer atomId1 : atomIds) {
 
@@ -644,7 +659,7 @@ public class SatProcessor implements UelProcessor {
 	 */
 	private SatInput runStep3_1_r() {
 		SatInput ret = new SatInput();
-		for (Integer atomId1 : goal.getVariables()) {
+		for (Integer atomId1 : getVariables()) {
 			Set<Integer> clause = new HashSet<Integer>();
 			clause.add(getMinusOrderLiteral(atomId1, atomId1));
 			ret.add(clause);
@@ -660,11 +675,11 @@ public class SatProcessor implements UelProcessor {
 	private SatInput runStep3_1_t() {
 		SatInput ret = new SatInput();
 
-		for (Integer atomId1 : goal.getVariables()) {
+		for (Integer atomId1 : getVariables()) {
 
-			for (Integer atomId2 : goal.getVariables()) {
+			for (Integer atomId2 : getVariables()) {
 
-				for (Integer atomId3 : goal.getVariables()) {
+				for (Integer atomId3 : getVariables()) {
 
 					if (!atomId1.equals(atomId2) && !atomId2.equals(atomId3)) {
 
@@ -689,9 +704,9 @@ public class SatProcessor implements UelProcessor {
 	private SatInput runStep3_2() {
 		SatInput ret = new SatInput();
 
-		for (Integer atomId1 : goal.getEAtoms()) {
+		for (Integer atomId1 : getEAtoms()) {
 
-			Atom eatom = goal.getSatAtomManager().get(atomId1);
+			Atom eatom = getSatAtomManager().get(atomId1);
 			if (!eatom.isExistentialRestriction()) {
 				throw new IllegalStateException();
 			}
@@ -699,10 +714,9 @@ public class SatProcessor implements UelProcessor {
 
 			if (child.isConceptName() && asConceptName(child).isVariable()) {
 
-				for (Integer atomId2 : goal.getVariables()) {
+				for (Integer atomId2 : getVariables()) {
 					Set<Integer> clause = new HashSet<Integer>();
-					Integer childId = goal.getSatAtomManager().addAndGetIndex(
-							child);
+					Integer childId = getSatAtomManager().addAndGetIndex(child);
 					clause.add(getOrderLiteral(atomId2, childId));
 					clause.add(getSubOrDissubLiteral(atomId2, atomId1));
 					ret.add(clause);
@@ -719,17 +733,17 @@ public class SatProcessor implements UelProcessor {
 	private SatInput runSteps2_2_N_2_3() {
 		SatInput ret = new SatInput();
 
-		for (Integer atomId1 : goal.getEAtoms()) {
+		for (Integer atomId1 : getEAtoms()) {
 
-			for (Integer atomId2 : goal.getEAtoms()) {
+			for (Integer atomId2 : getEAtoms()) {
 
 				if (!atomId1.equals(atomId2)) {
 
 					Integer role1 = asExistentialRestriction(
-							goal.getSatAtomManager().get(atomId1)).getRoleId();
+							getSatAtomManager().get(atomId1)).getRoleId();
 
 					Integer role2 = asExistentialRestriction(
-							goal.getSatAtomManager().get(atomId2)).getRoleId();
+							getSatAtomManager().get(atomId2)).getRoleId();
 
 					/*
 					 * if roles are not equal, then Step 2.2
@@ -744,8 +758,8 @@ public class SatProcessor implements UelProcessor {
 						 * if the roles are equal, then clause in Step 2.3
 						 */
 					} else {
-						Atom atom1 = goal.getSatAtomManager().get(atomId1);
-						Atom atom2 = goal.getSatAtomManager().get(atomId2);
+						Atom atom1 = getSatAtomManager().get(atomId1);
+						Atom atom2 = getSatAtomManager().get(atomId2);
 
 						if (!atom1.isExistentialRestriction()
 								|| !atom2.isExistentialRestriction()) {
@@ -754,13 +768,13 @@ public class SatProcessor implements UelProcessor {
 
 						Atom child1 = asExistentialRestriction(atom1)
 								.getChild();
-						Integer child1Id = goal.getSatAtomManager()
-								.addAndGetIndex(child1);
+						Integer child1Id = getSatAtomManager().addAndGetIndex(
+								child1);
 
 						Atom child2 = asExistentialRestriction(atom2)
 								.getChild();
-						Integer child2Id = goal.getSatAtomManager()
-								.addAndGetIndex(child2);
+						Integer child2Id = getSatAtomManager().addAndGetIndex(
+								child2);
 
 						if (!child1Id.equals(child2Id)) {
 							Set<Integer> clause = new HashSet<Integer>();
@@ -790,8 +804,8 @@ public class SatProcessor implements UelProcessor {
 		 * Literals for dis-subsumptions
 		 */
 
-		for (Integer atomId1 : goal.getUsedAtomIds()) {
-			for (Integer atomId2 : goal.getUsedAtomIds()) {
+		for (Integer atomId1 : getUsedAtomIds()) {
+			for (Integer atomId2 : getUsedAtomIds()) {
 				Literal literal = invertLiteral ? new SubsumptionLiteral(
 						atomId1, atomId2) : new DissubsumptionLiteral(atomId1,
 						atomId2);
@@ -805,8 +819,8 @@ public class SatProcessor implements UelProcessor {
 		 * Literals for order on variables
 		 */
 
-		for (Integer atomId1 : goal.getVariables()) {
-			for (Integer atomId2 : goal.getVariables()) {
+		for (Integer atomId1 : getVariables()) {
+			for (Integer atomId2 : getVariables()) {
 				Literal literal = new OrderLiteral(atomId1, atomId2);
 				literalManager.add(literal);
 			}
@@ -878,10 +892,10 @@ public class SatProcessor implements UelProcessor {
 
 				if (!getLiteralValue(i)) {
 
-					if (goal.getVariables().contains(atomId1)) {
-						if (goal.getConstants().contains(atomId2)) {
+					if (getVariables().contains(atomId1)) {
+						if (getConstants().contains(atomId2)) {
 							addToSetOfSubsumers(atomId1, atomId2);
-						} else if (goal.getEAtoms().contains(atomId2)) {
+						} else if (getEAtoms().contains(atomId2)) {
 							addToSetOfSubsumers(atomId1, atomId2);
 						}
 					}
@@ -889,10 +903,10 @@ public class SatProcessor implements UelProcessor {
 			} else if (literalManager.get(i).isSubsumption()) {
 				if (getLiteralValue(i)) {
 
-					if (goal.getVariables().contains(atomId1)) {
-						if (goal.getConstants().contains(atomId2)) {
+					if (getVariables().contains(atomId1)) {
+						if (getConstants().contains(atomId2)) {
 							addToSetOfSubsumers(atomId1, atomId2);
-						} else if (goal.getEAtoms().contains(atomId2)) {
+						} else if (getEAtoms().contains(atomId2)) {
 							addToSetOfSubsumers(atomId1, atomId2);
 						}
 					}
