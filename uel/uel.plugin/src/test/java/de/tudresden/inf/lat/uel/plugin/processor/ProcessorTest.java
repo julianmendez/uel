@@ -25,6 +25,7 @@ import de.tudresden.inf.lat.uel.plugin.type.SatAtom;
 import de.tudresden.inf.lat.uel.plugin.ui.UelController;
 import de.tudresden.inf.lat.uel.plugin.ui.UelView;
 import de.tudresden.inf.lat.uel.type.api.Equation;
+import de.tudresden.inf.lat.uel.type.api.UelProcessor;
 
 public class ProcessorTest extends TestCase {
 
@@ -174,11 +175,11 @@ public class ProcessorTest extends TestCase {
 			Integer numberOfUnifiers) throws OWLOntologyCreationException,
 			IOException {
 		Map<String, OWLClass> idClassMap = new HashMap<String, OWLClass>();
-		UelModel processor = new UelModel();
+		UelModel uelModel = new UelModel();
 
 		OWLOntology owlOntology = createOntology(new FileInputStream(
 				ontologyName));
-		processor.loadOntology(owlOntology, owlOntology);
+		uelModel.loadOntology(owlOntology, owlOntology);
 		Set<OWLClass> clsSet = owlOntology.getClassesInSignature();
 		for (OWLClass cls : clsSet) {
 			idClassMap.put(cls.getIRI().getFragment(), cls);
@@ -187,25 +188,26 @@ public class ProcessorTest extends TestCase {
 		Set<String> input = new HashSet<String>();
 		input.add(idClassMap.get("C").toStringID());
 		input.add(idClassMap.get("D").toStringID());
-		PluginGoal goal = processor.configure(input);
+		PluginGoal goal = uelModel.configure(input);
 
 		for (String var : varNames) {
 			Integer atomId = getAtomId(goal, idClassMap.get(var).toStringID());
 			goal.makeVariable(atomId);
 		}
 
-		processor.configureUelProcessor(goal.getUelInput());
-		//processor.computeSatInput();
+		UelProcessor processor = UelProcessorFactory.createProcessor(
+				UelProcessorFactory.SAT_PROCESSOR, goal.getUelInput());
+		uelModel.configureUelProcessor(processor);
 
 		boolean hasUnifiers = true;
 		while (hasUnifiers) {
-			hasUnifiers = processor.computeNextUnifier();
+			hasUnifiers = uelModel.computeNextUnifier();
 		}
 
-		List<Set<Equation>> unifiers = processor.getUnifierList();
+		List<Set<Equation>> unifiers = uelModel.getUnifierList();
 		String goalStr = goal.getGoalEquations();
 
-		UelController controller = new UelController(new UelView(processor),
+		UelController controller = new UelController(new UelView(uelModel),
 				owlOntology.getOWLOntologyManager());
 
 		for (Set<Equation> unifier : unifiers) {
@@ -221,5 +223,4 @@ public class ProcessorTest extends TestCase {
 
 		assertEquals(numberOfUnifiers, (Integer) unifiers.size());
 	}
-
 }

@@ -51,6 +51,7 @@ public interface Message {
 	public static final String tooltipRejectVar = "cancels this selection of variables";
 	public static final String tooltipSave = "saves the current unifier into a file";
 	public static final String tooltipSaveGoal = "saves the goal to a file";
+	public static final String tooltipSelectProcessor = "selects the processor";
 	public static final String tooltipSelectVariables = "gets candidates for variables";
 	public static final String tooltipShowStatInfo = "shows statistical information before computing the first unifier";
 	public static final String tooltipTextAllVarCount = "number of variables";

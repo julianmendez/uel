@@ -10,10 +10,8 @@ import java.util.Set;
 import org.semanticweb.owlapi.model.OWLOntology;
 
 import de.tudresden.inf.lat.uel.plugin.type.SatAtom;
-import de.tudresden.inf.lat.uel.sat.solver.SatProcessor;
 import de.tudresden.inf.lat.uel.type.api.Equation;
 import de.tudresden.inf.lat.uel.type.api.IndexedSet;
-import de.tudresden.inf.lat.uel.type.api.UelInput;
 import de.tudresden.inf.lat.uel.type.api.UelProcessor;
 import de.tudresden.inf.lat.uel.type.impl.IndexedSetImpl;
 
@@ -27,6 +25,7 @@ public class UelModel {
 
 	private IndexedSet<SatAtom> atomManager = new IndexedSetImpl<SatAtom>();
 	private DynamicOntology ontology = null;
+	private String processorName;
 	private UelProcessor uelProcessor = null;
 	private List<Set<Equation>> unifierList = new ArrayList<Set<Equation>>();
 	private Set<Set<Equation>> unifierSet = new HashSet<Set<Equation>>();
@@ -37,6 +36,12 @@ public class UelModel {
 	public UelModel() {
 		this.ontology = new DynamicOntology(new OntologyBuilder(
 				getAtomManager()));
+	}
+
+	public void clearOntology() {
+		this.ontology.clear();
+		this.unifierList.clear();
+		this.unifierSet.clear();
 	}
 
 	public boolean computeNextUnifier() {
@@ -50,12 +55,6 @@ public class UelModel {
 			}
 		}
 		return ret;
-	}
-
-	public void clearOntology() {
-		this.ontology.clear();
-		this.unifierList.clear();
-		this.unifierSet.clear();
 	}
 
 	/**
@@ -78,8 +77,8 @@ public class UelModel {
 				rightStr);
 	}
 
-	public void configureUelProcessor(UelInput input) {
-		this.uelProcessor = new SatProcessor(input);
+	public void configureUelProcessor(UelProcessor processor) {
+		this.uelProcessor = processor;
 	}
 
 	public IndexedSet<SatAtom> getAtomManager() {
@@ -88,6 +87,10 @@ public class UelModel {
 
 	public Ontology getOntology() {
 		return this.ontology;
+	}
+
+	public String getProcessorName() {
+		return this.processorName;
 	}
 
 	public UelProcessor getUelProcessor() {
@@ -100,6 +103,14 @@ public class UelModel {
 
 	public void loadOntology(OWLOntology ontology01, OWLOntology ontology02) {
 		this.ontology.load(ontology01, ontology02);
+	}
+
+	public void setProcessorName(String name) {
+		if (!UelProcessorFactory.getProcessorNames().contains(name)) {
+			throw new IllegalArgumentException("Processor name is invalid: '"
+					+ name + "'.");
+		}
+		this.processorName = name;
 	}
 
 }

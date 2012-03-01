@@ -27,6 +27,7 @@ import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 
 import de.tudresden.inf.lat.uel.plugin.processor.PluginGoal;
 import de.tudresden.inf.lat.uel.plugin.processor.UelModel;
+import de.tudresden.inf.lat.uel.plugin.processor.UelProcessorFactory;
 
 /**
  * This class is a controller for the main panel of UEL's graphical user
@@ -116,7 +117,9 @@ public class UelController implements ActionListener {
 
 			this.varWindow.close();
 
-			getModel().configureUelProcessor(g.getUelInput());
+			getModel().configureUelProcessor(
+					UelProcessorFactory.createProcessor(getView()
+							.getSelectedProcessor(), g.getUelInput()));
 			getUnifier().setStatInfo(
 					new StatInfo(g, getLiteralSetSize(), getClauseSetSize(),
 							this.mapIdLabel));

@@ -13,6 +13,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import de.tudresden.inf.lat.uel.plugin.processor.UelModel;
+import de.tudresden.inf.lat.uel.plugin.processor.UelProcessorFactory;
 
 /**
  * Panel for UEL.
@@ -31,6 +32,7 @@ public class UelView extends JPanel {
 	private JComboBoxOfLabelId listClassName01 = new JComboBoxOfLabelId();
 	private JComboBox listOntologyName00 = new JComboBox();
 	private JComboBox listOntologyName01 = new JComboBox();
+	private JComboBox listProcessor = new JComboBox();
 	private final UelModel model;
 
 	public UelView(UelModel processor) {
@@ -125,6 +127,11 @@ public class UelView extends JPanel {
 		ret.setLayout(new BoxLayout(ret, BoxLayout.Y_AXIS));
 
 		JPanel smallPanel = new JPanel();
+		this.listProcessor.setToolTipText(Message.tooltipSelectProcessor);
+		for (String processorName : UelProcessorFactory.getProcessorNames()) {
+			this.listProcessor.addItem(processorName);
+		}
+		smallPanel.add(this.listProcessor);
 		this.buttonOpen.setToolTipText(Message.tooltipOpen);
 		smallPanel.add(this.buttonOpen);
 		this.buttonSelectVariables
@@ -185,6 +192,10 @@ public class UelView extends JPanel {
 
 	public int getSelectedOntologyName01() {
 		return this.listOntologyName01.getSelectedIndex();
+	}
+
+	public String getSelectedProcessor() {
+		return this.listProcessor.getSelectedItem().toString();
 	}
 
 	public void reloadClassNames00(List<LabelId> list) {
