@@ -62,11 +62,7 @@ public class ConceptName extends de.tudresden.inf.lat.uel.type.impl.ConceptName
 		boolean ret = (this == o);
 		if (!ret && o instanceof ConceptName) {
 			ConceptName other = (ConceptName) o;
-			if (this.conceptNameId != null) {
-				ret = this.conceptNameId.equals(other.conceptNameId);
-			} else {
-				ret = this.name.equals(other.name);
-			}
+			ret = this.name.equals(other.name);
 		}
 		return ret;
 	}

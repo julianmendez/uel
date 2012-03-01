@@ -58,11 +58,7 @@ public class ExistentialRestriction extends
 		boolean ret = (this == o);
 		if (!ret && o instanceof ExistentialRestriction) {
 			ExistentialRestriction other = (ExistentialRestriction) o;
-			if (this.roleId != null) {
-				ret = this.roleId.equals(other.roleId);
-			} else {
-				ret = this.name.equals(other.name);
-			}
+			ret = this.name.equals(other.name);
 			ret = ret
 					&& ((this.child == null && other.child == null) || (this.child != null && this.child
 							.equals(other.child)));
