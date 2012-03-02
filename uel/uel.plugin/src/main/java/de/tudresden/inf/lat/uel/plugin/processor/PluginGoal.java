@@ -44,7 +44,10 @@ public class PluginGoal {
 			String leftStr, String rightStr) {
 		this.satAtomManager = manager;
 		this.goal = new PluginGoalAux(manager);
-		initialize(ont, leftStr, rightStr);
+		Set<Equation> equations = initialize(ont, leftStr, rightStr);
+		for (Equation eq : equations) {
+			getGoal().addEquation(eq);
+		}
 	}
 
 	public Set<Integer> getConstants() {
@@ -91,12 +94,13 @@ public class PluginGoal {
 		return this.goal.getVariables().size();
 	}
 
-	private void initialize(Ontology ontology, String leftStr, String rightStr) {
+	private Set<Equation> initialize(Ontology ontology, String leftStr,
+			String rightStr) {
 
 		ConceptName left = new ConceptName(leftStr, true);
 		ConceptName right = new ConceptName(rightStr, true);
 
-		Set<Equation> newEquationSet = new HashSet<Equation>();
+		Set<Equation> ret = new HashSet<Equation>();
 		{
 			Set<Equation> equationSet = new HashSet<Equation>();
 			Integer leftId = getSatAtomManager().addAndGetIndex(left);
@@ -106,21 +110,17 @@ public class PluginGoal {
 
 			for (Equation eq : equationSet) {
 				if (eq.isPrimitive()) {
-					newEquationSet.add(processPrimitiveDefinition(eq));
+					ret.add(processPrimitiveDefinition(eq));
 				} else {
-					newEquationSet.add(eq);
+					ret.add(eq);
 				}
 			}
 		}
 
-		getGoal().addEquation(new EquationImpl(getSatAtomManager()
-				.addAndGetIndex(left), getSatAtomManager().addAndGetIndex(
-						right), false));
-		for (Equation eq : newEquationSet) {
-			getGoal().addEquation(eq);
-		}
+		ret.add(new EquationImpl(getSatAtomManager().addAndGetIndex(left),
+				getSatAtomManager().addAndGetIndex(right), false));
 
-		for (Equation eq : getUelInput().getEquations()) {
+		for (Equation eq : ret) {
 			Integer atomId = eq.getLeft();
 			getGoal().addVariable(atomId);
 			ConceptName concept = getSatAtomManager().get(atomId)
@@ -130,7 +130,7 @@ public class PluginGoal {
 		}
 
 		Set<Integer> usedAtomIds = new HashSet<Integer>();
-		for (Equation eq : getUelInput().getEquations()) {
+		for (Equation eq : ret) {
 			usedAtomIds.add(eq.getLeft());
 			usedAtomIds.addAll(eq.getRight());
 		}
@@ -163,6 +163,7 @@ public class PluginGoal {
 			}
 		}
 
+		return ret;
 	}
 
 	public void makeConstant(Integer atomId) {
