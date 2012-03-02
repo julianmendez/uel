@@ -123,8 +123,12 @@ import de.tudresden.inf.lat.uel.type.impl.UelOutputImpl;
  */
 public class SatProcessor implements UelProcessor {
 
+	private static final String keyName = "Name";
+	private static final String keyNumberOfClauses = "Number of clauses";
+	private static final String keyNumberOfPropositions = "Number of propositions";
 	private static final Logger logger = Logger.getLogger(SatProcessor.class
 			.getName());
+	private static final String processorName = "SAT-based algorithm";
 
 	private final ExtendedUelInput extUelInput;
 	private boolean firstTime = true;
@@ -156,14 +160,6 @@ public class SatProcessor implements UelProcessor {
 		this.extUelInput = new ExtendedUelInput(input);
 		this.invertLiteral = inv;
 		setLiterals();
-	}
-	
-	public Map<String, String> getInfo() {
-		Map<String, String> ret = new HashMap<String, String>();
-		ret.put("Name", "SAT-based algorithm");
-		ret.put("Number of propositions", Integer.toString(literalManager.size()));
-		ret.put("Number of clauses", Integer.toString(satinput.getClauses().size()));
-		return ret;
 	}
 
 	private boolean addToSetOfSubsumers(Integer atomId1, Integer atomId2) {
@@ -296,6 +292,18 @@ public class SatProcessor implements UelProcessor {
 
 	private Set<Equation> getEquations() {
 		return this.extUelInput.getEquations();
+	}
+
+	public Map<String, String> getInfo() {
+		Map<String, String> ret = new HashMap<String, String>();
+		ret.put(keyName, processorName);
+		if (literalManager != null) {
+			ret.put(keyNumberOfPropositions, "" + literalManager.size());
+		}
+		if (satinput != null) {
+			ret.put(keyNumberOfClauses, "" + satinput.getClauses().size());
+		}
+		return Collections.unmodifiableMap(ret);
 	}
 
 	@Override

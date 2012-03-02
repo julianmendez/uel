@@ -28,6 +28,7 @@ import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 import de.tudresden.inf.lat.uel.plugin.processor.PluginGoal;
 import de.tudresden.inf.lat.uel.plugin.processor.UelModel;
 import de.tudresden.inf.lat.uel.plugin.processor.UelProcessorFactory;
+import de.tudresden.inf.lat.uel.type.api.UelProcessor;
 
 /**
  * This class is a controller for the main panel of UEL's graphical user
@@ -117,12 +118,11 @@ public class UelController implements ActionListener {
 
 			this.varWindow.close();
 
-			getModel().configureUelProcessor(
-					UelProcessorFactory.createProcessor(getView()
-							.getSelectedProcessor(), g.getUelInput()));
+			UelProcessor processor = UelProcessorFactory.createProcessor(
+					getView().getSelectedProcessor(), g.getUelInput());
+			getModel().configureUelProcessor(processor);
 			getUnifier().setStatInfo(
-					new StatInfo(g, getLiteralSetSize(), getClauseSetSize(),
-							this.mapIdLabel));
+					new StatInfo(g, processor.getInfo(), this.mapIdLabel));
 		}
 
 		getUnifier().getView().setUnifierButtons(false);
@@ -258,11 +258,6 @@ public class UelController implements ActionListener {
 		return ret;
 	}
 
-	private int getClauseSetSize() {
-		// FIXME
-		return -1;
-	}
-
 	private Set<OWLClass> getDefinedConcepts(OWLOntology ontology,
 			boolean primitive) {
 		Set<OWLClass> ret = new HashSet<OWLClass>();
@@ -289,11 +284,6 @@ public class UelController implements ActionListener {
 
 	private String getId(OWLEntity entity) {
 		return entity.getIRI().toURI().toString();
-	}
-
-	private int getLiteralSetSize() {
-		// FIXME
-		return -1;
 	}
 
 	public UelModel getModel() {

@@ -11,10 +11,10 @@ public interface UelProcessor {
 
 	public boolean computeNextUnifier();
 
+	public Map<String, String> getInfo();
+
 	public UelInput getInput();
 
 	public UelOutput getUnifier();
 
-	public Map<String, String> getInfo();
-	
 }

@@ -29,9 +29,6 @@ public interface Message {
 	public static final String iconSave = "toolbarButtonGraphics/general/Save16.gif";
 	public static final String iconStepBack = "toolbarButtonGraphics/media/StepBack16.gif";
 	public static final String iconStepForward = "toolbarButtonGraphics/media/StepForward16.gif";
-	public static final String lblAllVarCount = "all variables";
-	public static final String lblClauseCount = "clauses";
-	public static final String lblPropositionCount = "propositions";
 	public static final String titleError = "Error";
 	public static final String tooltipAcceptVar = "use the selected entities as variables";
 	public static final String tooltipCheckBoxClassName00 = "shows also concepts with primitive definitions";
@@ -54,9 +51,7 @@ public interface Message {
 	public static final String tooltipSelectProcessor = "selects the processor";
 	public static final String tooltipSelectVariables = "gets candidates for variables";
 	public static final String tooltipShowStatInfo = "shows statistical information before computing the first unifier";
-	public static final String tooltipTextAllVarCount = "number of variables";
-	public static final String tooltipTextClauseCount = "number of clauses";
-	public static final String tooltipTextLiteralCount = "number of literals";
+	public static final String tooltipTextInfo = "statistical information given by the processor";
 	public static final String tooltipUnifier = "unifier";
 	public static final String tooltipUnifierId = "unifier id";
 
