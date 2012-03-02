@@ -10,6 +10,8 @@ import de.tudresden.inf.lat.uel.plugin.processor.PluginGoal;
  */
 public class StatInfo {
 
+	private static final String keyNumberOfVariables = "Number of variables";
+	
 	private Map<String, String> info;
 	private final Map<String, String> mapIdLabel;
 	private final PluginGoal pluginGoal;
@@ -28,6 +30,7 @@ public class StatInfo {
 
 		this.pluginGoal = g;
 		this.info = info;
+		info.put(keyNumberOfVariables, "" + pluginGoal.getVariableSetSize());
 		this.mapIdLabel = labels;
 	}
 
@@ -41,10 +44,6 @@ public class StatInfo {
 
 		}
 		return ret;
-	}
-
-	public Integer getAllVarCount() {
-		return this.pluginGoal.getVariableSetSize();
 	}
 
 	public Map<String, String> getInfo() {

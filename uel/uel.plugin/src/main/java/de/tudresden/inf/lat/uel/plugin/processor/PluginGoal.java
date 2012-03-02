@@ -26,7 +26,6 @@ public class PluginGoal {
 	public static final String UNDEF_SUFFIX = "_UNDEF";
 
 	private final PluginGoalAux goal;
-	private Equation mainEquation;
 	private IndexedSet<SatAtom> satAtomManager;
 
 	/**
@@ -72,10 +71,6 @@ public class PluginGoal {
 		return sbuf.toString();
 	}
 
-	public Equation getMainEquation() {
-		return this.mainEquation;
-	}
-
 	public IndexedSet<SatAtom> getSatAtomManager() {
 		return this.satAtomManager;
 	}
@@ -109,10 +104,6 @@ public class PluginGoal {
 			equationSet.addAll(ontology.getModule(leftId));
 			equationSet.addAll(ontology.getModule(rightId));
 
-			setMainEquation(new EquationImpl(getSatAtomManager()
-					.addAndGetIndex(left), getSatAtomManager().addAndGetIndex(
-					right), false));
-
 			for (Equation eq : equationSet) {
 				if (eq.isPrimitive()) {
 					newEquationSet.add(processPrimitiveDefinition(eq));
@@ -122,7 +113,9 @@ public class PluginGoal {
 			}
 		}
 
-		getGoal().addEquation(this.mainEquation);
+		getGoal().addEquation(new EquationImpl(getSatAtomManager()
+				.addAndGetIndex(left), getSatAtomManager().addAndGetIndex(
+						right), false));
 		for (Equation eq : newEquationSet) {
 			getGoal().addEquation(eq);
 		}
@@ -218,14 +211,9 @@ public class PluginGoal {
 		return new EquationImpl(e.getLeft(), newRightSet, false);
 	}
 
-	public void setMainEquation(Equation equation) {
-		this.mainEquation = equation;
-	}
-
 	@Override
 	public String toString() {
 		StringBuffer sbuf = new StringBuffer();
-		sbuf.append(toString(this.mainEquation));
 		sbuf.append(getGoalEquations());
 		return sbuf.toString();
 	}
