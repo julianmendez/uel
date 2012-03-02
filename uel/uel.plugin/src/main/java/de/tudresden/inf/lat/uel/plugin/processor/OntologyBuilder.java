@@ -107,8 +107,8 @@ public class OntologyBuilder {
 	private Set<SatAtom> processClass(OWLClass cls) {
 		Set<SatAtom> ret = new HashSet<SatAtom>();
 		ConceptName newAtom = new ConceptName(cls.toStringID(), false);
-		getAtomManager().add(newAtom);
-		ret.add(newAtom);
+		Integer index = getAtomManager().addAndGetIndex(newAtom);
+		ret.add(getAtomManager().get(index));
 		return ret;
 	}
 
@@ -211,7 +211,8 @@ public class OntologyBuilder {
 		} else if (atomSet.size() > 1) {
 			newAtom = createFlattenAtom(newAtomName, atomSet, newEquations);
 		}
-		ret.add(newAtom);
+		Integer index = getAtomManager().addAndGetIndex(newAtom);
+		ret.add(getAtomManager().get(index));
 		return ret;
 	}
 

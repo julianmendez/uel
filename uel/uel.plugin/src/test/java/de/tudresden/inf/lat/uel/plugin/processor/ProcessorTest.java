@@ -139,7 +139,7 @@ public class ProcessorTest extends TestCase {
 		Set<String> varNames = new HashSet<String>();
 		varNames.add("A1");
 		varNames.add("A3");
-		tryOntology(ontology10, varNames, 3);
+		tryOntology(ontology10, varNames, 2);
 	}
 
 	public void test11() throws OWLOntologyCreationException, IOException {
@@ -150,7 +150,7 @@ public class ProcessorTest extends TestCase {
 	public void test12() throws OWLOntologyCreationException, IOException {
 		Set<String> varNames = new HashSet<String>();
 		varNames.add("A2");
-		tryOntology(ontology12, varNames, 1);
+		tryOntology(ontology12, varNames, 0);
 	}
 
 	public void test13() throws OWLOntologyCreationException, IOException {
