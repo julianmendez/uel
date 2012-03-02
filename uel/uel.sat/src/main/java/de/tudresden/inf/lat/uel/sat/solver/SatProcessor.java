@@ -157,6 +157,14 @@ public class SatProcessor implements UelProcessor {
 		this.invertLiteral = inv;
 		setLiterals();
 	}
+	
+	public Map<String, String> getInfo() {
+		Map<String, String> ret = new HashMap<String, String>();
+		ret.put("Name", "SAT-based algorithm");
+		ret.put("Number of propositions", Integer.toString(literalManager.size()));
+		ret.put("Number of clauses", Integer.toString(satinput.getClauses().size()));
+		return ret;
+	}
 
 	private boolean addToSetOfSubsumers(Integer atomId1, Integer atomId2) {
 		Set<Integer> ret = this.subsumers.get(atomId1);

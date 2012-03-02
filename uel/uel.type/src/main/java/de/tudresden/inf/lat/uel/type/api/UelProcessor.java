@@ -1,5 +1,7 @@
 package de.tudresden.inf.lat.uel.type.api;
 
+import java.util.Map;
+
 /**
  * 
  * @author Stefan Borgwardt
@@ -13,4 +15,6 @@ public interface UelProcessor {
 
 	public UelOutput getUnifier();
 
+	public Map<String, String> getInfo();
+	
 }

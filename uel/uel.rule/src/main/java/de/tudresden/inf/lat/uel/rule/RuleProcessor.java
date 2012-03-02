@@ -4,9 +4,11 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Deque;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import de.tudresden.inf.lat.uel.rule.Rule.Application;
@@ -69,6 +71,12 @@ public class RuleProcessor implements UelProcessor {
 	
 	public UelInput getInput() {
 		return input;
+	}
+	
+	public Map<String, String> getInfo() {
+		Map<String, String> ret = new HashMap<String, String>();
+		ret.put("Name", "Rule-based algorithm");
+		return ret;
 	}
 
 	/**
