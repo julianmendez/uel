@@ -1,11 +1,5 @@
 package de.tudresden.inf.lat.uel.plugin.type;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-
-import de.tudresden.inf.lat.uel.type.api.AtomChangeListener;
 import de.tudresden.inf.lat.uel.type.cons.KRSSKeyword;
 
 /**
@@ -18,7 +12,6 @@ public class ConceptName extends de.tudresden.inf.lat.uel.type.impl.ConceptName
 
 	public static final String topKeyword = KRSSKeyword.top;
 
-	private List<AtomChangeListener> changeListener = new ArrayList<AtomChangeListener>();
 	private Integer conceptNameId = null;
 	private final String name;
 	private final boolean top;
@@ -43,11 +36,6 @@ public class ConceptName extends de.tudresden.inf.lat.uel.type.impl.ConceptName
 	}
 
 	@Override
-	public boolean addAtomChangeListener(AtomChangeListener o) {
-		return this.changeListener.add(o);
-	}
-
-	@Override
 	public ConceptName asConceptName() {
 		return this;
 	}
@@ -65,11 +53,6 @@ public class ConceptName extends de.tudresden.inf.lat.uel.type.impl.ConceptName
 			ret = this.name.equals(other.name);
 		}
 		return ret;
-	}
-
-	@Override
-	public Collection<AtomChangeListener> getAtomChangeListeners() {
-		return Collections.unmodifiableCollection(this.changeListener);
 	}
 
 	@Override
@@ -109,11 +92,6 @@ public class ConceptName extends de.tudresden.inf.lat.uel.type.impl.ConceptName
 	 */
 	public boolean isUserVariable() {
 		return this.userVariable;
-	}
-
-	@Override
-	public boolean removeAtomChangeListener(AtomChangeListener o) {
-		return this.changeListener.remove(o);
 	}
 
 	public void setConceptNameId(Integer id) {

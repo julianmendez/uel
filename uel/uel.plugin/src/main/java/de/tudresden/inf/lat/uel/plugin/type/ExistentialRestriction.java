@@ -1,11 +1,5 @@
 package de.tudresden.inf.lat.uel.plugin.type;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-
-import de.tudresden.inf.lat.uel.type.api.AtomChangeListener;
 import de.tudresden.inf.lat.uel.type.cons.KRSSKeyword;
 
 /**
@@ -17,7 +11,6 @@ public class ExistentialRestriction extends
 		de.tudresden.inf.lat.uel.type.impl.ExistentialRestriction implements
 		SatAtom {
 
-	private List<AtomChangeListener> changeListener = new ArrayList<AtomChangeListener>();
 	private final ConceptName child;
 	private final String id;
 	private final String name;
@@ -36,11 +29,6 @@ public class ExistentialRestriction extends
 		this.name = str;
 		this.child = ch;
 		this.id = updateId();
-	}
-
-	@Override
-	public boolean addAtomChangeListener(AtomChangeListener o) {
-		return this.changeListener.add(o);
 	}
 
 	@Override
@@ -64,11 +52,6 @@ public class ExistentialRestriction extends
 							.equals(other.child)));
 		}
 		return ret;
-	}
-
-	@Override
-	public Collection<AtomChangeListener> getAtomChangeListeners() {
-		return Collections.unmodifiableCollection(this.changeListener);
 	}
 
 	/**
@@ -106,11 +89,6 @@ public class ExistentialRestriction extends
 	@Override
 	public int hashCode() {
 		return this.id.hashCode();
-	}
-
-	@Override
-	public boolean removeAtomChangeListener(AtomChangeListener o) {
-		return this.changeListener.remove(o);
 	}
 
 	public void setRoleId(Integer id) {

@@ -1,7 +1,5 @@
 package de.tudresden.inf.lat.uel.type.api;
 
-import java.util.Collection;
-
 /**
  * Represents a flat EL-atom consisting of a role name (optional) and a concept
  * name.
@@ -10,10 +8,6 @@ import java.util.Collection;
  * @author Julian Mendez
  */
 public interface Atom {
-
-	public boolean addAtomChangeListener(AtomChangeListener o);
-
-	public Collection<AtomChangeListener> getAtomChangeListeners();
 
 	/**
 	 * Retrieve the concept name of this flat atom.
@@ -61,7 +55,5 @@ public interface Atom {
 	 *         restriction and is not ground
 	 */
 	public boolean isVariable();
-
-	public boolean removeAtomChangeListener(AtomChangeListener o);
 
 }
