@@ -9,6 +9,8 @@ import de.tudresden.inf.lat.uel.type.api.Atom;
 import de.tudresden.inf.lat.uel.type.api.Equation;
 import de.tudresden.inf.lat.uel.type.api.IndexedSet;
 import de.tudresden.inf.lat.uel.type.api.UelInput;
+import de.tudresden.inf.lat.uel.type.impl.ConceptName;
+import de.tudresden.inf.lat.uel.type.impl.ExistentialRestriction;
 import de.tudresden.inf.lat.uel.type.impl.IndexedSetImpl;
 
 /**
@@ -107,7 +109,9 @@ class PluginGoalAux implements UelInput {
 				Integer conceptId = manager.getIndex(atom);
 				this.conceptNameSet.add(atom.getName(), conceptId);
 				atom.asConceptName().setConceptNameId(conceptId);
-				ret.add(atom, conceptId);
+				ConceptName cAtom = new ConceptName(atom.isVariable(),
+						conceptId);
+				ret.add(cAtom, conceptId);
 
 				if (atom.asConceptName().isUserVariable()) {
 					this.userVariables.add(conceptId);
@@ -122,7 +126,11 @@ class PluginGoalAux implements UelInput {
 				Integer roleId = this.roleNameSet
 						.addAndGetIndex(atom.getName());
 				atom.asExistentialRestriction().setRoleId(roleId);
-				ret.add(atom, index);
+				ConceptName concept = (ConceptName) ret.get(atom
+						.asExistentialRestriction().getConceptNameId());
+				ExistentialRestriction eAtom = new ExistentialRestriction(
+						roleId, concept);
+				ret.add(eAtom, index);
 			}
 		}
 
