@@ -1,5 +1,6 @@
 package de.tudresden.inf.lat.uel.plugin.ui;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import de.tudresden.inf.lat.uel.plugin.processor.PluginGoal;
@@ -29,8 +30,7 @@ public class StatInfo {
 		}
 
 		this.pluginGoal = g;
-		this.info = info;
-		info.put(keyNumberOfVariables, "" + pluginGoal.getVariableSetSize());
+		setInfo(info);
 		this.mapIdLabel = labels;
 	}
 
@@ -51,7 +51,8 @@ public class StatInfo {
 	}
 	
 	public void setInfo(Map<String, String> info) {
-		this.info = info;
+		this.info = new HashMap<String, String>(info);
+		this.info.put(keyNumberOfVariables, "" + pluginGoal.getVariableSetSize());
 	}
 
 	public String getLabel(String id) {
