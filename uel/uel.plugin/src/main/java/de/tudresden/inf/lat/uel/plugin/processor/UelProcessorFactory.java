@@ -16,14 +16,14 @@ import de.tudresden.inf.lat.uel.type.api.UelProcessor;
  */
 public class UelProcessorFactory {
 
-	public static final String RULE_BASED_PROCESSOR = "Rule-based processor";
-	public static final String SAT_PROCESSOR = "SAT processor";
+	public static final String RULE_BASED_ALGORITHM = "Rule-based algorithm";
+	public static final String SAT_BASED_ALGORITHM = "SAT-based algorithm";
 
 	public static UelProcessor createProcessor(String name, UelInput input) {
 		UelProcessor ret;
-		if (name.equals(RULE_BASED_PROCESSOR)) {
+		if (name.equals(RULE_BASED_ALGORITHM)) {
 			ret = new RuleProcessor(input);
-		} else if (name.equals(SAT_PROCESSOR)) {
+		} else if (name.equals(SAT_BASED_ALGORITHM)) {
 			ret = new SatProcessor(input);
 		} else {
 			throw new IllegalArgumentException("Unknown processor : '" + name
@@ -34,8 +34,8 @@ public class UelProcessorFactory {
 
 	public static Collection<String> getProcessorNames() {
 		List<String> ret = new ArrayList<String>();
-		ret.add(SAT_PROCESSOR);
-		ret.add(RULE_BASED_PROCESSOR);
+		ret.add(SAT_BASED_ALGORITHM);
+		ret.add(RULE_BASED_ALGORITHM);
 		return Collections.unmodifiableCollection(ret);
 	}
 
