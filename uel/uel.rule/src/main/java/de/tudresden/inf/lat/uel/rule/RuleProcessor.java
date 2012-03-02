@@ -40,6 +40,9 @@ import de.tudresden.inf.lat.uel.type.impl.UelOutputImpl;
  */
 public class RuleProcessor implements UelProcessor {
 
+	private static final String keyName = "Name";
+	private static final String processorName = "Rule-based algorithm";
+	
 	private List<EagerRule> staticEagerRules;
 	private List<EagerRule> dynamicEagerRules;
 	private List<Rule> nondeterministicRules;
@@ -75,7 +78,7 @@ public class RuleProcessor implements UelProcessor {
 	
 	public Map<String, String> getInfo() {
 		Map<String, String> ret = new HashMap<String, String>();
-		ret.put("Name", "Rule-based algorithm");
+		ret.put(keyName, processorName);
 		return ret;
 	}
 

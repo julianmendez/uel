@@ -10,7 +10,7 @@ import de.tudresden.inf.lat.uel.plugin.processor.PluginGoal;
  */
 public class StatInfo {
 
-	private final Map<String, String> info;
+	private Map<String, String> info;
 	private final Map<String, String> mapIdLabel;
 	private final PluginGoal pluginGoal;
 
@@ -49,6 +49,10 @@ public class StatInfo {
 
 	public Map<String, String> getInfo() {
 		return this.info;
+	}
+	
+	public void setInfo(Map<String, String> info) {
+		this.info = info;
 	}
 
 	public String getLabel(String id) {

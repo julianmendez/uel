@@ -159,6 +159,7 @@ public class UnifierController implements ActionListener {
 	}
 
 	private void executeActionShowStatInfo() {
+		statInfo.setInfo(getModel().getUelProcessor().getInfo());
 		StatInfoController statInfoWindow = new StatInfoController(
 				new StatInfoView(this.statInfo));
 		statInfoWindow.open();

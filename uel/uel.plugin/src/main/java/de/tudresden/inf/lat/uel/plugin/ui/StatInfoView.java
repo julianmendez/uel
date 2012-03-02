@@ -26,7 +26,7 @@ import de.tudresden.inf.lat.uel.type.cons.KRSSKeyword;
  */
 class StatInfoView extends JDialog {
 
-	private static final String equalsSign = "=";
+	private static final String colon = ": ";
 	private static final String newLine = "\n";
 	private static final String quotes = "\"";
 	private static final long serialVersionUID = -4153981096827550491L;
@@ -158,7 +158,7 @@ class StatInfoView extends JDialog {
 		StringBuffer info = new StringBuffer();
 		for (String str : getModel().getInfo().keySet()) {
 			info.append(str);
-			info.append(equalsSign);
+			info.append(colon);
 			info.append(getModel().getInfo().get(str));
 			info.append(newLine);
 		}
