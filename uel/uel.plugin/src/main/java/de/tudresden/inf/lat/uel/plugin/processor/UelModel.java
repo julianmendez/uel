@@ -9,11 +9,10 @@ import java.util.Set;
 
 import org.semanticweb.owlapi.model.OWLOntology;
 
-import de.tudresden.inf.lat.uel.plugin.type.SatAtom;
+import de.tudresden.inf.lat.uel.plugin.type.AtomManager;
+import de.tudresden.inf.lat.uel.plugin.type.AtomManagerImpl;
 import de.tudresden.inf.lat.uel.type.api.Equation;
-import de.tudresden.inf.lat.uel.type.api.IndexedSet;
 import de.tudresden.inf.lat.uel.type.api.UelProcessor;
-import de.tudresden.inf.lat.uel.type.impl.IndexedSetImpl;
 
 /**
  * An object implementing this class connects with the UEL core and uses it to
@@ -23,7 +22,7 @@ import de.tudresden.inf.lat.uel.type.impl.IndexedSetImpl;
  */
 public class UelModel {
 
-	private IndexedSet<SatAtom> atomManager = new IndexedSetImpl<SatAtom>();
+	private AtomManager atomManager = new AtomManagerImpl();
 	private DynamicOntology ontology = null;
 	private String processorName;
 	private UelProcessor uelProcessor = null;
@@ -81,7 +80,7 @@ public class UelModel {
 		this.uelProcessor = processor;
 	}
 
-	public IndexedSet<SatAtom> getAtomManager() {
+	public AtomManager getAtomManager() {
 		return this.atomManager;
 	}
 

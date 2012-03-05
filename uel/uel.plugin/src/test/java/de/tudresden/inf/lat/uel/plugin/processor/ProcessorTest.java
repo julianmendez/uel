@@ -22,15 +22,18 @@ import org.semanticweb.owlapi.reasoner.Node;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 
 import de.tudresden.inf.lat.jcel.owlapi.main.JcelReasoner;
-import de.tudresden.inf.lat.uel.plugin.type.SatAtom;
+import de.tudresden.inf.lat.uel.plugin.type.AtomManager;
 import de.tudresden.inf.lat.uel.plugin.ui.UelController;
 import de.tudresden.inf.lat.uel.plugin.ui.UelView;
+import de.tudresden.inf.lat.uel.type.api.Atom;
 import de.tudresden.inf.lat.uel.type.api.Equation;
 import de.tudresden.inf.lat.uel.type.api.UelProcessor;
 
 public class ProcessorTest extends TestCase {
 
 	private static final String apath = "src/test/resources/";
+	private static final String conceptC = "C";
+	private static final String conceptD = "D";
 	private static final String ontology01 = apath + "testOntology-01.krss";
 	private static final String ontology02 = apath + "testOntology-02.krss";
 	private static final String ontology03 = apath + "testOntology-03.krss";
@@ -66,160 +69,202 @@ public class ProcessorTest extends TestCase {
 
 	private Integer getAtomId(PluginGoal goal, String atomName, boolean undef) {
 		if (undef) {
-			atomName += PluginGoal.UNDEF_SUFFIX;
+			atomName += AtomManager.UNDEF_SUFFIX;
 		}
 		Integer ret = null;
-		for (Integer currentAtomId : goal.getSatAtomManager().getIndices()) {
-			SatAtom currentAtom = goal.getSatAtomManager().get(currentAtomId);
-			if (currentAtom.getId().equals(atomName)) {
-				ret = currentAtomId;
+		for (Integer currentAtomId : goal.getAtomManager().getAtoms()
+				.getIndices()) {
+			Atom currentAtom = goal.getAtomManager().getAtoms()
+					.get(currentAtomId);
+			if (currentAtom.isConceptName()) {
+				String currentAtomName = goal.getAtomManager().getConceptName(
+						currentAtom.getConceptNameId());
+				if (currentAtomName.equals(atomName)) {
+					ret = currentAtomId;
+				}
 			}
 		}
 		return ret;
 	}
-	
-	public <T> Set<T> set(T ... elements) {
+
+	public <T> Set<T> set(T... elements) {
 		return new HashSet<T>(Arrays.asList(elements));
 	}
 
-	public void test01SAT() throws OWLOntologyCreationException, IOException {
-		tryOntology(ontology01, set("A1", "A4"), 16, UelProcessorFactory.SAT_BASED_ALGORITHM);
-	}
-
 	public void test01Rule() throws OWLOntologyCreationException, IOException {
-		tryOntology(ontology01, set("A1", "A4"), 1, UelProcessorFactory.RULE_BASED_ALGORITHM);
+		tryOntology(ontology01, set("A1", "A4"), 1,
+				UelProcessorFactory.RULE_BASED_ALGORITHM);
 	}
 
-	public void test02SAT() throws OWLOntologyCreationException, IOException {
-		tryOntology(ontology02, set("A1", "A4"), 64, UelProcessorFactory.SAT_BASED_ALGORITHM);
+	public void test01SAT() throws OWLOntologyCreationException, IOException {
+		tryOntology(ontology01, set("A1", "A4"), 16,
+				UelProcessorFactory.SAT_BASED_ALGORITHM);
 	}
 
 	public void test02Rule() throws OWLOntologyCreationException, IOException {
-		tryOntology(ontology02, set("A1", "A4"), 1, UelProcessorFactory.RULE_BASED_ALGORITHM);
+		tryOntology(ontology02, set("A1", "A4"), 1,
+				UelProcessorFactory.RULE_BASED_ALGORITHM);
 	}
 
-	public void test03SAT() throws OWLOntologyCreationException, IOException {
-		tryOntology(ontology03, set("Z"), 1, UelProcessorFactory.SAT_BASED_ALGORITHM);
+	public void test02SAT() throws OWLOntologyCreationException, IOException {
+		tryOntology(ontology02, set("A1", "A4"), 64,
+				UelProcessorFactory.SAT_BASED_ALGORITHM);
 	}
 
 	public void test03Rule() throws OWLOntologyCreationException, IOException {
-		tryOntology(ontology03, set("Z"), 1, UelProcessorFactory.RULE_BASED_ALGORITHM);
+		tryOntology(ontology03, set("Z"), 1,
+				UelProcessorFactory.RULE_BASED_ALGORITHM);
 	}
 
-	public void test04SAT() throws OWLOntologyCreationException, IOException {
-		tryOntology(ontology04, new HashSet<String>(), 0, UelProcessorFactory.SAT_BASED_ALGORITHM);
+	public void test03SAT() throws OWLOntologyCreationException, IOException {
+		tryOntology(ontology03, set("Z"), 1,
+				UelProcessorFactory.SAT_BASED_ALGORITHM);
 	}
 
 	public void test04Rule() throws OWLOntologyCreationException, IOException {
-		tryOntology(ontology04, new HashSet<String>(), 0, UelProcessorFactory.RULE_BASED_ALGORITHM);
+		tryOntology(ontology04, new HashSet<String>(), 0,
+				UelProcessorFactory.RULE_BASED_ALGORITHM);
 	}
 
-	public void test05SAT() throws OWLOntologyCreationException, IOException {
-		tryOntology(ontology05, set("A", "A1", "A2"), 32, UelProcessorFactory.SAT_BASED_ALGORITHM);
+	public void test04SAT() throws OWLOntologyCreationException, IOException {
+		tryOntology(ontology04, new HashSet<String>(), 0,
+				UelProcessorFactory.SAT_BASED_ALGORITHM);
 	}
 
 	public void test05Rule() throws OWLOntologyCreationException, IOException {
-		tryOntology(ontology05, set("A", "A1", "A2"), 1, UelProcessorFactory.RULE_BASED_ALGORITHM);
+		tryOntology(ontology05, set("A", "A1", "A2"), 1,
+				UelProcessorFactory.RULE_BASED_ALGORITHM);
 	}
 
-	public void test06SAT() throws OWLOntologyCreationException, IOException {
-		tryOntology(ontology06, set("A1", "A2"), 3, UelProcessorFactory.SAT_BASED_ALGORITHM);
+	public void test05SAT() throws OWLOntologyCreationException, IOException {
+		tryOntology(ontology05, set("A", "A1", "A2"), 32,
+				UelProcessorFactory.SAT_BASED_ALGORITHM);
 	}
 
 	public void test06Rule() throws OWLOntologyCreationException, IOException {
-		tryOntology(ontology06, set("A1", "A2"), 2, UelProcessorFactory.RULE_BASED_ALGORITHM);
+		tryOntology(ontology06, set("A1", "A2"), 2,
+				UelProcessorFactory.RULE_BASED_ALGORITHM);
 	}
 
-	public void test07SAT() throws OWLOntologyCreationException, IOException {
-		tryOntology(ontology07, set("A1", "A2"), 0, UelProcessorFactory.SAT_BASED_ALGORITHM);
+	public void test06SAT() throws OWLOntologyCreationException, IOException {
+		tryOntology(ontology06, set("A1", "A2"), 3,
+				UelProcessorFactory.SAT_BASED_ALGORITHM);
 	}
 
 	public void test07Rule() throws OWLOntologyCreationException, IOException {
-		tryOntology(ontology07, set("A1", "A2"), 0, UelProcessorFactory.RULE_BASED_ALGORITHM);
+		tryOntology(ontology07, set("A1", "A2"), 0,
+				UelProcessorFactory.RULE_BASED_ALGORITHM);
+	}
+
+	public void test07SAT() throws OWLOntologyCreationException, IOException {
+		tryOntology(ontology07, set("A1", "A2"), 0,
+				UelProcessorFactory.SAT_BASED_ALGORITHM);
+	}
+
+	public void test08Rule() throws OWLOntologyCreationException, IOException {
+		tryOntology(ontology08, set("A1", "A2", "A4"), 3,
+				UelProcessorFactory.RULE_BASED_ALGORITHM);
 	}
 
 	public void test08SAT() throws OWLOntologyCreationException, IOException {
 		// including repetitions
-		tryOntology(ontology08, set("A1", "A2", "A4"), 1040, UelProcessorFactory.SAT_BASED_ALGORITHM);
-	}
-
-	public void test08Rule() throws OWLOntologyCreationException, IOException {
-		tryOntology(ontology08, set("A1", "A2", "A4"), 3, UelProcessorFactory.RULE_BASED_ALGORITHM);
-	}
-
-	public void test09SAT() throws OWLOntologyCreationException, IOException {
-		tryOntology(ontology09, set("A1", "A2"), 0, UelProcessorFactory.SAT_BASED_ALGORITHM);
+		tryOntology(ontology08, set("A1", "A2", "A4"), 1040,
+				UelProcessorFactory.SAT_BASED_ALGORITHM);
 	}
 
 	public void test09Rule() throws OWLOntologyCreationException, IOException {
-		tryOntology(ontology09, set("A1", "A2"), 0, UelProcessorFactory.RULE_BASED_ALGORITHM);
+		tryOntology(ontology09, set("A1", "A2"), 0,
+				UelProcessorFactory.RULE_BASED_ALGORITHM);
 	}
 
-	public void test10SAT() throws OWLOntologyCreationException, IOException {
-		tryOntology(ontology10, set("A1", "A3"), 2, UelProcessorFactory.SAT_BASED_ALGORITHM);
+	public void test09SAT() throws OWLOntologyCreationException, IOException {
+		tryOntology(ontology09, set("A1", "A2"), 0,
+				UelProcessorFactory.SAT_BASED_ALGORITHM);
 	}
 
 	public void test10Rule() throws OWLOntologyCreationException, IOException {
-		tryOntology(ontology10, set("A1", "A3"), 2, UelProcessorFactory.RULE_BASED_ALGORITHM);
+		tryOntology(ontology10, set("A1", "A3"), 2,
+				UelProcessorFactory.RULE_BASED_ALGORITHM);
 	}
 
-	public void test11SAT() throws OWLOntologyCreationException, IOException {
-		tryOntology(ontology11, new HashSet<String>(), 1, UelProcessorFactory.SAT_BASED_ALGORITHM);
+	public void test10SAT() throws OWLOntologyCreationException, IOException {
+		tryOntology(ontology10, set("A1", "A3"), 2,
+				UelProcessorFactory.SAT_BASED_ALGORITHM);
 	}
 
 	public void test11Rule() throws OWLOntologyCreationException, IOException {
-		tryOntology(ontology11, new HashSet<String>(), 1, UelProcessorFactory.RULE_BASED_ALGORITHM);
+		tryOntology(ontology11, new HashSet<String>(), 1,
+				UelProcessorFactory.RULE_BASED_ALGORITHM);
 	}
 
-	public void test12SAT() throws OWLOntologyCreationException, IOException {
-		tryOntology(ontology12, set("A2"), 0, UelProcessorFactory.SAT_BASED_ALGORITHM);
+	public void test11SAT() throws OWLOntologyCreationException, IOException {
+		tryOntology(ontology11, new HashSet<String>(), 1,
+				UelProcessorFactory.SAT_BASED_ALGORITHM);
 	}
 
 	public void test12Rule() throws OWLOntologyCreationException, IOException {
-		tryOntology(ontology12, set("A2"), 0, UelProcessorFactory.RULE_BASED_ALGORITHM);
+		tryOntology(ontology12, set("A2"), 0,
+				UelProcessorFactory.RULE_BASED_ALGORITHM);
 	}
 
-	public void test13SAT() throws OWLOntologyCreationException, IOException {
-		tryOntology(ontology13, set("B2"), 0, UelProcessorFactory.SAT_BASED_ALGORITHM);
+	public void test12SAT() throws OWLOntologyCreationException, IOException {
+		tryOntology(ontology12, set("A2"), 0,
+				UelProcessorFactory.SAT_BASED_ALGORITHM);
 	}
 
 	public void test13Rule() throws OWLOntologyCreationException, IOException {
-		tryOntology(ontology13, set("B2"), 0, UelProcessorFactory.RULE_BASED_ALGORITHM);
+		tryOntology(ontology13, set("B2"), 0,
+				UelProcessorFactory.RULE_BASED_ALGORITHM);
 	}
 
-	public void test14SAT() throws OWLOntologyCreationException, IOException {
-		tryOntology(ontology14, set("A", "B5"), 8, UelProcessorFactory.SAT_BASED_ALGORITHM);
+	public void test13SAT() throws OWLOntologyCreationException, IOException {
+		tryOntology(ontology13, set("B2"), 0,
+				UelProcessorFactory.SAT_BASED_ALGORITHM);
 	}
 
 	public void test14Rule() throws OWLOntologyCreationException, IOException {
-		tryOntology(ontology14, set("A", "B5"), 1, UelProcessorFactory.RULE_BASED_ALGORITHM);
+		tryOntology(ontology14, set("A", "B5"), 1,
+				UelProcessorFactory.RULE_BASED_ALGORITHM);
 	}
 
-	public void test15SAT() throws OWLOntologyCreationException, IOException {
-		tryOntology(ontology15, new HashSet<String>(), 0, UelProcessorFactory.SAT_BASED_ALGORITHM);
+	public void test14SAT() throws OWLOntologyCreationException, IOException {
+		tryOntology(ontology14, set("A", "B5"), 8,
+				UelProcessorFactory.SAT_BASED_ALGORITHM);
 	}
 
 	public void test15Rule() throws OWLOntologyCreationException, IOException {
-		tryOntology(ontology15, new HashSet<String>(), 0, UelProcessorFactory.RULE_BASED_ALGORITHM);
+		tryOntology(ontology15, new HashSet<String>(), 0,
+				UelProcessorFactory.RULE_BASED_ALGORITHM);
 	}
 
-	public void test16SAT() throws OWLOntologyCreationException, IOException {
-		tryOntology(ontology16, new HashSet<String>(), set("Head_injury", "Severe_injury"), 128, UelProcessorFactory.SAT_BASED_ALGORITHM);
+	public void test15SAT() throws OWLOntologyCreationException, IOException {
+		tryOntology(ontology15, new HashSet<String>(), 0,
+				UelProcessorFactory.SAT_BASED_ALGORITHM);
 	}
 
 	public void test16Rule() throws OWLOntologyCreationException, IOException {
-		tryOntology(ontology16, new HashSet<String>(), set("Head_injury", "Severe_injury"), 1, UelProcessorFactory.RULE_BASED_ALGORITHM);
+		tryOntology(ontology16, new HashSet<String>(),
+				set("Head_injury", "Severe_injury"), 1,
+				UelProcessorFactory.RULE_BASED_ALGORITHM);
+	}
+
+	public void test16SAT() throws OWLOntologyCreationException, IOException {
+		tryOntology(ontology16, new HashSet<String>(),
+				set("Head_injury", "Severe_injury"), 128,
+				UelProcessorFactory.SAT_BASED_ALGORITHM);
 	}
 
 	private void tryOntology(String ontologyName, Set<String> varNames,
 			Integer numberOfUnifiers, String processorName)
 			throws OWLOntologyCreationException, IOException {
-		tryOntology(ontologyName, varNames, new HashSet<String>(), numberOfUnifiers, processorName);
+		tryOntology(ontologyName, varNames, new HashSet<String>(),
+				numberOfUnifiers, processorName);
 	}
-	
+
 	private void tryOntology(String ontologyName, Set<String> varNames,
-			Set<String> undefVarNames, Integer numberOfUnifiers, String processorName)
-			throws OWLOntologyCreationException, IOException {
+			Set<String> undefVarNames, Integer numberOfUnifiers,
+			String processorName) throws OWLOntologyCreationException,
+			IOException {
 		Map<String, OWLClass> idClassMap = new HashMap<String, OWLClass>();
 		UelModel uelModel = new UelModel();
 
@@ -232,23 +277,25 @@ public class ProcessorTest extends TestCase {
 		}
 
 		Set<String> input = new HashSet<String>();
-		input.add(idClassMap.get("C").toStringID());
-		input.add(idClassMap.get("D").toStringID());
+		input.add(idClassMap.get(conceptC).toStringID());
+		input.add(idClassMap.get(conceptD).toStringID());
 		PluginGoal goal = uelModel.configure(input);
 
 		for (String var : varNames) {
-			Integer atomId = getAtomId(goal, idClassMap.get(var).toStringID(), false);
+			Integer atomId = getAtomId(goal, idClassMap.get(var).toStringID(),
+					false);
 			goal.makeVariable(atomId);
 		}
 		for (String var : undefVarNames) {
-			Integer atomId = getAtomId(goal, idClassMap.get(var).toStringID(), true);
+			Integer atomId = getAtomId(goal, idClassMap.get(var).toStringID(),
+					true);
 			goal.makeVariable(atomId);
 		}
 
 		UelProcessor processor = UelProcessorFactory.createProcessor(
 				processorName, goal.getUelInput());
 		uelModel.configureUelProcessor(processor);
-		
+
 		boolean hasUnifiers = true;
 		while (hasUnifiers) {
 			hasUnifiers = uelModel.computeNextUnifier();
@@ -266,8 +313,8 @@ public class ProcessorTest extends TestCase {
 
 			OWLReasoner reasoner = createReasoner(extendedOntology);
 			Node<OWLClass> node = reasoner.getEquivalentClasses(idClassMap
-					.get("C"));
-			OWLClass elem = idClassMap.get("D");
+					.get(conceptC));
+			OWLClass elem = idClassMap.get(conceptD);
 			assertTrue(node.contains(elem));
 		}
 

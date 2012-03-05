@@ -20,11 +20,13 @@ import org.semanticweb.owlapi.io.OWLRendererException;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 
-import de.tudresden.inf.lat.uel.plugin.processor.PluginGoal;
 import de.tudresden.inf.lat.uel.plugin.processor.UelModel;
-import de.tudresden.inf.lat.uel.plugin.type.SatAtom;
+import de.tudresden.inf.lat.uel.plugin.type.AtomManager;
+import de.tudresden.inf.lat.uel.type.api.Atom;
 import de.tudresden.inf.lat.uel.type.api.Equation;
 import de.tudresden.inf.lat.uel.type.cons.KRSSKeyword;
+import de.tudresden.inf.lat.uel.type.impl.ConceptName;
+import de.tudresden.inf.lat.uel.type.impl.ExistentialRestriction;
 
 /**
  * 
@@ -167,17 +169,17 @@ public class UnifierController implements ActionListener {
 
 	private String getLabel(String candidateId) {
 		String ret = candidateId;
-		if (candidateId.endsWith(PluginGoal.UNDEF_SUFFIX)) {
+		if (candidateId.endsWith(AtomManager.UNDEF_SUFFIX)) {
 			ret = candidateId.substring(0, candidateId.length()
-					- PluginGoal.UNDEF_SUFFIX.length());
+					- AtomManager.UNDEF_SUFFIX.length());
 		}
 
 		String str = this.mapIdLabel.get(ret);
 		if (str != null) {
 			ret = str;
 		}
-		if (candidateId.endsWith(PluginGoal.UNDEF_SUFFIX)) {
-			ret += PluginGoal.UNDEF_SUFFIX;
+		if (candidateId.endsWith(AtomManager.UNDEF_SUFFIX)) {
+			ret += AtomManager.UNDEF_SUFFIX;
 		}
 		return ret;
 	}
@@ -186,15 +188,16 @@ public class UnifierController implements ActionListener {
 		return getView().getModel();
 	}
 
-	private Collection<SatAtom> getSetOfSubsumers(SatAtom atom) {
-		Set<SatAtom> ret = new HashSet<SatAtom>();
+	private Collection<Atom> getSetOfSubsumers(Atom atom) {
+		Set<Atom> ret = new HashSet<Atom>();
 		Set<Equation> equations = getModel().getUelProcessor().getUnifier()
 				.getEquations();
 		for (Equation equation : equations) {
-			if (equation.getLeft().equals(
-					getModel().getAtomManager().addAndGetIndex(atom))) {
+			if (equation.getLeft()
+					.equals(getModel().getAtomManager().getAtoms()
+							.addAndGetIndex(atom))) {
 				for (Integer id : equation.getRight()) {
-					ret.add(getModel().getAtomManager().get(id));
+					ret.add(getModel().getAtomManager().getAtoms().get(id));
 				}
 			}
 		}
@@ -220,7 +223,7 @@ public class UnifierController implements ActionListener {
 	 * 
 	 * @return the string representation of a substitution set
 	 */
-	public String printSetOfSubsumers(Collection<SatAtom> setOfSubsumers) {
+	public String printSetOfSubsumers(Collection<Atom> setOfSubsumers) {
 
 		StringBuffer sbuf = new StringBuffer();
 
@@ -231,7 +234,7 @@ public class UnifierController implements ActionListener {
 
 		} else if (setOfSubsumers.size() == 1) {
 
-			SatAtom atom = setOfSubsumers.iterator().next();
+			Atom atom = setOfSubsumers.iterator().next();
 			sbuf.append(printSubstitution(atom));
 
 		} else {
@@ -240,7 +243,7 @@ public class UnifierController implements ActionListener {
 			sbuf.append(KRSSKeyword.and);
 			sbuf.append(KRSSKeyword.space);
 
-			for (SatAtom atom : setOfSubsumers) {
+			for (Atom atom : setOfSubsumers) {
 				sbuf.append(KRSSKeyword.space);
 				sbuf.append(printSubstitution(atom));
 				sbuf.append(KRSSKeyword.space);
@@ -252,28 +255,36 @@ public class UnifierController implements ActionListener {
 		return sbuf.toString();
 	}
 
-	private String printSubstitution(SatAtom atom) {
+	private String printSubstitution(Atom atom) {
 		StringBuffer sbuf = new StringBuffer();
-		if (atom.isExistentialRestriction()
-				&& !(atom.asExistentialRestriction().getChild().isConceptName() && atom
-						.asExistentialRestriction().getChild().asConceptName()
-						.isUserVariable())) {
+		if (atom.isExistentialRestriction()) {
+			ConceptName child = ((ExistentialRestriction) atom).getChild();
+			Integer conceptId = getModel().getAtomManager().getAtoms()
+					.getIndex(child);
+			boolean childIsUserVariable = getModel().getUelProcessor()
+					.getInput().getUserVariables().contains(conceptId);
+
 			sbuf.append(KRSSKeyword.open);
 			sbuf.append(KRSSKeyword.some);
 			sbuf.append(KRSSKeyword.space);
-			sbuf.append(atom.getName());
+			String roleName = getModel().getAtomManager().getRoleName(
+					((ExistentialRestriction) atom).getRoleId());
+			sbuf.append(roleName);
 			sbuf.append(KRSSKeyword.space);
-			SatAtom child = atom.asExistentialRestriction().getChild();
-			if (child.isConceptName() && child.asConceptName().isVariable()
-					&& !child.asConceptName().isUserVariable()) {
-				sbuf.append(printSetOfSubsumers(getSetOfSubsumers(child
-						.asConceptName())));
+			if (child.isVariable() && !childIsUserVariable) {
+				sbuf.append(printSetOfSubsumers(getSetOfSubsumers(child)));
 			} else {
-				sbuf.append(child.getName());
+				String childName = getModel().getAtomManager().getConceptName(
+						child.getConceptNameId());
+				sbuf.append(childName);
 			}
 			sbuf.append(KRSSKeyword.close);
 		} else {
-			sbuf.append(atom.getId());
+			ConceptName concept = (ConceptName) atom;
+			Integer conceptId = getModel().getAtomManager().getAtoms()
+					.getIndex(concept);
+			String name = getModel().getAtomManager().getConceptName(conceptId);
+			sbuf.append(name);
 		}
 		return sbuf.toString();
 	}
@@ -325,18 +336,23 @@ public class UnifierController implements ActionListener {
 		unif.addAll(set);
 		StringBuffer sbuf = new StringBuffer();
 		for (Equation eq : set) {
-			SatAtom leftPart = getModel().getAtomManager().get(eq.getLeft());
+			Atom leftPart = getModel().getAtomManager().getAtoms()
+					.get(eq.getLeft());
 
-			Set<SatAtom> right = new HashSet<SatAtom>();
+			Set<Atom> right = new HashSet<Atom>();
 			for (Integer atomId : eq.getRight()) {
-				right.add(getModel().getAtomManager().get(atomId));
+				right.add(getModel().getAtomManager().getAtoms().get(atomId));
 			}
 
 			sbuf.append(KRSSKeyword.newLine);
 			sbuf.append(KRSSKeyword.open);
 			sbuf.append(KRSSKeyword.define_concept);
 			sbuf.append(KRSSKeyword.space);
-			sbuf.append(leftPart.getId());
+			Integer conceptId = getModel().getAtomManager().getAtoms()
+					.getIndex(leftPart);
+			String conceptName = getModel().getAtomManager().getConceptName(
+					conceptId);
+			sbuf.append(conceptName);
 			sbuf.append(KRSSKeyword.space);
 
 			sbuf.append(printSetOfSubsumers(right));

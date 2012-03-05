@@ -7,7 +7,9 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import de.tudresden.inf.lat.uel.plugin.processor.PluginGoal;
-import de.tudresden.inf.lat.uel.plugin.type.SatAtom;
+import de.tudresden.inf.lat.uel.plugin.type.AtomManager;
+import de.tudresden.inf.lat.uel.type.api.Atom;
+import de.tudresden.inf.lat.uel.type.impl.ConceptName;
 
 /**
  * 
@@ -36,22 +38,10 @@ class VarSelectionModel {
 		this.pluginGoal = g;
 	}
 
-	private Integer getAtomId(String atomName) {
-		Integer ret = null;
-		for (Integer currentAtomId : getGoal().getSatAtomManager().getIndices()) {
-			SatAtom currentAtom = getGoal().getSatAtomManager().get(
-					currentAtomId);
-			if (currentAtom.getId().equals(atomName)) {
-				ret = currentAtomId;
-			}
-		}
-		return ret;
-	}
-
 	public Set<String> getConstants() {
 		Set<String> ret = new HashSet<String>();
 		for (Integer atomId : getGoal().getConstants()) {
-			ret.add(getGoal().getSatAtomManager().get(atomId).getId());
+			ret.add(getGoal().getAtomManager().getConceptName(atomId));
 		}
 		return Collections.unmodifiableSet(ret);
 	}
@@ -68,12 +58,12 @@ class VarSelectionModel {
 		String ret = this.idLabelMap.get(id);
 
 		if (ret == null) {
-			if (id.endsWith(PluginGoal.UNDEF_SUFFIX)) {
+			if (id.endsWith(AtomManager.UNDEF_SUFFIX)) {
 				String origId = id.substring(0, id.length()
-						- PluginGoal.UNDEF_SUFFIX.length());
+						- AtomManager.UNDEF_SUFFIX.length());
 				ret = this.idLabelMap.get(origId);
 				if (ret != null) {
-					ret += PluginGoal.UNDEF_SUFFIX;
+					ret += AtomManager.UNDEF_SUFFIX;
 				}
 			}
 		}
@@ -101,9 +91,16 @@ class VarSelectionModel {
 	public Set<String> getVariables() {
 		Set<String> ret = new HashSet<String>();
 		for (Integer atomId : getGoal().getVariables()) {
-			SatAtom atom = getGoal().getSatAtomManager().get(atomId);
-			if (atom.isConceptName() && atom.asConceptName().isUserVariable()) {
-				ret.add(atom.getId());
+			Atom atom = getGoal().getAtomManager().getAtoms().get(atomId);
+
+			if (atom.isConceptName()) {
+				ConceptName concept = (ConceptName) atom;
+				if (getGoal().getUelInput().getUserVariables()
+						.contains(concept.getConceptNameId())) {
+					String name = getGoal().getAtomManager().getConceptName(
+							atom.getConceptNameId());
+					ret.add(name);
+				}
 			}
 		}
 		return Collections.unmodifiableSet(ret);
@@ -114,9 +111,9 @@ class VarSelectionModel {
 			throw new IllegalArgumentException("Null argument.");
 		}
 
-		Integer atomId = getAtomId(id);
+		Integer atomId = getGoal().getAtomManager().getConceptIndex(id);
 		if (atomId == null) {
-			throw new IllegalArgumentException("Unkown atom.");
+			throw new IllegalArgumentException("Unkown atom:'" + id + "'.");
 		}
 		this.pluginGoal.makeConstant(atomId);
 	}
@@ -126,9 +123,9 @@ class VarSelectionModel {
 			throw new IllegalArgumentException("Null argument.");
 		}
 
-		Integer atomId = getAtomId(id);
+		Integer atomId = getGoal().getAtomManager().getConceptIndex(id);
 		if (atomId == null) {
-			throw new IllegalArgumentException("Unkown atom.");
+			throw new IllegalArgumentException("Unkown atom :'" + id + "'.");
 		}
 		this.pluginGoal.makeVariable(atomId);
 	}

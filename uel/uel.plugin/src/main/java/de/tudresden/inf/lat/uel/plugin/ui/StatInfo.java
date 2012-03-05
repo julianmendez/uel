@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import de.tudresden.inf.lat.uel.plugin.processor.PluginGoal;
+import de.tudresden.inf.lat.uel.plugin.type.AtomManager;
 
 /**
  * 
@@ -12,7 +13,7 @@ import de.tudresden.inf.lat.uel.plugin.processor.PluginGoal;
 public class StatInfo {
 
 	private static final String keyNumberOfVariables = "Number of variables";
-	
+
 	private Map<String, String> info;
 	private final Map<String, String> mapIdLabel;
 	private final PluginGoal pluginGoal;
@@ -49,11 +50,6 @@ public class StatInfo {
 	public Map<String, String> getInfo() {
 		return this.info;
 	}
-	
-	public void setInfo(Map<String, String> info) {
-		this.info = new HashMap<String, String>(info);
-		this.info.put(keyNumberOfVariables, "" + pluginGoal.getVariableSetSize());
-	}
 
 	public String getLabel(String id) {
 		if (id == null) {
@@ -63,12 +59,12 @@ public class StatInfo {
 		String ret = this.mapIdLabel.get(id);
 
 		if (ret == null) {
-			if (id.endsWith(PluginGoal.UNDEF_SUFFIX)) {
+			if (id.endsWith(AtomManager.UNDEF_SUFFIX)) {
 				String origId = id.substring(0, id.length()
-						- PluginGoal.UNDEF_SUFFIX.length());
+						- AtomManager.UNDEF_SUFFIX.length());
 				ret = this.mapIdLabel.get(origId);
 				if (ret != null) {
-					ret += PluginGoal.UNDEF_SUFFIX;
+					ret += AtomManager.UNDEF_SUFFIX;
 				}
 			}
 		}
@@ -86,6 +82,12 @@ public class StatInfo {
 	@Override
 	public int hashCode() {
 		return this.pluginGoal.hashCode();
+	}
+
+	public void setInfo(Map<String, String> info) {
+		this.info = new HashMap<String, String>(info);
+		this.info.put(keyNumberOfVariables,
+				"" + pluginGoal.getVariableSetSize());
 	}
 
 	@Override
