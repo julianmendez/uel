@@ -52,34 +52,10 @@ public class PluginGoal {
 		this.atomManager = manager;
 		Set<Equation> equations = initialize(ont, leftStr, rightStr);
 		for (Equation eq : equations) {
-			addEquation(eq);
+			this.equations.add(eq);
 		}
 		this.uelInput = new UelInputImpl(manager.getAtoms(), equations,
 				this.userVariables);
-	}
-
-	private boolean addConstant(Integer atomId) {
-		return this.constants.add(atomId);
-	}
-
-	private boolean addEAtom(Integer atomId) {
-		return this.eatoms.add(atomId);
-	}
-
-	private boolean addEquation(Equation e) {
-		return this.equations.add(e);
-	}
-
-	private boolean addUsedAtomId(Integer atomId) {
-		return this.usedAtomIds.add(atomId);
-	}
-
-	private boolean addUserVariable(Integer atomId) {
-		return this.userVariables.add(atomId);
-	}
-
-	private boolean addVariable(Integer atomId) {
-		return this.variables.add(atomId);
 	}
 
 	public AtomManager getAtomManager() {
@@ -146,11 +122,11 @@ public class PluginGoal {
 
 		for (Equation eq : ret) {
 			Integer atomId = eq.getLeft();
-			addVariable(atomId);
+			this.variables.add(atomId);
 			ConceptName concept = (ConceptName) getAtomManager().getAtoms()
 					.get(atomId);
 			concept.setVariable(true);
-			removeUserVariable(concept.getConceptNameId());
+			this.userVariables.remove(concept.getConceptNameId());
 		}
 
 		Set<Integer> usedAtomIds = new HashSet<Integer>();
@@ -165,7 +141,7 @@ public class PluginGoal {
 			if (atom.isConceptName()) {
 				conceptNameIds.add(usedAtomId);
 			} else if (atom.isExistentialRestriction()) {
-				addEAtom(usedAtomId);
+				this.eatoms.add(usedAtomId);
 				ConceptName child = ((ExistentialRestriction) atom).getChild();
 				Integer childId = getAtomManager().getAtoms().addAndGetIndex(
 						child);
@@ -174,16 +150,16 @@ public class PluginGoal {
 		}
 		usedAtomIds.addAll(conceptNameIds);
 		for (Integer atomId : usedAtomIds) {
-			addUsedAtomId(atomId);
+			this.usedAtomIds.add(atomId);
 		}
 
 		for (Integer atomId : conceptNameIds) {
 			Atom atom = getAtomManager().getAtoms().get(atomId);
 			if (atom.isConceptName()) {
 				if (((ConceptName) atom).isVariable()) {
-					addVariable(atomId);
+					this.variables.add(atomId);
 				} else if (!((ConceptName) atom).isVariable()) {
-					addConstant(atomId);
+					this.constants.add(atomId);
 				}
 			}
 		}
@@ -200,9 +176,9 @@ public class PluginGoal {
 		}
 		ConceptName conceptName = (ConceptName) atom;
 		if (getVariables().contains(atomId)) {
-			removeVariable(atomId);
-			addConstant(atomId);
-			removeUserVariable(conceptName.getConceptNameId());
+			this.variables.remove(atomId);
+			this.constants.add(atomId);
+			this.userVariables.remove(conceptName.getConceptNameId());
 			conceptName.setVariable(false);
 		}
 	}
@@ -216,9 +192,9 @@ public class PluginGoal {
 		}
 		ConceptName conceptName = (ConceptName) atom;
 		if (getConstants().contains(atomId)) {
-			removeConstant(atomId);
-			addVariable(atomId);
-			addUserVariable(conceptName.getConceptNameId());
+			this.constants.remove(atomId);
+			this.variables.add(atomId);
+			this.userVariables.add(conceptName.getConceptNameId());
 			conceptName.setVariable(true);
 		}
 	}
@@ -227,7 +203,7 @@ public class PluginGoal {
 		Atom leftAtom = getAtomManager().getAtoms().get(e.getLeft());
 		ConceptName b = (ConceptName) leftAtom;
 		ConceptName var = this.atomManager.createUndefConceptName(b, false);
-		removeUserVariable(var.getConceptNameId());
+		this.userVariables.remove(var.getConceptNameId());
 		getAtomManager().getAtoms().add(var);
 		Integer varId = getAtomManager().getAtoms().addAndGetIndex(var);
 
@@ -235,18 +211,6 @@ public class PluginGoal {
 		newRightSet.addAll(e.getRight());
 		newRightSet.add(varId);
 		return new EquationImpl(e.getLeft(), newRightSet, false);
-	}
-
-	private boolean removeConstant(Integer atomId) {
-		return this.constants.remove(atomId);
-	}
-
-	private boolean removeUserVariable(Integer atomId) {
-		return this.userVariables.remove(atomId);
-	}
-
-	private boolean removeVariable(Integer atomId) {
-		return this.variables.remove(atomId);
 	}
 
 	private String renderByAtomId(Integer atomId) {
