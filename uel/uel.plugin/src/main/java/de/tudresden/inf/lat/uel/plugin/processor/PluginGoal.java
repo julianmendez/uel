@@ -1,5 +1,6 @@
 package de.tudresden.inf.lat.uel.plugin.processor;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -11,6 +12,7 @@ import de.tudresden.inf.lat.uel.type.cons.KRSSKeyword;
 import de.tudresden.inf.lat.uel.type.impl.ConceptName;
 import de.tudresden.inf.lat.uel.type.impl.EquationImpl;
 import de.tudresden.inf.lat.uel.type.impl.ExistentialRestriction;
+import de.tudresden.inf.lat.uel.type.impl.UelInputImpl;
 
 /**
  * This class implements a goal of unification, i.e., a set of equations between
@@ -24,8 +26,14 @@ import de.tudresden.inf.lat.uel.type.impl.ExistentialRestriction;
  */
 public class PluginGoal {
 
-	private AtomManager atomManager;
-	private final PluginGoalAux goal;
+	private final AtomManager atomManager;
+	private final Set<Integer> constants = new HashSet<Integer>();
+	private final Set<Integer> eatoms = new HashSet<Integer>();
+	private final Set<Equation> equations = new HashSet<Equation>();
+	private final UelInput uelInput;
+	private final Set<Integer> usedAtomIds = new HashSet<Integer>();
+	private final Set<Integer> userVariables = new HashSet<Integer>();
+	private final Set<Integer> variables = new HashSet<Integer>();
 
 	/**
 	 * Constructs a new goal based on a specified ontology.
@@ -42,11 +50,36 @@ public class PluginGoal {
 	public PluginGoal(AtomManager manager, Ontology ont, String leftStr,
 			String rightStr) {
 		this.atomManager = manager;
-		this.goal = new PluginGoalAux(manager.getAtoms());
 		Set<Equation> equations = initialize(ont, leftStr, rightStr);
 		for (Equation eq : equations) {
-			getGoal().addEquation(eq);
+			addEquation(eq);
 		}
+		this.uelInput = new UelInputImpl(manager.getAtoms(), equations,
+				this.userVariables);
+	}
+
+	private boolean addConstant(Integer atomId) {
+		return this.constants.add(atomId);
+	}
+
+	private boolean addEAtom(Integer atomId) {
+		return this.eatoms.add(atomId);
+	}
+
+	private boolean addEquation(Equation e) {
+		return this.equations.add(e);
+	}
+
+	private boolean addUsedAtomId(Integer atomId) {
+		return this.usedAtomIds.add(atomId);
+	}
+
+	private boolean addUserVariable(Integer atomId) {
+		return this.userVariables.add(atomId);
+	}
+
+	private boolean addVariable(Integer atomId) {
+		return this.variables.add(atomId);
 	}
 
 	public AtomManager getAtomManager() {
@@ -54,11 +87,7 @@ public class PluginGoal {
 	}
 
 	public Set<Integer> getConstants() {
-		return this.goal.getConstants();
-	}
-
-	public PluginGoalAux getGoal() {
-		return this.goal;
+		return Collections.unmodifiableSet(this.constants);
 	}
 
 	/**
@@ -78,19 +107,15 @@ public class PluginGoal {
 	}
 
 	public UelInput getUelInput() {
-		return this.goal;
+		return this.uelInput;
 	}
 
 	public Set<Integer> getUsedAtomIds() {
-		return getGoal().getUsedAtomIds();
+		return Collections.unmodifiableSet(this.usedAtomIds);
 	}
 
 	public Set<Integer> getVariables() {
-		return this.goal.getVariables();
-	}
-
-	public int getVariableSetSize() {
-		return this.goal.getVariables().size();
+		return Collections.unmodifiableSet(this.variables);
 	}
 
 	private Set<Equation> initialize(Ontology ontology, String leftStr,
@@ -121,11 +146,11 @@ public class PluginGoal {
 
 		for (Equation eq : ret) {
 			Integer atomId = eq.getLeft();
-			getGoal().addVariable(atomId);
+			addVariable(atomId);
 			ConceptName concept = (ConceptName) getAtomManager().getAtoms()
 					.get(atomId);
 			concept.setVariable(true);
-			getGoal().removeUserVariable(concept.getConceptNameId());
+			removeUserVariable(concept.getConceptNameId());
 		}
 
 		Set<Integer> usedAtomIds = new HashSet<Integer>();
@@ -140,7 +165,7 @@ public class PluginGoal {
 			if (atom.isConceptName()) {
 				conceptNameIds.add(usedAtomId);
 			} else if (atom.isExistentialRestriction()) {
-				getGoal().addEAtom(usedAtomId);
+				addEAtom(usedAtomId);
 				ConceptName child = ((ExistentialRestriction) atom).getChild();
 				Integer childId = getAtomManager().getAtoms().addAndGetIndex(
 						child);
@@ -149,16 +174,16 @@ public class PluginGoal {
 		}
 		usedAtomIds.addAll(conceptNameIds);
 		for (Integer atomId : usedAtomIds) {
-			getGoal().addUsedAtomId(atomId);
+			addUsedAtomId(atomId);
 		}
 
 		for (Integer atomId : conceptNameIds) {
 			Atom atom = getAtomManager().getAtoms().get(atomId);
 			if (atom.isConceptName()) {
 				if (((ConceptName) atom).isVariable()) {
-					getGoal().addVariable(atomId);
+					addVariable(atomId);
 				} else if (!((ConceptName) atom).isVariable()) {
-					getGoal().addConstant(atomId);
+					addConstant(atomId);
 				}
 			}
 		}
@@ -174,10 +199,10 @@ public class PluginGoal {
 							+ "'.");
 		}
 		ConceptName conceptName = (ConceptName) atom;
-		if (getGoal().getVariables().contains(atomId)) {
-			getGoal().removeVariable(atomId);
-			getGoal().addConstant(atomId);
-			getGoal().removeUserVariable(conceptName.getConceptNameId());
+		if (getVariables().contains(atomId)) {
+			removeVariable(atomId);
+			addConstant(atomId);
+			removeUserVariable(conceptName.getConceptNameId());
 			conceptName.setVariable(false);
 		}
 	}
@@ -190,10 +215,10 @@ public class PluginGoal {
 							+ "'.");
 		}
 		ConceptName conceptName = (ConceptName) atom;
-		if (getGoal().getConstants().contains(atomId)) {
-			getGoal().removeConstant(atomId);
-			getGoal().addVariable(atomId);
-			getGoal().addUserVariable(conceptName.getConceptNameId());
+		if (getConstants().contains(atomId)) {
+			removeConstant(atomId);
+			addVariable(atomId);
+			addUserVariable(conceptName.getConceptNameId());
 			conceptName.setVariable(true);
 		}
 	}
@@ -202,7 +227,7 @@ public class PluginGoal {
 		Atom leftAtom = getAtomManager().getAtoms().get(e.getLeft());
 		ConceptName b = (ConceptName) leftAtom;
 		ConceptName var = this.atomManager.createUndefConceptName(b, false);
-		getGoal().removeUserVariable(var.getConceptNameId());
+		removeUserVariable(var.getConceptNameId());
 		getAtomManager().getAtoms().add(var);
 		Integer varId = getAtomManager().getAtoms().addAndGetIndex(var);
 
@@ -210,6 +235,18 @@ public class PluginGoal {
 		newRightSet.addAll(e.getRight());
 		newRightSet.add(varId);
 		return new EquationImpl(e.getLeft(), newRightSet, false);
+	}
+
+	private boolean removeConstant(Integer atomId) {
+		return this.constants.remove(atomId);
+	}
+
+	private boolean removeUserVariable(Integer atomId) {
+		return this.userVariables.remove(atomId);
+	}
+
+	private boolean removeVariable(Integer atomId) {
+		return this.variables.remove(atomId);
 	}
 
 	private String renderByAtomId(Integer atomId) {

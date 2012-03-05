@@ -86,8 +86,8 @@ public class StatInfo {
 
 	public void setInfo(Map<String, String> info) {
 		this.info = new HashMap<String, String>(info);
-		this.info.put(keyNumberOfVariables,
-				"" + pluginGoal.getVariableSetSize());
+		this.info.put(keyNumberOfVariables, ""
+				+ pluginGoal.getVariables().size());
 	}
 
 	@Override
