@@ -23,4 +23,6 @@ public interface IndexedSet<T> extends Set<T> {
 
 	public Integer getMaxIndex();
 
+	public Integer getNextIndex();
+
 }

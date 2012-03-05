@@ -33,7 +33,7 @@ public class IndexedSetImpl<T> implements Set<T>, IndexedSet<T> {
 		if (element == null) {
 			throw new NullPointerException();
 		}
-		return add(element, getMaxIndex() + 1);
+		return add(element, getNextIndex());
 	}
 
 	@Override
@@ -116,7 +116,12 @@ public class IndexedSetImpl<T> implements Set<T>, IndexedSet<T> {
 
 	@Override
 	public Integer getMaxIndex() {
-		return maxIndex;
+		return this.maxIndex;
+	}
+
+	@Override
+	public Integer getNextIndex() {
+		return getMaxIndex() + 1;
 	}
 
 	@Override
