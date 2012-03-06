@@ -126,6 +126,7 @@ public class SatProcessor implements UelProcessor {
 	private static final String keyName = "Name";
 	private static final String keyNumberOfClauses = "Number of clauses";
 	private static final String keyNumberOfPropositions = "Number of propositions";
+	private static final String keyNumberOfVariables = "Number of variables";
 	private static final Logger logger = Logger.getLogger(SatProcessor.class
 			.getName());
 	private static final String processorName = "SAT-based algorithm";
@@ -303,6 +304,8 @@ public class SatProcessor implements UelProcessor {
 		if (satinput != null) {
 			ret.put(keyNumberOfClauses, "" + satinput.getClauses().size());
 		}
+		ret.put(keyNumberOfVariables, ""
+				+ this.extUelInput.getVariables().size());
 		return Collections.unmodifiableMap(ret);
 	}
 

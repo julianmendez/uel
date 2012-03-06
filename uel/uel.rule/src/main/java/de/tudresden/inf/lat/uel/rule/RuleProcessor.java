@@ -19,6 +19,7 @@ import de.tudresden.inf.lat.uel.type.api.UelInput;
 import de.tudresden.inf.lat.uel.type.api.UelOutput;
 import de.tudresden.inf.lat.uel.type.api.UelProcessor;
 import de.tudresden.inf.lat.uel.type.impl.EquationImpl;
+import de.tudresden.inf.lat.uel.type.impl.ExtendedUelInput;
 import de.tudresden.inf.lat.uel.type.impl.UelOutputImpl;
 
 /**
@@ -41,6 +42,7 @@ import de.tudresden.inf.lat.uel.type.impl.UelOutputImpl;
 public class RuleProcessor implements UelProcessor {
 
 	private static final String keyName = "Name";
+	private static final String keyNumberOfVariables = "Number of variables";
 	private static final String processorName = "Rule-based algorithm";
 	
 	private List<EagerRule> staticEagerRules;
@@ -79,6 +81,8 @@ public class RuleProcessor implements UelProcessor {
 	public Map<String, String> getInfo() {
 		Map<String, String> ret = new HashMap<String, String>();
 		ret.put(keyName, processorName);
+		ExtendedUelInput extUelInput = new ExtendedUelInput(getInput());
+		ret.put(keyNumberOfVariables, "" + extUelInput.getVariables().size());
 		return ret;
 	}
 
