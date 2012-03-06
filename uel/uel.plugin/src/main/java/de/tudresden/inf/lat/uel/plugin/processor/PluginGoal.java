@@ -97,6 +97,12 @@ public class PluginGoal {
 	private Set<Equation> initialize(Ontology ontology, String leftStr,
 			String rightStr) {
 
+		for (Atom atom : getAtomManager().getAtoms()) {
+			if (atom.isConceptName()) {
+				((ConceptName) atom).setVariable(false);
+			}
+		}
+
 		ConceptName left = getAtomManager().createConceptName(leftStr, true);
 		ConceptName right = getAtomManager().createConceptName(rightStr, true);
 
