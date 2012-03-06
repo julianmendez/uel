@@ -233,6 +233,7 @@ public class PluginGoal {
 			sbuf.append(renderByAtomId(restriction.getChild()
 					.getConceptNameId()));
 			sbuf.append(KRSSKeyword.close);
+			ret = sbuf.toString();
 		} else if (atom.isConceptName()) {
 			ConceptName concept = (ConceptName) atom;
 			ret = getAtomManager().getConceptName(concept.getConceptNameId());
