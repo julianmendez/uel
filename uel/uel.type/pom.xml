@@ -14,7 +14,7 @@
 
 	<groupId>uel</groupId>
 	<artifactId>uel.type</artifactId>
-	<version>1.0.0</version>
+	<version>1.1.0</version>
 	<packaging>jar</packaging>
 
 	<name>uel type</name>
@@ -22,7 +22,7 @@
 	<parent>
 		<groupId>uel</groupId>
 		<artifactId>parent</artifactId>
-		<version>1.0.0</version>
+		<version>1.1.0</version>
 		<relativePath>../uel.jars</relativePath>
 	</parent>
 
