@@ -30,22 +30,6 @@ public class ExtendedUelInput implements UelInput {
 		configure(input);
 	}
 
-	private boolean addConstant(Integer atomId) {
-		return this.constants.add(atomId);
-	}
-
-	private boolean addEAtom(Integer atomId) {
-		return this.eatoms.add(atomId);
-	}
-
-	private boolean addUsedAtomId(Integer atomId) {
-		return this.usedAtomIds.add(atomId);
-	}
-
-	private boolean addVariable(Integer atomId) {
-		return this.variables.add(atomId);
-	}
-
 	private void configure(UelInput input) {
 		Set<Integer> usedAtomsIds = new TreeSet<Integer>();
 
@@ -59,7 +43,7 @@ public class ExtendedUelInput implements UelInput {
 			for (Integer index : usedAtomsIds) {
 				Atom atom = input.getAtomManager().get(index);
 				if (atom.isExistentialRestriction()) {
-					addEAtom(index);
+					this.eatoms.add(index);
 					ConceptName child = ((ExistentialRestriction) atom)
 							.getChild();
 					Integer childId = input.getAtomManager().addAndGetIndex(
@@ -71,13 +55,13 @@ public class ExtendedUelInput implements UelInput {
 		}
 
 		for (Integer index : usedAtomsIds) {
-			addUsedAtomId(index);
+			this.usedAtomIds.add(index);
 			Atom atom = input.getAtomManager().get(index);
 			if (atom.isConceptName()) {
 				if (atom.isVariable()) {
-					addVariable(index);
+					this.variables.add(index);
 				} else {
-					addConstant(index);
+					this.constants.add(index);
 				}
 			}
 		}
