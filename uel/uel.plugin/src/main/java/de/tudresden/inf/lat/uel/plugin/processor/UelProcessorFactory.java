@@ -24,7 +24,7 @@ public class UelProcessorFactory {
 		if (name.equals(RULE_BASED_ALGORITHM)) {
 			ret = new RuleProcessor(input);
 		} else if (name.equals(SAT_BASED_ALGORITHM)) {
-			ret = new SatProcessor(input);
+			ret = new SatProcessor(input, true);
 		} else {
 			throw new IllegalArgumentException("Unknown processor : '" + name
 					+ "'.");
