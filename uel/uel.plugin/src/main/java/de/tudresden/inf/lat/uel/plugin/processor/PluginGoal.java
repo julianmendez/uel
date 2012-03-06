@@ -228,6 +228,8 @@ public class PluginGoal {
 					restriction.getRoleId());
 			StringBuffer sbuf = new StringBuffer();
 			sbuf.append(KRSSKeyword.open);
+			sbuf.append(KRSSKeyword.some);
+			sbuf.append(KRSSKeyword.space);
 			sbuf.append(roleName);
 			sbuf.append(KRSSKeyword.space);
 			sbuf.append(renderByAtomId(restriction.getChild()
