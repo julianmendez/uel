@@ -45,6 +45,7 @@ public class RuleProcessor implements UelProcessor {
 	private static final String keyInitialSubs = "Initial number of subsumptions";
 	private static final String keyMaxSubs = "Max. number of subsumptions (so far)";
 	private static final String keyTreeSize = "Size of the search tree (so far)";
+	private static final String keyDeadEnds = "Number of encountered dead ends (so far)";
 	private static final String keyNumberOfVariables = "Number of variables";
 	private static final String processorName = "Rule-based algorithm";
 	
@@ -57,6 +58,7 @@ public class RuleProcessor implements UelProcessor {
 	private Assignment assignment;
 	private final int initialSize;
 	private int treeSize = 1;
+	private int deadEnds = 0;
 	private final int numVariables;
 	
 	private Deque<Result> searchStack = null;
@@ -93,6 +95,7 @@ public class RuleProcessor implements UelProcessor {
 		ret.put(keyInitialSubs, "" + initialSize);
 		ret.put(keyMaxSubs, "" + goal.getMaxSize());
 		ret.put(keyTreeSize, "" + treeSize);
+		ret.put(keyDeadEnds, "" + deadEnds);
 		ret.put(keyNumberOfVariables, "" + numVariables);
 		return ret;
 	}
@@ -164,6 +167,7 @@ public class RuleProcessor implements UelProcessor {
 			Subsumption sub = chooseUnsolvedSubsumption();
 			if (sub == null) return true;
 			if (applyNextNondeterministicRule(sub, null)) continue;
+			deadEnds++;
 			if (!backtrack()) return false;
 		}
 	}
