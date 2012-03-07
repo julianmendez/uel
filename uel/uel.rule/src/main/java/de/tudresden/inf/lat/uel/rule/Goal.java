@@ -23,6 +23,7 @@ class Goal implements Set<Subsumption> {
 	private Map<Integer, Set<Subsumption>> variableLHSIndex;
 	private Map<Integer, Set<Subsumption>> variableRHSIndex;
 	private Set<Subsumption> goal;
+	private int maxSize;
 
 	/**
 	 * Construct a new goal from a set of equations given by a UelInput object.
@@ -30,6 +31,7 @@ class Goal implements Set<Subsumption> {
 	 */
 	public Goal(UelInput input) {
 		goal = convertInput(input);
+		maxSize = goal.size();
 		variableLHSIndex = new HashMap<Integer, Set<Subsumption>>();
 		variableRHSIndex = new HashMap<Integer, Set<Subsumption>>();
 		for (Subsumption sub : goal) {
@@ -91,6 +93,7 @@ class Goal implements Set<Subsumption> {
 		if (!goal.add(sub)) {
 			return false;
 		}
+		if (goal.size() > maxSize) maxSize = goal.size();
 		addToIndex(sub);
 		return true;
 	}
@@ -100,6 +103,7 @@ class Goal implements Set<Subsumption> {
 		if (!goal.addAll(c)) {
 			return false;
 		}
+		if (goal.size() > maxSize) maxSize = goal.size();
 		for (Subsumption sub : c) {
 			addToIndex(sub);
 		}
@@ -157,6 +161,10 @@ class Goal implements Set<Subsumption> {
 	@Override
 	public int size() {
 		return goal.size();
+	}
+	
+	public int getMaxSize() {
+		return maxSize;
 	}
 
 	@Override

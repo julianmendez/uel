@@ -42,6 +42,9 @@ import de.tudresden.inf.lat.uel.type.impl.UelOutputImpl;
 public class RuleProcessor implements UelProcessor {
 
 	private static final String keyName = "Name";
+	private static final String keyInitialSubs = "Initial number of subsumptions";
+	private static final String keyMaxSubs = "Max. number of subsumptions (so far)";
+	private static final String keyTreeSize = "Size of the search tree (so far)";
 	private static final String keyNumberOfVariables = "Number of variables";
 	private static final String processorName = "Rule-based algorithm";
 	
@@ -52,6 +55,9 @@ public class RuleProcessor implements UelProcessor {
 	private UelInput input;
 	private Goal goal;
 	private Assignment assignment;
+	private final int initialSize;
+	private int treeSize = 1;
+	private final int numVariables;
 	
 	private Deque<Result> searchStack = null;
 	
@@ -62,7 +68,10 @@ public class RuleProcessor implements UelProcessor {
 	public RuleProcessor(UelInput input) {
 		this.goal = new Goal(input);
 		this.input = input;
-		assignment = new Assignment();
+		this.assignment = new Assignment();
+		this.initialSize = goal.size();
+		ExtendedUelInput extUelInput = new ExtendedUelInput(getInput());
+		this.numVariables = extUelInput.getVariables().size();
 		
 		for (Subsumption sub : goal) {
 			if (sub.getHead().isVariable()) {
@@ -81,8 +90,10 @@ public class RuleProcessor implements UelProcessor {
 	public Map<String, String> getInfo() {
 		Map<String, String> ret = new HashMap<String, String>();
 		ret.put(keyName, processorName);
-		ExtendedUelInput extUelInput = new ExtendedUelInput(getInput());
-		ret.put(keyNumberOfVariables, "" + extUelInput.getVariables().size());
+		ret.put(keyInitialSubs, "" + initialSize);
+		ret.put(keyMaxSubs, "" + goal.getMaxSize());
+		ret.put(keyTreeSize, "" + treeSize);
+		ret.put(keyNumberOfVariables, "" + numVariables);
 		return ret;
 	}
 
@@ -220,6 +231,7 @@ public class RuleProcessor implements UelProcessor {
 					continue;
 				}
 				searchStack.push(res);
+				treeSize++;
 				return true;
 			}
 			previous = null;
