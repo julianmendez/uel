@@ -1,0 +1,2 @@
+(define-concept x#C (and x#A x#Z))
+(define-concept x#D (and x#B x#Z))

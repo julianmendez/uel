@@ -1,0 +1,25 @@
+Bundle-ManifestVersion: 2
+Bundle-Name: UEL Plug-in
+Bundle-SymbolicName: de.tudresden.inf.lat.uel;singleton:=true
+Bundle-Category: protege
+Bundle-Description: UEL Protege plug-in
+Bundle-Vendor: Chair of Automata Theory - TU Dresden
+Bundle-DocURL: http://lat.inf.tu-dresden.de
+Bundle-ClassPath: .,
+ lib/uel/uel.type/1.1.0/uel.type-1.1.0.jar,
+ lib/uel/uel.rule/1.1.0/uel.rule-1.1.0.jar,
+ lib/uel/uel.sat/1.1.0/uel.sat-1.1.0.jar,
+ lib/org/sat4j/core/2.3.0/core-2.3.0.jar,
+ lib/com/sun/java/jlfgr/1.0/jlfgr-1.0.jar
+Import-Package: javax.accessibility,
+ javax.swing,
+ javax.swing.border,
+ org.apache.log4j,
+ org.osgi.framework
+Bundle-Version: 1.1.0.333
+Bundle-Activator: org.protege.editor.core.plugin.DefaultPluginActivator
+Require-Bundle: org.eclipse.equinox.registry,
+ org.eclipse.equinox.common,
+ org.protege.editor.core.application,
+ org.protege.editor.owl,
+ org.semanticweb.owl.owlapi

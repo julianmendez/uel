@@ -1,0 +1,5 @@
+(define-primitive-concept x#C (some x#r x#A1))
+(define-concept x#D (some x#r x#A2))
+
+(define-concept x#A1 (some x#r x#B1))
+(define-concept x#A2 (some x#r x#B2))
