@@ -6,9 +6,8 @@ import de.tudresden.inf.lat.uel.type.impl.ConceptName;
 import de.tudresden.inf.lat.uel.type.impl.ExistentialRestriction;
 
 /**
- * An implementation of this interface manages atoms. Roles and concepts have
- * identifiers. Atoms, concept names and existential restrictions, have also
- * identifiers.
+ * An atom manager manages identifiers for atoms (concept names and existential
+ * restrictions) and also identifiers and names for concepts and roles.
  * 
  * @author Stefan Borgwardt
  * @author Julian Mendez

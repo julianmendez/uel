@@ -15,6 +15,8 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
 import de.uulm.ecs.ai.owlapi.krssrenderer.KRSS2OWLSyntaxRenderer;
 
 /**
+ * An object of this class can read OWL ontologies from strings and also write
+ * these ontologies as strings.
  * 
  * @author Julian Mendez
  */

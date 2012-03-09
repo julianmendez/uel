@@ -4,6 +4,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 /**
+ * This is the controller of the panel to select the variables in a given
+ * unification problem.
  * 
  * @author Julian Mendez
  */

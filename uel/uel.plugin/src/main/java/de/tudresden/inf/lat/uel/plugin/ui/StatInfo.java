@@ -6,6 +6,8 @@ import de.tudresden.inf.lat.uel.plugin.processor.PluginGoal;
 import de.tudresden.inf.lat.uel.plugin.type.AtomManager;
 
 /**
+ * An object of this class contains statistical information about a processor
+ * after the computation of unifiers.
  * 
  * @author Julian Mendez
  */

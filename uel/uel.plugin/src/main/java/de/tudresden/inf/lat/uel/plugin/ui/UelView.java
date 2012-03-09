@@ -16,7 +16,7 @@ import de.tudresden.inf.lat.uel.plugin.processor.UelModel;
 import de.tudresden.inf.lat.uel.plugin.processor.UelProcessorFactory;
 
 /**
- * Panel for UEL.
+ * This is the main panel of the UEL system.
  * 
  * @author Julian Mendez
  */

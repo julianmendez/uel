@@ -9,8 +9,12 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 
 /**
+ * This is a combo box that contains label-ids. This class is used to keep
+ * compatibility with Java 1.6, since Java 1.7 contains already a parameterized
+ * combo box.
  * 
  * @author Julian Mendez
+ * @see JComboBox
  */
 public class JComboBoxOfLabelId extends JComboBox {
 

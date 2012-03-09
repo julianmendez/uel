@@ -14,6 +14,7 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 
 /**
+ * This is the controller of the panel that shows statistical information.
  * 
  * @author Julian Mendez
  */

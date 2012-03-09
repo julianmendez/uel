@@ -20,6 +20,7 @@ import javax.swing.JScrollPane;
 import javax.swing.WindowConstants;
 
 /**
+ * This is the panel to select the variables in a given unification problem.
  * 
  * @author Julian Mendez
  */

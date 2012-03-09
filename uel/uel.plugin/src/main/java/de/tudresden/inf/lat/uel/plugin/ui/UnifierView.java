@@ -16,6 +16,11 @@ import javax.swing.WindowConstants;
 
 import de.tudresden.inf.lat.uel.plugin.processor.UelModel;
 
+/**
+ * This is the panel that shows the unifiers.
+ * 
+ * @author Julian Mendez
+ */
 public class UnifierView extends JDialog {
 
 	private static final long serialVersionUID = 7965907233259580732L;

@@ -31,8 +31,7 @@ import de.tudresden.inf.lat.uel.plugin.processor.UelProcessorFactory;
 import de.tudresden.inf.lat.uel.type.api.UelProcessor;
 
 /**
- * This class is a controller for the main panel of UEL's graphical user
- * interface.
+ * This class is a controller for the main panel of the UEL system.
  * 
  * @author Julian Mendez
  */

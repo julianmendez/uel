@@ -1,6 +1,8 @@
 package de.tudresden.inf.lat.uel.plugin.ui;
 
 /**
+ * An object of this class is a pair of label-identifier that is sorted first by
+ * label and second by identifier.
  * 
  * @author Julian Mendez
  */
@@ -10,6 +12,14 @@ class LabelId implements Comparable<LabelId> {
 	private String id = null;
 	private String label = null;
 
+	/**
+	 * Constructs a new pair label-identifier.
+	 * 
+	 * @param label
+	 *            label
+	 * @param id
+	 *            identifier
+	 */
 	public LabelId(String label, String id) {
 		if (label == null) {
 			throw new IllegalArgumentException("Null argument.");

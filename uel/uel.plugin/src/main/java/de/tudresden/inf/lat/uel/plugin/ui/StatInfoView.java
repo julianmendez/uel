@@ -21,6 +21,7 @@ import javax.swing.WindowConstants;
 import de.tudresden.inf.lat.uel.type.cons.KRSSKeyword;
 
 /**
+ * This is the panel that shows the statistical information.
  * 
  * @author Julian Mendez
  */

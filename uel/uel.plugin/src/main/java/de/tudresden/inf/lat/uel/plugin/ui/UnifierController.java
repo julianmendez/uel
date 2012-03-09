@@ -29,6 +29,7 @@ import de.tudresden.inf.lat.uel.type.impl.ConceptName;
 import de.tudresden.inf.lat.uel.type.impl.ExistentialRestriction;
 
 /**
+ * This is the controller for the panel that shows the unifiers.
  * 
  * @author Julian Mendez
  */
