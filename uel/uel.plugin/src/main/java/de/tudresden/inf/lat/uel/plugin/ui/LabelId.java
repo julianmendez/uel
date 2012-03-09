@@ -48,8 +48,8 @@ class LabelId implements Comparable<LabelId> {
 
 	@Override
 	public boolean equals(Object o) {
-		boolean ret = false;
-		if (o instanceof LabelId) {
+		boolean ret = (this == o);
+		if (!ret && o instanceof LabelId) {
 			LabelId other = (LabelId) o;
 			ret = getLabel().equals(other.getLabel())
 					&& getId().equals(other.getId());

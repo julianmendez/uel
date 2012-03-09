@@ -79,8 +79,8 @@ public class SatInput {
 
 	@Override
 	public boolean equals(Object o) {
-		boolean ret = false;
-		if (o instanceof SatInput) {
+		boolean ret = (this == o);
+		if (!ret && o instanceof SatInput) {
 			SatInput other = (SatInput) o;
 			ret = this.clauses.equals(other.clauses)
 					&& this.lastId == other.lastId;

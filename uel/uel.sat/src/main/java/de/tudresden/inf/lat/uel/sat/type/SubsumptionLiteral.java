@@ -34,8 +34,8 @@ public class SubsumptionLiteral implements Literal {
 
 	@Override
 	public boolean equals(Object o) {
-		boolean ret = false;
-		if (o instanceof SubsumptionLiteral) {
+		boolean ret = (this == o);
+		if (!ret && o instanceof SubsumptionLiteral) {
 			SubsumptionLiteral other = (SubsumptionLiteral) o;
 			ret = this.first.equals(other.first)
 					&& this.second.equals(other.second);

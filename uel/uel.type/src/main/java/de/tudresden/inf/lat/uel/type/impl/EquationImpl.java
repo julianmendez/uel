@@ -66,8 +66,8 @@ public class EquationImpl implements Equation {
 
 	@Override
 	public boolean equals(Object o) {
-		boolean ret = false;
-		if (o instanceof EquationImpl) {
+		boolean ret = (this == o);
+		if (!ret && o instanceof EquationImpl) {
 			EquationImpl other = (EquationImpl) o;
 			ret = this.primitive == other.primitive
 					&& this.left.equals(other.left)

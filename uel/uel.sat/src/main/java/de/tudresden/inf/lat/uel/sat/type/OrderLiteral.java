@@ -34,8 +34,8 @@ public class OrderLiteral implements Literal {
 
 	@Override
 	public boolean equals(Object o) {
-		boolean ret = false;
-		if (o instanceof OrderLiteral) {
+		boolean ret = (this == o);
+		if (!ret && o instanceof OrderLiteral) {
 			OrderLiteral other = (OrderLiteral) o;
 			ret = this.first.equals(other.first)
 					&& this.second.equals(other.second);
