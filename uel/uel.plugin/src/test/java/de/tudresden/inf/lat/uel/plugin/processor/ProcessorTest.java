@@ -87,8 +87,8 @@ public class ProcessorTest extends TestCase {
 		return ret;
 	}
 
-	public <T> Set<T> set(T... elements) {
-		return new HashSet<T>(Arrays.asList(elements));
+	private Set<String> set(String... elements) {
+		return new HashSet<String>(Arrays.asList(elements));
 	}
 
 	public void test01Rule() throws OWLOntologyCreationException, IOException {
