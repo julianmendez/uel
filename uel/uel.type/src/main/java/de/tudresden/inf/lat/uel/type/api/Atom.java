@@ -17,7 +17,7 @@ public interface Atom {
 	public Integer getConceptNameId();
 
 	/**
-	 * Tells whether this flat atom is concept name.
+	 * Tells whether this flat atom is a concept name.
 	 * 
 	 * @return <code>true</code> if and only if this atom has an associated role
 	 *         name

@@ -3,7 +3,8 @@ package de.tudresden.inf.lat.uel.type.api;
 import java.util.Set;
 
 /**
- * An object implementing this interface is an output of the UEL system.
+ * An object implementing this interface is an output of the UEL system, i.e., a
+ * unifier.
  * 
  * @author Stefan Borgwardt
  * @author Julian Mendez
