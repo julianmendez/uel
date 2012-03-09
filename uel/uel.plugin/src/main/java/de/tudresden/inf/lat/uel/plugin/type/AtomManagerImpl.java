@@ -7,14 +7,23 @@ import de.tudresden.inf.lat.uel.type.impl.ExistentialRestriction;
 import de.tudresden.inf.lat.uel.type.impl.IndexedSetImpl;
 
 /**
+ * This is the default implementation of an atom manager.
+ * 
  * @author Stefan Borgwardt
  * @author Julian Mendez
+ * @see AtomManager
  */
 public class AtomManagerImpl implements AtomManager {
 
 	private IndexedSet<Atom> atoms = new IndexedSetImpl<Atom>();
 	private IndexedSet<String> conceptNames = new IndexedSetImpl<String>();
 	private IndexedSet<String> roleNames = new IndexedSetImpl<String>();
+
+	/**
+	 * Constructs a new atom manager.
+	 */
+	public AtomManagerImpl() {
+	}
 
 	@Override
 	public Integer addConcept(String str) {

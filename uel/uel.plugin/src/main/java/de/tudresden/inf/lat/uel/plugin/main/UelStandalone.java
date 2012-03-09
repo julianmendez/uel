@@ -7,6 +7,7 @@ import javax.swing.JFrame;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 
 /**
+ * The UEL standalone is used to start UEL without Protege.
  * 
  * @author Julian Mendez
  */

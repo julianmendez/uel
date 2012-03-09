@@ -11,6 +11,7 @@ import de.tudresden.inf.lat.uel.type.api.UelInput;
 import de.tudresden.inf.lat.uel.type.api.UelProcessor;
 
 /**
+ * A UEL processor factory constructs processors.
  * 
  * @author Julian Mendez
  */
@@ -19,6 +20,15 @@ public class UelProcessorFactory {
 	public static final String RULE_BASED_ALGORITHM = "Rule-based algorithm";
 	public static final String SAT_BASED_ALGORITHM = "SAT-based algorithm";
 
+	/**
+	 * Creates a processor with a given UEL input.
+	 * 
+	 * @param name
+	 *            name of processor
+	 * @param input
+	 *            UEL input
+	 * @return a new processor with a given UEL input
+	 */
 	public static UelProcessor createProcessor(String name, UelInput input) {
 		UelProcessor ret;
 		if (name.equals(RULE_BASED_ALGORITHM)) {
@@ -32,6 +42,11 @@ public class UelProcessorFactory {
 		return ret;
 	}
 
+	/**
+	 * Returns all the processors that this factory can construct.
+	 * 
+	 * @return all the processors that this factory can construct
+	 */
 	public static Collection<String> getProcessorNames() {
 		List<String> ret = new ArrayList<String>();
 		ret.add(SAT_BASED_ALGORITHM);

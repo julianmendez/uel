@@ -21,6 +21,7 @@ import de.tudresden.inf.lat.uel.plugin.ui.UelController;
 import de.tudresden.inf.lat.uel.plugin.ui.UelView;
 
 /**
+ * An object of this class starts the UEL system.
  * 
  * @author Julian Mendez
  */
@@ -31,6 +32,12 @@ public class UelStarter implements OWLOntologyChangeListener,
 	private final UelController panel;
 	private OWLModelManagerEntityRenderer renderer = null;
 
+	/**
+	 * Constructs a new UEL starter.
+	 * 
+	 * @param modelManager
+	 *            OWL model manager
+	 */
 	public UelStarter(OWLModelManager modelManager) {
 		if (modelManager == null) {
 			throw new IllegalArgumentException("Null argument.");
@@ -46,6 +53,12 @@ public class UelStarter implements OWLOntologyChangeListener,
 		reset();
 	}
 
+	/**
+	 * Constructs a new UEL starter.
+	 * 
+	 * @param manager
+	 *            OWL ontology manager
+	 */
 	public UelStarter(OWLOntologyManager manager) {
 		if (manager == null) {
 			throw new IllegalArgumentException("Null argument.");

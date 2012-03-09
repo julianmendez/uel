@@ -8,8 +8,11 @@ import de.tudresden.inf.lat.uel.type.api.IndexedSet;
 import de.tudresden.inf.lat.uel.type.api.UelOutput;
 
 /**
+ * This is the default implementation of a UEL output.
+ * 
  * @author Stefan Borgwardt
  * @author Julian Mendez
+ * @see UelOutput
  */
 public class UelOutputImpl implements UelOutput {
 

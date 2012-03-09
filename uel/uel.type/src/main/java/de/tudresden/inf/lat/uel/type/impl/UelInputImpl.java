@@ -8,8 +8,11 @@ import de.tudresden.inf.lat.uel.type.api.IndexedSet;
 import de.tudresden.inf.lat.uel.type.api.UelInput;
 
 /**
+ * This is the default implementation of a UEL input.
+ * 
  * @author Stefan Borgwardt
  * @author Julian Mendez
+ * @see UelInput
  */
 public class UelInputImpl implements UelInput {
 
