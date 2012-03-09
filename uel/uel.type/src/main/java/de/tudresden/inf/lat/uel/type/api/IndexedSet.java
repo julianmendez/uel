@@ -24,11 +24,11 @@ public interface IndexedSet<T> extends Set<T> {
 	 *            element
 	 * @param index
 	 *            index
+	 * @return <code>true</code> if and only if this indexed set has been
+	 *         modified.
 	 * @throws IllegalArgumentException
 	 *             when trying to add an existing element with a different index
 	 *             or a new element with a used index
-	 * @return <code>true</code> if and only if this indexed set has been
-	 *         modified.
 	 */
 	public boolean add(T element, Integer index);
 
@@ -38,8 +38,8 @@ public interface IndexedSet<T> extends Set<T> {
 	 * 
 	 * @param element
 	 *            element
-	 * @see getIndex(T element)
 	 * @return the index of the given element
+	 * @see #getIndex
 	 */
 	public int addAndGetIndex(T element);
 
@@ -79,8 +79,8 @@ public interface IndexedSet<T> extends Set<T> {
 	 * Returns the next unused index. This number is strictly greater than the
 	 * maximum index.
 	 * 
-	 * @see getMaxIndex()
 	 * @return the next unused index
+	 * @see #getMaxIndex()
 	 */
 	public Integer getNextIndex();
 

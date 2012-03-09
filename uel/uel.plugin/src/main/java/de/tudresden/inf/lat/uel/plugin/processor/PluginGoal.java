@@ -210,7 +210,6 @@ public class PluginGoal {
 		ConceptName b = (ConceptName) leftAtom;
 		ConceptName var = this.atomManager.createUndefConceptName(b, false);
 		this.userVariables.remove(var.getConceptNameId());
-		getAtomManager().getAtoms().add(var);
 		Integer varId = getAtomManager().getAtoms().addAndGetIndex(var);
 
 		Set<Integer> newRightSet = new HashSet<Integer>();

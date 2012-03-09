@@ -38,7 +38,7 @@ public interface UelProcessor {
 	/**
 	 * Returns the result of the last computation.
 	 * 
-	 * @throw IllegalStateException if invoked before the first computation
+	 * @throws IllegalStateException if invoked before the first computation
 	 * @return the result of the last computation
 	 */
 	public UelOutput getUnifier();

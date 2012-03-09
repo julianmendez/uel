@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 
 import de.tudresden.inf.lat.uel.type.api.IndexedSet;
 
@@ -16,7 +15,7 @@ import de.tudresden.inf.lat.uel.type.api.IndexedSet;
  * @author Julian Mendez
  * @param <T>
  */
-public class IndexedSetImpl<T> implements Set<T>, IndexedSet<T> {
+public class IndexedSetImpl<T> implements IndexedSet<T> {
 
 	private Map<Integer, T> invMap = new HashMap<Integer, T>();
 	private Map<T, Integer> map = new HashMap<T, Integer>();
@@ -42,12 +41,27 @@ public class IndexedSetImpl<T> implements Set<T>, IndexedSet<T> {
 			throw new NullPointerException();
 		}
 		boolean ret = false;
-		if (!this.map.containsKey(element)) {
+		if (this.map.containsKey(element)) {
+			Integer oldIndex = this.map.get(element);
+			if (!oldIndex.equals(index)) {
+				throw new IllegalArgumentException("Element '" + element
+						+ "' has already index " + oldIndex + " but new index "
+						+ index + " was given.");
+			}
+		} else if (this.invMap.containsKey(index)) {
+			T oldElement = this.invMap.get(index);
+			if (!oldElement.equals(element)) {
+				throw new IllegalArgumentException("Index " + index
+						+ " has been used for element '" + oldElement
+						+ "' but new element '" + element + "' was given.");
+			}
+		} else {
 			this.map.put(element, index);
 			this.invMap.put(index, element);
-			if (maxIndex < index) {
-				maxIndex = index;
+			if (this.maxIndex < index) {
+				this.maxIndex = index;
 			}
+			ret = true;
 		}
 		return ret;
 	}
@@ -72,7 +86,9 @@ public class IndexedSetImpl<T> implements Set<T>, IndexedSet<T> {
 			throw new IllegalArgumentException("Null argument.");
 		}
 
-		add(element);
+		if (!contains(element)) {
+			add(element);
+		}
 		return getIndex(element);
 	}
 
@@ -87,7 +103,7 @@ public class IndexedSetImpl<T> implements Set<T>, IndexedSet<T> {
 			throw new NullPointerException();
 		}
 
-		return this.map.keySet().contains(element);
+		return this.map.containsKey(element);
 	}
 
 	@Override
