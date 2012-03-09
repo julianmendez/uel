@@ -15,11 +15,7 @@ import de.tudresden.inf.lat.uel.type.impl.ExistentialRestriction;
 import de.tudresden.inf.lat.uel.type.impl.UelInputImpl;
 
 /**
- * This class implements a goal of unification, i.e., a set of equations between
- * concept terms with variables.
- * 
- * The goal is unique for the procedure, and should be accessible for most other
- * objects.
+ * This class is a goal of unification.
  * 
  * @author Barbara Morawska
  * @author Julian Mendez

@@ -12,8 +12,8 @@ import de.tudresden.inf.lat.uel.type.api.Atom;
 import de.tudresden.inf.lat.uel.type.impl.ConceptName;
 
 /**
- * An object of this class can manage which concept names are considered
- * variables and which ones are constants by the user.
+ * An object of this class can manage which concept names are considered by the
+ * user as variables and which ones as constants.
  * 
  * @author Julian Mendez
  */

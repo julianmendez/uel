@@ -15,7 +15,7 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 
 /**
- * It has a set of definitions extracted from an OWL ontology. Contains OWL
+ * This has a set of definitions extracted from an OWL ontology and contains OWL
  * classes.
  * 
  * @author Julian Mendez

@@ -6,7 +6,7 @@ import org.protege.editor.owl.ui.view.cls.AbstractOWLClassViewComponent;
 import org.semanticweb.owlapi.model.OWLClass;
 
 /**
- * Protege view component for UEL.
+ * This is the Protege view component of UEL.
  * 
  * @author Julian Mendez
  */

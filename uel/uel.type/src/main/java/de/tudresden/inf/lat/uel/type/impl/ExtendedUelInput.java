@@ -11,11 +11,12 @@ import de.tudresden.inf.lat.uel.type.api.IndexedSet;
 import de.tudresden.inf.lat.uel.type.api.UelInput;
 
 /**
- * This class implements an extended UEL input of unification, i.e., a set of
- * equations between concept terms with variables.
+ * This class implements an extended UEL input. This extension is used to
+ * classify the atoms contained in the UEL input.
  * 
  * @author Barbara Morawska
  * @author Julian Mendez
+ * @see UelInput
  */
 public class ExtendedUelInput implements UelInput {
 

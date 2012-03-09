@@ -15,8 +15,8 @@ import de.tudresden.inf.lat.uel.type.api.Equation;
 import de.tudresden.inf.lat.uel.type.api.UelProcessor;
 
 /**
- * An object implementing this class connects with the UEL core and uses it to
- * unify.
+ * An object of this class connects the graphical user interface with the
+ * processor.
  * 
  * @author Julian Mendez
  */

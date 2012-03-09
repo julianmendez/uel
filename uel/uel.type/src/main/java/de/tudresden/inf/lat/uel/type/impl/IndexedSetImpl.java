@@ -9,11 +9,12 @@ import java.util.Map;
 import de.tudresden.inf.lat.uel.type.api.IndexedSet;
 
 /**
- * An object of this class is a set with indices, i.e. , each element in this
- * set has a unique non-negative number to identify it.
+ * An object of this class is a set with indices, i.e., each element in this set
+ * has a unique non-negative number that identifies it.
  * 
  * @author Julian Mendez
  * @param <T>
+ *            type of the object stored in this indexed set
  */
 public class IndexedSetImpl<T> implements IndexedSet<T> {
 

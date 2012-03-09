@@ -15,7 +15,7 @@ import de.tudresden.inf.lat.uel.type.api.IndexedSet;
 import de.tudresden.inf.lat.uel.type.api.UelInput;
 
 /**
- * Class representing the set of goal subsumptions of a unification problem.
+ * This is a class representing the set of goal subsumptions of a unification problem.
  * 
  * @author Stefan Borgwardt
  */

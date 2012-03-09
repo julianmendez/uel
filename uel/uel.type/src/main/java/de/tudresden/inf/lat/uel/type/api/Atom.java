@@ -1,8 +1,8 @@
 package de.tudresden.inf.lat.uel.type.api;
 
 /**
- * Represents a flat EL-atom consisting of a role name (optional) and a concept
- * name.
+ * Represents a flat EL-atom, which can be a concept name or an existential
+ * restriction.
  * 
  * @author Stefan Borgwardt
  * @author Julian Mendez

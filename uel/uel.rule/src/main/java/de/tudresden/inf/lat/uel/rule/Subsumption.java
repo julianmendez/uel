@@ -7,7 +7,7 @@ import java.util.List;
 import de.tudresden.inf.lat.uel.type.api.Atom;
 
 /**
- * A class representing a subsumption between a conjunction of flat atoms (body) and a flat atom
+ * This is a class representing a subsumption between a conjunction of flat atoms (body) and a flat atom
  * (head).
  * 
  * @author Stefan Borgwardt

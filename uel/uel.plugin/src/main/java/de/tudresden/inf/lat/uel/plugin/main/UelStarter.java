@@ -21,7 +21,7 @@ import de.tudresden.inf.lat.uel.plugin.ui.UelController;
 import de.tudresden.inf.lat.uel.plugin.ui.UelView;
 
 /**
- * An object of this class starts the UEL system.
+ * This is used to start the UEL system.
  * 
  * @author Julian Mendez
  */

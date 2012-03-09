@@ -11,7 +11,7 @@ import de.tudresden.inf.lat.uel.type.api.UelInput;
 import de.tudresden.inf.lat.uel.type.api.UelProcessor;
 
 /**
- * A UEL processor factory constructs processors.
+ * This factory constructs processors referred by name.
  * 
  * @author Julian Mendez
  */
