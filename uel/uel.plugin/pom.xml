@@ -35,6 +35,12 @@
 
 		<dependency>
 			<groupId>uel</groupId>
+			<artifactId>uel.rule</artifactId>
+			<version>1.1.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>uel</groupId>
 			<artifactId>uel.sat</artifactId>
 			<version>1.1.0</version>
 		</dependency>
@@ -61,6 +67,24 @@
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.8.2</version>
+		</dependency>
+
+		<dependency>
+			<groupId>de.tudresden.inf.lat.jcel</groupId>
+			<artifactId>jcel.ontology</artifactId>
+			<version>0.15.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>de.tudresden.inf.lat.jcel</groupId>
+			<artifactId>jcel.core</artifactId>
+			<version>0.15.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>de.tudresden.inf.lat.jcel</groupId>
+			<artifactId>jcel.owlapi</artifactId>
+			<version>0.15.0</version>
 		</dependency>
 
 	</dependencies>
