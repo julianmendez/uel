@@ -4,7 +4,6 @@ import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -87,8 +86,25 @@ public class ProcessorTest extends TestCase {
 		return ret;
 	}
 
-	private Set<String> set(String... elements) {
-		return new HashSet<String>(Arrays.asList(elements));
+	private Set<String> set(String a) {
+		Set<String> ret = new HashSet<String>();
+		ret.add(a);
+		return ret;
+	}
+
+	private Set<String> set(String a, String b) {
+		Set<String> ret = new HashSet<String>();
+		ret.add(a);
+		ret.add(b);
+		return ret;
+	}
+
+	private Set<String> set(String a, String b, String c) {
+		Set<String> ret = new HashSet<String>();
+		ret.add(a);
+		ret.add(b);
+		ret.add(c);
+		return ret;
 	}
 
 	public void test01Rule() throws OWLOntologyCreationException, IOException {

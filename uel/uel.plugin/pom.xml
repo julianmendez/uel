@@ -70,6 +70,12 @@
 		</dependency>
 
 		<dependency>
+			<groupId>com.sun.java</groupId>
+			<artifactId>jlfgr</artifactId>
+			<version>1.0</version>
+		</dependency>
+
+		<dependency>
 			<groupId>de.tudresden.inf.lat.jcel</groupId>
 			<artifactId>jcel.ontology</artifactId>
 			<version>0.15.0</version>
