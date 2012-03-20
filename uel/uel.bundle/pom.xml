@@ -17,14 +17,7 @@
 	<version>1.1.0</version>
 	<packaging>bundle</packaging>
 
-	<name>uel Protege plug-in</name>
-
-	<parent>
-		<groupId>uel</groupId>
-		<artifactId>parent</artifactId>
-		<version>1.1.0</version>
-		<relativePath>../uel.jars</relativePath>
-	</parent>
+	<name>uel bundle</name>
 
 	<build>
 
@@ -35,6 +28,7 @@
 				<artifactId>maven-jar-plugin</artifactId>
 				<version>2.3.1</version>
 				<configuration>
+					<phase>package</phase>
 					<archive>
 						<manifestFile>src/main/manifest/MANIFEST.MF</manifestFile>
 					</archive>
@@ -50,7 +44,7 @@
 					<instructions>
 						<Include-Resource>
 							{maven-resources}, {maven-dependencies},
-							@target/uel.plugin-1.1.0.jar,
+							@../uel.plugin/target/uel.plugin-1.1.0.jar,
 							lib/uel/uel.type/1.1.0/uel.type-1.1.0.jar=../uel.type/target/uel.type-1.1.0.jar,
 							lib/uel/uel.rule/1.1.0/uel.rule-1.1.0.jar=../uel.rule/target/uel.rule-1.1.0.jar,
 							lib/uel/uel.sat/1.1.0/uel.sat-1.1.0.jar=../uel.sat/target/uel.sat-1.1.0.jar,
