@@ -25,6 +25,10 @@ public class UelInputImpl implements UelInput {
 	 * 
 	 * @param manager
 	 *            atom manager
+	 * @param eq
+	 *            set of input equations
+	 * @param set
+	 *            set of user variables
 	 */
 	public UelInputImpl(IndexedSet<Atom> manager, Set<Equation> eq,
 			Set<Integer> set) {

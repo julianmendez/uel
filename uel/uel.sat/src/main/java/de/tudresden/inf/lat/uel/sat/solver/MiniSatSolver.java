@@ -17,7 +17,7 @@ import java.util.StringTokenizer;
  */
 public class MiniSatSolver implements Solver {
 
-	public static final String minisatCommand = "MiniSat";
+	private static final String minisatCommand = "MiniSat";
 	private static final String tempPrefix = "uelMiniSat";
 	private static final String tempSuffix = ".tmp";
 
@@ -29,8 +29,8 @@ public class MiniSatSolver implements Solver {
 
 	private void runMiniSat(File satinput, File satoutput) throws IOException {
 		try {
-			ProcessBuilder pb = new ProcessBuilder(minisatCommand,
-					satinput.toString(), satoutput.toString());
+			ProcessBuilder pb = new ProcessBuilder(minisatCommand, satinput
+					.toString(), satoutput.toString());
 			Process p = pb.start();
 			p.waitFor();
 			p.destroy();
@@ -62,8 +62,8 @@ public class MiniSatSolver implements Solver {
 		Set<Integer> clause = new HashSet<Integer>();
 		if (line.trim().equals(Solver.SAT)) {
 			satisfiable = true;
-			StringTokenizer stok = new StringTokenizer(
-					satoutputReader.readLine());
+			StringTokenizer stok = new StringTokenizer(satoutputReader
+					.readLine());
 			while (stok.hasMoreTokens()) {
 				clause.add(Integer.parseInt(stok.nextToken()));
 			}

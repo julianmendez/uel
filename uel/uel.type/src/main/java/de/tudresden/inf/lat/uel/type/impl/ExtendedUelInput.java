@@ -26,6 +26,12 @@ public class ExtendedUelInput implements UelInput {
 	private final Set<Integer> usedAtomIds = new HashSet<Integer>();
 	private final Set<Integer> variables = new HashSet<Integer>();
 
+	/**
+	 * Construct an extended UEL input from a standard UEL input.
+	 * 
+	 * @param input
+	 *            the input
+	 */
 	public ExtendedUelInput(UelInput input) {
 		this.uelInput = input;
 		configure(input);
@@ -86,10 +92,20 @@ public class ExtendedUelInput implements UelInput {
 		return this.uelInput.getAtomManager();
 	}
 
+	/**
+	 * Retrieve all constants occurring in the UEL input.
+	 * 
+	 * @return a set containing the identifiers of the constants
+	 */
 	public Set<Integer> getConstants() {
 		return Collections.unmodifiableSet(constants);
 	}
 
+	/**
+	 * Retrieve all existential restrictions occurring in the UEL input.
+	 * 
+	 * @return a set containing the identifiers of the existential restrictions
+	 */
 	public Set<Integer> getEAtoms() {
 		return Collections.unmodifiableSet(eatoms);
 	}
@@ -99,6 +115,11 @@ public class ExtendedUelInput implements UelInput {
 		return this.uelInput.getEquations();
 	}
 
+	/**
+	 * Determine which identifiers are currently used for atoms.
+	 * 
+	 * @return a set containing all used identifiers
+	 */
 	public Set<Integer> getUsedAtomIds() {
 		return Collections.unmodifiableSet(this.usedAtomIds);
 	}
@@ -108,6 +129,11 @@ public class ExtendedUelInput implements UelInput {
 		return this.uelInput.getUserVariables();
 	}
 
+	/**
+	 * Retrieve all variables occurring in the UEL input.
+	 * 
+	 * @return a set containing the identifiers of the variables
+	 */
 	public Set<Integer> getVariables() {
 		return Collections.unmodifiableSet(variables);
 	}

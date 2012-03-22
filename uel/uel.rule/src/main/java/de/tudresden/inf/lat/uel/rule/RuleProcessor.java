@@ -23,19 +23,19 @@ import de.tudresden.inf.lat.uel.type.impl.ExtendedUelInput;
 import de.tudresden.inf.lat.uel.type.impl.UelOutputImpl;
 
 /**
- * This class is used to solve a unification problem using a rule-based unification algorithm for
- * EL.
+ * This class is used to solve a unification problem using a rule-based
+ * unification algorithm for EL.
  * 
- * This algorithm is described in:
- * Franz Baader, Stefan Borgwardt, and Barbara Morawska. 'Uniﬁcation in the description logic EL
- * w.r.t. cycle-restricted TBoxes'. LTCS-Report 11-05, Chair for Automata Theory, Institute for
- * Theoretical Computer Science, Technische Universität Dresden, Dresden, Germany, 2011.
- * See http://lat.inf.tu-dresden.de/research/reports.html.
+ * This algorithm is described in: Franz Baader, Stefan Borgwardt, and Barbara
+ * Morawska. 'Uniﬁcation in the description logic EL w.r.t. cycle-restricted
+ * TBoxes'. LTCS-Report 11-05, Chair for Automata Theory, Institute for
+ * Theoretical Computer Science, Technische Universität Dresden, Dresden,
+ * Germany, 2011. See http://lat.inf.tu-dresden.de/research/reports.html.
  * 
- * Based on the algorithm in:
- * Franz Baader and Barbara Morawska. 'Uniﬁcation in the description logic EL'. Logical Methods in
- * Computer Science, 6(3), 2010. Special Issue: 20th Int. Conf. on Rewriting Techniques and
- * Applications (RTA’09).
+ * Based on the algorithm in: Franz Baader and Barbara Morawska. 'Uniﬁcation in
+ * the description logic EL'. Logical Methods in Computer Science, 6(3), 2010.
+ * Special Issue: 20th Int. Conf. on Rewriting Techniques and Applications
+ * (RTA’09).
  * 
  * @author Stefan Borgwardt
  */
@@ -48,11 +48,11 @@ public class RuleProcessor implements UelProcessor {
 	private static final String keyDeadEnds = "Number of encountered dead ends (so far)";
 	private static final String keyNumberOfVariables = "Number of variables";
 	private static final String processorName = "Rule-based algorithm";
-	
+
 	private List<EagerRule> staticEagerRules;
 	private List<EagerRule> dynamicEagerRules;
 	private List<Rule> nondeterministicRules;
-	
+
 	private UelInput input;
 	private Goal goal;
 	private Assignment assignment;
@@ -60,12 +60,15 @@ public class RuleProcessor implements UelProcessor {
 	private int treeSize = 1;
 	private int deadEnds = 0;
 	private final int numVariables;
-	
+
 	private Deque<Result> searchStack = null;
-	
+
 	/**
-	 * Initialize a new unification problem with goal subsumptions. 
-	 * @param input a UelInput object that will return the subsumptions to be solved
+	 * Initialize a new unification problem with goal subsumptions.
+	 * 
+	 * @param input
+	 *            a UelInput object that will return the subsumptions to be
+	 *            solved
 	 */
 	public RuleProcessor(UelInput input) {
 		this.goal = new Goal(input);
@@ -74,21 +77,22 @@ public class RuleProcessor implements UelProcessor {
 		this.initialSize = goal.size();
 		ExtendedUelInput extUelInput = new ExtendedUelInput(getInput());
 		this.numVariables = extUelInput.getVariables().size();
-		
+
 		for (Subsumption sub : goal) {
 			if (sub.getHead().isVariable()) {
-				// subsumptions with a variable on the right-hand side are always solved
+				// subsumptions with a variable on the right-hand side are
+				// always solved
 				sub.setSolved(true);
 			}
 		}
-		
+
 		initRules();
 	}
-	
+
 	public UelInput getInput() {
 		return input;
 	}
-	
+
 	public Map<String, String> getInfo() {
 		Map<String, String> ret = new HashMap<String, String>();
 		ret.put(keyName, processorName);
@@ -101,8 +105,8 @@ public class RuleProcessor implements UelProcessor {
 	}
 
 	/**
-	 * Initialize the rule lists according to the rule-based algorithm for unification in EL w.r.t.
-	 * the empty TBox.
+	 * Initialize the rule lists according to the rule-based algorithm for
+	 * unification in EL w.r.t. the empty TBox.
 	 */
 	private void initRules() {
 		staticEagerRules = new ArrayList<EagerRule>();
@@ -116,88 +120,106 @@ public class RuleProcessor implements UelProcessor {
 		nondeterministicRules.add(new DecompositionRule());
 		nondeterministicRules.add(new ExtensionRule());
 	}
-	
+
 	/**
-	 * If at least one unifier has already been computed, this method tries to compute the next
-	 * unifier. If there are no more unifiers, 'false' is returned.
-	 * @return true iff the current assignment represents a unifier of the goal subsumptions
+	 * If at least one unifier has already been computed, this method tries to
+	 * compute the next unifier. If there are no more unifiers, 'false' is
+	 * returned.
+	 * 
+	 * @return true iff the current assignment represents a unifier of the goal
+	 *         subsumptions
 	 */
 	public boolean computeNextUnifier() {
 		if (searchStack == null) {
 			searchStack = new ArrayDeque<Result>();
-			
+
 			// apply eager rules to each unsolved subsumption
 			Result res = applyEagerRules(goal, staticEagerRules, null);
-			if (!res.wasSuccessful()) return false;
+			if (!res.wasSuccessful())
+				return false;
 			for (Subsumption sub : res.getSolvedSubsumptions()) {
 				sub.setSolved(true);
 			}
 			Assignment tmp = new Assignment();
 			res = applyEagerRules(goal, dynamicEagerRules, tmp);
-			if (!res.wasSuccessful()) return false;
-			if (!commitResult(res, tmp)) return false;
-			
-			// exhaustively apply eager rules to the result of this initial iteration
+			if (!res.wasSuccessful())
+				return false;
+			if (!commitResult(res, tmp))
+				return false;
+
+			// exhaustively apply eager rules to the result of this initial
+			// iteration
 			applyEagerRules(res);
 		} else {
-			// we already have a search stack --> try to backtrack from last solution
+			// we already have a search stack --> try to backtrack from last
+			// solution
 			if (!backtrack()) {
 				return false;
 			}
 		}
 		return solve();
 	}
-	
+
+	@Override
 	public UelOutput getUnifier() {
 		// convert current assignment to a set of equations
 		IndexedSet<Atom> atomManager = input.getAtomManager();
 		Set<Equation> equations = new HashSet<Equation>();
 		for (Integer userVar : input.getUserVariables()) {
 			Set<Integer> body = new HashSet<Integer>();
-			for (Atom at : assignment.getSubsumers(atomManager.get(userVar).getConceptNameId())) {
+			for (Atom at : assignment.getSubsumers(atomManager.get(userVar)
+					.getConceptNameId())) {
 				body.add(atomManager.addAndGetIndex(at));
 			}
 			equations.add(new EquationImpl(userVar, body, false));
 		}
 		return new UelOutputImpl(atomManager, equations);
 	}
-	
+
 	private boolean solve() {
-		while(true) {
+		while (true) {
 			Subsumption sub = chooseUnsolvedSubsumption();
-			if (sub == null) return true;
-			if (applyNextNondeterministicRule(sub, null)) continue;
+			if (sub == null)
+				return true;
+			if (applyNextNondeterministicRule(sub, null))
+				continue;
 			deadEnds++;
-			if (!backtrack()) return false;
+			if (!backtrack())
+				return false;
 		}
 	}
-	
+
 	private boolean backtrack() {
 		while (!searchStack.isEmpty()) {
 			Result res = searchStack.pop();
 			rollBackResult(res);
-			if (applyNextNondeterministicRule(res.getSubsumption(), res.getApplication())) {
+			if (applyNextNondeterministicRule(res.getSubsumption(), res
+					.getApplication())) {
 				return true;
 			}
 		}
 		return false;
 	}
-	
+
 	private Subsumption chooseUnsolvedSubsumption() {
 		for (Subsumption sub : goal) {
-			if (!sub.isSolved()) return sub;
+			if (!sub.isSolved())
+				return sub;
 		}
 		return null;
 	}
 
-	private Result applyEagerRules(Collection<Subsumption> subs, List<EagerRule> rules, Assignment currentAssignment) {
+	private Result applyEagerRules(Collection<Subsumption> subs,
+			List<EagerRule> rules, Assignment currentAssignment) {
 		Result res = new Result(null, null);
 		for (Subsumption sub : subs) {
 			if (!sub.isSolved()) {
 				for (Rule rule : rules) {
 					Result r = tryApplyRule(sub, rule, null, currentAssignment);
-					if (r == null) continue;
-					if (!r.wasSuccessful()) return r;
+					if (r == null)
+						continue;
+					if (!r.wasSuccessful())
+						return r;
 					res.getSolvedSubsumptions().add(sub);
 					res.getNewSubsumers().addAll(r.getNewSubsumers());
 					if (currentAssignment != null) {
@@ -209,23 +231,29 @@ public class RuleProcessor implements UelProcessor {
 		}
 		return res;
 	}
-	
-	private boolean applyNextNondeterministicRule(Subsumption sub, Rule.Application previous) {
-		Iterator<Rule> iter = nondeterministicRules.listIterator(
-				(previous == null) ? 0 : nondeterministicRules.indexOf(previous.rule()));
-		
+
+	private boolean applyNextNondeterministicRule(Subsumption sub,
+			Rule.Application previous) {
+		Iterator<Rule> iter = nondeterministicRules
+				.listIterator((previous == null) ? 0 : nondeterministicRules
+						.indexOf(previous.rule()));
+
 		while (iter.hasNext()) {
 			Rule rule = iter.next();
-			while(true) {
+			while (true) {
 				Result res = tryApplyRule(sub, rule, previous, assignment);
-				if (res == null) break;
+				if (res == null)
+					break;
 				previous = res.getApplication();
-				if (!res.wasSuccessful()) continue;
-				
-				// now 'res' is the result of a successful nondeterministic rule application ->
+				if (!res.wasSuccessful())
+					continue;
+
+				// now 'res' is the result of a successful nondeterministic rule
+				// application ->
 				// apply eager rules, put result on the stack
 				if (!commitResult(res, null)) {
-					// application of static eager rules failed -> roll back changes and continue search
+					// application of static eager rules failed -> roll back
+					// changes and continue search
 					rollBackResult(res);
 					continue;
 				}
@@ -246,133 +274,158 @@ public class RuleProcessor implements UelProcessor {
 	/**
 	 * Exhaustively apply all applicable eager rules to the goal subsumptions.
 	 * 
-	 * @param parent the previous result of a nondeterministic rule application to which the
-	 *               results of the eager rule applications should be added; if it is 'null', then
-	 *               no results are stored
+	 * @param parent
+	 *            the previous result of a nondeterministic rule application to
+	 *            which the results of the eager rule applications should be
+	 *            added; if it is 'null', then no results are stored
 	 * @return true iff all rule applications were successful
 	 */
 	private boolean applyEagerRules(Result parent) {
 		Result currentResult = parent;
 		Result nextResult = new Result(null, null);
 		Assignment tmp = new Assignment(assignment);
-		
+
 		do {
-			
+
 			// apply dynamic eager rules to each new unsolved subsumption
 			{
-				Result res = applyEagerRules(currentResult.getNewUnsolvedSubsumptions(), dynamicEagerRules, tmp);
-				if (!res.wasSuccessful()) return false;
-				nextResult.getSolvedSubsumptions().addAll(res.getSolvedSubsumptions());
+				Result res = applyEagerRules(currentResult
+						.getNewUnsolvedSubsumptions(), dynamicEagerRules, tmp);
+				if (!res.wasSuccessful())
+					return false;
+				nextResult.getSolvedSubsumptions().addAll(
+						res.getSolvedSubsumptions());
 				nextResult.getNewSubsumers().addAll(res.getNewSubsumers());
 			}
-			
+
 			// apply dynamic eager rules for each new assignment
-			Assignment newSubsumers = currentResult.getNewSubsumers(); 
+			Assignment newSubsumers = currentResult.getNewSubsumers();
 			for (Integer var : newSubsumers.getKeys()) {
 				if (!newSubsumers.getSubsumers(var).isEmpty()) {
-					Result res = applyEagerRules(goal.getSubsumptionsByLHSVariable(var), dynamicEagerRules, tmp);
-					if (!res.wasSuccessful()) return false;
-					nextResult.getSolvedSubsumptions().addAll(res.getSolvedSubsumptions());
+					Result res = applyEagerRules(goal
+							.getSubsumptionsByBodyVariable(var),
+							dynamicEagerRules, tmp);
+					if (!res.wasSuccessful())
+						return false;
+					nextResult.getSolvedSubsumptions().addAll(
+							res.getSolvedSubsumptions());
 					nextResult.getNewSubsumers().addAll(res.getNewSubsumers());
 				}
 			}
-			
-			boolean commitSuccessful = commitResult(nextResult, tmp); 
+
+			boolean commitSuccessful = commitResult(nextResult, tmp);
 			parent.amend(nextResult);
-			if (!commitSuccessful) return false;
-			
+			if (!commitSuccessful)
+				return false;
+
 			currentResult = nextResult;
 			nextResult = new Result(null, null);
 			tmp = new Assignment(assignment);
-		} while (!currentResult.getNewSubsumers().isEmpty() || !currentResult.getNewUnsolvedSubsumptions().isEmpty());
-		
+		} while (!currentResult.getNewSubsumers().isEmpty()
+				|| !currentResult.getNewUnsolvedSubsumptions().isEmpty());
+
 		return true;
 	}
-	
+
 	/**
 	 * Try to apply a rule to a given subsumption.
 	 * 
-	 * @param rule the rule to be applied
-	 * @param sub the considered subsumption
-	 * @param previous the previous result or 'null' if this is the first try
-	 * @return the result of the rule application or 'null' if no more rule applications are
-	 *         possible
+	 * @param rule
+	 *            the rule to be applied
+	 * @param sub
+	 *            the considered subsumption
+	 * @param previous
+	 *            the previous result or 'null' if this is the first try
+	 * @return the result of the rule application or 'null' if no more rule
+	 *         applications are possible
 	 */
-	private Result tryApplyRule(Subsumption sub, Rule rule, Application previous, Assignment currentAssignment) {
+	private Result tryApplyRule(Subsumption sub, Rule rule,
+			Application previous, Assignment currentAssignment) {
 		Rule.Application next;
 		if (previous == null) {
 			next = rule.getFirstApplication(sub, currentAssignment);
 		} else {
 			next = rule.getNextApplication(sub, currentAssignment, previous);
 		}
-		if (next == null) return null;
-		
+		if (next == null)
+			return null;
+
 		Result res = rule.apply(sub, currentAssignment, next);
 		return res;
 	}
-	
+
 	/**
-	 * Adds the new unsolved subsumptions resulting from a rule application to the current goal and
-	 * also applies the changes to the current assignment. In the process, the result is changed to
-	 * reflect the exact changes that are made. For example, a created subsumption that is already
-	 * in the goal is removed from the result. Additionally, the result of goal expansion is added
-	 * to the result.
+	 * Adds the new unsolved subsumptions resulting from a rule application to
+	 * the current goal and also applies the changes to the current assignment.
+	 * In the process, the result is changed to reflect the exact changes that
+	 * are made. For example, a created subsumption that is already in the goal
+	 * is removed from the result. Additionally, the result of goal expansion is
+	 * added to the result.
 	 * 
-	 * @param res the result to be considered; will be changed in-place
-	 * @param newAssignment the new assignment that will replace the current assignment; if this is
-	 * 'null', then the change will be computed from 'res.getNewSubsumers()'
+	 * @param res
+	 *            the result to be considered; will be changed in-place
+	 * @param newAssignment
+	 *            the new assignment that will replace the current assignment;
+	 *            if this is 'null', then the change will be computed from
+	 *            'res.getNewSubsumers()'
 	 */
 	private boolean commitResult(Result res, Assignment newAssignment) {
 		// solve subsumption that triggered the rule
 		if (res.getSubsumption() != null) {
 			res.getSubsumption().setSolved(true);
 		}
-		
+
 		// add new unsolved subsumptions to the goal
 		res.getNewUnsolvedSubsumptions().removeAll(goal);
 		goal.addAll(res.getNewUnsolvedSubsumptions());
 		for (Subsumption sub : res.getNewUnsolvedSubsumptions()) {
 			if (sub.getHead().isVariable()) {
-				// subsumptions with a variable on the right-hand side are always solved
+				// subsumptions with a variable on the right-hand side are
+				// always solved
 				sub.setSolved(true);
 				res.getNewSolvedSubsumptions().add(sub);
 			}
 		}
-		res.getNewUnsolvedSubsumptions().removeAll(res.getNewSolvedSubsumptions());
-		
-//		{
-//			Iterator<Subsumption> iter = res.getNewUnsolvedSubsumptions().iterator();
-//			while (iter.hasNext()) {
-//				Subsumption newUnsolvedSub = iter.next();
-//				if (!goal.add(newUnsolvedSub)) {
-//					// if 'newUnsolvedSub' is already in the goal, we can ignore it
-//					iter.remove();
-//				} else { 
-//					if (newUnsolvedSub.getHead().isVariable()) {
-//						// subsumptions with a variable on the right-hand side are always solved
-//						iter.remove();
-//						newUnsolvedSub.setSolved(true);
-//						res.getNewSolvedSubsumptions().add(newUnsolvedSub);
-//					}
-//				}
-//			}
-//		}
+		res.getNewUnsolvedSubsumptions().removeAll(
+				res.getNewSolvedSubsumptions());
+
+		// {
+		// Iterator<Subsumption> iter =
+		// res.getNewUnsolvedSubsumptions().iterator();
+		// while (iter.hasNext()) {
+		// Subsumption newUnsolvedSub = iter.next();
+		// if (!goal.add(newUnsolvedSub)) {
+		// // if 'newUnsolvedSub' is already in the goal, we can ignore it
+		// iter.remove();
+		// } else {
+		// if (newUnsolvedSub.getHead().isVariable()) {
+		// // subsumptions with a variable on the right-hand side are always
+		// solved
+		// iter.remove();
+		// newUnsolvedSub.setSolved(true);
+		// res.getNewSolvedSubsumptions().add(newUnsolvedSub);
+		// }
+		// }
+		// }
+		// }
 
 		// goal expansion (I)
 		for (Subsumption sub : res.getNewSolvedSubsumptions()) {
-			/* we can assume that all new solved subsumptions have a variable on the right-hand
-			 * side
+			/*
+			 * we can assume that all new solved subsumptions have a variable on
+			 * the right-hand side
 			 */
 			Integer var = sub.getHead().getConceptNameId();
-			Set<Subsumption> newSubs = goal.expand(sub, assignment.getSubsumers(var));
+			Set<Subsumption> newSubs = goal.expand(sub, assignment
+					.getSubsumers(var));
 			res.getNewUnsolvedSubsumptions().addAll(newSubs);
 		}
-		
+
 		// solve subsumptions in 'res.solvedSubsumptions'
 		for (Subsumption sub : res.getSolvedSubsumptions()) {
 			sub.setSolved(true);
 		}
-		
+
 		// update current assignment
 		res.getNewSubsumers().removeAll(assignment);
 		if (newAssignment == null) {
@@ -380,63 +433,68 @@ public class RuleProcessor implements UelProcessor {
 		} else {
 			assignment = newAssignment;
 		}
-		
+
 		// goal expansion (II)
 		Set<Subsumption> newSubs = goal.expand(res.getNewSubsumers());
 		res.getNewUnsolvedSubsumptions().addAll(newSubs);
-		
-//		Assignment newSubsumers = res.getNewSubsumers();
-//		if (!newSubsumers.isEmpty()) {
-//			// add new subsumers to the current assignment
-//			for (Integer var : newSubsumers.getKeys()) {
-//				Iterator<FlatAtom> iter = newSubsumers.getSubsumers(var).iterator();
-//				while (iter.hasNext()) {
-//					FlatAtom newAtom = iter.next();
-//					if (!assignment.add(var, newAtom)) {
-//						// if 'newAtom' is already in the assignment, we can ignore it
-//						iter.remove();
-//					}
-//				}
-//				
-//				// goal expansion (II)
-//				Set<Subsumption> newSubs = goal.expand(var, newSubsumers.getSubsumers(var));
-//				res.getNewUnsolvedSubsumptions().addAll(newSubs);
-//			}
-//			
-//			/* check assignment for cycles again since this result might have come from a bulk
-//			 * application of eager rules
-//			 */
-//			if (newSubsumers.getDomain().size() > 1) {
-//				if (assignment.isCyclic()) return false;
-//			}
-//		}
-		
+
+		// Assignment newSubsumers = res.getNewSubsumers();
+		// if (!newSubsumers.isEmpty()) {
+		// // add new subsumers to the current assignment
+		// for (Integer var : newSubsumers.getKeys()) {
+		// Iterator<FlatAtom> iter = newSubsumers.getSubsumers(var).iterator();
+		// while (iter.hasNext()) {
+		// FlatAtom newAtom = iter.next();
+		// if (!assignment.add(var, newAtom)) {
+		// // if 'newAtom' is already in the assignment, we can ignore it
+		// iter.remove();
+		// }
+		// }
+		//				
+		// // goal expansion (II)
+		// Set<Subsumption> newSubs = goal.expand(var,
+		// newSubsumers.getSubsumers(var));
+		// res.getNewUnsolvedSubsumptions().addAll(newSubs);
+		// }
+		//			
+		// /* check assignment for cycles again since this result might have
+		// come from a bulk
+		// * application of eager rules
+		// */
+		// if (newSubsumers.getDomain().size() > 1) {
+		// if (assignment.isCyclic()) return false;
+		// }
+		// }
+
 		// try to solve new unsolved subsumptions by static eager rules
-		Result eagerRes = applyEagerRules(res.getNewUnsolvedSubsumptions(), staticEagerRules, null);
-		if (!eagerRes.wasSuccessful()) return false;
+		Result eagerRes = applyEagerRules(res.getNewUnsolvedSubsumptions(),
+				staticEagerRules, null);
+		if (!eagerRes.wasSuccessful())
+			return false;
 		for (Subsumption sub : eagerRes.getSolvedSubsumptions()) {
 			sub.setSolved(true);
 		}
 		res.amend(eagerRes);
 		return true;
 	}
-	
+
 	/**
 	 * Undo the changes made to the goal by a result.
 	 * 
-	 * @param res the result to undo
+	 * @param res
+	 *            the result to undo
 	 */
 	private void rollBackResult(Result res) {
-		
+
 		assignment.removeAll(res.getNewSubsumers());
 		goal.removeAll(res.getNewSolvedSubsumptions());
 		goal.removeAll(res.getNewUnsolvedSubsumptions());
-		
+
 		for (Subsumption sub : res.getSolvedSubsumptions()) {
 			sub.setSolved(false);
 		}
-		
+
 		res.getSubsumption().setSolved(false);
 	}
-	
+
 }

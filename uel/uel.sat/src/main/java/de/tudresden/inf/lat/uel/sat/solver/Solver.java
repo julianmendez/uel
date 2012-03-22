@@ -9,10 +9,19 @@ import java.io.IOException;
  */
 public interface Solver {
 
+	/**
+	 * The integer 0 that signals the end of a clause.
+	 */
 	public static final Integer END_OF_CLAUSE = 0;
 
+	/**
+	 * A string representing a line break.
+	 */
 	public static final String NEWLINE = "\n";
 
+	/**
+	 * The string that signals the start of a DIMACS CNF file.
+	 */
 	public static final String P_CNF = "p cnf";
 
 	/**
@@ -20,8 +29,11 @@ public interface Solver {
 	 */
 	public static final String SAT = "SAT";
 
+	/**
+	 * The string ' '.
+	 */
 	public static final String SPACE = " ";
-	
+
 	/**
 	 * First string returned by the solver when the SAT problem is not
 	 * satisfiable.

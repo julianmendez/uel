@@ -9,6 +9,13 @@ import de.tudresden.inf.lat.uel.type.api.Atom;
  */
 public class ConceptName implements Atom {
 
+	/**
+	 * Create a concept name representing the top concept.
+	 * 
+	 * @param id
+	 *            the identifier of the top concept
+	 * @return a new instance of top
+	 */
 	public static ConceptName createTop(Integer id) {
 		ConceptName ret = new ConceptName(id, true);
 		return ret;

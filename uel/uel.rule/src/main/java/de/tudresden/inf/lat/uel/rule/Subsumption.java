@@ -7,8 +7,8 @@ import java.util.List;
 import de.tudresden.inf.lat.uel.type.api.Atom;
 
 /**
- * This is a class representing a subsumption between a conjunction of flat atoms (body) and a flat atom
- * (head).
+ * This is a class representing a subsumption between a conjunction of flat
+ * atoms (body) and a flat atom (head).
  * 
  * @author Stefan Borgwardt
  */
@@ -17,14 +17,16 @@ class Subsumption {
 	private final List<Atom> body;
 	private final Atom head;
 	private boolean solved;
-	
+
 	/**
 	 * Construct a new subsumption from the given atoms.
 	 * 
-	 * @param body the body of the new subsumption
-	 * @param head the head of the new subsumption
+	 * @param body
+	 *            the body of the new subsumption
+	 * @param head
+	 *            the head of the new subsumption
 	 */
-	public Subsumption(List<Atom> body, Atom head) {
+	Subsumption(List<Atom> body, Atom head) {
 		if ((body == null) || (head == null)) {
 			throw new IllegalArgumentException("Body and head cannot be null.");
 		}
@@ -32,43 +34,73 @@ class Subsumption {
 		this.head = head;
 		this.solved = false;
 	}
-	
+
 	/**
 	 * Construct a new subsumption with a single-atom body.
 	 * 
-	 * @param body the body of the new subsumption
-	 * @param head the head of the new subsumption
+	 * @param body
+	 *            the body of the new subsumption
+	 * @param head
+	 *            the head of the new subsumption
 	 */
-	public Subsumption(Atom body, Atom head) {
+	Subsumption(Atom body, Atom head) {
 		if ((body == null) || (head == null)) {
 			throw new IllegalArgumentException("Body and head cannot be null.");
 		}
-		this.body = Arrays.asList(new Atom[]{body});
+		this.body = Arrays.asList(new Atom[] { body });
 		this.head = head;
 		this.solved = false;
 	}
-	
+
+	/**
+	 * Retrieve the body of this subsumption.
+	 * 
+	 * @return a list containing the atoms of the body of this subsumption
+	 */
 	List<Atom> getBody() {
 		return body;
 	}
-	
+
+	/**
+	 * Retrieve the head of this subsumption.
+	 * 
+	 * @return the atom that is the head of this subsumption
+	 */
 	Atom getHead() {
 		return head;
 	}
-	
+
+	/**
+	 * Check whether this subsumption is already solved.
+	 * 
+	 * @return true iff this subsumption is solved
+	 */
 	boolean isSolved() {
 		return solved;
 	}
-	
+
+	/**
+	 * Set the 'solved' status of this subsumption.
+	 * 
+	 * @param solved
+	 *            a flag indicating whether this subsumption is solved
+	 */
 	void setSolved(boolean solved) {
 		this.solved = solved;
 	}
-	
+
+	/**
+	 * Check whether this subsumption is ground.
+	 * 
+	 * @return true iff body and head are both ground
+	 */
 	boolean isGround() {
 		for (Atom at : body) {
-			if (!at.isGround()) return false;
+			if (!at.isGround())
+				return false;
 		}
-		if (!head.isGround()) return false;
+		if (!head.isGround())
+			return false;
 		return true;
 	}
 
@@ -83,17 +115,23 @@ class Subsumption {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj == null) return false;
-		if (obj == this) return true;
-		if (!(obj instanceof Subsumption)) return false;
-		
+		if (obj == null)
+			return false;
+		if (obj == this)
+			return true;
+		if (!(obj instanceof Subsumption))
+			return false;
+
 		Subsumption other = (Subsumption) obj;
-		if (!body.containsAll(other.body)) return false;
-		if (!other.body.containsAll(body)) return false;
-		if (!head.equals(other.head)) return false;
+		if (!body.containsAll(other.body))
+			return false;
+		if (!other.body.containsAll(body))
+			return false;
+		if (!head.equals(other.head))
+			return false;
 		return true;
 	}
-	
+
 	@Override
 	public String toString() {
 		StringBuffer buf = new StringBuffer();
@@ -113,7 +151,7 @@ class Subsumption {
 			buf.append("[s]");
 		}
 		return buf.toString();
-		
+
 	}
-	
+
 }

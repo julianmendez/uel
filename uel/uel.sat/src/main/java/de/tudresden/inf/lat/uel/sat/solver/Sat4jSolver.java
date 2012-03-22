@@ -20,7 +20,7 @@ import org.sat4j.specs.TimeoutException;
  */
 public class Sat4jSolver implements Solver {
 
-	public static final int timeout = 3600;
+	private static final int timeout = 3600;
 
 	/**
 	 * Constructs a new solver.

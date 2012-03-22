@@ -5,16 +5,15 @@ import java.util.Set;
 
 import de.tudresden.inf.lat.uel.rule.Rule.Application;
 
-
 /**
- * Instances of this class describe the result of applying a rule of the rule-based unification
- * algorithm for EL to a subsumption. In particular, they specify newly created subsumptions and
- * new assignments. 
+ * Instances of this class describe the result of applying a rule of the
+ * rule-based unification algorithm for EL to a subsumption. In particular, they
+ * specify newly created subsumptions and new assignments.
  * 
  * @author Stefan Borgwardt
  */
 final class Result {
-	
+
 	private final Subsumption subsumption;
 	private final Application application;
 	private final Set<Subsumption> newUnsolvedSubsumptions = new HashSet<Subsumption>();
@@ -22,25 +21,52 @@ final class Result {
 	private final Set<Subsumption> solvedSubsumptions = new HashSet<Subsumption>();
 	private final Assignment newSubsumers = new Assignment();
 	private boolean successful;
-	
-	public Result(Subsumption subsumption, Application application, boolean successful) {
+
+	/**
+	 * Construct a new rule application result.
+	 * 
+	 * @param subsumption
+	 *            the subsumption that triggered the rule application
+	 * @param application
+	 *            the rule application
+	 * @param successful
+	 *            a flag indicating whether the rule application was successful
+	 */
+	Result(Subsumption subsumption, Application application, boolean successful) {
 		this.subsumption = subsumption;
 		this.application = application;
 		this.successful = successful;
 	}
-	
-	public Result(Subsumption subsumption, Application application) {
+
+	/**
+	 * Construct a new rule application result, assuming that the application
+	 * was successful.
+	 * 
+	 * @param subsumption
+	 *            the subsumption that triggered the rule application
+	 * @param application
+	 *            the rule application
+	 */
+	Result(Subsumption subsumption, Application application) {
 		this(subsumption, application, true);
 	}
 
-	public void amend(Result res) {
-		/* the result of (committed) eager rule applications should be added to the (committed)
-		 * main result
+	/**
+	 * Adds the given result to this instance by appropriately merging the sets
+	 * of new subsumptions and the new assignments.
+	 * 
+	 * @param res
+	 *            the result that is to be added to the current result
+	 */
+	void amend(Result res) {
+		/*
+		 * the result of (committed) eager rule applications should be added to
+		 * the (committed) main result
 		 */
 		if (res.subsumption != null) {
 			solveSubsumption(res.subsumption);
 		}
-		
+
 		newUnsolvedSubsumptions.addAll(res.newUnsolvedSubsumptions);
 		newSolvedSubsumptions.addAll(res.newSolvedSubsumptions);
 		for (Subsumption sub : res.solvedSubsumptions) {
@@ -56,39 +82,85 @@ final class Result {
 			solvedSubsumptions.add(sub);
 		}
 	}
-	
-	public Subsumption getSubsumption() {
+
+	/**
+	 * Return the subsumption that triggered the rule application.
+	 * 
+	 * @return the triggering subsumption
+	 */
+	Subsumption getSubsumption() {
 		return subsumption;
 	}
-	
-	public Application getApplication() {
+
+	/**
+	 * Return the rule application that led to this result.
+	 * 
+	 * @return the rule application
+	 */
+	Application getApplication() {
 		return application;
 	}
-	
-	public boolean wasSuccessful() {
+
+	/**
+	 * Return a flag indicating whether the rule application was successful.
+	 * 
+	 * @return 'false' iff the rule application failed
+	 */
+	boolean wasSuccessful() {
 		return successful;
 	}
-	
-	public void setSuccessful(boolean value) {
+
+	/**
+	 * Set the success status of this rule application result.
+	 * 
+	 * @param value
+	 *            a flag indicating whether the rule application was successful
+	 */
+	void setSuccessful(boolean value) {
 		successful = value;
 	}
 
-	public Assignment getNewSubsumers() {
+	/**
+	 * Retrieve the new assignments that resulted from the rule application or
+	 * subsequent applications of eager rules.
+	 * 
+	 * @return an object specifying new non-variable atoms that were assigned to
+	 *         variables
+	 */
+	Assignment getNewSubsumers() {
 		return newSubsumers;
 	}
 
-	public Set<Subsumption> getNewUnsolvedSubsumptions() {
+	/**
+	 * Retrieve the new unsolved subsumptions that resulted from the rule
+	 * application or subsequent applications of eager rules.
+	 * 
+	 * @return a set of new unsolved subsumptions
+	 */
+	Set<Subsumption> getNewUnsolvedSubsumptions() {
 		return newUnsolvedSubsumptions;
 	}
 
-	public Set<Subsumption> getNewSolvedSubsumptions() {
+	/**
+	 * Retrieve the new unsolved subsumptions that resulted from the rule
+	 * application or subsequent applications of eager rules.
+	 * 
+	 * @return a set of new unsolved subsumptions
+	 */
+	Set<Subsumption> getNewSolvedSubsumptions() {
 		return newSolvedSubsumptions;
 	}
 
-	public Set<Subsumption> getSolvedSubsumptions() {
+	/**
+	 * Retrieve the solved subsumptions that resulted from the rule application
+	 * or subsequent applications of eager rules.
+	 * 
+	 * @return a set of solved subsumptions
+	 */
+	Set<Subsumption> getSolvedSubsumptions() {
 		return solvedSubsumptions;
 	}
-	
+
 	@Override
 	public String toString() {
 		StringBuffer buf = new StringBuffer();
@@ -109,5 +181,5 @@ final class Result {
 		buf.append("}");
 		return buf.toString();
 	}
-	
+
 }

@@ -29,6 +29,7 @@ public class SatInput {
 	 * 
 	 * @param clause
 	 *            new clause
+	 * @return a value indicating whether the SatInput was changed
 	 */
 	public boolean add(Collection<Integer> clause) {
 		if (clause == null) {
@@ -55,6 +56,7 @@ public class SatInput {
 	 * 
 	 * @param clauses
 	 *            set of new clauses
+	 * @return a value indicating whether the SatInput was changed
 	 */
 	public boolean addAll(Set<? extends Collection<Integer>> clauses) {
 		if (clauses == null) {

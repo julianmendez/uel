@@ -142,6 +142,12 @@ public class SatProcessor implements UelProcessor {
 	private final UelInput uelInput;
 	private Set<Integer> update = new HashSet<Integer>();
 
+	/**
+	 * Construct a new SAT processor to solve a unification problem.
+	 * 
+	 * @param input
+	 *            the UEL input
+	 */
 	public SatProcessor(UelInput input) {
 		if (input == null) {
 			throw new IllegalArgumentException("Null argument.");
@@ -152,6 +158,14 @@ public class SatProcessor implements UelProcessor {
 		setLiterals();
 	}
 
+	/**
+	 * Construct a new SAT processor to solve a unification problem.
+	 * 
+	 * @param input
+	 *            the UEL input
+	 * @param inv
+	 *            a flag indicating whether inverted literals should be used
+	 */
 	public SatProcessor(UelInput input, boolean inv) {
 		if (input == null) {
 			throw new IllegalArgumentException("Null argument.");
@@ -207,8 +221,8 @@ public class SatProcessor implements UelProcessor {
 		hasMoreUnifiers = hasMoreUnifiers && unifiable;
 		reset();
 		if (unifiable) {
-			this.result = new UelOutputImpl(getAtomManager(),
-					toTBox(satoutput.getOutput()));
+			this.result = new UelOutputImpl(getAtomManager(), toTBox(satoutput
+					.getOutput()));
 		}
 
 		this.firstTime = false;
@@ -221,6 +235,9 @@ public class SatProcessor implements UelProcessor {
 	 * negative literal is represented by a corresponding negative number. Each
 	 * clause is on one line. The end of a clause is marked by 0. Example of a
 	 * clause in DIMACS format: 1 -3 0
+	 * 
+	 * @return an object representing the DIMACS CNF encoding of the input
+	 *         subsumptions
 	 */
 	public SatInput computeSatInput() {
 		SatInput ret = new SatInput();
@@ -323,7 +340,7 @@ public class SatProcessor implements UelProcessor {
 		return Collections.unmodifiableSet(this.literalManager);
 	}
 
-	public boolean getLiteralValue(Integer literalId) {
+	private boolean getLiteralValue(Integer literalId) {
 		if (literalId == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
@@ -344,7 +361,7 @@ public class SatProcessor implements UelProcessor {
 		return literalManager.addAndGetIndex(literal);
 	}
 
-	public Collection<Integer> getSetOfSubsumers(Integer atomId) {
+	private Collection<Integer> getSetOfSubsumers(Integer atomId) {
 		Set<Integer> list = this.subsumers.get(atomId);
 		if (list == null) {
 			list = new HashSet<Integer>();
@@ -365,7 +382,7 @@ public class SatProcessor implements UelProcessor {
 		return result;
 	}
 
-	public Set<Integer> getUpdate() {
+	private Set<Integer> getUpdate() {
 		return Collections.unmodifiableSet(update);
 	}
 
@@ -846,7 +863,7 @@ public class SatProcessor implements UelProcessor {
 		}
 	}
 
-	public void setLiteralValue(Integer literalId, boolean value) {
+	private void setLiteralValue(Integer literalId, boolean value) {
 		if (literalId == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}

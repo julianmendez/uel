@@ -38,10 +38,18 @@ public class SatOutput {
 		}
 	}
 
+	/**
+	 * Retrieve the model.
+	 * 
+	 * @return a set of literal identifiers
+	 */
 	public Set<Integer> getOutput() {
 		return Collections.unmodifiableSet(this.clause);
 	}
 
+	/**
+	 * @return a value indicating whether the problem is satisfiable
+	 */
 	public boolean isSatisfiable() {
 		return this.satisfiable;
 	}

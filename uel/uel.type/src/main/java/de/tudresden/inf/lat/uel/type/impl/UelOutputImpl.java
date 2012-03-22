@@ -24,6 +24,8 @@ public class UelOutputImpl implements UelOutput {
 	 * 
 	 * @param manager
 	 *            atom manager
+	 * @param eq
+	 *            set of output definitions representing the unifier
 	 */
 	public UelOutputImpl(IndexedSet<Atom> manager, Set<Equation> eq) {
 		this.atomManager = manager;
