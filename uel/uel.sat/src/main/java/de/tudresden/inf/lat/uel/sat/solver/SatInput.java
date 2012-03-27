@@ -45,7 +45,7 @@ public class SatInput {
 
 		Set<Integer> set = new TreeSet<Integer>();
 		set.addAll(clause);
-		boolean ret = this.clauses.add(set);
+		boolean ret = this.clauses.add(Collections.unmodifiableSet(set));
 		if (ret) {
 			updateLastId(clause);
 		}
