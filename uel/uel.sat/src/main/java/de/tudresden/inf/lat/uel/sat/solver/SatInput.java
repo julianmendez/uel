@@ -1,10 +1,8 @@
 package de.tudresden.inf.lat.uel.sat.solver;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -15,7 +13,7 @@ import java.util.TreeSet;
  */
 public class SatInput {
 
-	private Set<Collection<Integer>> clauses = new HashSet<Collection<Integer>>();
+	private Set<Set<Integer>> clauses = new HashSet<Set<Integer>>();
 	private Integer lastId = 0;
 
 	/**
@@ -25,46 +23,49 @@ public class SatInput {
 	}
 
 	/**
-	 * Adds a new clause. Empty clauses are ignored.
+	 * Adds a new non-empty clause.
 	 * 
 	 * @param clause
-	 *            new clause
+	 *            new non-empty clause
 	 * @return a value indicating whether the SatInput was changed
+	 * 
 	 */
-	public boolean add(Collection<Integer> clause) {
+	public boolean add(Set<Integer> clause) {
 		if (clause == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
 
-		boolean ret = false;
-		Set<Integer> newSet = new TreeSet<Integer>();
-		newSet.addAll(clause);
-		newSet.remove(Solver.END_OF_CLAUSE);
-		if (!newSet.isEmpty()) {
-			List<Integer> newList = new ArrayList<Integer>();
-			newList.addAll(newSet);
-			ret = this.clauses.add(Collections.unmodifiableCollection(newList));
-			if (ret) {
-				updateLastId(newList);
-			}
+		if (clause.isEmpty()) {
+			throw new IllegalArgumentException("Clause cannot be empty.");
+		}
+		if (clause.contains(Solver.END_OF_CLAUSE)) {
+			throw new IllegalArgumentException("Clause cannot contain "
+					+ Solver.END_OF_CLAUSE + ".");
+		}
+
+		Set<Integer> set = new TreeSet<Integer>();
+		set.addAll(clause);
+		boolean ret = this.clauses.add(set);
+		if (ret) {
+			updateLastId(clause);
 		}
 		return ret;
 	}
 
 	/**
-	 * Adds a set of new clauses. Empty clauses are ignored.
+	 * Adds a set of new non-empty clauses.
 	 * 
 	 * @param clauses
-	 *            set of new clauses
+	 *            set of new non-empty clauses
 	 * @return a value indicating whether the SatInput was changed
 	 */
-	public boolean addAll(Set<? extends Collection<Integer>> clauses) {
+	public boolean addAll(Set<? extends Set<Integer>> clauses) {
 		if (clauses == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
 
 		boolean ret = false;
-		for (Collection<Integer> clause : clauses) {
+		for (Set<Integer> clause : clauses) {
 			boolean changed = add(clause);
 			ret = ret || changed;
 		}
@@ -95,10 +96,15 @@ public class SatInput {
 	 * 
 	 * @return the clauses
 	 */
-	public Set<Collection<Integer>> getClauses() {
+	public Set<Set<Integer>> getClauses() {
 		return Collections.unmodifiableSet(this.clauses);
 	}
 
+	/**
+	 * Returns the greatest propositional variable identifier.
+	 * 
+	 * @return the greatest propositional variable identifier
+	 */
 	public Integer getLastId() {
 		return this.lastId;
 	}
