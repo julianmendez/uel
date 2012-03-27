@@ -19,11 +19,32 @@
 
 	<name>uel bundle</name>
 
+
 	<build>
 
 		<finalName>de.tudresden.inf.lat.uel</finalName>
 
 		<plugins>
+
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>properties-maven-plugin</artifactId>
+				<version>1.0-alpha-2</version>
+				<executions>
+					<execution>
+						<phase>initialize</phase>
+						<goals>
+							<goal>read-project-properties</goal>
+						</goals>
+						<configuration>
+							<files>
+								<file>version.properties</file>
+							</files>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
 			<plugin>
 				<groupId>org.apache.felix</groupId>
 				<artifactId>maven-bundle-plugin</artifactId>
@@ -33,7 +54,7 @@
 					<instructions>
 						<Bundle-SymbolicName>de.tudresden.inf.lat.uel;singleton:=true</Bundle-SymbolicName>
 						<Bundle-Name>UEL Plug-in</Bundle-Name>
-						<Bundle-Version>${project.version}.333</Bundle-Version>
+						<Bundle-Version>${project.version}.${svn.revision}</Bundle-Version>
 						<Bundle-Activator>org.protege.editor.core.plugin.DefaultPluginActivator</Bundle-Activator>
 						<Bundle-Category>protege</Bundle-Category>
 						<Bundle-Description>UEL Protege plug-in</Bundle-Description>
@@ -43,16 +64,17 @@
 						<Import-Package>javax.accessibility, javax.swing, javax.swing.border, org.osgi.framework, org.protege.editor.core.ui.workspace, *</Import-Package>
 						<Include-Resource>
 							{maven-resources}, {maven-dependencies},
-							@../uel.plugin/target/uel.plugin-1.1.0.jar,
-							lib/uel/uel.type/1.1.0/uel.type-1.1.0.jar=../uel.type/target/uel.type-1.1.0.jar,
-							lib/uel/uel.rule/1.1.0/uel.rule-1.1.0.jar=../uel.rule/target/uel.rule-1.1.0.jar,
-							lib/uel/uel.sat/1.1.0/uel.sat-1.1.0.jar=../uel.sat/target/uel.sat-1.1.0.jar,
+							@../uel.plugin/target/uel.plugin-${project.version}.jar,
+							lib/uel/uel.type/${project.version}/uel.type-${project.version}.jar=../uel.type/target/uel.type-${project.version}.jar,
+							lib/uel/uel.rule/${project.version}/uel.rule-${project.version}.jar=../uel.rule/target/uel.rule-${project.version}.jar,
+							lib/uel/uel.sat/${project.version}/uel.sat-${project.version}.jar=../uel.sat/target/uel.sat-${project.version}.jar,
 							lib/org/sat4j/core/2.3.0/core-2.3.0.jar=../uel.jars/lib/org/sat4j/core/2.3.0/core-2.3.0.jar,
 							lib/com/sun/java/jlfgr/1.0/jlfgr-1.0.jar=../uel.jars/lib/com/sun/java/jlfgr/1.0/jlfgr-1.0.jar
 						</Include-Resource>
 					</instructions>
 				</configuration>
 			</plugin>
+
 		</plugins>
 	</build>
 
