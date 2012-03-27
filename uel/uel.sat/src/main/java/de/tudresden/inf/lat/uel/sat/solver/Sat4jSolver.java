@@ -1,13 +1,12 @@
 package de.tudresden.inf.lat.uel.sat.solver;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.sat4j.core.VecInt;
 import org.sat4j.minisat.SolverFactory;
-import org.sat4j.reader.DimacsReader;
-import org.sat4j.reader.ParseFormatException;
 import org.sat4j.specs.ContradictionException;
 import org.sat4j.specs.IProblem;
 import org.sat4j.specs.ISolver;
@@ -20,8 +19,6 @@ import org.sat4j.specs.TimeoutException;
  */
 public class Sat4jSolver implements Solver {
 
-	private static final int timeout = 3600;
-
 	/**
 	 * Constructs a new solver.
 	 */
@@ -29,37 +26,47 @@ public class Sat4jSolver implements Solver {
 	}
 
 	@Override
-	public SatOutput solve(SatInput input) throws IOException {
+	public SatOutput solve(SatInput input) {
 		if (input == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
 
-		ByteArrayInputStream satinputInputStream = new ByteArrayInputStream(
-				input.toCNF().getBytes());
 		ISolver solver = SolverFactory.newDefault();
-		solver.setTimeout(timeout);
-		boolean satisfiable = false;
-		Set<Integer> clause = new TreeSet<Integer>();
-		try {
-			DimacsReader reader = new DimacsReader(solver);
-			IProblem problem = reader.parseInstance(satinputInputStream);
-			satisfiable = problem.isSatisfiable();
-			if (satisfiable) {
-				int[] model = problem.model();
-				for (Integer e : model) {
-					clause.add(e);
-				}
-				clause.remove(Solver.END_OF_CLAUSE);
+		solver.newVar(input.getLastId());
+		solver.setExpectedNumberOfClauses(input.getClauses().size());
+		for (Collection<Integer> clause : input.getClauses()) {
+			try {
+				solver.addClause(new VecInt(toArray(clause)));
+			} catch (ContradictionException e) {
+				return new SatOutput(false, Collections.<Integer> emptySet());
 			}
-		} catch (ContradictionException e) {
-			// unsatisfiable
-		} catch (ParseFormatException e) {
-			throw new RuntimeException(e);
+		}
+
+		IProblem problem = solver;
+		Set<Integer> model = new TreeSet<Integer>();
+		boolean satisfiable;
+		try {
+			satisfiable = problem.isSatisfiable();
 		} catch (TimeoutException e) {
 			throw new RuntimeException(e);
 		}
+		if (satisfiable) {
+			for (Integer e : problem.model()) {
+				model.add(e);
+			}
+		}
 
-		return new SatOutput(satisfiable, clause);
+		return new SatOutput(satisfiable, model);
+	}
+
+	private int[] toArray(Collection<Integer> clause) {
+		int[] ret = new int[clause.size()];
+		int index = 0;
+		for (Integer var : clause) {
+			ret[index] = var;
+			index++;
+		}
+		return ret;
 	}
 
 }

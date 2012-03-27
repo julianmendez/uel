@@ -99,6 +99,10 @@ public class SatInput {
 		return Collections.unmodifiableSet(this.clauses);
 	}
 
+	public Integer getLastId() {
+		return this.lastId;
+	}
+
 	@Override
 	public int hashCode() {
 		return this.clauses.hashCode();
