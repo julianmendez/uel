@@ -1,6 +1,5 @@
 package de.tudresden.inf.lat.uel.sat.solver;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -134,8 +133,9 @@ public class SatProcessor implements UelProcessor {
 	private boolean firstTime = true;
 	private boolean invertLiteral = false;
 	private IndexedSet<Literal> literalManager = new IndexedSetImpl<Literal>();
+	private long numberOfClauses = 0;
 	private UelOutput result;
-	private SatInput satinput = null;
+	private Sat4jSolver solver;
 	private Map<Integer, Set<Integer>> subsumers = new HashMap<Integer, Set<Integer>>();
 	private Set<Integer> trueLiterals = new HashSet<Integer>();
 	private final UelInput uelInput;
@@ -154,6 +154,7 @@ public class SatProcessor implements UelProcessor {
 
 		this.uelInput = input;
 		this.extUelInput = new ExtendedUelInput(input);
+		this.solver = new Sat4jSolver();
 		setLiterals();
 	}
 
@@ -195,29 +196,25 @@ public class SatProcessor implements UelProcessor {
 
 	@Override
 	public boolean computeNextUnifier() {
-		if (this.firstTime) {
-			this.satinput = computeSatInput();
-		}
-		boolean hasMoreUnifiers = true;
-		Solver solver = new Sat4jSolver();
 		SatOutput satoutput = null;
-		if (!this.firstTime) {
+		boolean unifiable = false;
+		if (this.firstTime) {
+			solver = new Sat4jSolver();
+			SatInput satInput = computeSatInput();
+			numberOfClauses = satInput.getClauses().size();
+			satoutput = solver.solve(satInput);
+			unifiable = satoutput.isSatisfiable();
+		} else {
 			Set<Integer> update = getUpdate();
 			if (update.isEmpty()) {
-				hasMoreUnifiers = false;
+				unifiable = false;
 			} else {
-				this.satinput.add(update);
+				numberOfClauses++;
+				satoutput = solver.update(update);
+				unifiable = satoutput.isSatisfiable();
 			}
 		}
 
-		try {
-			satoutput = solver.solve(this.satinput);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-
-		boolean unifiable = satoutput.isSatisfiable();
-		hasMoreUnifiers = hasMoreUnifiers && unifiable;
 		reset();
 		if (unifiable) {
 			this.result = new UelOutputImpl(getAtomManager(),
@@ -225,7 +222,7 @@ public class SatProcessor implements UelProcessor {
 		}
 
 		this.firstTime = false;
-		return hasMoreUnifiers;
+		return unifiable;
 	}
 
 	/**
@@ -317,9 +314,7 @@ public class SatProcessor implements UelProcessor {
 		if (literalManager != null) {
 			ret.put(keyNumberOfPropositions, "" + literalManager.size());
 		}
-		if (satinput != null) {
-			ret.put(keyNumberOfClauses, "" + satinput.getClauses().size());
-		}
+		ret.put(keyNumberOfClauses, "" + numberOfClauses);
 		ret.put(keyNumberOfVariables, ""
 				+ this.extUelInput.getVariables().size());
 		return Collections.unmodifiableMap(ret);

@@ -19,29 +19,15 @@ import org.sat4j.specs.TimeoutException;
  */
 public class Sat4jSolver implements Solver {
 
+	private ISolver solver;
+
 	/**
 	 * Constructs a new solver.
 	 */
 	public Sat4jSolver() {
 	}
 
-	@Override
-	public SatOutput solve(SatInput input) {
-		if (input == null) {
-			throw new IllegalArgumentException("Null argument.");
-		}
-
-		ISolver solver = SolverFactory.newDefault();
-		solver.newVar(input.getLastId());
-		solver.setExpectedNumberOfClauses(input.getClauses().size());
-		for (Collection<Integer> clause : input.getClauses()) {
-			try {
-				solver.addClause(new VecInt(toArray(clause)));
-			} catch (ContradictionException e) {
-				return new SatOutput(false, Collections.<Integer> emptySet());
-			}
-		}
-
+	private SatOutput getSatOutput() {
 		IProblem problem = solver;
 		Set<Integer> model = new TreeSet<Integer>();
 		boolean satisfiable;
@@ -59,6 +45,24 @@ public class Sat4jSolver implements Solver {
 		return new SatOutput(satisfiable, model);
 	}
 
+	@Override
+	public SatOutput solve(SatInput input) {
+		if (input == null) {
+			throw new IllegalArgumentException("Null argument.");
+		}
+
+		solver = SolverFactory.newDefault();
+		solver.newVar(input.getLastId());
+		for (Collection<Integer> clause : input.getClauses()) {
+			try {
+				solver.addClause(new VecInt(toArray(clause)));
+			} catch (ContradictionException e) {
+				return new SatOutput(false, Collections.<Integer> emptySet());
+			}
+		}
+		return getSatOutput();
+	}
+
 	private int[] toArray(Collection<Integer> clause) {
 		int[] ret = new int[clause.size()];
 		int index = 0;
@@ -67,6 +71,15 @@ public class Sat4jSolver implements Solver {
 			index++;
 		}
 		return ret;
+	}
+
+	public SatOutput update(Set<Integer> clause) {
+		try {
+			solver.addClause(new VecInt(toArray(clause)));
+		} catch (ContradictionException e) {
+			return new SatOutput(false, Collections.<Integer> emptySet());
+		}
+		return getSatOutput();
 	}
 
 }
