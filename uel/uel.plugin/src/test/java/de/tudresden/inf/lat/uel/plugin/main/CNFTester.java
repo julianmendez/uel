@@ -6,8 +6,8 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import de.tudresden.inf.lat.uel.plugin.processor.UelProcessorFactory;
 import de.tudresden.inf.lat.uel.plugin.type.AtomManager;
@@ -172,7 +172,7 @@ public class CNFTester {
 	}
 
 	private void printInfo(UelProcessor processor) {
-		for (Entry<String, String> info : processor.getInfo().entrySet()) {
+		for (Entry<String, String> info : processor.getInfo()) {
 			System.out.println(info.getKey() + ": " + info.getValue());
 		}
 		System.out.println();

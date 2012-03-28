@@ -1,5 +1,6 @@
 package de.tudresden.inf.lat.uel.plugin.ui;
 
+import java.util.List;
 import java.util.Map;
 
 import de.tudresden.inf.lat.uel.plugin.processor.PluginGoal;
@@ -13,11 +14,11 @@ import de.tudresden.inf.lat.uel.plugin.type.AtomManager;
  */
 public class StatInfo {
 
-	private Map<String, String> info;
+	private List<Map.Entry<String, String>> info;
 	private final Map<String, String> mapIdLabel;
 	private final PluginGoal pluginGoal;
 
-	public StatInfo(PluginGoal g, Map<String, String> info,
+	public StatInfo(PluginGoal g, List<Map.Entry<String, String>> info,
 			Map<String, String> labels) {
 		if (g == null) {
 			throw new IllegalArgumentException("Null argument.");
@@ -46,7 +47,7 @@ public class StatInfo {
 		return ret;
 	}
 
-	public Map<String, String> getInfo() {
+	public List<Map.Entry<String, String>> getInfo() {
 		return this.info;
 	}
 
@@ -83,7 +84,7 @@ public class StatInfo {
 		return this.pluginGoal.hashCode();
 	}
 
-	public void setInfo(Map<String, String> info) {
+	public void setInfo(List<Map.Entry<String, String>> info) {
 		this.info = info;
 	}
 

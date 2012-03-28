@@ -1,10 +1,10 @@
 package de.tudresden.inf.lat.uel.rule;
 
+import java.util.AbstractMap;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Deque;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -93,14 +93,20 @@ public class RuleProcessor implements UelProcessor {
 		return input;
 	}
 
-	public Map<String, String> getInfo() {
-		Map<String, String> ret = new HashMap<String, String>();
-		ret.put(keyName, processorName);
-		ret.put(keyInitialSubs, "" + initialSize);
-		ret.put(keyMaxSubs, "" + goal.getMaxSize());
-		ret.put(keyTreeSize, "" + treeSize);
-		ret.put(keyDeadEnds, "" + deadEnds);
-		ret.put(keyNumberOfVariables, "" + numVariables);
+	private boolean addEntry(List<Map.Entry<String, String>> list, String key,
+			String value) {
+		return list
+				.add(new AbstractMap.SimpleEntry<String, String>(key, value));
+	}
+
+	public List<Map.Entry<String, String>> getInfo() {
+		List<Map.Entry<String, String>> ret = new ArrayList<Map.Entry<String, String>>();
+		addEntry(ret, keyName, processorName);
+		addEntry(ret, keyInitialSubs, "" + initialSize);
+		addEntry(ret, keyMaxSubs, "" + goal.getMaxSize());
+		addEntry(ret, keyTreeSize, "" + treeSize);
+		addEntry(ret, keyDeadEnds, "" + deadEnds);
+		addEntry(ret, keyNumberOfVariables, "" + numVariables);
 		return ret;
 	}
 
@@ -193,8 +199,8 @@ public class RuleProcessor implements UelProcessor {
 		while (!searchStack.isEmpty()) {
 			Result res = searchStack.pop();
 			rollBackResult(res);
-			if (applyNextNondeterministicRule(res.getSubsumption(), res
-					.getApplication())) {
+			if (applyNextNondeterministicRule(res.getSubsumption(),
+					res.getApplication())) {
 				return true;
 			}
 		}
@@ -289,8 +295,9 @@ public class RuleProcessor implements UelProcessor {
 
 			// apply dynamic eager rules to each new unsolved subsumption
 			{
-				Result res = applyEagerRules(currentResult
-						.getNewUnsolvedSubsumptions(), dynamicEagerRules, tmp);
+				Result res = applyEagerRules(
+						currentResult.getNewUnsolvedSubsumptions(),
+						dynamicEagerRules, tmp);
 				if (!res.wasSuccessful())
 					return false;
 				nextResult.getSolvedSubsumptions().addAll(
@@ -302,8 +309,8 @@ public class RuleProcessor implements UelProcessor {
 			Assignment newSubsumers = currentResult.getNewSubsumers();
 			for (Integer var : newSubsumers.getKeys()) {
 				if (!newSubsumers.getSubsumers(var).isEmpty()) {
-					Result res = applyEagerRules(goal
-							.getSubsumptionsByBodyVariable(var),
+					Result res = applyEagerRules(
+							goal.getSubsumptionsByBodyVariable(var),
 							dynamicEagerRules, tmp);
 					if (!res.wasSuccessful())
 						return false;
@@ -416,8 +423,8 @@ public class RuleProcessor implements UelProcessor {
 			 * the right-hand side
 			 */
 			Integer var = sub.getHead().getConceptNameId();
-			Set<Subsumption> newSubs = goal.expand(sub, assignment
-					.getSubsumers(var));
+			Set<Subsumption> newSubs = goal.expand(sub,
+					assignment.getSubsumers(var));
 			res.getNewUnsolvedSubsumptions().addAll(newSubs);
 		}
 
@@ -450,13 +457,13 @@ public class RuleProcessor implements UelProcessor {
 		// iter.remove();
 		// }
 		// }
-		//				
+		//
 		// // goal expansion (II)
 		// Set<Subsumption> newSubs = goal.expand(var,
 		// newSubsumers.getSubsumers(var));
 		// res.getNewUnsolvedSubsumptions().addAll(newSubs);
 		// }
-		//			
+		//
 		// /* check assignment for cycles again since this result might have
 		// come from a bulk
 		// * application of eager rules

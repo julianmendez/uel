@@ -7,6 +7,7 @@ import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 import javax.swing.BoxLayout;
@@ -157,10 +158,10 @@ class StatInfoView extends JDialog {
 		this.textGoal
 				.setText(showLabels(getModel().getPluginGoal().toString()));
 		StringBuffer info = new StringBuffer();
-		for (String str : getModel().getInfo().keySet()) {
-			info.append(str);
+		for (Map.Entry<String, String> pair : getModel().getInfo()) {
+			info.append(pair.getKey());
 			info.append(colon);
-			info.append(getModel().getInfo().get(str));
+			info.append(pair.getValue());
 			info.append(newLine);
 		}
 		this.textInfo.setText(info.toString());

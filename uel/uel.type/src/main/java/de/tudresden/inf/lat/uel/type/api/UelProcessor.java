@@ -1,5 +1,6 @@
 package de.tudresden.inf.lat.uel.type.api;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -26,7 +27,7 @@ public interface UelProcessor {
 	 * 
 	 * @return information about the last computation
 	 */
-	public Map<String, String> getInfo();
+	public List<Map.Entry<String, String>> getInfo();
 
 	/**
 	 * Returns the input to be used to compute the next unifier.

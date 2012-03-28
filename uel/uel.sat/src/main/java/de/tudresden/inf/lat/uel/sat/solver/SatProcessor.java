@@ -1,9 +1,12 @@
 package de.tudresden.inf.lat.uel.sat.solver;
 
+import java.util.AbstractMap;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -166,6 +169,12 @@ public class SatProcessor implements UelProcessor {
 		setLiterals();
 	}
 
+	private boolean addEntry(List<Map.Entry<String, String>> list, String key,
+			String value) {
+		return list
+				.add(new AbstractMap.SimpleEntry<String, String>(key, value));
+	}
+
 	private boolean addToSetOfSubsumers(Integer atomId1, Integer atomId2) {
 		Set<Integer> ret = this.subsumers.get(atomId1);
 		if (ret == null) {
@@ -300,23 +309,23 @@ public class SatProcessor implements UelProcessor {
 		return this.extUelInput.getEquations();
 	}
 
-	public Map<String, String> getInfo() {
-		Map<String, String> ret = new HashMap<String, String>();
-		ret.put(keyName, processorName);
+	public List<Map.Entry<String, String>> getInfo() {
+		List<Map.Entry<String, String>> ret = new ArrayList<Map.Entry<String, String>>();
+		addEntry(ret, keyName, processorName);
 
 		if (onlyMinimalAssignments) {
-			ret.put(keyConfiguration, usingMinimalAssignments);
+			addEntry(ret, keyConfiguration, usingMinimalAssignments);
 		} else {
-			ret.put(keyConfiguration, notUsingMinimalAssignments);
+			addEntry(ret, keyConfiguration, notUsingMinimalAssignments);
 		}
 
 		if (literalManager != null) {
-			ret.put(keyNumberOfPropositions, "" + literalManager.size());
+			addEntry(ret, keyNumberOfPropositions, "" + literalManager.size());
 		}
-		ret.put(keyNumberOfClauses, "" + numberOfClauses);
-		ret.put(keyNumberOfVariables, ""
+		addEntry(ret, keyNumberOfClauses, "" + numberOfClauses);
+		addEntry(ret, keyNumberOfVariables, ""
 				+ this.extUelInput.getVariables().size());
-		return Collections.unmodifiableMap(ret);
+		return Collections.unmodifiableList(ret);
 	}
 
 	@Override
