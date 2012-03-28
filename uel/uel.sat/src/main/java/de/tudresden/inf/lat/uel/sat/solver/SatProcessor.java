@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.logging.Logger;
 
 import de.tudresden.inf.lat.uel.sat.type.DissubsumptionLiteral;
@@ -221,8 +220,8 @@ public class SatProcessor implements UelProcessor {
 		hasMoreUnifiers = hasMoreUnifiers && unifiable;
 		reset();
 		if (unifiable) {
-			this.result = new UelOutputImpl(getAtomManager(), toTBox(satoutput
-					.getOutput()));
+			this.result = new UelOutputImpl(getAtomManager(),
+					toTBox(satoutput.getOutput()));
 		}
 
 		this.firstTime = false;
@@ -288,8 +287,8 @@ public class SatProcessor implements UelProcessor {
 							: new DissubsumptionLiteral(firstAtomId,
 									secondAtomId);
 					Integer literalId = literalManager.addAndGetIndex(literal);
-					ret.add(getLiteralValue(literalId) ? literalId : (-1)
-							* literalId);
+					ret.add(getLiteralValue(literalId) ? (-1) * literalId
+							: literalId);
 				}
 			}
 		}
@@ -429,7 +428,7 @@ public class SatProcessor implements UelProcessor {
 	 */
 	public void reset() {
 
-		update.clear();
+		update = new HashSet<Integer>();
 
 		for (Integer key : literalManager.getIndices()) {
 			setLiteralValue(key, false);
@@ -904,12 +903,7 @@ public class SatProcessor implements UelProcessor {
 	public Set<Equation> toTBox(Set<Integer> val) {
 		setValuesForLiterals(val);
 		updateTBox();
-		Set<Integer> newClause = createUpdate();
-		Set<Integer> invertedClause = new TreeSet<Integer>();
-		for (Integer e : newClause) {
-			invertedClause.add((-1) * e);
-		}
-		update = invertedClause;
+		update = createUpdate();
 		Set<Equation> ret = getUpdatedUnifier();
 		return Collections.unmodifiableSet(ret);
 	}

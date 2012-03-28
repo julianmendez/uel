@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.TreeSet;
 
 /**
  * An object of this class represents a SAT input file.
@@ -43,9 +42,7 @@ public class SatInput {
 					+ Solver.END_OF_CLAUSE + ".");
 		}
 
-		Set<Integer> set = new TreeSet<Integer>();
-		set.addAll(clause);
-		boolean ret = this.clauses.add(Collections.unmodifiableSet(set));
+		boolean ret = this.clauses.add(Collections.unmodifiableSet(clause));
 		if (ret) {
 			updateLastId(clause);
 		}
