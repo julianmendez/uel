@@ -121,19 +121,23 @@ import de.tudresden.inf.lat.uel.type.impl.UelOutputImpl;
  */
 public class SatProcessor implements UelProcessor {
 
+	private static final String keyConfiguration = "Configuration";
 	private static final String keyName = "Name";
 	private static final String keyNumberOfClauses = "Number of clauses";
 	private static final String keyNumberOfPropositions = "Number of propositions";
 	private static final String keyNumberOfVariables = "Number of variables";
 	private static final Logger logger = Logger.getLogger(SatProcessor.class
 			.getName());
+	private static final String notUsingMinimalAssignments = "all local assignments";
 	private static final String processorName = "SAT-based algorithm";
+	private static final String usingMinimalAssignments = "only minimal assignments";
 
 	private final ExtendedUelInput extUelInput;
 	private boolean firstTime = true;
-	private boolean invertLiteral = false;
+	private final boolean invertLiteral;
 	private IndexedSet<Literal> literalManager = new IndexedSetImpl<Literal>();
 	private long numberOfClauses = 0;
+	private final boolean onlyMinimalAssignments;
 	private UelOutput result;
 	private Sat4jSolver solver;
 	private Map<Integer, Set<Integer>> subsumers = new HashMap<Integer, Set<Integer>>();
@@ -146,27 +150,11 @@ public class SatProcessor implements UelProcessor {
 	 * 
 	 * @param input
 	 *            the UEL input
-	 */
-	public SatProcessor(UelInput input) {
-		if (input == null) {
-			throw new IllegalArgumentException("Null argument.");
-		}
-
-		this.uelInput = input;
-		this.extUelInput = new ExtendedUelInput(input);
-		this.solver = new Sat4jSolver();
-		setLiterals();
-	}
-
-	/**
-	 * Construct a new SAT processor to solve a unification problem.
-	 * 
-	 * @param input
-	 *            the UEL input
 	 * @param inv
 	 *            a flag indicating whether inverted literals should be used
 	 */
-	public SatProcessor(UelInput input, boolean inv) {
+	public SatProcessor(UelInput input, boolean inv,
+			boolean useMinimalAssignments) {
 		if (input == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
@@ -174,6 +162,7 @@ public class SatProcessor implements UelProcessor {
 		this.uelInput = input;
 		this.extUelInput = new ExtendedUelInput(input);
 		this.invertLiteral = inv;
+		this.onlyMinimalAssignments = useMinimalAssignments;
 		setLiterals();
 	}
 
@@ -284,8 +273,11 @@ public class SatProcessor implements UelProcessor {
 							: new DissubsumptionLiteral(firstAtomId,
 									secondAtomId);
 					Integer literalId = literalManager.addAndGetIndex(literal);
-					ret.add(getLiteralValue(literalId) ? (-1) * literalId
-							: literalId);
+					if (!onlyMinimalAssignments
+							|| getLiteralValue(literalId) == this.invertLiteral) {
+						ret.add(getLiteralValue(literalId) ? (-1) * literalId
+								: literalId);
+					}
 				}
 			}
 		}
@@ -311,6 +303,13 @@ public class SatProcessor implements UelProcessor {
 	public Map<String, String> getInfo() {
 		Map<String, String> ret = new HashMap<String, String>();
 		ret.put(keyName, processorName);
+
+		if (onlyMinimalAssignments) {
+			ret.put(keyConfiguration, usingMinimalAssignments);
+		} else {
+			ret.put(keyConfiguration, notUsingMinimalAssignments);
+		}
+
 		if (literalManager != null) {
 			ret.put(keyNumberOfPropositions, "" + literalManager.size());
 		}
