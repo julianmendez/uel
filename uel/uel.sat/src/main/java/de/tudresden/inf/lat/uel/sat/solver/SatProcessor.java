@@ -239,28 +239,28 @@ public class SatProcessor implements UelProcessor {
 		logger.finer("computing SAT input ...");
 
 		logger.finer("running step 1 ...");
-		ret.addAll(runStep1().getClauses());
+		runStep1(ret);
 
 		logger.finer("running step 2.1 ...");
-		ret.addAll(runStep2_1().getClauses());
+		runStep2_1(ret);
 
 		logger.finer("running steps 2.2 and 2.3 ...");
-		ret.addAll(runSteps2_2_N_2_3().getClauses());
+		runSteps2_2_N_2_3(ret);
 
 		logger.finer("running step 2.4 ...");
-		ret.addAll(runStep2_4().getClauses());
+		runStep2_4(ret);
 
 		logger.finer("running step 2.5 ...");
-		ret.addAll(runStep2_5().getClauses());
+		runStep2_5(ret);
 
 		logger.finer("running step 3.1 reflexivity ...");
-		ret.addAll(runStep3_1_r().getClauses());
+		runStep3_1_r(ret);
 
 		logger.finer("running step 3.1 transitivity ...");
-		ret.addAll(runStep3_1_t().getClauses());
+		runStep3_1_t(ret);
 
 		logger.finer("running step 3.2 ...");
-		ret.addAll(runStep3_2().getClauses());
+		runStep3_2(ret);
 
 		logger.finer("SAT input computed.");
 
@@ -454,15 +454,11 @@ public class SatProcessor implements UelProcessor {
 	/**
 	 * Clauses created in Step 1
 	 */
-	private SatInput runStep1() {
-		SatInput ret = new SatInput();
-
+	private void runStep1(SatInput input) {
 		for (Equation e : getEquations()) {
-			ret.addAll(runStep1ForConstants(e).getClauses());
-			ret.addAll(runStep1ForExistentialAtoms(e).getClauses());
+			runStep1ForConstants(e, input);
+			runStep1ForExistentialAtoms(e, input);
 		}
-
-		return ret;
 	}
 
 	/**
@@ -471,9 +467,7 @@ public class SatProcessor implements UelProcessor {
 	 * @param e
 	 *            equation
 	 */
-	private SatInput runStep1ForConstants(Equation e) {
-		SatInput ret = new SatInput();
-
+	private void runStep1ForConstants(Equation e, SatInput input) {
 		for (Integer atomId1 : getConstants()) {
 
 			if (!e.getLeft().equals(atomId1) && !e.getRight().contains(atomId1)) {
@@ -490,7 +484,7 @@ public class SatProcessor implements UelProcessor {
 					Set<Integer> clause = new HashSet<Integer>();
 					clause.add(getMinusSubOrDissubLiteral(atomId2, atomId1));
 					clause.add(getSubOrDissubLiteral(atomId3, atomId1));
-					ret.add(clause);
+					input.add(clause);
 				}
 
 				/*
@@ -502,7 +496,7 @@ public class SatProcessor implements UelProcessor {
 					clause.add(getMinusSubOrDissubLiteral(atomId3, atomId1));
 				}
 				clause.add(getSubOrDissubLiteral(atomId2, atomId1));
-				ret.add(clause);
+				input.add(clause);
 
 			} else if (!e.getLeft().equals(atomId1)
 					&& e.getRight().contains(atomId1)) {
@@ -514,7 +508,7 @@ public class SatProcessor implements UelProcessor {
 				Set<Integer> clause = new HashSet<Integer>();
 				Integer atomId2 = e.getLeft();
 				clause.add(getMinusSubOrDissubLiteral(atomId2, atomId1));
-				ret.add(clause);
+				input.add(clause);
 
 			} else if (e.getLeft().equals(atomId1)
 					&& !e.getRight().contains(atomId1)) {
@@ -527,11 +521,9 @@ public class SatProcessor implements UelProcessor {
 				for (Integer atomId3 : e.getRight()) {
 					clause.add(getMinusSubOrDissubLiteral(atomId3, atomId1));
 				}
-				ret.add(clause);
+				input.add(clause);
 			}
 		}
-
-		return ret;
 	}
 
 	/**
@@ -540,9 +532,7 @@ public class SatProcessor implements UelProcessor {
 	 * @param e
 	 *            equation
 	 */
-	private SatInput runStep1ForExistentialAtoms(Equation e) {
-		SatInput ret = new SatInput();
-
+	private void runStep1ForExistentialAtoms(Equation e, SatInput input) {
 		for (Integer atomId1 : getEAtoms()) {
 
 			if (!e.getLeft().equals(atomId1) && !e.getRight().contains(atomId1)) {
@@ -558,7 +548,7 @@ public class SatProcessor implements UelProcessor {
 					Set<Integer> clause = new HashSet<Integer>();
 					clause.add(getMinusSubOrDissubLiteral(atomId2, atomId1));
 					clause.add(getSubOrDissubLiteral(atomId3, atomId1));
-					ret.add(clause);
+					input.add(clause);
 				}
 
 				/*
@@ -570,7 +560,7 @@ public class SatProcessor implements UelProcessor {
 					clause.add(getMinusSubOrDissubLiteral(atomId3, atomId1));
 				}
 				clause.add(getSubOrDissubLiteral(atomId2, atomId1));
-				ret.add(clause);
+				input.add(clause);
 
 			} else if (!e.getLeft().equals(atomId1)
 					&& e.getRight().contains(atomId1)) {
@@ -583,7 +573,7 @@ public class SatProcessor implements UelProcessor {
 				Set<Integer> clause = new HashSet<Integer>();
 				Integer atomId2 = e.getLeft();
 				clause.add(getMinusSubOrDissubLiteral(atomId2, atomId1));
-				ret.add(clause);
+				input.add(clause);
 
 				// end of outer if; key1 is not on the left, ask if it
 				// is on the right
@@ -599,20 +589,16 @@ public class SatProcessor implements UelProcessor {
 				for (Integer atomId3 : e.getRight()) {
 					clause.add(getMinusSubOrDissubLiteral(atomId3, atomId1));
 				}
-				ret.add(clause);
+				input.add(clause);
 
 			}
 		}
-
-		return ret;
 	}
 
 	/**
 	 * Step 2.1
 	 */
-	private SatInput runStep2_1() {
-		SatInput ret = new SatInput();
-
+	private void runStep2_1(SatInput input) {
 		for (Integer atomId1 : getConstants()) {
 
 			for (Integer atomId2 : getConstants()) {
@@ -620,41 +606,36 @@ public class SatProcessor implements UelProcessor {
 				if (!isTop(atomId2) && (!atomId1.equals(atomId2))) {
 					Set<Integer> clause = new HashSet<Integer>();
 					clause.add(getSubOrDissubLiteral(atomId1, atomId2));
-					ret.add(clause);
+					input.add(clause);
 				}
 
 			}
 
 		}
-
-		return ret;
 	}
 
 	/**
 	 * Step 2.4
 	 */
-	private SatInput runStep2_4() {
-		SatInput ret = new SatInput();
-
+	private void runStep2_4(SatInput input) {
 		for (Integer atomId1 : getConstants()) {
 
 			for (Integer atomId2 : getEAtoms()) {
 				{
 					Set<Integer> clause = new HashSet<Integer>();
 					clause.add(getSubOrDissubLiteral(atomId1, atomId2));
-					ret.add(clause);
+					input.add(clause);
 				}
 
 				if (!isTop(atomId1)) {
 					Set<Integer> clause = new HashSet<Integer>();
 					clause.add(getSubOrDissubLiteral(atomId2, atomId1));
-					ret.add(clause);
+					input.add(clause);
 				}
 
 			}
 
 		}
-		return ret;
 	}
 
 	/**
@@ -662,9 +643,7 @@ public class SatProcessor implements UelProcessor {
 	 * 
 	 * Transitivity of dis-subsumption
 	 */
-	private SatInput runStep2_5() {
-		SatInput ret = new SatInput();
-
+	private void runStep2_5(SatInput input) {
 		Collection<Integer> atomIds = getUsedAtomIds();
 
 		for (Integer atomId1 : atomIds) {
@@ -681,13 +660,12 @@ public class SatProcessor implements UelProcessor {
 							clause.add(getSubOrDissubLiteral(atomId2, atomId3));
 							clause.add(getMinusSubOrDissubLiteral(atomId1,
 									atomId3));
-							ret.add(clause);
+							input.add(clause);
 						}
 					}
 				}
 			}
 		}
-		return ret;
 	}
 
 	/**
@@ -695,14 +673,12 @@ public class SatProcessor implements UelProcessor {
 	 * 
 	 * Reflexivity for order literals
 	 */
-	private SatInput runStep3_1_r() {
-		SatInput ret = new SatInput();
+	private void runStep3_1_r(SatInput input) {
 		for (Integer atomId1 : getVariables()) {
 			Set<Integer> clause = new HashSet<Integer>();
 			clause.add(getMinusOrderLiteral(atomId1, atomId1));
-			ret.add(clause);
+			input.add(clause);
 		}
-		return ret;
 	}
 
 	/**
@@ -710,9 +686,7 @@ public class SatProcessor implements UelProcessor {
 	 * 
 	 * Transitivity for order literals
 	 */
-	private SatInput runStep3_1_t() {
-		SatInput ret = new SatInput();
-
+	private void runStep3_1_t(SatInput input) {
 		for (Integer atomId1 : getVariables()) {
 
 			for (Integer atomId2 : getVariables()) {
@@ -725,7 +699,7 @@ public class SatProcessor implements UelProcessor {
 						clause.add(getMinusOrderLiteral(atomId1, atomId2));
 						clause.add(getMinusOrderLiteral(atomId2, atomId3));
 						clause.add(getOrderLiteral(atomId1, atomId3));
-						ret.add(clause);
+						input.add(clause);
 					}
 
 				}
@@ -733,15 +707,12 @@ public class SatProcessor implements UelProcessor {
 			}
 
 		}
-		return ret;
 	}
 
 	/**
 	 * Step 3.2 Disjunction between order literals and dis-subsumption
 	 */
-	private SatInput runStep3_2() {
-		SatInput ret = new SatInput();
-
+	private void runStep3_2(SatInput input) {
 		for (Integer atomId1 : getEAtoms()) {
 
 			Atom eatom = getAtomManager().get(atomId1);
@@ -757,20 +728,16 @@ public class SatProcessor implements UelProcessor {
 					Integer childId = getAtomManager().addAndGetIndex(child);
 					clause.add(getOrderLiteral(atomId2, childId));
 					clause.add(getSubOrDissubLiteral(atomId2, atomId1));
-					ret.add(clause);
+					input.add(clause);
 				}
 			}
 		}
-
-		return ret;
 	}
 
 	/**
 	 * Step 2.2 and Step 2.3
 	 */
-	private SatInput runSteps2_2_N_2_3() {
-		SatInput ret = new SatInput();
-
+	private void runSteps2_2_N_2_3(SatInput input) {
 		for (Integer atomId1 : getEAtoms()) {
 
 			for (Integer atomId2 : getEAtoms()) {
@@ -790,7 +757,7 @@ public class SatProcessor implements UelProcessor {
 					if (!role1.equals(role2)) {
 						Set<Integer> clause = new HashSet<Integer>();
 						clause.add(getSubOrDissubLiteral(atomId1, atomId2));
-						ret.add(clause);
+						input.add(clause);
 
 						/*
 						 * if the roles are equal, then clause in Step 2.3
@@ -819,7 +786,7 @@ public class SatProcessor implements UelProcessor {
 							clause.add(getMinusSubOrDissubLiteral(child1Id,
 									child2Id));
 							clause.add(getSubOrDissubLiteral(atomId1, atomId2));
-							ret.add(clause);
+							input.add(clause);
 						}
 
 					}
@@ -829,7 +796,6 @@ public class SatProcessor implements UelProcessor {
 			}
 
 		}
-		return ret;
 	}
 
 	/**

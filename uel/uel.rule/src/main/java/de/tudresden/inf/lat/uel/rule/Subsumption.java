@@ -17,6 +17,7 @@ class Subsumption {
 	private final List<Atom> body;
 	private final Atom head;
 	private boolean solved;
+	private final int hashCode;
 
 	/**
 	 * Construct a new subsumption from the given atoms.
@@ -33,6 +34,7 @@ class Subsumption {
 		this.body = body;
 		this.head = head;
 		this.solved = false;
+		this.hashCode = body.hashCode() * 31 + head.hashCode();
 	}
 
 	/**
@@ -50,6 +52,7 @@ class Subsumption {
 		this.body = Arrays.asList(new Atom[] { body });
 		this.head = head;
 		this.solved = false;
+		this.hashCode = body.hashCode() * 31 + head.hashCode();
 	}
 
 	/**
@@ -106,11 +109,7 @@ class Subsumption {
 
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + body.hashCode();
-		result = prime * result + head.hashCode();
-		return result;
+		return hashCode;
 	}
 
 	@Override

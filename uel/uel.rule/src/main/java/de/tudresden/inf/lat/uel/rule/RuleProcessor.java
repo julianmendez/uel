@@ -260,11 +260,13 @@ public class RuleProcessor implements UelProcessor {
 				if (!commitResult(res, null)) {
 					// application of static eager rules failed -> roll back
 					// changes and continue search
+					deadEnds++;
 					rollBackResult(res);
 					continue;
 				}
 				if (!applyEagerRules(res)) {
 					// exhaustive application of eager rules failed
+					deadEnds++;
 					rollBackResult(res);
 					continue;
 				}
