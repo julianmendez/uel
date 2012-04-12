@@ -4,5 +4,7 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="/uel.jars/lib/org/sat4j/core/2.3.0/core-2.3.0.jar" sourcepath="/uel.jars/lib/org/sat4j/core/2.3.0/core-src-2.3.0.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/uel.type"/>
+	<classpathentry kind="lib" path="/uel.jars/lib/org/sat4j/maxsat/2.3.0/maxsat-2.3.0.jar" sourcepath="/uel.jars/lib/org/sat4j/maxsat/2.3.0/maxsat-src-2.3.0.jar"/>
+	<classpathentry kind="lib" path="/uel.jars/lib/org/sat4j/pb/2.3.0/pb-2.3.0.jar" sourcepath="/uel.jars/lib/org/sat4j/pb/2.3.0/pb-src-2.3.0.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

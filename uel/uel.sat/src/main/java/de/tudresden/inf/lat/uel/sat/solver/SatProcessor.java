@@ -1,5 +1,6 @@
 package de.tudresden.inf.lat.uel.sat.solver;
 
+import java.io.IOException;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -142,7 +143,7 @@ public class SatProcessor implements UelProcessor {
 	private long numberOfClauses = 0;
 	private final boolean onlyMinimalAssignments;
 	private UelOutput result;
-	private Sat4jSolver solver;
+	private Solver solver;
 	private Map<Integer, Set<Integer>> subsumers = new HashMap<Integer, Set<Integer>>();
 	private Set<Integer> trueLiterals = new HashSet<Integer>();
 	private final UelInput uelInput;
@@ -155,6 +156,7 @@ public class SatProcessor implements UelProcessor {
 	 *            the UEL input
 	 * @param inv
 	 *            a flag indicating whether inverted literals should be used
+	 * @param useMinimalAssignments
 	 */
 	public SatProcessor(UelInput input, boolean inv,
 			boolean useMinimalAssignments) {
@@ -196,27 +198,35 @@ public class SatProcessor implements UelProcessor {
 	public boolean computeNextUnifier() {
 		SatOutput satoutput = null;
 		boolean unifiable = false;
-		if (this.firstTime) {
-			solver = new Sat4jSolver();
-			SatInput satInput = computeSatInput();
-			numberOfClauses = satInput.getClauses().size();
-			satoutput = solver.solve(satInput);
-			unifiable = satoutput.isSatisfiable();
-		} else {
-			Set<Integer> update = getUpdate();
-			if (update.isEmpty()) {
-				unifiable = false;
-			} else {
-				numberOfClauses++;
-				satoutput = solver.update(update);
+		try {
+			if (this.firstTime) {
+				if (onlyMinimalAssignments) {
+					solver = new Sat4jMaxSatSolver();
+				} else {
+					solver = new Sat4jSolver();
+				}
+				SatInput satInput = computeSatInput();
+				numberOfClauses = satInput.getClauses().size();
+				satoutput = solver.solve(satInput);
 				unifiable = satoutput.isSatisfiable();
+			} else {
+				Set<Integer> update = getUpdate();
+				if (update.isEmpty()) {
+					unifiable = false;
+				} else {
+					numberOfClauses++;
+					satoutput = solver.update(update);
+					unifiable = satoutput.isSatisfiable();
+				}
 			}
+		} catch (IOException e) {
+			throw new RuntimeException(e);
 		}
 
 		reset();
 		if (unifiable) {
-			this.result = new UelOutputImpl(getAtomManager(),
-					toTBox(satoutput.getOutput()));
+			this.result = new UelOutputImpl(getAtomManager(), toTBox(satoutput
+					.getOutput()));
 		}
 
 		this.firstTime = false;
@@ -262,6 +272,24 @@ public class SatProcessor implements UelProcessor {
 		logger.finer("running step 3.2 ...");
 		runStep3_2(ret);
 
+		if (onlyMinimalAssignments) {
+			logger.finer("adding literals to be minimized ...");
+			for (Integer var : getVariables()) {
+				if (isUserVariable(var)) {
+				for (Integer con : getConstants()) {
+					Literal literal = invertLiteral ? new SubsumptionLiteral(var, con) : new DissubsumptionLiteral(var, con);
+					Integer literalId = literalManager.addAndGetIndex(literal);
+					ret.addMinimizeLiteral(literalId);
+				}
+				for (Integer eat : getEAtoms()) {
+					Literal literal = invertLiteral ? new SubsumptionLiteral(var, eat) : new DissubsumptionLiteral(var, eat);
+					Integer literalId = literalManager.addAndGetIndex(literal);
+					ret.addMinimizeLiteral(literalId);
+				}
+				}
+			}
+		}
+		
 		logger.finer("SAT input computed.");
 
 		return ret;
@@ -275,7 +303,7 @@ public class SatProcessor implements UelProcessor {
 		for (Integer firstAtomId : getVariables()) {
 			Atom firstAtom = getAtomManager().get(firstAtomId);
 			if (firstAtom.isConceptName()
-					&& isUserVariable(asConceptName(firstAtom))) {
+					&& isUserVariable(firstAtomId)) {
 				for (Integer secondAtomId : set) {
 					Literal literal = this.invertLiteral ? new SubsumptionLiteral(
 							firstAtomId, secondAtomId)
@@ -393,7 +421,7 @@ public class SatProcessor implements UelProcessor {
 		for (Integer leftPartId : getVariables()) {
 			Atom leftPart = getAtomManager().get(leftPartId);
 			if (leftPart.isConceptName()
-					&& isUserVariable(asConceptName(leftPart))) {
+					&& isUserVariable(leftPartId)) {
 				Set<Integer> rightPartIds = new HashSet<Integer>();
 				Collection<Integer> setOfSubsumers = getSetOfSubsumers(leftPartId);
 				for (Integer subsumerId : setOfSubsumers) {
@@ -420,9 +448,8 @@ public class SatProcessor implements UelProcessor {
 		return (atom.isConceptName() && asConceptName(atom).isTop());
 	}
 
-	private boolean isUserVariable(ConceptName atom) {
-		int index = getAtomManager().getIndex(atom);
-		return this.extUelInput.getUserVariables().contains(index);
+	private boolean isUserVariable(Integer atomId) {
+		return this.extUelInput.getUserVariables().contains(atomId);
 	}
 
 	/**

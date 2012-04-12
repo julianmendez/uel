@@ -6,8 +6,8 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Map.Entry;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import de.tudresden.inf.lat.uel.plugin.processor.UelProcessorFactory;
 import de.tudresden.inf.lat.uel.plugin.type.AtomManager;
@@ -45,35 +45,32 @@ public class CNFTester {
 	 * @throws IOException if the input is invalid
 	 */
 	public static void main(String[] args) throws IOException {
-		if (args.length == 2) {
-			(new CNFTester()).run(args[0], args[1]);
+		if (args.length == 1) {
+			UelInput input = constructInput(args[0]);
+			run(UelProcessorFactory.createProcessor(
+					UelProcessorFactory.SAT_BASED_ALGORITHM_MINIMAL, input));
+			run(UelProcessorFactory.createProcessor(
+					UelProcessorFactory.RULE_BASED_ALGORITHM, input));
 		} else {
 			System.out
-					.println("Parameters: <input DIMACS CNF file> [SAT|Rule]");
+					.println("Parameters: <input DIMACS CNF file>");
 		}
 	}
 
-	private void run(String cnfFile, String processorName) throws IOException {
-		UelInput input = constructInput(cnfFile);
-		UelProcessor processor;
-		if (processorName.equals("SAT")) {
-			processor = UelProcessorFactory.createProcessor(
-					UelProcessorFactory.SAT_BASED_ALGORITHM, input);
-		} else if (processorName.equals("Rule")) {
-			processor = UelProcessorFactory.createProcessor(
-					UelProcessorFactory.RULE_BASED_ALGORITHM, input);
-		} else {
-			throw new IOException(
-					"Unknown processor. Please specify either 'SAT' or 'Rule'.");
-		}
-
+	private static void run(UelProcessor processor) throws IOException {
+		int numberOfUnifiers = 0;
 		long startTime = System.nanoTime();
 		long firstTime = 0;
 
 		boolean hasUnifiers = true;
 		boolean first = true;
 		while (hasUnifiers) {
-			hasUnifiers = processor.computeNextUnifier();
+			if (processor.computeNextUnifier()) {
+				hasUnifiers = true;
+				numberOfUnifiers++;
+			} else {
+				hasUnifiers = false;
+			}
 			if (first) {
 				firstTime = System.nanoTime();
 				first = false;
@@ -83,10 +80,11 @@ public class CNFTester {
 		long endTime = System.nanoTime();
 		System.out.println("first: " + (firstTime - startTime));
 		System.out.println("all: " + (endTime - startTime));
+		System.out.println("unifiers: " + numberOfUnifiers);
 		printInfo(processor);
 	}
 
-	private UelInput constructInput(String cnfFile) throws IOException {
+	private static UelInput constructInput(String cnfFile) throws IOException {
 		BufferedReader reader = new BufferedReader(new FileReader(cnfFile));
 		AtomManager atomManager = new AtomManagerImpl();
 		Set<Equation> equations = new HashSet<Equation>();
@@ -162,16 +160,16 @@ public class CNFTester {
 			equations.add(new EquationImpl(vId, set(literals), false));
 		}
 
-		System.out.println(equations.size());
+		System.out.println("equations: " + equations.size());
 		return new UelInputImpl(atomManager.getAtoms(), equations, Collections
 				.<Integer> emptySet());
 	}
 
-	private <T> Set<T> set(T... elements) {
+	private static <T> Set<T> set(T... elements) {
 		return new HashSet<T>(Arrays.asList(elements));
 	}
 
-	private void printInfo(UelProcessor processor) {
+	private static void printInfo(UelProcessor processor) {
 		for (Entry<String, String> info : processor.getInfo()) {
 			System.out.println(info.getKey() + ": " + info.getValue());
 		}

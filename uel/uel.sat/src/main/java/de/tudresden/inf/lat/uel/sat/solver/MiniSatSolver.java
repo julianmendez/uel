@@ -76,4 +76,9 @@ public class MiniSatSolver implements Solver {
 		return new SatOutput(satisfiable, clause);
 	}
 
+	@Override
+	public SatOutput update(Set<Integer> clause) throws IOException {
+		throw new UnsupportedOperationException();
+	}
+
 }

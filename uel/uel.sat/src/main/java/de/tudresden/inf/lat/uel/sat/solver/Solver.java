@@ -1,6 +1,7 @@
 package de.tudresden.inf.lat.uel.sat.solver;
 
 import java.io.IOException;
+import java.util.Set;
 
 /**
  * An object implementing this interface can solve a SAT problem.
@@ -17,12 +18,17 @@ public interface Solver {
 	/**
 	 * A string representing a line break.
 	 */
-	public static final String NEWLINE = "\n";
+	public static final String NEWLINE = System.getProperty("line.separator");
 
 	/**
 	 * The string that signals the start of a DIMACS CNF file.
 	 */
 	public static final String P_CNF = "p cnf";
+
+	/**
+	 * The string that signals the start of a WCNF file.
+	 */
+	public static final String P_WCNF = "p wcnf";
 
 	/**
 	 * First string returned by the solver when the SAT problem is satisfiable.
@@ -45,9 +51,20 @@ public interface Solver {
 	 * 
 	 * @param input
 	 *            SAT problem to solve
-	 * @return an output of a SAT solver
+	 * @return the output of the SAT solver
 	 * @throws IOException
 	 */
 	public SatOutput solve(SatInput input) throws IOException;
+
+	/**
+	 * Updates the last solved SAT instances by adding one clause and solves the
+	 * resulting problem.
+	 * 
+	 * @param clause
+	 *            the clause to be added
+	 * @return the output of the SAT solver
+	 * @throws IOException
+	 */
+	public SatOutput update(Set<Integer> clause) throws IOException;
 
 }

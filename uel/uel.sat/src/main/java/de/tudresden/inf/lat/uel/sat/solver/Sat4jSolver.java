@@ -1,6 +1,5 @@
 package de.tudresden.inf.lat.uel.sat.solver;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 import java.util.TreeSet;
@@ -53,9 +52,9 @@ public class Sat4jSolver implements Solver {
 
 		solver = SolverFactory.newDefault();
 		solver.newVar(input.getLastId());
-		for (Collection<Integer> clause : input.getClauses()) {
+		for (Set<Integer> clause : input.getClauses()) {
 			try {
-				solver.addClause(new VecInt(toArray(clause)));
+				solver.addClause(new VecInt(SatInput.toArray(clause)));
 			} catch (ContradictionException e) {
 				return new SatOutput(false, Collections.<Integer> emptySet());
 			}
@@ -63,19 +62,9 @@ public class Sat4jSolver implements Solver {
 		return getSatOutput();
 	}
 
-	private int[] toArray(Collection<Integer> clause) {
-		int[] ret = new int[clause.size()];
-		int index = 0;
-		for (Integer var : clause) {
-			ret[index] = var;
-			index++;
-		}
-		return ret;
-	}
-
 	public SatOutput update(Set<Integer> clause) {
 		try {
-			solver.addClause(new VecInt(toArray(clause)));
+			solver.addClause(new VecInt(SatInput.toArray(clause)));
 		} catch (ContradictionException e) {
 			return new SatOutput(false, Collections.<Integer> emptySet());
 		}

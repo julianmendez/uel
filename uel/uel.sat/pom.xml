@@ -39,7 +39,19 @@
 			<artifactId>core</artifactId>
 			<version>2.3.0</version>
 		</dependency>
-
+		
+		<dependency>
+            <groupId>org.sat4j</groupId>
+            <artifactId>pb</artifactId>
+            <version>2.3.0</version>
+        </dependency>
+		
+		<dependency>
+            <groupId>org.sat4j</groupId>
+            <artifactId>maxsat</artifactId>
+            <version>2.3.0</version>
+        </dependency>
+		
 	</dependencies>
 
 </project>

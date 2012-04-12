@@ -49,6 +49,7 @@ public class ProcessorTest extends TestCase {
 	private static final String ontology14 = apath + "testOntology-14.krss";
 	private static final String ontology15 = apath + "testOntology-15.krss";
 	private static final String ontology16 = apath + "testOntology-16.krss";
+	private static final String ontology17 = apath + "testOntology-17.krss";
 
 	private OWLOntology createOntology(InputStream input)
 			throws OWLOntologyCreationException {
@@ -367,6 +368,22 @@ public class ProcessorTest extends TestCase {
 				UelProcessorFactory.SAT_BASED_ALGORITHM_MINIMAL);
 	}
 
+	public void test17Rule() throws OWLOntologyCreationException, IOException {
+		tryOntology(ontology17, set("X", "Y"), 2,
+				UelProcessorFactory.RULE_BASED_ALGORITHM);
+	}
+
+	public void test17SAT() throws OWLOntologyCreationException, IOException {
+		tryOntology(ontology17, set("X", "Y"), 12,
+				UelProcessorFactory.SAT_BASED_ALGORITHM);
+	}
+
+	public void test17SATminimal() throws OWLOntologyCreationException,
+			IOException {
+		tryOntology(ontology17, set("X", "Y"), 1,
+				UelProcessorFactory.SAT_BASED_ALGORITHM_MINIMAL);
+	}
+	
 	private void tryOntology(String ontologyName, Set<String> varNames,
 			Integer numberOfUnifiers, String processorName)
 			throws OWLOntologyCreationException, IOException {
