@@ -1,0 +1,89 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+
+	<!--
+ *
+ * @author Julian Mendez
+ *
+-->
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>uel</groupId>
+	<artifactId>bundle</artifactId>
+	<version>1.2.0</version>
+	<packaging>bundle</packaging>
+
+	<name>uel bundle</name>
+
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+
+
+	<build>
+
+		<finalName>de.tudresden.inf.lat.uel</finalName>
+
+		<plugins>
+
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>properties-maven-plugin</artifactId>
+				<version>1.0-alpha-2</version>
+				<executions>
+					<execution>
+						<phase>initialize</phase>
+						<goals>
+							<goal>read-project-properties</goal>
+						</goals>
+						<configuration>
+							<files>
+								<file>version.properties</file>
+							</files>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<version>2.3.4</version>
+				<extensions>true</extensions>
+				<configuration>
+					<instructions>
+						<Bundle-SymbolicName>de.tudresden.inf.lat.uel;singleton:=true</Bundle-SymbolicName>
+						<Bundle-Name>UEL Plug-in</Bundle-Name>
+						<Bundle-Version>${project.version}.${svn.revision}</Bundle-Version>
+						<Bundle-Activator>org.protege.editor.core.plugin.DefaultPluginActivator</Bundle-Activator>
+						<Bundle-Category>protege</Bundle-Category>
+						<Bundle-Description>UEL Protege plug-in</Bundle-Description>
+						<Bundle-Vendor>Chair of Automata Theory - TU Dresden</Bundle-Vendor>
+						<Bundle-DocURL>http://lat.inf.tu-dresden.de</Bundle-DocURL>
+						<Bundle-ClassPath>${bundle.classpath}</Bundle-ClassPath>
+						<Import-Package>javax.accessibility, javax.swing, javax.swing.border, org.osgi.framework, org.protege.editor.core.ui.workspace, *</Import-Package>
+						<Include-Resource>
+							{maven-resources}, {maven-dependencies},
+							@../uel.plugin/target/uel.plugin-${project.version}.jar,
+							lib/uel/uel.type/${project.version}/uel.type-${project.version}.jar=../uel.type/target/uel.type-${project.version}.jar,
+							lib/uel/uel.rule/${project.version}/uel.rule-${project.version}.jar=../uel.rule/target/uel.rule-${project.version}.jar,
+							lib/uel/uel.sat/${project.version}/uel.sat-${project.version}.jar=../uel.sat/target/uel.sat-${project.version}.jar,
+							lib/org/sat4j/core/2.3.0/core-2.3.0.jar=../uel.jars/lib/org/sat4j/core/2.3.0/core-2.3.0.jar,
+							lib/org/sat4j/pb/2.3.0/pb-2.3.0.jar=../uel.jars/lib/org/sat4j/pb/2.3.0/pb-2.3.0.jar,
+							lib/org/sat4j/maxsat/2.3.0/maxsat-2.3.0.jar=../uel.jars/lib/org/sat4j/maxsat/2.3.0/maxsat-2.3.0.jar,
+							lib/org/apache/commons-cli/1.2/commons-cli-1.2.jar=../uel.jars/lib/org/apache/commons-cli/1.2/commons-cli-1.2.jar,
+							lib/com/sun/java/jlfgr/1.0/jlfgr-1.0.jar=../uel.jars/lib/com/sun/java/jlfgr/1.0/jlfgr-1.0.jar
+						</Include-Resource>
+					</instructions>
+				</configuration>
+			</plugin>
+
+		</plugins>
+	</build>
+
+</project>
+

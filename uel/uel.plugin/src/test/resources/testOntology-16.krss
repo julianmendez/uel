@@ -1,0 +1,16 @@
+
+(define-primitive-concept x#Patient )
+
+(define-concept x#C (and x#Patient (some x#finding (and x#Severe_injury (some x#finding_site x#Head)))))
+
+(define-primitive-concept x#Severe_injury  x#Injury)
+
+(define-primitive-concept x#Head_injury  x#Injury)
+
+(define-primitive-concept x#Head )
+
+(define-primitive-concept x#Injury )
+
+(define-concept x#D (and x#Patient (some x#finding (and x#Head_injury (some x#severity x#Severe)))))
+
+(define-primitive-concept x#Severe )

@@ -1,0 +1,39 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+
+	<!--
+ *
+ * @author Julian Mendez
+ *
+-->
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>uel</groupId>
+	<artifactId>uel.rule</artifactId>
+	<version>1.2.0</version>
+	<packaging>jar</packaging>
+
+	<name>uel rule</name>
+
+	<parent>
+		<groupId>uel</groupId>
+		<artifactId>parent</artifactId>
+		<version>1.2.0</version>
+		<relativePath>../uel.jars</relativePath>
+	</parent>
+
+	<dependencies>
+
+		<dependency>
+			<groupId>uel</groupId>
+			<artifactId>uel.type</artifactId>
+			<version>1.2.0</version>
+		</dependency>
+
+	</dependencies>
+
+</project>
+

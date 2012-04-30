@@ -1,0 +1,2 @@
+(define-concept x#C (and (some x#r (some x#s x#A1)) (some x#r (and x#A2 (some x#r x#A3)))))
+(define-concept x#D (and (some x#r x#A4) (some x#r (some x#s x#A5))))
