@@ -119,12 +119,6 @@
 		</junit>
 	</target>
 
-	<!-- Creates the javadoc. -->
-	<target name="javadoc">
-		<mkdir dir="${_javadoc.directory}" />
-		<javadoc packagenames="*" sourcepath="${javadocsrc}" destdir="${_javadoc.directory}" version="true" use="true" windowtitle="${project.groupId}-${project.artifactId}" overview="${_src.javadoc.directory}/overview.html" classpathref="libs.directory" access="package" />
-	</target>
-
 	<!-- Creates a jar with the binaries. -->
 	<target name="jar" depends="compile">
 		<mkdir dir="${_prjlib.directory}" />
@@ -136,13 +130,14 @@
 		</jar>
 	</target>
 
-	<!-- Creates a compressed file containing the whole project. -->
-	<target name="zip">
-		<delete file="${_zipfile.directory}" />
-		<zip destfile="${_zipfile.directory}" basedir="${basedir}" />
+	<!-- Creates the javadoc. -->
+	<target name="javadoc">
+		<mkdir dir="${_javadoc.directory}" />
+		<javadoc packagenames="*" sourcepath="${javadocsrc}" destdir="${_javadoc.directory}" version="true" use="true" windowtitle="${project.groupId}-${project.artifactId}" overview="${_src.javadoc.directory}/overview.html" classpathref="libs.directory" access="package" />
 	</target>
 
-	<target name="dist" depends="clean, source, compile, checktestsources, compiletests, javadoc, jar" />
+	<!-- Executes all the tasks. -->
+	<target name="dist" depends="clean, source, compile, checktestsources, compiletests, jar, javadoc" />
 
 </project>
 
