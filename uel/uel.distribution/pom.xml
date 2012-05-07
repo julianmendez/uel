@@ -18,6 +18,12 @@
 
 	<name>uel distribution</name>
 
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+
+
 	<modules>
 		<module>../uel.type</module>
 		<module>../uel.rule</module>
