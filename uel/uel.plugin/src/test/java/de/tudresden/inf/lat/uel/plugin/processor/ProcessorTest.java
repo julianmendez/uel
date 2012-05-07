@@ -62,7 +62,8 @@ public class ProcessorTest extends TestCase {
 	private OWLReasoner createReasoner(String ontologyStr)
 			throws OWLOntologyCreationException {
 		JcelReasoner reasoner = new JcelReasoner(
-				createOntology(new ByteArrayInputStream(ontologyStr.getBytes())));
+				createOntology(new ByteArrayInputStream(ontologyStr.getBytes())),
+				false);
 		reasoner.precomputeInferences();
 		return reasoner;
 	}
@@ -383,7 +384,7 @@ public class ProcessorTest extends TestCase {
 		tryOntology(ontology17, set("X", "Y"), 1,
 				UelProcessorFactory.SAT_BASED_ALGORITHM_MINIMAL);
 	}
-	
+
 	private void tryOntology(String ontologyName, Set<String> varNames,
 			Integer numberOfUnifiers, String processorName)
 			throws OWLOntologyCreationException, IOException {
