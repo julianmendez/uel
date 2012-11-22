@@ -27,7 +27,7 @@
 
 	-->
 
-	<property name="parent.directory" value="../uel.jars" />
+	<property name="parent.directory" value="../uel.build/jars" />
 
 	<!-- Compiles this module. -->
 	<target name="dist">

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<project name="uel.distribution" default="dist" basedir=".">
+<project name="uel.build" default="dist" basedir=".">
 
 	<!--
  *
@@ -12,7 +12,7 @@
 	-->
 
 	<property name="project.groupId" value="uel" />
-	<property name="project.artifactId" value="distribution" />
+	<property name="project.artifactId" value="build" />
 
 	<!-- Imports version properties. -->
 	<property file="version.properties" />
@@ -24,7 +24,7 @@
 	<property name="_lib.directory" value="${project.build.directory}/lib" />
 	<property name="_targetlib.directory" value="target" />
 	<property name="groupId.directory" value="uel" />
-	<property name="repository.directory" value="../uel.jars/lib" />
+	<property name="repository.directory" value="../uel.build/jars/lib" />
 	<property name="project.build.outputDirectory" value="${project.build.directory}/classes" />
 	<property name="_jars.directory" value="${basedir}/.." />
 	<property name="_resources.directory" value="${src.directory}/main/resources" />
