@@ -58,7 +58,7 @@
 					<instructions>
 						<Bundle-SymbolicName>de.tudresden.inf.lat.uel;singleton:=true</Bundle-SymbolicName>
 						<Bundle-Name>UEL Plug-in</Bundle-Name>
-						<Bundle-Version>${project.version}.${svn.revision}</Bundle-Version>
+						<Bundle-Version>${project.version}</Bundle-Version>
 						<Bundle-Activator>org.protege.editor.core.plugin.DefaultPluginActivator</Bundle-Activator>
 						<Bundle-Category>protege</Bundle-Category>
 						<Bundle-Description>UEL Protege plug-in</Bundle-Description>

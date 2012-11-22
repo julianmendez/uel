@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<project name="uel.bundle" default="dist" basedir=".">
+<project name="uel.build.plugin" default="dist" basedir=".">
 
 	<!--
  *
@@ -94,7 +94,7 @@
 				<attribute name="Bundle-ManifestVersion" value="2" />
 				<attribute name="Bundle-SymbolicName" value="de.tudresden.inf.lat.uel;singleton:=true" />
 				<attribute name="Bundle-Name" value="UEL Plug-in" />
-				<attribute name="Bundle-Version" value="${project.version}.${svn.revision}" />
+				<attribute name="Bundle-Version" value="${project.version}" />
 				<attribute name="Bundle-Activator" value="org.protege.editor.core.plugin.DefaultPluginActivator" />
 				<attribute name="Bundle-Category" value="protege" />
 				<attribute name="Bundle-Description" value="UEL Protege plug-in" />
