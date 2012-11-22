@@ -29,7 +29,7 @@
 		<repository>
 			<id>localrepo</id>
 			<name>local maven repository</name>
-			<url>file:../uel.jars/lib</url>
+			<url>file:../uel.build/jars/lib</url>
 		</repository>
 
 	</repositories>
