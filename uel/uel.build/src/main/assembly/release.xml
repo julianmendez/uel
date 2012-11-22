@@ -18,7 +18,12 @@
 	<files>
 
 		<file>
-			<source>${basedir}/../uel.bundle/target/de.tudresden.inf.lat.uel.jar</source>
+			<source>${basedir}/library/target/uel-${project.version}.jar</source>
+			<outputDirectory>library</outputDirectory>
+		</file>
+
+		<file>
+			<source>${basedir}/plugin/target/de.tudresden.inf.lat.uel.jar</source>
 			<outputDirectory>plugin</outputDirectory>
 		</file>
 

@@ -26,7 +26,7 @@
 
 	<build>
 
-		<finalName>de.tudresden.inf.lat.uel</finalName>
+		<finalName>uel-${project.version}</finalName>
 
 		<plugins>
 
