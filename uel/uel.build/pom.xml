@@ -31,6 +31,7 @@
 		<module>../uel.plugin</module>
 		<module>library</module>
 		<module>plugin</module>
+		<module>standalone</module>
 	</modules>
 
 	<build>

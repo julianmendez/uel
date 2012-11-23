@@ -41,6 +41,8 @@
 	<property name="build.1.filename" value="uel-${project.version}" />
 	<property name="build.2.name" value="plugin" />
 	<property name="build.2.filename" value="de.tudresden.inf.lat.uel" />
+	<property name="build.3.name" value="standalone" />
+	<property name="build.3.filename" value="uel-${project.version}-standalone" />
 
 	<!-- Cleans everything. -->
 	<target name="clean">
@@ -69,6 +71,7 @@
 	<target name="bundle">
 		<subant antfile="${build.1.name}/build.xml" buildpath="." />
 		<subant antfile="${build.2.name}/build.xml" buildpath="." />
+		<subant antfile="${build.3.name}/build.xml" buildpath="." />
 	</target>
 
 	<!-- Creates the release. -->
@@ -98,6 +101,10 @@
 
 		<copy todir="${_release.directory}/${build.2.name}">
 			<fileset dir="${build.2.name}/target" includes="${build.2.filename}.jar" />
+		</copy>
+
+		<copy todir="${_release.directory}/${build.3.name}">
+			<fileset dir="${build.3.name}/target" includes="${build.3.filename}.jar" />
 		</copy>
 
 		<zip destfile="${_release.directory}/doc/${project.groupId}-${project.version}-javadoc.zip">

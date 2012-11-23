@@ -28,6 +28,11 @@
 		</file>
 
 		<file>
+			<source>${basedir}/standalone/target/uel-${project.version}-standalone.jar</source>
+			<outputDirectory>standalone</outputDirectory>
+		</file>
+
+		<file>
 			<source>${basedir}/target/uel-${project.version}-javadoc.zip</source>
 			<outputDirectory>doc</outputDirectory>
 		</file>
