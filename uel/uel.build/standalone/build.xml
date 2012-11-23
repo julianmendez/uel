@@ -86,11 +86,10 @@
 		</copy>
 	</target>
 
-	<!-- Prepares the local repository. -->
+	<!-- Decompresses the external jars. -->
 	<target name="unjar">
 		<mkdir dir="${_targetclasses.directory}" />
 		<unjar dest="${_targetclasses.directory}">
-			<!--fileset file="${_targetlib.directory}/lib/owlapi/owlapi/3.2.4/owlapi-3.2.4.jar" /-->
 			<fileset dir="${_bundlejars.directory}" includes="${bundlejars}" />
 		</unjar>
 	</target>
