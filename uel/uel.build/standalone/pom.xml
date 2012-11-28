@@ -26,7 +26,7 @@
 
 	<build>
 
-		<finalName>uel-${project.version}-standalone</finalName>
+		<finalName>uel</finalName>
 
 		<plugins>
 
