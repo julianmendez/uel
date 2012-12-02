@@ -6,16 +6,16 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>de.tudresden.inf.lat.jcel</groupId>
-	<artifactId>jcel.core</artifactId>
-	<version>0.17.1</version>
+	<artifactId>jcel</artifactId>
+	<version>0.18.0</version>
 
 
 	<dependencies>
 
 		<dependency>
-			<groupId>de.tudresden.inf.lat.jcel</groupId>
-			<artifactId>jcel.coreontology</artifactId>
-			<version>0.17.1</version>
+			<groupId>owlapi</groupId>
+			<artifactId>owlapi</artifactId>
+			<version>3.4.1</version>
 		</dependency>
 
 	</dependencies>
