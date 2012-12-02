@@ -72,6 +72,7 @@ public class MiniSatSolver implements Solver {
 
 		satinput.delete();
 		satoutput.delete();
+		satoutputReader.close();
 
 		return new SatOutput(satisfiable, clause);
 	}
