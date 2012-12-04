@@ -19,6 +19,7 @@ import de.tudresden.inf.lat.uel.type.impl.UelInputImpl;
  * 
  * @author Barbara Morawska
  * @author Julian Mendez
+ * @author Stefan Borgwardt
  */
 public class PluginGoal {
 
@@ -26,13 +27,28 @@ public class PluginGoal {
 	private final Set<Integer> constants = new HashSet<Integer>();
 	private final Set<Integer> eatoms = new HashSet<Integer>();
 	private final Set<Equation> equations = new HashSet<Equation>();
-	private final UelInput uelInput;
+	private final Ontology ontology;
+	private UelInput uelInput;
 	private final Set<Integer> usedAtomIds = new HashSet<Integer>();
 	private final Set<Integer> userVariables = new HashSet<Integer>();
 	private final Set<Integer> variables = new HashSet<Integer>();
 
 	/**
 	 * Constructs a new goal based on a specified ontology.
+	 * 
+	 * @param manager
+	 *            atom manager
+	 * @param ont
+	 *            ontology
+	 */
+	public PluginGoal(AtomManager manager, Ontology ont) {
+		this.atomManager = manager;
+		this.ontology = ont;
+	}
+
+	/**
+	 * Constructs a new goal based on a specified ontology and the main
+	 * equation.
 	 * 
 	 * @param manager
 	 *            atom manager
@@ -46,12 +62,59 @@ public class PluginGoal {
 	public PluginGoal(AtomManager manager, Ontology ont, String leftStr,
 			String rightStr) {
 		this.atomManager = manager;
-		Set<Equation> equations = initialize(ont, leftStr, rightStr);
-		for (Equation eq : equations) {
-			this.equations.add(eq);
+		this.ontology = ont;
+		addEquation(ont, leftStr, rightStr);
+		updateUelInput();
+	}
+
+	public void addEquation(Ontology ontology, String leftStr, String rightStr) {
+		for (Atom atom : getAtomManager().getAtoms()) {
+			if (atom.isConceptName()) {
+				((ConceptName) atom).setVariable(false);
+			}
 		}
-		this.uelInput = new UelInputImpl(manager.getAtoms(), equations,
-				this.userVariables);
+
+		Set<Equation> equationSet = new HashSet<Equation>();
+		Integer leftId = addModule(equationSet, leftStr);
+		Integer rightId = addModule(equationSet, rightStr);
+
+		equationSet.add(new EquationImpl(leftId, rightId, false));
+		this.equations.addAll(equationSet);
+		updateIndexSets(equationSet);
+	}
+
+	private Integer addModule(Set<Equation> equationSet, String str) {
+		ConceptName conceptName = getAtomManager().createConceptName(str, true);
+		Integer ret = getAtomManager().getAtoms().addAndGetIndex(conceptName);
+		for (Equation eq : this.ontology.getModule(ret)) {
+			if (eq.isPrimitive()) {
+				equationSet.add(processPrimitiveDefinition(eq));
+			} else {
+				equationSet.add(eq);
+			}
+		}
+		return ret;
+	}
+
+	public void addSubsumption(Ontology ontology, String leftStr,
+			String rightStr) {
+		for (Atom atom : getAtomManager().getAtoms()) {
+			if (atom.isConceptName()) {
+				((ConceptName) atom).setVariable(false);
+			}
+		}
+
+		Set<Equation> equationSet = new HashSet<Equation>();
+		Integer leftId = addModule(equationSet, leftStr);
+		Integer rightId = addModule(equationSet, rightStr);
+
+		Set<Integer> rightIds = new HashSet<Integer>();
+		rightIds.add(leftId);
+		rightIds.add(rightId);
+
+		equationSet.add(new EquationImpl(leftId, rightIds, false));
+		this.equations.addAll(equationSet);
+		updateIndexSets(equationSet);
 	}
 
 	public AtomManager getAtomManager() {
@@ -88,85 +151,6 @@ public class PluginGoal {
 
 	public Set<Integer> getVariables() {
 		return Collections.unmodifiableSet(this.variables);
-	}
-
-	private Set<Equation> initialize(Ontology ontology, String leftStr,
-			String rightStr) {
-
-		for (Atom atom : getAtomManager().getAtoms()) {
-			if (atom.isConceptName()) {
-				((ConceptName) atom).setVariable(false);
-			}
-		}
-
-		ConceptName left = getAtomManager().createConceptName(leftStr, true);
-		ConceptName right = getAtomManager().createConceptName(rightStr, true);
-
-		Set<Equation> ret = new HashSet<Equation>();
-		{
-			Set<Equation> equationSet = new HashSet<Equation>();
-			Integer leftId = getAtomManager().getAtoms().addAndGetIndex(left);
-			Integer rightId = getAtomManager().getAtoms().addAndGetIndex(right);
-			equationSet.addAll(ontology.getModule(leftId));
-			equationSet.addAll(ontology.getModule(rightId));
-
-			for (Equation eq : equationSet) {
-				if (eq.isPrimitive()) {
-					ret.add(processPrimitiveDefinition(eq));
-				} else {
-					ret.add(eq);
-				}
-			}
-		}
-
-		ret.add(new EquationImpl(getAtomManager().getAtoms().addAndGetIndex(
-				left), getAtomManager().getAtoms().addAndGetIndex(right), false));
-
-		for (Equation eq : ret) {
-			Integer atomId = eq.getLeft();
-			this.variables.add(atomId);
-			ConceptName concept = (ConceptName) getAtomManager().getAtoms()
-					.get(atomId);
-			concept.setVariable(true);
-			this.userVariables.remove(concept.getConceptNameId());
-		}
-
-		Set<Integer> usedAtomIds = new HashSet<Integer>();
-		for (Equation eq : ret) {
-			usedAtomIds.add(eq.getLeft());
-			usedAtomIds.addAll(eq.getRight());
-		}
-
-		Set<Integer> conceptNameIds = new HashSet<Integer>();
-		for (Integer usedAtomId : usedAtomIds) {
-			Atom atom = getAtomManager().getAtoms().get(usedAtomId);
-			if (atom.isConceptName()) {
-				conceptNameIds.add(usedAtomId);
-			} else if (atom.isExistentialRestriction()) {
-				this.eatoms.add(usedAtomId);
-				ConceptName child = ((ExistentialRestriction) atom).getChild();
-				Integer childId = getAtomManager().getAtoms().addAndGetIndex(
-						child);
-				conceptNameIds.add(childId);
-			}
-		}
-		usedAtomIds.addAll(conceptNameIds);
-		for (Integer atomId : usedAtomIds) {
-			this.usedAtomIds.add(atomId);
-		}
-
-		for (Integer atomId : conceptNameIds) {
-			Atom atom = getAtomManager().getAtoms().get(atomId);
-			if (atom.isConceptName()) {
-				if (((ConceptName) atom).isVariable()) {
-					this.variables.add(atomId);
-				} else if (!((ConceptName) atom).isVariable()) {
-					this.constants.add(atomId);
-				}
-			}
-		}
-
-		return ret;
 	}
 
 	public void makeConstant(Integer atomId) {
@@ -273,6 +257,58 @@ public class PluginGoal {
 		sbuf.append(KRSSKeyword.close);
 		sbuf.append("\n");
 		return sbuf.toString();
+	}
+
+	private void updateIndexSets(Set<Equation> equationSet) {
+		for (Equation eq : equationSet) {
+			Integer atomId = eq.getLeft();
+			this.variables.add(atomId);
+			ConceptName concept = (ConceptName) getAtomManager().getAtoms()
+					.get(atomId);
+			concept.setVariable(true);
+			this.userVariables.remove(concept.getConceptNameId());
+		}
+
+		Set<Integer> usedAtomIds = new HashSet<Integer>();
+		for (Equation eq : equationSet) {
+			usedAtomIds.add(eq.getLeft());
+			usedAtomIds.addAll(eq.getRight());
+		}
+
+		Set<Integer> conceptNameIds = new HashSet<Integer>();
+		for (Integer usedAtomId : usedAtomIds) {
+			Atom atom = getAtomManager().getAtoms().get(usedAtomId);
+			if (atom.isConceptName()) {
+				conceptNameIds.add(usedAtomId);
+			} else if (atom.isExistentialRestriction()) {
+				this.eatoms.add(usedAtomId);
+				ConceptName child = ((ExistentialRestriction) atom).getChild();
+				Integer childId = getAtomManager().getAtoms().addAndGetIndex(
+						child);
+				conceptNameIds.add(childId);
+			}
+		}
+		usedAtomIds.addAll(conceptNameIds);
+		for (Integer atomId : usedAtomIds) {
+			this.usedAtomIds.add(atomId);
+		}
+
+		for (Integer atomId : conceptNameIds) {
+			Atom atom = getAtomManager().getAtoms().get(atomId);
+			if (atom.isConceptName()) {
+				if (((ConceptName) atom).isVariable()) {
+					this.variables.add(atomId);
+				} else if (!((ConceptName) atom).isVariable()) {
+					this.constants.add(atomId);
+				}
+			}
+		}
+
+	}
+
+	public void updateUelInput() {
+		this.uelInput = new UelInputImpl(getAtomManager().getAtoms(),
+				equations, this.userVariables);
 	}
 
 }
