@@ -281,7 +281,7 @@ public class UelController implements ActionListener {
 		return ret;
 	}
 
-	private String getId(OWLEntity entity) {
+	public static String getId(OWLEntity entity) {
 		return entity.getIRI().toURI().toString();
 	}
 
