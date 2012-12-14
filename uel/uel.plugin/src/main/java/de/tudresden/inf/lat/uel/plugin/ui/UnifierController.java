@@ -333,8 +333,6 @@ public class UnifierController implements ActionListener {
 	}
 
 	public String toKRSS(Set<Equation> set) {
-		Set<Equation> unif = new HashSet<Equation>();
-		unif.addAll(set);
 		StringBuffer sbuf = new StringBuffer();
 		for (Equation eq : set) {
 			Atom leftPart = getModel().getAtomManager().getAtoms()

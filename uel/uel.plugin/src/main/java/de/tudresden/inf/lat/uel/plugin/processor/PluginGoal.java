@@ -63,11 +63,11 @@ public class PluginGoal {
 			String rightStr) {
 		this.atomManager = manager;
 		this.ontology = ont;
-		addEquation(ont, leftStr, rightStr);
+		addEquation(leftStr, rightStr);
 		updateUelInput();
 	}
 
-	public void addEquation(Ontology ontology, String leftStr, String rightStr) {
+	public void addEquation(String leftStr, String rightStr) {
 		for (Atom atom : getAtomManager().getAtoms()) {
 			if (atom.isConceptName()) {
 				((ConceptName) atom).setVariable(false);
@@ -96,8 +96,7 @@ public class PluginGoal {
 		return ret;
 	}
 
-	public void addSubsumption(Ontology ontology, String leftStr,
-			String rightStr) {
+	public void addSubsumption(String leftStr, String rightStr) {
 		for (Atom atom : getAtomManager().getAtoms()) {
 			if (atom.isConceptName()) {
 				((ConceptName) atom).setVariable(false);

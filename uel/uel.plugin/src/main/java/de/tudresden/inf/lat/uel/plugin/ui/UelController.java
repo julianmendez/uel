@@ -48,6 +48,10 @@ public class UelController implements ActionListener {
 	private static final String actionRejectVar = "reject var";
 	private static final String actionSelectVariables = "get var candidate";
 
+	public static String getId(OWLEntity entity) {
+		return entity.getIRI().toURI().toString();
+	}
+
 	private List<LabelId> classList00 = null;
 	private List<LabelId> classList01 = null;
 	private Map<String, OWLClass> mapIdClass = new HashMap<String, OWLClass>();
@@ -279,10 +283,6 @@ public class UelController implements ActionListener {
 			}
 		}
 		return ret;
-	}
-
-	public static String getId(OWLEntity entity) {
-		return entity.getIRI().toURI().toString();
 	}
 
 	public UelModel getModel() {
