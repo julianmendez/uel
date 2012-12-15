@@ -5,7 +5,7 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="/uel.build/jars/lib/net/sourceforge/owlapi/owlapi/3.4.1/owlapi-3.4.1.jar" sourcepath="/uel.build/jars/lib/net/sourceforge/owlapi/owlapi/3.4.1/owlapi-src-3.4.1.jar"/>
 	<classpathentry kind="lib" path="/uel.build/jars/lib/org/protege/protege-editor-owl/4.1/protege-editor-owl-4.1.jar"/>
-	<classpathentry kind="lib" path="/uel.build/jars/lib/org/protege/protege-editor-core.application/4.1/protege-editor-core-application-4.1.jar"/>
+	<classpathentry kind="lib" path="/uel.build/jars/lib/org/protege/protege-editor-core-application/4.1/protege-editor-core-application-4.1.jar"/>
 	<classpathentry kind="lib" path="/uel.build/jars/lib/org/junit/junit/4.10/junit-4.10.jar"/>
 	<classpathentry kind="lib" path="/uel.build/jars/lib/de/tudresden/inf/lat/jcel/jcel/0.18.0/jcel-0.18.0.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/uel.type"/>
