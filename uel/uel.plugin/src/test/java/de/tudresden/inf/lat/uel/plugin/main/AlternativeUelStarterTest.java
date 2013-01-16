@@ -108,21 +108,21 @@ public class AlternativeUelStarterTest extends TestCase {
 			Set<OWLUelClassDefinition> unifier = iterator.next();
 			actualNumberOfUnifiers++;
 
-			Set<OWLAxiom> auxAxiomSet = new HashSet<OWLAxiom>();
-			auxAxiomSet.addAll(owlOntology.getAxioms());
-			for (OWLUelClassDefinition equation : unifier) {
-				auxAxiomSet.add(equation.asOWLEquivalentClassesAxiom());
-			}
-
-			OWLOntology auxOntology = owlOntology.getOWLOntologyManager()
-					.createOntology(auxAxiomSet);
-
-			OWLReasoner reasoner = createReasoner(auxOntology);
-			Node<OWLClass> node = reasoner.getEquivalentClasses(idClassMap
-					.get(conceptC));
-			OWLClass elem = idClassMap.get(conceptD);
-
-			// assertTrue(node.contains(elem));
+//			Set<OWLAxiom> auxAxiomSet = new HashSet<OWLAxiom>();
+//			auxAxiomSet.addAll(owlOntology.getAxioms());
+//			for (OWLUelClassDefinition equation : unifier) {
+//				auxAxiomSet.add(equation.asOWLEquivalentClassesAxiom());
+//			}
+//
+//			OWLOntology auxOntology = owlOntology.getOWLOntologyManager()
+//					.createOntology(auxAxiomSet);
+//
+//			OWLReasoner reasoner = createReasoner(auxOntology);
+//			Node<OWLClass> node = reasoner.getEquivalentClasses(idClassMap
+//					.get(conceptC));
+//			OWLClass elem = idClassMap.get(conceptD);
+//
+//			assertTrue(node.contains(elem));
 
 		}
 
