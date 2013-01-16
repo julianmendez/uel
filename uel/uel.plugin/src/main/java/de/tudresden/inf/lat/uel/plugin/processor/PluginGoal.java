@@ -77,6 +77,7 @@ public class PluginGoal {
 		Set<Equation> equationSet = new HashSet<Equation>();
 		Integer leftId = addModule(equationSet, leftStr);
 		Integer rightId = addModule(equationSet, rightStr);
+		markAuxiliaryVariables(equationSet);
 
 		equationSet.add(new EquationImpl(leftId, rightId, false));
 		this.equations.addAll(equationSet);
@@ -106,6 +107,7 @@ public class PluginGoal {
 		Set<Equation> equationSet = new HashSet<Equation>();
 		Integer leftId = addModule(equationSet, leftStr);
 		Integer rightId = addModule(equationSet, rightStr);
+		markAuxiliaryVariables(equationSet);
 
 		Set<Integer> rightIds = new HashSet<Integer>();
 		rightIds.add(leftId);
@@ -257,17 +259,8 @@ public class PluginGoal {
 		sbuf.append("\n");
 		return sbuf.toString();
 	}
-
+	
 	private void updateIndexSets(Set<Equation> equationSet) {
-		for (Equation eq : equationSet) {
-			Integer atomId = eq.getLeft();
-			this.variables.add(atomId);
-			ConceptName concept = (ConceptName) getAtomManager().getAtoms()
-					.get(atomId);
-			concept.setVariable(true);
-			this.userVariables.remove(concept.getConceptNameId());
-		}
-
 		Set<Integer> usedAtomIds = new HashSet<Integer>();
 		for (Equation eq : equationSet) {
 			usedAtomIds.add(eq.getLeft());
@@ -303,6 +296,17 @@ public class PluginGoal {
 			}
 		}
 
+	}
+
+	private void markAuxiliaryVariables(Set<Equation> equationSet) {
+		for (Equation eq : equationSet) {
+			Integer atomId = eq.getLeft();
+			this.variables.add(atomId);
+			ConceptName concept = (ConceptName) getAtomManager().getAtoms()
+					.get(atomId);
+			concept.setVariable(true);
+			this.userVariables.remove(concept.getConceptNameId());
+		}
 	}
 
 	public void updateUelInput() {

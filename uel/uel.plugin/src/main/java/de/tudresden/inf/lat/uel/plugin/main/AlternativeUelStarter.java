@@ -6,11 +6,13 @@ import java.util.Map;
 import java.util.Set;
 
 import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 
 import de.tudresden.inf.lat.uel.plugin.processor.PluginGoal;
@@ -59,12 +61,16 @@ public class AlternativeUelStarter {
 			ret = this.mapOfAuxClassExpr.get(expr);
 			if (ret == null) {
 				this.classCounter++;
-				OWLDataFactory factory = this.auxOntology
-						.getOWLOntologyManager().getOWLDataFactory();
+				OWLOntologyManager manager = this.auxOntology
+						.getOWLOntologyManager();
+				OWLDataFactory factory = manager.getOWLDataFactory();
 				IRI iri = IRI.create(classPrefix + classCounter);
 				ret = factory.getOWLClass(iri);
 
 				this.mapOfAuxClassExpr.put(expr, ret);
+				
+				OWLAxiom newDefinition = factory.getOWLEquivalentClassesAxiom(ret, expr);
+				this.auxOntology.getOWLOntologyManager().addAxiom(auxOntology, newDefinition);
 			}
 		}
 		return ret;
