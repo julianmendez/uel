@@ -44,6 +44,11 @@ public class PluginGoal {
 	public PluginGoal(AtomManager manager, Ontology ont) {
 		this.atomManager = manager;
 		this.ontology = ont;
+		for (Atom atom : getAtomManager().getAtoms()) {
+			if (atom.isConceptName()) {
+				((ConceptName) atom).setVariable(false);
+			}
+		}
 	}
 
 	/**
@@ -61,19 +66,12 @@ public class PluginGoal {
 	 */
 	public PluginGoal(AtomManager manager, Ontology ont, String leftStr,
 			String rightStr) {
-		this.atomManager = manager;
-		this.ontology = ont;
+		this(manager, ont);
 		addEquation(leftStr, rightStr);
 		updateUelInput();
 	}
 
 	public void addEquation(String leftStr, String rightStr) {
-		for (Atom atom : getAtomManager().getAtoms()) {
-			if (atom.isConceptName()) {
-				((ConceptName) atom).setVariable(false);
-			}
-		}
-
 		Set<Equation> equationSet = new HashSet<Equation>();
 		Integer leftId = addModule(equationSet, leftStr);
 		Integer rightId = addModule(equationSet, rightStr);
@@ -87,7 +85,13 @@ public class PluginGoal {
 	private Integer addModule(Set<Equation> equationSet, String str) {
 		ConceptName conceptName = getAtomManager().createConceptName(str, true);
 		Integer ret = getAtomManager().getAtoms().addAndGetIndex(conceptName);
-		for (Equation eq : this.ontology.getModule(ret)) {
+		Set<Equation> module = this.ontology.getModule(ret);
+		if (module.isEmpty()) {
+			// if 'conceptName' is not defined in 'ontology', then it is a constant
+			// (and possibly a user variable)
+			conceptName.setVariable(false);
+		}
+		for (Equation eq : module) {
 			if (eq.isPrimitive()) {
 				equationSet.add(processPrimitiveDefinition(eq));
 			} else {
@@ -98,12 +102,6 @@ public class PluginGoal {
 	}
 
 	public void addSubsumption(String leftStr, String rightStr) {
-		for (Atom atom : getAtomManager().getAtoms()) {
-			if (atom.isConceptName()) {
-				((ConceptName) atom).setVariable(false);
-			}
-		}
-
 		Set<Equation> equationSet = new HashSet<Equation>();
 		Integer leftId = addModule(equationSet, leftStr);
 		Integer rightId = addModule(equationSet, rightStr);

@@ -22,8 +22,11 @@ import de.tudresden.inf.lat.uel.plugin.type.AtomManager;
 import de.tudresden.inf.lat.uel.plugin.type.OWLUelClassDefinition;
 import de.tudresden.inf.lat.uel.plugin.type.UnifierTranslator;
 import de.tudresden.inf.lat.uel.plugin.ui.UelController;
+import de.tudresden.inf.lat.uel.type.api.Atom;
+import de.tudresden.inf.lat.uel.type.api.Equation;
 import de.tudresden.inf.lat.uel.type.api.UelProcessor;
 import de.tudresden.inf.lat.uel.type.impl.ConceptName;
+import de.tudresden.inf.lat.uel.type.impl.ExistentialRestriction;
 
 public class AlternativeUelStarter {
 
@@ -116,6 +119,9 @@ public class AlternativeUelStarter {
 		}
 
 		goal.updateUelInput();
+		
+		// output unification problem for debugging
+		print(goal.getUelInput().getEquations(), goal.getAtomManager(), goal.getUelInput().getUserVariables());
 
 		UelProcessor satProcessor = UelProcessorFactory.createProcessor(
 				UelProcessorFactory.SAT_BASED_ALGORITHM, goal.getUelInput());
@@ -127,6 +133,50 @@ public class AlternativeUelStarter {
 				.getOWLOntologyManager().getOWLDataFactory(), atomManager, goal
 				.getUelInput().getUserVariables());
 		return new UnifierIterator(satProcessor, translator);
+	}
+
+	private void print(Set<Equation> equations, AtomManager atomManager, Set<Integer> userVariables) {
+		for (Equation eq : equations) {
+			print(eq.getLeft(), atomManager, userVariables);
+			System.out.print(" = ");
+			for (Integer atomId : eq.getRight()) {
+				print(atomId, atomManager, userVariables);
+				System.out.print(" + ");
+			}
+			System.out.println();
+		}
+	}
+
+	private void print(Integer atomId, AtomManager atomManager, Set<Integer> userVariables) {
+		Atom atom = atomManager.getAtoms().get(atomId);
+		if (atom.isExistentialRestriction()) {
+			ExistentialRestriction ex = (ExistentialRestriction) atom;
+			System.out.print("(exists "
+					+ atomManager.getRoleName(ex.getRoleId())
+					+ " "
+					+ atomManager.getConceptName(ex.getConceptNameId())
+					+ "["
+					+ isVariable(ex.getChild(), atomManager, userVariables)
+					+ "])");
+		} else {
+			ConceptName name = (ConceptName) atom;
+			System.out.print(atomManager.getConceptName(name.getConceptNameId())
+					+ "["
+					+ isVariable(name, atomManager, userVariables)
+					+ "]");
+		}
+	}
+	
+	private String isVariable(ConceptName name, AtomManager atomManager, Set<Integer> userVariables) {
+		if (name.isVariable()) {
+			if (userVariables.contains(atomManager.getAtoms().addAndGetIndex(name))) {
+				return "uv";
+			} else {
+				return "v";
+			}
+		} else {
+			return "c";
+		}
 	}
 
 }

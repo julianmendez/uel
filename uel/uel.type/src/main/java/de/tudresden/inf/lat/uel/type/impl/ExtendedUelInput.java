@@ -56,6 +56,8 @@ public class ExtendedUelInput implements UelInput {
 					Integer childId = input.getAtomManager().addAndGetIndex(
 							child);
 					conceptNameIds.add(childId);
+				} else {
+					conceptNameIds.add(index);
 				}
 			}
 			usedAtomsIds.addAll(conceptNameIds);

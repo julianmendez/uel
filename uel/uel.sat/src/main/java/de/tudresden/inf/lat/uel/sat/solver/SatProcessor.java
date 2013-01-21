@@ -419,17 +419,14 @@ public class SatProcessor implements UelProcessor {
 	private Set<Equation> getUpdatedUnifier() {
 		Set<Equation> ret = new HashSet<Equation>();
 		for (Integer leftPartId : getVariables()) {
-			Atom leftPart = getAtomManager().get(leftPartId);
-			if (leftPart.isConceptName()
-					&& isUserVariable(leftPartId)) {
-				Set<Integer> rightPartIds = new HashSet<Integer>();
-				Collection<Integer> setOfSubsumers = getSetOfSubsumers(leftPartId);
-				for (Integer subsumerId : setOfSubsumers) {
-					Atom newAtom = getAtomManager().get(subsumerId);
-					rightPartIds.add(getAtomManager().addAndGetIndex(newAtom));
-				}
-				ret.add(new EquationImpl(leftPartId, rightPartIds, false));
-			}
+//			Atom leftPart = getAtomManager().get(leftPartId);
+//			if (leftPart.isConceptName()
+//					&& isUserVariable(leftPartId)) {
+				ret.add(new EquationImpl(
+						leftPartId,
+						new HashSet<Integer>(getSetOfSubsumers(leftPartId)),
+						false));
+//			}
 		}
 
 		return ret;

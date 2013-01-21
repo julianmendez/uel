@@ -191,12 +191,13 @@ public class UnifierController implements ActionListener {
 
 	private Collection<Atom> getSetOfSubsumers(Atom atom) {
 		Set<Atom> ret = new HashSet<Atom>();
-		Set<Equation> equations = getModel().getUelProcessor().getUnifier()
-				.getEquations();
+		Set<Equation> equations = getModel().getUnifierList().get(
+				this.unifierIndex);
 		for (Equation equation : equations) {
 			if (equation.getLeft()
-					.equals(getModel().getAtomManager().getAtoms()
-							.addAndGetIndex(atom))) {
+					.equals(
+							getModel().getAtomManager().getAtoms()
+									.addAndGetIndex(atom))) {
 				for (Integer id : equation.getRight()) {
 					ret.add(getModel().getAtomManager().getAtoms().get(id));
 				}
