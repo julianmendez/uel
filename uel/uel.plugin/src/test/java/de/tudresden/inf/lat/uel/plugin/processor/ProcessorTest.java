@@ -22,8 +22,7 @@ import org.semanticweb.owlapi.reasoner.OWLReasoner;
 
 import de.tudresden.inf.lat.jcel.owlapi.main.JcelReasoner;
 import de.tudresden.inf.lat.uel.plugin.type.AtomManager;
-import de.tudresden.inf.lat.uel.plugin.ui.UelController;
-import de.tudresden.inf.lat.uel.plugin.ui.UelView;
+import de.tudresden.inf.lat.uel.plugin.type.UnifierKRSSRenderer;
 import de.tudresden.inf.lat.uel.type.api.Atom;
 import de.tudresden.inf.lat.uel.type.api.Equation;
 import de.tudresden.inf.lat.uel.type.api.UelProcessor;
@@ -222,7 +221,7 @@ public class ProcessorTest extends TestCase {
 	}
 
 	public void test08Rule() throws OWLOntologyCreationException, IOException {
-		tryOntology(ontology08, set("A1", "A2", "A4"), 3,
+		tryOntology(ontology08, set("A1", "A2", "A4"), 4,
 				UelProcessorFactory.RULE_BASED_ALGORITHM);
 	}
 
@@ -434,13 +433,11 @@ public class ProcessorTest extends TestCase {
 
 		List<Set<Equation>> unifiers = uelModel.getUnifierList();
 		String goalStr = goal.getGoalEquations();
-
-		UelController controller = new UelController(new UelView(uelModel),
-				owlOntology.getOWLOntologyManager());
+		UnifierKRSSRenderer renderer = new UnifierKRSSRenderer(
+				goal.getAtomManager(), goal.getUelInput().getUserVariables());
 
 		for (Set<Equation> unifier : unifiers) {
-			String str = controller.getUnifier().toKRSS(unifier);
-			String extendedOntology = goalStr + str;
+			String extendedOntology = goalStr + renderer.printUnifier(unifier);
 
 			OWLReasoner reasoner = createReasoner(extendedOntology);
 			Node<OWLClass> node = reasoner.getEquivalentClasses(idClassMap

@@ -77,7 +77,6 @@ public class UelController implements ActionListener {
 	public UelController(UelView view, OWLOntologyManager ontologyManager) {
 		this.view = view;
 		this.owlOntologyManager = ontologyManager;
-		resetUnifierController();
 		init();
 	}
 
@@ -131,8 +130,7 @@ public class UelController implements ActionListener {
 		getUnifier().getView().setUnifierButtons(false);
 		getUnifier().getView().setButtonNextEnabled(true);
 		getUnifier().getView().setButtonShowStatInfoEnabled(true);
-
-		this.unifierController.getView().setVisible(true);
+		getUnifier().getView().setVisible(true);
 	}
 
 	private void executeActionClass00Selected() {

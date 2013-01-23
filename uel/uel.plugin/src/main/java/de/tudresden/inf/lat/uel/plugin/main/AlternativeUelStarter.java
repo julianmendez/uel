@@ -6,11 +6,13 @@ import java.util.Map;
 import java.util.Set;
 
 import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 
 import de.tudresden.inf.lat.uel.plugin.processor.PluginGoal;
@@ -20,8 +22,11 @@ import de.tudresden.inf.lat.uel.plugin.type.AtomManager;
 import de.tudresden.inf.lat.uel.plugin.type.OWLUelClassDefinition;
 import de.tudresden.inf.lat.uel.plugin.type.UnifierTranslator;
 import de.tudresden.inf.lat.uel.plugin.ui.UelController;
+import de.tudresden.inf.lat.uel.type.api.Atom;
+import de.tudresden.inf.lat.uel.type.api.Equation;
 import de.tudresden.inf.lat.uel.type.api.UelProcessor;
 import de.tudresden.inf.lat.uel.type.impl.ConceptName;
+import de.tudresden.inf.lat.uel.type.impl.ExistentialRestriction;
 
 public class AlternativeUelStarter {
 
@@ -59,12 +64,16 @@ public class AlternativeUelStarter {
 			ret = this.mapOfAuxClassExpr.get(expr);
 			if (ret == null) {
 				this.classCounter++;
-				OWLDataFactory factory = this.auxOntology
-						.getOWLOntologyManager().getOWLDataFactory();
+				OWLOntologyManager manager = this.auxOntology
+						.getOWLOntologyManager();
+				OWLDataFactory factory = manager.getOWLDataFactory();
 				IRI iri = IRI.create(classPrefix + classCounter);
 				ret = factory.getOWLClass(iri);
 
 				this.mapOfAuxClassExpr.put(expr, ret);
+				
+				OWLAxiom newDefinition = factory.getOWLEquivalentClassesAxiom(ret, expr);
+				this.auxOntology.getOWLOntologyManager().addAxiom(auxOntology, newDefinition);
 			}
 		}
 		return ret;
@@ -110,6 +119,9 @@ public class AlternativeUelStarter {
 		}
 
 		goal.updateUelInput();
+		
+		// output unification problem for debugging
+//		print(goal.getUelInput().getEquations(), goal.getAtomManager(), goal.getUelInput().getUserVariables());
 
 		UelProcessor satProcessor = UelProcessorFactory.createProcessor(
 				UelProcessorFactory.SAT_BASED_ALGORITHM, goal.getUelInput());
@@ -121,6 +133,50 @@ public class AlternativeUelStarter {
 				.getOWLOntologyManager().getOWLDataFactory(), atomManager, goal
 				.getUelInput().getUserVariables());
 		return new UnifierIterator(satProcessor, translator);
+	}
+
+	private void print(Set<Equation> equations, AtomManager atomManager, Set<Integer> userVariables) {
+		for (Equation eq : equations) {
+			print(eq.getLeft(), atomManager, userVariables);
+			System.out.print(" = ");
+			for (Integer atomId : eq.getRight()) {
+				print(atomId, atomManager, userVariables);
+				System.out.print(" + ");
+			}
+			System.out.println();
+		}
+	}
+
+	private void print(Integer atomId, AtomManager atomManager, Set<Integer> userVariables) {
+		Atom atom = atomManager.getAtoms().get(atomId);
+		if (atom.isExistentialRestriction()) {
+			ExistentialRestriction ex = (ExistentialRestriction) atom;
+			System.out.print("(exists "
+					+ atomManager.getRoleName(ex.getRoleId())
+					+ " "
+					+ atomManager.getConceptName(ex.getConceptNameId())
+					+ "["
+					+ isVariable(ex.getChild(), atomManager, userVariables)
+					+ "])");
+		} else {
+			ConceptName name = (ConceptName) atom;
+			System.out.print(atomManager.getConceptName(name.getConceptNameId())
+					+ "["
+					+ isVariable(name, atomManager, userVariables)
+					+ "]");
+		}
+	}
+	
+	private String isVariable(ConceptName name, AtomManager atomManager, Set<Integer> userVariables) {
+		if (name.isVariable()) {
+			if (userVariables.contains(atomManager.getAtoms().addAndGetIndex(name))) {
+				return "uv";
+			} else {
+				return "v";
+			}
+		} else {
+			return "c";
+		}
 	}
 
 }
