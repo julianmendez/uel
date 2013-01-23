@@ -18,6 +18,7 @@ import de.tudresden.inf.lat.uel.type.api.IndexedSet;
 import de.tudresden.inf.lat.uel.type.api.UelInput;
 import de.tudresden.inf.lat.uel.type.api.UelOutput;
 import de.tudresden.inf.lat.uel.type.api.UelProcessor;
+import de.tudresden.inf.lat.uel.type.impl.ConceptName;
 import de.tudresden.inf.lat.uel.type.impl.EquationImpl;
 import de.tudresden.inf.lat.uel.type.impl.ExtendedUelInput;
 import de.tudresden.inf.lat.uel.type.impl.UelOutputImpl;
@@ -171,14 +172,27 @@ public class RuleProcessor implements UelProcessor {
 		// convert current assignment to a set of equations
 		IndexedSet<Atom> atomManager = input.getAtomManager();
 		Set<Equation> equations = new HashSet<Equation>();
-		for (Integer userVar : input.getUserVariables()) {
-			Set<Integer> body = new HashSet<Integer>();
-			for (Atom at : assignment.getSubsumers(atomManager.get(userVar)
-					.getConceptNameId())) {
-				body.add(atomManager.addAndGetIndex(at));
+		for (Atom at : atomManager) {
+			if (at.isConceptName()) {
+				ConceptName name = (ConceptName) at;
+				if (name.isVariable()) {
+					Integer nameId = name.getConceptNameId();
+					Set<Integer> body = new HashSet<Integer>();
+					for (Atom subsumer : assignment.getSubsumers(nameId)) {
+						body.add(atomManager.addAndGetIndex(subsumer));
+					}
+					equations.add(new EquationImpl(nameId, body, false));
+				}
 			}
-			equations.add(new EquationImpl(userVar, body, false));
 		}
+//		for (Integer userVar : input.getUserVariables()) {
+//			Set<Integer> body = new HashSet<Integer>();
+//			for (Atom at : assignment.getSubsumers(atomManager.get(userVar)
+//					.getConceptNameId())) {
+//				body.add(atomManager.addAndGetIndex(at));
+//			}
+//			equations.add(new EquationImpl(userVar, body, false));
+//		}
 		return new UelOutputImpl(atomManager, equations);
 	}
 

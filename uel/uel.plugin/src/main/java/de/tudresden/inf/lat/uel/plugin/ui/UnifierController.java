@@ -8,10 +8,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.StringTokenizer;
 
 import javax.swing.JFileChooser;
@@ -22,11 +19,8 @@ import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 
 import de.tudresden.inf.lat.uel.plugin.processor.UelModel;
 import de.tudresden.inf.lat.uel.plugin.type.AtomManager;
-import de.tudresden.inf.lat.uel.type.api.Atom;
-import de.tudresden.inf.lat.uel.type.api.Equation;
+import de.tudresden.inf.lat.uel.plugin.type.UnifierKRSSRenderer;
 import de.tudresden.inf.lat.uel.type.cons.KRSSKeyword;
-import de.tudresden.inf.lat.uel.type.impl.ConceptName;
-import de.tudresden.inf.lat.uel.type.impl.ExistentialRestriction;
 
 /**
  * This is the controller for the panel that shows the unifiers.
@@ -48,10 +42,13 @@ public class UnifierController implements ActionListener {
 	private StatInfo statInfo = null;
 	private int unifierIndex = -1;
 	private UnifierView view;
+	private UnifierKRSSRenderer renderer;
 
 	public UnifierController(UnifierView view, Map<String, String> labels) {
 		this.view = view;
 		this.mapIdLabel = labels;
+		this.renderer = new UnifierKRSSRenderer(getModel().getAtomManager(),
+				getModel().getUelProcessor().getInput().getUserVariables());
 		init();
 	}
 
@@ -131,8 +128,7 @@ public class UnifierController implements ActionListener {
 		}
 		if (file != null) {
 			try {
-				String unifier = toKRSS(getModel().getUnifierList().get(
-						this.unifierIndex));
+				String unifier = printCurrentUnifier();
 				OntologyRenderer renderer = new OntologyRenderer();
 				OWLOntology owlOntology = renderer.parseKRSS(unifier);
 				if (file.getName().endsWith(OntologyRenderer.EXTENSION_RDF)) {
@@ -189,23 +185,6 @@ public class UnifierController implements ActionListener {
 		return getView().getModel();
 	}
 
-	private Collection<Atom> getSetOfSubsumers(Atom atom) {
-		Set<Atom> ret = new HashSet<Atom>();
-		Set<Equation> equations = getModel().getUnifierList().get(
-				this.unifierIndex);
-		for (Equation equation : equations) {
-			if (equation.getLeft()
-					.equals(
-							getModel().getAtomManager().getAtoms()
-									.addAndGetIndex(atom))) {
-				for (Integer id : equation.getRight()) {
-					ret.add(getModel().getAtomManager().getAtoms().get(id));
-				}
-			}
-		}
-		return ret;
-	}
-
 	public UnifierView getView() {
 		return this.view;
 	}
@@ -219,78 +198,6 @@ public class UnifierController implements ActionListener {
 		getView().addButtonShowStatInfoListener(this, actionShowStatInfo);
 	}
 
-	/**
-	 * Prints a substitution set (i.e. a set of atoms) as a conjunction of atoms
-	 * in the krss format. Used in Translator.
-	 * 
-	 * @return the string representation of a substitution set
-	 */
-	public String printSetOfSubsumers(Collection<Atom> setOfSubsumers) {
-
-		StringBuffer sbuf = new StringBuffer();
-
-		if (setOfSubsumers.isEmpty()) {
-
-			sbuf.append(KRSSKeyword.top);
-			sbuf.append(KRSSKeyword.space);
-
-		} else if (setOfSubsumers.size() == 1) {
-
-			Atom atom = setOfSubsumers.iterator().next();
-			sbuf.append(printSubstitution(atom));
-
-		} else {
-
-			sbuf.append(KRSSKeyword.open);
-			sbuf.append(KRSSKeyword.and);
-			sbuf.append(KRSSKeyword.space);
-
-			for (Atom atom : setOfSubsumers) {
-				sbuf.append(KRSSKeyword.space);
-				sbuf.append(printSubstitution(atom));
-				sbuf.append(KRSSKeyword.space);
-			}
-
-			sbuf.append(KRSSKeyword.space);
-			sbuf.append(KRSSKeyword.close);
-		}
-		return sbuf.toString();
-	}
-
-	private String printSubstitution(Atom atom) {
-		StringBuffer sbuf = new StringBuffer();
-		if (atom.isExistentialRestriction()) {
-			ConceptName child = ((ExistentialRestriction) atom).getChild();
-			Integer conceptId = getModel().getAtomManager().getAtoms()
-					.getIndex(child);
-			boolean childIsUserVariable = getModel().getUelProcessor()
-					.getInput().getUserVariables().contains(conceptId);
-
-			sbuf.append(KRSSKeyword.open);
-			sbuf.append(KRSSKeyword.some);
-			sbuf.append(KRSSKeyword.space);
-			String roleName = getModel().getAtomManager().getRoleName(
-					((ExistentialRestriction) atom).getRoleId());
-			sbuf.append(roleName);
-			sbuf.append(KRSSKeyword.space);
-			if (child.isVariable() && !childIsUserVariable) {
-				sbuf.append(printSetOfSubsumers(getSetOfSubsumers(child)));
-			} else {
-				String childName = getModel().getAtomManager().getConceptName(
-						child.getConceptNameId());
-				sbuf.append(childName);
-			}
-			sbuf.append(KRSSKeyword.close);
-		} else {
-			ConceptName concept = (ConceptName) atom;
-			Integer conceptId = getModel().getAtomManager().getAtoms()
-					.getIndex(concept);
-			String name = getModel().getAtomManager().getConceptName(conceptId);
-			sbuf.append(name);
-		}
-		return sbuf.toString();
-	}
-
 	public void setStatInfo(StatInfo info) {
 		if (info == null) {
 			throw new IllegalArgumentException("Null argument.");
@@ -302,8 +209,8 @@ public class UnifierController implements ActionListener {
 	private String showLabels(String text) {
 		StringBuffer ret = new StringBuffer();
 		try {
-			BufferedReader reader = new BufferedReader(new StringReader(
-					text.replace(KRSSKeyword.close, KRSSKeyword.space
+			BufferedReader reader = new BufferedReader(new StringReader(text
+					.replace(KRSSKeyword.close, KRSSKeyword.space
 							+ KRSSKeyword.close)));
 			String line = new String();
 			while (line != null) {
@@ -333,43 +240,13 @@ public class UnifierController implements ActionListener {
 		return ret.toString();
 	}
 
-	public String toKRSS(Set<Equation> set) {
-		StringBuffer sbuf = new StringBuffer();
-		for (Equation eq : set) {
-			Atom leftPart = getModel().getAtomManager().getAtoms()
-					.get(eq.getLeft());
-
-			Set<Atom> right = new HashSet<Atom>();
-			for (Integer atomId : eq.getRight()) {
-				right.add(getModel().getAtomManager().getAtoms().get(atomId));
-			}
-
-			sbuf.append(KRSSKeyword.newLine);
-			sbuf.append(KRSSKeyword.open);
-			sbuf.append(KRSSKeyword.define_concept);
-			sbuf.append(KRSSKeyword.space);
-			Integer conceptId = getModel().getAtomManager().getAtoms()
-					.getIndex(leftPart);
-			String conceptName = getModel().getAtomManager().getConceptName(
-					conceptId);
-			sbuf.append(conceptName);
-			sbuf.append(KRSSKeyword.space);
-
-			sbuf.append(printSetOfSubsumers(right));
-			sbuf.append(KRSSKeyword.space);
-			sbuf.append(KRSSKeyword.close);
-			sbuf.append(KRSSKeyword.space);
-			sbuf.append(KRSSKeyword.newLine);
-		}
-		return sbuf.toString();
-
+	private String printCurrentUnifier() {
+		return renderer.printUnifier(getModel().getUnifierList().get(this.unifierIndex));
 	}
 
 	private void updateUnifier() {
 		if (getModel().getUnifierList().size() > 0) {
-			getView().getUnifier().setText(
-					showLabels(toKRSS(getModel().getUnifierList().get(
-							this.unifierIndex))));
+			getView().getUnifier().setText(showLabels(printCurrentUnifier()));
 		} else {
 			getView().getUnifier().setText("[not unifiable]");
 		}

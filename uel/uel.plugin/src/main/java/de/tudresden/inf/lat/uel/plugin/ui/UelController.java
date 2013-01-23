@@ -114,8 +114,6 @@ public class UelController implements ActionListener {
 	}
 
 	private void executeActionAcceptVar() {
-		resetUnifierController();
-
 		if (getModel().getUnifierList().isEmpty()) {
 			PluginGoal g = this.varWindow.getView().getModel().getPluginGoal();
 
@@ -127,12 +125,13 @@ public class UelController implements ActionListener {
 			getUnifier().setStatInfo(
 					new StatInfo(g, processor.getInfo(), this.mapIdLabel));
 		}
+		
+		resetUnifierController();
 
 		getUnifier().getView().setUnifierButtons(false);
 		getUnifier().getView().setButtonNextEnabled(true);
 		getUnifier().getView().setButtonShowStatInfoEnabled(true);
-
-		this.unifierController.getView().setVisible(true);
+		getUnifier().getView().setVisible(true);
 	}
 
 	private void executeActionClass00Selected() {

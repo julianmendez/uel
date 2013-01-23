@@ -223,9 +223,7 @@ public class PluginGoal {
 
 	@Override
 	public String toString() {
-		StringBuffer sbuf = new StringBuffer();
-		sbuf.append(getGoalEquations());
-		return sbuf.toString();
+		return getGoalEquations();
 	}
 
 	private String toString(Equation eq) {

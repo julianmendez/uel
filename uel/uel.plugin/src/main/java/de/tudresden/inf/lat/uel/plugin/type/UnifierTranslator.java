@@ -33,19 +33,20 @@ public class UnifierTranslator {
 
 		Set<OWLUelClassDefinition> ret = new HashSet<OWLUelClassDefinition>();
 		for (Equation equation : equations) {
+			if (userVariables.contains(equation.getLeft())) {
+				OWLClass definiendum = getClassFor(equation.getLeft());
 
-			OWLClass definiendum = getClassFor(equation.getLeft());
+				Set<Atom> right = new HashSet<Atom>();
+				for (Integer atomId : equation.getRight()) {
+					right.add(this.atomManager.getAtoms().get(atomId));
+				}
 
-			Set<Atom> right = new HashSet<Atom>();
-			for (Integer atomId : equation.getRight()) {
-				right.add(this.atomManager.getAtoms().get(atomId));
+				OWLClassExpression definiens = toOWLClassExpression(right,
+						equations);
+
+				ret.add(new OWLUelClassDefinitionImpl(definiendum, definiens,
+						this.dataFactory));
 			}
-
-			OWLClassExpression definiens = toOWLClassExpression(right,
-					equations);
-
-			ret.add(new OWLUelClassDefinitionImpl(definiendum, definiens,
-					this.dataFactory));
 		}
 		return ret;
 	}
@@ -77,8 +78,8 @@ public class UnifierTranslator {
 
 			OWLClassExpression classExpression;
 			if (child.isVariable() && !childIsUserVariable) {
-				classExpression = toOWLClassExpression(
-						getSetOfSubsumers(child, equations), equations);
+				classExpression = toOWLClassExpression(getSetOfSubsumers(child,
+						equations), equations);
 			} else {
 				classExpression = getClassFor(child.getConceptNameId());
 			}
@@ -114,7 +115,7 @@ public class UnifierTranslator {
 	 * 
 	 * @return the string representation of a substitution set
 	 */
-	public OWLClassExpression toOWLClassExpression(
+	private OWLClassExpression toOWLClassExpression(
 			Collection<Atom> setOfSubsumers, Set<Equation> equations) {
 
 		OWLClassExpression ret = null;

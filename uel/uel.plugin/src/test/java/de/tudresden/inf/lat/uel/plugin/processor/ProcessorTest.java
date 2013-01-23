@@ -22,8 +22,7 @@ import org.semanticweb.owlapi.reasoner.OWLReasoner;
 
 import de.tudresden.inf.lat.jcel.owlapi.main.JcelReasoner;
 import de.tudresden.inf.lat.uel.plugin.type.AtomManager;
-import de.tudresden.inf.lat.uel.plugin.ui.UelController;
-import de.tudresden.inf.lat.uel.plugin.ui.UelView;
+import de.tudresden.inf.lat.uel.plugin.type.UnifierKRSSRenderer;
 import de.tudresden.inf.lat.uel.type.api.Atom;
 import de.tudresden.inf.lat.uel.type.api.Equation;
 import de.tudresden.inf.lat.uel.type.api.UelProcessor;
@@ -75,8 +74,8 @@ public class ProcessorTest extends TestCase {
 		Integer ret = null;
 		for (Integer currentAtomId : goal.getAtomManager().getAtoms()
 				.getIndices()) {
-			Atom currentAtom = goal.getAtomManager().getAtoms()
-					.get(currentAtomId);
+			Atom currentAtom = goal.getAtomManager().getAtoms().get(
+					currentAtomId);
 			if (currentAtom.isConceptName()) {
 				String currentAtomName = goal.getAtomManager().getConceptName(
 						currentAtom.getConceptNameId());
@@ -351,21 +350,19 @@ public class ProcessorTest extends TestCase {
 	}
 
 	public void test16Rule() throws OWLOntologyCreationException, IOException {
-		tryOntology(ontology16, new HashSet<String>(),
-				set("Head_injury", "Severe_injury"), 1,
-				UelProcessorFactory.RULE_BASED_ALGORITHM);
+		tryOntology(ontology16, new HashSet<String>(), set("Head_injury",
+				"Severe_injury"), 1, UelProcessorFactory.RULE_BASED_ALGORITHM);
 	}
 
 	public void test16SAT() throws OWLOntologyCreationException, IOException {
-		tryOntology(ontology16, new HashSet<String>(),
-				set("Head_injury", "Severe_injury"), 128,
-				UelProcessorFactory.SAT_BASED_ALGORITHM);
+		tryOntology(ontology16, new HashSet<String>(), set("Head_injury",
+				"Severe_injury"), 128, UelProcessorFactory.SAT_BASED_ALGORITHM);
 	}
 
 	public void test16SATminimal() throws OWLOntologyCreationException,
 			IOException {
-		tryOntology(ontology16, new HashSet<String>(),
-				set("Head_injury", "Severe_injury"), 1,
+		tryOntology(ontology16, new HashSet<String>(), set("Head_injury",
+				"Severe_injury"), 1,
 				UelProcessorFactory.SAT_BASED_ALGORITHM_MINIMAL);
 	}
 
@@ -434,13 +431,11 @@ public class ProcessorTest extends TestCase {
 
 		List<Set<Equation>> unifiers = uelModel.getUnifierList();
 		String goalStr = goal.getGoalEquations();
-
-		UelController controller = new UelController(new UelView(uelModel),
-				owlOntology.getOWLOntologyManager());
+		UnifierKRSSRenderer renderer = new UnifierKRSSRenderer(goal
+				.getAtomManager(), goal.getUelInput().getUserVariables());
 
 		for (Set<Equation> unifier : unifiers) {
-			String str = controller.getUnifier().toKRSS(unifier);
-			String extendedOntology = goalStr + str;
+			String extendedOntology = goalStr + renderer.printUnifier(unifier);
 
 			OWLReasoner reasoner = createReasoner(extendedOntology);
 			Node<OWLClass> node = reasoner.getEquivalentClasses(idClassMap
