@@ -77,7 +77,6 @@ public class UelController implements ActionListener {
 	public UelController(UelView view, OWLOntologyManager ontologyManager) {
 		this.view = view;
 		this.owlOntologyManager = ontologyManager;
-		resetUnifierController();
 		init();
 	}
 
@@ -114,6 +113,8 @@ public class UelController implements ActionListener {
 	}
 
 	private void executeActionAcceptVar() {
+		resetUnifierController();
+
 		if (getModel().getUnifierList().isEmpty()) {
 			PluginGoal g = this.varWindow.getView().getModel().getPluginGoal();
 
@@ -125,8 +126,6 @@ public class UelController implements ActionListener {
 			getUnifier().setStatInfo(
 					new StatInfo(g, processor.getInfo(), this.mapIdLabel));
 		}
-		
-		resetUnifierController();
 
 		getUnifier().getView().setUnifierButtons(false);
 		getUnifier().getView().setButtonNextEnabled(true);

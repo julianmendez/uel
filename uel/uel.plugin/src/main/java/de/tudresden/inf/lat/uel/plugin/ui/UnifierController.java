@@ -42,13 +42,11 @@ public class UnifierController implements ActionListener {
 	private StatInfo statInfo = null;
 	private int unifierIndex = -1;
 	private UnifierView view;
-	private UnifierKRSSRenderer renderer;
+	private UnifierKRSSRenderer renderer = null;
 
 	public UnifierController(UnifierView view, Map<String, String> labels) {
 		this.view = view;
 		this.mapIdLabel = labels;
-		this.renderer = new UnifierKRSSRenderer(getModel().getAtomManager(),
-				getModel().getUelProcessor().getInput().getUserVariables());
 		init();
 	}
 
@@ -209,8 +207,8 @@ public class UnifierController implements ActionListener {
 	private String showLabels(String text) {
 		StringBuffer ret = new StringBuffer();
 		try {
-			BufferedReader reader = new BufferedReader(new StringReader(text
-					.replace(KRSSKeyword.close, KRSSKeyword.space
+			BufferedReader reader = new BufferedReader(new StringReader(
+					text.replace(KRSSKeyword.close, KRSSKeyword.space
 							+ KRSSKeyword.close)));
 			String line = new String();
 			while (line != null) {
@@ -241,7 +239,13 @@ public class UnifierController implements ActionListener {
 	}
 
 	private String printCurrentUnifier() {
-		return renderer.printUnifier(getModel().getUnifierList().get(this.unifierIndex));
+		if (this.renderer == null) {
+			this.renderer = new UnifierKRSSRenderer(
+					getModel().getAtomManager(), getModel().getUelProcessor()
+							.getInput().getUserVariables());
+		}
+		return renderer.printUnifier(getModel().getUnifierList().get(
+				this.unifierIndex));
 	}
 
 	private void updateUnifier() {
