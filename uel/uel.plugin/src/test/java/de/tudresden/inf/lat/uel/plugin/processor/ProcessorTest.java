@@ -74,8 +74,8 @@ public class ProcessorTest extends TestCase {
 		Integer ret = null;
 		for (Integer currentAtomId : goal.getAtomManager().getAtoms()
 				.getIndices()) {
-			Atom currentAtom = goal.getAtomManager().getAtoms().get(
-					currentAtomId);
+			Atom currentAtom = goal.getAtomManager().getAtoms()
+					.get(currentAtomId);
 			if (currentAtom.isConceptName()) {
 				String currentAtomName = goal.getAtomManager().getConceptName(
 						currentAtom.getConceptNameId());
@@ -221,7 +221,7 @@ public class ProcessorTest extends TestCase {
 	}
 
 	public void test08Rule() throws OWLOntologyCreationException, IOException {
-		tryOntology(ontology08, set("A1", "A2", "A4"), 3,
+		tryOntology(ontology08, set("A1", "A2", "A4"), 4,
 				UelProcessorFactory.RULE_BASED_ALGORITHM);
 	}
 
@@ -350,19 +350,21 @@ public class ProcessorTest extends TestCase {
 	}
 
 	public void test16Rule() throws OWLOntologyCreationException, IOException {
-		tryOntology(ontology16, new HashSet<String>(), set("Head_injury",
-				"Severe_injury"), 1, UelProcessorFactory.RULE_BASED_ALGORITHM);
+		tryOntology(ontology16, new HashSet<String>(),
+				set("Head_injury", "Severe_injury"), 1,
+				UelProcessorFactory.RULE_BASED_ALGORITHM);
 	}
 
 	public void test16SAT() throws OWLOntologyCreationException, IOException {
-		tryOntology(ontology16, new HashSet<String>(), set("Head_injury",
-				"Severe_injury"), 128, UelProcessorFactory.SAT_BASED_ALGORITHM);
+		tryOntology(ontology16, new HashSet<String>(),
+				set("Head_injury", "Severe_injury"), 128,
+				UelProcessorFactory.SAT_BASED_ALGORITHM);
 	}
 
 	public void test16SATminimal() throws OWLOntologyCreationException,
 			IOException {
-		tryOntology(ontology16, new HashSet<String>(), set("Head_injury",
-				"Severe_injury"), 1,
+		tryOntology(ontology16, new HashSet<String>(),
+				set("Head_injury", "Severe_injury"), 1,
 				UelProcessorFactory.SAT_BASED_ALGORITHM_MINIMAL);
 	}
 
@@ -431,8 +433,8 @@ public class ProcessorTest extends TestCase {
 
 		List<Set<Equation>> unifiers = uelModel.getUnifierList();
 		String goalStr = goal.getGoalEquations();
-		UnifierKRSSRenderer renderer = new UnifierKRSSRenderer(goal
-				.getAtomManager(), goal.getUelInput().getUserVariables());
+		UnifierKRSSRenderer renderer = new UnifierKRSSRenderer(
+				goal.getAtomManager(), goal.getUelInput().getUserVariables());
 
 		for (Set<Equation> unifier : unifiers) {
 			String extendedOntology = goalStr + renderer.printUnifier(unifier);

@@ -58,7 +58,7 @@ public class UnifierKRSSRenderer {
 	 * 
 	 * @return the string representation of a substitution set
 	 */
-	private String toKRSS(StringBuffer sbuf, Collection<Atom> setOfSubsumers,
+	private void toKRSS(StringBuffer sbuf, Collection<Atom> setOfSubsumers,
 			Set<Equation> equations) {
 
 		if (setOfSubsumers.isEmpty()) {
@@ -86,10 +86,9 @@ public class UnifierKRSSRenderer {
 			sbuf.append(KRSSKeyword.space);
 			sbuf.append(KRSSKeyword.close);
 		}
-		return sbuf.toString();
 	}
 
-	private String toKRSS(StringBuffer sbuf, Atom atom, Set<Equation> equations) {
+	private void toKRSS(StringBuffer sbuf, Atom atom, Set<Equation> equations) {
 		if (atom.isExistentialRestriction()) {
 			ConceptName child = ((ExistentialRestriction) atom).getChild();
 			Integer conceptId = atomManager.getAtoms().getIndex(child);
@@ -103,8 +102,7 @@ public class UnifierKRSSRenderer {
 			sbuf.append(roleName);
 			sbuf.append(KRSSKeyword.space);
 			if (child.isVariable() && !childIsUserVariable) {
-				sbuf.append(toKRSS(sbuf, getSetOfSubsumers(child, equations),
-						equations));
+				toKRSS(sbuf, getSetOfSubsumers(child, equations), equations);
 			} else {
 				String childName = atomManager.getConceptName(child
 						.getConceptNameId());
@@ -117,7 +115,6 @@ public class UnifierKRSSRenderer {
 			String name = atomManager.getConceptName(conceptId);
 			sbuf.append(name);
 		}
-		return sbuf.toString();
 	}
 
 	private Collection<Atom> getSetOfSubsumers(Atom atom,
