@@ -121,7 +121,7 @@ public class AlternativeUelStarter {
 		goal.updateUelInput();
 		
 		// output unification problem for debugging
-		print(goal.getUelInput().getEquations(), goal.getAtomManager(), goal.getUelInput().getUserVariables());
+//		print(goal.getUelInput().getEquations(), goal.getAtomManager(), goal.getUelInput().getUserVariables());
 
 		UelProcessor satProcessor = UelProcessorFactory.createProcessor(
 				UelProcessorFactory.SAT_BASED_ALGORITHM, goal.getUelInput());
