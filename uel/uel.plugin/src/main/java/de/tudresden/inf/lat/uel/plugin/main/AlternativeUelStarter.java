@@ -1,6 +1,7 @@
 package de.tudresden.inf.lat.uel.plugin.main;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -17,11 +18,12 @@ import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 
 import de.tudresden.inf.lat.uel.plugin.processor.PluginGoal;
 import de.tudresden.inf.lat.uel.plugin.processor.UelModel;
-import de.tudresden.inf.lat.uel.plugin.processor.UelProcessorFactory;
 import de.tudresden.inf.lat.uel.plugin.type.AtomManager;
 import de.tudresden.inf.lat.uel.plugin.type.OWLUelClassDefinition;
 import de.tudresden.inf.lat.uel.plugin.type.UnifierTranslator;
 import de.tudresden.inf.lat.uel.plugin.ui.UelController;
+import de.tudresden.inf.lat.uel.sat.solver.SatProcessor;
+import de.tudresden.inf.lat.uel.sat.type.SubsumptionLiteral;
 import de.tudresden.inf.lat.uel.type.api.Atom;
 import de.tudresden.inf.lat.uel.type.api.Equation;
 import de.tudresden.inf.lat.uel.type.api.UelProcessor;
@@ -71,9 +73,11 @@ public class AlternativeUelStarter {
 				ret = factory.getOWLClass(iri);
 
 				this.mapOfAuxClassExpr.put(expr, ret);
-				
-				OWLAxiom newDefinition = factory.getOWLEquivalentClassesAxiom(ret, expr);
-				this.auxOntology.getOWLOntologyManager().addAxiom(auxOntology, newDefinition);
+
+				OWLAxiom newDefinition = factory.getOWLEquivalentClassesAxiom(
+						ret, expr);
+				this.auxOntology.getOWLOntologyManager().addAxiom(auxOntology,
+						newDefinition);
 			}
 		}
 		return ret;
@@ -84,12 +88,18 @@ public class AlternativeUelStarter {
 	}
 
 	public Iterator<Set<OWLUelClassDefinition>> modifyOntologyAndSolve(
-			Set<OWLSubClassOfAxiom> subsumptions, Set<OWLClass> variables) {
+			Set<OWLSubClassOfAxiom> subsumptions,
+			Set<OWLSubClassOfAxiom> dissubsumptions, Set<OWLClass> variables) {
 
 		// add two definitions for each subsumption to the ontology
 		for (OWLSubClassOfAxiom subsumption : subsumptions) {
 			findAuxiliaryDefinition(subsumption.getSubClass());
 			findAuxiliaryDefinition(subsumption.getSuperClass());
+		}
+		// and the same for each dissubsumption
+		for (OWLSubClassOfAxiom dissubsumption : dissubsumptions) {
+			findAuxiliaryDefinition(dissubsumption.getSubClass());
+			findAuxiliaryDefinition(dissubsumption.getSuperClass());
 		}
 
 		UelModel model = new UelModel();
@@ -107,6 +117,17 @@ public class AlternativeUelStarter {
 
 			goal.addSubsumption(subClassId, superClassId);
 		}
+		
+		Set<SubsumptionLiteral> intDissubsumptions = new HashSet<SubsumptionLiteral>();
+		// construct the dissubsumptions
+		for (OWLSubClassOfAxiom dissubsumption : dissubsumptions) {
+			String subClassId = getId(findAuxiliaryDefinition(dissubsumption
+					.getSubClass()));
+			String superClassId = getId(findAuxiliaryDefinition(dissubsumption
+					.getSuperClass()));
+
+			intDissubsumptions.add(goal.constructDissubsumption(subClassId, superClassId));
+		}
 
 		// translate the variables to the IDs, and mark them as variables in the
 		// PluginGoal
@@ -119,13 +140,15 @@ public class AlternativeUelStarter {
 		}
 
 		goal.updateUelInput();
-		
-		// output unification problem for debugging
-//		print(goal.getUelInput().getEquations(), goal.getAtomManager(), goal.getUelInput().getUserVariables());
 
-		UelProcessor satProcessor = UelProcessorFactory.createProcessor(
-				UelProcessorFactory.SAT_BASED_ALGORITHM, goal.getUelInput());
-		model.configureUelProcessor(satProcessor);
+		// output unification problem for debugging
+		// print(goal.getUelInput().getEquations(), goal.getAtomManager(),
+		// goal.getUelInput().getUserVariables());
+
+//		UelProcessor satProcessor = UelProcessorFactory.createProcessor(
+//				UelProcessorFactory.SAT_BASED_ALGORITHM, goal.getUelInput());
+//		model.configureUelProcessor(satProcessor);
+		UelProcessor satProcessor = new SatProcessor(goal.getUelInput(), intDissubsumptions);
 
 		// satProcessor.getUnifier();
 
@@ -135,7 +158,8 @@ public class AlternativeUelStarter {
 		return new UnifierIterator(satProcessor, translator);
 	}
 
-	private void print(Set<Equation> equations, AtomManager atomManager, Set<Integer> userVariables) {
+	private void print(Set<Equation> equations, AtomManager atomManager,
+			Set<Integer> userVariables) {
 		for (Equation eq : equations) {
 			print(eq.getLeft(), atomManager, userVariables);
 			System.out.print(" = ");
@@ -147,29 +171,31 @@ public class AlternativeUelStarter {
 		}
 	}
 
-	private void print(Integer atomId, AtomManager atomManager, Set<Integer> userVariables) {
+	private void print(Integer atomId, AtomManager atomManager,
+			Set<Integer> userVariables) {
 		Atom atom = atomManager.getAtoms().get(atomId);
 		if (atom.isExistentialRestriction()) {
 			ExistentialRestriction ex = (ExistentialRestriction) atom;
 			System.out.print("(exists "
-					+ atomManager.getRoleName(ex.getRoleId())
-					+ " "
-					+ atomManager.getConceptName(ex.getConceptNameId())
-					+ "["
+					+ atomManager.getRoleName(ex.getRoleId()) + " "
+					+ atomManager.getConceptName(ex.getConceptNameId()) + "["
 					+ isVariable(ex.getChild(), atomManager, userVariables)
 					+ "])");
 		} else {
 			ConceptName name = (ConceptName) atom;
-			System.out.print(atomManager.getConceptName(name.getConceptNameId())
-					+ "["
-					+ isVariable(name, atomManager, userVariables)
-					+ "]");
+			System.out
+					.print(atomManager.getConceptName(name.getConceptNameId())
+							+ "["
+							+ isVariable(name, atomManager, userVariables)
+							+ "]");
 		}
 	}
-	
-	private String isVariable(ConceptName name, AtomManager atomManager, Set<Integer> userVariables) {
+
+	private String isVariable(ConceptName name, AtomManager atomManager,
+			Set<Integer> userVariables) {
 		if (name.isVariable()) {
-			if (userVariables.contains(atomManager.getAtoms().addAndGetIndex(name))) {
+			if (userVariables.contains(atomManager.getAtoms().addAndGetIndex(
+					name))) {
 				return "uv";
 			} else {
 				return "v";
