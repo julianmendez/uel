@@ -4,6 +4,7 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
+import de.tudresden.inf.lat.uel.plugin.type.AtomManager;
 import de.tudresden.inf.lat.uel.plugin.type.OWLUelClassDefinition;
 import de.tudresden.inf.lat.uel.plugin.type.UnifierTranslator;
 import de.tudresden.inf.lat.uel.type.api.UelOutput;
@@ -20,6 +21,14 @@ public class UnifierIterator implements Iterator<Set<OWLUelClassDefinition>> {
 	public UnifierIterator(UelProcessor proc, UnifierTranslator translator) {
 		this.processor = proc;
 		this.translator = translator;
+	}
+	
+	protected UelProcessor getProcessor() {
+		return this.processor;
+	}
+	
+	protected AtomManager getAtomManager() {
+		return this.translator.getAtomManager();
 	}
 
 	private void compute() {

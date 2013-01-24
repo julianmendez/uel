@@ -432,12 +432,15 @@ public class ProcessorTest extends TestCase {
 		}
 
 		List<Set<Equation>> unifiers = uelModel.getUnifierList();
-		String goalStr = goal.getGoalEquations();
+		String goalStr = goal.printDefinitions();
 		UnifierKRSSRenderer renderer = new UnifierKRSSRenderer(
 				goal.getAtomManager(), goal.getUelInput().getUserVariables());
 
 		for (Set<Equation> unifier : unifiers) {
 			String extendedOntology = goalStr + renderer.printUnifier(unifier);
+			System.out.println();
+			System.out.println("---");
+			System.out.println(extendedOntology);
 
 			OWLReasoner reasoner = createReasoner(extendedOntology);
 			Node<OWLClass> node = reasoner.getEquivalentClasses(idClassMap

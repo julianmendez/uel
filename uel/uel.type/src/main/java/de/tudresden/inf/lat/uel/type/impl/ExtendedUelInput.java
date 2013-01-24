@@ -34,13 +34,13 @@ public class ExtendedUelInput implements UelInput {
 	 */
 	public ExtendedUelInput(UelInput input) {
 		this.uelInput = input;
-		configure(input);
+		configure();
 	}
 
-	private void configure(UelInput input) {
+	private void configure() {
 		Set<Integer> usedAtomsIds = new TreeSet<Integer>();
 
-		for (Equation eq : input.getEquations()) {
+		for (Equation eq : getEquations()) {
 			usedAtomsIds.add(eq.getLeft());
 			usedAtomsIds.addAll(eq.getRight());
 		}
@@ -48,12 +48,12 @@ public class ExtendedUelInput implements UelInput {
 		{
 			Set<Integer> conceptNameIds = new HashSet<Integer>();
 			for (Integer index : usedAtomsIds) {
-				Atom atom = input.getAtomManager().get(index);
+				Atom atom = getAtomManager().get(index);
 				if (atom.isExistentialRestriction()) {
 					this.eatoms.add(index);
 					ConceptName child = ((ExistentialRestriction) atom)
 							.getChild();
-					Integer childId = input.getAtomManager().addAndGetIndex(
+					Integer childId = getAtomManager().addAndGetIndex(
 							child);
 					conceptNameIds.add(childId);
 				} else {
@@ -65,13 +65,30 @@ public class ExtendedUelInput implements UelInput {
 
 		for (Integer index : usedAtomsIds) {
 			this.usedAtomIds.add(index);
-			Atom atom = input.getAtomManager().get(index);
+			Atom atom = getAtomManager().get(index);
 			if (atom.isConceptName()) {
 				if (atom.isVariable()) {
 					this.variables.add(index);
 				} else {
 					this.constants.add(index);
 				}
+			}
+		}
+	}
+	
+	public void addAtomToIndex(Integer atomId) {
+		this.usedAtomIds.add(atomId);
+		Atom atom = getAtomManager().get(atomId);
+		if (atom.isExistentialRestriction()) {
+			this.eatoms.add(atomId);
+			ConceptName child = ((ExistentialRestriction) atom).getChild();
+			Integer childId = getAtomManager().addAndGetIndex(child);
+			addAtomToIndex(childId);
+		} else {
+			if (atom.isVariable()) {
+				this.variables.add(atomId);
+			} else {
+				this.constants.add(atomId);
 			}
 		}
 	}
@@ -110,6 +127,16 @@ public class ExtendedUelInput implements UelInput {
 	 */
 	public Set<Integer> getEAtoms() {
 		return Collections.unmodifiableSet(eatoms);
+	}
+	
+	@Override
+	public Set<Equation> getDefinitions() {
+		return this.uelInput.getDefinitions();
+	}
+
+	@Override
+	public Set<Equation> getGoalEquations() {
+		return this.uelInput.getGoalEquations();
 	}
 
 	@Override

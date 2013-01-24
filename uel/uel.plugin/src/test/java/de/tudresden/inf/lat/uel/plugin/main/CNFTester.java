@@ -4,9 +4,10 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import de.tudresden.inf.lat.uel.plugin.processor.UelProcessorFactory;
 import de.tudresden.inf.lat.uel.plugin.type.AtomManager;
@@ -39,11 +40,15 @@ public class CNFTester {
 
 	private UelInput input;
 	private AtomManager atomManager;
-	
+
 	/**
-	 * Construct a new test object to run all different known processors on an input CNF file.
-	 * @param filename the name of the CNF file
-	 * @throws IOException if there was an error parsing the input file
+	 * Construct a new test object to run all different known processors on an
+	 * input CNF file.
+	 * 
+	 * @param filename
+	 *            the name of the CNF file
+	 * @throws IOException
+	 *             if there was an error parsing the input file
 	 */
 	public CNFTester(String filename) throws IOException {
 		constructInput(filename);
@@ -71,10 +76,10 @@ public class CNFTester {
 
 		ConceptName conceptU = atomManager.createConceptName("U", true);
 		Integer uId = atomManager.getAtoms().getIndex(conceptU);
-//		userVariables.add(uId);
+		// userVariables.add(uId);
 		ConceptName conceptV = atomManager.createConceptName("V", true);
 		Integer vId = atomManager.getAtoms().getIndex(conceptV);
-//		userVariables.add(vId);
+		// userVariables.add(vId);
 		ConceptName conceptA = atomManager.createConceptName("A", false);
 		Integer aId = atomManager.getAtoms().getIndex(conceptA);
 		ConceptName conceptB = atomManager.createConceptName("B", false);
@@ -131,8 +136,8 @@ public class CNFTester {
 		}
 
 		System.out.println("equations: " + equations.size());
-		input = new UelInputImpl(atomManager.getAtoms(), equations,
-				userVariables);
+		input = new UelInputImpl(atomManager.getAtoms(),
+				Collections.<Equation> emptySet(), equations, userVariables);
 	}
 
 	/**
@@ -164,7 +169,9 @@ public class CNFTester {
 
 	/**
 	 * Run the test on a given UEL processor.
-	 * @param processorName the string identifier of the processor
+	 * 
+	 * @param processorName
+	 *            the string identifier of the processor
 	 */
 	public void runProcessor(String processorName) {
 		UelProcessor processor = UelProcessorFactory.createProcessor(

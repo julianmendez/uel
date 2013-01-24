@@ -27,6 +27,10 @@ public class UnifierTranslator {
 		this.atomManager = atomManager;
 		this.userVariables = userVariables;
 	}
+	
+	public AtomManager getAtomManager() {
+		return this.atomManager;
+	}
 
 	public Set<OWLUelClassDefinition> createOWLUelClassDefinition(
 			Set<Equation> equations) {

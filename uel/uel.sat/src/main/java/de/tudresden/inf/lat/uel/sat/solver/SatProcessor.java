@@ -148,6 +148,7 @@ public class SatProcessor implements UelProcessor {
 	private Set<Integer> trueLiterals = new HashSet<Integer>();
 	private final UelInput uelInput;
 	private Set<Integer> update = new HashSet<Integer>();
+	private Set<SubsumptionLiteral> externalDissubsumptions = null;
 
 	/**
 	 * Construct a new SAT processor to solve a unification problem.
@@ -168,6 +169,25 @@ public class SatProcessor implements UelProcessor {
 		this.extUelInput = new ExtendedUelInput(input);
 		this.invertLiteral = inv;
 		this.onlyMinimalAssignments = useMinimalAssignments;
+		setLiterals();
+	}
+
+	
+	public SatProcessor(UelInput input,
+			Set<SubsumptionLiteral> dissubsumptions) {
+		if ((input == null) || (dissubsumptions == null)) {
+			throw new IllegalArgumentException("Null argument.");
+		}
+		
+		this.uelInput = input;
+		this.externalDissubsumptions = dissubsumptions;
+		this.extUelInput = new ExtendedUelInput(input);
+		for (SubsumptionLiteral lit : dissubsumptions) {
+			this.extUelInput.addAtomToIndex(lit.getFirst());
+			this.extUelInput.addAtomToIndex(lit.getSecond());
+		}
+		this.invertLiteral = true;
+		this.onlyMinimalAssignments = false;
 		setLiterals();
 	}
 
@@ -272,6 +292,10 @@ public class SatProcessor implements UelProcessor {
 		logger.finer("running step 3.2 ...");
 		runStep3_2(ret);
 
+		if (externalDissubsumptions != null) {
+			addExternalDissubsumptions(ret);
+		}
+
 		if (onlyMinimalAssignments) {
 			logger.finer("adding literals to be minimized ...");
 			for (Integer var : getVariables()) {
@@ -294,6 +318,16 @@ public class SatProcessor implements UelProcessor {
 
 		return ret;
 	}
+
+	private void addExternalDissubsumptions(SatInput input) {
+		for (SubsumptionLiteral dissub : externalDissubsumptions) {
+			Set<Integer> clause = new HashSet<Integer>();
+			Integer literalId = literalManager.addAndGetIndex(dissub);
+			clause.add((-1) * literalId);
+			input.add(clause);
+		}
+	}
+
 
 	private Set<Integer> createUpdate() {
 		Set<Integer> ret = new HashSet<Integer>();
@@ -862,7 +896,7 @@ public class SatProcessor implements UelProcessor {
 
 		if (value) {
 			this.trueLiterals.add(literalId);
-		} else if (this.trueLiterals.contains(literalId)) {
+		} else {
 			this.trueLiterals.remove(literalId);
 		}
 	}
