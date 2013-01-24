@@ -409,7 +409,8 @@ public class ProcessorTest extends TestCase {
 		Set<String> input = new HashSet<String>();
 		input.add(idClassMap.get(conceptC).toStringID());
 		input.add(idClassMap.get(conceptD).toStringID());
-		PluginGoal goal = uelModel.configure(input);
+		uelModel.configure(input);
+		PluginGoal goal = uelModel.getPluginGoal();
 
 		for (String var : varNames) {
 			Integer atomId = getAtomId(goal, idClassMap.get(var).toStringID(),
@@ -434,13 +435,14 @@ public class ProcessorTest extends TestCase {
 		List<Set<Equation>> unifiers = uelModel.getUnifierList();
 		String goalStr = goal.printDefinitions();
 		UnifierKRSSRenderer renderer = new UnifierKRSSRenderer(
-				goal.getAtomManager(), goal.getUelInput().getUserVariables());
+				goal.getAtomManager(), goal.getUserVariables(),
+				goal.getAuxiliaryVariables());
 
 		for (Set<Equation> unifier : unifiers) {
 			String extendedOntology = goalStr + renderer.printUnifier(unifier);
-			System.out.println();
-			System.out.println("---");
-			System.out.println(extendedOntology);
+//			System.out.println();
+//			System.out.println("---");
+//			System.out.println(extendedOntology);
 
 			OWLReasoner reasoner = createReasoner(extendedOntology);
 			Node<OWLClass> node = reasoner.getEquivalentClasses(idClassMap

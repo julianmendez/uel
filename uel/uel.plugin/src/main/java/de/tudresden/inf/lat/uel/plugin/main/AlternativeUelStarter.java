@@ -108,7 +108,7 @@ public class AlternativeUelStarter {
 		PluginGoal goal = new PluginGoal(model.getAtomManager(),
 				model.getOntology());
 
-		// add the subsumption themselves to the PluginGoal
+		// add the subsumptions themselves to the PluginGoal
 		for (OWLSubClassOfAxiom subsumption : subsumptions) {
 			String subClassId = getId(findAuxiliaryDefinition(subsumption
 					.getSubClass()));

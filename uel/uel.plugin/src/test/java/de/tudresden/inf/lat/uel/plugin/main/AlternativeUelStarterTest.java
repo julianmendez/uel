@@ -65,15 +65,20 @@ public class AlternativeUelStarterTest extends TestCase {
 		return reasoner;
 	}
 
-	private Set<String> set(String a, String b) {
-		Set<String> ret = new HashSet<String>();
-		ret.add(a);
-		ret.add(b);
+	private <T> Set<T> set(T ... elements) {
+		Set<T> ret = new HashSet<T>();
+		for (T e : elements) {
+			ret.add(e);
+		}
 		return ret;
 	}
 
 	public void test01() throws OWLOntologyCreationException, IOException {
 		tryOntology("01", set(conceptX, conceptY), 36);
+	}
+
+	public void test02() throws OWLOntologyCreationException, IOException {
+		tryOntology("02", set(conceptX), 218);
 	}
 
 	private String toString(OWLOntology ontology) {
