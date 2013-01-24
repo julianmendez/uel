@@ -20,12 +20,14 @@ public class UnifierTranslator {
 	private final AtomManager atomManager;
 	private final OWLDataFactory dataFactory;
 	private final Set<Integer> userVariables;
+	private final Set<Integer> auxiliaryVariables;
 
 	public UnifierTranslator(OWLDataFactory factory, AtomManager atomManager,
-			Set<Integer> userVariables) {
+			Set<Integer> userVariables, Set<Integer> auxiliaryVariables) {
 		this.dataFactory = factory;
 		this.atomManager = atomManager;
 		this.userVariables = userVariables;
+		this.auxiliaryVariables = auxiliaryVariables;
 	}
 	
 	public AtomManager getAtomManager() {
@@ -74,14 +76,11 @@ public class UnifierTranslator {
 			ConceptName child = ((ExistentialRestriction) atom).getChild();
 			Integer conceptId = this.atomManager.getAtoms().getIndex(child);
 
-			boolean childIsUserVariable = this.userVariables
-					.contains(conceptId);
-
 			OWLObjectProperty objectProperty = getObjectPropertyFor(((ExistentialRestriction) atom)
 					.getRoleId());
 
 			OWLClassExpression classExpression;
-			if (child.isVariable() && !childIsUserVariable) {
+			if (this.auxiliaryVariables.contains(conceptId)) {
 				classExpression = toOWLClassExpression(getSetOfSubsumers(child,
 						equations), equations);
 			} else {

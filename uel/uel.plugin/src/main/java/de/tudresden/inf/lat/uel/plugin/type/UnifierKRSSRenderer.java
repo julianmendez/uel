@@ -14,11 +14,13 @@ public class UnifierKRSSRenderer {
 
 	private final AtomManager atomManager;
 	private final Set<Integer> userVariables;
+	private final Set<Integer> auxiliaryVariables;
 
 	public UnifierKRSSRenderer(AtomManager atomManager,
-			Set<Integer> userVariables) {
+			Set<Integer> userVariables, Set<Integer> auxiliaryVariables) {
 		this.atomManager = atomManager;
 		this.userVariables = userVariables;
+		this.auxiliaryVariables = auxiliaryVariables;
 	}
 
 	public String printUnifier(Set<Equation> equations) {
@@ -92,7 +94,6 @@ public class UnifierKRSSRenderer {
 		if (atom.isExistentialRestriction()) {
 			ConceptName child = ((ExistentialRestriction) atom).getChild();
 			Integer conceptId = atomManager.getAtoms().getIndex(child);
-			boolean childIsUserVariable = userVariables.contains(conceptId);
 
 			sbuf.append(KRSSKeyword.open);
 			sbuf.append(KRSSKeyword.some);
@@ -101,7 +102,7 @@ public class UnifierKRSSRenderer {
 					.getRoleName(((ExistentialRestriction) atom).getRoleId());
 			sbuf.append(roleName);
 			sbuf.append(KRSSKeyword.space);
-			if (child.isVariable() && !childIsUserVariable) {
+			if (auxiliaryVariables.contains(conceptId)) {
 				toKRSS(sbuf, getSetOfSubsumers(child, equations), equations);
 			} else {
 				String childName = atomManager.getConceptName(child

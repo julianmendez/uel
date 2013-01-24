@@ -42,11 +42,12 @@ public class OntologyBuilder {
 		this.atomManager = manager;
 	}
 
-	private Atom createFlattenAtom(String newAtomName, Set<Atom> atomSet,
+	private Atom createFlattenAtom(String roleName, Set<Atom> atomSet,
 			Set<Equation> newEquations) {
 		ConceptName child = createNewAtom();
+		child.setAuxiliaryVariable(true);
 		ExistentialRestriction newAtom = this.atomManager
-				.createExistentialRestriction(newAtomName, child);
+				.createExistentialRestriction(roleName, child);
 		Integer childId = getAtoms().getIndex(child);
 		Set<Integer> atomIdSet = new HashSet<Integer>();
 		for (Atom a : atomSet) {
@@ -61,8 +62,7 @@ public class OntologyBuilder {
 	private ConceptName createNewAtom() {
 		String str = freshConstantPrefix + freshConstantIndex;
 		freshConstantIndex++;
-		ConceptName ret = this.atomManager.createConceptName(str, true);
-		return ret;
+		return this.atomManager.createConceptName(str, true);
 	}
 
 	/**
@@ -199,19 +199,19 @@ public class OntologyBuilder {
 		Set<Atom> atomSet = processClassExpression(
 				someValuesRestriction.getFiller(), newEquations);
 		Atom newAtom = null;
-		String newAtomName = someValuesRestriction.getProperty()
+		String roleName = someValuesRestriction.getProperty()
 				.getNamedProperty().toStringID();
 		if (atomSet.size() == 1) {
 			Atom atom = atomSet.iterator().next();
 			if (atom.isConceptName()) {
 				ConceptName concept = (ConceptName) atom;
 				newAtom = this.atomManager.createExistentialRestriction(
-						newAtomName, concept);
+						roleName, concept);
 			} else {
-				newAtom = createFlattenAtom(newAtomName, atomSet, newEquations);
+				newAtom = createFlattenAtom(roleName, atomSet, newEquations);
 			}
 		} else if (atomSet.size() > 1) {
-			newAtom = createFlattenAtom(newAtomName, atomSet, newEquations);
+			newAtom = createFlattenAtom(roleName, atomSet, newEquations);
 		}
 		ret.add(newAtom);
 		return ret;

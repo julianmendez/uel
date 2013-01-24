@@ -23,6 +23,7 @@ public class ConceptName implements Atom {
 
 	private final Integer conceptNameId;
 	private boolean isGround;
+	private boolean isAuxiliaryVariable = false;
 	private boolean isTop = false;
 
 	/**
@@ -148,6 +149,14 @@ public class ConceptName implements Atom {
 	 */
 	public void setVariable(boolean isVariable) {
 		this.isGround = !isVariable;
+	}
+	
+	public void setAuxiliaryVariable(boolean isAuxiliaryVariable) {
+		this.isAuxiliaryVariable = isAuxiliaryVariable;
+	}
+	
+	public boolean isAuxiliaryVariable() {
+		return this.isAuxiliaryVariable;
 	}
 
 	@Override

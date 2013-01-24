@@ -241,8 +241,9 @@ public class UnifierController implements ActionListener {
 	private String printCurrentUnifier() {
 		if (this.renderer == null) {
 			this.renderer = new UnifierKRSSRenderer(
-					getModel().getAtomManager(), getModel().getUelProcessor()
-							.getInput().getUserVariables());
+					getModel().getAtomManager(), getModel().getPluginGoal()
+							.getUserVariables(), getModel().getPluginGoal()
+							.getAuxiliaryVariables());
 		}
 		return renderer.printUnifier(getModel().getUnifierList().get(
 				this.unifierIndex));

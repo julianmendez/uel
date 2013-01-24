@@ -34,6 +34,7 @@ public class PluginGoal {
 		}
 		return sbuf.toString();
 	}
+
 	public static String toString(AtomManager atomManager, Equation eq) {
 		StringBuffer sbuf = new StringBuffer();
 		sbuf.append(KRSSKeyword.newLine);
@@ -63,8 +64,8 @@ public class PluginGoal {
 		sbuf.append("\n");
 		return sbuf.toString();
 	}
-	public static String toString(AtomManager atomManager,
-			Integer atomId) {
+
+	public static String toString(AtomManager atomManager, Integer atomId) {
 		String ret = null;
 		Atom atom = atomManager.getAtoms().get(atomId);
 		if (atom.isExistentialRestriction()) {
@@ -86,6 +87,7 @@ public class PluginGoal {
 		}
 		return ret;
 	}
+
 	private final AtomManager atomManager;
 	private final Set<Integer> constants = new HashSet<Integer>();
 	// private final Set<Integer> eatoms = new HashSet<Integer>();
@@ -97,6 +99,7 @@ public class PluginGoal {
 
 	// private final Set<Integer> usedAtomIds = new HashSet<Integer>();
 	private final Set<Integer> userVariables = new HashSet<Integer>();
+	private final Set<Integer> auxiliaryVariables = new HashSet<Integer>();
 
 	private final Set<Integer> variables = new HashSet<Integer>();
 
@@ -142,7 +145,7 @@ public class PluginGoal {
 		Set<Equation> equationSet = new HashSet<Equation>();
 		Integer leftId = addModule(equationSet, leftStr);
 		Integer rightId = addModule(equationSet, rightStr);
-		markAuxiliaryVariables(equationSet);
+		markDefinedConceptNamesAsVariables(equationSet);
 		this.definitions.addAll(equationSet);
 
 		Equation newGoalEquation = new EquationImpl(leftId, rightId, false);
@@ -171,7 +174,7 @@ public class PluginGoal {
 		Set<Equation> equationSet = new HashSet<Equation>();
 		Integer leftId = addModule(equationSet, leftStr);
 		Integer rightId = addModule(equationSet, rightStr);
-		markAuxiliaryVariables(equationSet);
+		markDefinedConceptNamesAsVariables(equationSet);
 		this.definitions.addAll(equationSet);
 
 		Set<Integer> rightIds = new HashSet<Integer>();
@@ -189,7 +192,7 @@ public class PluginGoal {
 		Set<Equation> equationSet = new HashSet<Equation>();
 		Integer leftId = addModule(equationSet, leftStr);
 		Integer rightId = addModule(equationSet, rightStr);
-		markAuxiliaryVariables(equationSet);
+		markDefinedConceptNamesAsVariables(equationSet);
 		this.definitions.addAll(equationSet);
 
 		// temporary equation used for correct updating of index sets
@@ -216,6 +219,14 @@ public class PluginGoal {
 
 	public Set<Integer> getVariables() {
 		return Collections.unmodifiableSet(this.variables);
+	}
+	
+	public Set<Integer> getAuxiliaryVariables() {
+		return Collections.unmodifiableSet(this.auxiliaryVariables);
+	}
+	
+	public Set<Integer> getUserVariables() {
+		return Collections.unmodifiableSet(this.userVariables);
 	}
 
 	public void makeConstant(Integer atomId) {
@@ -250,7 +261,7 @@ public class PluginGoal {
 		}
 	}
 
-	private void markAuxiliaryVariables(Set<Equation> equationSet) {
+	private void markDefinedConceptNamesAsVariables(Set<Equation> equationSet) {
 		for (Equation eq : equationSet) {
 			Integer atomId = eq.getLeft();
 			this.variables.add(atomId);
@@ -321,7 +332,10 @@ public class PluginGoal {
 			if (atom.isConceptName()) {
 				if (((ConceptName) atom).isVariable()) {
 					this.variables.add(atomId);
-				} else if (!((ConceptName) atom).isVariable()) {
+					if (((ConceptName) atom).isAuxiliaryVariable()) {
+						this.auxiliaryVariables.add(atomId);
+					}
+				} else {
 					this.constants.add(atomId);
 				}
 			}
@@ -331,7 +345,7 @@ public class PluginGoal {
 
 	public void updateUelInput() {
 		this.uelInput = new UelInputImpl(getAtomManager().getAtoms(),
-				definitions, goalEquations, this.userVariables);
+				this.definitions, this.goalEquations, this.userVariables);
 	}
 
 }

@@ -28,6 +28,7 @@ public class UelModel {
 	private UelProcessor uelProcessor = null;
 	private List<Set<Equation>> unifierList = new ArrayList<Set<Equation>>();
 	private Set<Set<Equation>> unifierSet = new HashSet<Set<Equation>>();
+	private PluginGoal pluginGoal = null;
 
 	/**
 	 * Constructs a new processor.
@@ -43,6 +44,12 @@ public class UelModel {
 		this.unifierSet.clear();
 	}
 
+	/**
+	 * Computes the next unifier. This unifier can be equivalent to another one
+	 * already computed.
+	 * 
+	 * @return <code>true</code> if and only if more unifiers can be computed
+	 */
 	public boolean computeNextUnifier() {
 		while (this.uelProcessor.computeNextUnifier()) {
 			Set<Equation> result = this.uelProcessor.getUnifier()
@@ -56,14 +63,7 @@ public class UelModel {
 		return false;
 	}
 
-	/**
-	 * Computes the next unifier. This unifier can be equivalent to another one
-	 * already computed.
-	 * 
-	 * @return <code>true</code> if and only if more unifiers can be computed
-	 */
-
-	public PluginGoal configure(Set<String> input) {
+	public void configure(Set<String> input) {
 		if (input == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
@@ -72,8 +72,12 @@ public class UelModel {
 		String leftStr = it.next();
 		String rightStr = it.next();
 
-		return new PluginGoal(this.atomManager, this.ontology, leftStr,
-				rightStr);
+		this.pluginGoal = new PluginGoal(this.atomManager, this.ontology,
+				leftStr, rightStr);
+	}
+
+	public PluginGoal getPluginGoal() {
+		return this.pluginGoal;
 	}
 
 	public void configureUelProcessor(UelProcessor processor) {

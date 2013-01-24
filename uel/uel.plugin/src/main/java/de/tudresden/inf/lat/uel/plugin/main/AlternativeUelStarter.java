@@ -154,7 +154,7 @@ public class AlternativeUelStarter {
 
 		UnifierTranslator translator = new UnifierTranslator(ontology
 				.getOWLOntologyManager().getOWLDataFactory(), atomManager, goal
-				.getUelInput().getUserVariables());
+				.getUelInput().getUserVariables(), goal.getAuxiliaryVariables());
 		return new UnifierIterator(satProcessor, translator);
 	}
 

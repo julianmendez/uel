@@ -123,7 +123,7 @@ public class SatInput {
 	 *            set of new non-empty clauses
 	 * @return a value indicating whether the SatInput was changed
 	 */
-	public boolean addAll(Set<? extends Set<Integer>> clauses) {
+	public boolean addAll(Collection<? extends Set<Integer>> clauses) {
 		if (clauses == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}

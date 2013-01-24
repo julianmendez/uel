@@ -232,7 +232,8 @@ public class UelController implements ActionListener {
 		classSet.add(getView().getSelectedClassName00().getId());
 		classSet.add(getView().getSelectedClassName01().getId());
 
-		PluginGoal goal = getModel().configure(classSet);
+		getModel().configure(classSet);
+		PluginGoal goal = getModel().getPluginGoal();
 
 		try {
 			this.varWindow = initVarWindow(classSet, goal);
