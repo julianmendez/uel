@@ -172,13 +172,11 @@ public class SatProcessor implements UelProcessor {
 		setLiterals();
 	}
 
-	
-	public SatProcessor(UelInput input,
-			Set<SubsumptionLiteral> dissubsumptions) {
+	public SatProcessor(UelInput input, Set<SubsumptionLiteral> dissubsumptions) {
 		if ((input == null) || (dissubsumptions == null)) {
 			throw new IllegalArgumentException("Null argument.");
 		}
-		
+
 		this.uelInput = input;
 		this.externalDissubsumptions = dissubsumptions;
 		this.extUelInput = new ExtendedUelInput(input);
@@ -195,6 +193,15 @@ public class SatProcessor implements UelProcessor {
 			String value) {
 		return list
 				.add(new AbstractMap.SimpleEntry<String, String>(key, value));
+	}
+
+	private void addExternalDissubsumptions(SatInput input) {
+		for (SubsumptionLiteral dissub : externalDissubsumptions) {
+			Set<Integer> clause = new HashSet<Integer>();
+			Integer literalId = literalManager.addAndGetIndex(dissub);
+			clause.add((-1) * literalId);
+			input.add(clause);
+		}
 	}
 
 	private boolean addToSetOfSubsumers(Integer atomId1, Integer atomId2) {
@@ -245,8 +252,8 @@ public class SatProcessor implements UelProcessor {
 
 		reset();
 		if (unifiable) {
-			this.result = new UelOutputImpl(getAtomManager(), toTBox(satoutput
-					.getOutput()));
+			this.result = new UelOutputImpl(getAtomManager(),
+					toTBox(satoutput.getOutput()));
 		}
 
 		this.firstTime = false;
@@ -296,38 +303,46 @@ public class SatProcessor implements UelProcessor {
 			addExternalDissubsumptions(ret);
 		}
 
+		addSmallSubsumptions(ret);
+
 		if (onlyMinimalAssignments) {
 			logger.finer("adding literals to be minimized ...");
 			for (Integer var : getVariables()) {
 				if (isUserVariable(var)) {
-				for (Integer con : getConstants()) {
-					Literal literal = invertLiteral ? new SubsumptionLiteral(var, con) : new DissubsumptionLiteral(var, con);
-					Integer literalId = literalManager.addAndGetIndex(literal);
-					ret.addMinimizeLiteral(literalId);
-				}
-				for (Integer eat : getEAtoms()) {
-					Literal literal = invertLiteral ? new SubsumptionLiteral(var, eat) : new DissubsumptionLiteral(var, eat);
-					Integer literalId = literalManager.addAndGetIndex(literal);
-					ret.addMinimizeLiteral(literalId);
-				}
+					for (Integer con : getConstants()) {
+						Literal literal = invertLiteral ? new SubsumptionLiteral(
+								var, con) : new DissubsumptionLiteral(var, con);
+						Integer literalId = literalManager
+								.addAndGetIndex(literal);
+						ret.addMinimizeLiteral(literalId);
+					}
+					for (Integer eat : getEAtoms()) {
+						Literal literal = invertLiteral ? new SubsumptionLiteral(
+								var, eat) : new DissubsumptionLiteral(var, eat);
+						Integer literalId = literalManager
+								.addAndGetIndex(literal);
+						ret.addMinimizeLiteral(literalId);
+					}
 				}
 			}
 		}
-		
+
 		logger.finer("SAT input computed.");
 
 		return ret;
 	}
 
-	private void addExternalDissubsumptions(SatInput input) {
-		for (SubsumptionLiteral dissub : externalDissubsumptions) {
-			Set<Integer> clause = new HashSet<Integer>();
-			Integer literalId = literalManager.addAndGetIndex(dissub);
-			clause.add((-1) * literalId);
-			input.add(clause);
+	private void addSmallSubsumptions(SatInput input) {
+		for (Equation e : getEquations()) {
+			if (e.getRight().size() == 1) {
+				Set<Integer> clause = new HashSet<Integer>();
+				Integer subsumed = e.getRight().iterator().next();
+				Integer subsuming = e.getLeft();
+				clause.add(getMinusSubOrDissubLiteral(subsumed, subsuming));
+				input.add(clause);
+			}
 		}
 	}
-
 
 	private Set<Integer> createUpdate() {
 		Set<Integer> ret = new HashSet<Integer>();
@@ -336,8 +351,7 @@ public class SatProcessor implements UelProcessor {
 		set.addAll(getEAtoms());
 		for (Integer firstAtomId : getVariables()) {
 			Atom firstAtom = getAtomManager().get(firstAtomId);
-			if (firstAtom.isConceptName()
-					&& isUserVariable(firstAtomId)) {
+			if (firstAtom.isConceptName() && isUserVariable(firstAtomId)) {
 				for (Integer secondAtomId : set) {
 					Literal literal = this.invertLiteral ? new SubsumptionLiteral(
 							firstAtomId, secondAtomId)
@@ -453,14 +467,12 @@ public class SatProcessor implements UelProcessor {
 	private Set<Equation> getUpdatedUnifier() {
 		Set<Equation> ret = new HashSet<Equation>();
 		for (Integer leftPartId : getVariables()) {
-//			Atom leftPart = getAtomManager().get(leftPartId);
-//			if (leftPart.isConceptName()
-//					&& isUserVariable(leftPartId)) {
-				ret.add(new EquationImpl(
-						leftPartId,
-						new HashSet<Integer>(getSetOfSubsumers(leftPartId)),
-						false));
-//			}
+			// Atom leftPart = getAtomManager().get(leftPartId);
+			// if (leftPart.isConceptName()
+			// && isUserVariable(leftPartId)) {
+			ret.add(new EquationImpl(leftPartId, new HashSet<Integer>(
+					getSetOfSubsumers(leftPartId)), false));
+			// }
 		}
 
 		return ret;
