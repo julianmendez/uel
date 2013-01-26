@@ -1,0 +1,4 @@
+(implies x#X (some x#r x#A))
+(implies x#X (some x#r x#B))
+(implies x#X (some x#r x#C))
+(implies x#X (some x#r x#D))

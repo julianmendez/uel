@@ -1,0 +1,8 @@
+(define-concept x#A (and x#E (some x#r x#C)))
+(define-primitive-concept x#B x#C)
+(define-primitive-concept x#C (and x#F x#G))
+(define-primitive-concept x#D top)
+(define-primitive-concept x#E top)
+(define-primitive-concept x#F top)
+(define-primitive-concept x#G top)
+
