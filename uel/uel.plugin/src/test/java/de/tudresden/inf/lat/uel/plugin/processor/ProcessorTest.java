@@ -20,7 +20,7 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.reasoner.Node;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 
-import de.tudresden.inf.lat.jcel.owlapi.main.JcelReasoner;
+import de.tudresden.inf.lat.jcel.owlapi.main.JcelReasonerFactory;
 import de.tudresden.inf.lat.uel.plugin.type.AtomManager;
 import de.tudresden.inf.lat.uel.plugin.type.UnifierKRSSRenderer;
 import de.tudresden.inf.lat.uel.type.api.Atom;
@@ -60,9 +60,10 @@ public class ProcessorTest extends TestCase {
 
 	private OWLReasoner createReasoner(String ontologyStr)
 			throws OWLOntologyCreationException {
-		JcelReasoner reasoner = new JcelReasoner(
-				createOntology(new ByteArrayInputStream(ontologyStr.getBytes())),
-				false);
+		JcelReasonerFactory factory = new JcelReasonerFactory();
+		OWLReasoner reasoner = factory
+				.createNonBufferingReasoner(createOntology(new ByteArrayInputStream(
+						ontologyStr.getBytes())));
 		reasoner.precomputeInferences();
 		return reasoner;
 	}
