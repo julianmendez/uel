@@ -89,17 +89,17 @@ public class PluginGoal {
 	}
 
 	private final AtomManager atomManager;
+	private final Set<Integer> auxiliaryVariables = new HashSet<Integer>();
 	private final Set<Integer> constants = new HashSet<Integer>();
 	// private final Set<Integer> eatoms = new HashSet<Integer>();
 	private final Set<Equation> definitions = new HashSet<Equation>();
 	private final Set<Equation> goalEquations = new HashSet<Equation>();
+
 	private final Ontology ontology;
 
 	private UelInput uelInput;
-
 	// private final Set<Integer> usedAtomIds = new HashSet<Integer>();
 	private final Set<Integer> userVariables = new HashSet<Integer>();
-	private final Set<Integer> auxiliaryVariables = new HashSet<Integer>();
 
 	private final Set<Integer> variables = new HashSet<Integer>();
 
@@ -209,6 +209,10 @@ public class PluginGoal {
 	// return Collections.unmodifiableSet(this.usedAtomIds);
 	// }
 
+	public Set<Integer> getAuxiliaryVariables() {
+		return Collections.unmodifiableSet(this.auxiliaryVariables);
+	}
+
 	public Set<Integer> getConstants() {
 		return Collections.unmodifiableSet(this.constants);
 	}
@@ -217,16 +221,25 @@ public class PluginGoal {
 		return this.uelInput;
 	}
 
+	public Set<Integer> getUserVariables() {
+		return Collections.unmodifiableSet(this.userVariables);
+	}
+
 	public Set<Integer> getVariables() {
 		return Collections.unmodifiableSet(this.variables);
 	}
-	
-	public Set<Integer> getAuxiliaryVariables() {
-		return Collections.unmodifiableSet(this.auxiliaryVariables);
-	}
-	
-	public Set<Integer> getUserVariables() {
-		return Collections.unmodifiableSet(this.userVariables);
+
+	public void makeAuxiliaryVariable(Integer atomId) {
+		Atom atom = getAtomManager().getAtoms().get(atomId);
+		if ((atom == null) || !atom.isConceptName()) {
+			throw new IllegalArgumentException(
+					"Argument is not a concept name identifier: '" + atomId
+							+ "'.");
+		}
+		ConceptName conceptName = (ConceptName) atom;
+		if (getVariables().contains(atomId)) {
+			this.auxiliaryVariables.add(conceptName.getConceptNameId());
+		}
 	}
 
 	public void makeConstant(Integer atomId) {
@@ -245,9 +258,9 @@ public class PluginGoal {
 		}
 	}
 
-	public void makeVariable(Integer atomId) {
+	public void makeUserVariable(Integer atomId) {
 		Atom atom = getAtomManager().getAtoms().get(atomId);
-		if (!atom.isConceptName()) {
+		if ((atom == null) || !atom.isConceptName()) {
 			throw new IllegalArgumentException(
 					"Argument is not a concept name identifier: '" + atomId
 							+ "'.");

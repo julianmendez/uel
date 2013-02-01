@@ -129,7 +129,7 @@ class VarSelectionModel {
 		if (atomId == null) {
 			throw new IllegalArgumentException("Unkown atom :'" + id + "'.");
 		}
-		this.pluginGoal.makeVariable(atomId);
+		this.pluginGoal.makeUserVariable(atomId);
 	}
 
 }

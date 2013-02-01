@@ -416,12 +416,12 @@ public class ProcessorTest extends TestCase {
 		for (String var : varNames) {
 			Integer atomId = getAtomId(goal, idClassMap.get(var).toStringID(),
 					false);
-			goal.makeVariable(atomId);
+			goal.makeUserVariable(atomId);
 		}
 		for (String var : undefVarNames) {
 			Integer atomId = getAtomId(goal, idClassMap.get(var).toStringID(),
 					true);
-			goal.makeVariable(atomId);
+			goal.makeUserVariable(atomId);
 		}
 
 		UelProcessor processor = UelProcessorFactory.createProcessor(

@@ -87,6 +87,20 @@ public class AlternativeUelStarter {
 		return UelController.getId(cls);
 	}
 
+	private String isVariable(ConceptName name, AtomManager atomManager,
+			Set<Integer> userVariables) {
+		if (name.isVariable()) {
+			if (userVariables.contains(atomManager.getAtoms().addAndGetIndex(
+					name))) {
+				return "uv";
+			} else {
+				return "v";
+			}
+		} else {
+			return "c";
+		}
+	}
+
 	public Iterator<Set<OWLUelClassDefinition>> modifyOntologyAndSolve(
 			Set<OWLSubClassOfAxiom> subsumptions,
 			Set<OWLSubClassOfAxiom> dissubsumptions, Set<OWLClass> variables) {
@@ -117,7 +131,7 @@ public class AlternativeUelStarter {
 
 			goal.addSubsumption(subClassId, superClassId);
 		}
-		
+
 		Set<SubsumptionLiteral> intDissubsumptions = new HashSet<SubsumptionLiteral>();
 		// construct the dissubsumptions
 		for (OWLSubClassOfAxiom dissubsumption : dissubsumptions) {
@@ -126,7 +140,8 @@ public class AlternativeUelStarter {
 			String superClassId = getId(findAuxiliaryDefinition(dissubsumption
 					.getSuperClass()));
 
-			intDissubsumptions.add(goal.constructDissubsumption(subClassId, superClassId));
+			intDissubsumptions.add(goal.constructDissubsumption(subClassId,
+					superClassId));
 		}
 
 		// translate the variables to the IDs, and mark them as variables in the
@@ -136,7 +151,15 @@ public class AlternativeUelStarter {
 			String name = getId(var);
 			ConceptName conceptName = atomManager.createConceptName(name, true);
 			Integer atomId = atomManager.getAtoms().addAndGetIndex(conceptName);
-			goal.makeVariable(atomId);
+			goal.makeUserVariable(atomId);
+		}
+
+		// mark the auxiliary variables as auxiliary
+		for (OWLClass auxVar : mapOfAuxClassExpr.values()) {
+			String name = getId(auxVar);
+			ConceptName conceptName = atomManager.createConceptName(name, true);
+			Integer atomId = atomManager.getAtoms().addAndGetIndex(conceptName);
+			goal.makeAuxiliaryVariable(atomId);
 		}
 
 		goal.updateUelInput();
@@ -145,10 +168,11 @@ public class AlternativeUelStarter {
 		// print(goal.getUelInput().getEquations(), goal.getAtomManager(),
 		// goal.getUelInput().getUserVariables());
 
-//		UelProcessor satProcessor = UelProcessorFactory.createProcessor(
-//				UelProcessorFactory.SAT_BASED_ALGORITHM, goal.getUelInput());
-//		model.configureUelProcessor(satProcessor);
-		UelProcessor satProcessor = new SatProcessor(goal.getUelInput(), intDissubsumptions);
+		// UelProcessor satProcessor = UelProcessorFactory.createProcessor(
+		// UelProcessorFactory.SAT_BASED_ALGORITHM, goal.getUelInput());
+		// model.configureUelProcessor(satProcessor);
+		UelProcessor satProcessor = new SatProcessor(goal.getUelInput(),
+				intDissubsumptions);
 
 		// satProcessor.getUnifier();
 
@@ -156,19 +180,6 @@ public class AlternativeUelStarter {
 				.getOWLOntologyManager().getOWLDataFactory(), atomManager, goal
 				.getUelInput().getUserVariables(), goal.getAuxiliaryVariables());
 		return new UnifierIterator(satProcessor, translator);
-	}
-
-	private void print(Set<Equation> equations, AtomManager atomManager,
-			Set<Integer> userVariables) {
-		for (Equation eq : equations) {
-			print(eq.getLeft(), atomManager, userVariables);
-			System.out.print(" = ");
-			for (Integer atomId : eq.getRight()) {
-				print(atomId, atomManager, userVariables);
-				System.out.print(" + ");
-			}
-			System.out.println();
-		}
 	}
 
 	private void print(Integer atomId, AtomManager atomManager,
@@ -191,17 +202,16 @@ public class AlternativeUelStarter {
 		}
 	}
 
-	private String isVariable(ConceptName name, AtomManager atomManager,
+	private void print(Set<Equation> equations, AtomManager atomManager,
 			Set<Integer> userVariables) {
-		if (name.isVariable()) {
-			if (userVariables.contains(atomManager.getAtoms().addAndGetIndex(
-					name))) {
-				return "uv";
-			} else {
-				return "v";
+		for (Equation eq : equations) {
+			print(eq.getLeft(), atomManager, userVariables);
+			System.out.print(" = ");
+			for (Integer atomId : eq.getRight()) {
+				print(atomId, atomManager, userVariables);
+				System.out.print(" + ");
 			}
-		} else {
-			return "c";
+			System.out.println();
 		}
 	}
 
