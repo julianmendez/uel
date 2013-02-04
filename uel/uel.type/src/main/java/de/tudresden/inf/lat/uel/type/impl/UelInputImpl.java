@@ -6,6 +6,7 @@ import java.util.Set;
 import de.tudresden.inf.lat.uel.type.api.Atom;
 import de.tudresden.inf.lat.uel.type.api.Equation;
 import de.tudresden.inf.lat.uel.type.api.IndexedSet;
+import de.tudresden.inf.lat.uel.type.api.SmallEquation;
 import de.tudresden.inf.lat.uel.type.api.UelInput;
 
 /**
@@ -20,6 +21,7 @@ public class UelInputImpl implements UelInput {
 	private final IndexedSet<Atom> atomManager;
 	private final Set<Equation> definitions;
 	private final Set<Equation> goalEquations;
+	private final Set<SmallEquation> goalDisequations;
 	private final Set<Equation> equations;
 	private final Set<Integer> userVariables;
 
@@ -34,13 +36,15 @@ public class UelInputImpl implements UelInput {
 	 *            set of user variables
 	 */
 	public UelInputImpl(IndexedSet<Atom> manager, Set<Equation> defs,
-			Set<Equation> goal, Set<Integer> vars) {
+			Set<Equation> goalEqs, Set<SmallEquation> goalDiseqs,
+			Set<Integer> vars) {
 		this.atomManager = manager;
 		this.definitions = defs;
-		this.goalEquations = goal;
+		this.goalEquations = goalEqs;
+		this.goalDisequations = goalDiseqs;
 		this.equations = new HashSet<Equation>();
 		equations.addAll(defs);
-		equations.addAll(goal);
+		equations.addAll(goalEqs);
 		this.userVariables = vars;
 	}
 
@@ -48,7 +52,7 @@ public class UelInputImpl implements UelInput {
 	public IndexedSet<Atom> getAtomManager() {
 		return this.atomManager;
 	}
-	
+
 	@Override
 	public Set<Equation> getDefinitions() {
 		return this.definitions;
@@ -58,7 +62,12 @@ public class UelInputImpl implements UelInput {
 	public Set<Equation> getGoalEquations() {
 		return this.goalEquations;
 	}
-	
+
+	@Override
+	public Set<SmallEquation> getGoalDisequations() {
+		return this.goalDisequations;
+	}
+
 	@Override
 	public Set<Equation> getEquations() {
 		return this.equations;

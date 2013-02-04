@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import de.tudresden.inf.lat.uel.sat.type.AuxiliaryLiteral;
 import de.tudresden.inf.lat.uel.sat.type.DissubsumptionLiteral;
 import de.tudresden.inf.lat.uel.sat.type.Literal;
 import de.tudresden.inf.lat.uel.sat.type.OrderLiteral;
@@ -19,6 +20,7 @@ import de.tudresden.inf.lat.uel.sat.type.SubsumptionLiteral;
 import de.tudresden.inf.lat.uel.type.api.Atom;
 import de.tudresden.inf.lat.uel.type.api.Equation;
 import de.tudresden.inf.lat.uel.type.api.IndexedSet;
+import de.tudresden.inf.lat.uel.type.api.SmallEquation;
 import de.tudresden.inf.lat.uel.type.api.UelInput;
 import de.tudresden.inf.lat.uel.type.api.UelOutput;
 import de.tudresden.inf.lat.uel.type.api.UelProcessor;
@@ -148,7 +150,7 @@ public class SatProcessor implements UelProcessor {
 	private Set<Integer> trueLiterals = new HashSet<Integer>();
 	private final UelInput uelInput;
 	private Set<Integer> update = new HashSet<Integer>();
-	private Set<SubsumptionLiteral> externalDissubsumptions = null;
+	private final boolean hasDisequations;
 
 	/**
 	 * Construct a new SAT processor to solve a unification problem.
@@ -167,26 +169,50 @@ public class SatProcessor implements UelProcessor {
 
 		this.uelInput = input;
 		this.extUelInput = new ExtendedUelInput(input);
+		this.hasDisequations = (getDisequations() != null)
+				&& !getDisequations().isEmpty();
 		this.invertLiteral = inv;
 		this.onlyMinimalAssignments = useMinimalAssignments;
 		setLiterals();
 	}
 
-	public SatProcessor(UelInput input, Set<SubsumptionLiteral> dissubsumptions) {
-		if ((input == null) || (dissubsumptions == null)) {
-			throw new IllegalArgumentException("Null argument.");
+	private void addClausesForDissubsumptions(SatInput ret) {
+		for (Integer x : getVariables()) {
+			for (Integer d : getConstants()) {
+				addClausesForDissubsumptions(ret, d, x);
+			}
+			for (Integer d : getEAtoms()) {
+				addClausesForDissubsumptions(ret, d, x);
+			}
 		}
+	}
 
-		this.uelInput = input;
-		this.externalDissubsumptions = dissubsumptions;
-		this.extUelInput = new ExtendedUelInput(input);
-		for (SubsumptionLiteral lit : dissubsumptions) {
-			this.extUelInput.addAtomToIndex(lit.getFirst());
-			this.extUelInput.addAtomToIndex(lit.getSecond());
+	private void addClausesForDissubsumptions(SatInput ret, Integer d, Integer x) {
+		Set<Integer> mainClause = new HashSet<Integer>();
+		mainClause.add(getMinusSubOrDissubLiteral(d, x));
+		for (Integer e : getConstants()) {
+			addClausesForDissubsumptions(ret, d, x, e, mainClause);
 		}
-		this.invertLiteral = true;
-		this.onlyMinimalAssignments = false;
-		setLiterals();
+		for (Integer e : getEAtoms()) {
+			addClausesForDissubsumptions(ret, d, x, e, mainClause);
+		}
+		ret.add(mainClause);
+	}
+
+	private void addClausesForDissubsumptions(SatInput ret, Integer d,
+			Integer x, Integer e, Set<Integer> mainClause) {
+		Integer p = getAuxiliaryLiteral(d, x, e);
+		mainClause.add(p);
+
+		Set<Integer> clause1 = new HashSet<Integer>();
+		clause1.add((-1) * p);
+		clause1.add(getMinusSubOrDissubLiteral(x, e));
+		ret.add(clause1);
+
+		Set<Integer> clause2 = new HashSet<Integer>();
+		clause2.add((-1) * p);
+		clause2.add(getSubOrDissubLiteral(d, e));
+		ret.add(clause2);
 	}
 
 	private boolean addEntry(List<Map.Entry<String, String>> list, String key,
@@ -195,12 +221,16 @@ public class SatProcessor implements UelProcessor {
 				.add(new AbstractMap.SimpleEntry<String, String>(key, value));
 	}
 
-	private void addExternalDissubsumptions(SatInput input) {
-		for (SubsumptionLiteral dissub : externalDissubsumptions) {
-			Set<Integer> clause = new HashSet<Integer>();
-			Integer literalId = literalManager.addAndGetIndex(dissub);
-			clause.add((-1) * literalId);
-			input.add(clause);
+	private void addSmallSubsumptions(SatInput input) {
+		// TODO: remove?
+		for (Equation e : getEquations()) {
+			if (e.getRight().size() == 1) {
+				Set<Integer> clause = new HashSet<Integer>();
+				Integer subsumed = e.getRight().iterator().next();
+				Integer subsuming = e.getLeft();
+				clause.add(getMinusSubOrDissubLiteral(subsumed, subsuming));
+				input.add(clause);
+			}
 		}
 	}
 
@@ -299,11 +329,14 @@ public class SatProcessor implements UelProcessor {
 		logger.finer("running step 3.2 ...");
 		runStep3_2(ret);
 
-		if (externalDissubsumptions != null) {
-			addExternalDissubsumptions(ret);
-		}
+		if (hasDisequations) {
+			// add clauses with auxiliary variables needed for soundness of
+			// disunification
+			logger.finer("adding clauses for dissubsumptions ...");
+			addClausesForDissubsumptions(ret);
 
-		addSmallSubsumptions(ret);
+			addSmallSubsumptions(ret);
+		}
 
 		if (onlyMinimalAssignments) {
 			logger.finer("adding literals to be minimized ...");
@@ -330,18 +363,6 @@ public class SatProcessor implements UelProcessor {
 		logger.finer("SAT input computed.");
 
 		return ret;
-	}
-
-	private void addSmallSubsumptions(SatInput input) {
-		for (Equation e : getEquations()) {
-			if (e.getRight().size() == 1) {
-				Set<Integer> clause = new HashSet<Integer>();
-				Integer subsumed = e.getRight().iterator().next();
-				Integer subsuming = e.getLeft();
-				clause.add(getMinusSubOrDissubLiteral(subsumed, subsuming));
-				input.add(clause);
-			}
-		}
 	}
 
 	private Set<Integer> createUpdate() {
@@ -373,8 +394,16 @@ public class SatProcessor implements UelProcessor {
 		return this.extUelInput.getAtomManager();
 	}
 
+	private Integer getAuxiliaryLiteral(Integer d, Integer x, Integer e) {
+		return literalManager.addAndGetIndex(new AuxiliaryLiteral(d, x, e));
+	}
+
 	private Set<Integer> getConstants() {
 		return this.extUelInput.getConstants();
+	}
+
+	private Set<SmallEquation> getDisequations() {
+		return this.extUelInput.getGoalDisequations();
 	}
 
 	private Set<Integer> getEAtoms() {
@@ -529,6 +558,14 @@ public class SatProcessor implements UelProcessor {
 			runStep1ForConstants(e, input);
 			runStep1ForExistentialAtoms(e, input);
 		}
+
+		// goal disequations
+		for (SmallEquation e : getDisequations()) {
+			Set<Integer> clause = new HashSet<Integer>();
+			clause.add(getSubOrDissubLiteral(e.getLeft(), e.getRight()));
+			clause.add(getSubOrDissubLiteral(e.getRight(), e.getLeft()));
+			input.add(clause);
+		}
 	}
 
 	/**
@@ -672,13 +709,18 @@ public class SatProcessor implements UelProcessor {
 		for (Integer atomId1 : getConstants()) {
 
 			for (Integer atomId2 : getConstants()) {
-
 				if (!isTop(atomId2) && (!atomId1.equals(atomId2))) {
 					Set<Integer> clause = new HashSet<Integer>();
 					clause.add(getSubOrDissubLiteral(atomId1, atomId2));
 					input.add(clause);
 				}
+			}
 
+			if (hasDisequations) {
+				// positive clause needed for soundness of disunification
+				Set<Integer> clause = new HashSet<Integer>();
+				clause.add(getMinusSubOrDissubLiteral(atomId1, atomId1));
+				input.add(clause);
 			}
 
 		}
@@ -814,11 +856,12 @@ public class SatProcessor implements UelProcessor {
 
 				if (!atomId1.equals(atomId2)) {
 
-					Integer role1 = asExistentialRestriction(
-							getAtomManager().get(atomId1)).getRoleId();
-
-					Integer role2 = asExistentialRestriction(
-							getAtomManager().get(atomId2)).getRoleId();
+					ExistentialRestriction ex1 = asExistentialRestriction(getAtomManager()
+							.get(atomId1));
+					ExistentialRestriction ex2 = asExistentialRestriction(getAtomManager()
+							.get(atomId2));
+					Integer role1 = ex1.getRoleId();
+					Integer role2 = ex2.getRoleId();
 
 					/*
 					 * if roles are not equal, then Step 2.2
@@ -833,21 +876,12 @@ public class SatProcessor implements UelProcessor {
 						 * if the roles are equal, then clause in Step 2.3
 						 */
 					} else {
-						Atom atom1 = getAtomManager().get(atomId1);
-						Atom atom2 = getAtomManager().get(atomId2);
 
-						if (!atom1.isExistentialRestriction()
-								|| !atom2.isExistentialRestriction()) {
-							throw new IllegalStateException();
-						}
-
-						Atom child1 = asExistentialRestriction(atom1)
-								.getChild();
+						Atom child1 = ex1.getChild();
 						Integer child1Id = getAtomManager().addAndGetIndex(
 								child1);
 
-						Atom child2 = asExistentialRestriction(atom2)
-								.getChild();
+						Atom child2 = ex2.getChild();
 						Integer child2Id = getAtomManager().addAndGetIndex(
 								child2);
 
@@ -856,6 +890,16 @@ public class SatProcessor implements UelProcessor {
 							clause.add(getMinusSubOrDissubLiteral(child1Id,
 									child2Id));
 							clause.add(getSubOrDissubLiteral(atomId1, atomId2));
+							input.add(clause);
+						}
+
+						if (hasDisequations) {
+							// converse clause needed for soundness of
+							// disunification
+							Set<Integer> clause = new HashSet<Integer>();
+							clause.add(getMinusSubOrDissubLiteral(atomId1,
+									atomId2));
+							clause.add(getSubOrDissubLiteral(child1Id, child2Id));
 							input.add(clause);
 						}
 

@@ -9,12 +9,13 @@ import de.tudresden.inf.lat.uel.plugin.type.AtomManager;
 import de.tudresden.inf.lat.uel.sat.type.SubsumptionLiteral;
 import de.tudresden.inf.lat.uel.type.api.Atom;
 import de.tudresden.inf.lat.uel.type.api.Equation;
+import de.tudresden.inf.lat.uel.type.api.SmallEquation;
 import de.tudresden.inf.lat.uel.type.api.UelInput;
 import de.tudresden.inf.lat.uel.type.cons.KRSSKeyword;
 import de.tudresden.inf.lat.uel.type.impl.ConceptName;
 import de.tudresden.inf.lat.uel.type.impl.EquationImpl;
 import de.tudresden.inf.lat.uel.type.impl.ExistentialRestriction;
-import de.tudresden.inf.lat.uel.type.impl.ExtendedUelInput;
+import de.tudresden.inf.lat.uel.type.impl.SmallEquationImpl;
 import de.tudresden.inf.lat.uel.type.impl.UelInputImpl;
 
 /**
@@ -91,14 +92,13 @@ public class PluginGoal {
 	private final AtomManager atomManager;
 	private final Set<Integer> auxiliaryVariables = new HashSet<Integer>();
 	private final Set<Integer> constants = new HashSet<Integer>();
-	// private final Set<Integer> eatoms = new HashSet<Integer>();
 	private final Set<Equation> definitions = new HashSet<Equation>();
+	private final Set<SmallEquation> goalDisequations = new HashSet<SmallEquation>();
 	private final Set<Equation> goalEquations = new HashSet<Equation>();
 
 	private final Ontology ontology;
 
 	private UelInput uelInput;
-	// private final Set<Integer> usedAtomIds = new HashSet<Integer>();
 	private final Set<Integer> userVariables = new HashSet<Integer>();
 
 	private final Set<Integer> variables = new HashSet<Integer>();
@@ -141,6 +141,21 @@ public class PluginGoal {
 		updateUelInput();
 	}
 
+	public void addGoalDisequation(String leftStr, String rightStr) {
+		Set<Equation> equationSet = new HashSet<Equation>();
+		Integer leftId = addModule(equationSet, leftStr);
+		Integer rightId = addModule(equationSet, rightStr);
+		markDefinedConceptNamesAsVariables(equationSet);
+		this.definitions.addAll(equationSet);
+
+		SmallEquation newGoalDisequation = new SmallEquationImpl(leftId,
+				rightId);
+
+		this.goalDisequations.add(newGoalDisequation);
+		updateIndexSets(equationSet);
+		updateIndexSets(newGoalDisequation);
+	}
+
 	public void addGoalEquation(String leftStr, String rightStr) {
 		Set<Equation> equationSet = new HashSet<Equation>();
 		Integer leftId = addModule(equationSet, leftStr);
@@ -149,6 +164,23 @@ public class PluginGoal {
 		this.definitions.addAll(equationSet);
 
 		Equation newGoalEquation = new EquationImpl(leftId, rightId, false);
+
+		equationSet.add(newGoalEquation);
+		this.goalEquations.add(newGoalEquation);
+		updateIndexSets(equationSet);
+	}
+
+	public void addGoalSubsumption(String leftStr, String rightStr) {
+		Set<Equation> equationSet = new HashSet<Equation>();
+		Integer leftId = addModule(equationSet, leftStr);
+		Integer rightId = addModule(equationSet, rightStr);
+		markDefinedConceptNamesAsVariables(equationSet);
+		this.definitions.addAll(equationSet);
+
+		Set<Integer> rightIds = new HashSet<Integer>();
+		rightIds.add(leftId);
+		rightIds.add(rightId);
+		Equation newGoalEquation = new EquationImpl(leftId, rightIds, false);
 
 		equationSet.add(newGoalEquation);
 		this.goalEquations.add(newGoalEquation);
@@ -170,44 +202,9 @@ public class PluginGoal {
 		return ret;
 	}
 
-	public void addSubsumption(String leftStr, String rightStr) {
-		Set<Equation> equationSet = new HashSet<Equation>();
-		Integer leftId = addModule(equationSet, leftStr);
-		Integer rightId = addModule(equationSet, rightStr);
-		markDefinedConceptNamesAsVariables(equationSet);
-		this.definitions.addAll(equationSet);
-
-		Set<Integer> rightIds = new HashSet<Integer>();
-		rightIds.add(leftId);
-		rightIds.add(rightId);
-		Equation newGoalEquation = new EquationImpl(leftId, rightIds, false);
-
-		equationSet.add(newGoalEquation);
-		this.goalEquations.add(newGoalEquation);
-		updateIndexSets(equationSet);
-	}
-
-	public SubsumptionLiteral constructDissubsumption(String leftStr,
-			String rightStr) {
-		Set<Equation> equationSet = new HashSet<Equation>();
-		Integer leftId = addModule(equationSet, leftStr);
-		Integer rightId = addModule(equationSet, rightStr);
-		markDefinedConceptNamesAsVariables(equationSet);
-		this.definitions.addAll(equationSet);
-
-		// temporary equation used for correct updating of index sets
-		equationSet.add(new EquationImpl(leftId, rightId, false));
-		updateIndexSets(equationSet);
-		return new SubsumptionLiteral(leftId, rightId);
-	}
-
 	public AtomManager getAtomManager() {
 		return this.atomManager;
 	}
-
-	// public Set<Integer> getUsedAtomIds() {
-	// return Collections.unmodifiableSet(this.usedAtomIds);
-	// }
 
 	public Set<Integer> getAuxiliaryVariables() {
 		return Collections.unmodifiableSet(this.auxiliaryVariables);
@@ -321,14 +318,23 @@ public class PluginGoal {
 			usedAtomIds.add(eq.getLeft());
 			usedAtomIds.addAll(eq.getRight());
 		}
+		updateIndexSetsWithAtoms(usedAtomIds);
+	}
 
+	private void updateIndexSets(SmallEquation eq) {
+		Set<Integer> usedAtomIds = new HashSet<Integer>();
+		usedAtomIds.add(eq.getLeft());
+		usedAtomIds.add(eq.getRight());
+		updateIndexSetsWithAtoms(usedAtomIds);
+	}
+
+	private void updateIndexSetsWithAtoms(Set<Integer> usedAtomIds) {
 		Set<Integer> conceptNameIds = new HashSet<Integer>();
 		for (Integer usedAtomId : usedAtomIds) {
 			Atom atom = getAtomManager().getAtoms().get(usedAtomId);
 			if (atom.isConceptName()) {
 				conceptNameIds.add(usedAtomId);
 			} else if (atom.isExistentialRestriction()) {
-				// this.eatoms.add(usedAtomId);
 				ConceptName child = ((ExistentialRestriction) atom).getChild();
 				Integer childId = getAtomManager().getAtoms().addAndGetIndex(
 						child);
@@ -336,9 +342,6 @@ public class PluginGoal {
 			}
 		}
 		usedAtomIds.addAll(conceptNameIds);
-		// for (Integer atomId : usedAtomIds) {
-		// this.usedAtomIds.add(atomId);
-		// }
 
 		for (Integer atomId : conceptNameIds) {
 			Atom atom = getAtomManager().getAtoms().get(atomId);
@@ -358,7 +361,8 @@ public class PluginGoal {
 
 	public void updateUelInput() {
 		this.uelInput = new UelInputImpl(getAtomManager().getAtoms(),
-				this.definitions, this.goalEquations, this.userVariables);
+				this.definitions, this.goalEquations, this.goalDisequations,
+				this.userVariables);
 	}
 
 }

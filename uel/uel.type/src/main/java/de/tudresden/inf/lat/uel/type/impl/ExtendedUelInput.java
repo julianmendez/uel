@@ -8,6 +8,7 @@ import java.util.TreeSet;
 import de.tudresden.inf.lat.uel.type.api.Atom;
 import de.tudresden.inf.lat.uel.type.api.Equation;
 import de.tudresden.inf.lat.uel.type.api.IndexedSet;
+import de.tudresden.inf.lat.uel.type.api.SmallEquation;
 import de.tudresden.inf.lat.uel.type.api.UelInput;
 
 /**
@@ -44,6 +45,10 @@ public class ExtendedUelInput implements UelInput {
 			usedAtomsIds.add(eq.getLeft());
 			usedAtomsIds.addAll(eq.getRight());
 		}
+		for (SmallEquation eq : getGoalDisequations()) {
+			usedAtomsIds.add(eq.getLeft());
+			usedAtomsIds.add(eq.getRight());
+		}
 
 		{
 			Set<Integer> conceptNameIds = new HashSet<Integer>();
@@ -53,8 +58,7 @@ public class ExtendedUelInput implements UelInput {
 					this.eatoms.add(index);
 					ConceptName child = ((ExistentialRestriction) atom)
 							.getChild();
-					Integer childId = getAtomManager().addAndGetIndex(
-							child);
+					Integer childId = getAtomManager().addAndGetIndex(child);
 					conceptNameIds.add(childId);
 				} else {
 					conceptNameIds.add(index);
@@ -72,23 +76,6 @@ public class ExtendedUelInput implements UelInput {
 				} else {
 					this.constants.add(index);
 				}
-			}
-		}
-	}
-	
-	public void addAtomToIndex(Integer atomId) {
-		this.usedAtomIds.add(atomId);
-		Atom atom = getAtomManager().get(atomId);
-		if (atom.isExistentialRestriction()) {
-			this.eatoms.add(atomId);
-			ConceptName child = ((ExistentialRestriction) atom).getChild();
-			Integer childId = getAtomManager().addAndGetIndex(child);
-			addAtomToIndex(childId);
-		} else {
-			if (atom.isVariable()) {
-				this.variables.add(atomId);
-			} else {
-				this.constants.add(atomId);
 			}
 		}
 	}
@@ -128,7 +115,7 @@ public class ExtendedUelInput implements UelInput {
 	public Set<Integer> getEAtoms() {
 		return Collections.unmodifiableSet(eatoms);
 	}
-	
+
 	@Override
 	public Set<Equation> getDefinitions() {
 		return this.uelInput.getDefinitions();
@@ -137,6 +124,11 @@ public class ExtendedUelInput implements UelInput {
 	@Override
 	public Set<Equation> getGoalEquations() {
 		return this.uelInput.getGoalEquations();
+	}
+
+	@Override
+	public Set<SmallEquation> getGoalDisequations() {
+		return this.uelInput.getGoalDisequations();
 	}
 
 	@Override

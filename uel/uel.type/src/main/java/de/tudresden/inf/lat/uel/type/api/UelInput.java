@@ -32,6 +32,13 @@ public interface UelInput {
 	public Set<Equation> getGoalEquations();
 	
 	/**
+	 * Returns the set of flattened and small goal disequations.
+	 * 
+	 * @return the set of goal disequations
+	 */
+	public Set<SmallEquation> getGoalDisequations();
+	
+	/**
 	 * Returns the set of all flattened equations (definitions and goal).
 	 * 
 	 * @return the set of equations

@@ -13,6 +13,7 @@ import de.tudresden.inf.lat.uel.plugin.processor.UelProcessorFactory;
 import de.tudresden.inf.lat.uel.plugin.type.AtomManager;
 import de.tudresden.inf.lat.uel.plugin.type.AtomManagerImpl;
 import de.tudresden.inf.lat.uel.type.api.Equation;
+import de.tudresden.inf.lat.uel.type.api.SmallEquation;
 import de.tudresden.inf.lat.uel.type.api.UelInput;
 import de.tudresden.inf.lat.uel.type.api.UelProcessor;
 import de.tudresden.inf.lat.uel.type.impl.ConceptName;
@@ -137,7 +138,8 @@ public class CNFTester {
 
 		System.out.println("equations: " + equations.size());
 		input = new UelInputImpl(atomManager.getAtoms(),
-				Collections.<Equation> emptySet(), equations, userVariables);
+				Collections.<Equation> emptySet(), equations,
+				Collections.<SmallEquation> emptySet(), userVariables);
 	}
 
 	/**

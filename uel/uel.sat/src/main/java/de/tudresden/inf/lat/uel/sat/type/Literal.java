@@ -26,9 +26,16 @@ public interface Literal {
 	public Integer getSecond();
 
 	/**
+	 * Tells whether this literal is an auxiliary literal.
+	 * 
+	 * @return <code>true</code> if and only if this is an auxiliary literal
+	 */
+	public boolean isAuxiliary();
+
+	/**
 	 * Tells whether this literal is a dissubsumption literal.
 	 * 
-	 * @return <code>true</code> if and only if this is an dissubsumption
+	 * @return <code>true</code> if and only if this is a dissubsumption
 	 *         literal
 	 */
 	public boolean isDissubsumption();
@@ -39,11 +46,11 @@ public interface Literal {
 	 * @return <code>true</code> if and only if this is an order literal
 	 */
 	public boolean isOrder();
-
+	
 	/**
 	 * Tells whether this literal is a subsumption literal.
 	 * 
-	 * @return <code>true</code> if and only if this is an subsumption literal
+	 * @return <code>true</code> if and only if this is a subsumption literal
 	 */
 	public boolean isSubsumption();
 

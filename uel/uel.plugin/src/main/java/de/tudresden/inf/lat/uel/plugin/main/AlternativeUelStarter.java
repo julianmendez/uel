@@ -11,6 +11,7 @@ import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
+import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
@@ -18,12 +19,11 @@ import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 
 import de.tudresden.inf.lat.uel.plugin.processor.PluginGoal;
 import de.tudresden.inf.lat.uel.plugin.processor.UelModel;
+import de.tudresden.inf.lat.uel.plugin.processor.UelProcessorFactory;
 import de.tudresden.inf.lat.uel.plugin.type.AtomManager;
 import de.tudresden.inf.lat.uel.plugin.type.OWLUelClassDefinition;
 import de.tudresden.inf.lat.uel.plugin.type.UnifierTranslator;
 import de.tudresden.inf.lat.uel.plugin.ui.UelController;
-import de.tudresden.inf.lat.uel.sat.solver.SatProcessor;
-import de.tudresden.inf.lat.uel.sat.type.SubsumptionLiteral;
 import de.tudresden.inf.lat.uel.type.api.Atom;
 import de.tudresden.inf.lat.uel.type.api.Equation;
 import de.tudresden.inf.lat.uel.type.api.UelProcessor;
@@ -110,10 +110,23 @@ public class AlternativeUelStarter {
 			findAuxiliaryDefinition(subsumption.getSubClass());
 			findAuxiliaryDefinition(subsumption.getSuperClass());
 		}
-		// and the same for each dissubsumption
+
+		// construct (small!) disequations from the dissubsumptions
+		Set<OWLEquivalentClassesAxiom> disequations = new HashSet<OWLEquivalentClassesAxiom>();
 		for (OWLSubClassOfAxiom dissubsumption : dissubsumptions) {
-			findAuxiliaryDefinition(dissubsumption.getSubClass());
-			findAuxiliaryDefinition(dissubsumption.getSuperClass());
+			OWLClass auxSubClass = findAuxiliaryDefinition(dissubsumption
+					.getSubClass());
+			OWLClass auxSuperClass = findAuxiliaryDefinition(dissubsumption
+					.getSuperClass());
+			OWLDataFactory factory = this.auxOntology.getOWLOntologyManager()
+					.getOWLDataFactory();
+
+			OWLClassExpression conjunction = factory
+					.getOWLObjectIntersectionOf(auxSubClass, auxSuperClass);
+			OWLClass auxConjunction = findAuxiliaryDefinition(conjunction);
+			OWLEquivalentClassesAxiom disequation = factory
+					.getOWLEquivalentClassesAxiom(auxSubClass, auxConjunction);
+			disequations.add(disequation);
 		}
 
 		UelModel model = new UelModel();
@@ -129,19 +142,17 @@ public class AlternativeUelStarter {
 			String superClassId = getId(findAuxiliaryDefinition(subsumption
 					.getSuperClass()));
 
-			goal.addSubsumption(subClassId, superClassId);
+			goal.addGoalSubsumption(subClassId, superClassId);
 		}
 
-		Set<SubsumptionLiteral> intDissubsumptions = new HashSet<SubsumptionLiteral>();
-		// construct the dissubsumptions
-		for (OWLSubClassOfAxiom dissubsumption : dissubsumptions) {
-			String subClassId = getId(findAuxiliaryDefinition(dissubsumption
-					.getSubClass()));
-			String superClassId = getId(findAuxiliaryDefinition(dissubsumption
-					.getSuperClass()));
+		// add the disequations
+		for (OWLEquivalentClassesAxiom disequation : disequations) {
+			Iterator<OWLClassExpression> expressions = disequation
+					.getClassExpressions().iterator();
+			String class1Id = getId((OWLClass) expressions.next());
+			String class2Id = getId((OWLClass) expressions.next());
 
-			intDissubsumptions.add(goal.constructDissubsumption(subClassId,
-					superClassId));
+			goal.addGoalDisequation(class1Id, class1Id);
 		}
 
 		// translate the variables to the IDs, and mark them as variables in the
@@ -168,12 +179,9 @@ public class AlternativeUelStarter {
 		// print(goal.getUelInput().getEquations(), goal.getAtomManager(),
 		// goal.getUelInput().getUserVariables());
 
-		// UelProcessor satProcessor = UelProcessorFactory.createProcessor(
-		// UelProcessorFactory.SAT_BASED_ALGORITHM, goal.getUelInput());
+		UelProcessor satProcessor = UelProcessorFactory.createProcessor(
+				UelProcessorFactory.SAT_BASED_ALGORITHM, goal.getUelInput());
 		// model.configureUelProcessor(satProcessor);
-		UelProcessor satProcessor = new SatProcessor(goal.getUelInput(),
-				intDissubsumptions);
-
 		// satProcessor.getUnifier();
 
 		UnifierTranslator translator = new UnifierTranslator(ontology

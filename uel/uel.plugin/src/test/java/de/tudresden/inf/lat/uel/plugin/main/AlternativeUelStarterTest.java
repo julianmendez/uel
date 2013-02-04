@@ -131,8 +131,8 @@ public class AlternativeUelStarterTest extends TestCase {
 			Set<OWLUelClassDefinition> unifier = iterator.next();
 			actualNumberOfUnifiers++;
 
-//			System.out.println();
-//			System.out.println("--- " + actualNumberOfUnifiers);
+			System.out.println();
+			System.out.println("--- " + actualNumberOfUnifiers);
 			OWLOntology auxOntology = ontologyManager
 					.loadOntologyFromOntologyDocument(new ByteArrayInputStream(
 							krssDefinitions.getBytes()));
@@ -140,12 +140,12 @@ public class AlternativeUelStarterTest extends TestCase {
 				ontologyManager.addAxiom(auxOntology,
 						def.asOWLEquivalentClassesAxiom());
 			}
-//			try {
-//				ontologyManager.saveOntology(auxOntology,
-//						new KRSS2OntologyFormat(), System.out);
-//			} catch (OWLOntologyStorageException e) {
-//				e.printStackTrace();
-//			}
+			try {
+				ontologyManager.saveOntology(auxOntology,
+						new KRSS2OntologyFormat(), System.out);
+			} catch (OWLOntologyStorageException e) {
+				e.printStackTrace();
+			}
 
 			OWLReasoner reasoner = createReasoner(auxOntology);
 			

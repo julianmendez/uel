@@ -59,6 +59,11 @@ public class DissubsumptionLiteral implements Literal {
 	}
 
 	@Override
+	public boolean isAuxiliary() {
+		return false;
+	}
+
+	@Override
 	public boolean isDissubsumption() {
 		return true;
 	}

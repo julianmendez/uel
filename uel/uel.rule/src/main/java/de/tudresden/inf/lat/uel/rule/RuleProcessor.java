@@ -33,9 +33,9 @@ import de.tudresden.inf.lat.uel.type.impl.UelOutputImpl;
  * Theoretical Computer Science, Technische Universität Dresden, Dresden,
  * Germany, 2011. See http://lat.inf.tu-dresden.de/research/reports.html.
  * 
- * Based on the algorithm in: Franz Baader and Barbara Morawska. 'Uniﬁcation in
- * the description logic EL'. Logical Methods in Computer Science, 6(3), 2010.
- * Special Issue: 20th Int. Conf. on Rewriting Techniques and Applications
+ * Based on the algorithm in: Franz Baader and Barbara Morawska. 'Uniﬁcation
+ * in the description logic EL'. Logical Methods in Computer Science, 6(3),
+ * 2010. Special Issue: 20th Int. Conf. on Rewriting Techniques and Applications
  * (RTA’09).
  * 
  * @author Stefan Borgwardt
@@ -74,6 +74,11 @@ public class RuleProcessor implements UelProcessor {
 	public RuleProcessor(UelInput input) {
 		this.goal = new Goal(input);
 		this.input = input;
+		if ((input.getGoalDisequations() != null)
+				&& (input.getGoalDisequations().size() > 0)) {
+			throw new UnsupportedOperationException(
+					"The rule processor cannot deal with disequations!");
+		}
 		this.assignment = new Assignment();
 		this.initialSize = goal.size();
 		ExtendedUelInput extUelInput = new ExtendedUelInput(getInput());
@@ -185,14 +190,14 @@ public class RuleProcessor implements UelProcessor {
 				}
 			}
 		}
-//		for (Integer userVar : input.getUserVariables()) {
-//			Set<Integer> body = new HashSet<Integer>();
-//			for (Atom at : assignment.getSubsumers(atomManager.get(userVar)
-//					.getConceptNameId())) {
-//				body.add(atomManager.addAndGetIndex(at));
-//			}
-//			equations.add(new EquationImpl(userVar, body, false));
-//		}
+		// for (Integer userVar : input.getUserVariables()) {
+		// Set<Integer> body = new HashSet<Integer>();
+		// for (Atom at : assignment.getSubsumers(atomManager.get(userVar)
+		// .getConceptNameId())) {
+		// body.add(atomManager.addAndGetIndex(at));
+		// }
+		// equations.add(new EquationImpl(userVar, body, false));
+		// }
 		return new UelOutputImpl(atomManager, equations);
 	}
 
