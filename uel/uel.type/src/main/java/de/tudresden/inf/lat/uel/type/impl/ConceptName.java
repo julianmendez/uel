@@ -131,7 +131,7 @@ public class ConceptName implements Atom {
 	/**
 	 * Set this flat atom as a variable.
 	 * 
-	 * @param isVariable
+	 * @param isVar
 	 *            true iff this flat atom is variable
 	 */
 	public void setVariable(boolean isVar) {

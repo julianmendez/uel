@@ -74,7 +74,7 @@ public class AlternativeUelStarterTest extends TestCase {
 	}
 
 	public void test01() throws OWLOntologyCreationException, IOException {
-		tryOntology("01", set(conceptX, conceptY), 36);
+		tryOntology("01", set(conceptX, conceptY), 13);
 	}
 
 	public void test02() throws OWLOntologyCreationException, IOException {
