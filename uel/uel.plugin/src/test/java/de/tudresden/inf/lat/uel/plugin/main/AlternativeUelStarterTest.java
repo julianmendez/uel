@@ -80,6 +80,10 @@ public class AlternativeUelStarterTest extends TestCase {
 	public void test02() throws OWLOntologyCreationException, IOException {
 		tryOntology("02", set(conceptX), 0);
 	}
+	
+	public void test03() throws OWLOntologyCreationException, IOException {
+		tryOntology("03", set(conceptX), 1);
+	}
 
 	private String toString(OWLOntology ontology) {
 		StringBuffer sbuf = new StringBuffer();

@@ -17,38 +17,25 @@ public class ConceptName implements Atom {
 	 * @return a new instance of top
 	 */
 	public static ConceptName createTop(Integer id) {
-		ConceptName ret = new ConceptName(id, true);
+		ConceptName ret = new ConceptName(id, false);
 		return ret;
 	}
 
 	private final Integer conceptNameId;
-	private boolean isGround;
+	private boolean isVariable;
 	private boolean isAuxiliaryVariable = false;
 	private boolean isTop = false;
 
 	/**
 	 * Construct a new concept name.
-	 * 
+	 * @param conceptName
+	 *            the concept name
 	 * @param isVar
 	 *            a flag indicating whether the concept name is a variable
-	 * @param conceptName
-	 *            the concept name
 	 */
-	public ConceptName(boolean isVar, Integer conceptName) {
-		this(conceptName, !isVar);
-	}
-
-	/**
-	 * Construct a new concept name.
-	 * 
-	 * @param conceptName
-	 *            the concept name
-	 * @param ground
-	 *            a flag indicating whether the concept name is not a variable
-	 */
-	public ConceptName(Integer conceptName, boolean ground) {
+	public ConceptName(Integer conceptName, boolean isVar) {
 		this.conceptNameId = conceptName;
-		this.isGround = ground;
+		this.isVariable = isVar;
 	}
 
 	@Override
@@ -98,7 +85,7 @@ public class ConceptName implements Atom {
 	 */
 	@Override
 	public boolean isConstant() {
-		return isGround();
+		return !isVariable;
 	}
 
 	/**
@@ -118,7 +105,7 @@ public class ConceptName implements Atom {
 	 */
 	@Override
 	public boolean isGround() {
-		return isGround;
+		return isConstant();
 	}
 
 	/**
@@ -138,7 +125,7 @@ public class ConceptName implements Atom {
 	 */
 	@Override
 	public boolean isVariable() {
-		return !isGround();
+		return isVariable;
 	}
 
 	/**
@@ -147,12 +134,12 @@ public class ConceptName implements Atom {
 	 * @param isVariable
 	 *            true iff this flat atom is variable
 	 */
-	public void setVariable(boolean isVariable) {
-		this.isGround = !isVariable;
+	public void setVariable(boolean isVar) {
+		this.isVariable = isVar;
 	}
 	
-	public void setAuxiliaryVariable(boolean isAuxiliaryVariable) {
-		this.isAuxiliaryVariable = isAuxiliaryVariable;
+	public void setAuxiliaryVariable(boolean isAuxiliaryVar) {
+		this.isAuxiliaryVariable = isAuxiliaryVar;
 	}
 	
 	public boolean isAuxiliaryVariable() {

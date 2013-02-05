@@ -1,0 +1,1 @@
+(implies x#X (some x#r x#A))

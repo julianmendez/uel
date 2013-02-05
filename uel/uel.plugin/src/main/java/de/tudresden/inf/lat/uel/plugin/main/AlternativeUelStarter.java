@@ -152,7 +152,7 @@ public class AlternativeUelStarter {
 			String class1Id = getId((OWLClass) expressions.next());
 			String class2Id = getId((OWLClass) expressions.next());
 
-			goal.addGoalDisequation(class1Id, class1Id);
+			goal.addGoalDisequation(class1Id, class2Id);
 		}
 
 		// translate the variables to the IDs, and mark them as variables in the

@@ -177,41 +177,34 @@ public class SatProcessor implements UelProcessor {
 	}
 
 	private void addClausesForDissubsumptions(SatInput ret) {
-		for (Integer x : getVariables()) {
-			for (Integer d : getConstants()) {
-				addClausesForDissubsumptions(ret, d, x);
-			}
-			for (Integer d : getEAtoms()) {
-				addClausesForDissubsumptions(ret, d, x);
+		for (Integer c : getUsedAtomIds()) {
+			for (Integer x : getVariables()) {
+				Set<Integer> mainClause = new HashSet<Integer>();
+				mainClause.add(getMinusSubOrDissubLiteral(c, x));
+				for (Integer d : getConstants()) {
+					addClausesForDissubsumptions(ret, c, x, d, mainClause);
+				}
+				for (Integer d : getEAtoms()) {
+					addClausesForDissubsumptions(ret, c, x, d, mainClause);
+				}
+				ret.add(mainClause);
 			}
 		}
 	}
 
-	private void addClausesForDissubsumptions(SatInput ret, Integer d, Integer x) {
-		Set<Integer> mainClause = new HashSet<Integer>();
-		mainClause.add(getMinusSubOrDissubLiteral(d, x));
-		for (Integer e : getConstants()) {
-			addClausesForDissubsumptions(ret, d, x, e, mainClause);
-		}
-		for (Integer e : getEAtoms()) {
-			addClausesForDissubsumptions(ret, d, x, e, mainClause);
-		}
-		ret.add(mainClause);
-	}
-
-	private void addClausesForDissubsumptions(SatInput ret, Integer d,
-			Integer x, Integer e, Set<Integer> mainClause) {
-		Integer p = getAuxiliaryLiteral(d, x, e);
+	private void addClausesForDissubsumptions(SatInput ret, Integer c,
+			Integer x, Integer d, Set<Integer> mainClause) {
+		Integer p = getAuxiliaryLiteral(c, x, d);
 		mainClause.add(p);
 
 		Set<Integer> clause1 = new HashSet<Integer>();
 		clause1.add((-1) * p);
-		clause1.add(getMinusSubOrDissubLiteral(x, e));
+		clause1.add(getMinusSubOrDissubLiteral(x, d));
 		ret.add(clause1);
 
 		Set<Integer> clause2 = new HashSet<Integer>();
 		clause2.add((-1) * p);
-		clause2.add(getSubOrDissubLiteral(d, e));
+		clause2.add(getSubOrDissubLiteral(c, d));
 		ret.add(clause2);
 	}
 
@@ -223,15 +216,15 @@ public class SatProcessor implements UelProcessor {
 
 	private void addSmallSubsumptions(SatInput input) {
 		// TODO: remove?
-		for (Equation e : getEquations()) {
-			if (e.getRight().size() == 1) {
-				Set<Integer> clause = new HashSet<Integer>();
-				Integer subsumed = e.getRight().iterator().next();
-				Integer subsuming = e.getLeft();
-				clause.add(getMinusSubOrDissubLiteral(subsumed, subsuming));
-				input.add(clause);
-			}
-		}
+		// for (Equation e : getEquations()) {
+		// if (e.getRight().size() == 1) {
+		// Set<Integer> clause = new HashSet<Integer>();
+		// Integer subsumed = e.getRight().iterator().next();
+		// Integer subsuming = e.getLeft();
+		// clause.add(getMinusSubOrDissubLiteral(subsumed, subsuming));
+		// input.add(clause);
+		// }
+		// }
 	}
 
 	private boolean addToSetOfSubsumers(Integer atomId1, Integer atomId2) {
@@ -907,6 +900,14 @@ public class SatProcessor implements UelProcessor {
 
 				}
 
+			}
+
+			if (hasDisequations) {
+				// converse clause (as above) for trival subsumption
+				// between an existential restriction and itself
+				Set<Integer> clause = new HashSet<Integer>();
+				clause.add(getMinusSubOrDissubLiteral(atomId1, atomId1));
+				input.add(clause);
 			}
 
 		}

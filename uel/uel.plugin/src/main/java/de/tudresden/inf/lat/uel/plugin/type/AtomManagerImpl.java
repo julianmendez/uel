@@ -40,14 +40,14 @@ public class AtomManagerImpl implements AtomManager {
 		ConceptName ret;
 		if (this.conceptNames.contains(str)) {
 			Integer conceptId = this.conceptNames.getIndex(str);
-			Integer index = this.atoms.getIndex(new ConceptName(isVar,
-					conceptId));
+			Integer index = this.atoms.getIndex(new ConceptName(conceptId,
+					isVar));
 			ret = (ConceptName) this.atoms.get(index);
 		} else {
 			Integer conceptId = Math.max(this.atoms.getNextIndex(),
 					this.conceptNames.getNextIndex());
 			this.conceptNames.add(str, conceptId);
-			ret = new ConceptName(isVar, conceptId);
+			ret = new ConceptName(conceptId, isVar);
 			this.atoms.add(ret);
 		}
 		return ret;

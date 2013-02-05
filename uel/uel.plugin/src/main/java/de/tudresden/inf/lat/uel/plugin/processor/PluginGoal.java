@@ -341,7 +341,6 @@ public class PluginGoal {
 				conceptNameIds.add(childId);
 			}
 		}
-		usedAtomIds.addAll(conceptNameIds);
 
 		for (Integer atomId : conceptNameIds) {
 			Atom atom = getAtomManager().getAtoms().get(atomId);

@@ -2,18 +2,18 @@ package de.tudresden.inf.lat.uel.sat.type;
 
 public class AuxiliaryLiteral implements Literal {
 
-	private Integer d, x, e;
+	private Integer c, x, d;
 	private int hashCode = 0;
 
-	public AuxiliaryLiteral(Integer d, Integer x, Integer e) {
-		if ((d == null) || (x == null) || (e == null)) {
+	public AuxiliaryLiteral(Integer c, Integer x, Integer d) {
+		if ((c == null) || (x == null) || (d == null)) {
 			throw new IllegalArgumentException("Null argument.");
 		}
 
-		this.d = d;
+		this.c = c;
 		this.x = x;
-		this.e = e;
-		hashCode = d.hashCode() + 31 * x.hashCode() + 31 * 31 * e.hashCode();
+		this.d = d;
+		hashCode = c.hashCode() + 31 * x.hashCode() + 31 * 31 * d.hashCode();
 	}
 
 	@Override
@@ -21,20 +21,20 @@ public class AuxiliaryLiteral implements Literal {
 		boolean ret = (this == o);
 		if (!ret && o instanceof AuxiliaryLiteral) {
 			AuxiliaryLiteral other = (AuxiliaryLiteral) o;
-			ret = this.d.equals(other.d) && this.x.equals(other.x)
-					&& this.e.equals(other.e);
+			ret = this.c.equals(other.c) && this.x.equals(other.x)
+					&& this.d.equals(other.d);
 		}
 		return ret;
 	}
 
 	@Override
 	public Integer getFirst() {
-		return d;
+		return c;
 	}
 
 	@Override
 	public Integer getSecond() {
-		return e;
+		return d;
 	}
 
 	@Override
@@ -65,11 +65,11 @@ public class AuxiliaryLiteral implements Literal {
 	@Override
 	public String toString() {
 		StringBuilder sbuf = new StringBuilder("(p_{");
+		sbuf.append(c);
+		sbuf.append(", ");
 		sbuf.append(x);
 		sbuf.append(", ");
 		sbuf.append(d);
-		sbuf.append(", ");
-		sbuf.append(e);
 		sbuf.append("})");
 		return sbuf.toString();
 	}
