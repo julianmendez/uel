@@ -13,7 +13,7 @@
 	<dependencies>
 
 		<dependency>
-			<groupId>owlapi</groupId>
+			<groupId>net.sourceforge.owlapi</groupId>
 			<artifactId>owlapi</artifactId>
 			<version>3.4.2</version>
 		</dependency>
