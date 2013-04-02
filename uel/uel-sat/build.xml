@@ -28,6 +28,12 @@
 	-->
 
 	<property name="parent.directory" value="../uel-build" />
+	<property name="project.build.directory" value="${basedir}/target" />
+
+	<!-- Cleans compiled files. -->
+	<target name="clean">
+		<delete dir="${project.build.directory}" />
+	</target>
 
 	<!-- Compiles this module. -->
 	<target name="dist">
