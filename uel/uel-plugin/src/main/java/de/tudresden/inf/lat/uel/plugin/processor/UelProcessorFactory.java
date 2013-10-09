@@ -20,6 +20,7 @@ public class UelProcessorFactory {
 	public static final String RULE_BASED_ALGORITHM = "Rule-based algorithm";
 	public static final String SAT_BASED_ALGORITHM = "SAT-based algorithm";
 	public static final String SAT_BASED_ALGORITHM_MINIMAL = "SAT-based algorithm (minimal assignments)";
+	public static final String ASP_BASED_ALGORITHM = "ASP-based algorithm";
 
 	/**
 	 * Creates a processor with a given UEL input.
@@ -38,6 +39,8 @@ public class UelProcessorFactory {
 			ret = new SatProcessor(input, true, false);
 		} else if (name.equals(SAT_BASED_ALGORITHM_MINIMAL)) {
 			ret = new SatProcessor(input, true, true);
+		} else if (name.equals(ASP_BASED_ALGORITHM)) {
+			ret = new AspProcessor(input);
 		} else {
 			throw new IllegalArgumentException("Unknown processor : '" + name
 					+ "'.");
@@ -55,6 +58,7 @@ public class UelProcessorFactory {
 		ret.add(SAT_BASED_ALGORITHM);
 		ret.add(SAT_BASED_ALGORITHM_MINIMAL);
 		ret.add(RULE_BASED_ALGORITHM);
+		ret.add(ASP_BASED_ALGORITHM);
 		return Collections.unmodifiableCollection(ret);
 	}
 

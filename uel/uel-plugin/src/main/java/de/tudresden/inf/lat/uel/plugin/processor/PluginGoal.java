@@ -6,7 +6,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import de.tudresden.inf.lat.uel.plugin.type.AtomManager;
-import de.tudresden.inf.lat.uel.sat.type.SubsumptionLiteral;
 import de.tudresden.inf.lat.uel.type.api.Atom;
 import de.tudresden.inf.lat.uel.type.api.Equation;
 import de.tudresden.inf.lat.uel.type.api.SmallEquation;
@@ -292,6 +291,7 @@ public class PluginGoal {
 	public String printDefinitions() {
 		return toString(getAtomManager(), this.definitions);
 	}
+
 
 	private Equation processPrimitiveDefinition(Equation e) {
 		Atom leftAtom = getAtomManager().getAtoms().get(e.getLeft());
