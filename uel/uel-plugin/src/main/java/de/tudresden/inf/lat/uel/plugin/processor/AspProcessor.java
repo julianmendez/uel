@@ -2,110 +2,100 @@ package de.tudresden.inf.lat.uel.plugin.processor;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
 import de.tudresden.inf.lat.uel.type.api.Atom;
 import de.tudresden.inf.lat.uel.type.api.Equation;
-import de.tudresden.inf.lat.uel.type.api.IndexedSet;
 import de.tudresden.inf.lat.uel.type.api.UelInput;
 import de.tudresden.inf.lat.uel.type.api.UelOutput;
 import de.tudresden.inf.lat.uel.type.api.UelProcessor;
-import de.tudresden.inf.lat.uel.type.impl.ExistentialRestriction;
+import de.tudresden.inf.lat.uel.type.impl.ConceptName;
+import de.tudresden.inf.lat.uel.type.impl.EquationImpl;
+import de.tudresden.inf.lat.uel.type.impl.UelOutputImpl;
 
 public class AspProcessor implements UelProcessor {
 
-	private Set<Equation> equations;
-	private IndexedSet<Atom> atomManager;
-	private Set<Integer> userVariables;
+	private UelInput uelInput;
+	private AspInput aspInput;
+	private AspOutput aspOutput;
+	private boolean computed;
+	private int currentUnifierIndex;
 
 	public AspProcessor(UelInput input) {
-		equations = input.getEquations();
-		atomManager = input.getAtomManager();
-		userVariables = input.getUserVariables();
+		this.uelInput = input;
+		this.aspInput = new AspInput(input.getEquations(),
+				input.getAtomManager(), input.getUserVariables());
+		this.computed = false;
+		this.currentUnifierIndex = -1;
 	}
 
 	@Override
 	public boolean computeNextUnifier() {
-		// TODO Auto-generated method stub
-		return false;
+		if (!computed) {
+			AspSolver solver = new ClaspSolver();
+			aspOutput = solver.solve(aspInput);
+			currentUnifierIndex = 0;
+			computed = true;
+			return aspOutput.isSatisfiable();
+		} else {
+			currentUnifierIndex++;
+			return currentUnifierIndex < aspOutput.getAssignments().size();
+		}
 	}
 
 	@Override
 	public List<Entry<String, String>> getInfo() {
-		StringBuilder encoding = new StringBuilder();
-
-		int i = 1;
-		for (Equation eq : equations) {
-			encodeEquation(encoding, eq, i);
-			i++;
-		}
-		for (Integer var : userVariables) {
-			encoding.append("relevant(x");
-			encoding.append(var);
-			encoding.append(").\n");
-		}
-
 		Entry<String, String> e = new AbstractMap.SimpleEntry<String, String>(
-				"ASP encoding", encoding.toString());
+				"ASP encoding", aspInput.getProgram());
 		List<Entry<String, String>> res = new ArrayList<Entry<String, String>>();
 		res.add(e);
 		return res;
 	}
 
-	private void encodeEquation(StringBuilder encoding, Equation eq, int index) {
-		encoding.append("%equation ");
-		encoding.append(index);
-		encoding.append("\n");
-		// lhs
-		encodeAtom(encoding, eq.getLeft(), 0, index);
-		// rhs
-		for (Integer at : eq.getRight()) {
-			encodeAtom(encoding, at, 1, index);
-		}
-		encoding.append("\n");
-	}
-
-	private void encodeAtom(StringBuilder encoding, Integer atomId, int side,
-			int equationId) {
-		encoding.append("hasatom(");
-		encodeAtom(encoding, atomManager.get(atomId));
-		encoding.append(", ");
-		encoding.append(side);
-		encoding.append(", ");
-		encoding.append(equationId);
-		encoding.append(").\n");
-	}
-
-	private void encodeAtom(StringBuilder encoding, Atom atom) {
-		if (atom.isExistentialRestriction()) {
-			ExistentialRestriction ex = (ExistentialRestriction) atom;
-			encoding.append("exists(r");
-			encoding.append(ex.getRoleId());
-			encoding.append(", ");
-			encodeAtom(encoding, ex.getChild());
-		} else {
-			if (atom.isVariable()) {
-				encoding.append("var(x");
-			} else {
-				encoding.append("cname(a");
-			}
-			encoding.append(atom.getConceptNameId());
-		}
-		encoding.append(")");
-	}
-
 	@Override
 	public UelInput getInput() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.uelInput;
 	}
 
 	@Override
 	public UelOutput getUnifier() {
-		// TODO Auto-generated method stub
-		return null;
+		if (aspOutput == null) {
+			throw new IllegalStateException(
+					"The unifiers have not been computed yet.");
+		}
+		if (!aspOutput.isSatisfiable()) {
+			throw new IllegalStateException("There are no unifiers.");
+		}
+		if (currentUnifierIndex >= aspOutput.getAssignments().size()) {
+			throw new IllegalStateException("There are no more unifiers.");
+		}
+
+		Map<Integer, Set<Integer>> assignment = aspOutput.getAssignments().get(
+				currentUnifierIndex);
+		return new UelOutputImpl(uelInput.getAtomManager(),
+				toUnifier(assignment));
 	}
 
+	private Set<Equation> toUnifier(Map<Integer, Set<Integer>> assignment) {
+		Set<Equation> equations = new HashSet<Equation>();
+		for (Atom at : uelInput.getAtomManager()) {
+			if (at.isConceptName()) {
+				ConceptName name = (ConceptName) at;
+				if (name.isVariable()) {
+					Integer nameId = name.getConceptNameId();
+					Set<Integer> body = assignment.get(nameId);
+					if (body == null) {
+						body = Collections.emptySet();
+					}
+					equations.add(new EquationImpl(nameId, body, false));
+				}
+			}
+		}
+		return equations;
+	}
 }
