@@ -1,5 +1,6 @@
 package de.tudresden.inf.lat.uel.plugin.processor;
 
+import java.io.IOException;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -38,7 +39,11 @@ public class AspProcessor implements UelProcessor {
 	public boolean computeNextUnifier() {
 		if (!computed) {
 			AspSolver solver = new ClaspSolver();
-			aspOutput = solver.solve(aspInput);
+			try {
+				aspOutput = solver.solve(aspInput);
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
 			currentUnifierIndex = 0;
 			computed = true;
 			return aspOutput.isSatisfiable();

@@ -11,5 +11,7 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/uel-type"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/uel-rule"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/uel-sat"/>
+	<classpathentry kind="lib" path="/uel-build/jars/lib/org/codehaus/jackson/jackson-core-asl/1.9.13/jackson-core-asl-1.9.13.jar"/>
+	<classpathentry kind="lib" path="/uel-build/jars/lib/org/codehaus/jackson/jackson-mapper-asl/1.9.13/jackson-mapper-asl-1.9.13.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

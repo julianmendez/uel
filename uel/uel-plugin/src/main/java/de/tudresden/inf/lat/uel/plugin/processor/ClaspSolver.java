@@ -1,5 +1,7 @@
 package de.tudresden.inf.lat.uel.plugin.processor;
 
+import java.io.IOException;
+
 /**
  * @author Stefan Borgwardt
  * 
@@ -14,7 +16,7 @@ public class ClaspSolver implements AspSolver {
 	}
 
 	@Override
-	public AspOutput solve(AspInput input) {
+	public AspOutput solve(AspInput input) throws IOException {
 		// TODO: call gringo and clasp
 		// call gringo with unification.lp and input.getProgram() as input files
 		// pipe the output to clasp
