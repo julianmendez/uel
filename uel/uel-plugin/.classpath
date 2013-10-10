@@ -7,7 +7,7 @@
 	<classpathentry kind="lib" path="/uel-build/jars/lib/org/protege/protege-editor-owl/4.1/protege-editor-owl-4.1.jar"/>
 	<classpathentry kind="lib" path="/uel-build/jars/lib/org/protege/protege-editor-core-application/4.1/protege-editor-core-application-4.1.jar"/>
 	<classpathentry kind="lib" path="/uel-build/jars/lib/junit/junit/4.10/junit-4.10.jar" sourcepath="/uel-build/jars/lib/junit/junit/4.10/junit-4.10-sources.jar"/>
-	<classpathentry kind="lib" path="/uel-build/jars/lib/de/tudresden/inf/lat/jcel/jcel/0.18.2/jcel-0.18.2.jar"/>
+	<classpathentry kind="lib" path="/uel-build/jars/lib/de/tudresden/inf/lat/jcel/jcel/0.19.1/jcel-0.19.1.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/uel-type"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/uel-rule"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/uel-sat"/>
