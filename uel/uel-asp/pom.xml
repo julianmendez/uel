@@ -13,7 +13,7 @@
 
 	<groupId>uel</groupId>
 	<artifactId>uel-asp</artifactId>
-	<version>1.2.0</version>
+	<version>1.3.0</version>
 	<packaging>jar</packaging>
 
 	<name>uel asp</name>
@@ -43,7 +43,7 @@
 		<dependency>
 			<groupId>uel</groupId>
 			<artifactId>uel-type</artifactId>
-			<version>1.2.0</version>
+			<version>1.3.0</version>
 		</dependency>
 
 		</dependency>
