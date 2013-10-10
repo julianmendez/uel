@@ -125,6 +125,11 @@ public class ProcessorTest extends TestCase {
 				UelProcessorFactory.SAT_BASED_ALGORITHM_MINIMAL);
 	}
 
+	public void test01ASP() throws OWLOntologyCreationException, IOException {
+		tryOntology(ontology01, set("A1", "A4"), 1,
+				UelProcessorFactory.ASP_BASED_ALGORITHM);
+	}
+
 	public void test02Rule() throws OWLOntologyCreationException, IOException {
 		tryOntology(ontology02, set("A1", "A4"), 1,
 				UelProcessorFactory.RULE_BASED_ALGORITHM);
@@ -236,6 +241,11 @@ public class ProcessorTest extends TestCase {
 			IOException {
 		tryOntology(ontology08, set("A1", "A2", "A4"), 2,
 				UelProcessorFactory.SAT_BASED_ALGORITHM_MINIMAL);
+	}
+
+	public void test08ASP() throws OWLOntologyCreationException, IOException {
+		tryOntology(ontology08, set("A1", "A2", "A4"), 2,
+				UelProcessorFactory.ASP_BASED_ALGORITHM);
 	}
 
 	public void test09Rule() throws OWLOntologyCreationException, IOException {
@@ -441,9 +451,9 @@ public class ProcessorTest extends TestCase {
 
 		for (Set<Equation> unifier : unifiers) {
 			String extendedOntology = goalStr + renderer.printUnifier(unifier);
-//			System.out.println();
-//			System.out.println("---");
-//			System.out.println(extendedOntology);
+			// System.out.println();
+			// System.out.println("---");
+			// System.out.println(extendedOntology);
 
 			OWLReasoner reasoner = createReasoner(extendedOntology);
 			Node<OWLClass> node = reasoner.getEquivalentClasses(idClassMap

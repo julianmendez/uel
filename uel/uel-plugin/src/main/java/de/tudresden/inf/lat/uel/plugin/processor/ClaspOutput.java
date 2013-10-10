@@ -36,6 +36,7 @@ public class ClaspOutput implements AspOutput {
 	public ClaspOutput(String json, IndexedSet<Atom> atomManager)
 			throws IOException {
 		this.atomManager = atomManager;
+		System.out.println(json);
 		parse(json);
 	}
 
