@@ -1,0 +1,64 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+
+	<!--
+ *
+ * @author Julian Mendez
+ *
+-->
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>uel</groupId>
+	<artifactId>uel-asp</artifactId>
+	<version>1.2.0</version>
+	<packaging>jar</packaging>
+
+	<name>uel asp</name>
+
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+
+
+	<licenses>
+
+		<license>
+			<name>GNU Lesser General Public License version 3</name>
+			<url>http://www.gnu.org/licenses/lgpl.txt</url>
+		</license>
+
+		<license>
+			<name>Apache License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+		</license>
+
+	</licenses>
+
+	<dependencies>
+
+		<dependency>
+			<groupId>uel</groupId>
+			<artifactId>uel-type</artifactId>
+			<version>1.2.0</version>
+		</dependency>
+
+		</dependency>
+
+	</dependencies>
+
+	<repositories>
+
+		<repository>
+			<id>localrepo</id>
+			<name>local maven repository</name>
+			<url>file:../uel-build/jars/lib</url>
+		</repository>
+
+	</repositories>
+
+</project>
+
