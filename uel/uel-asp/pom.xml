@@ -12,16 +12,17 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>uel</groupId>
-	<artifactId>uel-type</artifactId>
+	<artifactId>uel-asp</artifactId>
 	<version>1.3.0</version>
 	<packaging>jar</packaging>
 
-	<name>uel type</name>
+	<name>uel asp</name>
 
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
+
 
 	<licenses>
 
@@ -36,6 +37,28 @@
 		</license>
 
 	</licenses>
+
+	<dependencies>
+
+		<dependency>
+			<groupId>uel</groupId>
+			<artifactId>uel-type</artifactId>
+			<version>1.3.0</version>
+		</dependency>
+
+		</dependency>
+
+	</dependencies>
+
+	<repositories>
+
+		<repository>
+			<id>localrepo</id>
+			<name>local maven repository</name>
+			<url>file:../uel-build/jars/lib</url>
+		</repository>
+
+	</repositories>
 
 </project>
 
