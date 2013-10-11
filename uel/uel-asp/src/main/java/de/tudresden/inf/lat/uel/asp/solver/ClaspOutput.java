@@ -1,4 +1,4 @@
-package de.tudresden.inf.lat.uel.plugin.processor;
+package de.tudresden.inf.lat.uel.asp.solver;
 
 import java.io.IOException;
 import java.util.AbstractMap;
@@ -36,7 +36,7 @@ public class ClaspOutput implements AspOutput {
 	public ClaspOutput(String json, IndexedSet<Atom> atomManager)
 			throws IOException {
 		this.atomManager = atomManager;
-		System.out.println(json);
+		// System.out.println(json);
 		parse(json);
 	}
 

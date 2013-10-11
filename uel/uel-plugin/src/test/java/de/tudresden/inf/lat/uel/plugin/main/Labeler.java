@@ -92,6 +92,7 @@ public class Labeler {
 				}
 			}
 		}
+		reader.close();
 		return ret;
 	}
 
@@ -111,6 +112,8 @@ public class Labeler {
 			}
 		}
 		writer.flush();
+		reader.close();
+		writer.close();
 	}
 
 	private String toXMLEncoding(String input) {

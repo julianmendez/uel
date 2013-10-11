@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import de.tudresden.inf.lat.uel.asp.solver.AspProcessor;
 import de.tudresden.inf.lat.uel.rule.RuleProcessor;
 import de.tudresden.inf.lat.uel.sat.solver.SatProcessor;
 import de.tudresden.inf.lat.uel.type.api.UelInput;

@@ -125,10 +125,10 @@ public class ProcessorTest extends TestCase {
 				UelProcessorFactory.SAT_BASED_ALGORITHM_MINIMAL);
 	}
 
-	public void test01ASP() throws OWLOntologyCreationException, IOException {
-		tryOntology(ontology01, set("A1", "A4"), 1,
-				UelProcessorFactory.ASP_BASED_ALGORITHM);
-	}
+//	public void test01ASP() throws OWLOntologyCreationException, IOException {
+//		tryOntology(ontology01, set("A1", "A4"), 1,
+//				UelProcessorFactory.ASP_BASED_ALGORITHM);
+//	}
 
 	public void test02Rule() throws OWLOntologyCreationException, IOException {
 		tryOntology(ontology02, set("A1", "A4"), 1,
@@ -243,10 +243,10 @@ public class ProcessorTest extends TestCase {
 				UelProcessorFactory.SAT_BASED_ALGORITHM_MINIMAL);
 	}
 
-	public void test08ASP() throws OWLOntologyCreationException, IOException {
-		tryOntology(ontology08, set("A1", "A2", "A4"), 2,
-				UelProcessorFactory.ASP_BASED_ALGORITHM);
-	}
+//	public void test08ASP() throws OWLOntologyCreationException, IOException {
+//		tryOntology(ontology08, set("A1", "A2", "A4"), 2,
+//				UelProcessorFactory.ASP_BASED_ALGORITHM);
+//	}
 
 	public void test09Rule() throws OWLOntologyCreationException, IOException {
 		tryOntology(ontology09, set("A1", "A2"), 0,

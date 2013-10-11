@@ -1,4 +1,4 @@
-package de.tudresden.inf.lat.uel.plugin.processor;
+package de.tudresden.inf.lat.uel.asp.solver;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -21,7 +21,7 @@ public class ClaspSolver implements AspSolver {
 
 	private static String GRINGO_COMMAND = "gringo";
 	// TODO: fix path
-	private static String UNIFICATION_PROGRAM = "unification.lp";
+	private static String UNIFICATION_PROGRAM = "../uel-asp/src/main/resources/unification.lp";
 	private static String CLASP_COMMAND = "clasp 0 -t 4 --outf=2";
 
 	public ClaspSolver() {
@@ -51,9 +51,9 @@ public class ClaspSolver implements AspSolver {
 			pipe(pGringo.getInputStream(), pClasp.getOutputStream());
 			pClasp.getOutputStream().close();
 
-			ByteArrayOutputStream error = new ByteArrayOutputStream();
-			pipe(pGringo.getErrorStream(), error);
-			System.out.println(error.toString());
+			// ByteArrayOutputStream error = new ByteArrayOutputStream();
+			// pipe(pGringo.getErrorStream(), error);
+			// System.out.println(error.toString());
 
 			pGringo.destroy();
 			pClasp.waitFor();
@@ -62,9 +62,9 @@ public class ClaspSolver implements AspSolver {
 			ByteArrayOutputStream output = new ByteArrayOutputStream();
 			pipe(pClasp.getInputStream(), output);
 
-			error = new ByteArrayOutputStream();
-			pipe(pClasp.getErrorStream(), error);
-			System.out.println(error.toString());
+			// error = new ByteArrayOutputStream();
+			// pipe(pClasp.getErrorStream(), error);
+			// System.out.println(error.toString());
 
 			pClasp.destroy();
 			return new ClaspOutput(output.toString(), input.getAtomManager());

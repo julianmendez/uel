@@ -40,8 +40,7 @@ public class OntologyRenderer {
 	public String renderKRSS(OWLOntology owlOntology)
 			throws OWLRendererException {
 		StringWriter writer = new StringWriter();
-		KRSS2OWLSyntaxRenderer renderer = new KRSS2OWLSyntaxRenderer(
-				owlOntology.getOWLOntologyManager());
+		KRSS2OWLSyntaxRenderer renderer = new KRSS2OWLSyntaxRenderer();
 		renderer.render(owlOntology, writer);
 		writer.flush();
 		return writer.toString();
@@ -50,8 +49,7 @@ public class OntologyRenderer {
 	public String renderOWL(OWLOntology owlOntology)
 			throws OWLRendererException {
 		StringWriter writer = new StringWriter();
-		OWLXMLRenderer renderer = new OWLXMLRenderer(
-				owlOntology.getOWLOntologyManager());
+		OWLXMLRenderer renderer = new OWLXMLRenderer();
 		renderer.render(owlOntology, writer);
 		writer.flush();
 		return writer.toString();
@@ -59,8 +57,7 @@ public class OntologyRenderer {
 
 	public String renderRDF(OWLOntology owlOntology) throws IOException {
 		StringWriter writer = new StringWriter();
-		RDFXMLRenderer renderer = new RDFXMLRenderer(
-				owlOntology.getOWLOntologyManager(), owlOntology, writer);
+		RDFXMLRenderer renderer = new RDFXMLRenderer(owlOntology, writer);
 		renderer.render();
 		writer.flush();
 		return writer.toString();

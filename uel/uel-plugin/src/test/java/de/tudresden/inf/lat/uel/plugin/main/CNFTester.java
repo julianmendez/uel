@@ -69,6 +69,7 @@ public class CNFTester {
 
 		if ((line.length != 4) || !line[0].equals("p")
 				|| !line[1].equals("cnf")) {
+			reader.close();
 			throw new IOException("Input file is not in DIMACS CNF format!");
 		}
 
@@ -110,6 +111,7 @@ public class CNFTester {
 		for (int clause = 1; clause <= numClauses; clause++) {
 			line = reader.readLine().split(SPACES);
 			if ((line.length == 0) || !line[line.length - 1].equals("0")) {
+				reader.close();
 				throw new IOException("Input file is not in DIMACS CNF format!");
 			}
 
@@ -118,6 +120,7 @@ public class CNFTester {
 			for (int litIdx = 0; litIdx < line.length - 1; litIdx++) {
 				int literal = Integer.parseInt(line[litIdx]);
 				if (literal == 0) {
+					reader.close();
 					throw new IOException(
 							"Input file is not in DIMACS CNF format!");
 				}
@@ -135,6 +138,7 @@ public class CNFTester {
 			// encode the clause
 			equations.add(new EquationImpl(vId, set(literals), false));
 		}
+		reader.close();
 
 		System.out.println("equations: " + equations.size());
 		input = new UelInputImpl(atomManager.getAtoms(),

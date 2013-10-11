@@ -4,10 +4,8 @@ import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
 
 import junit.framework.TestCase;
@@ -20,9 +18,7 @@ import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
-import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
-import org.semanticweb.owlapi.reasoner.Node;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 
 import de.tudresden.inf.lat.jcel.owlapi.main.JcelReasoner;
@@ -30,7 +26,6 @@ import de.tudresden.inf.lat.uel.plugin.processor.PluginGoal;
 import de.tudresden.inf.lat.uel.plugin.type.AtomManager;
 import de.tudresden.inf.lat.uel.plugin.type.OWLUelClassDefinition;
 import de.tudresden.inf.lat.uel.type.api.Equation;
-import de.uulm.ecs.ai.owlapi.krssparser.KRSS2OntologyFormat;
 
 public class AlternativeUelStarterTest extends TestCase {
 
@@ -99,7 +94,7 @@ public class AlternativeUelStarterTest extends TestCase {
 			Integer expectedNumberOfUnifiers)
 			throws OWLOntologyCreationException, IOException {
 
-		Map<String, OWLClass> idClassMap = new HashMap<String, OWLClass>();
+//		Map<String, OWLClass> idClassMap = new HashMap<String, OWLClass>();
 
 		OWLOntologyManager ontologyManager = OWLManager
 				.createOWLOntologyManager();
