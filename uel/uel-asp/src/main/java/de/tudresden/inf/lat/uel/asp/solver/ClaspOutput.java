@@ -27,6 +27,7 @@ import de.tudresden.inf.lat.uel.type.impl.ExistentialRestriction;
 public class ClaspOutput implements AspOutput {
 
 	private static String SATISFIABLE = "SATISFIABLE";
+	private static String OPTIMUM_FOUND = "OPTIMUM FOUND";
 
 	private IndexedSet<Atom> atomManager;
 	private List<Map<Integer, Set<Integer>>> assignments;
@@ -48,7 +49,9 @@ public class ClaspOutput implements AspOutput {
 		JsonNode root = mapper.readValue(json, JsonNode.class);
 
 		// Result -> satisfiable
-		satisfiable = root.get("Result").asText().equals(SATISFIABLE);
+		String result = root.get("Result").asText();
+		satisfiable = result.equals(SATISFIABLE)
+				|| result.equals(OPTIMUM_FOUND);
 		if (satisfiable) {
 			// Witnesses -> assignments (using atomManager)
 			assignments = new ArrayList<Map<Integer, Set<Integer>>>();

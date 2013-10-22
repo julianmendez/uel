@@ -22,7 +22,7 @@ public class ClaspSolver implements AspSolver {
 	private static String GRINGO_COMMAND = "gringo";
 	// TODO: fix path
 	private static String UNIFICATION_PROGRAM = "../uel-asp/src/main/resources/unification.lp";
-	private static String CLASP_COMMAND = "clasp 0 -t 4 --outf=2";
+	private static String CLASP_COMMAND = "clasp 0 --outf=2";
 
 	public ClaspSolver() {
 	}
@@ -44,27 +44,29 @@ public class ClaspSolver implements AspSolver {
 			pipe(new FileInputStream(unificationProgram), gringoInput);
 			pipe(new ByteArrayInputStream(input.getProgram().getBytes()),
 					gringoInput);
+			// System.out.println(input.getProgram());
 			gringoInput.close();
-			pGringo.waitFor();
+			if (pGringo.waitFor() != 0) {
+				ByteArrayOutputStream error = new ByteArrayOutputStream();
+				pipe(pGringo.getErrorStream(), error);
+				throw new IOException("gringo error:\n" + error.toString());
+			}
 
 			// pipe the output to clasp
 			pipe(pGringo.getInputStream(), pClasp.getOutputStream());
 			pClasp.getOutputStream().close();
 
-			// ByteArrayOutputStream error = new ByteArrayOutputStream();
-			// pipe(pGringo.getErrorStream(), error);
-			// System.out.println(error.toString());
-
 			pGringo.destroy();
-			pClasp.waitFor();
+			int claspReturnCode = pClasp.waitFor();
+			if ((claspReturnCode) != 20 && (claspReturnCode != 30)) {
+				ByteArrayOutputStream error = new ByteArrayOutputStream();
+				pipe(pClasp.getErrorStream(), error);
+				throw new IOException("clasp error:\n" + error.toString());
+			}
 
 			// return the json output
 			ByteArrayOutputStream output = new ByteArrayOutputStream();
 			pipe(pClasp.getInputStream(), output);
-
-			// error = new ByteArrayOutputStream();
-			// pipe(pClasp.getErrorStream(), error);
-			// System.out.println(error.toString());
 
 			pClasp.destroy();
 			return new ClaspOutput(output.toString(), input.getAtomManager());
