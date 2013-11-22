@@ -54,13 +54,13 @@ public class UelProcessorFactory {
 	 * 
 	 * @return all the processors that this factory can construct
 	 */
-	public static Collection<String> getProcessorNames() {
+	public static List<String> getProcessorNames() {
 		List<String> ret = new ArrayList<String>();
 		ret.add(SAT_BASED_ALGORITHM);
 		ret.add(SAT_BASED_ALGORITHM_MINIMAL);
 		ret.add(RULE_BASED_ALGORITHM);
 		ret.add(ASP_BASED_ALGORITHM);
-		return Collections.unmodifiableCollection(ret);
+		return Collections.unmodifiableList(ret);
 	}
 
 }

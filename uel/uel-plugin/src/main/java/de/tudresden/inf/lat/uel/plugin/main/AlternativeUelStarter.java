@@ -1,11 +1,22 @@
 package de.tudresden.inf.lat.uel.plugin.main;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
+import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
@@ -37,6 +48,7 @@ public class AlternativeUelStarter {
 	private int classCounter = 0;
 	private Map<OWLClassExpression, OWLClass> mapOfAuxClassExpr = new HashMap<OWLClassExpression, OWLClass>();
 	private OWLOntology ontology;
+	private UelProcessor uelProcessor;
 
 	/**
 	 * Constructs a new UEL starter.
@@ -101,9 +113,124 @@ public class AlternativeUelStarter {
 		}
 	}
 
+	public static void main(String[] args) {
+		int argIdx = 0;
+		String mainFilename = "";
+		String subsFilename = "";
+		String dissubsFilename = "";
+		String varFilename = "";
+		int processorIdx = 0;
+		while (argIdx < args.length) {
+			switch (args[argIdx]) {
+			case "-s":
+				argIdx++;
+				subsFilename = args[argIdx];
+				break;
+			case "-d":
+				argIdx++;
+				dissubsFilename = args[argIdx];
+				break;
+			case "-v":
+				argIdx++;
+				varFilename = args[argIdx];
+				break;
+			case "-p":
+				argIdx++;
+				processorIdx = Integer.parseInt(args[argIdx]) - 1;
+				break;
+			case "-h":
+				printSyntax();
+				return;
+			default:
+				mainFilename = args[argIdx];
+				break;
+			}
+			argIdx++;
+		}
+
+		AlternativeUelStarter starter = new AlternativeUelStarter(
+				loadOntology(mainFilename));
+		Set<OWLSubClassOfAxiom> subsumptions = loadOntology(subsFilename)
+				.getAxioms(AxiomType.SUBCLASS_OF, false);
+		Set<OWLSubClassOfAxiom> dissubsumptions = loadOntology(dissubsFilename)
+				.getAxioms(AxiomType.SUBCLASS_OF, false);
+		Set<OWLClass> variables = loadVariables(varFilename);
+		String processorName = UelProcessorFactory.getProcessorNames().get(
+				processorIdx);
+
+		Iterator<Set<OWLUelClassDefinition>> result = starter
+				.modifyOntologyAndSolve(subsumptions, dissubsumptions,
+						variables, processorName);
+		int unifierIdx = 1;
+		while (result.hasNext()) {
+			System.out.println("Unifier " + unifierIdx + ":");
+			Set<OWLUelClassDefinition> unifier = result.next();
+			for (OWLUelClassDefinition def : unifier) {
+				System.out
+						.println(def.asOWLEquivalentClassesAxiom().toString());
+			}
+			System.out.println();
+			unifierIdx++;
+		}
+
+		System.out.println("Stats:");
+		for (Entry<String, String> entry : starter.getStats()) {
+			System.out.println(entry.getKey() + ":");
+			System.out.println(entry.getValue());
+		}
+	}
+
+	private static void printSyntax() {
+		System.out
+				.println("Usage: uel [-s subsumptions.owl] [-d dissubsumptions.owl] [-v variables.txt] [-p processorIndex] [-h] [ontology.owl]");
+	}
+
+	private static Set<OWLClass> loadVariables(String filename) {
+		if (filename.isEmpty()) {
+			return Collections.emptySet();
+		}
+		try {
+			OWLDataFactory factory = OWLManager.createOWLOntologyManager()
+					.getOWLDataFactory();
+			BufferedReader input = new BufferedReader(new FileReader(new File(
+					filename)));
+			Set<OWLClass> variables = new HashSet<OWLClass>();
+			String line = "";
+			while (line != null) {
+				line = input.readLine();
+				if (line != null) {
+					variables.add(factory.getOWLClass(IRI.create(line)));
+				}
+			}
+			return variables;
+		} catch (IOException ex) {
+			ex.printStackTrace();
+			System.exit(-1);
+			return null;
+		}
+	}
+
+	private static OWLOntology loadOntology(String filename) {
+		try {
+			OWLOntologyManager ontologyManager = OWLManager
+					.createOWLOntologyManager();
+			if (filename.isEmpty()) {
+				return ontologyManager.createOntology();
+			}
+			InputStream input = new FileInputStream(new File(filename));
+			ontologyManager.loadOntologyFromOntologyDocument(input);
+			return ontologyManager.getOntologies().iterator().next();
+		} catch (IOException | OWLOntologyCreationException ex) {
+			ex.printStackTrace();
+			System.exit(-1);
+			return null;
+		}
+	}
+
 	public Iterator<Set<OWLUelClassDefinition>> modifyOntologyAndSolve(
 			Set<OWLSubClassOfAxiom> subsumptions,
-			Set<OWLSubClassOfAxiom> dissubsumptions, Set<OWLClass> variables) {
+			Set<OWLSubClassOfAxiom> dissubsumptions, Set<OWLClass> variables,
+			String processorName) {
 
 		// add two definitions for each subsumption to the ontology
 		for (OWLSubClassOfAxiom subsumption : subsumptions) {
@@ -142,6 +269,8 @@ public class AlternativeUelStarter {
 			String superClassId = getId(findAuxiliaryDefinition(subsumption
 					.getSuperClass()));
 
+			// System.out.println(subClassId + " subsumed by " + superClassId);
+
 			goal.addGoalSubsumption(subClassId, superClassId);
 		}
 
@@ -151,6 +280,8 @@ public class AlternativeUelStarter {
 					.getClassExpressions().iterator();
 			String class1Id = getId((OWLClass) expressions.next());
 			String class2Id = getId((OWLClass) expressions.next());
+
+			// System.out.println(class1Id + " not equivalent to " + class2Id);
 
 			goal.addGoalDisequation(class1Id, class2Id);
 		}
@@ -162,6 +293,7 @@ public class AlternativeUelStarter {
 			String name = getId(var);
 			ConceptName conceptName = atomManager.createConceptName(name, true);
 			Integer atomId = atomManager.getAtoms().addAndGetIndex(conceptName);
+			// System.out.println("user variable: " + name);
 			goal.makeUserVariable(atomId);
 		}
 
@@ -170,24 +302,28 @@ public class AlternativeUelStarter {
 			String name = getId(auxVar);
 			ConceptName conceptName = atomManager.createConceptName(name, true);
 			Integer atomId = atomManager.getAtoms().addAndGetIndex(conceptName);
+			// System.out.println("aux. variable: " + name);
 			goal.makeAuxiliaryVariable(atomId);
 		}
 
 		goal.updateUelInput();
+		// System.out.println("final number of equations: "
+		// + goal.getUelInput().getEquations().size());
 
 		// output unification problem for debugging
 		// print(goal.getUelInput().getEquations(), goal.getAtomManager(),
 		// goal.getUelInput().getUserVariables());
-
-		UelProcessor satProcessor = UelProcessorFactory.createProcessor(
-				UelProcessorFactory.SAT_BASED_ALGORITHM, goal.getUelInput());
-		// model.configureUelProcessor(satProcessor);
-		// satProcessor.getUnifier();
+		uelProcessor = UelProcessorFactory.createProcessor(processorName,
+				goal.getUelInput());
 
 		UnifierTranslator translator = new UnifierTranslator(ontology
 				.getOWLOntologyManager().getOWLDataFactory(), atomManager, goal
 				.getUelInput().getUserVariables(), goal.getAuxiliaryVariables());
-		return new UnifierIterator(satProcessor, translator);
+		return new UnifierIterator(uelProcessor, translator);
+	}
+
+	public List<Entry<String, String>> getStats() {
+		return uelProcessor.getInfo();
 	}
 
 	private void print(Integer atomId, AtomManager atomManager,
