@@ -11,6 +11,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.lang.ProcessBuilder.Redirect;
 import java.util.Arrays;
 
 /**
@@ -21,7 +22,7 @@ public class ClaspSolver implements AspSolver {
 
 	private static String GRINGO_COMMAND = "gringo";
 	// TODO: fix path
-	private static String UNIFICATION_PROGRAM = "../uel-asp/src/main/resources/unification.lp";
+	private static String UNIFICATION_PROGRAM = "/de/tudresden/inf/lat/uel/asp/solver/unification.lp";
 	private static String CLASP_COMMAND = "clasp 0 --outf=2";
 
 	public ClaspSolver() {
@@ -40,35 +41,37 @@ public class ClaspSolver implements AspSolver {
 
 			// pipe unification.lp and input.getProgram() as input
 			OutputStream gringoInput = pGringo.getOutputStream();
-			File unificationProgram = new File(UNIFICATION_PROGRAM);
-			pipe(new FileInputStream(unificationProgram), gringoInput);
+			InputStream unificationProgram = AspProcessor.class
+					.getResourceAsStream(UNIFICATION_PROGRAM);
+			pipe(unificationProgram, gringoInput);
 			pipe(new ByteArrayInputStream(input.getProgram().getBytes()),
 					gringoInput);
-			// System.out.println(input.getProgram());
+			System.out.println(input.getProgram());
 			gringoInput.close();
-			if (pGringo.waitFor() != 0) {
-				ByteArrayOutputStream error = new ByteArrayOutputStream();
-				pipe(pGringo.getErrorStream(), error);
-				throw new IOException("gringo error:\n" + error.toString());
-			}
 
 			// pipe the output to clasp
 			pipe(pGringo.getInputStream(), pClasp.getOutputStream());
 			pClasp.getOutputStream().close();
 
+			if (pGringo.waitFor() != 0) {
+				ByteArrayOutputStream error = new ByteArrayOutputStream();
+				pipe(pGringo.getErrorStream(), error);
+				throw new IOException("gringo error:\n" + error.toString());
+			}
 			pGringo.destroy();
+
+			// return the json output
+			ByteArrayOutputStream output = new ByteArrayOutputStream();
+			pipe(pClasp.getInputStream(), output);
+
 			int claspReturnCode = pClasp.waitFor();
 			if ((claspReturnCode) != 20 && (claspReturnCode != 30)) {
 				ByteArrayOutputStream error = new ByteArrayOutputStream();
 				pipe(pClasp.getErrorStream(), error);
 				throw new IOException("clasp error:\n" + error.toString());
 			}
-
-			// return the json output
-			ByteArrayOutputStream output = new ByteArrayOutputStream();
-			pipe(pClasp.getInputStream(), output);
-
 			pClasp.destroy();
+
 			return new ClaspOutput(output.toString(), input.getAtomManager());
 		} catch (InterruptedException e) {
 			throw new RuntimeException(e);
@@ -86,6 +89,7 @@ public class ClaspSolver implements AspSolver {
 		String line = "";
 		while (line != null) {
 			line = input.readLine();
+			// System.out.println(line);
 			if (line != null) {
 				output.write(line);
 				output.newLine();
