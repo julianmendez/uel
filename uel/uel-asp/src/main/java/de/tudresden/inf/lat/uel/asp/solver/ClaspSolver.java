@@ -46,7 +46,7 @@ public class ClaspSolver implements AspSolver {
 			pipe(unificationProgram, gringoInput);
 			pipe(new ByteArrayInputStream(input.getProgram().getBytes()),
 					gringoInput);
-			System.out.println(input.getProgram());
+			// System.out.println(input.getProgram());
 			gringoInput.close();
 
 			// pipe the output to clasp

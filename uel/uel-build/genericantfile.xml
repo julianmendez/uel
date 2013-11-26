@@ -102,7 +102,7 @@
 	</target>
 
 	<!-- Performs the unit tests. -->
-	<target name="test" depends="compiletests" if="testSourceDirectory.available">
+	<target name="test" depends="compiletests" if="testSourceDirectory.available" unless="skipTests">
 		<mkdir dir="${_test.report.directory}" />
 		<junit printsummary="on" haltonfailure="yes" fork="yes" dir="${basedir}">
 			<classpath>
