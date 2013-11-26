@@ -28,15 +28,15 @@ import de.tudresden.inf.lat.uel.type.impl.UelOutputImpl;
  * unification algorithm for EL.
  * 
  * This algorithm is described in: Franz Baader, Stefan Borgwardt, and Barbara
- * Morawska. 'Uniﬁcation in the description logic EL w.r.t. cycle-restricted
+ * Morawska. 'Unification in the description logic EL w.r.t. cycle-restricted
  * TBoxes'. LTCS-Report 11-05, Chair for Automata Theory, Institute for
- * Theoretical Computer Science, Technische Universität Dresden, Dresden,
+ * Theoretical Computer Science, Technische Universitaet Dresden, Dresden,
  * Germany, 2011. See http://lat.inf.tu-dresden.de/research/reports.html.
  * 
- * Based on the algorithm in: Franz Baader and Barbara Morawska. 'Uniﬁcation
+ * Based on the algorithm in: Franz Baader and Barbara Morawska. 'Unification
  * in the description logic EL'. Logical Methods in Computer Science, 6(3),
  * 2010. Special Issue: 20th Int. Conf. on Rewriting Techniques and Applications
- * (RTA’09).
+ * (RTA'09).
  * 
  * @author Stefan Borgwardt
  */

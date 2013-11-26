@@ -3,6 +3,7 @@ package de.tudresden.inf.lat.uel.plugin.main;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,6 +17,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.io.UnparsableOntologyException;
 import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAxiom;
@@ -136,7 +138,12 @@ public class AlternativeUelStarter {
 				break;
 			case "-p":
 				argIdx++;
-				processorIdx = Integer.parseInt(args[argIdx]) - 1;
+				try {
+					processorIdx = Integer.parseInt(args[argIdx]) - 1;
+				} catch (NumberFormatException e) {
+					System.err.println("Invalid processor index.");
+					return;
+				}
 				break;
 			case "-h":
 				printSyntax();
@@ -150,13 +157,24 @@ public class AlternativeUelStarter {
 
 		AlternativeUelStarter starter = new AlternativeUelStarter(
 				loadOntology(mainFilename));
-		Set<OWLSubClassOfAxiom> subsumptions = loadOntology(subsFilename)
-				.getAxioms(AxiomType.SUBCLASS_OF, false);
-		Set<OWLSubClassOfAxiom> dissubsumptions = loadOntology(dissubsFilename)
-				.getAxioms(AxiomType.SUBCLASS_OF, false);
+		OWLOntology subsumptions = loadOntology(subsFilename);
+		if (subsumptions == null) {
+			return;
+		}
+		OWLOntology dissubsumptions = loadOntology(dissubsFilename);
+		if (dissubsumptions == null) {
+			return;
+		}
 		Set<OWLClass> variables = loadVariables(varFilename);
-		String processorName = UelProcessorFactory.getProcessorNames().get(
-				processorIdx);
+		if (variables == null) {
+			return;
+		}
+		List<String> processorNames = UelProcessorFactory.getProcessorNames();
+		if ((processorIdx < 0) || (processorIdx >= processorNames.size())) {
+			System.err.println("Invalid processor index.");
+			return;
+		}
+		String processorName = processorNames.get(processorIdx);
 
 		Iterator<Set<OWLUelClassDefinition>> result = starter
 				.modifyOntologyAndSolve(subsumptions, dissubsumptions,
@@ -202,10 +220,15 @@ public class AlternativeUelStarter {
 					variables.add(factory.getOWLClass(IRI.create(line)));
 				}
 			}
+			input.close();
 			return variables;
-		} catch (IOException ex) {
-			ex.printStackTrace();
-			System.exit(-1);
+		} catch (FileNotFoundException e) {
+			System.err.println("Could not find file '" + filename + "'.");
+			return null;
+		} catch (IOException e) {
+			System.err.println("Unknown I/O error while reading file '"
+					+ filename + "'.");
+			System.err.println(e.getMessage());
 			return null;
 		}
 	}
@@ -220,11 +243,24 @@ public class AlternativeUelStarter {
 			InputStream input = new FileInputStream(new File(filename));
 			ontologyManager.loadOntologyFromOntologyDocument(input);
 			return ontologyManager.getOntologies().iterator().next();
-		} catch (IOException | OWLOntologyCreationException ex) {
-			ex.printStackTrace();
-			System.exit(-1);
+		} catch (FileNotFoundException e) {
+			System.err.println("Could not find file '" + filename + "'.");
+			return null;
+		} catch (OWLOntologyCreationException e) {
+			System.err.println("Could not create ontology from file '"
+					+ filename + "'.");
+			System.err.println(e.getMessage());
 			return null;
 		}
+	}
+
+	public Iterator<Set<OWLUelClassDefinition>> modifyOntologyAndSolve(
+			OWLOntology subsumptions, OWLOntology dissubsumptions,
+			Set<OWLClass> variables, String processorName) {
+		return modifyOntologyAndSolve(
+				subsumptions.getAxioms(AxiomType.SUBCLASS_OF, false),
+				dissubsumptions.getAxioms(AxiomType.SUBCLASS_OF, false),
+				variables, processorName);
 	}
 
 	public Iterator<Set<OWLUelClassDefinition>> modifyOntologyAndSolve(

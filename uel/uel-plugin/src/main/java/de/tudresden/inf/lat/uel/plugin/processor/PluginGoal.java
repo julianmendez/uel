@@ -191,6 +191,7 @@ public class PluginGoal {
 				.createConceptName(str, false);
 		Integer ret = getAtomManager().getAtoms().addAndGetIndex(conceptName);
 		Set<Equation> module = this.ontology.getModule(ret);
+		// System.out.println("module size: " + module.size());
 		for (Equation eq : module) {
 			if (eq.isPrimitive()) {
 				equationSet.add(processPrimitiveDefinition(eq));
@@ -291,7 +292,6 @@ public class PluginGoal {
 	public String printDefinitions() {
 		return toString(getAtomManager(), this.definitions);
 	}
-
 
 	private Equation processPrimitiveDefinition(Equation e) {
 		Atom leftAtom = getAtomManager().getAtoms().get(e.getLeft());
