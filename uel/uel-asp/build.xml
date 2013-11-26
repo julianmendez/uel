@@ -29,6 +29,7 @@
 
 	<property name="parent.directory" value="../uel-build" />
 	<property name="project.build.directory" value="${basedir}/target" />
+	<property name="resource.directory" value="de/tudresden/inf/lat/uel/asp/solver/resources" />
 
 	<!-- Cleans compiled files. -->
 	<target name="clean">
@@ -44,6 +45,10 @@
 			<property name="build.number" value="${build.number}" />
 			<property name="dependencies" value="${dependencies}" />
 		</subant>
+		<mkdir dir="${project.build.directory}/classes/${resource.directory}" />
+		<copy todir="${project.build.directory}/classes/${resource.directory}">
+			<fileset file="${basedir}/src/main/java/${resource.directory}/unification.lp" />
+		</copy>
 	</target>
 
 </project>

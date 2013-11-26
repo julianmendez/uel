@@ -161,6 +161,7 @@ public class CNFTester {
 			tester.runProcessor(UelProcessorFactory.SAT_BASED_ALGORITHM);
 			tester.runProcessor(UelProcessorFactory.SAT_BASED_ALGORITHM_MINIMAL);
 			tester.runProcessor(UelProcessorFactory.RULE_BASED_ALGORITHM);
+			tester.runProcessor(UelProcessorFactory.ASP_BASED_ALGORITHM);
 		} else {
 			System.out.println("Parameters: <input DIMACS CNF file>");
 		}

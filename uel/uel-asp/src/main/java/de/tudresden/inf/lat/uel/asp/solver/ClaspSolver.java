@@ -22,7 +22,7 @@ public class ClaspSolver implements AspSolver {
 
 	private static String GRINGO_COMMAND = "gringo";
 	// TODO: fix path
-	private static String UNIFICATION_PROGRAM = "/de/tudresden/inf/lat/uel/asp/solver/unification.lp";
+	private static String UNIFICATION_PROGRAM = "resources/unification.lp";
 	private static String CLASP_COMMAND = "clasp 0 --outf=2";
 
 	public ClaspSolver() {
