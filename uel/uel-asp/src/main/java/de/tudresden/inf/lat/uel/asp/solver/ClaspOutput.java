@@ -58,7 +58,10 @@ public class ClaspOutput implements AspOutput {
 			for (JsonNode witness : root.get("Witnesses")) {
 				Map<Integer, Set<Integer>> assignment = new HashMap<Integer, Set<Integer>>();
 				for (JsonNode subsumption : witness.get("Value")) {
-					extendAssignment(assignment, subsumption.asText());
+					String text = subsumption.asText();
+					if (text.startsWith("relsubs")) {
+						extendAssignment(assignment, subsumption.asText());
+					}
 				}
 				assignments.add(assignment);
 			}
@@ -77,7 +80,7 @@ public class ClaspOutput implements AspOutput {
 	private void extendAssignment(Map<Integer, Set<Integer>> assignment,
 			String subsumption) throws IOException {
 		int parenthesisIndex = subsumption.indexOf(')');
-		Integer cnameId = Integer.parseInt(subsumption.substring(10,
+		Integer cnameId = Integer.parseInt(subsumption.substring(13,
 				parenthesisIndex));
 		Integer varId = atomManager.addAndGetIndex(new ConceptName(cnameId,
 				true));

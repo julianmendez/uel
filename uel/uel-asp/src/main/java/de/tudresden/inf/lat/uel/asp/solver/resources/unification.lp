@@ -37,8 +37,7 @@ nonvaratom(X) :- atom(X), X!=var(V):atom(var(V)).
 
 % some subsumtion propositions occurring in clause (2) 3 do not occurr earlier
 % this rule avoids simplification in grounding related to these propositions
-%{ subs(C1,C2) } :- atom(exists(R,C1)), atom(exists(R,C2)), 
-%                   not triviallyfalse(exists(R,C1),exist(R,C2)), C1!=C2.
+%{ subs(C1,C2) } :- atom(exists(R,C1)), atom(exists(R,C2)), C1!=C2.
 
 % clause (2) 3
 subs(X,Y) :- subs(exists(R,X),exists(R,Y)).
@@ -46,16 +45,21 @@ subs(X,Y) :- subs(exists(R,X),exists(R,Y)).
 % clause (2) 5
 subs(X,Z) :- subs(X,Y), subs(Y,Z), X!=Z, X!=Y, Z!=Y.
 
-% generate greater atoms (clause (3) 2
+:- subs(X,Y), triviallyfalse(X,Y).
+
+% generate greater atoms (clause (3) 2)
 greater(X,Y) :- subs(var(X),exists(R,var(Y))).
 
 :- greater(X,X).
 greater(X,Z) :- greater(X,Y), greater(Y,Z), X!=Y, X!=Z, Y!=Z.
 
-%#minimize{ subs(var(V),C) : relevant(V) :  nonvaratom(C) }.
+relsubs(var(X),C) :- subs(var(X),C), relevant(X), nonvaratom(C).
+
+%#minimize{ relsubs(X,Y) }.
 
 #hide.
-#show subs(var(V),C) : relevant(V) : nonvaratom(C).
+%#show subs/2.
+#show relsubs/2.
 %#show greater/2.
 
 

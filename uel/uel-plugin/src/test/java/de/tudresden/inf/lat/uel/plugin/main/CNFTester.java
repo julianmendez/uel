@@ -24,7 +24,7 @@ import de.tudresden.inf.lat.uel.type.impl.UelInputImpl;
  * This class is used to convert a given SAT problem in DIMACS CNF format into a
  * unification problem and solve it with a specified unification algorithm.
  * 
- * The translation is described in: Franz Baader and Ralf Küsters. 'Matching
+ * The translation is described in: Franz Baader and Ralf Kuesters. 'Matching
  * concept descriptions with existential restrictions'. In Proc. of the 7th Int.
  * Conf. on Principles of Knowledge Representation and Reasoning (KR'00), pages
  * 261-272. Morgan Kaufmann, 2000.
@@ -209,6 +209,7 @@ public class CNFTester {
 		printInfo(processor);
 	}
 
+	@SafeVarargs
 	private static <T> Set<T> set(T... elements) {
 		return new HashSet<T>(Arrays.asList(elements));
 	}

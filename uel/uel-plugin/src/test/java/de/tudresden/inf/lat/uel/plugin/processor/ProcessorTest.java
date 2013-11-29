@@ -32,9 +32,9 @@ import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import de.tudresden.inf.lat.jcel.owlapi.main.JcelReasonerFactory;
 import de.tudresden.inf.lat.uel.plugin.type.AtomManager;
 import de.tudresden.inf.lat.uel.plugin.type.UnifierKRSSRenderer;
-import de.tudresden.inf.lat.uel.type.api.Atom;
 import de.tudresden.inf.lat.uel.type.api.Equation;
 import de.tudresden.inf.lat.uel.type.api.UelProcessor;
+import de.tudresden.inf.lat.uel.type.impl.ConceptName;
 
 @RunWith(value = Parameterized.class)
 public class ProcessorTest {
@@ -99,24 +99,13 @@ public class ProcessorTest {
 		return reasoner;
 	}
 
-	private Integer getAtomId(PluginGoal goal, String atomName, boolean undef) {
+	private void makeVariable(PluginGoal goal, String atomName, boolean undef) {
+		AtomManager atomManager = goal.getAtomManager();
 		if (undef) {
 			atomName += AtomManager.UNDEF_SUFFIX;
 		}
-		Integer ret = null;
-		for (Integer currentAtomId : goal.getAtomManager().getAtoms()
-				.getIndices()) {
-			Atom currentAtom = goal.getAtomManager().getAtoms()
-					.get(currentAtomId);
-			if (currentAtom.isConceptName()) {
-				String currentAtomName = goal.getAtomManager().getConceptName(
-						currentAtom.getConceptNameId());
-				if (currentAtomName.equals(atomName)) {
-					ret = currentAtomId;
-				}
-			}
-		}
-		return ret;
+		ConceptName conceptName = atomManager.createConceptName(atomName, true);
+		goal.makeUserVariable(atomManager.getAtoms().getIndex(conceptName));
 	}
 
 	// private Set<String> set(String a) {
@@ -159,8 +148,7 @@ public class ProcessorTest {
 				while (processorName != null) {
 					Integer numberOfUnifiers = Integer.parseInt(configFile
 							.readLine());
-					if (!processorName
-							.equals(UelProcessorFactory.ASP_BASED_ALGORITHM)) {
+					if (!processorName.contains("ASP")) {
 						data.add(new Object[] { ontologyName, varNames,
 								undefVarNames, numberOfUnifiers, processorName });
 					}
@@ -534,14 +522,10 @@ public class ProcessorTest {
 		PluginGoal goal = uelModel.getPluginGoal();
 
 		for (String var : varNames) {
-			Integer atomId = getAtomId(goal, idClassMap.get(var).toStringID(),
-					false);
-			goal.makeUserVariable(atomId);
+			makeVariable(goal, idClassMap.get(var).toStringID(), false);
 		}
 		for (String var : undefVarNames) {
-			Integer atomId = getAtomId(goal, idClassMap.get(var).toStringID(),
-					true);
-			goal.makeUserVariable(atomId);
+			makeVariable(goal, idClassMap.get(var).toStringID(), true);
 		}
 
 		UelProcessor processor = UelProcessorFactory.createProcessor(

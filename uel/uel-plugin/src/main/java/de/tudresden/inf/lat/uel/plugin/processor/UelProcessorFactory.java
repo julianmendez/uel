@@ -1,7 +1,6 @@
 package de.tudresden.inf.lat.uel.plugin.processor;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -22,6 +21,7 @@ public class UelProcessorFactory {
 	public static final String SAT_BASED_ALGORITHM = "SAT-based algorithm";
 	public static final String SAT_BASED_ALGORITHM_MINIMAL = "SAT-based algorithm (minimal assignments)";
 	public static final String ASP_BASED_ALGORITHM = "ASP-based algorithm";
+	public static final String ASP_BASED_ALGORITHM_MINIMAL = "ASP-based algorithm (minimal assignments)";
 
 	/**
 	 * Creates a processor with a given UEL input.
@@ -41,7 +41,9 @@ public class UelProcessorFactory {
 		} else if (name.equals(SAT_BASED_ALGORITHM_MINIMAL)) {
 			ret = new SatProcessor(input, true, true);
 		} else if (name.equals(ASP_BASED_ALGORITHM)) {
-			ret = new AspProcessor(input);
+			ret = new AspProcessor(input, false);
+		} else if (name.equals(ASP_BASED_ALGORITHM_MINIMAL)) {
+			ret = new AspProcessor(input, true);
 		} else {
 			throw new IllegalArgumentException("Unknown processor : '" + name
 					+ "'.");
@@ -60,6 +62,7 @@ public class UelProcessorFactory {
 		ret.add(SAT_BASED_ALGORITHM_MINIMAL);
 		ret.add(RULE_BASED_ALGORITHM);
 		ret.add(ASP_BASED_ALGORITHM);
+		ret.add(ASP_BASED_ALGORITHM_MINIMAL);
 		return Collections.unmodifiableList(ret);
 	}
 

@@ -47,7 +47,7 @@
 		</subant>
 		<mkdir dir="${project.build.directory}/classes/${resource.directory}" />
 		<copy todir="${project.build.directory}/classes/${resource.directory}">
-			<fileset file="${basedir}/src/main/java/${resource.directory}/unification.lp" />
+			<fileset file="${basedir}/src/main/java/${resource.directory}/*.lp" />
 		</copy>
 	</target>
 
