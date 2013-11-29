@@ -28,13 +28,16 @@ public class OWLDefinitionSet {
 	private final Map<OWLClass, OWLClassExpression> definitions;
 	private final Map<OWLClass, Set<OWLClassExpression>> primitiveDefinitions;
 
-	public OWLDefinitionSet(OWLOntology ont1, OWLOntology ont2) {
+	public OWLDefinitionSet(OWLOntology ont1, OWLOntology ont2,
+			OWLClass owlThingAlias) {
 		this.definitions = new HashMap<OWLClass, OWLClassExpression>();
 		this.definitions.putAll(getDefinitions(ont1));
 		this.definitions.putAll(getDefinitions(ont2));
 		this.primitiveDefinitions = new HashMap<OWLClass, Set<OWLClassExpression>>();
-		this.primitiveDefinitions.putAll(getPrimitiveDefinitions(ont1));
-		this.primitiveDefinitions.putAll(getPrimitiveDefinitions(ont2));
+		this.primitiveDefinitions.putAll(getPrimitiveDefinitions(ont1,
+				owlThingAlias));
+		this.primitiveDefinitions.putAll(getPrimitiveDefinitions(ont2,
+				owlThingAlias));
 	}
 
 	public Set<OWLClass> getDefinedConcepts() {
@@ -103,7 +106,7 @@ public class OWLDefinitionSet {
 	 *         OWL Thing is the super class
 	 */
 	private Map<OWLClass, Set<OWLClassExpression>> getPrimitiveDefinitions(
-			OWLOntology owlOntology) {
+			OWLOntology owlOntology, OWLClass owlThingAlias) {
 		if (owlOntology == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
@@ -112,7 +115,8 @@ public class OWLDefinitionSet {
 		Set<OWLSubClassOfAxiom> setOfAxioms = owlOntology
 				.getAxioms(AxiomType.SUBCLASS_OF);
 		for (OWLSubClassOfAxiom axiom : setOfAxioms) {
-			if (!axiom.getSuperClass().isOWLThing()) {
+			if (!axiom.getSuperClass().isOWLThing()
+					&& !axiom.getSuperClass().equals(owlThingAlias)) {
 				if (axiom.getSubClass() instanceof OWLClass) {
 					OWLClass definiendum = (OWLClass) axiom.getSubClass();
 					Set<OWLClassExpression> definiensSet = ret.get(definiendum);

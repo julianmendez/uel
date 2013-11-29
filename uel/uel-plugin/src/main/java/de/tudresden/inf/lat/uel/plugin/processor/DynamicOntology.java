@@ -176,6 +176,11 @@ public class DynamicOntology implements Ontology {
 	 *            second OWL ontology
 	 */
 	public void load(OWLOntology owlOntology01, OWLOntology owlOntology02) {
+		load(owlOntology01, owlOntology02, null);
+	}
+
+	public void load(OWLOntology owlOntology01, OWLOntology owlOntology02,
+			OWLClass owlThingAlias) {
 		if (owlOntology01 == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
@@ -184,7 +189,7 @@ public class DynamicOntology implements Ontology {
 		}
 
 		this.owlDefinitionSet = new OWLDefinitionSet(owlOntology01,
-				owlOntology02);
+				owlOntology02, owlThingAlias);
 		Set<OWLClass> toVisit = new HashSet<OWLClass>();
 		toVisit.addAll(this.owlDefinitionSet.getDefinedConcepts());
 		toVisit.addAll(this.owlDefinitionSet.getPrimitiveDefinedConcepts());

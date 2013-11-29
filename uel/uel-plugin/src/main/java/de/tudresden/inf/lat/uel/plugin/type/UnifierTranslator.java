@@ -29,7 +29,7 @@ public class UnifierTranslator {
 		this.userVariables = userVariables;
 		this.auxiliaryVariables = auxiliaryVariables;
 	}
-	
+
 	public AtomManager getAtomManager() {
 		return this.atomManager;
 	}
@@ -81,8 +81,8 @@ public class UnifierTranslator {
 
 			OWLClassExpression classExpression;
 			if (this.auxiliaryVariables.contains(conceptId)) {
-				classExpression = toOWLClassExpression(getSetOfSubsumers(child,
-						equations), equations);
+				classExpression = toOWLClassExpression(
+						getSetOfSubsumers(child, equations), equations);
 			} else {
 				classExpression = getClassFor(child.getConceptNameId());
 			}
@@ -112,12 +112,6 @@ public class UnifierTranslator {
 		return ret;
 	}
 
-	/**
-	 * Prints a substitution set (i.e. a set of atoms) as a conjunction of atoms
-	 * in the krss format. Used in Translator.
-	 * 
-	 * @return the string representation of a substitution set
-	 */
 	private OWLClassExpression toOWLClassExpression(
 			Collection<Atom> setOfSubsumers, Set<Equation> equations) {
 

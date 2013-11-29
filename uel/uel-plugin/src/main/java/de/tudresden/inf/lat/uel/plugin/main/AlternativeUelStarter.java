@@ -29,10 +29,12 @@ import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 
+import de.tudresden.inf.lat.uel.plugin.processor.DynamicOntology;
+import de.tudresden.inf.lat.uel.plugin.processor.OntologyBuilder;
 import de.tudresden.inf.lat.uel.plugin.processor.PluginGoal;
-import de.tudresden.inf.lat.uel.plugin.processor.UelModel;
 import de.tudresden.inf.lat.uel.plugin.processor.UelProcessorFactory;
 import de.tudresden.inf.lat.uel.plugin.type.AtomManager;
+import de.tudresden.inf.lat.uel.plugin.type.AtomManagerImpl;
 import de.tudresden.inf.lat.uel.plugin.type.OWLUelClassDefinition;
 import de.tudresden.inf.lat.uel.plugin.type.UnifierTranslator;
 import de.tudresden.inf.lat.uel.plugin.ui.UelController;
@@ -53,23 +55,9 @@ public class AlternativeUelStarter {
 	private OWLOntology ontology;
 	private UelProcessor uelProcessor;
 	private boolean verbose = false;
+	private OWLClass owlThingAlias = null;
 
-	public AlternativeUelStarter(OWLOntology ontology, boolean verbose) {
-		this.verbose = verbose;
-		initializeOntologies(ontology);
-	}
-
-	/**
-	 * Constructs a new UEL starter.
-	 * 
-	 * @param ontology
-	 *            OWL ontology
-	 */
 	public AlternativeUelStarter(OWLOntology ontology) {
-		initializeOntologies(ontology);
-	}
-
-	private void initializeOntologies(OWLOntology ontology) {
 		if (ontology == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
@@ -81,6 +69,14 @@ public class AlternativeUelStarter {
 		} catch (OWLOntologyCreationException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	public void setVerbosity(boolean verbose) {
+		this.verbose = verbose;
+	}
+
+	public void setOwlThingAlias(OWLClass owlThingAlias) {
+		this.owlThingAlias = owlThingAlias;
 	}
 
 	public OWLClass findAuxiliaryDefinition(OWLClassExpression expr) {
@@ -132,6 +128,7 @@ public class AlternativeUelStarter {
 		String subsFilename = "";
 		String dissubsFilename = "";
 		String varFilename = "";
+		String owlThingAliasName = "";
 		boolean printInfo = false;
 		int processorIdx = 0;
 		while (argIdx < args.length) {
@@ -147,6 +144,10 @@ public class AlternativeUelStarter {
 			case "-v":
 				argIdx++;
 				varFilename = args[argIdx];
+				break;
+			case "-t":
+				argIdx++;
+				owlThingAliasName = args[argIdx];
 				break;
 			case "-p":
 				argIdx++;
@@ -171,7 +172,15 @@ public class AlternativeUelStarter {
 		}
 
 		AlternativeUelStarter starter = new AlternativeUelStarter(
-				loadOntology(mainFilename), printInfo);
+				loadOntology(mainFilename));
+		starter.setVerbosity(printInfo);
+		OWLDataFactory factory = OWLManager.createOWLOntologyManager()
+				.getOWLDataFactory();
+		if (!owlThingAliasName.isEmpty()) {
+			starter.setOwlThingAlias(factory.getOWLClass(IRI
+					.create(owlThingAliasName)));
+		}
+
 		OWLOntology subsumptions = loadOntology(subsFilename);
 		if (subsumptions == null) {
 			return;
@@ -180,7 +189,7 @@ public class AlternativeUelStarter {
 		if (dissubsumptions == null) {
 			return;
 		}
-		Set<OWLClass> variables = loadVariables(varFilename);
+		Set<OWLClass> variables = loadVariables(varFilename, factory);
 		if (variables == null) {
 			return;
 		}
@@ -220,16 +229,16 @@ public class AlternativeUelStarter {
 
 	private static void printSyntax() {
 		System.out
-				.println("Usage: uel [-s subsumptions.owl] [-d dissubsumptions.owl] [-v variables.txt] [-p processorIndex] [-h] [-i] [ontology.owl]");
+				.println("Usage: uel [-s subsumptions.owl] [-d dissubsumptions.owl] [-v variables.txt] [-t owl:Thing_alias] [-p processorIndex] [-h] [-i] [ontology.owl]");
 	}
 
-	private static Set<OWLClass> loadVariables(String filename) {
+	private static Set<OWLClass> loadVariables(String filename,
+			OWLDataFactory factory) {
 		if (filename.isEmpty()) {
 			return Collections.emptySet();
 		}
 		try {
-			OWLDataFactory factory = OWLManager.createOWLOntologyManager()
-					.getOWLDataFactory();
+
 			BufferedReader input = new BufferedReader(new FileReader(new File(
 					filename)));
 			Set<OWLClass> variables = new HashSet<OWLClass>();
@@ -312,11 +321,11 @@ public class AlternativeUelStarter {
 			disequations.add(disequation);
 		}
 
-		UelModel model = new UelModel();
-		model.loadOntology(this.ontology, this.auxOntology);
-
-		PluginGoal goal = new PluginGoal(model.getAtomManager(),
-				model.getOntology());
+		AtomManager atomManager = new AtomManagerImpl();
+		DynamicOntology dynamicOntology = new DynamicOntology(new OntologyBuilder(
+				atomManager));
+		dynamicOntology.load(this.ontology, this.auxOntology, owlThingAlias);
+		PluginGoal goal = new PluginGoal(atomManager, dynamicOntology);
 
 		// add the subsumptions themselves to the PluginGoal
 		for (OWLSubClassOfAxiom subsumption : subsumptions) {
@@ -344,13 +353,22 @@ public class AlternativeUelStarter {
 
 		// translate the variables to the IDs, and mark them as variables in the
 		// PluginGoal
-		AtomManager atomManager = goal.getAtomManager();
 		for (OWLClass var : variables) {
 			String name = getId(var);
 			ConceptName conceptName = atomManager.createConceptName(name, true);
 			Integer atomId = atomManager.getAtoms().addAndGetIndex(conceptName);
 			// System.out.println("user variable: " + name);
 			goal.makeUserVariable(atomId);
+		}
+
+		// mark all "_UNDEF" variables as user variables
+		for (Atom at : atomManager.getAtoms()) {
+			if (at.isConceptName()) {
+				String name = atomManager.getConceptName(at.getConceptNameId());
+				if (name.endsWith(AtomManager.UNDEF_SUFFIX)) {
+					goal.makeUserVariable(atomManager.getAtoms().getIndex(at));
+				}
+			}
 		}
 
 		// mark the auxiliary variables as auxiliary
