@@ -71,7 +71,7 @@ public class AlternativeUelStarter {
 		}
 	}
 
-	public void setVerbosity(boolean verbose) {
+	public void setVerbose(boolean verbose) {
 		this.verbose = verbose;
 	}
 
@@ -173,7 +173,7 @@ public class AlternativeUelStarter {
 
 		AlternativeUelStarter starter = new AlternativeUelStarter(
 				loadOntology(mainFilename));
-		starter.setVerbosity(printInfo);
+		starter.setVerbose(printInfo);
 		OWLDataFactory factory = OWLManager.createOWLOntologyManager()
 				.getOWLDataFactory();
 		if (!owlThingAliasName.isEmpty()) {
