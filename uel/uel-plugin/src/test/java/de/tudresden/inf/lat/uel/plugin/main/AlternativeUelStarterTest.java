@@ -63,7 +63,7 @@ public class AlternativeUelStarterTest extends TestCase {
 		return reasoner;
 	}
 
-	@SafeVarargs
+	//@SafeVarargs
 	private final <T> Set<T> set(T... elements) {
 		Set<T> ret = new HashSet<T>();
 		for (T e : elements) {

@@ -209,7 +209,7 @@ public class CNFTester {
 		printInfo(processor);
 	}
 
-	@SafeVarargs
+	//@SafeVarargs
 	private static <T> Set<T> set(T... elements) {
 		return new HashSet<T>(Arrays.asList(elements));
 	}
