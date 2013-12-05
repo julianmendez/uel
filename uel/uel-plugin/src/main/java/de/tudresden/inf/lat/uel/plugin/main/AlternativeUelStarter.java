@@ -132,41 +132,45 @@ public class AlternativeUelStarter {
 		boolean printInfo = false;
 		int processorIdx = 0;
 		while (argIdx < args.length) {
-			switch (args[argIdx]) {
-			case "-s":
-				argIdx++;
-				subsFilename = args[argIdx];
-				break;
-			case "-d":
-				argIdx++;
-				dissubsFilename = args[argIdx];
-				break;
-			case "-v":
-				argIdx++;
-				varFilename = args[argIdx];
-				break;
-			case "-t":
-				argIdx++;
-				owlThingAliasName = args[argIdx];
-				break;
-			case "-p":
-				argIdx++;
-				try {
-					processorIdx = Integer.parseInt(args[argIdx]) - 1;
-				} catch (NumberFormatException e) {
-					System.err.println("Invalid processor index.");
+			if ((args[argIdx].length() == 2) && (args[argIdx].charAt(0) == '-')) {
+				switch (args[argIdx].charAt(1)) {
+				case 's':
+					argIdx++;
+					subsFilename = args[argIdx];
+					break;
+				case 'd':
+					argIdx++;
+					dissubsFilename = args[argIdx];
+					break;
+				case 'v':
+					argIdx++;
+					varFilename = args[argIdx];
+					break;
+				case 't':
+					argIdx++;
+					owlThingAliasName = args[argIdx];
+					break;
+				case 'p':
+					argIdx++;
+					try {
+						processorIdx = Integer.parseInt(args[argIdx]) - 1;
+					} catch (NumberFormatException e) {
+						System.err.println("Invalid processor index.");
+						return;
+					}
+					break;
+				case 'h':
+					printSyntax();
 					return;
+				case 'i':
+					printInfo = true;
+					break;
+				default:
+					mainFilename = args[argIdx];
+					break;
 				}
-				break;
-			case "-h":
-				printSyntax();
-				return;
-			case "-i":
-				printInfo = true;
-				break;
-			default:
+			} else {
 				mainFilename = args[argIdx];
-				break;
 			}
 			argIdx++;
 		}
