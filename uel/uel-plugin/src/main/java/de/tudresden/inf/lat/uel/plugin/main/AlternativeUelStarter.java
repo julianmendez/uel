@@ -175,21 +175,21 @@ public class AlternativeUelStarter {
 			argIdx++;
 		}
 
-		AlternativeUelStarter starter = new AlternativeUelStarter(
-				loadOntology(mainFilename));
+		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
+		OWLDataFactory factory = manager.getOWLDataFactory();
+		AlternativeUelStarter starter = new AlternativeUelStarter(loadOntology(
+				mainFilename, manager));
 		starter.setVerbose(printInfo);
-		OWLDataFactory factory = OWLManager.createOWLOntologyManager()
-				.getOWLDataFactory();
 		if (!owlThingAliasName.isEmpty()) {
 			starter.setOwlThingAlias(factory.getOWLClass(IRI
 					.create(owlThingAliasName)));
 		}
 
-		OWLOntology subsumptions = loadOntology(subsFilename);
+		OWLOntology subsumptions = loadOntology(subsFilename, manager);
 		if (subsumptions == null) {
 			return;
 		}
-		OWLOntology dissubsumptions = loadOntology(dissubsFilename);
+		OWLOntology dissubsumptions = loadOntology(dissubsFilename, manager);
 		if (dissubsumptions == null) {
 			return;
 		}
@@ -236,7 +236,7 @@ public class AlternativeUelStarter {
 				.println("Usage: uel [-s subsumptions.owl] [-d dissubsumptions.owl] [-v variables.txt] [-t owl:Thing_alias] [-p processorIndex] [-h] [-i] [ontology.owl]");
 	}
 
-	private static Set<OWLClass> loadVariables(String filename,
+	public static Set<OWLClass> loadVariables(String filename,
 			OWLDataFactory factory) {
 		if (filename.isEmpty()) {
 			return Collections.emptySet();
@@ -266,16 +266,14 @@ public class AlternativeUelStarter {
 		}
 	}
 
-	private static OWLOntology loadOntology(String filename) {
+	public static OWLOntology loadOntology(String filename,
+			OWLOntologyManager manager) {
 		try {
-			OWLOntologyManager ontologyManager = OWLManager
-					.createOWLOntologyManager();
 			if (filename.isEmpty()) {
-				return ontologyManager.createOntology();
+				return manager.createOntology();
 			}
 			InputStream input = new FileInputStream(new File(filename));
-			ontologyManager.loadOntologyFromOntologyDocument(input);
-			return ontologyManager.getOntologies().iterator().next();
+			return manager.loadOntologyFromOntologyDocument(input);
 		} catch (FileNotFoundException e) {
 			System.err.println("Could not find file '" + filename + "'.");
 			return null;
@@ -291,9 +289,9 @@ public class AlternativeUelStarter {
 			OWLOntology subsumptions, OWLOntology dissubsumptions,
 			Set<OWLClass> variables, String processorName) {
 		return modifyOntologyAndSolve(
-				subsumptions.getAxioms(AxiomType.SUBCLASS_OF, false),
-				dissubsumptions.getAxioms(AxiomType.SUBCLASS_OF, false),
-				variables, processorName);
+				subsumptions.getAxioms(AxiomType.SUBCLASS_OF),
+				dissubsumptions.getAxioms(AxiomType.SUBCLASS_OF), variables,
+				processorName);
 	}
 
 	public Iterator<Set<OWLUelClassDefinition>> modifyOntologyAndSolve(
@@ -326,8 +324,8 @@ public class AlternativeUelStarter {
 		}
 
 		AtomManager atomManager = new AtomManagerImpl();
-		DynamicOntology dynamicOntology = new DynamicOntology(new OntologyBuilder(
-				atomManager));
+		DynamicOntology dynamicOntology = new DynamicOntology(
+				new OntologyBuilder(atomManager));
 		dynamicOntology.load(this.ontology, this.auxOntology, owlThingAlias);
 		PluginGoal goal = new PluginGoal(atomManager, dynamicOntology);
 

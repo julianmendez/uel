@@ -1,24 +1,26 @@
 package de.tudresden.inf.lat.uel.plugin.main;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
-import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.HashSet;
-import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Set;
 
-import junit.framework.TestCase;
-
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.AxiomType;
-import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
-import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 
@@ -28,32 +30,69 @@ import de.tudresden.inf.lat.uel.plugin.processor.UelProcessorFactory;
 import de.tudresden.inf.lat.uel.plugin.type.AtomManager;
 import de.tudresden.inf.lat.uel.plugin.type.OWLUelClassDefinition;
 import de.tudresden.inf.lat.uel.type.api.Equation;
-import de.uulm.ecs.ai.owlapi.krssparser.KRSS2OntologyFormat;
 
-public class AlternativeUelStarterTest extends TestCase {
+@RunWith(value = Parameterized.class)
+public class AlternativeUelStarterTest {
 
 	private static final String apath = "src/test/resources/";
-	private static final String conceptX = "x#X";
-	private static final String conceptY = "x#Y";
-	private static final String ontologyName = apath + "testOntology-alt-";
-	private static final String subsName = apath + "testSubsumptions-alt-";
-	private static final String dissubsName = apath
-			+ "testDissubsumptions-alt-";
-	private static final String fileExt = ".krss";
+	private static final String prefix = "alt-test";
+	private static final String ontologyFilename = "-ontology.krss";
+	private static final String subsFilename = "-subsumptions.krss";
+	private static final String dissubsFilename = "-dissubsumptions.krss";
+	private static final String varFilename = "-variables.txt";
+	private static final String testFilename = ".test";
+	private static final int maxTest = 3;
 
-	private OWLOntology parseOntology(OWLOntologyManager ontologyManager,
-			InputStream input) throws OWLOntologyCreationException {
+	private OWLOntology mainOntology;
+	private OWLOntology subsumptions;
+	private OWLOntology dissubsumptions;
+	private Set<OWLClass> variables;
+	private Integer numberOfUnifiers;
 
-		return ontologyManager.loadOntologyFromOntologyDocument(input);
+	public AlternativeUelStarterTest(OWLOntology mainOntology,
+			OWLOntology subsumptions, OWLOntology dissubsumptions,
+			Set<OWLClass> variables, Integer numberOfUnifiers) {
+		this.mainOntology = mainOntology;
+		this.subsumptions = subsumptions;
+		this.dissubsumptions = dissubsumptions;
+		this.variables = variables;
+		this.numberOfUnifiers = numberOfUnifiers;
 	}
 
-	private Set<OWLSubClassOfAxiom> parseGoal(
-			OWLOntologyManager ontologyManager, InputStream input)
-			throws OWLOntologyCreationException {
+	@Parameters(name = "{index}")
+	public static Collection<Object[]> data() {
+		Collection<Object[]> data = new ArrayList<Object[]>();
 
-		OWLOntology ontology = ontologyManager
-				.loadOntologyFromOntologyDocument(input);
-		return ontology.getAxioms(AxiomType.SUBCLASS_OF);
+		for (int i = 1; i <= maxTest; i++) {
+			try {
+				String baseFilename = apath + prefix + String.format("%02d", i);
+				OWLOntologyManager manager = OWLManager
+						.createOWLOntologyManager();
+				OWLDataFactory factory = manager.getOWLDataFactory();
+
+				OWLOntology mainOntology = AlternativeUelStarter.loadOntology(
+						baseFilename + ontologyFilename, manager);
+				OWLOntology subsumptions = AlternativeUelStarter.loadOntology(
+						baseFilename + subsFilename, manager);
+				OWLOntology dissubsumptions = AlternativeUelStarter
+						.loadOntology(baseFilename + dissubsFilename, manager);
+				Set<OWLClass> variables = AlternativeUelStarter.loadVariables(
+						baseFilename + varFilename, factory);
+
+				BufferedReader testFile = new BufferedReader(new FileReader(
+						baseFilename + testFilename));
+				Integer numberOfUnifiers = Integer
+						.parseInt(testFile.readLine());
+				testFile.close();
+
+				data.add(new Object[] { mainOntology, subsumptions,
+						dissubsumptions, variables, numberOfUnifiers });
+			} catch (IOException ex) {
+				throw new RuntimeException(ex);
+			}
+		}
+		
+		return data;
 	}
 
 	private OWLReasoner createReasoner(OWLOntology ontology)
@@ -61,27 +100,6 @@ public class AlternativeUelStarterTest extends TestCase {
 		JcelReasoner reasoner = new JcelReasoner(ontology, false);
 		reasoner.precomputeInferences();
 		return reasoner;
-	}
-
-	//@SafeVarargs
-	private final <T> Set<T> set(T... elements) {
-		Set<T> ret = new HashSet<T>();
-		for (T e : elements) {
-			ret.add(e);
-		}
-		return ret;
-	}
-
-	public void test01() throws OWLOntologyCreationException, IOException {
-		tryOntology("01", set(conceptX, conceptY), 40);
-	}
-
-	public void test02() throws OWLOntologyCreationException, IOException {
-		tryOntology("02", set(conceptX), 0);
-	}
-
-	public void test03() throws OWLOntologyCreationException, IOException {
-		tryOntology("03", set(conceptX), 1);
 	}
 
 	private String toString(OWLOntology ontology) {
@@ -94,35 +112,14 @@ public class AlternativeUelStarterTest extends TestCase {
 		return sbuf.toString();
 	}
 
-	private void tryOntology(String testId, Set<String> varNames,
-			Integer expectedNumberOfUnifiers)
-			throws OWLOntologyCreationException, IOException {
+	@Test
+	public void tryOntology() throws OWLOntologyCreationException, IOException {
 
-		// Map<String, OWLClass> idClassMap = new HashMap<String, OWLClass>();
-
-		OWLOntologyManager ontologyManager = OWLManager
-				.createOWLOntologyManager();
-		OWLOntology owlOntology = parseOntology(ontologyManager,
-				new FileInputStream(ontologyName + testId + fileExt));
-		Set<OWLSubClassOfAxiom> goalSubsumptions = parseGoal(ontologyManager,
-				new FileInputStream(subsName + testId + fileExt));
-		Set<OWLSubClassOfAxiom> goalDissubsumptions = parseGoal(
-				ontologyManager, new FileInputStream(dissubsName + testId
-						+ fileExt));
-
-		Set<OWLClass> variables = new HashSet<OWLClass>();
-		for (String varName : varNames) {
-			IRI varIRI = IRI.create(varName);
-			OWLClass varClass = ontologyManager.getOWLDataFactory()
-					.getOWLClass(varIRI);
-			variables.add(varClass);
-		}
-
-		AlternativeUelStarter starter = new AlternativeUelStarter(owlOntology);
+		AlternativeUelStarter starter = new AlternativeUelStarter(mainOntology);
 		// starter.setVerbose(true);
 
 		UnifierIterator iterator = (UnifierIterator) starter
-				.modifyOntologyAndSolve(goalSubsumptions, goalDissubsumptions,
+				.modifyOntologyAndSolve(subsumptions, dissubsumptions,
 						variables, UelProcessorFactory.SAT_BASED_ALGORITHM);
 
 		AtomManager atomManager = iterator.getAtomManager();
@@ -145,12 +142,12 @@ public class AlternativeUelStarterTest extends TestCase {
 			// }
 			// System.out.println();
 
-			OWLOntology auxOntology = ontologyManager
+			OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
+			OWLOntology auxOntology = manager
 					.loadOntologyFromOntologyDocument(new ByteArrayInputStream(
 							krssDefinitions.getBytes()));
 			for (OWLUelClassDefinition def : unifier) {
-				ontologyManager.addAxiom(auxOntology,
-						def.asOWLEquivalentClassesAxiom());
+				manager.addAxiom(auxOntology, def.asOWLEquivalentClassesAxiom());
 			}
 			// try {
 			// ontologyManager.saveOntology(auxOntology,
@@ -161,15 +158,17 @@ public class AlternativeUelStarterTest extends TestCase {
 
 			OWLReasoner reasoner = createReasoner(auxOntology);
 
-			for (OWLSubClassOfAxiom sub : goalSubsumptions) {
-				assertTrue(reasoner.isEntailed(sub));
+			for (OWLSubClassOfAxiom sub : subsumptions
+					.getAxioms(AxiomType.SUBCLASS_OF)) {
+				Assert.assertTrue(reasoner.isEntailed(sub));
 			}
-			for (OWLSubClassOfAxiom dissub : goalDissubsumptions) {
-				assertTrue(!reasoner.isEntailed(dissub));
+			for (OWLSubClassOfAxiom dissub : dissubsumptions
+					.getAxioms(AxiomType.SUBCLASS_OF)) {
+				Assert.assertTrue(!reasoner.isEntailed(dissub));
 			}
 
 		}
 
-		assertEquals(expectedNumberOfUnifiers, (Integer) actualNumberOfUnifiers);
+		Assert.assertEquals(numberOfUnifiers, (Integer) actualNumberOfUnifiers);
 	}
 }
