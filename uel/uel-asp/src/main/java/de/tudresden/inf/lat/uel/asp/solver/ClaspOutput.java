@@ -34,8 +34,10 @@ public class ClaspOutput implements AspOutput {
 	private boolean satisfiable;
 	private List<Entry<String, String>> stats;
 
-	public ClaspOutput(String json, IndexedSet<Atom> atomManager)
-			throws IOException {
+	public ClaspOutput(String json, boolean searchCompleted,
+			IndexedSet<Atom> atomManager) throws IOException {
+		stats = new ArrayList<Entry<String, String>>();
+		addEntry(stats, "Search Completed", searchCompleted ? "Yes" : "No");
 		this.atomManager = atomManager;
 		// System.out.println(json);
 		parse(json);
@@ -68,7 +70,6 @@ public class ClaspOutput implements AspOutput {
 		}
 
 		// Solver,Stats>Time -> stats
-		stats = new ArrayList<Entry<String, String>>();
 		addEntry(stats, "ASP Solver", root.get("Solver").asText());
 		JsonNode time = root.get("Stats").get("Time");
 		addEntry(stats, "Total time (s)", time.get("Total").asText());

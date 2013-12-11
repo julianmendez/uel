@@ -31,7 +31,8 @@ public class AspProcessor implements UelProcessor {
 	public AspProcessor(UelInput input, boolean minimize) {
 		this.uelInput = input;
 		this.aspInput = new AspInput(input.getEquations(),
-				input.getAtomManager(), input.getUserVariables());
+				input.getGoalDisequations(), input.getAtomManager(),
+				input.getUserVariables());
 		this.computed = false;
 		this.currentUnifierIndex = -1;
 		this.minimize = minimize;
@@ -41,7 +42,8 @@ public class AspProcessor implements UelProcessor {
 	public boolean computeNextUnifier() {
 		// TODO: implement asynchronous execution of ClaspSolver
 		if (!computed) {
-			AspSolver solver = new ClaspSolver(minimize);
+			AspSolver solver = new ClaspSolver(!uelInput.getGoalDisequations()
+					.isEmpty(), false, minimize);
 			try {
 				aspOutput = solver.solve(aspInput);
 			} catch (IOException e) {

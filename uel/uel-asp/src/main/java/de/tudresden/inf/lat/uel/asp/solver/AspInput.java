@@ -5,6 +5,7 @@ import java.util.Set;
 import de.tudresden.inf.lat.uel.type.api.Atom;
 import de.tudresden.inf.lat.uel.type.api.Equation;
 import de.tudresden.inf.lat.uel.type.api.IndexedSet;
+import de.tudresden.inf.lat.uel.type.api.SmallEquation;
 import de.tudresden.inf.lat.uel.type.impl.ExistentialRestriction;
 
 /**
@@ -16,14 +17,16 @@ import de.tudresden.inf.lat.uel.type.impl.ExistentialRestriction;
 public class AspInput {
 
 	private Set<Equation> equations;
+	private Set<SmallEquation> disequations;
 	private IndexedSet<Atom> atomManager;
 	private Set<Integer> userVariables;
 	private boolean changed;
 	private String program;
 
-	public AspInput(Set<Equation> equations, IndexedSet<Atom> atomManager,
-			Set<Integer> userVariables) {
+	public AspInput(Set<Equation> equations, Set<SmallEquation> disequations,
+			IndexedSet<Atom> atomManager, Set<Integer> userVariables) {
 		this.equations = equations;
+		this.disequations = disequations;
 		this.atomManager = atomManager;
 		this.userVariables = userVariables;
 		this.changed = true;
@@ -48,6 +51,11 @@ public class AspInput {
 			encodeEquation(encoding, eq, i);
 			i++;
 		}
+		i = 1;
+		for (SmallEquation eq : disequations) {
+			encodeDisequation(encoding, eq, i);
+			i++;
+		}
 		for (Integer var : userVariables) {
 			encoding.append("relevant(x");
 			encoding.append(var);
@@ -67,6 +75,18 @@ public class AspInput {
 			encodeAtom(encoding, at, 1, index);
 		}
 		encoding.append("\n");
+	}
+
+	private void encodeDisequation(StringBuilder encoding, SmallEquation eq,
+			int index) {
+		encoding.append("%disequation ");
+		encoding.append(index);
+		encoding.append("\n");
+		encoding.append("diseq(");
+		encodeAtom(encoding, atomManager.get(eq.getLeft()));
+		encoding.append(", ");
+		encodeAtom(encoding, atomManager.get(eq.getRight()));
+		encoding.append(").\n\n");
 	}
 
 	private void encodeAtom(StringBuilder encoding, Integer atomId, int side,

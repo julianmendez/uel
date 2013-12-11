@@ -18,14 +18,21 @@ import java.util.Arrays;
 public class ClaspSolver implements AspSolver {
 
 	private static String UNIFICATION_PROGRAM = "resources/unification.lp";
+	private static String DISUNIFICATION_PROGRAM = "resources/disunification.lp";
+	private static String TYPES_PROGRAM = "resources/types.lp";
 	private static String HEURISTIC_PROGRAM = "resources/heuristic.lp";
+	private static String FINAL_PROGRAM = "resources/final.lp";
 	private static String GRINGO_COMMAND = "gringo";
-	private static String CLASP_COMMAND = "clasp 0 --outf=2";
-	private static String HCLASP_COMMAND = "hclasp 0 -e record --outf=2";
+	private static String CLASP_COMMAND = "clasp -n 100 --outf=2";
+	private static String HCLASP_COMMAND = "hclasp -n 100 -e record --outf=2";
 
+	private boolean disequations;
+	private boolean types;
 	private boolean minimize;
 
-	public ClaspSolver(boolean minimize) {
+	public ClaspSolver(boolean disequations, boolean types, boolean minimize) {
+		this.disequations = disequations;
+		this.types = types;
 		this.minimize = minimize;
 	}
 
@@ -33,7 +40,8 @@ public class ClaspSolver implements AspSolver {
 	public AspOutput solve(AspInput input) throws IOException {
 		try {
 			// call gringo and (h)clasp
-			ProcessBuilder pbGringo = new ProcessBuilder(GRINGO_COMMAND);
+			ProcessBuilder pbGringo = new ProcessBuilder(
+					GRINGO_COMMAND.split(" "));
 			Process pGringo = pbGringo.start();
 
 			String solverCommand = minimize ? HCLASP_COMMAND : CLASP_COMMAND;
@@ -41,17 +49,9 @@ public class ClaspSolver implements AspSolver {
 					Arrays.asList(solverCommand.split(" ")));
 			Process pSolver = pbSolver.start();
 
-			// pipe unification.lp (heuristic.lp) and input.getProgram() as
-			// input
+			// pipe .lp files and input.getProgram() as input
 			OutputStream gringoInput = pGringo.getOutputStream();
-			InputStream unificationProgram = AspProcessor.class
-					.getResourceAsStream(UNIFICATION_PROGRAM);
-			pipe(unificationProgram, gringoInput);
-			if (minimize) {
-				InputStream heuristicProgram = AspProcessor.class
-						.getResourceAsStream(HEURISTIC_PROGRAM);
-				pipe(heuristicProgram, gringoInput);
-			}
+			inputPrograms(gringoInput);
 			pipe(new ByteArrayInputStream(input.getProgram().getBytes()),
 					gringoInput);
 			// System.out.println(input.getProgram());
@@ -73,17 +73,44 @@ public class ClaspSolver implements AspSolver {
 			pipe(pSolver.getInputStream(), output);
 
 			int claspReturnCode = pSolver.waitFor();
-			if ((claspReturnCode) != 20 && (claspReturnCode != 30)) {
+			// successful if there was no exception (lsb=0) and either a model
+			// was found (10) or the search space was exhausted (20)
+			if (((claspReturnCode & 1) == 1)
+					|| (((claspReturnCode & 10) == 0) && ((claspReturnCode & 20) == 0))) {
 				ByteArrayOutputStream error = new ByteArrayOutputStream();
 				pipe(pSolver.getErrorStream(), error);
-				throw new IOException("clasp error:\n" + error.toString());
+				throw new IOException("clasp error (return code "
+						+ claspReturnCode + "):\n" + error.toString());
 			}
 			pSolver.destroy();
 
-			return new ClaspOutput(output.toString(), input.getAtomManager());
+			// System.out.println(output.toString());
+			return new ClaspOutput(output.toString(), claspReturnCode > 10,
+					input.getAtomManager());
 		} catch (InterruptedException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	private void inputPrograms(OutputStream input) throws IOException {
+		pipeResource(input, UNIFICATION_PROGRAM);
+		if (disequations) {
+			pipeResource(input, DISUNIFICATION_PROGRAM);
+		}
+		if (types) {
+			pipeResource(input, TYPES_PROGRAM);
+		}
+		pipeResource(input, FINAL_PROGRAM);
+		if (minimize) {
+			pipeResource(input, HEURISTIC_PROGRAM);
+		}
+	}
+
+	private void pipeResource(OutputStream gringoInput, String resourceName)
+			throws IOException {
+		InputStream unificationProgram = AspProcessor.class
+				.getResourceAsStream(resourceName);
+		pipe(unificationProgram, gringoInput);
 	}
 
 	private void pipe(InputStream input, OutputStream output)
@@ -97,8 +124,8 @@ public class ClaspSolver implements AspSolver {
 		String line = "";
 		while (line != null) {
 			line = input.readLine();
-			// System.out.println(line);
 			if (line != null) {
+				// System.out.println(line);
 				output.write(line);
 				output.newLine();
 			}
