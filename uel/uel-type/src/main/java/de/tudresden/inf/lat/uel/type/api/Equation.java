@@ -17,20 +17,20 @@ public interface Equation {
 	 * 
 	 * @return the left-hand side of the equation
 	 */
-	public Integer getLeft();
+	Integer getLeft();
 
 	/**
 	 * Returns the right-hand side of the equation as a set of atom identifiers.
 	 * 
 	 * @return the right-hand side of the equation
 	 */
-	public Set<Integer> getRight();
+	Set<Integer> getRight();
 
 	/**
 	 * Tells whether this equation is primitive.
 	 * 
 	 * @return <code>true</code> if and only if this equation if primitive
 	 */
-	public boolean isPrimitive();
+	boolean isPrimitive();
 
 }

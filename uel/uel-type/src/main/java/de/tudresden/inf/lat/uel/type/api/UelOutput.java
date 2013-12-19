@@ -17,13 +17,13 @@ public interface UelOutput {
 	 * 
 	 * @return the atom manager
 	 */
-	public IndexedSet<Atom> getAtomManager();
+	IndexedSet<Atom> getAtomManager();
 
 	/**
 	 * Returns the set of equations.
 	 * 
 	 * @return the set of equations
 	 */
-	public Set<Equation> getEquations();
+	Set<Equation> getEquations();
 
 }

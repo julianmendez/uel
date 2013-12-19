@@ -13,38 +13,38 @@ public interface Solver {
 	/**
 	 * The integer 0 that signals the end of a clause.
 	 */
-	public static final Integer END_OF_CLAUSE = 0;
+	Integer END_OF_CLAUSE = 0;
 
 	/**
 	 * A string representing a line break.
 	 */
-	public static final String NEWLINE = System.getProperty("line.separator");
+	String NEWLINE = System.getProperty("line.separator");
 
 	/**
 	 * The string that signals the start of a DIMACS CNF file.
 	 */
-	public static final String P_CNF = "p cnf";
+	String P_CNF = "p cnf";
 
 	/**
 	 * The string that signals the start of a WCNF file.
 	 */
-	public static final String P_WCNF = "p wcnf";
+	String P_WCNF = "p wcnf";
 
 	/**
 	 * First string returned by the solver when the SAT problem is satisfiable.
 	 */
-	public static final String SAT = "SAT";
+	String SAT = "SAT";
 
 	/**
 	 * The string ' '.
 	 */
-	public static final String SPACE = " ";
+	String SPACE = " ";
 
 	/**
 	 * First string returned by the solver when the SAT problem is not
 	 * satisfiable.
 	 */
-	public static final String UNSAT = "UNSAT";
+	String UNSAT = "UNSAT";
 
 	/**
 	 * Solves a SAT problem. The input must be in the DIMACS CNF format.
@@ -54,7 +54,7 @@ public interface Solver {
 	 * @return the output of the SAT solver
 	 * @throws IOException
 	 */
-	public SatOutput solve(SatInput input) throws IOException;
+	SatOutput solve(SatInput input) throws IOException;
 
 	/**
 	 * Updates the last solved SAT instances by adding one clause and solves the
@@ -65,6 +65,6 @@ public interface Solver {
 	 * @return the output of the SAT solver
 	 * @throws IOException
 	 */
-	public SatOutput update(Set<Integer> clause) throws IOException;
+	SatOutput update(Set<Integer> clause) throws IOException;
 
 }

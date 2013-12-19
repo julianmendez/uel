@@ -20,16 +20,16 @@ public interface AspOutput {
 	 * Returns several mappings from the variables to their subsuming
 	 * non-variable atoms.
 	 */
-	public List<Map<Integer, Set<Integer>>> getAssignments();
+	List<Map<Integer, Set<Integer>>> getAssignments();
 
 	/**
 	 * Returns a value indicating whether the ASP solver output "satisfiable".
 	 */
-	public boolean isSatisfiable();
+	boolean isSatisfiable();
 
 	/**
 	 * Returns a list of stats provided by the ASP solver.
 	 */
-	public List<Entry<String, String>> getStats();
+	List<Entry<String, String>> getStats();
 
 }

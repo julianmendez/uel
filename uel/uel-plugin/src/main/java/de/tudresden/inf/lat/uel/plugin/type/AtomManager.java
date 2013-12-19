@@ -18,7 +18,7 @@ public interface AtomManager {
 	 * Suffix used for concept names created automatically by primitive
 	 * definitions.
 	 */
-	public static final String UNDEF_SUFFIX = "_UNDEF";
+	String UNDEF_SUFFIX = "_UNDEF";
 
 	/**
 	 * Adds a new concept to the manager and returns the identifier of the given
@@ -28,7 +28,7 @@ public interface AtomManager {
 	 *            concept name
 	 * @return the identifier of the given concept name
 	 */
-	public Integer addConcept(String name);
+	Integer addConcept(String name);
 
 	/**
 	 * Adds a new role to the manager and returns the identifier of the given
@@ -38,7 +38,7 @@ public interface AtomManager {
 	 *            role name
 	 * @return the identifier of the given role name
 	 */
-	public Integer addRole(String name);
+	Integer addRole(String name);
 
 	/**
 	 * Creates a new concept name atom with the given name.
@@ -50,7 +50,7 @@ public interface AtomManager {
 	 *            a variable
 	 * @return a new concept name atom registered in this atom manager
 	 */
-	public ConceptName createConceptName(String conceptName, boolean isVar);
+	ConceptName createConceptName(String conceptName, boolean isVar);
 
 	/**
 	 * Creates a new existential restriction atom with the given role name and
@@ -63,7 +63,7 @@ public interface AtomManager {
 	 * @return a new existential restriction atom registered in this atom
 	 *         manager
 	 */
-	public ExistentialRestriction createExistentialRestriction(String roleName,
+	ExistentialRestriction createExistentialRestriction(String roleName,
 			ConceptName child);
 
 	/**
@@ -79,14 +79,14 @@ public interface AtomManager {
 	 * @return a new concept name atom taking another concept name atom as
 	 *         reference
 	 */
-	public ConceptName createUndefConceptName(ConceptName concept, boolean isVar);
+	ConceptName createUndefConceptName(ConceptName concept, boolean isVar);
 
 	/**
 	 * Returns the stored atoms and their indices.
 	 * 
 	 * @return the stored atoms and their indices
 	 */
-	public IndexedSet<Atom> getAtoms();
+	IndexedSet<Atom> getAtoms();
 
 	/**
 	 * Returns the index of the given concept name.
@@ -95,7 +95,7 @@ public interface AtomManager {
 	 *            concept name
 	 * @return the index of the given concept name.
 	 */
-	public Integer getConceptIndex(String conceptName);
+	Integer getConceptIndex(String conceptName);
 
 	/**
 	 * Returns the concept name of the given index.
@@ -104,7 +104,7 @@ public interface AtomManager {
 	 *            index
 	 * @return the concept name of the given index
 	 */
-	public String getConceptName(Integer id);
+	String getConceptName(Integer id);
 
 	/**
 	 * Returns the index of the given role name.
@@ -113,7 +113,7 @@ public interface AtomManager {
 	 *            role name
 	 * @return the index of the given role name
 	 */
-	public Integer getRoleIndex(String roleName);
+	Integer getRoleIndex(String roleName);
 
 	/**
 	 * Returns the role name of the given index.
@@ -122,6 +122,6 @@ public interface AtomManager {
 	 *            index
 	 * @return the role name of the given index
 	 */
-	public String getRoleName(Integer id);
+	String getRoleName(Integer id);
 
 }

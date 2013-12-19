@@ -20,7 +20,7 @@ public interface Ontology {
 	 * @return <code>true</code> if and only if this ontology contains a
 	 *         definition for the specified concept name identifier
 	 */
-	public boolean containsDefinition(Integer id);
+	boolean containsDefinition(Integer id);
 
 	/**
 	 * Tells whether this ontology contains the specified primitive definition.
@@ -32,7 +32,7 @@ public interface Ontology {
 	 * @return <code>true</code> if and only if this ontology contains a
 	 *         primitive definition for the specified concept name identifier
 	 */
-	public boolean containsPrimitiveDefinition(Integer id);
+	boolean containsPrimitiveDefinition(Integer id);
 
 	/**
 	 * Returns the definition for a given concept name.
@@ -41,7 +41,7 @@ public interface Ontology {
 	 *            concept name identifier
 	 * @return the definitions for a given concept name
 	 */
-	public Equation getDefinition(Integer id);
+	Equation getDefinition(Integer id);
 
 	/**
 	 * Returns all the concept names on the left-hand side of primitive and
@@ -50,7 +50,7 @@ public interface Ontology {
 	 * @return all the concept names on the left-hand side of primitive and
 	 *         non-primitive definitions
 	 */
-	public Set<Integer> getDefinitionIds();
+	Set<Integer> getDefinitionIds();
 
 	/**
 	 * Returns the set of equations that are reachable from a give concept name.
@@ -59,7 +59,7 @@ public interface Ontology {
 	 *            concept name identifier
 	 * @return the set of equations that are reachable from a give concept name
 	 */
-	public Set<Equation> getModule(Integer id);
+	Set<Equation> getModule(Integer id);
 
 	/**
 	 * Returns the primitive definition for a given concept name. The ontology
@@ -69,6 +69,6 @@ public interface Ontology {
 	 *            concept name identifier
 	 * @return the definitions for a given concept name
 	 */
-	public Equation getPrimitiveDefinition(Integer id);
+	Equation getPrimitiveDefinition(Integer id);
 
 }

@@ -30,7 +30,7 @@ public interface IndexedSet<T> extends Set<T> {
 	 *             when trying to add an existing element with a different index
 	 *             or a new element with a used index
 	 */
-	public boolean add(T element, Integer index);
+	boolean add(T element, Integer index);
 
 	/**
 	 * Adds an element to this indexed set and returns its index. If the element
@@ -41,7 +41,7 @@ public interface IndexedSet<T> extends Set<T> {
 	 * @return the index of the given element
 	 * @see #getIndex
 	 */
-	public int addAndGetIndex(T element);
+	int addAndGetIndex(T element);
 
 	/**
 	 * Returns the element for a given index.
@@ -50,7 +50,7 @@ public interface IndexedSet<T> extends Set<T> {
 	 *            index
 	 * @return the element for a given index
 	 */
-	public T get(int id);
+	T get(int id);
 
 	/**
 	 * Returns the index of the given element.
@@ -59,21 +59,21 @@ public interface IndexedSet<T> extends Set<T> {
 	 *            element
 	 * @return the index of the given element
 	 */
-	public int getIndex(T element);
+	int getIndex(T element);
 
 	/**
 	 * Returns a collection containing the indices.
 	 * 
 	 * @return a collection containing the indices
 	 */
-	public Collection<Integer> getIndices();
+	Collection<Integer> getIndices();
 
 	/**
 	 * Returns the maximum index in this indexed set.
 	 * 
 	 * @return the maximum index in this indexed set
 	 */
-	public Integer getMaxIndex();
+	Integer getMaxIndex();
 
 	/**
 	 * Returns the next unused index. This number is strictly greater than the
@@ -82,6 +82,6 @@ public interface IndexedSet<T> extends Set<T> {
 	 * @return the next unused index
 	 * @see #getMaxIndex()
 	 */
-	public Integer getNextIndex();
+	Integer getNextIndex();
 
 }

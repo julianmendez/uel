@@ -14,7 +14,7 @@ public interface Atom {
 	 * 
 	 * @return the concept name
 	 */
-	public Integer getConceptNameId();
+	Integer getConceptNameId();
 
 	/**
 	 * Tells whether this flat atom is a concept name.
@@ -22,7 +22,7 @@ public interface Atom {
 	 * @return <code>true</code> if and only if this atom has an associated role
 	 *         name
 	 */
-	public boolean isConceptName();
+	boolean isConceptName();
 
 	/**
 	 * Tells whether this flat atom is a constant.
@@ -30,7 +30,7 @@ public interface Atom {
 	 * @return <code>true</code> if and only if this atom is not an existential
 	 *         restriction and is ground
 	 */
-	public boolean isConstant();
+	boolean isConstant();
 
 	/**
 	 * Tells whether this flat atom is an existential restriction.
@@ -38,7 +38,7 @@ public interface Atom {
 	 * @return <code>true</code> if and only if this atom has an associated role
 	 *         name
 	 */
-	public boolean isExistentialRestriction();
+	boolean isExistentialRestriction();
 
 	/**
 	 * Check whether this flat atom is ground.
@@ -46,7 +46,7 @@ public interface Atom {
 	 * @return <code>true</code> if and only if the concept name is not a
 	 *         variable
 	 */
-	public boolean isGround();
+	boolean isGround();
 
 	/**
 	 * Check whether this flat atom is a variable.
@@ -54,6 +54,6 @@ public interface Atom {
 	 * @return <code>true</code> if and only if this atom is not an existential
 	 *         restriction and is not ground
 	 */
-	public boolean isVariable();
+	boolean isVariable();
 
 }

@@ -18,7 +18,7 @@ public interface UelProcessor {
 	 * @return <code>true</code> if and only if the unifier has been
 	 *         successfully computed
 	 */
-	public boolean computeNextUnifier();
+	boolean computeNextUnifier();
 
 	/**
 	 * Returns information about the last computation. This information can
@@ -27,14 +27,14 @@ public interface UelProcessor {
 	 * 
 	 * @return information about the last computation
 	 */
-	public List<Map.Entry<String, String>> getInfo();
+	List<Map.Entry<String, String>> getInfo();
 
 	/**
 	 * Returns the input to be used to compute the next unifier.
 	 * 
 	 * @return the input to be used to compute the next unifier
 	 */
-	public UelInput getInput();
+	UelInput getInput();
 
 	/**
 	 * Returns the result of the last computation.
@@ -43,6 +43,6 @@ public interface UelProcessor {
 	 *             if invoked before the first computation
 	 * @return the result of the last computation
 	 */
-	public UelOutput getUnifier();
+	UelOutput getUnifier();
 
 }

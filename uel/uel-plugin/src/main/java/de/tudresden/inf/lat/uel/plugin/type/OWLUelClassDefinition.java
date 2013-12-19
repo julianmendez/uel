@@ -6,10 +6,10 @@ import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
 
 public interface OWLUelClassDefinition {
 
-	public OWLEquivalentClassesAxiom asOWLEquivalentClassesAxiom();
+	OWLEquivalentClassesAxiom asOWLEquivalentClassesAxiom();
 
-	public OWLClass getDefiniendum();
+	OWLClass getDefiniendum();
 
-	public OWLClassExpression getDefiniens();
+	OWLClassExpression getDefiniens();
 
 }

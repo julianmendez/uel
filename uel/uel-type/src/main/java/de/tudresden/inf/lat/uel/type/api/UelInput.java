@@ -15,41 +15,41 @@ public interface UelInput {
 	 * 
 	 * @return the atom manager
 	 */
-	public IndexedSet<Atom> getAtomManager();
+	IndexedSet<Atom> getAtomManager();
 
 	/**
 	 * Returns the set of flattened definitions.
 	 * 
 	 * @return the set of definitions
 	 */
-	public Set<Equation> getDefinitions();
+	Set<Equation> getDefinitions();
 
 	/**
 	 * Returns the set of flattened goal equations.
 	 * 
 	 * @return the set of goal equations
 	 */
-	public Set<Equation> getGoalEquations();
-	
+	Set<Equation> getGoalEquations();
+
 	/**
 	 * Returns the set of flattened and small goal disequations.
 	 * 
 	 * @return the set of goal disequations
 	 */
-	public Set<SmallEquation> getGoalDisequations();
-	
+	Set<SmallEquation> getGoalDisequations();
+
 	/**
 	 * Returns the set of all flattened equations (definitions and goal).
 	 * 
 	 * @return the set of equations
 	 */
-	public Set<Equation> getEquations();
+	Set<Equation> getEquations();
 
 	/**
 	 * Returns the set of user variables.
 	 * 
 	 * @return the set of user variables
 	 */
-	public Set<Integer> getUserVariables();
+	Set<Integer> getUserVariables();
 
 }
