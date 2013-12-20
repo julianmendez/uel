@@ -23,8 +23,8 @@ public class ClaspSolver implements AspSolver {
 	private static String HEURISTIC_PROGRAM = "resources/heuristic.lp";
 	private static String FINAL_PROGRAM = "resources/final.lp";
 	private static String GRINGO_COMMAND = "gringo";
-	private static String CLASP_COMMAND = "clasp -n 100 --outf=2";
-	private static String HCLASP_COMMAND = "hclasp -n 100 -e record --outf=2";
+	private static String CLASP_COMMAND = "clasp --project --outf=2";
+	private static String HCLASP_COMMAND = "hclasp --project -e record --outf=2";
 
 	private boolean disequations;
 	private boolean types;
