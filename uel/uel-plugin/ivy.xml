@@ -20,7 +20,8 @@
 		<dependency org="org.sat4j" name="org.sat4j.core" rev="2.3.0" />
 		<dependency org="org.sat4j" name="org.sat4j.pb" rev="2.3.0" />
 		<dependency org="org.sat4j" name="org.sat4j.maxsat" rev="2.3.0" />
-		<dependency org="net.sourceforge.owlapi" name="owlapi" rev="3.4.2" />
+		<dependency org="net.sourceforge.owlapi" name="owlapi-distribution" rev="3.4.9" />
+		<dependency org="net.sourceforge.owlapi" name="oboformat-included-owlapi" rev="3.4.9" />
 		<dependency org="com.sun.java" name="jlfgr" rev="1.0" />
 		<dependency org="de.tudresden.inf.lat.jcel" name="jcel" rev="0.19.1" />
 		<dependency org="org.hamcrest" name="hamcrest-core" rev="1.3" />

@@ -3,7 +3,7 @@
 	<classpathentry kind="src" path="src/main/java"/>
 	<classpathentry kind="src" path="src/test/java"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="/uel-build/jars/lib/net/sourceforge/owlapi/owlapi/3.4.2/owlapi-3.4.2.jar" sourcepath="/uel-build/jars/lib/net/sourceforge/owlapi/owlapi/3.4.2/owlapi-3.4.2-sources.jar"/>
+	<classpathentry kind="lib" path="/uel-build/jars/lib/net/sourceforge/owlapi/owlapi-distribution/3.4.9/owlapi-distribution-3.4.9.jar" />
 	<classpathentry kind="lib" path="/uel-build/jars/lib/org/protege/protege-editor-owl/4.1/protege-editor-owl-4.1.jar"/>
 	<classpathentry kind="lib" path="/uel-build/jars/lib/org/protege/protege-editor-core-application/4.1/protege-editor-core-application-4.1.jar"/>
 	<classpathentry kind="lib" path="/uel-build/jars/lib/de/tudresden/inf/lat/jcel/jcel/0.19.1/jcel-0.19.1.jar"/>
