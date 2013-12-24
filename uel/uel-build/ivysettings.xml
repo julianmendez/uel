@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ivysettings>
+	<settings defaultResolver="local" />
+	<resolvers>
+		<ibiblio name="central" m2compatible="true" />
+		<filesystem name="local">
+			<artifact pattern="${ivy.settings.dir}/jars/lib/[orgPath]/[module]/[revision]/[artifact]-[revision].[ext]" />
+			<artifact pattern="${ivy.settings.dir}/../[artifact]/target/[artifact]-[revision].[ext]" />
+		</filesystem>
+	</resolvers>
+	<modules>
+		<module organisation="de.tudresden.inf.lat" name="uel-type" resolver="local"/>
+		<module organisation="de.tudresden.inf.lat" name="uel-rule" resolver="local"/>
+		<module organisation="de.tudresden.inf.lat" name="uel-sat" resolver="local"/>
+		<module organisation="de.tudresden.inf.lat" name="uel-asp" resolver="local"/>
+		<module organisation="de.tudresden.inf.lat" name="uel-plugin" resolver="local"/>
+	</modules>
+</ivysettings>
+

@@ -7,23 +7,19 @@
  *
 -->
 
-	<!-- 
-	For more information about this file, see http://ant.apache.org 
-	-->
+	<!-- For more information about this file, see http://ant.apache.org -->
 
-	<!-- Imports project.groupId, project.artifactId, and project.version properties. -->
+	<!-- Imports 'project.groupId', 'project.artifactId', and 'project.version' properties. -->
 	<xmlproperty file="pom.xml" />
 
-	<!-- Imports dependencies. -->
+	<!-- Imports 'javadocsrc' property. -->
 	<property file="version.properties" />
 
-	<!-- 
-
-	The following version properties should be defined at this point : 
-	  * dependencies : has a space-separated list of the jars required to compile the project and run the test cases
-	  * javadocsrc : has a colon-separated list of source directories for the javadoc
-
-	-->
+	<!-- Project-specific properties. -->
+	<fail unless="project.groupId">Error: 'project.groupId' is undefined. This property should have the group identifier.</fail>
+	<fail unless="project.artifactId">Error: 'project.artifactId' is undefined. This property should have the artifact identifier.</fail>
+	<fail unless="project.version">Error: 'project.version' is undefined. This property should have the version number in the form major.minor.patch.</fail>
+	<fail unless="javadocsrc">Error: 'javadocsrc' is undefined. This property should have a colon-separated list of source directories for the javadoc.</fail>
 
 	<property name="parent.directory" value="../uel-build" />
 	<property name="project.build.directory" value="${basedir}/target" />
@@ -39,7 +35,7 @@
 			<property name="project.groupId" value="${project.groupId}" />
 			<property name="project.artifactId" value="${project.artifactId}" />
 			<property name="project.version" value="${project.version}" />
-			<property name="dependencies" value="${dependencies}" />
+			<property name="javadocsrc" value="${javadocsrc}" />
 		</subant>
 	</target>
 

@@ -35,7 +35,7 @@ import de.tudresden.inf.lat.uel.type.impl.UelInputImpl;
  * @author Stefan Borgwardt
  * 
  */
-public class CNFTester {
+public class CNFChecker {
 
 	private static final String SPACES = "\\s+";
 
@@ -51,7 +51,7 @@ public class CNFTester {
 	 * @throws IOException
 	 *             if there was an error parsing the input file
 	 */
-	public CNFTester(String filename) throws IOException {
+	public CNFChecker(String filename) throws IOException {
 		constructInput(filename);
 	}
 
@@ -157,7 +157,7 @@ public class CNFTester {
 	 */
 	public static void main(String[] args) throws IOException {
 		if (args.length == 1) {
-			CNFTester tester = new CNFTester(args[0]);
+			CNFChecker tester = new CNFChecker(args[0]);
 			tester.runProcessor(UelProcessorFactory.SAT_BASED_ALGORITHM);
 			tester.runProcessor(UelProcessorFactory.SAT_BASED_ALGORITHM_MINIMAL);
 			tester.runProcessor(UelProcessorFactory.RULE_BASED_ALGORITHM);
