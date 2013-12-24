@@ -68,6 +68,16 @@
 		</file>
 
 		<file>
+			<source>${basedir}/../uel-asp/target/uel-asp-${project.version}.jar</source>
+			<outputDirectory>lib</outputDirectory>
+		</file>
+
+		<file>
+			<source>${basedir}/../uel-asp/target/uel-asp-${project.version}-sources.jar</source>
+			<outputDirectory>src</outputDirectory>
+		</file>
+
+		<file>
 			<source>${basedir}/../uel-plugin/target/uel-plugin-${project.version}.jar</source>
 			<outputDirectory>lib</outputDirectory>
 		</file>

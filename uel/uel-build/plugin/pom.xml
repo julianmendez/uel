@@ -42,7 +42,7 @@
 						</goals>
 						<configuration>
 							<files>
-								<file>version.properties</file>
+								<file>build.properties</file>
 							</files>
 						</configuration>
 					</execution>
@@ -72,9 +72,10 @@
 							lib/uel/uel-type/${project.version}/uel-type-${project.version}.jar=../../uel-type/target/uel-type-${project.version}.jar,
 							lib/uel/uel-rule/${project.version}/uel-rule-${project.version}.jar=../../uel-rule/target/uel-rule-${project.version}.jar,
 							lib/uel/uel-sat/${project.version}/uel-sat-${project.version}.jar=../../uel-sat/target/uel-sat-${project.version}.jar,
-							lib/org/sat4j/core/2.3.0/core-2.3.0.jar=../jars/lib/org/sat4j/core/2.3.0/core-2.3.0.jar,
-							lib/org/sat4j/pb/2.3.0/pb-2.3.0.jar=../jars/lib/org/sat4j/pb/2.3.0/pb-2.3.0.jar,
-							lib/org/sat4j/maxsat/2.3.0/maxsat-2.3.0.jar=../jars/lib/org/sat4j/maxsat/2.3.0/maxsat-2.3.0.jar,
+							lib/uel/uel-asp/${project.version}/uel-asp-${project.version}.jar=../../uel-asp/target/uel-asp-${project.version}.jar,
+							lib/org/sat4j/org.sat4j.core/2.3.0/org.sat4j.core-2.3.0.jar=../jars/lib/org/sat4j/org.sat4j.core/2.3.0/org.sat4j.core-2.3.0.jar,
+							lib/org/sat4j/org.sat4j.pb/2.3.0/org.sat4j.pb-2.3.0.jar=../jars/lib/org/sat4j/org.sat4j.pb/2.3.0/org.sat4j.pb-2.3.0.jar,
+							lib/org/sat4j/org.sat4j.maxsat/2.3.0/org.sat4j.maxsat-2.3.0.jar=../jars/lib/org/sat4j/org.sat4j.maxsat/2.3.0/org.sat4j.maxsat-2.3.0.jar,
 							lib/commons-cli/commons-cli/1.2/commons-cli-1.2.jar=../jars/lib/commons-cli/commons-cli/1.2/commons-cli-1.2.jar,
 							lib/com/sun/java/jlfgr/1.0/jlfgr-1.0.jar=../jars/lib/com/sun/java/jlfgr/1.0/jlfgr-1.0.jar
 						</Include-Resource>
