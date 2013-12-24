@@ -13,7 +13,7 @@
 	<xmlproperty file="pom.xml" />
 
 	<!-- Imports 'javadocsrc' property. -->
-	<property file="version.properties" />
+	<property file="build.properties" />
 
 	<!-- Project-specific properties. -->
 	<fail unless="project.groupId">Error: 'project.groupId' is undefined. This property should have the group identifier.</fail>
@@ -31,7 +31,7 @@
 
 	<!-- Compiles this module. -->
 	<target name="dist">
-		<subant genericantfile="${parent.directory}/genericantfile.xml" buildpath=".">
+		<subant genericantfile="${parent.directory}/common.xml" buildpath=".">
 			<property name="project.groupId" value="${project.groupId}" />
 			<property name="project.artifactId" value="${project.artifactId}" />
 			<property name="project.version" value="${project.version}" />
