@@ -71,7 +71,7 @@
 		<repository>
 			<id>localrepo</id>
 			<name>local maven repository</name>
-			<url>file:../uel-build/jars/lib</url>
+			<url>file:../uel-build/lib</url>
 		</repository>
 
 	</repositories>
