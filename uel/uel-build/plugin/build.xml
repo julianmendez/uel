@@ -31,6 +31,7 @@
 	<property name="_targetlib.directory" value="target" />
 	<property name="groupId.directory" value="uel" />
 	<property name="repository.directory" value="../jars/lib" />
+	<property name="localrepository.directory" value="../lib" />
 	<property name="project.build.outputDirectory" value="${project.build.directory}/classes" />
 	<property name="_jars.directory" value="${basedir}/.." />
 	<property name="_bundle.directory" value="${project.build.directory}" />
@@ -91,6 +92,7 @@
 		<mkdir dir="${_lib.directory}" />
 		<copy todir="${_lib.directory}">
 			<fileset dir="${repository.directory}" />
+			<fileset dir="${localrepository.directory}" />
 		</copy>
 	</target>
 
