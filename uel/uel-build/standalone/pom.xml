@@ -74,7 +74,7 @@
 							@../../uel-rule/target/uel-rule-${project.version}.jar,
 							@../../uel-sat/target/uel-sat-${project.version}.jar,
 							@../../uel-asp/target/uel-asp-${project.version}.jar,
-							@../jars/lib/org/sat4j/org.sat4j.core/2.3.0/org.sat4j.core-2.3.0.jar,
+							@../lib/org/sat4j/org.sat4j.core/2.3.0/org.sat4j.core-2.3.0.jar,
 							@../jars/lib/org/sat4j/org.sat4j.pb/2.3.0/org.sat4j.pb-2.3.0.jar,
 							@../jars/lib/org/sat4j/org.sat4j.maxsat/2.3.0/org.sat4j.maxsat-2.3.0.jar,
 							@../jars/lib/commons-cli/commons-cli/1.2/commons-cli-1.2.jar,

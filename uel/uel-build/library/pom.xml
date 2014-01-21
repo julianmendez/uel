@@ -70,6 +70,7 @@
 						<Include-Resource>
 							{maven-resources}, {maven-dependencies},
 							@../../uel-plugin/target/uel-plugin-${project.version}.jar,
+							@../../uel-asp/target/uel-asp-${project.version}.jar,
 							@../../uel-type/target/uel-type-${project.version}.jar,
 							@../../uel-rule/target/uel-rule-${project.version}.jar,
 							@../../uel-sat/target/uel-sat-${project.version}.jar
