@@ -13,10 +13,8 @@
 
 	<dependencies>
 		<dependency name="uel-type" rev="latest.integration" />
-		<dependency org="junit" name="junit" rev="4.11" />
-		<dependency org="org.sat4j" name="org.sat4j.core" rev="2.3.0" />
-		<dependency org="org.sat4j" name="org.sat4j.pb" rev="2.3.0" />
-		<dependency org="org.sat4j" name="org.sat4j.maxsat" rev="2.3.0" />
+		<dependency org="org.ow2.sat4j" name="org.ow2.sat4j.maxsat" rev="2.3.5"
+			conf="javadoc->javadoc;sources->sources;compile->default" />
 	</dependencies>
 
 </ivy-module>

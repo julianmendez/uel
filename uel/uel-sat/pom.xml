@@ -47,21 +47,9 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.sat4j</groupId>
-			<artifactId>org.sat4j.core</artifactId>
-			<version>2.3.0</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.sat4j</groupId>
-			<artifactId>org.sat4j.pb</artifactId>
-			<version>2.3.0</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.sat4j</groupId>
-			<artifactId>org.sat4j.maxsat</artifactId>
-			<version>2.3.0</version>
+			<groupId>org.ow2.sat4j</groupId>
+			<artifactId>org.ow2.sat4j.maxsat</artifactId>
+			<version>2.3.5</version>
 		</dependency>
 
 	</dependencies>

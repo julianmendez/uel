@@ -14,8 +14,8 @@
 
 		<dependency>
 			<groupId>net.sourceforge.owlapi</groupId>
-			<artifactId>owlapi</artifactId>
-			<version>3.4.4</version>
+			<artifactId>owlapi-distribution</artifactId>
+			<version>3.4.10</version>
 		</dependency>
 
 	</dependencies>
