@@ -1,17 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="src/main/java"/>
-	<classpathentry kind="src" path="src/test/java"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="/uel-build/jars/lib/org/protege/protege-editor-owl/4.1.0/protege-editor-owl-4.1.0.jar"/>
-	<classpathentry kind="lib" path="/uel-build/jars/lib/org/protege/protege-editor-core-application/4.1.0/protege-editor-core-application-4.1.0.jar"/>
-	<classpathentry kind="lib" path="/uel-build/jars/lib/de/tudresden/inf/lat/jcel/jcel/0.19.1/jcel-0.19.1.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/uel-type"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/uel-rule"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/uel-sat"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/uel-asp"/>
-	<classpathentry kind="lib" path="/uel-build/jars/lib/junit/junit/4.11/junit-4.11.jar"/>
-	<classpathentry kind="lib" path="/uel-build/jars/lib/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar"/>
-	<classpathentry kind="lib" path="/uel-build/jars/lib/net/sourceforge/owlapi/owlapi-distribution/3.4.10/owlapi-distribution-3.4.10.jar"/>
-	<classpathentry kind="output" path="target/classes"/>
+	<classpathentry kind="src" path="src/main/java" />
+	<classpathentry kind="src" path="src/test/java" />
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER" />
+	<classpathentry kind="con" path="org.eclipse.m2e.MAVEN2_CLASSPATH_CONTAINER" />
+	<classpathentry kind="output" path="target/classes" />
 </classpath>
