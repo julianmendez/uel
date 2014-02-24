@@ -16,14 +16,6 @@
 	<packaging>pom</packaging>
 	<version>1.3.0</version>
 
-	<name>uel build</name>
-
-
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-	</properties>
-
-
 	<modules>
 		<module>../uel-type</module>
 		<module>../uel-rule</module>
@@ -34,6 +26,10 @@
 		<module>plugin</module>
 		<module>standalone</module>
 	</modules>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
 
 	<build>
 		<plugins>
@@ -75,6 +71,8 @@
 
 		</plugins>
 	</build>
+
+	<name>uel build</name>
 
 </project>
 

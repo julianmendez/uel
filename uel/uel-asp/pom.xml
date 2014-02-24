@@ -16,28 +16,6 @@
 	<version>1.3.0</version>
 	<packaging>jar</packaging>
 
-	<name>uel asp</name>
-
-
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-	</properties>
-
-
-	<licenses>
-
-		<license>
-			<name>GNU Lesser General Public License version 3</name>
-			<url>http://www.gnu.org/licenses/lgpl.txt</url>
-		</license>
-
-		<license>
-			<name>Apache License, Version 2.0</name>
-			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-		</license>
-
-	</licenses>
-
 	<dependencies>
 
 		<dependency>
@@ -53,6 +31,39 @@
 		</dependency>
 
 	</dependencies>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+	<name>uel asp</name>
+
+	<licenses>
+
+		<license>
+			<name>GNU Lesser General Public License version 3</name>
+			<url>http://www.gnu.org/licenses/lgpl.txt</url>
+		</license>
+
+		<license>
+			<name>Apache License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+		</license>
+
+	</licenses>
 
 	<repositories>
 
