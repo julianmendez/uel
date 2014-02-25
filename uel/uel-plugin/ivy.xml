@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ivy-module version="2.0">
 
-	<info organisation="de.tudresden.inf.lat" module="uel-plugin" />
+	<info organisation="de.tudresden.inf.lat.uel" module="uel-plugin" />
 
 	<configurations defaultconfmapping="compile->default">
 		<conf name="compile" />
