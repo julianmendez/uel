@@ -16,27 +16,27 @@
 	<dependencies>
 
 		<dependency>
-			<groupId>de.tudresden.inf.lat.uel</groupId>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>uel-type</artifactId>
-			<version>1.3.0</version>
+			<version>${project.version}</version>
 		</dependency>
 
 		<dependency>
-			<groupId>de.tudresden.inf.lat.uel</groupId>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>uel-rule</artifactId>
-			<version>1.3.0</version>
+			<version>${project.version}</version>
 		</dependency>
 
 		<dependency>
-			<groupId>de.tudresden.inf.lat.uel</groupId>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>uel-sat</artifactId>
-			<version>1.3.0</version>
+			<version>${project.version}</version>
 		</dependency>
 
 		<dependency>
-			<groupId>de.tudresden.inf.lat.uel</groupId>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>uel-asp</artifactId>
-			<version>1.3.0</version>
+			<version>${project.version}</version>
 		</dependency>
 
 		<dependency>
