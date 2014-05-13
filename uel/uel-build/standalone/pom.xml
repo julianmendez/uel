@@ -79,7 +79,7 @@
 							@../jars/lib/org/ow2/sat4j/org.ow2.sat4j.maxsat/2.3.5/org.ow2.sat4j.maxsat-2.3.5.jar,
 							@../jars/lib/commons-cli/commons-cli/1.1/commons-cli-1.1.jar,
 							@../jars/lib/com/sun/java/jlfgr/1.0/jlfgr-1.0.jar,
-							@../jars/lib/net/sourceforge/owlapi/owlapi-distribution/3.4.10/owlapi-distribution-3.4.10.jar
+							@../jars/lib/net/sourceforge/owlapi/owlapi-distribution/3.5.0/owlapi-distribution-3.5.0.jar
 						</Include-Resource>
 					</instructions>
 				</configuration>
