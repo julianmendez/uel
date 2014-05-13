@@ -20,7 +20,7 @@
 	<fileSets>
 
 		<fileSet>
-			<directory>${basedir}/../uel-plugin/target/site/</directory>
+			<directory>${basedir}/../../uel-plugin/target/site/</directory>
 			<includes>
 				<include>**</include>
 			</includes>
