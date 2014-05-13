@@ -102,7 +102,7 @@ public class AlternativeUelStarterTest {
 		return reasoner;
 	}
 
-	private String toString(OWLOntology ontology) {
+	String toString(OWLOntology ontology) {
 		StringBuffer sbuf = new StringBuffer();
 
 		for (OWLAxiom axiom : ontology.getAxioms()) {
