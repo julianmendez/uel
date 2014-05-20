@@ -11,12 +11,5 @@
 			<ibiblio name="central" m2compatible="true" />
 		</chain>
 	</resolvers>
-	<modules>
-		<module organisation="de.tudresden.inf.lat.uel" name="uel-type" resolver="local"/>
-		<module organisation="de.tudresden.inf.lat.uel" name="uel-rule" resolver="local"/>
-		<module organisation="de.tudresden.inf.lat.uel" name="uel-sat" resolver="local"/>
-		<module organisation="de.tudresden.inf.lat.uel" name="uel-asp" resolver="local"/>
-		<module organisation="de.tudresden.inf.lat.uel" name="uel-plugin" resolver="local"/>
-	</modules>
 </ivysettings>
 

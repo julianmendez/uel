@@ -17,12 +17,6 @@
 
 		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>uel-type</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>${project.groupId}</groupId>
 			<artifactId>uel-rule</artifactId>
 			<version>${project.version}</version>
 		</dependency>
@@ -46,15 +40,15 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.protege</groupId>
-			<artifactId>protege-editor-owl</artifactId>
-			<version>4.1.0</version>
+			<groupId>edu.stanford.protege</groupId>
+			<artifactId>org.protege.editor.owl</artifactId>
+			<version>4.3.0</version>
 		</dependency>
 
 		<dependency>
-			<groupId>org.protege</groupId>
-			<artifactId>protege-editor-core-application</artifactId>
-			<version>4.1.0</version>
+			<groupId>edu.stanford.protege</groupId>
+			<artifactId>org.protege.editor.core.application</artifactId>
+			<version>4.3.0</version>
 		</dependency>
 
 		<dependency>
@@ -67,12 +61,14 @@
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.11</version>
+			<scope>test</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>de.tudresden.inf.lat.jcel</groupId>
 			<artifactId>jcel</artifactId>
 			<version>0.19.1</version>
+			<scope>test</scope>
 		</dependency>
 
 	</dependencies>
