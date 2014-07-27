@@ -19,12 +19,12 @@ import de.tudresden.inf.lat.uel.type.impl.ConceptName;
 import de.tudresden.inf.lat.uel.type.impl.ExistentialRestriction;
 
 /**
- * This class parses the output of clasp.
+ * This class parses the output of clingo.
  * 
  * @author Stefan Borgwardt
  * 
  */
-public class ClaspOutput implements AspOutput {
+public class ClingoOutput implements AspOutput {
 
 	private static String SATISFIABLE = "SATISFIABLE";
 	private static String OPTIMUM_FOUND = "OPTIMUM FOUND";
@@ -34,7 +34,7 @@ public class ClaspOutput implements AspOutput {
 	private boolean satisfiable;
 	private List<Entry<String, String>> stats;
 
-	public ClaspOutput(String json, boolean searchCompleted,
+	public ClingoOutput(String json, boolean searchCompleted,
 			IndexedSet<Atom> atomManager) throws IOException {
 		stats = new ArrayList<Entry<String, String>>();
 		addEntry(stats, "Search Completed", searchCompleted ? "Yes" : "No");
@@ -57,7 +57,7 @@ public class ClaspOutput implements AspOutput {
 		if (satisfiable) {
 			// Witnesses -> assignments (using atomManager)
 			assignments = new ArrayList<Map<Integer, Set<Integer>>>();
-			for (JsonNode witness : root.get("Witnesses")) {
+			for (JsonNode witness : root.get("Call").get(0).get("Witnesses")) {
 				Map<Integer, Set<Integer>> assignment = new HashMap<Integer, Set<Integer>>();
 				for (JsonNode subsumption : witness.get("Value")) {
 					String text = subsumption.asText();
@@ -69,12 +69,13 @@ public class ClaspOutput implements AspOutput {
 			}
 		}
 
-		// Solver,Stats>Time -> stats
+		// Solver,Time -> stats
 		addEntry(stats, "ASP Solver", root.get("Solver").asText());
-		JsonNode time = root.get("Stats").get("Time");
+		JsonNode time = root.get("Time");
 		addEntry(stats, "Total time (s)", time.get("Total").asText());
 		addEntry(stats, "Solving time (s)", time.get("Solve").asText());
 		addEntry(stats, "Model time (s)", time.get("Model").asText());
+		addEntry(stats, "Unsat time (s)", time.get("Unsat").asText());
 		addEntry(stats, "CPU time (s)", time.get("CPU").asText());
 	}
 

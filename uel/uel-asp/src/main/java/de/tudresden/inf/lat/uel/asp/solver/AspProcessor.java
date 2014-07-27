@@ -42,7 +42,7 @@ public class AspProcessor implements UelProcessor {
 	public boolean computeNextUnifier() {
 		// TODO: implement asynchronous execution of ClaspSolver
 		if (!computed) {
-			AspSolver solver = new ClaspSolver(!uelInput.getGoalDisequations()
+			AspSolver solver = new ClingoSolver(!uelInput.getGoalDisequations()
 					.isEmpty(), false, minimize);
 			try {
 				aspOutput = solver.solve(aspInput);
