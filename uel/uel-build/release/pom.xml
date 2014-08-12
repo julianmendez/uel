@@ -33,7 +33,7 @@
 
 					<execution>
 						<id>create-javadoc-zip</id>
-						<phase>package</phase>
+						<phase>install</phase>
 						<goals>
 							<goal>single</goal>
 						</goals>
@@ -47,7 +47,7 @@
 
 					<execution>
 						<id>create-release</id>
-						<phase>package</phase>
+						<phase>install</phase>
 						<goals>
 							<goal>single</goal>
 						</goals>
