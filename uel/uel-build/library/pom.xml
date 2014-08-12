@@ -13,6 +13,16 @@
 	<artifactId>library</artifactId>
 	<packaging>bundle</packaging>
 
+	<dependencies>
+
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>uel-plugin</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+	</dependencies>
+
 	<parent>
 		<groupId>de.tudresden.inf.lat.uel</groupId>
 		<artifactId>uel-parent</artifactId>
@@ -68,11 +78,11 @@
 						<Main-Class>${mainclass}</Main-Class>
 						<Include-Resource>
 							{maven-resources}, {maven-dependencies},
-							@../../uel-plugin/target/uel-plugin-${project.version}.jar,
-							@../../uel-asp/target/uel-asp-${project.version}.jar,
-							@../../uel-type/target/uel-type-${project.version}.jar,
-							@../../uel-rule/target/uel-rule-${project.version}.jar,
-							@../../uel-sat/target/uel-sat-${project.version}.jar
+							@uel-plugin-${project.version}.jar,
+							@uel-asp-${project.version}.jar,
+							@uel-type-${project.version}.jar,
+							@uel-rule-${project.version}.jar,
+							@uel-sat-${project.version}.jar
 						</Include-Resource>
 					</instructions>
 				</configuration>

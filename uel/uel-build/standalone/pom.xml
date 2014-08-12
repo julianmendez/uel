@@ -13,6 +13,16 @@
 	<artifactId>standalone</artifactId>
 	<packaging>bundle</packaging>
 
+	<dependencies>
+
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>uel-plugin</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+	</dependencies>
+
 	<parent>
 		<groupId>de.tudresden.inf.lat.uel</groupId>
 		<artifactId>uel-parent</artifactId>
@@ -68,17 +78,17 @@
 						<Main-Class>${mainclass}</Main-Class>
 						<Include-Resource>
 							{maven-resources}, {maven-dependencies},
-							@../../uel-plugin/target/uel-plugin-${project.version}.jar,
-							@../../uel-type/target/uel-type-${project.version}.jar,
-							@../../uel-rule/target/uel-rule-${project.version}.jar,
-							@../../uel-sat/target/uel-sat-${project.version}.jar,
-							@../../uel-asp/target/uel-asp-${project.version}.jar,
-							@../lib/org/ow2/sat4j/org.ow2.sat4j.core/2.3.5/org.ow2.sat4j.core-2.3.5.jar,
-							@../jars/lib/org/ow2/sat4j/org.ow2.sat4j.pb/2.3.5/org.ow2.sat4j.pb-2.3.5.jar,
-							@../jars/lib/org/ow2/sat4j/org.ow2.sat4j.maxsat/2.3.5/org.ow2.sat4j.maxsat-2.3.5.jar,
-							@../jars/lib/commons-cli/commons-cli/1.1/commons-cli-1.1.jar,
-							@../jars/lib/com/sun/java/jlfgr/1.0/jlfgr-1.0.jar,
-							@../jars/lib/net/sourceforge/owlapi/owlapi-distribution/3.5.0/owlapi-distribution-3.5.0.jar
+							@uel-plugin-${project.version}.jar,
+							@uel-type-${project.version}.jar,
+							@uel-rule-${project.version}.jar,
+							@uel-sat-${project.version}.jar,
+							@uel-asp-${project.version}.jar,
+							@org.ow2.sat4j.core-2.3.5.jar,
+							@org.ow2.sat4j.pb-2.3.5.jar,
+							@org.ow2.sat4j.maxsat-2.3.5.jar,
+							@commons-cli-1.1.jar,
+							@jlfgr-1.0.jar,
+							@owlapi-distribution-3.5.0.jar
 						</Include-Resource>
 					</instructions>
 				</configuration>
