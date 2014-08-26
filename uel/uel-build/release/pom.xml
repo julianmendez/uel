@@ -32,20 +32,6 @@
 				<executions>
 
 					<execution>
-						<id>create-javadoc-jar</id>
-						<phase>package</phase>
-						<goals>
-							<goal>single</goal>
-						</goals>
-						<configuration>
-							<finalName>uel-${project.version}</finalName>
-							<descriptors>
-								<descriptor>${basedir}/src/main/assembly/javadoc.xml</descriptor>
-							</descriptors>
-						</configuration>
-					</execution>
-
-					<execution>
 						<id>create-release</id>
 						<phase>package</phase>
 						<goals>

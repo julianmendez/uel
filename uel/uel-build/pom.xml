@@ -22,7 +22,6 @@
 		<module>../uel-asp</module>
 		<module>../uel-plugin</module>
 		<module>library</module>
-		<module>librarysources</module>
 		<module>plugin</module>
 		<module>standalone</module>
 		<module>release</module>

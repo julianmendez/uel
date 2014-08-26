@@ -23,8 +23,13 @@
 		</file>
 
 		<file>
-			<source>${basedir}/../librarysources/target/uel-${project.version}-sources.jar</source>
-			<outputDirectory>librarysources</outputDirectory>
+			<source>${basedir}/../library/target/uel-${project.version}-sources.jar</source>
+			<outputDirectory>library</outputDirectory>
+		</file>
+
+		<file>
+			<source>${basedir}/../library/target/uel-${project.version}-javadoc.jar</source>
+			<outputDirectory>library</outputDirectory>
 		</file>
 
 		<file>
@@ -35,11 +40,6 @@
 		<file>
 			<source>${basedir}/../standalone/target/uel.jar</source>
 			<outputDirectory>standalone</outputDirectory>
-		</file>
-
-		<file>
-			<source>${basedir}/../release/target/uel-${project.version}-javadoc.jar</source>
-			<outputDirectory>doc</outputDirectory>
 		</file>
 
 		<file>

@@ -32,6 +32,7 @@
 	<property name="_lib.directory" value="${project.build.directory}/lib" />
 	<property name="_targetlib.directory" value="target" />
 	<property name="_targetclasses.directory" value="${_targetlib.directory}/classes" />
+	<property name="_sources.directory" value="${src.directory}/main/java" />
 	<property name="_resources.directory" value="${src.directory}/main/resources" />
 	<property name="groupId.directory" value="uel" />
 	<property name="repository.directory" value="../target/jars/lib" />
@@ -44,6 +45,7 @@
 	<property name="module.2.name" value="uel-sat" />
 	<property name="module.3.name" value="uel-asp" />
 	<property name="module.4.name" value="uel-plugin" />
+	<property name="lastmodule.name" value="${module.4.name}" />
 
 	<!-- Cleans everything. -->
 	<target name="clean">
@@ -55,6 +57,12 @@
 		<mkdir dir="${_lib.directory}/${groupId.directory}/${module.name}/${project.version}" />
 		<copy todir="${project.build.outputDirectory}">
 			<fileset dir="${_root.directory}/${module.name}/${_targetclasses.directory}" />
+		</copy>
+		<copy todir="${project.build.outputDirectory}" failonerror="false">
+			<fileset dir="${_root.directory}/${module.name}/${_resources.directory}" />
+		</copy>
+		<copy todir="${project.build.outputDirectory}">
+			<fileset dir="${_root.directory}/${module.name}/${_sources.directory}" />
 		</copy>
 		<copy todir="${project.build.outputDirectory}" failonerror="false">
 			<fileset dir="${_root.directory}/${module.name}/${_resources.directory}" />
@@ -88,8 +96,8 @@
 		</copy>
 	</target>
 
-	<!-- Creates the bundle. -->
-	<target name="bundle">
+	<!-- Creates the jars. -->
+	<target name="jars">
 		<mkdir dir="${_bundle.directory}" />
 		<jar destfile="${_bundle.directory}/${_bundle.name}.jar">
 			<fileset dir="${project.build.outputDirectory}" />
@@ -100,9 +108,19 @@
 				<attribute name="Main-Class" value="${mainclass}" />
 			</manifest>
 		</jar>
+		<jar destfile="${_bundle.directory}/${_bundle.name}-sources.jar">
+			<fileset dir="${project.build.outputDirectory}" />
+			<fileset dir="." includes="${bundlelicenses}" />
+			<manifest>
+				<attribute name="Implementation-Title" value="${project.groupId}" />
+				<attribute name="Implementation-Version" value="${project.version}" />
+			</manifest>
+		</jar>
+		<jar destfile="${_bundle.directory}/${_bundle.name}-javadoc.jar">
+			<fileset dir="${_root.directory}/${lastmodule.name}/target/site" includes="apidocs/**" />
+		</jar>
 	</target>
 
-	<target name="dist" depends="clean, getjars, getrepository, bundle" />
+	<target name="dist" depends="clean, getjars, getrepository, jars" />
 
 </project>
-

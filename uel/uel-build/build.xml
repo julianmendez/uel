@@ -26,10 +26,9 @@
 	<property name="module.3.name" value="uel-asp" />
 	<property name="module.4.name" value="uel-plugin" />
 	<property name="build.0.name" value="library" />
-	<property name="build.1.name" value="librarysources" />
-	<property name="build.2.name" value="plugin" />
-	<property name="build.3.name" value="standalone" />
-	<property name="build.4.name" value="release" />
+	<property name="build.1.name" value="plugin" />
+	<property name="build.2.name" value="standalone" />
+	<property name="build.3.name" value="release" />
 
 
 	<!-- Calls subprojects. -->
@@ -47,7 +46,6 @@
 		<subant antfile="${build.1.name}/build.xml" buildpath="." target="${target}" />
 		<subant antfile="${build.2.name}/build.xml" buildpath="." target="${target}" />
 		<subant antfile="${build.3.name}/build.xml" buildpath="." target="${target}" />
-		<subant antfile="${build.4.name}/build.xml" buildpath="." target="${target}" />
 	</target>
 
 	<!-- Cleans compiled files. -->
