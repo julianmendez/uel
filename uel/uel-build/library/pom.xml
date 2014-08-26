@@ -56,7 +56,7 @@
 								<format>jar</format>
 							</formats>
 							<descriptors>
-								<descriptor>${basedir}/src/main/assembly/sources.xml</descriptor>
+								<descriptor>${basedir}/src/assembly/sources.xml</descriptor>
 							</descriptors>
 						</configuration>
 					</execution>
@@ -70,7 +70,7 @@
 						<configuration>
 							<finalName>uel-${project.version}</finalName>
 							<descriptors>
-								<descriptor>${basedir}/src/main/assembly/javadoc.xml</descriptor>
+								<descriptor>${basedir}/src/assembly/javadoc.xml</descriptor>
 							</descriptors>
 						</configuration>
 					</execution>

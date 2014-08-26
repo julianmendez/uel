@@ -41,7 +41,7 @@
 							<finalName>uel-${project.version}</finalName>
 							<appendAssemblyId>false</appendAssemblyId>
 							<descriptors>
-								<descriptor>${basedir}/src/main/assembly/release.xml</descriptor>
+								<descriptor>${basedir}/src/assembly/release.xml</descriptor>
 							</descriptors>
 						</configuration>
 					</execution>
