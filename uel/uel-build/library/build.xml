@@ -36,7 +36,8 @@
 	<property name="_resources.directory" value="${src.directory}/main/resources" />
 	<property name="groupId.directory" value="uel" />
 	<property name="repository.directory" value="../target/jars/lib" />
-	<property name="project.build.outputDirectory" value="${project.build.directory}/classes" />
+	<property name="project.build.outputDirectory.classes" value="${project.build.directory}/classes" />
+	<property name="project.build.outputDirectory.sources" value="${project.build.directory}/sources" />
 	<property name="_bundle.directory" value="${project.build.directory}" />
 	<property name="_bundle.name" value="uel-${project.version}" />
 
@@ -55,16 +56,16 @@
 	<!-- Copies the compiled classes and the created jars. -->
 	<target name="getjar">
 		<mkdir dir="${_lib.directory}/${groupId.directory}/${module.name}/${project.version}" />
-		<copy todir="${project.build.outputDirectory}">
+		<copy todir="${project.build.outputDirectory.classes}">
 			<fileset dir="${_root.directory}/${module.name}/${_targetclasses.directory}" />
 		</copy>
-		<copy todir="${project.build.outputDirectory}" failonerror="false">
+		<copy todir="${project.build.outputDirectory.classes}" failonerror="false">
 			<fileset dir="${_root.directory}/${module.name}/${_resources.directory}" />
 		</copy>
-		<copy todir="${project.build.outputDirectory}">
+		<copy todir="${project.build.outputDirectory.sources}">
 			<fileset dir="${_root.directory}/${module.name}/${_sources.directory}" />
 		</copy>
-		<copy todir="${project.build.outputDirectory}" failonerror="false">
+		<copy todir="${project.build.outputDirectory.sources}" failonerror="false">
 			<fileset dir="${_root.directory}/${module.name}/${_resources.directory}" />
 		</copy>
 	</target>
@@ -100,7 +101,7 @@
 	<target name="jars">
 		<mkdir dir="${_bundle.directory}" />
 		<jar destfile="${_bundle.directory}/${_bundle.name}.jar">
-			<fileset dir="${project.build.outputDirectory}" />
+			<fileset dir="${project.build.outputDirectory.classes}" />
 			<fileset dir="." includes="${bundlelicenses}" />
 			<manifest>
 				<attribute name="Implementation-Title" value="${project.groupId}" />
@@ -109,7 +110,7 @@
 			</manifest>
 		</jar>
 		<jar destfile="${_bundle.directory}/${_bundle.name}-sources.jar">
-			<fileset dir="${project.build.outputDirectory}" />
+			<fileset dir="${project.build.outputDirectory.sources}" />
 			<fileset dir="." includes="${bundlelicenses}" />
 			<manifest>
 				<attribute name="Implementation-Title" value="${project.groupId}" />
