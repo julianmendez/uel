@@ -44,52 +44,52 @@
 
 		<file>
 			<source>${basedir}/../../uel-type/target/uel-type-${project.version}.jar</source>
-			<outputDirectory>lib</outputDirectory>
+			<outputDirectory>modules</outputDirectory>
 		</file>
 
 		<file>
 			<source>${basedir}/../../uel-type/target/uel-type-${project.version}-sources.jar</source>
-			<outputDirectory>src</outputDirectory>
+			<outputDirectory>modules</outputDirectory>
 		</file>
 
 		<file>
 			<source>${basedir}/../../uel-sat/target/uel-sat-${project.version}.jar</source>
-			<outputDirectory>lib</outputDirectory>
+			<outputDirectory>modules</outputDirectory>
 		</file>
 
 		<file>
 			<source>${basedir}/../../uel-sat/target/uel-sat-${project.version}-sources.jar</source>
-			<outputDirectory>src</outputDirectory>
+			<outputDirectory>modules</outputDirectory>
 		</file>
 
 		<file>
 			<source>${basedir}/../../uel-rule/target/uel-rule-${project.version}.jar</source>
-			<outputDirectory>lib</outputDirectory>
+			<outputDirectory>modules</outputDirectory>
 		</file>
 
 		<file>
 			<source>${basedir}/../../uel-rule/target/uel-rule-${project.version}-sources.jar</source>
-			<outputDirectory>src</outputDirectory>
+			<outputDirectory>modules</outputDirectory>
 		</file>
 
 		<file>
 			<source>${basedir}/../../uel-asp/target/uel-asp-${project.version}.jar</source>
-			<outputDirectory>lib</outputDirectory>
+			<outputDirectory>modules</outputDirectory>
 		</file>
 
 		<file>
 			<source>${basedir}/../../uel-asp/target/uel-asp-${project.version}-sources.jar</source>
-			<outputDirectory>src</outputDirectory>
+			<outputDirectory>modules</outputDirectory>
 		</file>
 
 		<file>
 			<source>${basedir}/../../uel-plugin/target/uel-plugin-${project.version}.jar</source>
-			<outputDirectory>lib</outputDirectory>
+			<outputDirectory>modules</outputDirectory>
 		</file>
 
 		<file>
 			<source>${basedir}/../../uel-plugin/target/uel-plugin-${project.version}-sources.jar</source>
-			<outputDirectory>src</outputDirectory>
+			<outputDirectory>modules</outputDirectory>
 		</file>
 
 	</files>

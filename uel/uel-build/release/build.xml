@@ -48,10 +48,8 @@
 
 	<!-- Prepares the jars for the release. -->
 	<target name="preparejars">
-		<copy todir="${_release.directory}/lib">
+		<copy todir="${_release.directory}/modules">
 			<fileset dir="${_root.directory}/${module.name}/target" includes="${module.name}-${project.version}.jar" />
-		</copy>
-		<copy todir="${_release.directory}/src">
 			<fileset dir="${_root.directory}/${module.name}/target" includes="${module.name}-${project.version}-sources.jar" />
 		</copy>
 	</target>
