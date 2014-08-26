@@ -1,0 +1,101 @@
+<assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
+
+
+	<!--
+ *
+ * @author Julian Mendez
+ *
+-->
+
+	<id>sources</id>
+
+	<baseDirectory>.</baseDirectory>
+
+	<fileSets>
+
+		<fileSet>
+			<directory>${basedir}/../../uel-type/src/main/java/</directory>
+			<outputDirectory>.</outputDirectory>
+			<includes>
+				<include>**</include>
+			</includes>
+		</fileSet>
+
+		<fileSet>
+			<directory>${basedir}/../../uel-type/src/main/resources/</directory>
+			<outputDirectory>.</outputDirectory>
+			<includes>
+				<include>**</include>
+			</includes>
+		</fileSet>
+
+		<fileSet>
+			<directory>${basedir}/../../uel-sat/src/main/java/</directory>
+			<outputDirectory>.</outputDirectory>
+			<includes>
+				<include>**</include>
+			</includes>
+		</fileSet>
+
+		<fileSet>
+			<directory>${basedir}/../../uel-sat/src/main/resources/</directory>
+			<outputDirectory>.</outputDirectory>
+			<includes>
+				<include>**</include>
+			</includes>
+		</fileSet>
+
+		<fileSet>
+			<directory>${basedir}/../../uel-rule/src/main/java/</directory>
+			<outputDirectory>.</outputDirectory>
+			<includes>
+				<include>**</include>
+			</includes>
+		</fileSet>
+
+		<fileSet>
+			<directory>${basedir}/../../uel-rule/src/main/resources/</directory>
+			<outputDirectory>.</outputDirectory>
+			<includes>
+				<include>**</include>
+			</includes>
+		</fileSet>
+
+		<fileSet>
+			<directory>${basedir}/../../uel-asp/src/main/java/</directory>
+			<outputDirectory>.</outputDirectory>
+			<includes>
+				<include>**</include>
+			</includes>
+		</fileSet>
+
+		<fileSet>
+			<directory>${basedir}/../../uel-asp/src/main/resources/</directory>
+			<outputDirectory>.</outputDirectory>
+			<includes>
+				<include>**</include>
+			</includes>
+		</fileSet>
+
+		<fileSet>
+			<directory>${basedir}/../../uel-plugin/src/main/java/</directory>
+			<outputDirectory>.</outputDirectory>
+			<includes>
+				<include>**</include>
+			</includes>
+		</fileSet>
+
+		<fileSet>
+			<directory>${basedir}/../../uel-plugin/src/main/resources/</directory>
+			<outputDirectory>.</outputDirectory>
+			<includes>
+				<include>**</include>
+			</includes>
+		</fileSet>
+
+	</fileSets>
+
+</assembly>
+
