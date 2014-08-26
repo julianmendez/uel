@@ -32,8 +32,8 @@
 				<executions>
 
 					<execution>
-						<id>create-javadoc-zip</id>
-						<phase>install</phase>
+						<id>create-javadoc-jar</id>
+						<phase>package</phase>
 						<goals>
 							<goal>single</goal>
 						</goals>
@@ -47,7 +47,7 @@
 
 					<execution>
 						<id>create-release</id>
-						<phase>install</phase>
+						<phase>package</phase>
 						<goals>
 							<goal>single</goal>
 						</goals>

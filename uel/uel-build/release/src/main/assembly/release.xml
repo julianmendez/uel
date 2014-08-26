@@ -23,6 +23,11 @@
 		</file>
 
 		<file>
+			<source>${basedir}/../librarysources/target/uel-${project.version}-sources.jar</source>
+			<outputDirectory>librarysources</outputDirectory>
+		</file>
+
+		<file>
 			<source>${basedir}/../plugin/target/de.tudresden.inf.lat.uel.jar</source>
 			<outputDirectory>plugin</outputDirectory>
 		</file>
@@ -33,7 +38,7 @@
 		</file>
 
 		<file>
-			<source>${basedir}/../release/target/uel-${project.version}-javadoc.zip</source>
+			<source>${basedir}/../release/target/uel-${project.version}-javadoc.jar</source>
 			<outputDirectory>doc</outputDirectory>
 		</file>
 

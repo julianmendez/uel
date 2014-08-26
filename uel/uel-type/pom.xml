@@ -36,26 +36,28 @@
 			</plugin>
 
 			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<version>2.3</version>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.9.1</version>
 				<executions>
-
 					<execution>
-						<id>create-library-sources</id>
 						<phase>package</phase>
 						<goals>
-							<goal>single</goal>
+							<goal>javadoc</goal>
 						</goals>
-						<configuration>
-							<formats>
-								<format>jar</format>
-							</formats>
-							<descriptors>
-								<descriptor>${basedir}/../uel-build/src/main/assembly/sources.xml</descriptor>
-							</descriptors>
-						</configuration>
 					</execution>
+				</executions>
+			</plugin>
 
+			<plugin>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>2.3</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
 				</executions>
 			</plugin>
 
