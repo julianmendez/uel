@@ -24,8 +24,9 @@ public class AspProcessor implements UelProcessor {
 	private UelInput uelInput;
 	private AspInput aspInput;
 	private AspOutput aspOutput;
-	private boolean computed;
-	private int currentUnifierIndex;
+	private boolean initialized;
+	private Set<Equation> currentUnifier;
+	private boolean isSynchronized;
 	private boolean minimize;
 
 	public AspProcessor(UelInput input, boolean minimize) {
@@ -33,15 +34,16 @@ public class AspProcessor implements UelProcessor {
 		this.aspInput = new AspInput(input.getEquations(),
 				input.getGoalDisequations(), input.getAtomManager(),
 				input.getUserVariables());
-		this.computed = false;
-		this.currentUnifierIndex = -1;
+		this.initialized = false;
+		this.currentUnifier = null;
+		this.isSynchronized = false;
 		this.minimize = minimize;
 	}
 
 	@Override
 	public boolean computeNextUnifier() {
-		// TODO: implement asynchronous execution of ClaspSolver
-		if (!computed) {
+		// TODO: implement asynchronous execution of ClingoSolver
+		if (!initialized) {
 			AspSolver solver = new ClingoSolver(!uelInput.getGoalDisequations()
 					.isEmpty(), false, minimize);
 			try {
@@ -49,13 +51,11 @@ public class AspProcessor implements UelProcessor {
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
-			currentUnifierIndex = 0;
-			computed = true;
-			return aspOutput.isSatisfiable();
-		} else {
-			currentUnifierIndex++;
-			return currentUnifierIndex < aspOutput.getAssignments().size();
+			initialized = true;
 		}
+
+		isSynchronized = false;
+		return aspOutput.hasNext();
 	}
 
 	@Override
@@ -78,17 +78,15 @@ public class AspProcessor implements UelProcessor {
 			throw new IllegalStateException(
 					"The unifiers have not been computed yet.");
 		}
-		if (!aspOutput.isSatisfiable()) {
-			throw new IllegalStateException("There are no unifiers.");
-		}
-		if (currentUnifierIndex >= aspOutput.getAssignments().size()) {
+		if (!aspOutput.hasNext()) {
 			throw new IllegalStateException("There are no more unifiers.");
 		}
 
-		Map<Integer, Set<Integer>> assignment = aspOutput.getAssignments().get(
-				currentUnifierIndex);
-		return new UelOutputImpl(uelInput.getAtomManager(),
-				toUnifier(assignment));
+		if (!isSynchronized) {
+			currentUnifier = toUnifier(aspOutput.next());
+			isSynchronized = true;
+		}
+		return new UelOutputImpl(uelInput.getAtomManager(), currentUnifier);
 	}
 
 	private Set<Equation> toUnifier(Map<Integer, Set<Integer>> assignment) {

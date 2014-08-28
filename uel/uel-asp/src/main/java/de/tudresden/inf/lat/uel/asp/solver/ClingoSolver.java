@@ -4,13 +4,18 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author Stefan Borgwardt
@@ -22,41 +27,75 @@ public class ClingoSolver implements AspSolver {
 	private static String DISUNIFICATION_PROGRAM = "/disunification.lp";
 	private static String TYPES_PROGRAM = "/types.lp";
 	private static String FINAL_PROGRAM = "/final.lp";
-	private static String CLINGO_COMMAND = "clingo 0 --project --outf=2";
-	private static String HCLINGO_COMMAND = "clingo 0 --project --dom-pref=32 --dom-mod=6 --heu=Domain --outf=2";
+	private static String CLINGO_COMMAND = "clingo";
+	// TODO: multi-threading?
+	private static String COMMON_ARGUMENTS = "--project --outf=2";
+	private static String HEURISTIC_ARGUMENTS = "--dom-mod=2,16 --heu=Domain";
 
 	private boolean disequations;
 	private boolean types;
 	private boolean minimize;
+	private int maxSolutions = 1;
+	private String program;
+	private File outputFile;
+	private AspInput input;
 
 	public ClingoSolver(boolean disequations, boolean types, boolean minimize) {
 		this.disequations = disequations;
 		this.types = types;
 		this.minimize = minimize;
+		try {
+			this.outputFile = File.createTempFile("uel-asp-clingo", ".tmp");
+		} catch (IOException ex) {
+			throw new RuntimeException(ex);
+		}
 		// System.out.println(minimize);
+	}
+
+	private List<String> getClingoArguments() {
+		List<String> arguments = new ArrayList<String>();
+		arguments.add(CLINGO_COMMAND);
+		arguments.add(Integer.toString(maxSolutions));
+		maxSolutions *= 2;
+		arguments.addAll(Arrays.asList(COMMON_ARGUMENTS.split(" ")));
+		if (minimize) {
+			arguments.addAll(Arrays.asList(HEURISTIC_ARGUMENTS.split(" ")));
+		}
+		return arguments;
 	}
 
 	@Override
 	public AspOutput solve(AspInput input) throws IOException {
+		this.input = input;
+		StringBuilder programBuilder = new StringBuilder();
+		appendResource(UNIFICATION_PROGRAM, programBuilder);
+		if (disequations) {
+			appendResource(DISUNIFICATION_PROGRAM, programBuilder);
+		}
+		if (types) {
+			appendResource(TYPES_PROGRAM, programBuilder);
+		}
+		appendResource(FINAL_PROGRAM, programBuilder);
+		programBuilder.append(input.getProgram());
+		this.program = programBuilder.toString();
+		return new ClingoOutput(this, input.getAtomManager());
+	}
+
+	public boolean computeMoreSolutions() {
 		try {
 			// call clingo
-			String clingoCommand = minimize ? HCLINGO_COMMAND : CLINGO_COMMAND;
-			ProcessBuilder pbClingo = new ProcessBuilder(
-					Arrays.asList(clingoCommand.split(" ")));
+			ProcessBuilder pbClingo = new ProcessBuilder(getClingoArguments());
 			Process pClingo = pbClingo.start();
 
 			// pipe .lp files and input.getProgram() as input
 			OutputStream clingoInput = pClingo.getOutputStream();
-			// System.out.println(clingoInput);
-			inputPrograms(clingoInput);
-			pipe(new ByteArrayInputStream(input.getProgram().getBytes()),
-					clingoInput);
-			// System.out.println(input.getProgram());
+			pipe(new ByteArrayInputStream(program.getBytes()), clingoInput);
 			clingoInput.close();
 
-			// return the json output
-			ByteArrayOutputStream output = new ByteArrayOutputStream();
+			// write the json output
+			OutputStream output = new FileOutputStream(outputFile);
 			pipe(pClingo.getInputStream(), output);
+			output.close();
 
 			int clingoReturnCode = pClingo.waitFor();
 			// successful if there was no exception (lsb=0) and either a model
@@ -70,30 +109,32 @@ public class ClingoSolver implements AspSolver {
 			}
 			pClingo.destroy();
 
-			// System.out.println(output.toString());
-			return new ClingoOutput(output.toString(), clingoReturnCode > 10,
-					input.getAtomManager());
-		} catch (InterruptedException e) {
-			throw new RuntimeException(e);
+			return clingoReturnCode > 10;
+		} catch (InterruptedException ex) {
+			throw new RuntimeException(ex);
+		} catch (IOException ex) {
+			throw new RuntimeException(ex);
 		}
 	}
 
-	private void inputPrograms(OutputStream input) throws IOException {
-		pipeResource(UNIFICATION_PROGRAM, input);
-		if (disequations) {
-			pipeResource(DISUNIFICATION_PROGRAM, input);
+	public InputStream getCurrentSolutions() {
+		try {
+			InputStream stream = new FileInputStream(outputFile);
+			return stream;
+		} catch (FileNotFoundException ex) {
+			throw new RuntimeException(ex);
 		}
-		if (types) {
-			pipeResource(TYPES_PROGRAM, input);
-		}
-		pipeResource(FINAL_PROGRAM, input);
 	}
 
-	private void pipeResource(String resourceName, OutputStream output)
+	private void appendResource(String resourceName, StringBuilder output)
 			throws IOException {
-		InputStream unificationProgram = AspProcessor.class
-				.getResourceAsStream(resourceName);
-		pipe(unificationProgram, output);
+		BufferedReader reader = new BufferedReader(new InputStreamReader(
+				AspProcessor.class.getResourceAsStream(resourceName)));
+		String line = null;
+		while ((line = reader.readLine()) != null) {
+			output.append(line);
+			output.append(System.lineSeparator());
+		}
 	}
 
 	private void pipe(InputStream input, OutputStream output)
@@ -104,14 +145,11 @@ public class ClingoSolver implements AspSolver {
 
 	private void pipe(BufferedReader input, BufferedWriter output)
 			throws IOException {
-		String line = "";
-		while (line != null) {
-			line = input.readLine();
-			if (line != null) {
-				// System.out.println(line);
-				output.write(line);
-				output.newLine();
-			}
+		String line;
+		while ((line = input.readLine()) != null) {
+			System.out.println(line);
+			output.write(line);
+			output.newLine();
 		}
 		output.flush();
 	}

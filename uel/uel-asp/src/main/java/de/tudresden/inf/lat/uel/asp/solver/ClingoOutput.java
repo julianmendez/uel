@@ -1,6 +1,7 @@
 package de.tudresden.inf.lat.uel.asp.solver;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,6 +9,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 import org.codehaus.jackson.JsonNode;
@@ -29,34 +31,32 @@ public class ClingoOutput implements AspOutput {
 	private static String SATISFIABLE = "SATISFIABLE";
 	private static String OPTIMUM_FOUND = "OPTIMUM FOUND";
 
+	private ClingoSolver solver;
 	private IndexedSet<Atom> atomManager;
 	private List<Map<Integer, Set<Integer>>> assignments;
-	private boolean satisfiable;
 	private List<Entry<String, String>> stats;
+	private int currentIndex;
+	private boolean finished;
 
-	public ClingoOutput(String json, boolean searchCompleted,
-			IndexedSet<Atom> atomManager) throws IOException {
-		stats = new ArrayList<Entry<String, String>>();
-		addEntry(stats, "Search Completed", searchCompleted ? "Yes" : "No");
+	public ClingoOutput(ClingoSolver solver, IndexedSet<Atom> atomManager) {
+		this.solver = solver;
 		this.atomManager = atomManager;
-		// System.out.println(json);
-		parse(json);
+		this.assignments = new ArrayList<Map<Integer, Set<Integer>>>();
+		this.currentIndex = -1;
+		this.finished = false;
 	}
 
 	/**
 	 * Parse JSON output.
 	 */
-	private void parse(String json) throws IOException {
+	private void parse(InputStream jsonStream) throws IOException {
 		ObjectMapper mapper = new ObjectMapper();
-		JsonNode root = mapper.readValue(json, JsonNode.class);
+		JsonNode root = mapper.readValue(jsonStream, JsonNode.class);
 
 		// Result -> satisfiable
 		String result = root.get("Result").asText();
-		satisfiable = result.equals(SATISFIABLE)
-				|| result.equals(OPTIMUM_FOUND);
-		if (satisfiable) {
+		if (result.equals(SATISFIABLE) || result.equals(OPTIMUM_FOUND)) {
 			// Witnesses -> assignments (using atomManager)
-			assignments = new ArrayList<Map<Integer, Set<Integer>>>();
 			for (JsonNode witness : root.get("Call").get(0).get("Witnesses")) {
 				Map<Integer, Set<Integer>> assignment = new HashMap<Integer, Set<Integer>>();
 				for (JsonNode subsumption : witness.get("Value")) {
@@ -65,11 +65,14 @@ public class ClingoOutput implements AspOutput {
 						extendAssignment(assignment, subsumption.asText());
 					}
 				}
-				assignments.add(assignment);
+				if (!assignments.contains(assignment)) {
+					assignments.add(assignment);
+				}
 			}
 		}
 
 		// Solver,Time -> stats
+		stats = new ArrayList<Entry<String, String>>();
 		addEntry(stats, "ASP Solver", root.get("Solver").asText());
 		JsonNode time = root.get("Time");
 		addEntry(stats, "Total time (s)", time.get("Total").asText());
@@ -126,16 +129,47 @@ public class ClingoOutput implements AspOutput {
 				.add(new AbstractMap.SimpleEntry<String, String>(key, value));
 	}
 
-	public List<Map<Integer, Set<Integer>>> getAssignments() {
-		return assignments;
-	}
-
-	public boolean isSatisfiable() {
-		return satisfiable;
-	}
-
 	public List<Entry<String, String>> getStats() {
 		return stats;
+	}
+
+	public boolean hasNext() {
+		if (currentIndex + 1 < assignments.size()) {
+			// we still have pre-computed assignments left
+			return true;
+		} else {
+			// there are no more pre-computed assignments
+			if (finished) {
+				// the computation has finished -> all assignments have been
+				// returned
+				return false;
+			} else {
+				// try to compute more assignments
+				finished = solver.computeMoreSolutions();
+				try {
+					parse(solver.getCurrentSolutions());
+				} catch (IOException ex) {
+					throw new RuntimeException(ex);
+				}
+				// check if we now have at least one new assignment
+				return currentIndex + 1 < assignments.size();
+			}
+		}
+	}
+
+	@Override
+	public Map<Integer, Set<Integer>> next() {
+		if (!hasNext()) {
+			throw new NoSuchElementException();
+		}
+
+		currentIndex++;
+		return assignments.get(currentIndex);
+	}
+
+	@Override
+	public void remove() {
+		throw new UnsupportedOperationException();
 	}
 
 }

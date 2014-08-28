@@ -387,6 +387,8 @@ public class AlternativeUelStarter {
 
 		// output unification problem
 		if (verbose) {
+			System.out.println("Final number of atoms: "
+					+ goal.getUelInput().getAtomManager().size());
 			System.out.println("Final number of equations: "
 					+ goal.getUelInput().getEquations().size());
 			System.out.println("Unification problem:");
