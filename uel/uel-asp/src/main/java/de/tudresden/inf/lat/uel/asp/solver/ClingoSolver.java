@@ -147,7 +147,7 @@ public class ClingoSolver implements AspSolver {
 			throws IOException {
 		String line;
 		while ((line = input.readLine()) != null) {
-			System.out.println(line);
+//			System.out.println(line);
 			output.write(line);
 			output.newLine();
 		}
