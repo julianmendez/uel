@@ -81,7 +81,7 @@ public class AlternativeUelStarter {
 
 	public OWLClass findAuxiliaryDefinition(OWLClassExpression expr) {
 		OWLClass ret = null;
-		if (expr.isClassExpressionLiteral()) {
+		if (!expr.isAnonymous()) {
 			ret = expr.asOWLClass();
 		} else {
 			ret = this.mapOfAuxClassExpr.get(expr);
@@ -415,18 +415,26 @@ public class AlternativeUelStarter {
 		if (atom.isExistentialRestriction()) {
 			ExistentialRestriction ex = (ExistentialRestriction) atom;
 			System.out.print("(exists "
-					+ atomManager.getRoleName(ex.getRoleId()) + " "
-					+ atomManager.getConceptName(ex.getConceptNameId()) + "["
-					+ isVariable(ex.getChild(), atomManager, userVariables)
-					+ "])");
+					+ getFragment(atomManager.getRoleName(ex.getRoleId()))
+					+ " ");
+			print(ex.getChild(), atomManager, userVariables);
+			System.out.print(")");
 		} else {
-			ConceptName name = (ConceptName) atom;
-			System.out
-					.print(atomManager.getConceptName(name.getConceptNameId())
-							+ "["
-							+ isVariable(name, atomManager, userVariables)
-							+ "]");
+			print((ConceptName) atom, atomManager, userVariables);
 		}
+	}
+
+	private void print(ConceptName name, AtomManager atomManager,
+			Set<Integer> userVariables) {
+		System.out.print(getFragment(atomManager.getConceptName(name
+				.getConceptNameId()))
+				+ "["
+				+ isVariable(name, atomManager, userVariables) + "]");
+	}
+
+	private String getFragment(String iri) {
+		String[] parts = iri.split("#");
+		return parts[parts.length - 1];
 	}
 
 	private void print(Set<Equation> equations,
