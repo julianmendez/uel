@@ -1,4 +1,4 @@
-<assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2" 
+<assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
 
@@ -53,12 +53,22 @@
 		</file>
 
 		<file>
+			<source>${basedir}/../../uel-type/target/uel-type-${project.version}-javadoc.jar</source>
+			<outputDirectory>modules</outputDirectory>
+		</file>
+
+		<file>
 			<source>${basedir}/../../uel-sat/target/uel-sat-${project.version}.jar</source>
 			<outputDirectory>modules</outputDirectory>
 		</file>
 
 		<file>
 			<source>${basedir}/../../uel-sat/target/uel-sat-${project.version}-sources.jar</source>
+			<outputDirectory>modules</outputDirectory>
+		</file>
+
+		<file>
+			<source>${basedir}/../../uel-sat/target/uel-sat-${project.version}-javadoc.jar</source>
 			<outputDirectory>modules</outputDirectory>
 		</file>
 
@@ -73,6 +83,11 @@
 		</file>
 
 		<file>
+			<source>${basedir}/../../uel-rule/target/uel-rule-${project.version}-javadoc.jar</source>
+			<outputDirectory>modules</outputDirectory>
+		</file>
+
+		<file>
 			<source>${basedir}/../../uel-asp/target/uel-asp-${project.version}.jar</source>
 			<outputDirectory>modules</outputDirectory>
 		</file>
@@ -83,12 +98,22 @@
 		</file>
 
 		<file>
+			<source>${basedir}/../../uel-asp/target/uel-asp-${project.version}-javadoc.jar</source>
+			<outputDirectory>modules</outputDirectory>
+		</file>
+
+		<file>
 			<source>${basedir}/../../uel-plugin/target/uel-plugin-${project.version}.jar</source>
 			<outputDirectory>modules</outputDirectory>
 		</file>
 
 		<file>
 			<source>${basedir}/../../uel-plugin/target/uel-plugin-${project.version}-sources.jar</source>
+			<outputDirectory>modules</outputDirectory>
+		</file>
+
+		<file>
+			<source>${basedir}/../../uel-plugin/target/uel-plugin-${project.version}-javadoc.jar</source>
 			<outputDirectory>modules</outputDirectory>
 		</file>
 
