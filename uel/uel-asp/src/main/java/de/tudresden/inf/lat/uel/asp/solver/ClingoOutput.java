@@ -144,13 +144,17 @@ public class ClingoOutput implements AspOutput {
 				// returned
 				return false;
 			} else {
-				// try to compute more assignments
-				finished = solver.computeMoreSolutions();
-				try {
-					parse(solver.getCurrentSolutions());
-				} catch (IOException ex) {
-					throw new RuntimeException(ex);
-				}
+				// try to compute more assignments until either clingo reports
+				// that there are no more solutions or we have computed at least
+				// one additional assignment
+				do {
+					finished = solver.computeMoreSolutions();
+					try {
+						parse(solver.getCurrentSolutions());
+					} catch (IOException ex) {
+						throw new RuntimeException(ex);
+					}
+				} while ((currentIndex + 1 >= assignments.size()) && !finished);
 				// check if we now have at least one new assignment
 				return currentIndex + 1 < assignments.size();
 			}

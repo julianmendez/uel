@@ -4,14 +4,14 @@
 %
 
 % definitions
-%atom(C) :- diseq(C,D).
-%atom(D) :- diseq(C,D).
+atom(C) :- diseq(C,D).
+atom(D) :- diseq(C,D).
 
 % (VI) a
-%subs(cname(X),cname(X)) :- atom(cname(X)).
+subs(cname(X),cname(X)) :- atom(cname(X)).
 
 % (VI) e/2
-%subs(exists(R,X),exists(R,Y)) :- subs(X,Y), atom(exists(R,X)), atom(exists(R,Y)).
+subs(exists(R,X),exists(R,Y)) :- subs(X,Y), atom(exists(R,X)), atom(exists(R,Y)).
 
 
 %dissubs(C,D) :- triviallyfalse(C,D).
@@ -20,13 +20,13 @@
 
 
 % "transitivity" for dissubs
-%1 { dissubs(C,E),dissubs(E,D) } :- dissubs(C,D), atom(E).
+%1 { dissubs(C,E);dissubs(E,D) } :- dissubs(C,D), atom(E).
 
 
 
 % (II)
 %:- diseq(C,D), subs(C,D), subs(D,C).
-%1 { dissubs(C,D), dissubs(D,C) } :- diseq(C,D).
+%1 { dissubs(C,D);dissubs(D,C) } :- diseq(C,D).
 
 
 % (VIII)

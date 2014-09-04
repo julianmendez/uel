@@ -29,8 +29,8 @@ public class ClingoSolver implements AspSolver {
 	private static String FINAL_PROGRAM = "/final.lp";
 	private static String CLINGO_COMMAND = "clingo";
 	// TODO: multi-threading?
-	private static String COMMON_ARGUMENTS = "--project --outf=2";
-	private static String HEURISTIC_ARGUMENTS = "--dom-mod=2,16 --heu=Domain";
+	private static String COMMON_ARGUMENTS = "--project --outf=2 --enum-mode=domRec";
+	private static String HEURISTIC_ARGUMENTS = "--dom-mod=5,16 --heu=Domain";
 
 	private boolean disequations;
 	private boolean types;
@@ -38,7 +38,6 @@ public class ClingoSolver implements AspSolver {
 	private int maxSolutions = 1;
 	private String program;
 	private File outputFile;
-	private AspInput input;
 
 	public ClingoSolver(boolean disequations, boolean types, boolean minimize) {
 		this.disequations = disequations;
@@ -61,12 +60,12 @@ public class ClingoSolver implements AspSolver {
 		if (minimize) {
 			arguments.addAll(Arrays.asList(HEURISTIC_ARGUMENTS.split(" ")));
 		}
+		// System.out.println(arguments.toString());
 		return arguments;
 	}
 
 	@Override
 	public AspOutput solve(AspInput input) throws IOException {
-		this.input = input;
 		StringBuilder programBuilder = new StringBuilder();
 		appendResource(UNIFICATION_PROGRAM, programBuilder);
 		if (disequations) {
@@ -78,6 +77,7 @@ public class ClingoSolver implements AspSolver {
 		appendResource(FINAL_PROGRAM, programBuilder);
 		programBuilder.append(input.getProgram());
 		this.program = programBuilder.toString();
+		// System.out.println(program);
 		return new ClingoOutput(this, input.getAtomManager());
 	}
 
@@ -147,7 +147,7 @@ public class ClingoSolver implements AspSolver {
 			throws IOException {
 		String line;
 		while ((line = input.readLine()) != null) {
-//			System.out.println(line);
+			// System.out.println(line);
 			output.write(line);
 			output.newLine();
 		}

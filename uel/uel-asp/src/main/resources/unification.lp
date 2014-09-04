@@ -30,6 +30,9 @@ subs(X,Y) :- subs(exists(R,X),exists(R,Y)).
 % (I) a
 1 { subs(Y,X):hasatom(Y,|P-1|,E),not triviallyfalse(Y,X) } :- hasatom(X,P,E), nonvaratom(X).
 
+{ subs(X,C) } :- nonvaratom(C), hasatom(X,P,E), not hasatom(C,PX,E):hasatom(C,PX,E),
+                 not triviallyfalse(X,C).
+
 % (I) b
 1 { subs(Y,C):hasatom(Y,|P-1|,E),not triviallyfalse(Y,C) } :- subs(X,C), hasatom(X,P,E),
                   nonvaratom(C), not hasatom(C,PX,E):hasatom(C,PX,E).
