@@ -5,7 +5,7 @@ import java.util.Set;
 /**
  * An object implementing this interface is an equation. An equation has an
  * identifier on the left-hand side and a set of identifiers on the right-hand
- * side. The meaning is X = A<sub>1</sub> &#8851; &hellip; &#8851; A<sub>n</sub>
+ * side. The meaning is X = A<sub>1</sub> \u2293 &hellip; \u2293 A<sub>n</sub>
  * where X , A<sub>1</sub>, &hellip; A<sub>n</sub> are atoms.
  * 
  * @author Julian Mendez

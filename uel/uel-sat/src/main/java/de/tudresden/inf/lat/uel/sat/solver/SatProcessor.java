@@ -43,30 +43,30 @@ import de.tudresden.inf.lat.uel.type.impl.UelOutputImpl;
  * 
  * <ul>
  * <li>(1) Translation of the equations of &Gamma;. For every equation
- * A<sub>1</sub> &#8851; &hellip; &#8851; A<sub>m</sub> &equiv;<sup>?</sup>
- * B<sub>1</sub> &#8851; &hellip; &#8851; B<sub>n</sub> of &Gamma;, we create
+ * A<sub>1</sub> \u2293 &hellip; \u2293 A<sub>m</sub> &equiv;<sup>?</sup>
+ * B<sub>1</sub> \u2293 &hellip; \u2293 B<sub>n</sub> of &Gamma;, we create
  * the following Horn clauses, which express that any atom that occurs as a
  * top-level conjunct on one side of an equivalence must subsume a top-level
  * conjunct on the other side:
  * 
  * <ul>
  * <li>1. For every non-variable atom C &isin; {A<sub>1</sub>, &hellip; ,
- * A<sub>m</sub>}:<br />
- * [B<sub>1</sub> &#8930; C] &and; &hellip; &and; [B<sub>n</sub> &#8930; C]
+ * A<sub>m</sub>}:<br>
+ * [B<sub>1</sub> \u22E2 C] &and; &hellip; &and; [B<sub>n</sub> \u22E2 C]
  * &rarr;</li>
  * 
  * <li>2. For every non-variable atom C &isin; {B<sub>1</sub>, &hellip; ,
- * B<sub>n</sub>}:<br />
- * [A<sub>1</sub> &#8930; C] &and; &hellip; &and; [A<sub>m</sub> &#8930; C]
+ * B<sub>n</sub>}:<br>
+ * [A<sub>1</sub> \u22E2 C] &and; &hellip; &and; [A<sub>m</sub> \u22E2 C]
  * &rarr;</li>
  * 
  * <li>3. For every non-variable atom C of &Gamma; s.t. C &notin;
  * {A<sub>1</sub>, &hellip; A<sub>m</sub>, B<sub>1</sub>, &hellip;,
- * B<sub>n</sub>}:<br />
- * [A<sub>1</sub> &#8930; C] &and; &hellip; &and; [A<sub>m</sub> &#8930; C]
- * &rarr; [B<sub>j</sub> &#8930; C] for j = 1, &hellip;, n<br />
- * [B<sub>1</sub> &#8930; C] &and; &hellip; &and; [B<sub>n</sub> &#8930; C]
- * &rarr; [A<sub>i</sub> &#8930; C] for i = 1, &hellip;, m</li>
+ * B<sub>n</sub>}:<br>
+ * [A<sub>1</sub> \u22E2 C] &and; &hellip; &and; [A<sub>m</sub> \u22E2 C]
+ * &rarr; [B<sub>j</sub> \u22E2 C] for j = 1, &hellip;, n<br>
+ * [B<sub>1</sub> \u22E2 C] &and; &hellip; &and; [B<sub>n</sub> \u22E2 C]
+ * &rarr; [A<sub>i</sub> \u22E2 C] for i = 1, &hellip;, m</li>
  * </ul>
  * </li>
  * 
@@ -74,33 +74,33 @@ import de.tudresden.inf.lat.uel.type.impl.UelOutputImpl;
  * 
  * <ul>
  * <li>1. For every pair of distinct concept constants A, B occurring in
- * &Gamma;, we say that A cannot be subsumed by B:<br />
- * &rarr; [A &#8930; B]</li>
+ * &Gamma;, we say that A cannot be subsumed by B:<br>
+ * &rarr; [A \u22E2 B]</li>
  * 
  * <li>2. For every pair of distinct role names r, s and atoms
  * &exist;r<i>.</i>A, &exist;s<i>.</i>B of &Gamma;, we say that
- * &exist;r<i>.</i>A cannot be subsumed by &exist;s<i>.</i>B:<br />
- * &rarr; [&exist;r<i>.</i>A &#8930; &exist;s<i>.</i>B]</li>
+ * &exist;r<i>.</i>A cannot be subsumed by &exist;s<i>.</i>B:<br>
+ * &rarr; [&exist;r<i>.</i>A \u22E2 &exist;s<i>.</i>B]</li>
  * 
  * <li>3. For every pair &exist;r<i>.</i>A, &exist;r<i>.</i>B of atoms of
  * &Gamma;, we say that &exist;r<i>.</i>A can only be subsumed by
- * &exist;r<i>.</i>B if A is already subsumed by B:<br />
- * [A &#8930; B] &rarr; [&exist;r<i>.</i>A &#8930; &exist;r<i>.</i>B]</li>
+ * &exist;r<i>.</i>B if A is already subsumed by B:<br>
+ * [A \u22E2 B] &rarr; [&exist;r<i>.</i>A \u22E2 &exist;r<i>.</i>B]</li>
  * 
  * <li>4. For every concept constant A and every atom &exist;r<i>.</i>B of
  * &Gamma;, we say that A and &exist;r<i>.</i>B are not in a subsumption
- * relationship<br />
- * &rarr; [A &#8930; &exist;r<i>.</i>B] and &rarr; [&exist;r<i>.</i>B &#8930; A]
+ * relationship<br>
+ * &rarr; [A \u22E2 &exist;r<i>.</i>B] and &rarr; [&exist;r<i>.</i>B \u22E2 A]
  * </li>
  * 
- * <li>5. Transitivity of subsumption is expressed using the non-Horn clauses:<br />
- * [C<sub>1</sub> &#8930; C<sub>3</sub>] &rarr; [C<sub>1</sub> &#8930;
- * C<sub>2</sub>] &or; [C<sub>2</sub> &#8930; C<sub>3</sub>] where
- * C<sub>1</sub>, C<sub>2</sub>, C<sub>3</sub> are atoms of &Gamma;.<br />
+ * <li>5. Transitivity of subsumption is expressed using the non-Horn clauses:<br>
+ * [C<sub>1</sub> \u22E2 C<sub>3</sub>] &rarr; [C<sub>1</sub> \u22E2
+ * C<sub>2</sub>] &or; [C<sub>2</sub> \u22E2 C<sub>3</sub>] where
+ * C<sub>1</sub>, C<sub>2</sub>, C<sub>3</sub> are atoms of &Gamma;.<br>
  * </li>
  * </ul>
  * Note that there are further properties that hold for subsumption in <i>EL</i>
- * (e.g., the fact that A &#8849; B implies &exist;r<i>.</i>A &#8849;
+ * (e.g., the fact that A \u2291 B implies &exist;r<i>.</i>A \u2291
  * &exist;r<i>.</i>B), but that are not needed to ensure soundness of our
  * translation.</li>
  * 
@@ -108,13 +108,13 @@ import de.tudresden.inf.lat.uel.type.impl.UelOutputImpl;
  * 
  * <ul>
  * <li>1. Transitivity and irreexivity of &gt; can be expressed using the Horn
- * clauses:<br />
- * [X &gt; X] &rarr; and [X &gt; Y] &and; [Y &gt; Z] &rarr; [X &gt; Z],<br />
+ * clauses:<br>
+ * [X &gt; X] &rarr; and [X &gt; Y] &and; [Y &gt; Z] &rarr; [X &gt; Z],<br>
  * where X, Y, Z are concept variables occurring in &Gamma;.</li>
  * 
  * <li>2. The connection between this order and the order &gt;<sub>&sigma;</sub>
- * is expressed using the non-Horn clauses:<br />
- * &rarr; [X &gt; Y] &or; [X &#8930; &exist;r<i>.</i>Y],<br />
+ * is expressed using the non-Horn clauses:<br>
+ * &rarr; [X &gt; Y] &or; [X \u22E2 &exist;r<i>.</i>Y],<br>
  * where X, Y are concept variables occurring in &Gamma; and &exist;r<i>.</i>Y
  * is an atom of &Gamma;.</li>
  * </ul>
