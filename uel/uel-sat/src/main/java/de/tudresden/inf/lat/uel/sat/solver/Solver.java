@@ -5,7 +5,7 @@ import java.util.Set;
 
 /**
  * An object implementing this interface can solve a SAT problem.
- * 
+ *
  * @author Julian Mendez
  */
 public interface Solver {
@@ -48,22 +48,24 @@ public interface Solver {
 
 	/**
 	 * Solves a SAT problem. The input must be in the DIMACS CNF format.
-	 * 
+	 *
 	 * @param input
 	 *            SAT problem to solve
 	 * @return the output of the SAT solver
 	 * @throws IOException
+	 *             if an I/O error occurs
 	 */
 	SatOutput solve(SatInput input) throws IOException;
 
 	/**
 	 * Updates the last solved SAT instances by adding one clause and solves the
 	 * resulting problem.
-	 * 
+	 *
 	 * @param clause
 	 *            the clause to be added
 	 * @return the output of the SAT solver
 	 * @throws IOException
+	 *             if an I/O error occurs
 	 */
 	SatOutput update(Set<Integer> clause) throws IOException;
 

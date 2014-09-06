@@ -35,83 +35,82 @@ import de.tudresden.inf.lat.uel.type.impl.UelOutputImpl;
  * This class performs reduction of goal equations to propositional clauses. The
  * reduction is explained in F. Baader, B. Morawska,
  * "SAT Encoding of Unification in EL", LPAR 2010.
- * 
+ *
  * This algorithm is explained below:
- * 
+ *
  * <div> Given a flat <i>EL</i>-unification problem &Gamma;, the set C(&Gamma;)
  * consists of the following clauses:
- * 
+ *
  * <ul>
  * <li>(1) Translation of the equations of &Gamma;. For every equation
  * A<sub>1</sub> \u2293 &hellip; \u2293 A<sub>m</sub> &equiv;<sup>?</sup>
- * B<sub>1</sub> \u2293 &hellip; \u2293 B<sub>n</sub> of &Gamma;, we create
- * the following Horn clauses, which express that any atom that occurs as a
+ * B<sub>1</sub> \u2293 &hellip; \u2293 B<sub>n</sub> of &Gamma;, we create the
+ * following Horn clauses, which express that any atom that occurs as a
  * top-level conjunct on one side of an equivalence must subsume a top-level
  * conjunct on the other side:
- * 
+ *
  * <ul>
  * <li>1. For every non-variable atom C &isin; {A<sub>1</sub>, &hellip; ,
  * A<sub>m</sub>}:<br>
- * [B<sub>1</sub> \u22E2 C] &and; &hellip; &and; [B<sub>n</sub> \u22E2 C]
- * &rarr;</li>
- * 
+ * [B<sub>1</sub> \u22E2 C] &and; &hellip; &and; [B<sub>n</sub> \u22E2 C] &rarr;
+ * </li>
+ *
  * <li>2. For every non-variable atom C &isin; {B<sub>1</sub>, &hellip; ,
  * B<sub>n</sub>}:<br>
- * [A<sub>1</sub> \u22E2 C] &and; &hellip; &and; [A<sub>m</sub> \u22E2 C]
- * &rarr;</li>
- * 
+ * [A<sub>1</sub> \u22E2 C] &and; &hellip; &and; [A<sub>m</sub> \u22E2 C] &rarr;
+ * </li>
+ *
  * <li>3. For every non-variable atom C of &Gamma; s.t. C &notin;
  * {A<sub>1</sub>, &hellip; A<sub>m</sub>, B<sub>1</sub>, &hellip;,
  * B<sub>n</sub>}:<br>
- * [A<sub>1</sub> \u22E2 C] &and; &hellip; &and; [A<sub>m</sub> \u22E2 C]
- * &rarr; [B<sub>j</sub> \u22E2 C] for j = 1, &hellip;, n<br>
- * [B<sub>1</sub> \u22E2 C] &and; &hellip; &and; [B<sub>n</sub> \u22E2 C]
- * &rarr; [A<sub>i</sub> \u22E2 C] for i = 1, &hellip;, m</li>
+ * [A<sub>1</sub> \u22E2 C] &and; &hellip; &and; [A<sub>m</sub> \u22E2 C] &rarr;
+ * [B<sub>j</sub> \u22E2 C] for j = 1, &hellip;, n<br>
+ * [B<sub>1</sub> \u22E2 C] &and; &hellip; &and; [B<sub>n</sub> \u22E2 C] &rarr;
+ * [A<sub>i</sub> \u22E2 C] for i = 1, &hellip;, m</li>
  * </ul>
  * </li>
- * 
+ *
  * <li>(2) Translation of the relevant properties of subsumption in <i>EL</i>.
- * 
+ *
  * <ul>
  * <li>1. For every pair of distinct concept constants A, B occurring in
  * &Gamma;, we say that A cannot be subsumed by B:<br>
  * &rarr; [A \u22E2 B]</li>
- * 
+ *
  * <li>2. For every pair of distinct role names r, s and atoms
  * &exist;r<i>.</i>A, &exist;s<i>.</i>B of &Gamma;, we say that
  * &exist;r<i>.</i>A cannot be subsumed by &exist;s<i>.</i>B:<br>
  * &rarr; [&exist;r<i>.</i>A \u22E2 &exist;s<i>.</i>B]</li>
- * 
+ *
  * <li>3. For every pair &exist;r<i>.</i>A, &exist;r<i>.</i>B of atoms of
  * &Gamma;, we say that &exist;r<i>.</i>A can only be subsumed by
  * &exist;r<i>.</i>B if A is already subsumed by B:<br>
  * [A \u22E2 B] &rarr; [&exist;r<i>.</i>A \u22E2 &exist;r<i>.</i>B]</li>
- * 
+ *
  * <li>4. For every concept constant A and every atom &exist;r<i>.</i>B of
  * &Gamma;, we say that A and &exist;r<i>.</i>B are not in a subsumption
  * relationship<br>
- * &rarr; [A \u22E2 &exist;r<i>.</i>B] and &rarr; [&exist;r<i>.</i>B \u22E2 A]
- * </li>
- * 
+ * &rarr; [A \u22E2 &exist;r<i>.</i>B] and &rarr; [&exist;r<i>.</i>B \u22E2 A]</li>
+ *
  * <li>5. Transitivity of subsumption is expressed using the non-Horn clauses:<br>
  * [C<sub>1</sub> \u22E2 C<sub>3</sub>] &rarr; [C<sub>1</sub> \u22E2
- * C<sub>2</sub>] &or; [C<sub>2</sub> \u22E2 C<sub>3</sub>] where
- * C<sub>1</sub>, C<sub>2</sub>, C<sub>3</sub> are atoms of &Gamma;.<br>
+ * C<sub>2</sub>] &or; [C<sub>2</sub> \u22E2 C<sub>3</sub>] where C<sub>1</sub>,
+ * C<sub>2</sub>, C<sub>3</sub> are atoms of &Gamma;.<br>
  * </li>
  * </ul>
  * Note that there are further properties that hold for subsumption in <i>EL</i>
  * (e.g., the fact that A \u2291 B implies &exist;r<i>.</i>A \u2291
  * &exist;r<i>.</i>B), but that are not needed to ensure soundness of our
  * translation.</li>
- * 
+ *
  * <li>(3) Translation of the relevant properties of &gt;.
- * 
+ *
  * <ul>
  * <li>1. Transitivity and irreexivity of &gt; can be expressed using the Horn
  * clauses:<br>
  * [X &gt; X] &rarr; and [X &gt; Y] &and; [Y &gt; Z] &rarr; [X &gt; Z],<br>
  * where X, Y, Z are concept variables occurring in &Gamma;.</li>
- * 
+ *
  * <li>2. The connection between this order and the order &gt;<sub>&sigma;</sub>
  * is expressed using the non-Horn clauses:<br>
  * &rarr; [X &gt; Y] &or; [X \u22E2 &exist;r<i>.</i>Y],<br>
@@ -121,7 +120,7 @@ import de.tudresden.inf.lat.uel.type.impl.UelOutputImpl;
  * </li>
  * </ul>
  * </div>
- * 
+ *
  * @author Barbara Morawska
  * @author Julian Mendez
  */
@@ -141,25 +140,26 @@ public class SatProcessor implements UelProcessor {
 	private final ExtendedUelInput extUelInput;
 	private boolean firstTime = true;
 	private final boolean invertLiteral;
-	private IndexedSet<Literal> literalManager = new IndexedSetImpl<Literal>();
+	private final IndexedSet<Literal> literalManager = new IndexedSetImpl<Literal>();
 	private long numberOfClauses = 0;
 	private final boolean onlyMinimalAssignments;
 	private UelOutput result;
 	private Solver solver;
-	private Map<Integer, Set<Integer>> subsumers = new HashMap<Integer, Set<Integer>>();
-	private Set<Integer> trueLiterals = new HashSet<Integer>();
+	private final Map<Integer, Set<Integer>> subsumers = new HashMap<Integer, Set<Integer>>();
+	private final Set<Integer> trueLiterals = new HashSet<Integer>();
 	private final UelInput uelInput;
 	private Set<Integer> update = new HashSet<Integer>();
 	private final boolean hasDisequations;
 
 	/**
 	 * Construct a new SAT processor to solve a unification problem.
-	 * 
+	 *
 	 * @param input
 	 *            the UEL input
 	 * @param inv
 	 *            a flag indicating whether inverted literals should be used
 	 * @param useMinimalAssignments
+	 *            a flag to use minimal assignments
 	 */
 	public SatProcessor(UelInput input, boolean inv,
 			boolean useMinimalAssignments) {
@@ -250,22 +250,22 @@ public class SatProcessor implements UelProcessor {
 		boolean unifiable = false;
 		try {
 			if (this.firstTime) {
-				if (onlyMinimalAssignments) {
-					solver = new Sat4jMaxSatSolver();
+				if (this.onlyMinimalAssignments) {
+					this.solver = new Sat4jMaxSatSolver();
 				} else {
-					solver = new Sat4jSolver();
+					this.solver = new Sat4jSolver();
 				}
 				SatInput satInput = computeSatInput();
-				numberOfClauses = satInput.getClauses().size();
-				satoutput = solver.solve(satInput);
+				this.numberOfClauses = satInput.getClauses().size();
+				satoutput = this.solver.solve(satInput);
 				unifiable = satoutput.isSatisfiable();
 			} else {
 				Set<Integer> update = getUpdate();
 				if (update.isEmpty()) {
 					unifiable = false;
 				} else {
-					numberOfClauses++;
-					satoutput = solver.update(update);
+					this.numberOfClauses++;
+					satoutput = this.solver.update(update);
 					unifiable = satoutput.isSatisfiable();
 				}
 			}
@@ -289,7 +289,7 @@ public class SatProcessor implements UelProcessor {
 	 * negative literal is represented by a corresponding negative number. Each
 	 * clause is on one line. The end of a clause is marked by 0. Example of a
 	 * clause in DIMACS format: 1 -3 0
-	 * 
+	 *
 	 * @return an object representing the DIMACS CNF encoding of the input
 	 *         subsumptions
 	 */
@@ -322,7 +322,7 @@ public class SatProcessor implements UelProcessor {
 		logger.finer("running step 3.2 ...");
 		runStep3_2(ret);
 
-		if (hasDisequations) {
+		if (this.hasDisequations) {
 			// add clauses with auxiliary variables needed for soundness of
 			// disunification
 			logger.finer("adding clauses for dissubsumptions ...");
@@ -331,23 +331,23 @@ public class SatProcessor implements UelProcessor {
 			addSmallSubsumptions(ret);
 		}
 
-		if (onlyMinimalAssignments) {
+		if (this.onlyMinimalAssignments) {
 			logger.finer("adding literals to be minimized ...");
 			for (Integer var : getVariables()) {
 				if (isUserVariable(var)) {
 					for (Integer con : getConstants()) {
-						Literal literal = invertLiteral ? new SubsumptionLiteral(
+						Literal literal = this.invertLiteral ? new SubsumptionLiteral(
 								var, con) : new DissubsumptionLiteral(var, con);
-						Integer literalId = literalManager
-								.addAndGetIndex(literal);
-						ret.addMinimizeLiteral(literalId);
+								Integer literalId = this.literalManager
+										.addAndGetIndex(literal);
+								ret.addMinimizeLiteral(literalId);
 					}
 					for (Integer eat : getEAtoms()) {
-						Literal literal = invertLiteral ? new SubsumptionLiteral(
+						Literal literal = this.invertLiteral ? new SubsumptionLiteral(
 								var, eat) : new DissubsumptionLiteral(var, eat);
-						Integer literalId = literalManager
-								.addAndGetIndex(literal);
-						ret.addMinimizeLiteral(literalId);
+								Integer literalId = this.literalManager
+										.addAndGetIndex(literal);
+								ret.addMinimizeLiteral(literalId);
 					}
 				}
 			}
@@ -369,14 +369,15 @@ public class SatProcessor implements UelProcessor {
 				for (Integer secondAtomId : set) {
 					Literal literal = this.invertLiteral ? new SubsumptionLiteral(
 							firstAtomId, secondAtomId)
-							: new DissubsumptionLiteral(firstAtomId,
-									secondAtomId);
-					Integer literalId = literalManager.addAndGetIndex(literal);
-					if (!onlyMinimalAssignments
-							|| getLiteralValue(literalId) == this.invertLiteral) {
-						ret.add(getLiteralValue(literalId) ? (-1) * literalId
-								: literalId);
-					}
+					: new DissubsumptionLiteral(firstAtomId,
+							secondAtomId);
+							Integer literalId = this.literalManager
+									.addAndGetIndex(literal);
+							if (!this.onlyMinimalAssignments
+									|| (getLiteralValue(literalId) == this.invertLiteral)) {
+								ret.add(getLiteralValue(literalId) ? (-1) * literalId
+										: literalId);
+							}
 				}
 			}
 		}
@@ -388,7 +389,8 @@ public class SatProcessor implements UelProcessor {
 	}
 
 	private Integer getAuxiliaryLiteral(Integer d, Integer x, Integer e) {
-		return literalManager.addAndGetIndex(new AuxiliaryLiteral(d, x, e));
+		return this.literalManager
+				.addAndGetIndex(new AuxiliaryLiteral(d, x, e));
 	}
 
 	private Set<Integer> getConstants() {
@@ -407,20 +409,22 @@ public class SatProcessor implements UelProcessor {
 		return this.extUelInput.getEquations();
 	}
 
+	@Override
 	public List<Map.Entry<String, String>> getInfo() {
 		List<Map.Entry<String, String>> ret = new ArrayList<Map.Entry<String, String>>();
 		addEntry(ret, keyName, processorName);
 
-		if (onlyMinimalAssignments) {
+		if (this.onlyMinimalAssignments) {
 			addEntry(ret, keyConfiguration, usingMinimalAssignments);
 		} else {
 			addEntry(ret, keyConfiguration, notUsingMinimalAssignments);
 		}
 
-		if (literalManager != null) {
-			addEntry(ret, keyNumberOfPropositions, "" + literalManager.size());
+		if (this.literalManager != null) {
+			addEntry(ret, keyNumberOfPropositions,
+					"" + this.literalManager.size());
 		}
-		addEntry(ret, keyNumberOfClauses, "" + numberOfClauses);
+		addEntry(ret, keyNumberOfClauses, "" + this.numberOfClauses);
 		addEntry(ret, keyNumberOfVariables, ""
 				+ this.extUelInput.getVariables().size());
 		return Collections.unmodifiableList(ret);
@@ -433,7 +437,7 @@ public class SatProcessor implements UelProcessor {
 
 	/**
 	 * Returns the literals.
-	 * 
+	 *
 	 * @return the literals
 	 */
 	public Set<Literal> getLiterals() {
@@ -458,7 +462,7 @@ public class SatProcessor implements UelProcessor {
 
 	private Integer getOrderLiteral(Integer atomId1, Integer atomId2) {
 		Literal literal = new OrderLiteral(atomId1, atomId2);
-		return literalManager.addAndGetIndex(literal);
+		return this.literalManager.addAndGetIndex(literal);
 	}
 
 	private Collection<Integer> getSetOfSubsumers(Integer atomId) {
@@ -471,19 +475,19 @@ public class SatProcessor implements UelProcessor {
 	}
 
 	private Integer getSubOrDissubLiteral(Integer atomId1, Integer atomId2) {
-		Literal literal = invertLiteral ? new SubsumptionLiteral(atomId1,
+		Literal literal = this.invertLiteral ? new SubsumptionLiteral(atomId1,
 				atomId2) : new DissubsumptionLiteral(atomId1, atomId2);
-		int val = literalManager.addAndGetIndex(literal);
-		return invertLiteral ? (-1) * val : val;
+		int val = this.literalManager.addAndGetIndex(literal);
+		return this.invertLiteral ? (-1) * val : val;
 	}
 
 	@Override
 	public UelOutput getUnifier() {
-		return result;
+		return this.result;
 	}
 
 	private Set<Integer> getUpdate() {
-		return Collections.unmodifiableSet(update);
+		return Collections.unmodifiableSet(this.update);
 	}
 
 	private Set<Equation> getUpdatedUnifier() {
@@ -523,9 +527,9 @@ public class SatProcessor implements UelProcessor {
 	 */
 	public void reset() {
 
-		update = new HashSet<Integer>();
+		this.update = new HashSet<Integer>();
 
-		for (Integer key : literalManager.getIndices()) {
+		for (Integer key : this.literalManager.getIndices()) {
 			setLiteralValue(key, false);
 		}
 
@@ -563,7 +567,7 @@ public class SatProcessor implements UelProcessor {
 
 	/**
 	 * Step 1 for constants
-	 * 
+	 *
 	 * @param e
 	 *            equation
 	 */
@@ -576,7 +580,7 @@ public class SatProcessor implements UelProcessor {
 
 				/*
 				 * constant not in the equation
-				 * 
+				 *
 				 * one side of an equation
 				 */
 
@@ -628,7 +632,7 @@ public class SatProcessor implements UelProcessor {
 
 	/**
 	 * Step 1 for existential atoms
-	 * 
+	 *
 	 * @param e
 	 *            equation
 	 */
@@ -639,7 +643,7 @@ public class SatProcessor implements UelProcessor {
 
 				/*
 				 * atom not in the equation
-				 * 
+				 *
 				 * one side of equation
 				 */
 
@@ -709,7 +713,7 @@ public class SatProcessor implements UelProcessor {
 				}
 			}
 
-			if (hasDisequations) {
+			if (this.hasDisequations) {
 				// positive clause needed for soundness of disunification
 				Set<Integer> clause = new HashSet<Integer>();
 				clause.add(getMinusSubOrDissubLiteral(atomId1, atomId1));
@@ -745,7 +749,7 @@ public class SatProcessor implements UelProcessor {
 
 	/**
 	 * Step 2.5
-	 * 
+	 *
 	 * Transitivity of dis-subsumption
 	 */
 	private void runStep2_5(SatInput input) {
@@ -775,7 +779,7 @@ public class SatProcessor implements UelProcessor {
 
 	/**
 	 * Step 3.1
-	 * 
+	 *
 	 * Reflexivity for order literals
 	 */
 	private void runStep3_1_r(SatInput input) {
@@ -788,7 +792,7 @@ public class SatProcessor implements UelProcessor {
 
 	/**
 	 * Step 3.1
-	 * 
+	 *
 	 * Transitivity for order literals
 	 */
 	private void runStep3_1_t(SatInput input) {
@@ -886,7 +890,7 @@ public class SatProcessor implements UelProcessor {
 							input.add(clause);
 						}
 
-						if (hasDisequations) {
+						if (this.hasDisequations) {
 							// converse clause needed for soundness of
 							// disunification
 							Set<Integer> clause = new HashSet<Integer>();
@@ -902,7 +906,7 @@ public class SatProcessor implements UelProcessor {
 
 			}
 
-			if (hasDisequations) {
+			if (this.hasDisequations) {
 				// converse clause (as above) for trival subsumption
 				// between an existential restriction and itself
 				Set<Integer> clause = new HashSet<Integer>();
@@ -925,23 +929,23 @@ public class SatProcessor implements UelProcessor {
 
 		for (Integer atomId1 : getUsedAtomIds()) {
 			for (Integer atomId2 : getUsedAtomIds()) {
-				Literal literal = invertLiteral ? new SubsumptionLiteral(
+				Literal literal = this.invertLiteral ? new SubsumptionLiteral(
 						atomId1, atomId2) : new DissubsumptionLiteral(atomId1,
-						atomId2);
+								atomId2);
 
-				literalManager.add(literal);
+						this.literalManager.add(literal);
 			}
 		}
 
 		/*
-		 * 
+		 *
 		 * Literals for order on variables
 		 */
 
 		for (Integer atomId1 : getVariables()) {
 			for (Integer atomId2 : getVariables()) {
 				Literal literal = new OrderLiteral(atomId1, atomId2);
-				literalManager.add(literal);
+				this.literalManager.add(literal);
 			}
 		}
 	}
@@ -966,7 +970,7 @@ public class SatProcessor implements UelProcessor {
 		for (Integer currentLiteral : val) {
 			if (currentLiteral < 0) {
 				Integer i = (-1) * currentLiteral;
-				Literal literal = literalManager.get(i);
+				Literal literal = this.literalManager.get(i);
 				if (literal.isDissubsumption() || literal.isSubsumption()) {
 					setLiteralValue(i, false);
 				}
@@ -979,7 +983,7 @@ public class SatProcessor implements UelProcessor {
 	/**
 	 * Updates the translator with the SAT solver output, returning a new
 	 * unifier.
-	 * 
+	 *
 	 * @param val
 	 *            SAT solver output
 	 * @return a new unifier.
@@ -987,7 +991,7 @@ public class SatProcessor implements UelProcessor {
 	public Set<Equation> toTBox(Set<Integer> val) {
 		setValuesForLiterals(val);
 		updateTBox();
-		update = createUpdate();
+		this.update = createUpdate();
 		Set<Equation> ret = getUpdatedUnifier();
 		return Collections.unmodifiableSet(ret);
 	}
@@ -997,12 +1001,12 @@ public class SatProcessor implements UelProcessor {
 		 * Define S_X for each variable X
 		 */
 
-		for (Integer i : literalManager.getIndices()) {
+		for (Integer i : this.literalManager.getIndices()) {
 
-			Integer atomId1 = literalManager.get(i).getFirst();
-			Integer atomId2 = literalManager.get(i).getSecond();
+			Integer atomId1 = this.literalManager.get(i).getFirst();
+			Integer atomId2 = this.literalManager.get(i).getSecond();
 
-			if (literalManager.get(i).isDissubsumption()) {
+			if (this.literalManager.get(i).isDissubsumption()) {
 
 				if (!getLiteralValue(i)) {
 
@@ -1014,7 +1018,7 @@ public class SatProcessor implements UelProcessor {
 						}
 					}
 				}
-			} else if (literalManager.get(i).isSubsumption()) {
+			} else if (this.literalManager.get(i).isSubsumption()) {
 				if (getLiteralValue(i)) {
 
 					if (getVariables().contains(atomId1)) {

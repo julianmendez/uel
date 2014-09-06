@@ -17,19 +17,22 @@ import de.tudresden.inf.lat.uel.type.impl.ExistentialRestriction;
 /**
  * An object of this class is a UEL ontology that reuses a previously build OWL
  * ontology.
- * 
+ *
  * @author Julian Mendez
  */
 public class DynamicOntology implements Ontology {
 
-	private Map<Integer, Equation> definitionCache = new HashMap<Integer, Equation>();
-	private Map<Integer, OWLClass> nameMap = new HashMap<Integer, OWLClass>();
+	private final Map<Integer, Equation> definitionCache = new HashMap<Integer, Equation>();
+	private final Map<Integer, OWLClass> nameMap = new HashMap<Integer, OWLClass>();
 	private OntologyBuilder ontologyBuilder = null;
 	private OWLDefinitionSet owlDefinitionSet;
-	private Map<Integer, Equation> primitiveDefinitionCache = new HashMap<Integer, Equation>();
+	private final Map<Integer, Equation> primitiveDefinitionCache = new HashMap<Integer, Equation>();
 
 	/**
 	 * Constructs a new dynamic ontology.
+	 *
+	 * @param builder
+	 *            ontology builder
 	 */
 	public DynamicOntology(OntologyBuilder builder) {
 		if (builder == null) {
@@ -103,7 +106,7 @@ public class DynamicOntology implements Ontology {
 
 	@Override
 	public Set<Integer> getDefinitionIds() {
-		return Collections.unmodifiableSet(nameMap.keySet());
+		return Collections.unmodifiableSet(this.nameMap.keySet());
 	}
 
 	@Override
@@ -169,7 +172,7 @@ public class DynamicOntology implements Ontology {
 
 	/**
 	 * Loads an OWL ontology.
-	 * 
+	 *
 	 * @param owlOntology01
 	 *            first OWL ontology
 	 * @param owlOntology02

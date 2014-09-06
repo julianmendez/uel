@@ -12,7 +12,7 @@ import javax.swing.JComboBox;
  * This is a combo box that contains pairs label-identifier. This class is
  * mainly used to keep compatibility with Java 1.6, since Java 1.7 contains
  * already a parameterized combo box.
- * 
+ *
  * @author Julian Mendez
  * @see javax.swing.JComboBox
  */
@@ -20,7 +20,7 @@ public class JComboBoxOfLabelId extends JComboBox {
 
 	private static final long serialVersionUID = -1589168297784841281L;
 
-	private List<LabelId> list = new ArrayList<LabelId>();
+	private final List<LabelId> list = new ArrayList<LabelId>();
 
 	public JComboBoxOfLabelId() {
 		super();
@@ -39,8 +39,9 @@ public class JComboBoxOfLabelId extends JComboBox {
 
 	/**
 	 * This method is not supported.
-	 * 
+	 *
 	 * @throws UnsupportedOperationException
+	 *             always because this method is not supported
 	 */
 	@Override
 	public void addItem(Object anObject) {
@@ -51,7 +52,7 @@ public class JComboBoxOfLabelId extends JComboBox {
 		int left = 0;
 		int right = list.size();
 		int mid = left;
-		while (left < right - 1) {
+		while (left < (right - 1)) {
 			mid = (left + right) / 2;
 			LabelId current = list.get(mid);
 			if (current.getLabel().equals(key)) {
@@ -63,8 +64,8 @@ public class JComboBoxOfLabelId extends JComboBox {
 				right = mid;
 			}
 		}
-		int ret = left < list.size() - 1
-				&& list.get(left).getLabel().compareTo(key) < 0 ? left + 1
+		int ret = (left < (list.size() - 1))
+				&& (list.get(left).getLabel().compareTo(key) < 0) ? left + 1
 				: left;
 		return ret;
 	}
