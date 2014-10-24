@@ -8,7 +8,7 @@ atom(C) :- diseq(C,D).
 atom(D) :- diseq(C,D).
 
 % (VI) a
-subs(cname(X),cname(X)) :- atom(cname(X)).
+%subs(cname(X),cname(X)) :- atom(cname(X)).
 
 % (VI) e/2
 subs(exists(R,X),exists(R,Y)) :- subs(X,Y), atom(exists(R,X)), atom(exists(R,Y)).

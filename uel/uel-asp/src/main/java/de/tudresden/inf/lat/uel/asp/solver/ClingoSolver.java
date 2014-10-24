@@ -29,7 +29,7 @@ public class ClingoSolver implements AspSolver {
 	private static String FINAL_PROGRAM = "/final.lp";
 	private static String CLINGO_COMMAND = "clingo";
 	// TODO: multi-threading?
-	private static String COMMON_ARGUMENTS = "--project --outf=2 --enum-mode=domRec";
+	private static String COMMON_ARGUMENTS = "--project --outf=2"; // --enum-mode=domRec";
 	private static String HEURISTIC_ARGUMENTS = "--dom-mod=5,16 --heu=Domain";
 
 	private boolean disequations;

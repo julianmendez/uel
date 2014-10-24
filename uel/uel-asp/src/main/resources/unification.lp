@@ -39,7 +39,7 @@ subs(X,Y) :- subs(exists(R,X),exists(R,Y)).
 
 
 % (VII)
-subs(X,Z) :- subs(X,Y), subs(Y,Z), X!=Z, X!=Y, Z!=Y.
+subs(X,Z) :- subs(X,Y), subs(Y,Z).
 
 :- subs(X,Y), triviallyfalse(X,Y).
 
@@ -51,4 +51,4 @@ greater(X,Y) :- subs(var(X),exists(R,var(Y))).
 :- greater(X,X).
 
 % (IX) b
-greater(X,Z) :- greater(X,Y), greater(Y,Z), X!=Y, X!=Z, Y!=Z.
+greater(X,Z) :- greater(X,Y), greater(Y,Z).
