@@ -1,0 +1,2 @@
+(implies x#C x#D)
+(implies x#D x#C)

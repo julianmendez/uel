@@ -41,7 +41,7 @@ public class AlternativeUelStarterTest {
 	private static final String dissubsFilename = "-dissubsumptions.krss";
 	private static final String varFilename = "-variables.txt";
 	private static final String testFilename = ".test";
-	private static final int maxTest = 3;
+	private static final int maxTest = 4;
 
 	private OWLOntology mainOntology;
 	private OWLOntology subsumptions;
