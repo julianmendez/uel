@@ -16,22 +16,22 @@
 	<version>1.3.0-SNAPSHOT</version>
 
 	<modules>
-		<module>../uel-type</module>
-		<module>../uel-rule</module>
-		<module>../uel-sat</module>
-		<module>../uel-asp</module>
-		<module>../uel-plugin</module>
-		<module>library</module>
-		<module>plugin</module>
-		<module>standalone</module>
-		<module>release</module>
+		<module>uel-type</module>
+		<module>uel-rule</module>
+		<module>uel-sat</module>
+		<module>uel-asp</module>
+		<module>uel-plugin</module>
+		<module>uel-build/library</module>
+		<module>uel-build/plugin</module>
+		<module>uel-build/standalone</module>
+		<module>uel-build/release</module>
 	</modules>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
-	<name>UEL build</name>
+	<name>UEL</name>
 
 	<licenses>
 
@@ -52,7 +52,7 @@
 		<repository>
 			<id>localrepo</id>
 			<name>local Maven repository</name>
-			<url>file:../uel-build/lib</url>
+			<url>file:uel-build/lib</url>
 		</repository>
 
 	</repositories>

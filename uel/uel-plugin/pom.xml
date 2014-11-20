@@ -83,7 +83,7 @@
 		<groupId>de.tudresden.inf.lat.uel</groupId>
 		<artifactId>uel-parent</artifactId>
 		<version>1.3.0-SNAPSHOT</version>
-		<relativePath>../uel-build/pom.xml</relativePath>
+		<relativePath>..</relativePath>
 	</parent>
 
 	<properties>
