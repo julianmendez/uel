@@ -9,9 +9,9 @@ import java.util.HashSet;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import de.tudresden.inf.lat.uel.plugin.processor.UelProcessorFactory;
-import de.tudresden.inf.lat.uel.plugin.type.AtomManager;
-import de.tudresden.inf.lat.uel.plugin.type.AtomManagerImpl;
+import de.tudresden.inf.lat.uel.core.processor.UelProcessorFactory;
+import de.tudresden.inf.lat.uel.core.type.AtomManager;
+import de.tudresden.inf.lat.uel.core.type.AtomManagerImpl;
 import de.tudresden.inf.lat.uel.type.api.Equation;
 import de.tudresden.inf.lat.uel.type.api.SmallEquation;
 import de.tudresden.inf.lat.uel.type.api.UelInput;

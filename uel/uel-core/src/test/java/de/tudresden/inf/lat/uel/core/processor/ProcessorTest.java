@@ -1,4 +1,4 @@
-package de.tudresden.inf.lat.uel.plugin.processor;
+package de.tudresden.inf.lat.uel.core.processor;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -30,8 +30,11 @@ import org.semanticweb.owlapi.reasoner.Node;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 
 import de.tudresden.inf.lat.jcel.owlapi.main.JcelReasonerFactory;
-import de.tudresden.inf.lat.uel.plugin.type.AtomManager;
-import de.tudresden.inf.lat.uel.plugin.type.UnifierKRSSRenderer;
+import de.tudresden.inf.lat.uel.core.processor.PluginGoal;
+import de.tudresden.inf.lat.uel.core.processor.UelModel;
+import de.tudresden.inf.lat.uel.core.processor.UelProcessorFactory;
+import de.tudresden.inf.lat.uel.core.type.AtomManager;
+import de.tudresden.inf.lat.uel.core.type.UnifierKRSSRenderer;
 import de.tudresden.inf.lat.uel.type.api.Equation;
 import de.tudresden.inf.lat.uel.type.api.UelProcessor;
 import de.tudresden.inf.lat.uel.type.impl.ConceptName;

@@ -1,4 +1,4 @@
-package de.tudresden.inf.lat.uel.plugin.type;
+package de.tudresden.inf.lat.uel.core.type;
 
 import de.tudresden.inf.lat.uel.type.api.Atom;
 import de.tudresden.inf.lat.uel.type.api.IndexedSet;

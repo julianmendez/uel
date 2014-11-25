@@ -4,9 +4,9 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
-import de.tudresden.inf.lat.uel.plugin.type.AtomManager;
-import de.tudresden.inf.lat.uel.plugin.type.OWLUelClassDefinition;
-import de.tudresden.inf.lat.uel.plugin.type.UnifierTranslator;
+import de.tudresden.inf.lat.uel.core.type.AtomManager;
+import de.tudresden.inf.lat.uel.core.type.OWLUelClassDefinition;
+import de.tudresden.inf.lat.uel.core.type.UnifierTranslator;
 import de.tudresden.inf.lat.uel.type.api.UelOutput;
 import de.tudresden.inf.lat.uel.type.api.UelProcessor;
 

@@ -14,7 +14,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.WindowConstants;
 
-import de.tudresden.inf.lat.uel.plugin.processor.UelModel;
+import de.tudresden.inf.lat.uel.core.processor.UelModel;
 
 /**
  * This is the panel that shows the unifiers.

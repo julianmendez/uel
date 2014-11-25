@@ -1,4 +1,4 @@
-package de.tudresden.inf.lat.uel.plugin.type;
+package de.tudresden.inf.lat.uel.core.type;
 
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;

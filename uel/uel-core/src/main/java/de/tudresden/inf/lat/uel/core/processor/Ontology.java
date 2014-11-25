@@ -1,4 +1,4 @@
-package de.tudresden.inf.lat.uel.plugin.processor;
+package de.tudresden.inf.lat.uel.core.processor;
 
 import java.util.Set;
 

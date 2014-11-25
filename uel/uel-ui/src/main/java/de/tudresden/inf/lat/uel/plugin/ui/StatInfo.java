@@ -3,8 +3,8 @@ package de.tudresden.inf.lat.uel.plugin.ui;
 import java.util.List;
 import java.util.Map;
 
-import de.tudresden.inf.lat.uel.plugin.processor.PluginGoal;
-import de.tudresden.inf.lat.uel.plugin.type.AtomManager;
+import de.tudresden.inf.lat.uel.core.processor.PluginGoal;
+import de.tudresden.inf.lat.uel.core.type.AtomManager;
 
 /**
  * An object of this class contains statistical information about a processor
