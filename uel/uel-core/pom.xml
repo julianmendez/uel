@@ -46,24 +46,6 @@
 		</dependency>
 
 		<dependency>
-			<groupId>edu.stanford.protege</groupId>
-			<artifactId>org.protege.editor.owl</artifactId>
-			<version>4.3.0</version>
-		</dependency>
-
-		<dependency>
-			<groupId>edu.stanford.protege</groupId>
-			<artifactId>org.protege.editor.core.application</artifactId>
-			<version>4.3.0</version>
-		</dependency>
-
-		<dependency>
-			<groupId>com.sun.java</groupId>
-			<artifactId>jlfgr</artifactId>
-			<version>1.0</version>
-		</dependency>
-
-		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.11</version>
