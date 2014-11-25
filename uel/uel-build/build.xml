@@ -10,7 +10,7 @@
 	<!-- For more information about this file, see http://ant.apache.org -->
 
 	<!-- Imports 'project.groupId', 'project.artifactId', and 'project.version' properties. -->
-	<xmlproperty file="pom.xml" />
+	<xmlproperty file="../pom.xml" />
 
 	<property name="project.build.directory" value="${basedir}/target" />
 	<property name="src.directory" value="src" />
