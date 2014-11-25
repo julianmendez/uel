@@ -45,7 +45,7 @@
 	<property name="module.1.name" value="uel-rule" />
 	<property name="module.2.name" value="uel-sat" />
 	<property name="module.3.name" value="uel-asp" />
-	<property name="module.4.name" value="uel-plugin" />
+	<property name="module.4.name" value="uel-core" />
 
 	<!-- Cleans everything. -->
 	<target name="clean">

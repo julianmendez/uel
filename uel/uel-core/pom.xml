@@ -10,7 +10,7 @@
 
 	<modelVersion>4.0.0</modelVersion>
 
-	<artifactId>uel-plugin</artifactId>
+	<artifactId>uel-core</artifactId>
 	<packaging>jar</packaging>
 
 	<dependencies>

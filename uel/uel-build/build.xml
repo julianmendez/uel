@@ -24,7 +24,7 @@
 	<property name="module.1.name" value="uel-rule" />
 	<property name="module.2.name" value="uel-sat" />
 	<property name="module.3.name" value="uel-asp" />
-	<property name="module.4.name" value="uel-plugin" />
+	<property name="module.4.name" value="uel-core" />
 	<property name="build.0.name" value="library" />
 	<property name="build.1.name" value="plugin" />
 	<property name="build.2.name" value="standalone" />

@@ -80,7 +80,7 @@
 		</fileSet>
 
 		<fileSet>
-			<directory>${basedir}/../../uel-plugin/src/main/java/</directory>
+			<directory>${basedir}/../../uel-core/src/main/java/</directory>
 			<outputDirectory>.</outputDirectory>
 			<includes>
 				<include>**</include>
@@ -88,7 +88,7 @@
 		</fileSet>
 
 		<fileSet>
-			<directory>${basedir}/../../uel-plugin/src/main/resources/</directory>
+			<directory>${basedir}/../../uel-core/src/main/resources/</directory>
 			<outputDirectory>.</outputDirectory>
 			<includes>
 				<include>**</include>

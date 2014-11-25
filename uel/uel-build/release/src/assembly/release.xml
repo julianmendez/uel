@@ -103,17 +103,17 @@
 		</file>
 
 		<file>
-			<source>${basedir}/../../uel-plugin/target/uel-plugin-${project.version}.jar</source>
+			<source>${basedir}/../../uel-core/target/uel-core-${project.version}.jar</source>
 			<outputDirectory>modules</outputDirectory>
 		</file>
 
 		<file>
-			<source>${basedir}/../../uel-plugin/target/uel-plugin-${project.version}-sources.jar</source>
+			<source>${basedir}/../../uel-core/target/uel-core-${project.version}-sources.jar</source>
 			<outputDirectory>modules</outputDirectory>
 		</file>
 
 		<file>
-			<source>${basedir}/../../uel-plugin/target/uel-plugin-${project.version}-javadoc.jar</source>
+			<source>${basedir}/../../uel-core/target/uel-core-${project.version}-javadoc.jar</source>
 			<outputDirectory>modules</outputDirectory>
 		</file>
 

@@ -17,7 +17,7 @@
 
 		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>uel-plugin</artifactId>
+			<artifactId>uel-core</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
@@ -78,7 +78,7 @@
 						<Import-Package>javax.accessibility, javax.swing, javax.swing.border, org.osgi.framework, org.protege.editor.core.ui.workspace, *</Import-Package>
 						<Include-Resource>
 							{maven-resources}, {maven-dependencies},
-							@uel-plugin-${project.version}.jar,
+							@uel-core-${project.version}.jar,
 							lib/uel/uel-type/${project.version}/uel-type-${project.version}.jar=uel-type-${project.version}.jar,
 							lib/uel/uel-rule/${project.version}/uel-rule-${project.version}.jar=uel-rule-${project.version}.jar,
 							lib/uel/uel-sat/${project.version}/uel-sat-${project.version}.jar=uel-sat-${project.version}.jar,

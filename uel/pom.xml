@@ -20,7 +20,7 @@
 		<module>uel-rule</module>
 		<module>uel-sat</module>
 		<module>uel-asp</module>
-		<module>uel-plugin</module>
+		<module>uel-core</module>
 		<module>uel-build/library</module>
 		<module>uel-build/plugin</module>
 		<module>uel-build/standalone</module>

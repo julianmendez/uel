@@ -20,7 +20,7 @@
 	<fileSets>
 
 		<fileSet>
-			<directory>${basedir}/../../uel-plugin/target/apidocs/</directory>
+			<directory>${basedir}/../../uel-core/target/apidocs/</directory>
 			<outputDirectory>.</outputDirectory>
 			<includes>
 				<include>**</include>
