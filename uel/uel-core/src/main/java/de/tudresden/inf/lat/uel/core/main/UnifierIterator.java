@@ -22,11 +22,11 @@ public class UnifierIterator implements Iterator<Set<OWLUelClassDefinition>> {
 		this.processor = proc;
 		this.translator = translator;
 	}
-	
+
 	protected UelProcessor getProcessor() {
 		return this.processor;
 	}
-	
+
 	protected AtomManager getAtomManager() {
 		return this.translator.getAtomManager();
 	}

@@ -30,9 +30,6 @@ import org.semanticweb.owlapi.reasoner.Node;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 
 import de.tudresden.inf.lat.jcel.owlapi.main.JcelReasonerFactory;
-import de.tudresden.inf.lat.uel.core.processor.PluginGoal;
-import de.tudresden.inf.lat.uel.core.processor.UelModel;
-import de.tudresden.inf.lat.uel.core.processor.UelProcessorFactory;
 import de.tudresden.inf.lat.uel.core.type.AtomManager;
 import de.tudresden.inf.lat.uel.core.type.UnifierKRSSRenderer;
 import de.tudresden.inf.lat.uel.type.api.Equation;

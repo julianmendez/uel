@@ -91,7 +91,7 @@ public class AlternativeUelStarterTest {
 				throw new RuntimeException(ex);
 			}
 		}
-		
+
 		return data;
 	}
 
