@@ -1,4 +1,4 @@
-package de.tudresden.inf.lat.uel.plugin.main;
+package de.tudresden.inf.lat.uel.core.main;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;

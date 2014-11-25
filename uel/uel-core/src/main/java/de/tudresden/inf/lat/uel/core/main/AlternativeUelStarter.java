@@ -1,4 +1,4 @@
-package de.tudresden.inf.lat.uel.plugin.main;
+package de.tudresden.inf.lat.uel.core.main;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -23,6 +23,7 @@ import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
+import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
@@ -37,7 +38,6 @@ import de.tudresden.inf.lat.uel.core.type.AtomManager;
 import de.tudresden.inf.lat.uel.core.type.AtomManagerImpl;
 import de.tudresden.inf.lat.uel.core.type.OWLUelClassDefinition;
 import de.tudresden.inf.lat.uel.core.type.UnifierTranslator;
-import de.tudresden.inf.lat.uel.plugin.ui.UelController;
 import de.tudresden.inf.lat.uel.type.api.Atom;
 import de.tudresden.inf.lat.uel.type.api.Equation;
 import de.tudresden.inf.lat.uel.type.api.SmallEquation;
@@ -104,8 +104,8 @@ public class AlternativeUelStarter {
 		return ret;
 	}
 
-	public String getId(OWLClass cls) {
-		return UelController.getId(cls);
+	public static String getId(OWLEntity entity) {
+		return entity.getIRI().toURI().toString();
 	}
 
 	private String isVariable(ConceptName name, AtomManager atomManager,
