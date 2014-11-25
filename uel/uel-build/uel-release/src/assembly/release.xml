@@ -117,6 +117,21 @@
 			<outputDirectory>modules</outputDirectory>
 		</file>
 
+		<file>
+			<source>${basedir}/../../uel-ui/target/uel-ui-${project.version}.jar</source>
+			<outputDirectory>modules</outputDirectory>
+		</file>
+
+		<file>
+			<source>${basedir}/../../uel-ui/target/uel-ui-${project.version}-sources.jar</source>
+			<outputDirectory>modules</outputDirectory>
+		</file>
+
+		<file>
+			<source>${basedir}/../../uel-ui/target/uel-ui-${project.version}-javadoc.jar</source>
+			<outputDirectory>modules</outputDirectory>
+		</file>
+
 	</files>
 
 </assembly>

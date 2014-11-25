@@ -30,6 +30,7 @@
 	<property name="module.2.name" value="uel-sat" />
 	<property name="module.3.name" value="uel-asp" />
 	<property name="module.4.name" value="uel-core" />
+	<property name="module.5.name" value="uel-ui" />
 	<property name="build.0.name" value="uel-library" />
 	<property name="build.0.output.name" value="library" />
 	<property name="build.0.filename" value="uel-${project.version}" />
@@ -74,6 +75,9 @@
 		</antcall>
 		<antcall target="preparejars">
 			<param name="module.name" value="${module.4.name}" />
+		</antcall>
+		<antcall target="preparejars">
+			<param name="module.name" value="${module.5.name}" />
 		</antcall>
 
 		<copy todir="${_release.directory}/${build.0.output.name}">

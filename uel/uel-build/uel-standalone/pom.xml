@@ -17,7 +17,7 @@
 
 		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>uel-core</artifactId>
+			<artifactId>uel-ui</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
@@ -79,11 +79,12 @@
 						<Main-Class>${mainclass}</Main-Class>
 						<Include-Resource>
 							{maven-resources}, {maven-dependencies},
-							@uel-core-${project.version}.jar,
 							@uel-type-${project.version}.jar,
 							@uel-rule-${project.version}.jar,
 							@uel-sat-${project.version}.jar,
 							@uel-asp-${project.version}.jar,
+							@uel-core-${project.version}.jar,
+							@uel-ui-${project.version}.jar,
 							@org.ow2.sat4j.core-2.3.5.jar,
 							@org.ow2.sat4j.pb-2.3.5.jar,
 							@org.ow2.sat4j.maxsat-2.3.5.jar,
