@@ -1,4 +1,0 @@
-(implies (some x#r x#Y) x#X)
-(implies x#X (some x#r x#A))
-(implies x#Y (some x#r x#B))
-
