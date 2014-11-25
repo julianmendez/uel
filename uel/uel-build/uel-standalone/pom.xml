@@ -10,7 +10,7 @@
 
 	<modelVersion>4.0.0</modelVersion>
 
-	<artifactId>plugin</artifactId>
+	<artifactId>uel-standalone</artifactId>
 	<packaging>bundle</packaging>
 
 	<dependencies>
@@ -36,7 +36,7 @@
 
 	<build>
 
-		<finalName>de.tudresden.inf.lat.uel</finalName>
+		<finalName>uel</finalName>
 
 		<plugins>
 
@@ -67,27 +67,29 @@
 				<configuration>
 					<instructions>
 						<Bundle-SymbolicName>de.tudresden.inf.lat.uel;singleton:=true</Bundle-SymbolicName>
-						<Bundle-Name>UEL Plug-in</Bundle-Name>
+						<Bundle-Name>UEL</Bundle-Name>
 						<Bundle-Version>${project.version}</Bundle-Version>
 						<Bundle-Activator>org.protege.editor.core.plugin.DefaultPluginActivator</Bundle-Activator>
 						<Bundle-Category>protege</Bundle-Category>
-						<Bundle-Description>UEL Protege plug-in</Bundle-Description>
+						<Bundle-Description>UEL standalone</Bundle-Description>
 						<Bundle-Vendor>Chair of Automata Theory - TU Dresden</Bundle-Vendor>
 						<Bundle-DocURL>http://lat.inf.tu-dresden.de</Bundle-DocURL>
 						<Bundle-ClassPath>${bundle.classpath}</Bundle-ClassPath>
 						<Import-Package>javax.accessibility, javax.swing, javax.swing.border, org.osgi.framework, org.protege.editor.core.ui.workspace, *</Import-Package>
+						<Main-Class>${mainclass}</Main-Class>
 						<Include-Resource>
 							{maven-resources}, {maven-dependencies},
 							@uel-core-${project.version}.jar,
-							lib/uel/uel-type/${project.version}/uel-type-${project.version}.jar=uel-type-${project.version}.jar,
-							lib/uel/uel-rule/${project.version}/uel-rule-${project.version}.jar=uel-rule-${project.version}.jar,
-							lib/uel/uel-sat/${project.version}/uel-sat-${project.version}.jar=uel-sat-${project.version}.jar,
-							lib/uel/uel-asp/${project.version}/uel-asp-${project.version}.jar=uel-asp-${project.version}.jar,
-							lib/org/ow2/sat4j/org.ow2.sat4j.core/2.3.5/org.ow2.sat4j.core-2.3.5.jar=org.ow2.sat4j.core-2.3.5.jar,
-							lib/org/ow2/sat4j/org.ow2.sat4j.pb/2.3.5/org.ow2.sat4j.pb-2.3.5.jar=org.ow2.sat4j.pb-2.3.5.jar,
-							lib/org/ow2/sat4j/org.ow2.sat4j.maxsat/2.3.5/org.ow2.sat4j.maxsat-2.3.5.jar=org.ow2.sat4j.maxsat-2.3.5.jar,
-							lib/commons-cli/commons-cli/1.1/commons-cli-1.1.jar=commons-cli-1.1.jar,
-							lib/com/sun/java/jlfgr/1.0/jlfgr-1.0.jar=jlfgr-1.0.jar
+							@uel-type-${project.version}.jar,
+							@uel-rule-${project.version}.jar,
+							@uel-sat-${project.version}.jar,
+							@uel-asp-${project.version}.jar,
+							@org.ow2.sat4j.core-2.3.5.jar,
+							@org.ow2.sat4j.pb-2.3.5.jar,
+							@org.ow2.sat4j.maxsat-2.3.5.jar,
+							@commons-cli-1.1.jar,
+							@jlfgr-1.0.jar,
+							@owlapi-distribution-3.5.0.jar
 						</Include-Resource>
 					</instructions>
 				</configuration>
@@ -96,7 +98,7 @@
 		</plugins>
 	</build>
 
-	<name>UEL bundle</name>
+	<name>UEL standalone</name>
 
 </project>
 

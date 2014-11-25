@@ -18,27 +18,27 @@
 	<files>
 
 		<file>
-			<source>${basedir}/../library/target/uel-${project.version}.jar</source>
+			<source>${basedir}/../uel-library/target/uel-${project.version}.jar</source>
 			<outputDirectory>library</outputDirectory>
 		</file>
 
 		<file>
-			<source>${basedir}/../library/target/uel-${project.version}-sources.jar</source>
+			<source>${basedir}/../uel-library/target/uel-${project.version}-sources.jar</source>
 			<outputDirectory>library</outputDirectory>
 		</file>
 
 		<file>
-			<source>${basedir}/../library/target/uel-${project.version}-javadoc.jar</source>
+			<source>${basedir}/../uel-library/target/uel-${project.version}-javadoc.jar</source>
 			<outputDirectory>library</outputDirectory>
 		</file>
 
 		<file>
-			<source>${basedir}/../plugin/target/de.tudresden.inf.lat.uel.jar</source>
+			<source>${basedir}/../uel-plugin/target/de.tudresden.inf.lat.uel.jar</source>
 			<outputDirectory>plugin</outputDirectory>
 		</file>
 
 		<file>
-			<source>${basedir}/../standalone/target/uel.jar</source>
+			<source>${basedir}/../uel-standalone/target/uel.jar</source>
 			<outputDirectory>standalone</outputDirectory>
 		</file>
 

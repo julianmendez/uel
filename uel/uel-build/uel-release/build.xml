@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<project name="uel-build-release" default="dist" basedir=".">
+<project name="uel-release" default="dist" basedir=".">
 
 	<!--
  *
@@ -25,20 +25,23 @@
 
 	<property name="_root.directory" value="../../" />
 
-	<property name="_release.name" value="uel-${project.version}" />
-	<property name="_release.directory" value="${project.build.directory}/release/${_release.name}" />
-
 	<property name="module.0.name" value="uel-type" />
 	<property name="module.1.name" value="uel-rule" />
 	<property name="module.2.name" value="uel-sat" />
 	<property name="module.3.name" value="uel-asp" />
 	<property name="module.4.name" value="uel-core" />
-	<property name="build.0.name" value="library" />
+	<property name="build.0.name" value="uel-library" />
+	<property name="build.0.output.name" value="library" />
 	<property name="build.0.filename" value="uel-${project.version}" />
-	<property name="build.1.name" value="plugin" />
+	<property name="build.1.name" value="uel-plugin" />
+	<property name="build.1.output.name" value="plugin" />
 	<property name="build.1.filename" value="de.tudresden.inf.lat.uel" />
-	<property name="build.2.name" value="standalone" />
+	<property name="build.2.name" value="uel-standalone" />
+	<property name="build.2.output.name" value="standalone" />
 	<property name="build.2.filename" value="uel" />
+
+	<property name="_release.name" value="uel-${project.version}" />
+	<property name="_release.directory" value="${project.build.directory}/release/${_release.name}" />
 
 
 	<!-- Cleans compiled files. -->
@@ -73,17 +76,17 @@
 			<param name="module.name" value="${module.4.name}" />
 		</antcall>
 
-		<copy todir="${_release.directory}/${build.0.name}">
+		<copy todir="${_release.directory}/${build.0.output.name}">
 			<fileset dir="../${build.0.name}/target" includes="${build.0.filename}.jar" />
 			<fileset dir="../${build.0.name}/target" includes="${build.0.filename}-sources.jar" />
 			<fileset dir="../${build.0.name}/target" includes="${build.0.filename}-javadoc.jar" />
 		</copy>
 
-		<copy todir="${_release.directory}/${build.1.name}">
+		<copy todir="${_release.directory}/${build.1.output.name}">
 			<fileset dir="../${build.1.name}/target" includes="${build.1.filename}.jar" />
 		</copy>
 
-		<copy todir="${_release.directory}/${build.2.name}">
+		<copy todir="${_release.directory}/${build.2.output.name}">
 			<fileset dir="../${build.2.name}/target" includes="${build.2.filename}.jar" />
 		</copy>
 

@@ -21,10 +21,10 @@
 		<module>uel-sat</module>
 		<module>uel-asp</module>
 		<module>uel-core</module>
-		<module>uel-build/library</module>
-		<module>uel-build/plugin</module>
-		<module>uel-build/standalone</module>
-		<module>uel-build/release</module>
+		<module>uel-build/uel-library</module>
+		<module>uel-build/uel-plugin</module>
+		<module>uel-build/uel-standalone</module>
+		<module>uel-build/uel-release</module>
 	</modules>
 
 	<properties>
