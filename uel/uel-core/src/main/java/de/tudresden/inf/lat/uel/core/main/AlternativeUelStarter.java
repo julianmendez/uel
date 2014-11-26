@@ -56,6 +56,7 @@ public class AlternativeUelStarter {
 	private UelProcessor uelProcessor;
 	private boolean verbose = false;
 	private OWLClass owlThingAlias = null;
+	private boolean markUndefAsVariables = true;
 
 	public AlternativeUelStarter(OWLOntology ontology) {
 		if (ontology == null) {
@@ -77,6 +78,10 @@ public class AlternativeUelStarter {
 
 	public void setOwlThingAlias(OWLClass owlThingAlias) {
 		this.owlThingAlias = owlThingAlias;
+	}
+	
+	public void markUndefAsVariables(boolean markUndefAsVariables) {
+		this.markUndefAsVariables = markUndefAsVariables;
 	}
 
 	public OWLClass findAuxiliaryDefinition(OWLClassExpression expr) {
@@ -286,41 +291,73 @@ public class AlternativeUelStarter {
 	}
 
 	public Iterator<Set<OWLUelClassDefinition>> modifyOntologyAndSolve(
-			OWLOntology subsumptions, OWLOntology dissubsumptions,
+			OWLOntology positiveProblem, OWLOntology negativeProblem,
 			Set<OWLClass> variables, String processorName) {
 		return modifyOntologyAndSolve(
-				subsumptions.getAxioms(AxiomType.SUBCLASS_OF),
-				dissubsumptions.getAxioms(AxiomType.SUBCLASS_OF), variables,
-				processorName);
+				positiveProblem.getAxioms(AxiomType.SUBCLASS_OF),
+				positiveProblem.getAxioms(AxiomType.EQUIVALENT_CLASSES),
+				negativeProblem.getAxioms(AxiomType.SUBCLASS_OF),
+				negativeProblem.getAxioms(AxiomType.EQUIVALENT_CLASSES),
+				variables, processorName);
 	}
 
 	public Iterator<Set<OWLUelClassDefinition>> modifyOntologyAndSolve(
 			Set<OWLSubClassOfAxiom> subsumptions,
 			Set<OWLSubClassOfAxiom> dissubsumptions, Set<OWLClass> variables,
 			String processorName) {
+		return modifyOntologyAndSolve(subsumptions,
+				new HashSet<OWLEquivalentClassesAxiom>(), dissubsumptions,
+				new HashSet<OWLEquivalentClassesAxiom>(), variables,
+				processorName);
+	}
 
-		// add two definitions for each subsumption to the ontology
+	public Iterator<Set<OWLUelClassDefinition>> modifyOntologyAndSolve(
+			Set<OWLSubClassOfAxiom> subsumptions,
+			Set<OWLEquivalentClassesAxiom> equations,
+			Set<OWLSubClassOfAxiom> dissubsumptions,
+			Set<OWLEquivalentClassesAxiom> disequations,
+			Set<OWLClass> variables, String processorName) {
+
+		OWLDataFactory factory = this.auxOntology.getOWLOntologyManager()
+				.getOWLDataFactory();
+
+		// add an auxiliary definition for each class expression in a
+		// subsumption/equation to the ontology (if needed)
 		for (OWLSubClassOfAxiom subsumption : subsumptions) {
 			findAuxiliaryDefinition(subsumption.getSubClass());
 			findAuxiliaryDefinition(subsumption.getSuperClass());
 		}
+		for (OWLEquivalentClassesAxiom equation : equations) {
+			for (OWLClassExpression expr : equation.getClassExpressions()) {
+				findAuxiliaryDefinition(expr);
+			}
+		}
 
-		// construct (small!) disequations from the dissubsumptions
-		Set<OWLEquivalentClassesAxiom> disequations = new HashSet<OWLEquivalentClassesAxiom>();
+		// construct (small!) disequations from the dissubsumptions ...
+		Set<OWLEquivalentClassesAxiom> myDisequations = new HashSet<OWLEquivalentClassesAxiom>();
 		for (OWLSubClassOfAxiom dissubsumption : dissubsumptions) {
 			OWLClass auxSubClass = findAuxiliaryDefinition(dissubsumption
 					.getSubClass());
 			OWLClass auxSuperClass = findAuxiliaryDefinition(dissubsumption
 					.getSuperClass());
-			OWLDataFactory factory = this.auxOntology.getOWLOntologyManager()
-					.getOWLDataFactory();
 
 			OWLClassExpression conjunction = factory
 					.getOWLObjectIntersectionOf(auxSubClass, auxSuperClass);
 			OWLClass auxConjunction = findAuxiliaryDefinition(conjunction);
 			OWLEquivalentClassesAxiom disequation = factory
 					.getOWLEquivalentClassesAxiom(auxSubClass, auxConjunction);
-			disequations.add(disequation);
+			myDisequations.add(disequation);
+		}
+		// ... and replace original disequations by ones between variables
+		// (we assume that all equations contain exactly two class expressions)
+		for (OWLEquivalentClassesAxiom disequation : disequations) {
+			List<OWLClassExpression> exprs = disequation
+					.getClassExpressionsAsList();
+			OWLClass auxClass1 = findAuxiliaryDefinition(exprs.get(0));
+			OWLClass auxClass2 = findAuxiliaryDefinition(exprs.get(1));
+
+			myDisequations.add(factory.getOWLEquivalentClassesAxiom(auxClass1,
+					auxClass2));
 		}
 
 		AtomManager atomManager = new AtomManagerImpl();
@@ -329,7 +366,7 @@ public class AlternativeUelStarter {
 		dynamicOntology.load(this.ontology, this.auxOntology, owlThingAlias);
 		PluginGoal goal = new PluginGoal(atomManager, dynamicOntology);
 
-		// add the subsumptions themselves to the PluginGoal
+		// add the subsumptions themselves to the PluginGoal ...
 		for (OWLSubClassOfAxiom subsumption : subsumptions) {
 			String subClassId = getId(findAuxiliaryDefinition(subsumption
 					.getSubClass()));
@@ -340,9 +377,18 @@ public class AlternativeUelStarter {
 
 			goal.addGoalSubsumption(subClassId, superClassId);
 		}
+		// ... and do the same for the equations
+		for (OWLEquivalentClassesAxiom equation : equations) {
+			List<OWLClassExpression> exprs = equation
+					.getClassExpressionsAsList();
+			String classId1 = getId(findAuxiliaryDefinition(exprs.get(0)));
+			String classId2 = getId(findAuxiliaryDefinition(exprs.get(1)));
+
+			goal.addGoalEquation(classId1, classId2);
+		}
 
 		// add the disequations
-		for (OWLEquivalentClassesAxiom disequation : disequations) {
+		for (OWLEquivalentClassesAxiom disequation : myDisequations) {
 			Iterator<OWLClassExpression> expressions = disequation
 					.getClassExpressions().iterator();
 			String class1Id = getId((OWLClass) expressions.next());
@@ -363,12 +409,15 @@ public class AlternativeUelStarter {
 			goal.makeUserVariable(atomId);
 		}
 
-		// mark all "_UNDEF" variables as user variables
-		for (Atom at : atomManager.getAtoms()) {
-			if (at.isConceptName()) {
-				String name = atomManager.getConceptName(at.getConceptNameId());
-				if (name.endsWith(AtomManager.UNDEF_SUFFIX)) {
-					goal.makeUserVariable(atomManager.getAtoms().getIndex(at));
+		if (markUndefAsVariables) {
+			// mark all "_UNDEF" variables as user variables
+			for (Atom at : atomManager.getAtoms()) {
+				if (at.isConceptName()) {
+					String name = atomManager.getConceptName(at
+							.getConceptNameId());
+					if (name.endsWith(AtomManager.UNDEF_SUFFIX)) {
+						goal.makeUserVariable(atomManager.getAtoms().getIndex(at));
+					}
 				}
 			}
 		}
@@ -389,6 +438,12 @@ public class AlternativeUelStarter {
 		if (verbose) {
 			System.out.println("Final number of atoms: "
 					+ goal.getUelInput().getAtomManager().size());
+			System.out.println("Final number of constants: "
+					+ goal.getConstants().size());
+			System.out.println("Final number of variables: "
+					+ goal.getVariables().size());
+			System.out.println("Final number of user variables: "
+					+ goal.getUelInput().getUserVariables().size());
 			System.out.println("Final number of equations: "
 					+ goal.getUelInput().getEquations().size());
 			System.out.println("Unification problem:");
