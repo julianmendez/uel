@@ -17,7 +17,7 @@
 
 		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>uel-ui</artifactId>
+			<artifactId>uel-core</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
@@ -123,8 +123,7 @@
 							@uel-asp-${project.version}.jar,
 							@uel-rule-${project.version}.jar,
 							@uel-sat-${project.version}.jar,
-							@uel-core-${project.version}.jar,
-							@uel-ui-${project.version}.jar
+							@uel-core-${project.version}.jar
 						</Include-Resource>
 					</instructions>
 				</configuration>
