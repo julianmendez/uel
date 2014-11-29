@@ -104,11 +104,7 @@
 				<version>1.2.1</version>
 				<configuration>
 					<executable>java</executable>
-					<arguments>
-						<argument>-classpath</argument>
-						<classpath />
-						<argument>${mainClass}</argument>
-					</arguments>
+					<mainClass>${mainClass}</mainClass>
 				</configuration>
 			</plugin>
 
