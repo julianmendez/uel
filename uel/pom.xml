@@ -55,7 +55,7 @@
 		<repository>
 			<id>uelrepository</id>
 			<name>UEL local Maven repository</name>
-			<url>file:uel-build/lib</url>
+			<url>file:${project.basedir}/../uel-build/lib</url>
 		</repository>
 
 	</repositories>
