@@ -12,8 +12,8 @@
 
 	<groupId>de.tudresden.inf.lat.uel</groupId>
 	<artifactId>uel-parent</artifactId>
-	<packaging>pom</packaging>
 	<version>1.3.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
 
 	<modules>
 		<module>uel-type</module>
@@ -53,8 +53,8 @@
 	<repositories>
 
 		<repository>
-			<id>localrepo</id>
-			<name>local Maven repository</name>
+			<id>uelrepository</id>
+			<name>UEL local Maven repository</name>
 			<url>file:uel-build/lib</url>
 		</repository>
 
