@@ -82,10 +82,12 @@ public class UnifierController implements ActionListener {
 	private void executeActionLast() {
 		while (!this.allUnifiersFound) {
 			int previousSize = getModel().getUnifierList().size();
-			getModel().computeNextUnifier();
+			try {
+				getModel().computeNextUnifier();
+			} catch (InterruptedException ex) {
+			}
 			if (getModel().getUnifierList().size() == previousSize) {
 				this.allUnifiersFound = true;
-				this.unifierIndex = getModel().getUnifierList().size() - 1;
 			}
 		}
 		this.unifierIndex = getModel().getUnifierList().size() - 1;
@@ -98,7 +100,10 @@ public class UnifierController implements ActionListener {
 		this.unifierIndex++;
 		if (this.unifierIndex >= getModel().getUnifierList().size()) {
 			int previousSize = getModel().getUnifierList().size();
-			getModel().computeNextUnifier();
+			try {
+				getModel().computeNextUnifier();
+			} catch (InterruptedException ex) {
+			}
 			if (getModel().getUnifierList().size() == previousSize) {
 				this.allUnifiersFound = true;
 				this.unifierIndex = getModel().getUnifierList().size() - 1;

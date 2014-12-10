@@ -57,12 +57,18 @@ public class CNFMaxSatSolver implements Solver {
 			break;
 		}
 	}
+	
+	public void cleanup() {
+	}
 
-	private SatOutput convertToSatOutput(BufferedReader output)
+	private SatOutput convertToSatOutput(Process p)
 			throws IOException {
 
+		BufferedReader reader = new BufferedReader(new InputStreamReader(
+				p.getInputStream()));
+
 		Set<Integer> clause = new HashSet<Integer>();
-		String line = output.readLine();
+		String line = reader.readLine();
 		boolean satisfiable = false;
 		;
 		while (line != null) {
@@ -73,9 +79,10 @@ public class CNFMaxSatSolver implements Solver {
 					clause.add(Integer.parseInt(stok.nextToken()));
 				}
 			}
-			line = output.readLine();
+			line = reader.readLine();
 		}
-		output.close();
+		reader.close();
+		p.destroy();
 		clause.remove(Solver.END_OF_CLAUSE);
 
 		return new SatOutput(satisfiable, clause);
@@ -91,15 +98,13 @@ public class CNFMaxSatSolver implements Solver {
 				.getPath();
 	}
 
-	private BufferedReader solve() throws IOException {
+	private Process solve() throws IOException {
 		try {
 			ProcessBuilder pb = new ProcessBuilder(this.commandOptions);
 			pb.redirectErrorStream();
 			Process p = pb.start();
-			BufferedReader reader = new BufferedReader(new InputStreamReader(
-					p.getInputStream()));
 			p.waitFor();
-			return reader;
+			return p;
 		} catch (InterruptedException e) {
 			throw new RuntimeException(e);
 		}
@@ -115,7 +120,6 @@ public class CNFMaxSatSolver implements Solver {
 		writer.close();
 
 		return convertToSatOutput(solve());
-
 	}
 
 	@Override

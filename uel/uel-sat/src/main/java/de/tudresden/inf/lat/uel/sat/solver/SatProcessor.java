@@ -139,6 +139,7 @@ public class SatProcessor implements UelProcessor {
 
 	private final ExtendedUelInput extUelInput;
 	private boolean firstTime = true;
+	private final boolean hasDisequations;
 	private final boolean invertLiteral;
 	private final IndexedSet<Literal> literalManager = new IndexedSetImpl<Literal>();
 	private long numberOfClauses = 0;
@@ -149,7 +150,6 @@ public class SatProcessor implements UelProcessor {
 	private final Set<Integer> trueLiterals = new HashSet<Integer>();
 	private final UelInput uelInput;
 	private Set<Integer> update = new HashSet<Integer>();
-	private final boolean hasDisequations;
 
 	/**
 	 * Construct a new SAT processor to solve a unification problem.
@@ -176,7 +176,8 @@ public class SatProcessor implements UelProcessor {
 		setLiterals();
 	}
 
-	private void addClausesForDissubsumptions(SatInput ret) {
+	private void addClausesForDissubsumptions(SatInput ret)
+			throws InterruptedException {
 		for (Integer c : getUsedAtomIds()) {
 			for (Integer x : getVariables()) {
 				Set<Integer> mainClause = new HashSet<Integer>();
@@ -188,6 +189,10 @@ public class SatProcessor implements UelProcessor {
 					addClausesForDissubsumptions(ret, c, x, d, mainClause);
 				}
 				ret.add(mainClause);
+
+				if (Thread.interrupted()) {
+					throw new InterruptedException();
+				}
 			}
 		}
 	}
@@ -245,7 +250,14 @@ public class SatProcessor implements UelProcessor {
 	}
 
 	@Override
-	public boolean computeNextUnifier() {
+	public void cleanup() {
+		if (solver != null) {
+			solver.cleanup();
+		}
+	}
+
+	@Override
+	public boolean computeNextUnifier() throws InterruptedException {
 		SatOutput satoutput = null;
 		boolean unifiable = false;
 		try {
@@ -277,6 +289,10 @@ public class SatProcessor implements UelProcessor {
 		if (unifiable) {
 			this.result = new UelOutputImpl(getAtomManager(),
 					toTBox(satoutput.getOutput()));
+		} else {
+			// release resources used by the solver after all unifiers have been
+			// computed
+			solver.cleanup();
 		}
 
 		this.firstTime = false;
@@ -293,7 +309,7 @@ public class SatProcessor implements UelProcessor {
 	 * @return an object representing the DIMACS CNF encoding of the input
 	 *         subsumptions
 	 */
-	public SatInput computeSatInput() {
+	public SatInput computeSatInput() throws InterruptedException {
 		SatInput ret = new SatInput();
 
 		logger.finer("computing SAT input ...");
@@ -301,14 +317,30 @@ public class SatProcessor implements UelProcessor {
 		logger.finer("running step 1 ...");
 		runStep1(ret);
 
+		if (Thread.interrupted()) {
+			throw new InterruptedException();
+		}
+
 		logger.finer("running step 2.1 ...");
 		runStep2_1(ret);
+
+		if (Thread.interrupted()) {
+			throw new InterruptedException();
+		}
 
 		logger.finer("running steps 2.2 and 2.3 ...");
 		runSteps2_2_N_2_3(ret);
 
+		if (Thread.interrupted()) {
+			throw new InterruptedException();
+		}
+
 		logger.finer("running step 2.4 ...");
 		runStep2_4(ret);
+
+		if (Thread.interrupted()) {
+			throw new InterruptedException();
+		}
 
 		logger.finer("running step 2.5 ...");
 		runStep2_5(ret);
@@ -321,6 +353,10 @@ public class SatProcessor implements UelProcessor {
 
 		logger.finer("running step 3.2 ...");
 		runStep3_2(ret);
+
+		if (Thread.interrupted()) {
+			throw new InterruptedException();
+		}
 
 		if (this.hasDisequations) {
 			// add clauses with auxiliary variables needed for soundness of
@@ -338,19 +374,23 @@ public class SatProcessor implements UelProcessor {
 					for (Integer con : getConstants()) {
 						Literal literal = this.invertLiteral ? new SubsumptionLiteral(
 								var, con) : new DissubsumptionLiteral(var, con);
-								Integer literalId = this.literalManager
-										.addAndGetIndex(literal);
-								ret.addMinimizeLiteral(literalId);
+						Integer literalId = this.literalManager
+								.addAndGetIndex(literal);
+						ret.addMinimizeLiteral(literalId);
 					}
 					for (Integer eat : getEAtoms()) {
 						Literal literal = this.invertLiteral ? new SubsumptionLiteral(
 								var, eat) : new DissubsumptionLiteral(var, eat);
-								Integer literalId = this.literalManager
-										.addAndGetIndex(literal);
-								ret.addMinimizeLiteral(literalId);
+						Integer literalId = this.literalManager
+								.addAndGetIndex(literal);
+						ret.addMinimizeLiteral(literalId);
 					}
 				}
 			}
+		}
+
+		if (Thread.interrupted()) {
+			throw new InterruptedException();
 		}
 
 		logger.finer("SAT input computed.");
@@ -369,15 +409,15 @@ public class SatProcessor implements UelProcessor {
 				for (Integer secondAtomId : set) {
 					Literal literal = this.invertLiteral ? new SubsumptionLiteral(
 							firstAtomId, secondAtomId)
-					: new DissubsumptionLiteral(firstAtomId,
-							secondAtomId);
-							Integer literalId = this.literalManager
-									.addAndGetIndex(literal);
-							if (!this.onlyMinimalAssignments
-									|| (getLiteralValue(literalId) == this.invertLiteral)) {
-								ret.add(getLiteralValue(literalId) ? (-1) * literalId
-										: literalId);
-							}
+							: new DissubsumptionLiteral(firstAtomId,
+									secondAtomId);
+					Integer literalId = this.literalManager
+							.addAndGetIndex(literal);
+					if (!this.onlyMinimalAssignments
+							|| (getLiteralValue(literalId) == this.invertLiteral)) {
+						ret.add(getLiteralValue(literalId) ? (-1) * literalId
+								: literalId);
+					}
 				}
 			}
 		}
@@ -580,7 +620,7 @@ public class SatProcessor implements UelProcessor {
 
 				/*
 				 * constant not in the equation
-				 *
+				 * 
 				 * one side of an equation
 				 */
 
@@ -643,7 +683,7 @@ public class SatProcessor implements UelProcessor {
 
 				/*
 				 * atom not in the equation
-				 *
+				 * 
 				 * one side of equation
 				 */
 
@@ -752,7 +792,7 @@ public class SatProcessor implements UelProcessor {
 	 *
 	 * Transitivity of dis-subsumption
 	 */
-	private void runStep2_5(SatInput input) {
+	private void runStep2_5(SatInput input) throws InterruptedException {
 		Collection<Integer> atomIds = getUsedAtomIds();
 
 		for (Integer atomId1 : atomIds) {
@@ -773,6 +813,10 @@ public class SatProcessor implements UelProcessor {
 						}
 					}
 				}
+			}
+
+			if (Thread.interrupted()) {
+				throw new InterruptedException();
 			}
 		}
 	}
@@ -795,7 +839,7 @@ public class SatProcessor implements UelProcessor {
 	 *
 	 * Transitivity for order literals
 	 */
-	private void runStep3_1_t(SatInput input) {
+	private void runStep3_1_t(SatInput input) throws InterruptedException {
 		for (Integer atomId1 : getVariables()) {
 
 			for (Integer atomId2 : getVariables()) {
@@ -813,6 +857,10 @@ public class SatProcessor implements UelProcessor {
 
 				}
 
+			}
+
+			if (Thread.interrupted()) {
+				throw new InterruptedException();
 			}
 
 		}
@@ -931,14 +979,14 @@ public class SatProcessor implements UelProcessor {
 			for (Integer atomId2 : getUsedAtomIds()) {
 				Literal literal = this.invertLiteral ? new SubsumptionLiteral(
 						atomId1, atomId2) : new DissubsumptionLiteral(atomId1,
-								atomId2);
+						atomId2);
 
-						this.literalManager.add(literal);
+				this.literalManager.add(literal);
 			}
 		}
 
 		/*
-		 *
+		 * 
 		 * Literals for order on variables
 		 */
 

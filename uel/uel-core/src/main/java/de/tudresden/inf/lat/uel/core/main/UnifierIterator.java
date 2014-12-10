@@ -31,9 +31,19 @@ public class UnifierIterator implements Iterator<Set<OWLUelClassDefinition>> {
 		return this.translator.getAtomManager();
 	}
 
+	public void cleanup() {
+		if (processor != null) {
+			processor.cleanup();
+		}
+	}
+
 	private void compute() {
 		if (!isComputed) {
-			hasNext = processor.computeNextUnifier();
+			try {
+				hasNext = processor.computeNextUnifier();
+			} catch (InterruptedException ex) {
+				throw new Error(ex);
+			}
 			if (hasNext) {
 				unifier = processor.getUnifier();
 			}

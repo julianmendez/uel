@@ -30,6 +30,10 @@ public class Sat4jMaxSatSolver implements Solver {
 	public Sat4jMaxSatSolver() {
 	}
 
+	public void cleanup() {
+		solver.reset();
+	}
+
 	private SatOutput getSatOutput() {
 		IOptimizationProblem problem = new PseudoOptDecorator(solver, false);
 		Set<Integer> model = new TreeSet<Integer>();
@@ -91,5 +95,4 @@ public class Sat4jMaxSatSolver implements Solver {
 		}
 		return getSatOutput();
 	}
-
 }

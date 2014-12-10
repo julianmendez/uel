@@ -26,6 +26,10 @@ public class Sat4jSolver implements Solver {
 	public Sat4jSolver() {
 	}
 
+	public void cleanup() {
+		solver.reset();
+	}
+
 	private SatOutput getSatOutput() {
 		IProblem problem = solver;
 		Set<Integer> model = new TreeSet<Integer>();
@@ -45,7 +49,7 @@ public class Sat4jSolver implements Solver {
 	}
 
 	@Override
-	public SatOutput solve(SatInput input) {
+	public SatOutput solve(SatInput input) throws InterruptedException {
 		if (input == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
@@ -57,6 +61,10 @@ public class Sat4jSolver implements Solver {
 				solver.addClause(new VecInt(SatInput.toArray(clause)));
 			} catch (ContradictionException e) {
 				return new SatOutput(false, Collections.<Integer> emptySet());
+			}
+
+			if (Thread.interrupted()) {
+				throw new InterruptedException();
 			}
 		}
 		return getSatOutput();
@@ -70,5 +78,4 @@ public class Sat4jSolver implements Solver {
 		}
 		return getSatOutput();
 	}
-
 }

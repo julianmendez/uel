@@ -18,6 +18,11 @@ import java.util.Set;
 public interface AspOutput extends Iterator<Map<Integer, Set<Integer>>> {
 
 	/**
+	 * Release any resources that have been used.
+	 */
+	void cleanup();
+
+	/**
 	 * Returns a list of stats provided by the ASP solver.
 	 *
 	 * @return a list of stats provided by the ASP solver

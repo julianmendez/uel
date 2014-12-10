@@ -46,6 +46,12 @@ public class ClingoOutput implements AspOutput {
 		this.finished = false;
 	}
 
+	@Override
+	public void cleanup() {
+		// TODO: implement asynchronous execution of clingo and stop the solver
+		// here if it is currently running
+	}
+
 	/**
 	 * Parse JSON output.
 	 */

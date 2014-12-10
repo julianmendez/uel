@@ -50,7 +50,7 @@ public class UelModel {
 	 * 
 	 * @return <code>true</code> if and only if more unifiers can be computed
 	 */
-	public boolean computeNextUnifier() {
+	public boolean computeNextUnifier() throws InterruptedException {
 		while (this.uelProcessor.computeNextUnifier()) {
 			Set<Equation> result = this.uelProcessor.getUnifier()
 					.getEquations();

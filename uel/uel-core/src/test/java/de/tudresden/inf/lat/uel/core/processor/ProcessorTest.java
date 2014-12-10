@@ -135,7 +135,8 @@ public class ProcessorTest {
 	}
 
 	@Test
-	public void tryOntology() throws OWLOntologyCreationException, IOException {
+	public void tryOntology() throws OWLOntologyCreationException, IOException,
+			InterruptedException {
 		Map<String, OWLClass> idClassMap = new HashMap<String, OWLClass>();
 		UelModel uelModel = new UelModel();
 

@@ -12,13 +12,18 @@ import java.util.Map;
 public interface UelProcessor {
 
 	/**
+	 * Clean up used resources.
+	 */
+	void cleanup();
+	
+	/**
 	 * Computes the next unifier. Returns <code>true</code> if and only if the
 	 * unifier has been successfully computed.
 	 * 
 	 * @return <code>true</code> if and only if the unifier has been
 	 *         successfully computed
 	 */
-	boolean computeNextUnifier();
+	boolean computeNextUnifier() throws InterruptedException;
 
 	/**
 	 * Returns information about the last computation. This information can

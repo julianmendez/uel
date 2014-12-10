@@ -41,6 +41,14 @@ public class AspProcessor implements UelProcessor {
 	}
 
 	@Override
+	public void cleanup() {
+		if (aspOutput != null) {
+			// the AspOutput may have a reference to an asp solver that needs to be stopped
+			aspOutput.cleanup();
+		}
+	}
+
+	@Override
 	public boolean computeNextUnifier() {
 		// TODO: implement asynchronous execution of ClingoSolver
 		if (!initialized) {

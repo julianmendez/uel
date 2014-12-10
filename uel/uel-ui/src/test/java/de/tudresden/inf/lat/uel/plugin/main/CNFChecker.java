@@ -155,7 +155,7 @@ public class CNFChecker {
 	 * @throws IOException
 	 *             if the input is invalid
 	 */
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws IOException, InterruptedException {
 		if (args.length == 1) {
 			CNFChecker tester = new CNFChecker(args[0]);
 			tester.runProcessor(UelProcessorFactory.SAT_BASED_ALGORITHM);
@@ -180,7 +180,7 @@ public class CNFChecker {
 	 * @param processorName
 	 *            the string identifier of the processor
 	 */
-	public void runProcessor(String processorName) {
+	public void runProcessor(String processorName) throws InterruptedException {
 		UelProcessor processor = UelProcessorFactory.createProcessor(
 				processorName, input);
 		int numberOfUnifiers = 0;

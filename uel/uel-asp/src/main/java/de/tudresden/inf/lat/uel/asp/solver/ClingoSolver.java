@@ -97,6 +97,8 @@ public class ClingoSolver implements AspSolver {
 			pipe(pClingo.getInputStream(), output);
 			output.close();
 
+			// TODO: implement asynchronous execution of clingo and return
+			// solution on demand?
 			int clingoReturnCode = pClingo.waitFor();
 			// successful if there was no exception (lsb=0) and either a model
 			// was found (10) or the search space was exhausted (20)

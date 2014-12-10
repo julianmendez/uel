@@ -47,6 +47,11 @@ public interface Solver {
 	String UNSAT = "UNSAT";
 
 	/**
+	 * Clean up used resources, dependent on which concrete SAT solver is used.
+	 */
+	void cleanup();
+
+	/**
 	 * Solves a SAT problem. The input must be in the DIMACS CNF format.
 	 *
 	 * @param input
@@ -55,7 +60,7 @@ public interface Solver {
 	 * @throws IOException
 	 *             if an I/O error occurs
 	 */
-	SatOutput solve(SatInput input) throws IOException;
+	SatOutput solve(SatInput input) throws IOException, InterruptedException;
 
 	/**
 	 * Updates the last solved SAT instances by adding one clause and solves the
@@ -67,6 +72,6 @@ public interface Solver {
 	 * @throws IOException
 	 *             if an I/O error occurs
 	 */
-	SatOutput update(Set<Integer> clause) throws IOException;
-
+	SatOutput update(Set<Integer> clause) throws IOException,
+			InterruptedException;
 }
