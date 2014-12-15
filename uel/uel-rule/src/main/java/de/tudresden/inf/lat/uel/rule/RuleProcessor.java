@@ -147,7 +147,7 @@ public class RuleProcessor implements UelProcessor {
 	 * @return true iff the current assignment represents a unifier of the goal
 	 *         subsumptions
 	 */
-	public boolean computeNextUnifier() {
+	public boolean computeNextUnifier() throws InterruptedException {
 		if (searchStack == null) {
 			searchStack = new ArrayDeque<Result>();
 
@@ -207,8 +207,13 @@ public class RuleProcessor implements UelProcessor {
 		return new UelOutputImpl(atomManager, equations);
 	}
 
-	private boolean solve() {
+	private boolean solve() throws InterruptedException {
 		while (true) {
+
+			if (Thread.interrupted()) {
+				throw new InterruptedException();
+			}
+
 			Subsumption sub = chooseUnsolvedSubsumption();
 			if (sub == null)
 				return true;
