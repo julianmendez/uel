@@ -9,7 +9,7 @@ API documentation: [UEL Javadoc](http://uel.sourceforge.net/javadoc/)
 
 Authors: [Barbara Morawska](http://lat.inf.tu-dresden.de/~morawska/), [Stefan Borgwardt](http://lat.inf.tu-dresden.de/~stefborg/), [Julian Mendez](http://lat.inf.tu-dresden.de/~mendez/)
 
-Licenses: [Apache 2.0](uel/uel-build/license-2.0.txt), [LGPL 3.0](uel/uel-build/copying-lesser.txt)
+Licenses: [Apache 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt), [LGPL 3.0](http://www.gnu.org/licenses/lgpl-3.0.txt)
 
 
 
