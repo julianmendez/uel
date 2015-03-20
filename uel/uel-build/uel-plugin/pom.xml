@@ -93,6 +93,15 @@
 							org.apache.commons.cli,
 							org.codehaus.jackson;version="${@}",
 							org.codehaus.jackson.map;version="${@}",
+							javax.xml.datatype,
+							javax.xml.namespace,
+							javax.xml.parsers,
+							org.joda.time,
+							org.joda.time.format,
+							org.w3c.dom,
+							org.w3c.dom.bootstrap,
+							org.w3c.dom.ls,
+							org.xml.sax
 						</Import-Package>
 						<Require-Bundle>
 							org.eclipse.equinox.registry,
@@ -113,6 +122,8 @@
 							lib/org/ow2/sat4j/org.ow2.sat4j.pb/2.3.5/org.ow2.sat4j.pb-2.3.5.jar=org.ow2.sat4j.pb-2.3.5.jar,
 							lib/org/ow2/sat4j/org.ow2.sat4j.maxsat/2.3.5/org.ow2.sat4j.maxsat-2.3.5.jar=org.ow2.sat4j.maxsat-2.3.5.jar,
 							lib/commons-cli/commons-cli/1.1/commons-cli-1.1.jar=commons-cli-1.1.jar,
+							lib/org/codehaus/jackson/jackson-core-asl/1.9.13/jackson-core-asl-1.9.13.jar=jackson-core-asl-1.9.13.jar,
+							lib/org/codehaus/jackson/jackson-mapper-asl/1.9.13/jackson-mapper-asl-1.9.13.jar=jackson-mapper-asl-1.9.13.jar,
 							lib/com/sun/java/jlfgr/1.0/jlfgr-1.0.jar=jlfgr-1.0.jar
 						</Include-Resource>
 					</instructions>
