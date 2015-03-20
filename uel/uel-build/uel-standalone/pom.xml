@@ -92,7 +92,11 @@
 							@org.ow2.sat4j.maxsat-2.3.5.jar,
 							@commons-cli-1.1.jar,
 							@jlfgr-1.0.jar,
-							@owlapi-distribution-3.5.0.jar
+							@owlapi-distribution-3.5.0.jar,
+							@jackson-core-asl-1.9.13.jar,
+							@jackson-mapper-asl-1.9.13.jar,
+							@joda-time-2.7.jar,
+							@joda-convert-1.7.jar
 						</Include-Resource>
 					</instructions>
 				</configuration>
