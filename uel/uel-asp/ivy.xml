@@ -15,6 +15,8 @@
 		<dependency name="uel-type" rev="latest.integration" />
 		<dependency org="org.codehaus.jackson" name="jackson-mapper-asl" rev="1.9.13"
 			conf="javadoc->javadoc;sources->sources;compile->default" />
+		<dependency org="joda-time" name="joda-time" rev="2.7"
+			conf="javadoc->javadoc;sources->sources;compile->default" />
 	</dependencies>
 
 </ivy-module>
