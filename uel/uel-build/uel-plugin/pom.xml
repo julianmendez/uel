@@ -90,7 +90,6 @@
 							org.semanticweb.owlapi.io;version="${@}",
 							org.semanticweb.owlapi.model;version="${@}",
 							de.uulm.ecs.ai.owlapi.krssrenderer;version="${@}",
-							org.apache.commons.cli,
 							org.codehaus.jackson;version="${@}",
 							org.codehaus.jackson.map;version="${@}",
 							javax.xml.datatype,
