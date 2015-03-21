@@ -96,9 +96,6 @@
 							javax.xml.namespace,
 							javax.xml.parsers,
 							javax.xml.bind,
-							org.joda.time;version="${@}",
-							org.joda.time.format;version="${@}",
-							org.joda.convert;version="${@}",
 							org.w3c.dom,
 							org.w3c.dom.bootstrap,
 							org.w3c.dom.ls,
@@ -125,8 +122,6 @@
 							lib/commons-cli/commons-cli/1.1/commons-cli-1.1.jar=commons-cli-1.1.jar,
 							lib/org/codehaus/jackson/jackson-core-asl/1.9.13/jackson-core-asl-1.9.13.jar=jackson-core-asl-1.9.13.jar,
 							lib/org/codehaus/jackson/jackson-mapper-asl/1.9.13/jackson-mapper-asl-1.9.13.jar=jackson-mapper-asl-1.9.13.jar,
-							lib/joda-time/joda-time/2.7/joda-time-2.7.jar=joda-time-2.7.jar,
-							lib/org/joda/joda-convert/1.7/joda-convert-1.7.jar=joda-convert-1.7.jar,
 							lib/com/sun/java/jlfgr/1.0/jlfgr-1.0.jar=jlfgr-1.0.jar
 						</Include-Resource>
 					</instructions>

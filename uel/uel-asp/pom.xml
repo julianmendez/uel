@@ -27,18 +27,6 @@
 			<version>1.9.13</version>
 		</dependency>
 
-		<dependency>
-			<groupId>joda-time</groupId>
-			<artifactId>joda-time</artifactId>
-			<version>2.7</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.joda</groupId>
-			<artifactId>joda-convert</artifactId>
-			<version>1.7</version>
-		</dependency>
-
 	</dependencies>
 
 	<parent>
