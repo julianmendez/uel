@@ -99,7 +99,9 @@
 							org.w3c.dom,
 							org.w3c.dom.bootstrap,
 							org.w3c.dom.ls,
-							org.xml.sax
+							org.xml.sax,
+							org.joda.time,
+							org.joda.time.format
 						</Import-Package>
 						<Require-Bundle>
 							org.eclipse.equinox.registry,
