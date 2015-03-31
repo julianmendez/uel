@@ -82,10 +82,12 @@ public class ClingoSolver implements AspSolver {
 	}
 
 	public boolean computeMoreSolutions() {
+		Process pClingo = null;
+
 		try {
 			// call clingo
 			ProcessBuilder pbClingo = new ProcessBuilder(getClingoArguments());
-			Process pClingo = pbClingo.start();
+			pClingo = pbClingo.start();
 
 			// pipe .lp files and input.getProgram() as input
 			OutputStream clingoInput = pClingo.getOutputStream();
@@ -112,9 +114,10 @@ public class ClingoSolver implements AspSolver {
 			pClingo.destroy();
 
 			return clingoReturnCode > 10;
-		} catch (InterruptedException ex) {
-			throw new RuntimeException(ex);
-		} catch (IOException ex) {
+		} catch (InterruptedException | IOException ex) {
+			if (pClingo != null) {
+				pClingo.destroy();
+			}
 			throw new RuntimeException(ex);
 		}
 	}
