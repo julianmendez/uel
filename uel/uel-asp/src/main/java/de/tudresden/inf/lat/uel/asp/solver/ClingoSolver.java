@@ -91,23 +91,29 @@ public class ClingoSolver implements AspSolver {
 
 			// pipe .lp files and input.getProgram() as input
 			OutputStream clingoInput = pClingo.getOutputStream();
-			pipe(new ByteArrayInputStream(program.getBytes()), clingoInput);
+			syncPipe(new ByteArrayInputStream(program.getBytes()), clingoInput);
 			clingoInput.close();
 
-			// write the json output
+			// start writing the json output
 			OutputStream output = new FileOutputStream(outputFile);
-			pipe(pClingo.getInputStream(), output);
-			output.close();
+			AsyncPipe pipeOut = new AsyncPipe(pClingo.getInputStream(), output);
+			pipeOut.start();
 
 			// TODO: implement asynchronous execution of clingo and return
 			// solution on demand?
 			int clingoReturnCode = pClingo.waitFor();
+			pipeOut.join();
+			if (pipeOut.exception != null) {
+				throw pipeOut.exception;
+			}
+			output.close();
+
 			// successful if there was no exception (lsb=0) and either a model
 			// was found (10) or the search space was exhausted (20)
 			if (((clingoReturnCode & 1) == 1)
 					|| (((clingoReturnCode & 10) == 0) && ((clingoReturnCode & 20) == 0))) {
 				ByteArrayOutputStream error = new ByteArrayOutputStream();
-				pipe(pClingo.getErrorStream(), error);
+				syncPipe(pClingo.getErrorStream(), error);
 				throw new IOException("clingo error (return code "
 						+ clingoReturnCode + "):\n" + error.toString());
 			}
@@ -118,7 +124,22 @@ public class ClingoSolver implements AspSolver {
 			if (pClingo != null) {
 				pClingo.destroy();
 			}
-			throw new RuntimeException(ex);
+			if (ex instanceof InterruptedException) {
+				Thread.currentThread().interrupt();
+				return true;
+			} else {
+				throw new RuntimeException(ex);
+			}
+		}
+	}
+
+	private void syncPipe(InputStream input, OutputStream output)
+			throws InterruptedException, IOException {
+		AsyncPipe pipe = new AsyncPipe(input, output);
+		pipe.start();
+		pipe.join();
+		if (pipe.exception != null) {
+			throw pipe.exception;
 		}
 	}
 
@@ -140,23 +161,6 @@ public class ClingoSolver implements AspSolver {
 			output.append(line);
 			output.append(System.lineSeparator());
 		}
-	}
-
-	private void pipe(InputStream input, OutputStream output)
-			throws IOException {
-		pipe(new BufferedReader(new InputStreamReader(input)),
-				new BufferedWriter(new OutputStreamWriter(output)));
-	}
-
-	private void pipe(BufferedReader input, BufferedWriter output)
-			throws IOException {
-		String line;
-		while ((line = input.readLine()) != null) {
-			// System.out.println(line);
-			output.write(line);
-			output.newLine();
-		}
-		output.flush();
 	}
 
 }

@@ -155,6 +155,9 @@ public class ClingoOutput implements AspOutput {
 				// one additional assignment
 				do {
 					finished = solver.computeMoreSolutions();
+					if (Thread.currentThread().isInterrupted()) {
+						return false;
+					}
 					try {
 						parse(solver.getCurrentSolutions());
 					} catch (IOException ex) {

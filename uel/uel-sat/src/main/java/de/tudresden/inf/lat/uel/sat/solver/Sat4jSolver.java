@@ -27,7 +27,9 @@ public class Sat4jSolver implements Solver {
 	}
 
 	public void cleanup() {
-		solver.reset();
+		if (solver != null) {
+			solver.reset();
+		}
 	}
 
 	private SatOutput getSatOutput() {

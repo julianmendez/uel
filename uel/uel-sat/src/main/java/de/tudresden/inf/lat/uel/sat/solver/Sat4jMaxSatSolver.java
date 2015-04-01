@@ -31,7 +31,9 @@ public class Sat4jMaxSatSolver implements Solver {
 	}
 
 	public void cleanup() {
-		solver.reset();
+		if (solver != null) {
+			solver.reset();
+		}
 	}
 
 	private SatOutput getSatOutput() {

@@ -42,7 +42,8 @@ public class UnifierIterator implements Iterator<Set<OWLUelClassDefinition>> {
 			try {
 				hasNext = processor.computeNextUnifier();
 			} catch (InterruptedException ex) {
-				throw new Error(ex);
+				Thread.currentThread().interrupt();
+				hasNext = false;
 			}
 			if (hasNext) {
 				unifier = processor.getUnifier();

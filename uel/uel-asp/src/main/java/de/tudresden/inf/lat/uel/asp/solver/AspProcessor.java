@@ -43,13 +43,14 @@ public class AspProcessor implements UelProcessor {
 	@Override
 	public void cleanup() {
 		if (aspOutput != null) {
-			// the AspOutput may have a reference to an asp solver that needs to be stopped
+			// the AspOutput may have a reference to an asp solver that needs to
+			// be stopped
 			aspOutput.cleanup();
 		}
 	}
 
 	@Override
-	public boolean computeNextUnifier() {
+	public boolean computeNextUnifier() throws InterruptedException {
 		// TODO: implement asynchronous execution of ClingoSolver
 		if (!initialized) {
 			AspSolver solver = new ClingoSolver(!uelInput.getGoalDisequations()
@@ -63,7 +64,11 @@ public class AspProcessor implements UelProcessor {
 		}
 
 		isSynchronized = false;
-		return aspOutput.hasNext();
+		boolean hasNext = aspOutput.hasNext();
+		if (Thread.interrupted()) {
+			throw new InterruptedException();
+		}
+		return hasNext;
 	}
 
 	@Override
