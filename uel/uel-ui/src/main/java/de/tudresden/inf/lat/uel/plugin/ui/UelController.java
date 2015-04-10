@@ -57,8 +57,10 @@ public class UelController implements ActionListener {
 	private Map<String, OWLClass> mapIdClass = new HashMap<String, OWLClass>();
 	private Map<String, String> mapIdLabel = new HashMap<String, String>();
 	private List<String> ontologyList = new ArrayList<String>();
-	private OWLOntology owlOntology00 = null;
-	private OWLOntology owlOntology01 = null;
+	private OWLOntology owlOntologyBg00 = null;
+	private OWLOntology owlOntologyBg01 = null;
+	private OWLOntology owlOntologyPos = null;
+	private OWLOntology owlOntologyNeg = null;
 	private final OWLOntologyManager owlOntologyManager;
 	private Map<String, OWLOntology> owlOntologyMap = new HashMap<String, OWLOntology>();
 	private Map<OWLEntity, String> shortFormMap = new HashMap<OWLEntity, String>();

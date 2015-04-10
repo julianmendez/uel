@@ -28,10 +28,10 @@ public class UelView extends JPanel {
 			.getClassLoader().getResource(Message.iconOpen)));
 	private JButton buttonSelectVariables = new JButton(new ImageIcon(this
 			.getClass().getClassLoader().getResource(Message.iconForward)));
-	private JComboBoxOfLabelId listClassName00 = new JComboBoxOfLabelId();
-	private JComboBoxOfLabelId listClassName01 = new JComboBoxOfLabelId();
-	private JComboBox listOntologyName00 = new JComboBox();
-	private JComboBox listOntologyName01 = new JComboBox();
+	private JComboBox listOntologyNameBg00 = new JComboBox();
+	private JComboBox listOntologyNameBg01 = new JComboBox();
+	private JComboBox listOntologyNamePos = new JComboBox();
+	private JComboBox listOntologyNameNeg = new JComboBox();
 	private JComboBox listProcessor = new JComboBox();
 	private final UelModel model;
 
@@ -70,7 +70,7 @@ public class UelView extends JPanel {
 		this.buttonSelectVariables.setActionCommand(actionCommand);
 	}
 
-	public void addComboBoxClass00Listener(ActionListener listener,
+	public void addComboBoxOntologyBg00Listener(ActionListener listener,
 			String actionCommand) {
 		if (listener == null) {
 			throw new IllegalArgumentException("Null argument.");
@@ -79,11 +79,11 @@ public class UelView extends JPanel {
 			throw new IllegalArgumentException("Null argument.");
 		}
 
-		this.listClassName00.addActionListener(listener);
-		this.listClassName00.setActionCommand(actionCommand);
+		this.listOntologyNameBg00.addActionListener(listener);
+		this.listOntologyNameBg00.setActionCommand(actionCommand);
 	}
 
-	public void addComboBoxClass01Listener(ActionListener listener,
+	public void addComboBoxOntologyBg01Listener(ActionListener listener,
 			String actionCommand) {
 		if (listener == null) {
 			throw new IllegalArgumentException("Null argument.");
@@ -92,11 +92,11 @@ public class UelView extends JPanel {
 			throw new IllegalArgumentException("Null argument.");
 		}
 
-		this.listClassName01.addActionListener(listener);
-		this.listClassName01.setActionCommand(actionCommand);
+		this.listOntologyNameBg01.addActionListener(listener);
+		this.listOntologyNameBg01.setActionCommand(actionCommand);
 	}
 
-	public void addComboBoxOntology00Listener(ActionListener listener,
+	public void addComboBoxOntologyPosListener(ActionListener listener,
 			String actionCommand) {
 		if (listener == null) {
 			throw new IllegalArgumentException("Null argument.");
@@ -105,11 +105,11 @@ public class UelView extends JPanel {
 			throw new IllegalArgumentException("Null argument.");
 		}
 
-		this.listOntologyName00.addActionListener(listener);
-		this.listOntologyName00.setActionCommand(actionCommand);
+		this.listOntologyNamePos.addActionListener(listener);
+		this.listOntologyNamePos.setActionCommand(actionCommand);
 	}
 
-	public void addComboBoxOntology01Listener(ActionListener listener,
+	public void addComboBoxOntologyNegListener(ActionListener listener,
 			String actionCommand) {
 		if (listener == null) {
 			throw new IllegalArgumentException("Null argument.");
@@ -118,8 +118,8 @@ public class UelView extends JPanel {
 			throw new IllegalArgumentException("Null argument.");
 		}
 
-		this.listOntologyName01.addActionListener(listener);
-		this.listOntologyName01.setActionCommand(actionCommand);
+		this.listOntologyNameNeg.addActionListener(listener);
+		this.listOntologyNameNeg.setActionCommand(actionCommand);
 	}
 
 	private JPanel createSelectionPanel() {
@@ -140,36 +140,68 @@ public class UelView extends JPanel {
 		ret.add(smallPanel);
 
 		JLabel gap1 = new JLabel();
-		gap1.setPreferredSize(new Dimension(280, 28));
-		gap1.setMinimumSize(new Dimension(112, 28));
+		gap1.setPreferredSize(new Dimension(280, 14));
+		gap1.setMinimumSize(new Dimension(112, 14));
 		ret.add(gap1);
 
-		this.listOntologyName00
-				.setToolTipText(Message.tooltipComboBoxOntology00);
-		this.listOntologyName00.setPreferredSize(new Dimension(280, 28));
-		this.listOntologyName00.setMinimumSize(new Dimension(112, 28));
-		ret.add(this.listOntologyName00);
-
-		this.listClassName00.setToolTipText(Message.tooltipComboBoxClassName00);
-		this.listClassName00.setPreferredSize(new Dimension(280, 28));
-		this.listClassName00.setMinimumSize(new Dimension(112, 28));
-		ret.add(this.listClassName00);
+		JLabel labelOntologyNameBg00 = new JLabel();
+		labelOntologyNameBg00.setPreferredSize(new Dimension(280, 28));
+		labelOntologyNameBg00.setMinimumSize(new Dimension(112, 28));
+		labelOntologyNameBg00.setText(Message.textOntologyBg00);
+		ret.add(labelOntologyNameBg00);
+		this.listOntologyNameBg00
+				.setToolTipText(Message.tooltipComboBoxOntologyBg00);
+		this.listOntologyNameBg00.setPreferredSize(new Dimension(280, 28));
+		this.listOntologyNameBg00.setMinimumSize(new Dimension(112, 28));
+		ret.add(this.listOntologyNameBg00);
 
 		JLabel gap2 = new JLabel();
-		gap2.setPreferredSize(new Dimension(280, 28));
-		gap2.setMinimumSize(new Dimension(112, 28));
+		gap2.setPreferredSize(new Dimension(280, 14));
+		gap2.setMinimumSize(new Dimension(112, 14));
 		ret.add(gap2);
 
-		this.listOntologyName01
-				.setToolTipText(Message.tooltipComboBoxOntology01);
-		this.listOntologyName01.setPreferredSize(new Dimension(280, 28));
-		this.listOntologyName01.setMinimumSize(new Dimension(112, 28));
-		ret.add(this.listOntologyName01);
+		JLabel labelOntologyNameBg01 = new JLabel();
+		labelOntologyNameBg01.setPreferredSize(new Dimension(280, 28));
+		labelOntologyNameBg01.setMinimumSize(new Dimension(112, 28));
+		labelOntologyNameBg01.setText(Message.textOntologyBg01);
+		ret.add(labelOntologyNameBg01);
+		this.listOntologyNameBg01
+				.setToolTipText(Message.tooltipComboBoxOntologyBg01);
+		this.listOntologyNameBg01.setPreferredSize(new Dimension(280, 28));
+		this.listOntologyNameBg01.setMinimumSize(new Dimension(112, 28));
+		ret.add(this.listOntologyNameBg01);
 
-		this.listClassName01.setToolTipText(Message.tooltipComboBoxClassName01);
-		this.listClassName01.setPreferredSize(new Dimension(280, 28));
-		this.listClassName01.setMinimumSize(new Dimension(112, 28));
-		ret.add(this.listClassName01);
+		JLabel gap3 = new JLabel();
+		gap3.setPreferredSize(new Dimension(280, 14));
+		gap3.setMinimumSize(new Dimension(112, 14));
+		ret.add(gap3);
+
+		JLabel labelOntologyNamePos = new JLabel();
+		labelOntologyNamePos.setPreferredSize(new Dimension(280, 28));
+		labelOntologyNamePos.setMinimumSize(new Dimension(112, 28));
+		labelOntologyNamePos.setText(Message.textOntologyPos);
+		ret.add(labelOntologyNamePos);
+		this.listOntologyNamePos
+				.setToolTipText(Message.tooltipComboBoxOntologyPos);
+		this.listOntologyNamePos.setPreferredSize(new Dimension(280, 28));
+		this.listOntologyNamePos.setMinimumSize(new Dimension(112, 28));
+		ret.add(this.listOntologyNamePos);
+
+		JLabel gap4 = new JLabel();
+		gap4.setPreferredSize(new Dimension(280, 14));
+		gap4.setMinimumSize(new Dimension(112, 14));
+		ret.add(gap4);
+
+		JLabel labelOntologyNameNeg = new JLabel();
+		labelOntologyNameNeg.setPreferredSize(new Dimension(280, 28));
+		labelOntologyNameNeg.setMinimumSize(new Dimension(112, 28));
+		labelOntologyNameNeg.setText(Message.textOntologyNeg);
+		ret.add(labelOntologyNameNeg);
+		this.listOntologyNameNeg
+				.setToolTipText(Message.tooltipComboBoxOntologyNeg);
+		this.listOntologyNameNeg.setPreferredSize(new Dimension(280, 28));
+		this.listOntologyNameNeg.setMinimumSize(new Dimension(112, 28));
+		ret.add(this.listOntologyNameNeg);
 
 		return ret;
 	}
@@ -178,40 +210,24 @@ public class UelView extends JPanel {
 		return this.model;
 	}
 
-	public LabelId getSelectedClassName00() {
-		return this.listClassName00.getSelectedElement();
+	public int getSelectedOntologyNameBg00() {
+		return this.listOntologyNameBg00.getSelectedIndex();
 	}
 
-	public LabelId getSelectedClassName01() {
-		return this.listClassName01.getSelectedElement();
+	public int getSelectedOntologyNameBg01() {
+		return this.listOntologyNameBg01.getSelectedIndex();
 	}
 
-	public int getSelectedOntologyName00() {
-		return this.listOntologyName00.getSelectedIndex();
+	public int getSelectedOntologyNamePos() {
+		return this.listOntologyNamePos.getSelectedIndex();
 	}
 
-	public int getSelectedOntologyName01() {
-		return this.listOntologyName01.getSelectedIndex();
+	public int getSelectedOntologyNameNeg() {
+		return this.listOntologyNameNeg.getSelectedIndex();
 	}
 
 	public String getSelectedProcessor() {
 		return this.listProcessor.getSelectedItem().toString();
-	}
-
-	public void reloadClassNames00(List<LabelId> list) {
-		if (list == null) {
-			throw new IllegalArgumentException("Null argument.");
-		}
-
-		this.listClassName00.setItemList(list);
-	}
-
-	public void reloadClassNames01(List<LabelId> list) {
-		if (list == null) {
-			throw new IllegalArgumentException("Null argument.");
-		}
-
-		this.listClassName01.setItemList(list);
 	}
 
 	public void reloadOntologies(List<String> listOfOntologyNames) {
@@ -219,14 +235,16 @@ public class UelView extends JPanel {
 			throw new IllegalArgumentException("Null argument.");
 		}
 
-		this.listOntologyName00.removeAllItems();
-		this.listOntologyName01.removeAllItems();
+		this.listOntologyNameBg00.removeAllItems();
+		this.listOntologyNameBg01.removeAllItems();
+		this.listOntologyNamePos.removeAllItems();
+		this.listOntologyNameNeg.removeAllItems();
 		for (String ontologyName : listOfOntologyNames) {
-			this.listOntologyName00.addItem(ontologyName);
-			this.listOntologyName01.addItem(ontologyName);
+			this.listOntologyNameBg00.addItem(ontologyName);
+			this.listOntologyNameBg01.addItem(ontologyName);
+			this.listOntologyNamePos.addItem(ontologyName);
+			this.listOntologyNameNeg.addItem(ontologyName);
 		}
-		this.listClassName00.removeAllItems();
-		this.listClassName01.removeAllItems();
 	}
 
 	public void setButtonLoadEnabled(boolean b) {
@@ -237,36 +255,20 @@ public class UelView extends JPanel {
 		this.buttonSelectVariables.setEnabled(b);
 	}
 
-	public void setComboBoxClassName00Enabled(boolean b) {
-		this.listClassName00.setEnabled(b);
+	public void setComboBoxOntologyNameBg00Enabled(boolean b) {
+		this.listOntologyNameBg00.setEnabled(b);
 	}
 
-	public void setComboBoxClassName01Enabled(boolean b) {
-		this.listClassName01.setEnabled(b);
+	public void setComboBoxOntologyNameBg01Enabled(boolean b) {
+		this.listOntologyNameBg01.setEnabled(b);
 	}
 
-	public void setComboBoxOntologyName00Enabled(boolean b) {
-		this.listOntologyName00.setEnabled(b);
+	public void setComboBoxOntologyNamePosEnabled(boolean b) {
+		this.listOntologyNamePos.setEnabled(b);
 	}
 
-	public void setComboBoxOntologyName01Enabled(boolean b) {
-		this.listOntologyName01.setEnabled(b);
-	}
-
-	public void setToolTipTextClass00(String str) {
-		if (str == null) {
-			throw new IllegalArgumentException("Null argument.");
-		}
-
-		this.listClassName00.setToolTipText(str);
-	}
-
-	public void setToolTipTextClass01(String str) {
-		if (str == null) {
-			throw new IllegalArgumentException("Null argument.");
-		}
-
-		this.listClassName01.setToolTipText(str);
+	public void setComboBoxOntologyNameNegEnabled(boolean b) {
+		this.listOntologyNameNeg.setEnabled(b);
 	}
 
 }
