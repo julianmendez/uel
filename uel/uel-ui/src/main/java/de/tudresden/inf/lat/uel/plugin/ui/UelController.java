@@ -38,12 +38,10 @@ import de.tudresden.inf.lat.uel.type.api.UelProcessor;
 public class UelController implements ActionListener {
 
 	private static final String actionAcceptVar = "accept var";
-	private static final String actionCheckBoxClassName00 = "class 00 primitive";
-	private static final String actionCheckBoxClassName01 = "class 01 primitive";
-	private static final String actionClass00Selected = "class 00 selected";
-	private static final String actionClass01Selected = "class 01 selected";
-	private static final String actionOntology00Selected = "ontology 00 selected";
-	private static final String actionOntology01Selected = "ontology 01 selected";
+	private static final String actionOntologyBg00Selected = "ontology Bg00 selected";
+	private static final String actionOntologyBg01Selected = "ontology Bg01 selected";
+	private static final String actionOntologyPosSelected = "ontology Pos selected";
+	private static final String actionOntologyNegSelected = "ontology Neg selected";
 	private static final String actionOpen = "open";
 	private static final String actionRejectVar = "reject var";
 	private static final String actionSelectVariables = "get var candidate";
@@ -52,9 +50,6 @@ public class UelController implements ActionListener {
 		return entity.getIRI().toURI().toString();
 	}
 
-	private List<LabelId> classList00 = null;
-	private List<LabelId> classList01 = null;
-	private Map<String, OWLClass> mapIdClass = new HashMap<String, OWLClass>();
 	private Map<String, String> mapIdLabel = new HashMap<String, String>();
 	private List<String> ontologyList = new ArrayList<String>();
 	private OWLOntology owlOntologyBg00 = null;
@@ -91,24 +86,20 @@ public class UelController implements ActionListener {
 		String cmd = e.getActionCommand();
 		if (cmd.equals(actionOpen)) {
 			executeActionOpen();
-		} else if (cmd.equals(actionOntology00Selected)) {
-			executeActionOntology00Selected();
-		} else if (cmd.equals(actionOntology01Selected)) {
-			executeActionOntology01Selected();
-		} else if (cmd.equals(actionClass00Selected)) {
-			executeActionClass00Selected();
-		} else if (cmd.equals(actionClass01Selected)) {
-			executeActionClass01Selected();
+		} else if (cmd.equals(actionOntologyBg00Selected)) {
+			executeActionOntologyBg00Selected();
+		} else if (cmd.equals(actionOntologyBg01Selected)) {
+			executeActionOntologyBg01Selected();
+		} else if (cmd.equals(actionOntologyPosSelected)) {
+			executeActionOntologyPosSelected();
+		} else if (cmd.equals(actionOntologyNegSelected)) {
+			executeActionOntologyNegSelected();
 		} else if (cmd.equals(actionSelectVariables)) {
 			executeActionSelectVariables();
 		} else if (cmd.equals(actionAcceptVar)) {
 			executeActionAcceptVar();
 		} else if (cmd.equals(actionRejectVar)) {
 			executeActionRejectVar();
-		} else if (cmd.equals(actionCheckBoxClassName00)) {
-			executeActionOntology00Selected();
-		} else if (cmd.equals(actionCheckBoxClassName01)) {
-			executeActionOntology01Selected();
 		} else {
 			throw new IllegalStateException();
 		}
@@ -124,7 +115,7 @@ public class UelController implements ActionListener {
 
 			UelProcessor processor = UelProcessorFactory.createProcessor(
 					getView().getSelectedProcessor(), g.getUelInput());
-			getModel().configureUelProcessor(processor);
+			getModel().setUelProcessor(processor);
 			getUnifier().setStatInfo(
 					new StatInfo(g, processor.getInfo(), this.mapIdLabel));
 		}
@@ -135,65 +126,67 @@ public class UelController implements ActionListener {
 		getUnifier().getView().setVisible(true);
 	}
 
-	private void executeActionClass00Selected() {
-		getUnifier().getView().setUnifierButtons(false);
-		getUnifier().getView().getUnifier().setText("");
-		try {
-			getView().setToolTipTextClass00(
-					getView().getSelectedClassName00().getId());
-		} catch (ArrayIndexOutOfBoundsException e) {
-			getView().setToolTipTextClass00(Message.tooltipComboBoxClassName00);
-		}
+	private void executeActionOntologyBg00Selected() {
+		executeActionOntologyBg00Selected(getView()
+				.getSelectedOntologyNameBg00());
 	}
 
-	private void executeActionClass01Selected() {
-		getUnifier().getView().setUnifierButtons(false);
-		getUnifier().getView().getUnifier().setText("");
-		try {
-			getView().setToolTipTextClass01(
-					getView().getSelectedClassName01().getId());
-		} catch (ArrayIndexOutOfBoundsException e) {
-			getView().setToolTipTextClass01(Message.tooltipComboBoxClassName01);
-		}
-	}
-
-	private void executeActionOntology00Selected() {
-		executeActionOntology00Selected(getView().getSelectedOntologyName00());
-	}
-
-	private void executeActionOntology00Selected(int ontologyIndex) {
+	private void executeActionOntologyBg00Selected(int ontologyIndex) {
 		if (0 <= ontologyIndex && ontologyIndex < this.ontologyList.size()) {
 			getUnifier().getView().setUnifierButtons(false);
 
 			String ontologyId = this.ontologyList.get(ontologyIndex);
-			this.owlOntology00 = this.owlOntologyMap.get(ontologyId);
+			this.owlOntologyBg00 = this.owlOntologyMap.get(ontologyId);
 
-			this.classList00 = getClassNames(
-					this.owlOntologyMap.get(ontologyId), true);
-
-			getView().reloadClassNames00(this.classList00);
-			getView().setComboBoxClassName00Enabled(true);
 			getView().setButtonSelectVariablesEnabled(true);
 		}
 	}
 
-	private void executeActionOntology01Selected() {
-		executeActionOntology01Selected(getView().getSelectedOntologyName01());
+	private void executeActionOntologyBg01Selected() {
+		executeActionOntologyBg01Selected(getView()
+				.getSelectedOntologyNameBg01());
 	}
 
-	private void executeActionOntology01Selected(int ontologyIndex) {
+	private void executeActionOntologyBg01Selected(int ontologyIndex) {
 		if (0 <= ontologyIndex && ontologyIndex < this.ontologyList.size()) {
 
 			getUnifier().getView().setUnifierButtons(false);
 
 			String ontologyId = this.ontologyList.get(ontologyIndex);
-			this.owlOntology01 = this.owlOntologyMap.get(ontologyId);
+			this.owlOntologyBg01 = this.owlOntologyMap.get(ontologyId);
 
-			this.classList01 = getClassNames(
-					this.owlOntologyMap.get(ontologyId), true);
+			getView().setButtonSelectVariablesEnabled(true);
+		}
+	}
 
-			getView().reloadClassNames01(this.classList01);
-			getView().setComboBoxClassName01Enabled(true);
+	private void executeActionOntologyPosSelected() {
+		executeActionOntologyPosSelected(getView().getSelectedOntologyNamePos());
+	}
+
+	private void executeActionOntologyPosSelected(int ontologyIndex) {
+		if (0 <= ontologyIndex && ontologyIndex < this.ontologyList.size()) {
+
+			getUnifier().getView().setUnifierButtons(false);
+
+			String ontologyId = this.ontologyList.get(ontologyIndex);
+			this.owlOntologyPos = this.owlOntologyMap.get(ontologyId);
+
+			getView().setButtonSelectVariablesEnabled(true);
+		}
+	}
+
+	private void executeActionOntologyNegSelected() {
+		executeActionOntologyNegSelected(getView().getSelectedOntologyNameNeg());
+	}
+
+	private void executeActionOntologyNegSelected(int ontologyIndex) {
+		if (0 <= ontologyIndex && ontologyIndex < this.ontologyList.size()) {
+
+			getUnifier().getView().setUnifierButtons(false);
+
+			String ontologyId = this.ontologyList.get(ontologyIndex);
+			this.owlOntologyNeg = this.owlOntologyMap.get(ontologyId);
+
 			getView().setButtonSelectVariablesEnabled(true);
 		}
 	}
@@ -211,8 +204,7 @@ public class UelController implements ActionListener {
 						.loadOntologyFromOntologyDocument(file);
 				loadOntology(owlOntology);
 				reset();
-				executeActionOntology00Selected();
-				executeActionOntology01Selected();
+				updateOntologySelection();
 			} catch (OWLOntologyCreationException e) {
 				throw new RuntimeException(e);
 			}
@@ -227,63 +219,17 @@ public class UelController implements ActionListener {
 	private void executeActionSelectVariables() {
 		getUnifier().getView().setUnifierButtons(false);
 
-		getModel().clearOntology();
-		getModel().loadOntology(this.owlOntology00, this.owlOntology01);
+		getModel().reset();
 
-		Set<String> classSet = new HashSet<String>();
-		classSet.add(getView().getSelectedClassName00().getId());
-		classSet.add(getView().getSelectedClassName01().getId());
+		Set<OWLOntology> bgOntologies = new HashSet<OWLOntology>();
+		bgOntologies.add(this.owlOntologyBg00);
+		bgOntologies.add(this.owlOntologyBg01);
 
-		getModel().configure(classSet);
-		PluginGoal goal = getModel().getPluginGoal();
+		getModel().configure(owlOntologyManager, bgOntologies, owlOntologyPos,
+				owlOntologyNeg, null);
 
-		try {
-			this.varWindow = initVarWindow(classSet, goal);
-			this.varWindow.open();
-		} catch (RuntimeException e) {
-		}
-	}
-
-	private List<LabelId> getClassNames(OWLOntology ontology, boolean primitive) {
-		OWLClass nothing = ontology.getOWLOntologyManager().getOWLDataFactory()
-				.getOWLNothing();
-		OWLClass thing = ontology.getOWLOntologyManager().getOWLDataFactory()
-				.getOWLThing();
-
-		Set<OWLClass> set = new TreeSet<OWLClass>();
-		set.addAll(getDefinedConcepts(ontology, primitive));
-		set.remove(nothing);
-		set.remove(thing);
-
-		List<LabelId> ret = new ArrayList<LabelId>();
-		for (OWLClass cls : set) {
-			ret.add(new LabelId(getShortForm(cls), getId(cls)));
-		}
-		return ret;
-	}
-
-	private Set<OWLClass> getDefinedConcepts(OWLOntology ontology,
-			boolean primitive) {
-		Set<OWLClass> ret = new HashSet<OWLClass>();
-		for (OWLAxiom axiom : ontology.getAxioms()) {
-			if (axiom instanceof OWLEquivalentClassesAxiom) {
-				OWLEquivalentClassesAxiom equivAxiom = (OWLEquivalentClassesAxiom) axiom;
-				for (OWLClassExpression classExpr : equivAxiom
-						.getClassExpressions()) {
-					if (classExpr instanceof OWLClass) {
-						ret.add((OWLClass) classExpr);
-					}
-				}
-			}
-			if (primitive && axiom instanceof OWLSubClassOfAxiom) {
-				OWLSubClassOfAxiom subClassAxiom = (OWLSubClassOfAxiom) axiom;
-				OWLClassExpression classExpr = subClassAxiom.getSubClass();
-				if (classExpr instanceof OWLClass) {
-					ret.add((OWLClass) classExpr);
-				}
-			}
-		}
-		return ret;
+		this.varWindow = initVarWindow(getModel().getPluginGoal());
+		this.varWindow.open();
 	}
 
 	public UelModel getModel() {
@@ -322,23 +268,25 @@ public class UelController implements ActionListener {
 	private void init() {
 		getView().addButtonOpenListener(this, actionOpen);
 		getView().addButtonSelectVariablesListener(this, actionSelectVariables);
-		getView().addComboBoxClass00Listener(this, actionClass00Selected);
-		getView().addComboBoxClass01Listener(this, actionClass01Selected);
-		getView().addComboBoxOntology00Listener(this, actionOntology00Selected);
-		getView().addComboBoxOntology01Listener(this, actionOntology01Selected);
+		getView().addComboBoxOntologyBg00Listener(this,
+				actionOntologyBg00Selected);
+		getView().addComboBoxOntologyBg01Listener(this,
+				actionOntologyBg01Selected);
+		getView().addComboBoxOntologyPosListener(this,
+				actionOntologyPosSelected);
+		getView().addComboBoxOntologyNegListener(this,
+				actionOntologyNegSelected);
 
 		reset();
 		reloadOntologies();
 
-		executeActionOntology00Selected(0);
-		executeActionOntology01Selected(0);
+		updateOntologySelection(0);
 	}
 
-	private VarSelectionController initVarWindow(Set<String> originalVariables,
-			PluginGoal goal) {
+	private VarSelectionController initVarWindow(PluginGoal goal) {
 		VarSelectionController ret = new VarSelectionController(
-				new VarSelectionView(new VarSelectionModel(originalVariables,
-						this.mapIdLabel, goal)));
+				new VarSelectionView(new VarSelectionModel(this.mapIdLabel,
+						goal)));
 		ret.addAcceptVarButtonListener(this, actionAcceptVar);
 		return ret;
 	}
@@ -347,28 +295,9 @@ public class UelController implements ActionListener {
 		String ontologyId = owlOntology.getOntologyID().toString();
 		if (!this.owlOntologyMap.containsKey(ontologyId)) {
 			this.owlOntologyMap.put(ontologyId, owlOntology);
-			processMapIdClass(owlOntology);
-			Set<String> set = new TreeSet<String>();
-			set.addAll(this.owlOntologyMap.keySet());
-			this.ontologyList.clear();
-			this.ontologyList.addAll(set);
+			this.ontologyList.add(ontologyId);
 			getView().reloadOntologies(this.ontologyList);
 		}
-	}
-
-	private void processMapIdClass(OWLOntology ontology) {
-		Set<OWLClass> set = ontology.getClassesInSignature();
-		for (OWLClass cls : set) {
-			this.mapIdClass.put(getId(cls), cls);
-		}
-
-		OWLClass nothing = ontology.getOWLOntologyManager().getOWLDataFactory()
-				.getOWLNothing();
-		this.mapIdClass.put(getId(nothing), nothing);
-
-		OWLClass thing = ontology.getOWLOntologyManager().getOWLDataFactory()
-				.getOWLThing();
-		this.mapIdClass.put(getId(thing), thing);
 	}
 
 	private void recomputeShortForm() {
@@ -384,14 +313,25 @@ public class UelController implements ActionListener {
 		for (OWLOntology owlOntology : owlOntologies) {
 			loadOntology(owlOntology);
 		}
-		executeActionOntology00Selected();
-		executeActionOntology01Selected();
+		updateOntologySelection();
+	}
+
+	private void updateOntologySelection() {
+		executeActionOntologyBg00Selected();
+		executeActionOntologyBg01Selected();
+		executeActionOntologyPosSelected();
+		executeActionOntologyNegSelected();
+	}
+
+	private void updateOntologySelection(int ontologyIndex) {
+		executeActionOntologyBg00Selected(ontologyIndex);
+		executeActionOntologyBg01Selected(ontologyIndex);
+		executeActionOntologyPosSelected(ontologyIndex);
+		executeActionOntologyNegSelected(ontologyIndex);
 	}
 
 	public void reset() {
 		resetUnifierController();
-		getView().setComboBoxClassName00Enabled(false);
-		getView().setComboBoxClassName01Enabled(false);
 		getView().setButtonSelectVariablesEnabled(false);
 	}
 

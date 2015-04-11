@@ -1,16 +1,19 @@
 package de.tudresden.inf.lat.uel.plugin.ui;
 
 import java.awt.Dimension;
-import java.awt.GridBagLayout;
 import java.awt.event.ActionListener;
 import java.util.List;
 
+import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingConstants;
+import javax.swing.border.LineBorder;
 
 import de.tudresden.inf.lat.uel.core.processor.UelModel;
 import de.tudresden.inf.lat.uel.core.processor.UelProcessorFactory;
@@ -28,19 +31,19 @@ public class UelView extends JPanel {
 			.getClassLoader().getResource(Message.iconOpen)));
 	private JButton buttonSelectVariables = new JButton(new ImageIcon(this
 			.getClass().getClassLoader().getResource(Message.iconForward)));
-	private JComboBox listOntologyNameBg00 = new JComboBox();
-	private JComboBox listOntologyNameBg01 = new JComboBox();
-	private JComboBox listOntologyNamePos = new JComboBox();
-	private JComboBox listOntologyNameNeg = new JComboBox();
-	private JComboBox listProcessor = new JComboBox();
+	private JComboBox<String> listOntologyNameBg00 = new JComboBox<String>();
+	private JComboBox<String> listOntologyNameBg01 = new JComboBox<String>();
+	private JComboBox<String> listOntologyNamePos = new JComboBox<String>();
+	private JComboBox<String> listOntologyNameNeg = new JComboBox<String>();
+	private JComboBox<String> listProcessor = new JComboBox<String>();
 	private final UelModel model;
 
-	public UelView(UelModel processor) {
-		if (processor == null) {
+	public UelView(UelModel model) {
+		if (model == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
 
-		this.model = processor;
+		this.model = model;
 		add(createSelectionPanel());
 	}
 
@@ -123,10 +126,16 @@ public class UelView extends JPanel {
 	}
 
 	private JPanel createSelectionPanel() {
-		JPanel ret = new JPanel(new GridBagLayout());
+		JPanel ret = new JPanel();
 		ret.setLayout(new BoxLayout(ret, BoxLayout.Y_AXIS));
 
+		int width = 280;
+		int height = 28;
+		int gap = 4;
+
 		JPanel smallPanel = new JPanel();
+		smallPanel.setAlignmentX(CENTER_ALIGNMENT);
+		this.listProcessor.setRenderer(new ComboBoxRenderer());
 		this.listProcessor.setToolTipText(Message.tooltipSelectProcessor);
 		for (String processorName : UelProcessorFactory.getProcessorNames()) {
 			this.listProcessor.addItem(processorName);
@@ -139,69 +148,71 @@ public class UelView extends JPanel {
 		smallPanel.add(this.buttonSelectVariables);
 		ret.add(smallPanel);
 
-		JLabel gap1 = new JLabel();
-		gap1.setPreferredSize(new Dimension(280, 14));
-		gap1.setMinimumSize(new Dimension(112, 14));
-		ret.add(gap1);
+		ret.add(Box.createVerticalStrut(gap));
 
-		JLabel labelOntologyNameBg00 = new JLabel();
-		labelOntologyNameBg00.setPreferredSize(new Dimension(280, 28));
-		labelOntologyNameBg00.setMinimumSize(new Dimension(112, 28));
-		labelOntologyNameBg00.setText(Message.textOntologyBg00);
-		ret.add(labelOntologyNameBg00);
+		JPanel largePanel = new JPanel();
+		largePanel.setAlignmentX(CENTER_ALIGNMENT);
+		// largePanel.setPreferredSize(new Dimension(0, width));
+		largePanel.setLayout(new BoxLayout(largePanel, BoxLayout.Y_AXIS));
+
+		JLabel labelOntologyNameBg00 = new JLabel(Message.textOntologyBg00);
+		// labelOntologyNameBg00.setPreferredSize(new Dimension(width, height));
+		labelOntologyNameBg00.setAlignmentX(LEFT_ALIGNMENT);
+		largePanel.add(labelOntologyNameBg00);
+		
+		this.listOntologyNameBg00.setRenderer(new ComboBoxRenderer());
 		this.listOntologyNameBg00
 				.setToolTipText(Message.tooltipComboBoxOntologyBg00);
-		this.listOntologyNameBg00.setPreferredSize(new Dimension(280, 28));
-		this.listOntologyNameBg00.setMinimumSize(new Dimension(112, 28));
-		ret.add(this.listOntologyNameBg00);
+		// this.listOntologyNameBg00
+		// .setPreferredSize(new Dimension(width, height));
+		this.listOntologyNameBg00.setAlignmentX(LEFT_ALIGNMENT);
+		largePanel.add(this.listOntologyNameBg00);
 
-		JLabel gap2 = new JLabel();
-		gap2.setPreferredSize(new Dimension(280, 14));
-		gap2.setMinimumSize(new Dimension(112, 14));
-		ret.add(gap2);
+		largePanel.add(Box.createVerticalStrut(gap));
 
-		JLabel labelOntologyNameBg01 = new JLabel();
-		labelOntologyNameBg01.setPreferredSize(new Dimension(280, 28));
-		labelOntologyNameBg01.setMinimumSize(new Dimension(112, 28));
-		labelOntologyNameBg01.setText(Message.textOntologyBg01);
-		ret.add(labelOntologyNameBg01);
+		JLabel labelOntologyNameBg01 = new JLabel(Message.textOntologyBg01);
+		// labelOntologyNameBg01.setPreferredSize(new Dimension(width, height));
+		labelOntologyNameBg01.setAlignmentX(LEFT_ALIGNMENT);
+		largePanel.add(labelOntologyNameBg01);
+		
+		this.listOntologyNameBg01.setRenderer(new ComboBoxRenderer());
 		this.listOntologyNameBg01
 				.setToolTipText(Message.tooltipComboBoxOntologyBg01);
-		this.listOntologyNameBg01.setPreferredSize(new Dimension(280, 28));
-		this.listOntologyNameBg01.setMinimumSize(new Dimension(112, 28));
-		ret.add(this.listOntologyNameBg01);
+		// this.listOntologyNameBg01
+		// .setPreferredSize(new Dimension(width, height));
+		this.listOntologyNameBg01.setAlignmentX(LEFT_ALIGNMENT);
+		largePanel.add(this.listOntologyNameBg01);
 
-		JLabel gap3 = new JLabel();
-		gap3.setPreferredSize(new Dimension(280, 14));
-		gap3.setMinimumSize(new Dimension(112, 14));
-		ret.add(gap3);
+		largePanel.add(Box.createVerticalStrut(gap));
 
-		JLabel labelOntologyNamePos = new JLabel();
-		labelOntologyNamePos.setPreferredSize(new Dimension(280, 28));
-		labelOntologyNamePos.setMinimumSize(new Dimension(112, 28));
-		labelOntologyNamePos.setText(Message.textOntologyPos);
-		ret.add(labelOntologyNamePos);
+		JLabel labelOntologyNamePos = new JLabel(Message.textOntologyPos);
+		// labelOntologyNamePos.setPreferredSize(new Dimension(width, height));
+		labelOntologyNamePos.setAlignmentX(LEFT_ALIGNMENT);
+		largePanel.add(labelOntologyNamePos);
+		
+		this.listOntologyNamePos.setRenderer(new ComboBoxRenderer());
 		this.listOntologyNamePos
 				.setToolTipText(Message.tooltipComboBoxOntologyPos);
-		this.listOntologyNamePos.setPreferredSize(new Dimension(280, 28));
-		this.listOntologyNamePos.setMinimumSize(new Dimension(112, 28));
-		ret.add(this.listOntologyNamePos);
+		// this.listOntologyNamePos.setPreferredSize(new Dimension(width,
+		// height));
+		this.listOntologyNamePos.setAlignmentX(LEFT_ALIGNMENT);
+		largePanel.add(this.listOntologyNamePos);
 
-		JLabel gap4 = new JLabel();
-		gap4.setPreferredSize(new Dimension(280, 14));
-		gap4.setMinimumSize(new Dimension(112, 14));
-		ret.add(gap4);
+		largePanel.add(Box.createVerticalStrut(gap));
 
-		JLabel labelOntologyNameNeg = new JLabel();
-		labelOntologyNameNeg.setPreferredSize(new Dimension(280, 28));
-		labelOntologyNameNeg.setMinimumSize(new Dimension(112, 28));
-		labelOntologyNameNeg.setText(Message.textOntologyNeg);
-		ret.add(labelOntologyNameNeg);
+		JLabel labelOntologyNameNeg = new JLabel(Message.textOntologyNeg);
+		// labelOntologyNameNeg.setPreferredSize(new Dimension(width, height));
+		labelOntologyNameNeg.setHorizontalAlignment(SwingConstants.CENTER);
+		largePanel.add(labelOntologyNameNeg);
+		
+		this.listOntologyNameNeg.setRenderer(new ComboBoxRenderer());
 		this.listOntologyNameNeg
 				.setToolTipText(Message.tooltipComboBoxOntologyNeg);
-		this.listOntologyNameNeg.setPreferredSize(new Dimension(280, 28));
-		this.listOntologyNameNeg.setMinimumSize(new Dimension(112, 28));
-		ret.add(this.listOntologyNameNeg);
+		this.listOntologyNameNeg.setMinimumSize(new Dimension(width, height));
+		this.listOntologyNameNeg.setAlignmentX(LEFT_ALIGNMENT);
+		largePanel.add(this.listOntologyNameNeg);
+
+		ret.add(largePanel);
 
 		return ret;
 	}
@@ -271,4 +282,29 @@ public class UelView extends JPanel {
 		this.listOntologyNameNeg.setEnabled(b);
 	}
 
+	static class ComboBoxRenderer extends DefaultListCellRenderer {
+
+		private static final long serialVersionUID = -2411864526023749022L;
+
+		@Override
+		public Dimension getPreferredSize() {
+			Dimension d = super.getPreferredSize();
+			d.height *= 1.4;
+			return d;
+		}
+
+		@Override
+		public Dimension getMaximumSize() {
+			Dimension d = super.getMaximumSize();
+			d.height *= 1.4;
+			return d;
+		}
+
+		@Override
+		public Dimension getMinimumSize() {
+			Dimension d = super.getMinimumSize();
+			d.height *= 1.4;
+			return d;
+		}
+	}
 }

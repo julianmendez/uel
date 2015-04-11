@@ -120,26 +120,6 @@ public class PluginGoal {
 		}
 	}
 
-	/**
-	 * Constructs a new goal based on a specified ontology and the main
-	 * equation.
-	 * 
-	 * @param manager
-	 *            atom manager
-	 * @param ont
-	 *            ontology
-	 * @param leftStr
-	 *            left atom name of the main equation
-	 * @param rightStr
-	 *            right atom name of the main equation
-	 */
-	public PluginGoal(AtomManager manager, Ontology ont, String leftStr,
-			String rightStr) {
-		this(manager, ont);
-		addGoalEquation(leftStr, rightStr);
-		updateUelInput();
-	}
-
 	public void addGoalDisequation(String leftStr, String rightStr) {
 		Set<Equation> equationSet = new HashSet<Equation>();
 		Integer leftId = addModule(equationSet, leftStr);

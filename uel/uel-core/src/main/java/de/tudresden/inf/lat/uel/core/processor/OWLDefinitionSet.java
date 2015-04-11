@@ -28,16 +28,14 @@ public class OWLDefinitionSet {
 	private final Map<OWLClass, OWLClassExpression> definitions;
 	private final Map<OWLClass, Set<OWLClassExpression>> primitiveDefinitions;
 
-	public OWLDefinitionSet(OWLOntology ont1, OWLOntology ont2,
-			OWLClass owlThingAlias) {
+	public OWLDefinitionSet(Set<OWLOntology> ontologies, OWLClass owlThingAlias) {
 		this.definitions = new HashMap<OWLClass, OWLClassExpression>();
-		this.definitions.putAll(getDefinitions(ont1));
-		this.definitions.putAll(getDefinitions(ont2));
 		this.primitiveDefinitions = new HashMap<OWLClass, Set<OWLClassExpression>>();
-		this.primitiveDefinitions.putAll(getPrimitiveDefinitions(ont1,
-				owlThingAlias));
-		this.primitiveDefinitions.putAll(getPrimitiveDefinitions(ont2,
-				owlThingAlias));
+		for (OWLOntology ontology : ontologies) {
+			this.definitions.putAll(getDefinitions(ontology));
+			this.primitiveDefinitions.putAll(getPrimitiveDefinitions(ontology,
+					owlThingAlias));
+		}
 	}
 
 	public Set<OWLClass> getDefinedConcepts() {

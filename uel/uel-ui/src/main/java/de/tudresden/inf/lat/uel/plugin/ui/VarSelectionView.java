@@ -184,9 +184,7 @@ class VarSelectionView extends JDialog {
 	private void updateListOfVariables() {
 		Set<LabelId> setOfVariables = new TreeSet<LabelId>();
 		for (String str : getModel().getVariables()) {
-			if (!getModel().getOriginalVariables().contains(str)) {
-				setOfVariables.add(new LabelId(getModel().getLabel(str), str));
-			}
+			setOfVariables.add(new LabelId(getModel().getLabel(str), str));
 		}
 		this.listOfVariables = new ArrayList<LabelId>();
 		this.listOfVariables.addAll(setOfVariables);

@@ -142,17 +142,28 @@ public class ProcessorTest {
 
 		OWLOntology owlOntology = createOntology(new FileInputStream(
 				ontologyName));
-		uelModel.loadOntology(owlOntology, owlOntology);
+		OWLOntologyManager ontologyManager = owlOntology
+				.getOWLOntologyManager();
+		Set<OWLOntology> owlOntologies = new HashSet<OWLOntology>();
+		owlOntologies.add(owlOntology);
 		Set<OWLClass> clsSet = owlOntology.getClassesInSignature();
 		for (OWLClass cls : clsSet) {
 			idClassMap.put(cls.getIRI().getFragment(), cls);
 		}
 
-		Set<String> input = new HashSet<String>();
-		input.add(idClassMap.get(conceptC).toStringID());
-		input.add(idClassMap.get(conceptD).toStringID());
-		uelModel.configure(input);
+		OWLOntology positiveProblem = ontologyManager.createOntology();
+		ontologyManager.addAxiom(
+				positiveProblem,
+				ontologyManager.getOWLDataFactory()
+						.getOWLEquivalentClassesAxiom(idClassMap.get(conceptC),
+								idClassMap.get(conceptD)));
+		OWLOntology negativeProblem = ontologyManager.createOntology();
+
+		uelModel.configure(owlOntology.getOWLOntologyManager(), owlOntologies,
+				positiveProblem, negativeProblem, null);
 		PluginGoal goal = uelModel.getPluginGoal();
+		makeVariable(goal, idClassMap.get(conceptC).toStringID(), false);
+		makeVariable(goal, idClassMap.get(conceptD).toStringID(), false);
 
 		for (String var : varNames) {
 			makeVariable(goal, idClassMap.get(var).toStringID(), false);
@@ -163,7 +174,7 @@ public class ProcessorTest {
 
 		UelProcessor processor = UelProcessorFactory.createProcessor(
 				processorName, goal.getUelInput());
-		uelModel.configureUelProcessor(processor);
+		uelModel.setUelProcessor(processor);
 
 		boolean hasUnifiers = true;
 		while (hasUnifiers) {
@@ -191,5 +202,4 @@ public class ProcessorTest {
 
 		Assert.assertEquals(numberOfUnifiers, (Integer) unifiers.size());
 	}
-
 }

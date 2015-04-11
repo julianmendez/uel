@@ -21,13 +21,8 @@ class VarSelectionModel {
 
 	private final Map<String, String> idLabelMap;
 	private final PluginGoal pluginGoal;
-	private Set<String> setOfOriginalVariables = new TreeSet<String>();
 
-	public VarSelectionModel(Set<String> originalVariables,
-			Map<String, String> labels, PluginGoal g) {
-		if (originalVariables == null) {
-			throw new IllegalArgumentException("Null argument.");
-		}
+	public VarSelectionModel(Map<String, String> labels, PluginGoal g) {
 		if (labels == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
@@ -35,7 +30,6 @@ class VarSelectionModel {
 			throw new IllegalArgumentException("Null argument.");
 		}
 
-		this.setOfOriginalVariables.addAll(originalVariables);
 		this.idLabelMap = labels;
 		this.pluginGoal = g;
 	}
@@ -80,10 +74,6 @@ class VarSelectionModel {
 		}
 
 		return ret;
-	}
-
-	public Set<String> getOriginalVariables() {
-		return Collections.unmodifiableSet(this.setOfOriginalVariables);
 	}
 
 	public PluginGoal getPluginGoal() {

@@ -8,34 +8,27 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.IRI;
-import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
-import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
-import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 
-import de.tudresden.inf.lat.uel.core.processor.DynamicOntology;
-import de.tudresden.inf.lat.uel.core.processor.OntologyBuilder;
 import de.tudresden.inf.lat.uel.core.processor.PluginGoal;
+import de.tudresden.inf.lat.uel.core.processor.UelModel;
 import de.tudresden.inf.lat.uel.core.processor.UelProcessorFactory;
 import de.tudresden.inf.lat.uel.core.type.AtomManager;
-import de.tudresden.inf.lat.uel.core.type.AtomManagerImpl;
 import de.tudresden.inf.lat.uel.core.type.OWLUelClassDefinition;
 import de.tudresden.inf.lat.uel.core.type.UnifierTranslator;
 import de.tudresden.inf.lat.uel.type.api.Atom;
@@ -48,11 +41,8 @@ import de.tudresden.inf.lat.uel.type.impl.ExistentialRestriction;
 
 public class AlternativeUelStarter {
 
-	public static final String classPrefix = "http://uel.sourceforge.net/entities/auxclass#A";
-	private OWLOntology auxOntology;
-	private int classCounter = 0;
-	private Map<OWLClassExpression, OWLClass> mapOfAuxClassExpr = new HashMap<OWLClassExpression, OWLClass>();
-	private OWLOntology ontology;
+	private Set<OWLOntology> ontologies;
+	private OWLOntologyManager ontologyManager;
 	private UelProcessor uelProcessor;
 	private boolean verbose = false;
 	private OWLClass owlThingAlias = null;
@@ -62,14 +52,18 @@ public class AlternativeUelStarter {
 		if (ontology == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
-		this.ontology = ontology;
+		this.ontologyManager = ontology.getOWLOntologyManager();
+		this.ontologies = new HashSet<OWLOntology>();
+		this.ontologies.add(ontology);
+	}
 
-		try {
-			this.auxOntology = ontology.getOWLOntologyManager()
-					.createOntology();
-		} catch (OWLOntologyCreationException e) {
-			throw new RuntimeException(e);
+	public AlternativeUelStarter(OWLOntologyManager ontologyManager,
+			Set<OWLOntology> ontologies) {
+		if (ontologies == null) {
+			throw new IllegalArgumentException("Null argument.");
 		}
+		this.ontologyManager = ontologyManager;
+		this.ontologies = ontologies;
 	}
 
 	public void setVerbose(boolean verbose) {
@@ -79,38 +73,9 @@ public class AlternativeUelStarter {
 	public void setOwlThingAlias(OWLClass owlThingAlias) {
 		this.owlThingAlias = owlThingAlias;
 	}
-	
+
 	public void markUndefAsVariables(boolean markUndefAsVariables) {
 		this.markUndefAsVariables = markUndefAsVariables;
-	}
-
-	public OWLClass findAuxiliaryDefinition(OWLClassExpression expr) {
-		OWLClass ret = null;
-		if (!expr.isAnonymous()) {
-			ret = expr.asOWLClass();
-		} else {
-			ret = this.mapOfAuxClassExpr.get(expr);
-			if (ret == null) {
-				this.classCounter++;
-				OWLOntologyManager manager = this.auxOntology
-						.getOWLOntologyManager();
-				OWLDataFactory factory = manager.getOWLDataFactory();
-				IRI iri = IRI.create(classPrefix + classCounter);
-				ret = factory.getOWLClass(iri);
-
-				this.mapOfAuxClassExpr.put(expr, ret);
-
-				OWLAxiom newDefinition = factory.getOWLEquivalentClassesAxiom(
-						ret, expr);
-				this.auxOntology.getOWLOntologyManager().addAxiom(auxOntology,
-						newDefinition);
-			}
-		}
-		return ret;
-	}
-
-	public static String getId(OWLEntity entity) {
-		return entity.getIRI().toURI().toString();
 	}
 
 	private String isVariable(ConceptName name, AtomManager atomManager,
@@ -293,22 +258,12 @@ public class AlternativeUelStarter {
 	public Iterator<Set<OWLUelClassDefinition>> modifyOntologyAndSolve(
 			OWLOntology positiveProblem, OWLOntology negativeProblem,
 			Set<OWLClass> variables, String processorName) {
-		return modifyOntologyAndSolve(
-				positiveProblem.getAxioms(AxiomType.SUBCLASS_OF),
-				positiveProblem.getAxioms(AxiomType.EQUIVALENT_CLASSES),
-				negativeProblem.getAxioms(AxiomType.SUBCLASS_OF),
-				negativeProblem.getAxioms(AxiomType.EQUIVALENT_CLASSES),
-				variables, processorName);
-	}
 
-	public Iterator<Set<OWLUelClassDefinition>> modifyOntologyAndSolve(
-			Set<OWLSubClassOfAxiom> subsumptions,
-			Set<OWLSubClassOfAxiom> dissubsumptions, Set<OWLClass> variables,
-			String processorName) {
-		return modifyOntologyAndSolve(subsumptions,
-				new HashSet<OWLEquivalentClassesAxiom>(), dissubsumptions,
-				new HashSet<OWLEquivalentClassesAxiom>(), variables,
-				processorName);
+		UelModel uelModel = new UelModel();
+		uelModel.configure(ontologyManager, ontologies, positiveProblem,
+				negativeProblem, owlThingAlias);
+
+		return modifyOntologyAndSolve(uelModel, variables, processorName);
 	}
 
 	public Iterator<Set<OWLUelClassDefinition>> modifyOntologyAndSolve(
@@ -318,91 +273,23 @@ public class AlternativeUelStarter {
 			Set<OWLEquivalentClassesAxiom> disequations,
 			Set<OWLClass> variables, String processorName) {
 
-		OWLDataFactory factory = this.auxOntology.getOWLOntologyManager()
-				.getOWLDataFactory();
+		UelModel uelModel = new UelModel();
+		uelModel.configure(ontologyManager, ontologies, subsumptions,
+				equations, dissubsumptions, disequations, owlThingAlias);
 
-		// add an auxiliary definition for each class expression in a
-		// subsumption/equation to the ontology (if needed)
-		for (OWLSubClassOfAxiom subsumption : subsumptions) {
-			findAuxiliaryDefinition(subsumption.getSubClass());
-			findAuxiliaryDefinition(subsumption.getSuperClass());
-		}
-		for (OWLEquivalentClassesAxiom equation : equations) {
-			for (OWLClassExpression expr : equation.getClassExpressions()) {
-				findAuxiliaryDefinition(expr);
-			}
-		}
+		return modifyOntologyAndSolve(uelModel, variables, processorName);
+	}
 
-		// construct (small!) disequations from the dissubsumptions ...
-		Set<OWLEquivalentClassesAxiom> myDisequations = new HashSet<OWLEquivalentClassesAxiom>();
-		for (OWLSubClassOfAxiom dissubsumption : dissubsumptions) {
-			OWLClass auxSubClass = findAuxiliaryDefinition(dissubsumption
-					.getSubClass());
-			OWLClass auxSuperClass = findAuxiliaryDefinition(dissubsumption
-					.getSuperClass());
+	private Iterator<Set<OWLUelClassDefinition>> modifyOntologyAndSolve(
+			UelModel uelModel, Set<OWLClass> variables, String processorName) {
 
-			OWLClassExpression conjunction = factory
-					.getOWLObjectIntersectionOf(auxSubClass, auxSuperClass);
-			OWLClass auxConjunction = findAuxiliaryDefinition(conjunction);
-			OWLEquivalentClassesAxiom disequation = factory
-					.getOWLEquivalentClassesAxiom(auxSubClass, auxConjunction);
-			myDisequations.add(disequation);
-		}
-		// ... and replace original disequations by ones between variables
-		// (we assume that all equations contain exactly two class expressions)
-		for (OWLEquivalentClassesAxiom disequation : disequations) {
-			List<OWLClassExpression> exprs = disequation
-					.getClassExpressionsAsList();
-			OWLClass auxClass1 = findAuxiliaryDefinition(exprs.get(0));
-			OWLClass auxClass2 = findAuxiliaryDefinition(exprs.get(1));
-
-			myDisequations.add(factory.getOWLEquivalentClassesAxiom(auxClass1,
-					auxClass2));
-		}
-
-		AtomManager atomManager = new AtomManagerImpl();
-		DynamicOntology dynamicOntology = new DynamicOntology(
-				new OntologyBuilder(atomManager));
-		dynamicOntology.load(this.ontology, this.auxOntology, owlThingAlias);
-		PluginGoal goal = new PluginGoal(atomManager, dynamicOntology);
-
-		// add the subsumptions themselves to the PluginGoal ...
-		for (OWLSubClassOfAxiom subsumption : subsumptions) {
-			String subClassId = getId(findAuxiliaryDefinition(subsumption
-					.getSubClass()));
-			String superClassId = getId(findAuxiliaryDefinition(subsumption
-					.getSuperClass()));
-
-			// System.out.println(subClassId + " subsumed by " + superClassId);
-
-			goal.addGoalSubsumption(subClassId, superClassId);
-		}
-		// ... and do the same for the equations
-		for (OWLEquivalentClassesAxiom equation : equations) {
-			List<OWLClassExpression> exprs = equation
-					.getClassExpressionsAsList();
-			String classId1 = getId(findAuxiliaryDefinition(exprs.get(0)));
-			String classId2 = getId(findAuxiliaryDefinition(exprs.get(1)));
-
-			goal.addGoalEquation(classId1, classId2);
-		}
-
-		// add the disequations
-		for (OWLEquivalentClassesAxiom disequation : myDisequations) {
-			Iterator<OWLClassExpression> expressions = disequation
-					.getClassExpressions().iterator();
-			String class1Id = getId((OWLClass) expressions.next());
-			String class2Id = getId((OWLClass) expressions.next());
-
-			// System.out.println(class1Id + " not equivalent to " + class2Id);
-
-			goal.addGoalDisequation(class1Id, class2Id);
-		}
+		AtomManager atomManager = uelModel.getAtomManager();
+		PluginGoal goal = uelModel.getPluginGoal();
 
 		// translate the variables to the IDs, and mark them as variables in the
 		// PluginGoal
 		for (OWLClass var : variables) {
-			String name = getId(var);
+			String name = uelModel.getId(var);
 			ConceptName conceptName = atomManager.createConceptName(name, true);
 			Integer atomId = atomManager.getAtoms().addAndGetIndex(conceptName);
 			// System.out.println("user variable: " + name);
@@ -416,19 +303,11 @@ public class AlternativeUelStarter {
 					String name = atomManager.getConceptName(at
 							.getConceptNameId());
 					if (name.endsWith(AtomManager.UNDEF_SUFFIX)) {
-						goal.makeUserVariable(atomManager.getAtoms().getIndex(at));
+						goal.makeUserVariable(atomManager.getAtoms().getIndex(
+								at));
 					}
 				}
 			}
-		}
-
-		// mark the auxiliary variables as auxiliary
-		for (OWLClass auxVar : mapOfAuxClassExpr.values()) {
-			String name = getId(auxVar);
-			ConceptName conceptName = atomManager.createConceptName(name, true);
-			Integer atomId = atomManager.getAtoms().addAndGetIndex(conceptName);
-			// System.out.println("aux. variable: " + name);
-			goal.makeAuxiliaryVariable(atomId);
 		}
 
 		goal.updateUelInput();
@@ -454,8 +333,8 @@ public class AlternativeUelStarter {
 		uelProcessor = UelProcessorFactory
 				.createProcessor(processorName, input);
 
-		UnifierTranslator translator = new UnifierTranslator(ontology
-				.getOWLOntologyManager().getOWLDataFactory(), atomManager,
+		UnifierTranslator translator = new UnifierTranslator(
+				ontologyManager.getOWLDataFactory(), atomManager,
 				input.getUserVariables(), goal.getAuxiliaryVariables());
 		return new UnifierIterator(uelProcessor, translator);
 	}
