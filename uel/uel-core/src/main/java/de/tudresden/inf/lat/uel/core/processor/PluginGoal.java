@@ -120,27 +120,33 @@ public class PluginGoal {
 		}
 	}
 
-	public void addGoalDisequation(String leftStr, String rightStr) {
-		Set<Equation> equationSet = new HashSet<Equation>();
-		Integer leftId = addModule(equationSet, leftStr);
-		Integer rightId = addModule(equationSet, rightStr);
-		markDefinedConceptNamesAsVariables(equationSet);
-		this.definitions.addAll(equationSet);
+	public void addGoalDisequation(Equation disequation) {
+		Set<Equation> equationSet = extractModules(disequation.getLeft(),
+				disequation.getRight());
 
-		SmallEquation newGoalDisequation = new SmallEquationImpl(leftId,
-				rightId);
+		Integer rightId;
+		if (disequation.getRight().size() == 1) {
+			rightId = disequation.getRight().iterator().next();
+		} else {
+			ConceptName abbrev = ((DynamicOntology) this.ontology)
+					.getOntologyBuilder().createNewAtom();
+			rightId = getAtomManager().getAtoms().addAndGetIndex(abbrev);
+			Equation newDef = new EquationImpl(rightId, disequation.getRight(),
+					false);
+			equationSet.add(newDef);
+			this.definitions.add(newDef);
+		}
+
+		SmallEquation newGoalDisequation = new SmallEquationImpl(
+				disequation.getLeft(), rightId);
 
 		this.goalDisequations.add(newGoalDisequation);
 		updateIndexSets(equationSet);
 		updateIndexSets(newGoalDisequation);
 	}
 
-	public void addGoalEquation(String leftStr, String rightStr) {
-		Set<Equation> equationSet = new HashSet<Equation>();
-		Integer leftId = addModule(equationSet, leftStr);
-		Integer rightId = addModule(equationSet, rightStr);
-		markDefinedConceptNamesAsVariables(equationSet);
-		this.definitions.addAll(equationSet);
+	public void addGoalEquation(Integer leftId, Integer rightId) {
+		Set<Equation> equationSet = extractModules(leftId, rightId);
 
 		Equation newGoalEquation = new EquationImpl(leftId, rightId, false);
 
@@ -149,12 +155,8 @@ public class PluginGoal {
 		updateIndexSets(equationSet);
 	}
 
-	public void addGoalSubsumption(String leftStr, String rightStr) {
-		Set<Equation> equationSet = new HashSet<Equation>();
-		Integer leftId = addModule(equationSet, leftStr);
-		Integer rightId = addModule(equationSet, rightStr);
-		markDefinedConceptNamesAsVariables(equationSet);
-		this.definitions.addAll(equationSet);
+	public void addGoalSubsumption(Integer leftId, Integer rightId) {
+		Set<Equation> equationSet = extractModules(leftId, rightId);
 
 		Set<Integer> rightIds = new HashSet<Integer>();
 		rightIds.add(leftId);
@@ -166,12 +168,20 @@ public class PluginGoal {
 		updateIndexSets(equationSet);
 	}
 
-	private Integer addModule(Set<Equation> equationSet, String str) {
-		ConceptName conceptName = getAtomManager()
-				.createConceptName(str, false);
-		Integer ret = getAtomManager().getAtoms().addAndGetIndex(conceptName);
-		Set<Equation> module = this.ontology.getModule(ret);
+	private void addModule(Set<Equation> equationSet, Integer atomId) {
+		Atom atom = getAtomManager().getAtoms().get(atomId);
+		ConceptName conceptName;
+		if (atom.isConceptName()) {
+			conceptName = (ConceptName) atom;
+		} else {
+			conceptName = ((ExistentialRestriction) atom).getChild();
+		}
+
+		Integer conceptNameId = getAtomManager().getAtoms().addAndGetIndex(
+				conceptName);
+		Set<Equation> module = this.ontology.getModule(conceptNameId);
 		// System.out.println("module size: " + module.size());
+
 		for (Equation eq : module) {
 			if (eq.isPrimitive()) {
 				equationSet.add(processPrimitiveDefinition(eq));
@@ -179,7 +189,30 @@ public class PluginGoal {
 				equationSet.add(eq);
 			}
 		}
-		return ret;
+	}
+
+	private Set<Equation> extractModules(Integer leftId, Integer rightId) {
+		Set<Integer> atomIds = new HashSet<Integer>();
+		atomIds.add(leftId);
+		atomIds.add(rightId);
+		return extractModules(atomIds);
+	}
+
+	private Set<Equation> extractModules(Integer leftId, Set<Integer> rightIds) {
+		Set<Integer> atomIds = new HashSet<Integer>();
+		atomIds.add(leftId);
+		atomIds.addAll(rightIds);
+		return extractModules(atomIds);
+	}
+
+	private Set<Equation> extractModules(Set<Integer> atomIds) {
+		Set<Equation> equationSet = new HashSet<Equation>();
+		for (Integer atomId : atomIds) {
+			addModule(equationSet, atomId);
+		}
+		markDefinedConceptNamesAsVariables(equationSet);
+		this.definitions.addAll(equationSet);
+		return equationSet;
 	}
 
 	public AtomManager getAtomManager() {

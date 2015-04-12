@@ -51,13 +51,12 @@ public class UelController implements ActionListener {
 	}
 
 	private Map<String, String> mapIdLabel = new HashMap<String, String>();
-	private List<String> ontologyList = new ArrayList<String>();
+	private List<OWLOntology> ontologyList = new ArrayList<OWLOntology>();
 	private OWLOntology owlOntologyBg00 = null;
 	private OWLOntology owlOntologyBg01 = null;
 	private OWLOntology owlOntologyPos = null;
 	private OWLOntology owlOntologyNeg = null;
 	private final OWLOntologyManager owlOntologyManager;
-	private Map<String, OWLOntology> owlOntologyMap = new HashMap<String, OWLOntology>();
 	private Map<OWLEntity, String> shortFormMap = new HashMap<OWLEntity, String>();
 	private UnifierController unifierController;
 	private VarSelectionController varWindow = null;
@@ -135,8 +134,7 @@ public class UelController implements ActionListener {
 		if (0 <= ontologyIndex && ontologyIndex < this.ontologyList.size()) {
 			getUnifier().getView().setUnifierButtons(false);
 
-			String ontologyId = this.ontologyList.get(ontologyIndex);
-			this.owlOntologyBg00 = this.owlOntologyMap.get(ontologyId);
+			this.owlOntologyBg00 = this.ontologyList.get(ontologyIndex);
 
 			getView().setButtonSelectVariablesEnabled(true);
 		}
@@ -152,8 +150,7 @@ public class UelController implements ActionListener {
 
 			getUnifier().getView().setUnifierButtons(false);
 
-			String ontologyId = this.ontologyList.get(ontologyIndex);
-			this.owlOntologyBg01 = this.owlOntologyMap.get(ontologyId);
+			this.owlOntologyBg01 = this.ontologyList.get(ontologyIndex);
 
 			getView().setButtonSelectVariablesEnabled(true);
 		}
@@ -168,8 +165,7 @@ public class UelController implements ActionListener {
 
 			getUnifier().getView().setUnifierButtons(false);
 
-			String ontologyId = this.ontologyList.get(ontologyIndex);
-			this.owlOntologyPos = this.owlOntologyMap.get(ontologyId);
+			this.owlOntologyPos = this.ontologyList.get(ontologyIndex);
 
 			getView().setButtonSelectVariablesEnabled(true);
 		}
@@ -184,8 +180,7 @@ public class UelController implements ActionListener {
 
 			getUnifier().getView().setUnifierButtons(false);
 
-			String ontologyId = this.ontologyList.get(ontologyIndex);
-			this.owlOntologyNeg = this.owlOntologyMap.get(ontologyId);
+			this.owlOntologyNeg = this.ontologyList.get(ontologyIndex);
 
 			getView().setButtonSelectVariablesEnabled(true);
 		}
@@ -202,9 +197,7 @@ public class UelController implements ActionListener {
 			try {
 				OWLOntology owlOntology = this.owlOntologyManager
 						.loadOntologyFromOntologyDocument(file);
-				loadOntology(owlOntology);
 				reset();
-				updateOntologySelection();
 			} catch (OWLOntologyCreationException e) {
 				throw new RuntimeException(e);
 			}
@@ -278,9 +271,6 @@ public class UelController implements ActionListener {
 				actionOntologyNegSelected);
 
 		reset();
-		reloadOntologies();
-
-		updateOntologySelection(0);
 	}
 
 	private VarSelectionController initVarWindow(PluginGoal goal) {
@@ -291,29 +281,11 @@ public class UelController implements ActionListener {
 		return ret;
 	}
 
-	private void loadOntology(OWLOntology owlOntology) {
-		String ontologyId = owlOntology.getOntologyID().toString();
-		if (!this.owlOntologyMap.containsKey(ontologyId)) {
-			this.owlOntologyMap.put(ontologyId, owlOntology);
-			this.ontologyList.add(ontologyId);
-			getView().reloadOntologies(this.ontologyList);
-		}
-	}
-
 	private void recomputeShortForm() {
 		this.mapIdLabel.clear();
 		for (OWLEntity cls : this.shortFormMap.keySet()) {
 			this.mapIdLabel.put(getId(cls), getShortForm(cls));
 		}
-	}
-
-	public void reloadOntologies() {
-		Set<OWLOntology> owlOntologies = getOWLOntologyManager()
-				.getOntologies();
-		for (OWLOntology owlOntology : owlOntologies) {
-			loadOntology(owlOntology);
-		}
-		updateOntologySelection();
 	}
 
 	private void updateOntologySelection() {
@@ -323,16 +295,19 @@ public class UelController implements ActionListener {
 		executeActionOntologyNegSelected();
 	}
 
-	private void updateOntologySelection(int ontologyIndex) {
-		executeActionOntologyBg00Selected(ontologyIndex);
-		executeActionOntologyBg01Selected(ontologyIndex);
-		executeActionOntologyPosSelected(ontologyIndex);
-		executeActionOntologyNegSelected(ontologyIndex);
-	}
-
 	public void reset() {
 		resetUnifierController();
 		getView().setButtonSelectVariablesEnabled(false);
+		this.ontologyList.clear();
+		this.ontologyList.addAll(getOWLOntologyManager().getOntologies());
+
+		// for (OWLOntology ontology : getOWLOntologyManager().getOntologies())
+		// {
+		// // String ontologyId = owlOntology.getOntologyID().toString();
+		// this.ontologyList.add(ontology);
+		// }
+		getView().reloadOntologies(this.ontologyList);
+		updateOntologySelection();
 	}
 
 	private void resetUnifierController() {

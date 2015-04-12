@@ -59,7 +59,7 @@ public class OntologyBuilder {
 		return newAtom;
 	}
 
-	private ConceptName createNewAtom() {
+	public ConceptName createNewAtom() {
 		String str = freshConstantPrefix + freshConstantIndex;
 		freshConstantIndex++;
 		return this.atomManager.createConceptName(str, true);
