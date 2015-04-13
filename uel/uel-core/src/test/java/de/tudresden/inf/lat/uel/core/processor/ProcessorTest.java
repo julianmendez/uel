@@ -31,7 +31,7 @@ import org.semanticweb.owlapi.reasoner.OWLReasoner;
 
 import de.tudresden.inf.lat.jcel.owlapi.main.JcelReasonerFactory;
 import de.tudresden.inf.lat.uel.core.type.AtomManager;
-import de.tudresden.inf.lat.uel.core.type.UnifierKRSSRenderer;
+import de.tudresden.inf.lat.uel.core.type.KRSSRenderer;
 import de.tudresden.inf.lat.uel.type.api.Equation;
 import de.tudresden.inf.lat.uel.type.api.UelProcessor;
 import de.tudresden.inf.lat.uel.type.impl.ConceptName;
@@ -159,8 +159,8 @@ public class ProcessorTest {
 								idClassMap.get(conceptD)));
 		OWLOntology negativeProblem = ontologyManager.createOntology();
 
-		uelModel.configure(owlOntology.getOWLOntologyManager(), owlOntologies,
-				positiveProblem, negativeProblem, null);
+		uelModel.configure(owlOntologies, positiveProblem, negativeProblem,
+				null);
 		PluginGoal goal = uelModel.getPluginGoal();
 		makeVariable(goal, idClassMap.get(conceptC).toStringID(), false);
 		makeVariable(goal, idClassMap.get(conceptD).toStringID(), false);
@@ -172,6 +172,7 @@ public class ProcessorTest {
 			makeVariable(goal, idClassMap.get(var).toStringID(), true);
 		}
 
+		goal.updateUelInput();
 		UelProcessor processor = UelProcessorFactory.createProcessor(
 				processorName, goal.getUelInput());
 		uelModel.setUelProcessor(processor);
@@ -182,10 +183,11 @@ public class ProcessorTest {
 		}
 
 		List<Set<Equation>> unifiers = uelModel.getUnifierList();
-		String goalStr = goal.printDefinitions();
-		UnifierKRSSRenderer renderer = new UnifierKRSSRenderer(
+		KRSSRenderer renderer = new KRSSRenderer(
 				goal.getAtomManager(), goal.getUserVariables(),
-				goal.getAuxiliaryVariables());
+				goal.getAuxiliaryVariables(), null);
+		String goalStr = renderer.printDefinitions(goal.getUelInput()
+				.getDefinitions());
 
 		for (Set<Equation> unifier : unifiers) {
 			String extendedOntology = goalStr + renderer.printUnifier(unifier);

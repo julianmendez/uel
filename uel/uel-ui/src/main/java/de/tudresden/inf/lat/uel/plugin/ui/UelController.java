@@ -14,6 +14,7 @@ import java.util.TreeSet;
 
 import javax.swing.JFileChooser;
 
+import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
@@ -45,10 +46,6 @@ public class UelController implements ActionListener {
 	private static final String actionOpen = "open";
 	private static final String actionRejectVar = "reject var";
 	private static final String actionSelectVariables = "get var candidate";
-
-	public static String getId(OWLEntity entity) {
-		return entity.getIRI().toURI().toString();
-	}
 
 	private Map<String, String> mapIdLabel = new HashMap<String, String>();
 	private List<OWLOntology> ontologyList = new ArrayList<OWLOntology>();
@@ -218,8 +215,8 @@ public class UelController implements ActionListener {
 		bgOntologies.add(this.owlOntologyBg00);
 		bgOntologies.add(this.owlOntologyBg01);
 
-		getModel().configure(owlOntologyManager, bgOntologies, owlOntologyPos,
-				owlOntologyNeg, null);
+		getModel()
+				.configure(bgOntologies, owlOntologyPos, owlOntologyNeg, null);
 
 		this.varWindow = initVarWindow(getModel().getPluginGoal());
 		this.varWindow.open();
@@ -231,15 +228,6 @@ public class UelController implements ActionListener {
 
 	public OWLOntologyManager getOWLOntologyManager() {
 		return this.owlOntologyManager;
-	}
-
-	private String getShortForm(OWLEntity entity) {
-		String ret = this.shortFormMap.get(entity);
-		if (ret == null) {
-			IRI iri = entity.getIRI();
-			ret = iri.getFragment();
-		}
-		return ret;
 	}
 
 	public Map<OWLEntity, String> getShortFormMap() {
@@ -283,8 +271,9 @@ public class UelController implements ActionListener {
 
 	private void recomputeShortForm() {
 		this.mapIdLabel.clear();
-		for (OWLEntity cls : this.shortFormMap.keySet()) {
-			this.mapIdLabel.put(getId(cls), getShortForm(cls));
+		for (OWLEntity entity : this.shortFormMap.keySet()) {
+			this.mapIdLabel.put(entity.getIRI().toURI().toString(),
+					this.shortFormMap.get(entity));
 		}
 	}
 
@@ -299,13 +288,13 @@ public class UelController implements ActionListener {
 		resetUnifierController();
 		getView().setButtonSelectVariablesEnabled(false);
 		this.ontologyList.clear();
+		try {
+			this.ontologyList.add(OWLManager.createOWLOntologyManager()
+					.createOntology(IRI.create("empty")));
+		} catch (OWLOntologyCreationException e) {
+		}
 		this.ontologyList.addAll(getOWLOntologyManager().getOntologies());
 
-		// for (OWLOntology ontology : getOWLOntologyManager().getOntologies())
-		// {
-		// // String ontologyId = owlOntology.getOntologyID().toString();
-		// this.ontologyList.add(ontology);
-		// }
 		getView().reloadOntologies(this.ontologyList);
 		updateOntologySelection();
 	}

@@ -78,20 +78,6 @@ public class AlternativeUelStarter {
 		this.markUndefAsVariables = markUndefAsVariables;
 	}
 
-	private String isVariable(ConceptName name, AtomManager atomManager,
-			Set<Integer> userVariables) {
-		if (name.isVariable()) {
-			if (userVariables.contains(atomManager.getAtoms().addAndGetIndex(
-					name))) {
-				return "uv";
-			} else {
-				return "v";
-			}
-		} else {
-			return "c";
-		}
-	}
-
 	public static void main(String[] args) {
 		int argIdx = 0;
 		String mainFilename = "";
@@ -260,8 +246,8 @@ public class AlternativeUelStarter {
 			Set<OWLClass> variables, String processorName) {
 
 		UelModel uelModel = new UelModel();
-		uelModel.configure(ontologyManager, ontologies, positiveProblem,
-				negativeProblem, owlThingAlias);
+		uelModel.configure(ontologies, positiveProblem, negativeProblem,
+				owlThingAlias);
 
 		return modifyOntologyAndSolve(uelModel, variables, processorName);
 	}
@@ -274,8 +260,8 @@ public class AlternativeUelStarter {
 			Set<OWLClass> variables, String processorName) {
 
 		UelModel uelModel = new UelModel();
-		uelModel.configure(ontologyManager, ontologies, subsumptions,
-				equations, dissubsumptions, disequations, owlThingAlias);
+		uelModel.configure(ontologies, subsumptions, equations,
+				dissubsumptions, disequations, owlThingAlias);
 
 		return modifyOntologyAndSolve(uelModel, variables, processorName);
 	}
@@ -289,11 +275,7 @@ public class AlternativeUelStarter {
 		// translate the variables to the IDs, and mark them as variables in the
 		// PluginGoal
 		for (OWLClass var : variables) {
-			String name = uelModel.getId(var);
-			ConceptName conceptName = atomManager.createConceptName(name, true);
-			Integer atomId = atomManager.getAtoms().addAndGetIndex(conceptName);
-			// System.out.println("user variable: " + name);
-			goal.makeUserVariable(atomId);
+			goal.makeUserVariable(uelModel.getAtomId(var));
 		}
 
 		if (markUndefAsVariables) {
@@ -326,8 +308,7 @@ public class AlternativeUelStarter {
 			System.out.println("Final number of equations: "
 					+ goal.getUelInput().getEquations().size());
 			System.out.println("Unification problem:");
-			print(input.getEquations(), input.getGoalDisequations(),
-					atomManager, input.getUserVariables());
+			System.out.println(goal.toString());
 		}
 
 		uelProcessor = UelProcessorFactory
@@ -341,54 +322,6 @@ public class AlternativeUelStarter {
 
 	public List<Entry<String, String>> getStats() {
 		return uelProcessor.getInfo();
-	}
-
-	private void print(Integer atomId, AtomManager atomManager,
-			Set<Integer> userVariables) {
-		Atom atom = atomManager.getAtoms().get(atomId);
-		if (atom.isExistentialRestriction()) {
-			ExistentialRestriction ex = (ExistentialRestriction) atom;
-			System.out.print("(exists "
-					+ getFragment(atomManager.getRoleName(ex.getRoleId()))
-					+ " ");
-			print(ex.getChild(), atomManager, userVariables);
-			System.out.print(")");
-		} else {
-			print((ConceptName) atom, atomManager, userVariables);
-		}
-	}
-
-	private void print(ConceptName name, AtomManager atomManager,
-			Set<Integer> userVariables) {
-		System.out.print(getFragment(atomManager.getConceptName(name
-				.getConceptNameId()))
-				+ "["
-				+ isVariable(name, atomManager, userVariables) + "]");
-	}
-
-	private String getFragment(String iri) {
-		String[] parts = iri.split("#");
-		return parts[parts.length - 1];
-	}
-
-	private void print(Set<Equation> equations,
-			Set<SmallEquation> disequations, AtomManager atomManager,
-			Set<Integer> userVariables) {
-		for (Equation eq : equations) {
-			print(eq.getLeft(), atomManager, userVariables);
-			System.out.print(" = ");
-			for (Integer atomId : eq.getRight()) {
-				print(atomId, atomManager, userVariables);
-				System.out.print(" + ");
-			}
-			System.out.println();
-		}
-		for (SmallEquation eq : disequations) {
-			print(eq.getLeft(), atomManager, userVariables);
-			System.out.print(" != ");
-			print(eq.getRight(), atomManager, userVariables);
-			System.out.println();
-		}
 	}
 
 }

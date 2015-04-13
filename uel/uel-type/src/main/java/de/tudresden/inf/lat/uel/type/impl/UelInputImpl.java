@@ -81,5 +81,4 @@ public class UelInputImpl implements UelInput {
 	public Set<Integer> getUserVariables() {
 		return this.userVariables;
 	}
-
 }

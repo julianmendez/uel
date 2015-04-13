@@ -1,16 +1,18 @@
 package de.tudresden.inf.lat.uel.core.processor;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.semanticweb.owlapi.model.IRI;
+
 import de.tudresden.inf.lat.uel.core.type.AtomManager;
+import de.tudresden.inf.lat.uel.core.type.KRSSRenderer;
+import de.tudresden.inf.lat.uel.core.type.KRSSRenderer.Replacer;
 import de.tudresden.inf.lat.uel.type.api.Atom;
 import de.tudresden.inf.lat.uel.type.api.Equation;
 import de.tudresden.inf.lat.uel.type.api.SmallEquation;
 import de.tudresden.inf.lat.uel.type.api.UelInput;
-import de.tudresden.inf.lat.uel.type.cons.KRSSKeyword;
 import de.tudresden.inf.lat.uel.type.impl.ConceptName;
 import de.tudresden.inf.lat.uel.type.impl.EquationImpl;
 import de.tudresden.inf.lat.uel.type.impl.ExistentialRestriction;
@@ -25,68 +27,6 @@ import de.tudresden.inf.lat.uel.type.impl.UelInputImpl;
  * @author Stefan Borgwardt
  */
 public class PluginGoal {
-
-	public static String toString(AtomManager atomManager,
-			Collection<Equation> equations) {
-		StringBuffer sbuf = new StringBuffer();
-		for (Equation eq : equations) {
-			sbuf.append(toString(atomManager, eq));
-		}
-		return sbuf.toString();
-	}
-
-	public static String toString(AtomManager atomManager, Equation eq) {
-		StringBuffer sbuf = new StringBuffer();
-		sbuf.append(KRSSKeyword.newLine);
-		sbuf.append(KRSSKeyword.open);
-		if (eq.isPrimitive()) {
-			sbuf.append(KRSSKeyword.define_primitive_concept);
-		} else {
-			sbuf.append(KRSSKeyword.define_concept);
-		}
-		sbuf.append(KRSSKeyword.space);
-		sbuf.append(toString(atomManager, eq.getLeft()));
-		if (eq.getRight().size() > 1) {
-			sbuf.append(KRSSKeyword.space);
-			sbuf.append(KRSSKeyword.open);
-			sbuf.append(KRSSKeyword.and);
-			for (Integer atomId : eq.getRight()) {
-				sbuf.append(KRSSKeyword.space);
-				sbuf.append(toString(atomManager, atomId));
-			}
-			sbuf.append(KRSSKeyword.close);
-		} else if (eq.getRight().size() == 1) {
-			sbuf.append(KRSSKeyword.space);
-			Integer atomId = eq.getRight().iterator().next();
-			sbuf.append(toString(atomManager, atomId));
-		}
-		sbuf.append(KRSSKeyword.close);
-		sbuf.append("\n");
-		return sbuf.toString();
-	}
-
-	public static String toString(AtomManager atomManager, Integer atomId) {
-		String ret = null;
-		Atom atom = atomManager.getAtoms().get(atomId);
-		if (atom.isExistentialRestriction()) {
-			ExistentialRestriction restriction = (ExistentialRestriction) atom;
-			String roleName = atomManager.getRoleName(restriction.getRoleId());
-			StringBuffer sbuf = new StringBuffer();
-			sbuf.append(KRSSKeyword.open);
-			sbuf.append(KRSSKeyword.some);
-			sbuf.append(KRSSKeyword.space);
-			sbuf.append(roleName);
-			sbuf.append(KRSSKeyword.space);
-			sbuf.append(toString(atomManager, restriction.getChild()
-					.getConceptNameId()));
-			sbuf.append(KRSSKeyword.close);
-			ret = sbuf.toString();
-		} else if (atom.isConceptName()) {
-			ConceptName concept = (ConceptName) atom;
-			ret = atomManager.getConceptName(concept.getConceptNameId());
-		}
-		return ret;
-	}
 
 	private final AtomManager atomManager;
 	private final Set<Integer> auxiliaryVariables = new HashSet<Integer>();
@@ -130,7 +70,10 @@ public class PluginGoal {
 		} else {
 			ConceptName abbrev = ((DynamicOntology) this.ontology)
 					.getOntologyBuilder().createNewAtom();
+			abbrev.setAuxiliaryVariable(true);
 			rightId = getAtomManager().getAtoms().addAndGetIndex(abbrev);
+			makeAuxiliaryVariable(rightId);
+
 			Equation newDef = new EquationImpl(rightId, disequation.getRight(),
 					false);
 			equationSet.add(newDef);
@@ -295,17 +238,6 @@ public class PluginGoal {
 		}
 	}
 
-	/**
-	 * Returns a string representation of the equations, excluding the goal
-	 * equations.
-	 * 
-	 * @return a string representation of the equations, excluding the main
-	 *         equation
-	 */
-	public String printDefinitions() {
-		return toString(getAtomManager(), this.definitions);
-	}
-
 	private Equation processPrimitiveDefinition(Equation e) {
 		Atom leftAtom = getAtomManager().getAtoms().get(e.getLeft());
 		ConceptName b = (ConceptName) leftAtom;
@@ -321,8 +253,40 @@ public class PluginGoal {
 
 	@Override
 	public String toString() {
-		return toString(getAtomManager(), this.definitions)
-				+ toString(getAtomManager(), this.goalEquations);
+		Replacer aliasReplacer = new Replacer() {
+			public String replace(String input) {
+				return IRI.create(input).getFragment();
+			}
+		};
+		KRSSRenderer renderer = new KRSSRenderer(atomManager, userVariables,
+				auxiliaryVariables, aliasReplacer);
+		StringBuffer buf = new StringBuffer();
+		appendEquations(buf, renderer, definitions);
+		appendEquations(buf, renderer, goalEquations);
+		appendDisequations(buf, renderer, goalDisequations);
+		return buf.toString();
+	}
+
+	private void appendEquations(StringBuffer buf, KRSSRenderer renderer,
+			Set<Equation> equations) {
+		for (Equation eq : equations) {
+			buf.append(renderer.printAtom(eq.getLeft()));
+			buf.append(" ≡ ");
+			buf.append(renderer.printConjunction(eq.getRight()));
+			buf.append(System.lineSeparator());
+			buf.append(System.lineSeparator());
+		}
+	}
+
+	private void appendDisequations(StringBuffer buf, KRSSRenderer renderer,
+			Set<SmallEquation> disequations) {
+		for (SmallEquation eq : disequations) {
+			buf.append(renderer.printAtom(eq.getLeft()));
+			buf.append(" ≢ ");
+			buf.append(renderer.printAtom(eq.getRight()));
+			buf.append(System.lineSeparator());
+			buf.append(System.lineSeparator());
+		}
 	}
 
 	private void updateIndexSets(Set<Equation> equationSet) {

@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAxiom;
@@ -81,10 +81,10 @@ public class UelModel {
 		return false;
 	}
 
-	public void configure(OWLOntologyManager ontologyManager,
-			Set<OWLOntology> bgOntologies, OWLOntology positiveProblem,
-			OWLOntology negativeProblem, OWLClass owlThingAlias) {
-		configure(ontologyManager, bgOntologies,
+	public void configure(Set<OWLOntology> bgOntologies,
+			OWLOntology positiveProblem, OWLOntology negativeProblem,
+			OWLClass owlThingAlias) {
+		configure(bgOntologies,
 				positiveProblem.getAxioms(AxiomType.SUBCLASS_OF),
 				positiveProblem.getAxioms(AxiomType.EQUIVALENT_CLASSES),
 				negativeProblem.getAxioms(AxiomType.SUBCLASS_OF),
@@ -92,16 +92,15 @@ public class UelModel {
 				owlThingAlias);
 	}
 
-	public void configure(OWLOntologyManager ontologyManager,
-			Set<OWLOntology> bgOntologies,
+	public void configure(Set<OWLOntology> bgOntologies,
 			Set<OWLSubClassOfAxiom> subsumptions,
 			Set<OWLEquivalentClassesAxiom> equations,
 			Set<OWLSubClassOfAxiom> dissubsumptions,
 			Set<OWLEquivalentClassesAxiom> disequations, OWLClass owlThingAlias) {
 
-		OWLDataFactory factory = ontologyManager.getOWLDataFactory();
 		try {
-			this.auxOntology = ontologyManager.createOntology();
+			this.auxOntology = OWLManager.createOWLOntologyManager()
+					.createOntology();
 		} catch (OWLOntologyCreationException e) {
 			throw new RuntimeException(e);
 		}
@@ -229,7 +228,7 @@ public class UelModel {
 
 	}
 
-	private Integer getAtomId(OWLClass owlClass) {
+	public Integer getAtomId(OWLClass owlClass) {
 		ConceptName conceptName = getAtomManager().createConceptName(
 				getId(owlClass), false);
 		return getAtomManager().getAtoms().addAndGetIndex(conceptName);
@@ -247,8 +246,7 @@ public class UelModel {
 
 		OWLAxiom newDefinition = factory.getOWLEquivalentClassesAxiom(newClass,
 				expr);
-		this.auxOntology.getOWLOntologyManager().addAxiom(auxOntology,
-				newDefinition);
+		manager.addAxiom(auxOntology, newDefinition);
 
 		return ret;
 	}
@@ -274,6 +272,7 @@ public class UelModel {
 	}
 
 	public void reset() {
+		this.atomManager = new AtomManagerImpl();
 		this.pluginGoal = null;
 		this.mapOfAuxClassExpr.clear();
 		this.classCounter = 0;

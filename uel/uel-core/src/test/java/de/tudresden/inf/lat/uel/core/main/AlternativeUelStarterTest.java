@@ -14,22 +14,21 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
-import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 
 import de.tudresden.inf.lat.jcel.owlapi.main.JcelReasoner;
-import de.tudresden.inf.lat.uel.core.processor.PluginGoal;
 import de.tudresden.inf.lat.uel.core.processor.UelProcessorFactory;
 import de.tudresden.inf.lat.uel.core.type.AtomManager;
 import de.tudresden.inf.lat.uel.core.type.OWLUelClassDefinition;
+import de.tudresden.inf.lat.uel.core.type.KRSSRenderer;
 import de.tudresden.inf.lat.uel.type.api.Equation;
+import de.tudresden.inf.lat.uel.type.api.UelInput;
 
 @RunWith(value = Parameterized.class)
 public class AlternativeUelStarterTest {
@@ -123,9 +122,11 @@ public class AlternativeUelStarterTest {
 						variables, UelProcessorFactory.SAT_BASED_ALGORITHM);
 
 		AtomManager atomManager = iterator.getAtomManager();
-		Set<Equation> definitions = iterator.getProcessor().getInput()
-				.getDefinitions();
-		String krssDefinitions = PluginGoal.toString(atomManager, definitions);
+		UelInput uelInput = iterator.getProcessor().getInput();
+		Set<Equation> definitions = uelInput.getDefinitions();
+		KRSSRenderer renderer = new KRSSRenderer(atomManager,
+				uelInput.getUserVariables(), null, null);
+		String krssDefinitions = renderer.printDefinitions(definitions);
 		// System.out.println(krssDefinitions);
 		// System.out.println(PluginGoal.toString(atomManager, iterator
 		// .getProcessor().getInput().getGoalEquations()));
@@ -158,13 +159,11 @@ public class AlternativeUelStarterTest {
 
 			OWLReasoner reasoner = createReasoner(auxOntology);
 
-			for (OWLSubClassOfAxiom sub : subsumptions
-					.getAxioms(AxiomType.SUBCLASS_OF)) {
-				Assert.assertTrue(reasoner.isEntailed(sub));
+			for (OWLAxiom pos : subsumptions.getAxioms()) {
+				Assert.assertTrue(reasoner.isEntailed(pos));
 			}
-			for (OWLSubClassOfAxiom dissub : dissubsumptions
-					.getAxioms(AxiomType.SUBCLASS_OF)) {
-				Assert.assertTrue(!reasoner.isEntailed(dissub));
+			for (OWLAxiom neg : dissubsumptions.getAxioms()) {
+				Assert.assertTrue(!reasoner.isEntailed(neg));
 			}
 
 		}
