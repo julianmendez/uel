@@ -78,7 +78,6 @@ public class KRSSRenderer {
 				Atom leftPart = atomManager.getAtoms().get(eq.getLeft());
 				Collection<Atom> rightPart = toAtoms(eq.getRight());
 
-				sbuf.append(KRSSKeyword.newLine);
 				sbuf.append(KRSSKeyword.open);
 				if (eq.isPrimitive()) {
 					sbuf.append(KRSSKeyword.define_primitive_concept);
@@ -89,8 +88,8 @@ public class KRSSRenderer {
 				toKRSS(sbuf, leftPart, equations, restrictToUserVariables);
 				sbuf.append(KRSSKeyword.space);
 				toKRSS(sbuf, rightPart, equations, restrictToUserVariables);
-				sbuf.append(KRSSKeyword.space);
 				sbuf.append(KRSSKeyword.close);
+				sbuf.append(KRSSKeyword.newLine);
 				sbuf.append(KRSSKeyword.newLine);
 			}
 		}
@@ -167,6 +166,7 @@ public class KRSSRenderer {
 				sbuf.append(KRSSKeyword.space);
 			}
 
+			sbuf.setLength(sbuf.length() - KRSSKeyword.space.length());
 			sbuf.append(KRSSKeyword.close);
 		}
 	}

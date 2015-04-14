@@ -134,6 +134,28 @@ public class PluginGoal {
 		}
 	}
 
+	private void appendDisequations(StringBuffer buf, KRSSRenderer renderer,
+			Set<SmallEquation> disequations) {
+		for (SmallEquation eq : disequations) {
+			buf.append(renderer.printAtom(eq.getLeft()));
+			buf.append(" ≢ ");
+			buf.append(renderer.printAtom(eq.getRight()));
+			buf.append(System.lineSeparator());
+			buf.append(System.lineSeparator());
+		}
+	}
+
+	private void appendEquations(StringBuffer buf, KRSSRenderer renderer,
+			Set<Equation> equations) {
+		for (Equation eq : equations) {
+			buf.append(renderer.printAtom(eq.getLeft()));
+			buf.append(" ≡ ");
+			buf.append(renderer.printConjunction(eq.getRight()));
+			buf.append(System.lineSeparator());
+			buf.append(System.lineSeparator());
+		}
+	}
+
 	private Set<Equation> extractModules(Integer leftId, Integer rightId) {
 		Set<Integer> atomIds = new HashSet<Integer>();
 		atomIds.add(leftId);
@@ -265,28 +287,6 @@ public class PluginGoal {
 		appendEquations(buf, renderer, goalEquations);
 		appendDisequations(buf, renderer, goalDisequations);
 		return buf.toString();
-	}
-
-	private void appendEquations(StringBuffer buf, KRSSRenderer renderer,
-			Set<Equation> equations) {
-		for (Equation eq : equations) {
-			buf.append(renderer.printAtom(eq.getLeft()));
-			buf.append(" ≡ ");
-			buf.append(renderer.printConjunction(eq.getRight()));
-			buf.append(System.lineSeparator());
-			buf.append(System.lineSeparator());
-		}
-	}
-
-	private void appendDisequations(StringBuffer buf, KRSSRenderer renderer,
-			Set<SmallEquation> disequations) {
-		for (SmallEquation eq : disequations) {
-			buf.append(renderer.printAtom(eq.getLeft()));
-			buf.append(" ≢ ");
-			buf.append(renderer.printAtom(eq.getRight()));
-			buf.append(System.lineSeparator());
-			buf.append(System.lineSeparator());
-		}
 	}
 
 	private void updateIndexSets(Set<Equation> equationSet) {

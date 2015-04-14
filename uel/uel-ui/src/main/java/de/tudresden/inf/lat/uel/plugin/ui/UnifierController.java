@@ -40,7 +40,6 @@ public class UnifierController implements ActionListener {
 	private StatInfo statInfo = null;
 	private int unifierIndex = -1;
 	private UnifierView view;
-	private KRSSRenderer renderer = null;
 
 	public UnifierController(UnifierView view, Map<String, String> labels) {
 		this.view = view;
@@ -121,17 +120,22 @@ public class UnifierController implements ActionListener {
 	}
 
 	private void executeActionSave() {
+		if (getModel().getUnifierList().size() == 0) {
+			return;
+		}
+
 		JFileChooser fileChooser = new JFileChooser();
 		int returnVal = fileChooser.showSaveDialog(getView());
 		File file = null;
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
 			file = fileChooser.getSelectedFile();
 		}
+
 		if (file != null) {
 			try {
-				String unifier = printCurrentUnifier();
+				String unifier = printCurrentUnifier(false);
 				OntologyRenderer renderer = new OntologyRenderer();
-				OWLOntology owlOntology = renderer.parseKRSS(unifier);
+				OWLOntology owlOntology = renderer.parseOntology(unifier);
 				if (file.getName().endsWith(OntologyRenderer.EXTENSION_RDF)) {
 					unifier = renderer.renderRDF(owlOntology);
 				} else if (file.getName().endsWith(
@@ -143,9 +147,7 @@ public class UnifierController implements ActionListener {
 				}
 
 				BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-				if (getModel().getUnifierList().size() > 0) {
-					writer.write(unifier);
-				}
+				writer.write(unifier);
 				writer.flush();
 				writer.close();
 			} catch (OWLRendererException e) {
@@ -190,21 +192,22 @@ public class UnifierController implements ActionListener {
 		this.statInfo = info;
 	}
 
-	private String printCurrentUnifier() {
-		if (this.renderer == null) {
-			AtomManager atomManager = getModel().getAtomManager();
-			Set<Integer> userVariables = getModel().getPluginGoal()
-					.getUserVariables();
-			Set<Integer> auxVariables = getModel().getPluginGoal()
-					.getAuxiliaryVariables();
-			Replacer aliasReplacer = new Replacer() {
+	private String printCurrentUnifier(boolean shortForm) {
+		AtomManager atomManager = getModel().getAtomManager();
+		Set<Integer> userVariables = getModel().getPluginGoal()
+				.getUserVariables();
+		Set<Integer> auxVariables = getModel().getPluginGoal()
+				.getAuxiliaryVariables();
+		Replacer aliasReplacer = null;
+		if (shortForm) {
+			aliasReplacer = new Replacer() {
 				public String replace(String input) {
 					return getLabel(input);
 				}
 			};
-			this.renderer = new KRSSRenderer(atomManager, userVariables,
-					auxVariables, aliasReplacer);
 		}
+		KRSSRenderer renderer = new KRSSRenderer(atomManager, userVariables,
+				auxVariables, aliasReplacer);
 		return renderer.printUnifier(getModel().getUnifierList().get(
 				this.unifierIndex));
 	}
@@ -228,7 +231,7 @@ public class UnifierController implements ActionListener {
 
 	private void updateUnifier() {
 		if (getModel().getUnifierList().size() > 0) {
-			getView().getUnifier().setText(printCurrentUnifier());
+			getView().getUnifier().setText(printCurrentUnifier(true));
 		} else {
 			getView().getUnifier().setText("[not unifiable]");
 		}

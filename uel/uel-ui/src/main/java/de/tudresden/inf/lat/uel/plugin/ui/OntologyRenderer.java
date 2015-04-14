@@ -12,6 +12,7 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 
+import uk.ac.manchester.cs.owl.owlapi.mansyntaxrenderer.ManchesterOWLSyntaxRenderer;
 import de.uulm.ecs.ai.owlapi.krssrenderer.KRSS2OWLSyntaxRenderer;
 
 /**
@@ -29,11 +30,12 @@ public class OntologyRenderer {
 	public OntologyRenderer() {
 	}
 
-	public OWLOntology parseKRSS(String krss)
+	public OWLOntology parseOntology(String ontology)
 			throws OWLOntologyCreationException {
 		OWLOntologyManager ontologyManager = OWLManager
 				.createOWLOntologyManager();
-		ByteArrayInputStream input = new ByteArrayInputStream(krss.getBytes());
+		ByteArrayInputStream input = new ByteArrayInputStream(
+				ontology.getBytes());
 		return ontologyManager.loadOntologyFromOntologyDocument(input);
 	}
 
@@ -50,6 +52,7 @@ public class OntologyRenderer {
 			throws OWLRendererException {
 		StringWriter writer = new StringWriter();
 		OWLXMLRenderer renderer = new OWLXMLRenderer();
+		new ManchesterOWLSyntaxRenderer();
 		renderer.render(owlOntology, writer);
 		writer.flush();
 		return writer.toString();

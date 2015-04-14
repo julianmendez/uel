@@ -120,43 +120,8 @@ class StatInfoView extends JDialog {
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 	}
 
-	private String showLabels(String text) {
-		StringBuffer ret = new StringBuffer();
-		try {
-			BufferedReader reader = new BufferedReader(new StringReader(
-					text.replace(KRSSKeyword.close, KRSSKeyword.space
-							+ KRSSKeyword.close)));
-			String line = new String();
-			while (line != null) {
-				line = reader.readLine();
-				if (line != null) {
-					StringTokenizer stok = new StringTokenizer(line);
-					while (stok.hasMoreTokens()) {
-						String token = stok.nextToken();
-						String label = getModel().getLabel(token);
-						if (label.equals(token)) {
-							ret.append(token);
-						} else {
-							ret.append(quotes);
-							ret.append(label);
-							ret.append(quotes);
-						}
-						if (stok.hasMoreTokens()) {
-							ret.append(KRSSKeyword.space);
-						}
-					}
-				}
-				ret.append(KRSSKeyword.newLine);
-			}
-		} catch (IOException e) {
-			throw new IllegalStateException(e);
-		}
-		return ret.toString();
-	}
-
 	public void update() {
-		this.textGoal
-				.setText(showLabels(getModel().getPluginGoal().toString()));
+		this.textGoal.setText(getModel().getPluginGoal().toString());
 		StringBuffer info = new StringBuffer();
 		for (Map.Entry<String, String> pair : getModel().getInfo()) {
 			info.append(pair.getKey());

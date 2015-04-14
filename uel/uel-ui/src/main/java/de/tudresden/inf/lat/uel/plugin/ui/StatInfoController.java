@@ -57,27 +57,10 @@ class StatInfoController implements ActionListener {
 		}
 		if (file != null) {
 			try {
-				String goal = getModel().getPluginGoal().toString();
-				OntologyRenderer renderer = new OntologyRenderer();
-				OWLOntology owlOntology = renderer.parseKRSS(goal);
-				if (file.getName().endsWith(OntologyRenderer.EXTENSION_RDF)) {
-					goal = renderer.renderRDF(owlOntology);
-				} else if (file.getName().endsWith(
-						OntologyRenderer.EXTENSION_OWL)) {
-					goal = renderer.renderOWL(owlOntology);
-				} else if (file.getName().endsWith(
-						OntologyRenderer.EXTENSION_KRSS)) {
-					goal = renderer.renderKRSS(owlOntology);
-				}
-
 				BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-				writer.write(goal);
+				writer.write(getModel().getPluginGoal().toString());
 				writer.flush();
 				writer.close();
-			} catch (OWLRendererException e) {
-				throw new RuntimeException(e);
-			} catch (OWLOntologyCreationException e) {
-				throw new RuntimeException(e);
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
