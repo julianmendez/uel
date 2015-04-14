@@ -2,7 +2,10 @@ package de.tudresden.inf.lat.uel.core.type;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+
+import org.semanticweb.owlapi.model.IRI;
 
 import de.tudresden.inf.lat.uel.type.api.Atom;
 import de.tudresden.inf.lat.uel.type.api.Equation;
@@ -12,17 +15,13 @@ import de.tudresden.inf.lat.uel.type.impl.ExistentialRestriction;
 
 public class KRSSRenderer {
 
-	public interface Replacer {
-		String replace(String input);
-	}
-
-	private final Replacer aliasReplacer;
 	private final AtomManager atomManager;
 	private final Set<Integer> auxiliaryVariables;
+	private final Map<String, String> mapIdLabel;
 	private final Set<Integer> userVariables;
 
 	public KRSSRenderer(AtomManager atomManager, Set<Integer> userVariables,
-			Set<Integer> auxiliaryVariables, Replacer aliasReplacer) {
+			Set<Integer> auxiliaryVariables, Map<String, String> mapIdLabel) {
 		this.atomManager = atomManager;
 		this.userVariables = userVariables;
 		if (auxiliaryVariables == null) {
@@ -30,15 +29,38 @@ public class KRSSRenderer {
 		} else {
 			this.auxiliaryVariables = auxiliaryVariables;
 		}
-		this.aliasReplacer = aliasReplacer;
+		this.mapIdLabel = mapIdLabel;
 	}
 
 	private void appendName(StringBuffer sbuf, ConceptName child) {
 		String childName = atomManager.getConceptName(child.getConceptNameId());
-		if (aliasReplacer != null) {
-			childName = aliasReplacer.replace(childName);
+		if (mapIdLabel != null) {
+			childName = getLabel(childName);
 		}
 		sbuf.append(childName);
+	}
+
+	private String getLabel(String id) {
+		boolean alias = false;
+		String label = id;
+		if (id.endsWith(AtomManager.UNDEF_SUFFIX)) {
+			label = id.substring(0,
+					id.length() - AtomManager.UNDEF_SUFFIX.length());
+		}
+
+		String str = this.mapIdLabel.get(label);
+		if (str != null) {
+			alias = true;
+			label = str;
+		}
+		if (id.endsWith(AtomManager.UNDEF_SUFFIX)) {
+			label += AtomManager.UNDEF_SUFFIX;
+		}
+		if (alias) {
+			return "\"" + label + "\"";
+		} else {
+			return IRI.create(label).getFragment();
+		}
 	}
 
 	private Collection<Atom> getSetOfSubsumers(Atom atom,
@@ -119,8 +141,8 @@ public class KRSSRenderer {
 			sbuf.append(KRSSKeyword.space);
 			String roleName = atomManager
 					.getRoleName(((ExistentialRestriction) atom).getRoleId());
-			if (aliasReplacer != null) {
-				roleName = aliasReplacer.replace(roleName);
+			if (mapIdLabel != null) {
+				roleName = getLabel(roleName);
 			}
 			sbuf.append(roleName);
 			sbuf.append(KRSSKeyword.space);

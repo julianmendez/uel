@@ -2,13 +2,11 @@ package de.tudresden.inf.lat.uel.core.processor;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
-
-import org.semanticweb.owlapi.model.IRI;
 
 import de.tudresden.inf.lat.uel.core.type.AtomManager;
 import de.tudresden.inf.lat.uel.core.type.KRSSRenderer;
-import de.tudresden.inf.lat.uel.core.type.KRSSRenderer.Replacer;
 import de.tudresden.inf.lat.uel.type.api.Atom;
 import de.tudresden.inf.lat.uel.type.api.Equation;
 import de.tudresden.inf.lat.uel.type.api.SmallEquation;
@@ -275,13 +273,12 @@ public class PluginGoal {
 
 	@Override
 	public String toString() {
-		Replacer aliasReplacer = new Replacer() {
-			public String replace(String input) {
-				return IRI.create(input).getFragment();
-			}
-		};
+		return toString(null);
+	}
+
+	public String toString(Map<String, String> mapIdLabel) {
 		KRSSRenderer renderer = new KRSSRenderer(atomManager, userVariables,
-				auxiliaryVariables, aliasReplacer);
+				auxiliaryVariables, mapIdLabel);
 		StringBuffer buf = new StringBuffer();
 		appendEquations(buf, renderer, definitions);
 		appendEquations(buf, renderer, goalEquations);

@@ -18,7 +18,6 @@ import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import de.tudresden.inf.lat.uel.core.processor.UelModel;
 import de.tudresden.inf.lat.uel.core.type.AtomManager;
 import de.tudresden.inf.lat.uel.core.type.KRSSRenderer;
-import de.tudresden.inf.lat.uel.core.type.KRSSRenderer.Replacer;
 
 /**
  * This is the controller for the panel that shows the unifiers.
@@ -198,35 +197,10 @@ public class UnifierController implements ActionListener {
 				.getUserVariables();
 		Set<Integer> auxVariables = getModel().getPluginGoal()
 				.getAuxiliaryVariables();
-		Replacer aliasReplacer = null;
-		if (shortForm) {
-			aliasReplacer = new Replacer() {
-				public String replace(String input) {
-					return getLabel(input);
-				}
-			};
-		}
 		KRSSRenderer renderer = new KRSSRenderer(atomManager, userVariables,
-				auxVariables, aliasReplacer);
+				auxVariables, mapIdLabel);
 		return renderer.printUnifier(getModel().getUnifierList().get(
 				this.unifierIndex));
-	}
-
-	private String getLabel(String candidateId) {
-		String ret = candidateId;
-		if (candidateId.endsWith(AtomManager.UNDEF_SUFFIX)) {
-			ret = candidateId.substring(0, candidateId.length()
-					- AtomManager.UNDEF_SUFFIX.length());
-		}
-
-		String str = this.mapIdLabel.get(ret);
-		if (str != null) {
-			ret = str;
-		}
-		if (candidateId.endsWith(AtomManager.UNDEF_SUFFIX)) {
-			ret += AtomManager.UNDEF_SUFFIX;
-		}
-		return ret;
 	}
 
 	private void updateUnifier() {

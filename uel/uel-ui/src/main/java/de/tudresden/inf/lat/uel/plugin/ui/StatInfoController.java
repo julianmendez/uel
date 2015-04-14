@@ -9,10 +9,6 @@ import java.io.IOException;
 
 import javax.swing.JFileChooser;
 
-import org.semanticweb.owlapi.io.OWLRendererException;
-import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLOntologyCreationException;
-
 /**
  * This is the controller of the panel that shows statistical information.
  * 
@@ -58,7 +54,7 @@ class StatInfoController implements ActionListener {
 		if (file != null) {
 			try {
 				BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-				writer.write(getModel().getPluginGoal().toString());
+				writer.write(getModel().printPluginGoal());
 				writer.flush();
 				writer.close();
 			} catch (IOException e) {

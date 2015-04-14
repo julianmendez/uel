@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Map;
 
 import de.tudresden.inf.lat.uel.core.processor.PluginGoal;
-import de.tudresden.inf.lat.uel.core.type.AtomManager;
 
 /**
  * An object of this class contains statistical information about a processor
@@ -51,32 +50,8 @@ public class StatInfo {
 		return this.info;
 	}
 
-	public String getLabel(String id) {
-		if (id == null) {
-			throw new IllegalArgumentException("Null argument.");
-		}
-
-		String ret = this.mapIdLabel.get(id);
-
-		if (ret == null) {
-			if (id.endsWith(AtomManager.UNDEF_SUFFIX)) {
-				String origId = id.substring(0, id.length()
-						- AtomManager.UNDEF_SUFFIX.length());
-				ret = this.mapIdLabel.get(origId);
-				if (ret != null) {
-					ret += AtomManager.UNDEF_SUFFIX;
-				}
-			}
-		}
-
-		if (ret == null) {
-			ret = id;
-		}
-		return ret;
-	}
-
-	public PluginGoal getPluginGoal() {
-		return this.pluginGoal;
+	public String printPluginGoal() {
+		return this.pluginGoal.toString(this.mapIdLabel);
 	}
 
 	@Override
@@ -91,7 +66,7 @@ public class StatInfo {
 	@Override
 	public String toString() {
 		StringBuffer sbuf = new StringBuffer();
-		sbuf.append(getPluginGoal());
+		sbuf.append(printPluginGoal());
 		sbuf.append("\n");
 		sbuf.append(getInfo());
 		sbuf.append("\n");

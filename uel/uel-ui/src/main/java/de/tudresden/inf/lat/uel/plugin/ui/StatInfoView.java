@@ -121,7 +121,7 @@ class StatInfoView extends JDialog {
 	}
 
 	public void update() {
-		this.textGoal.setText(getModel().getPluginGoal().toString());
+		this.textGoal.setText(getModel().printPluginGoal());
 		StringBuffer info = new StringBuffer();
 		for (Map.Entry<String, String> pair : getModel().getInfo()) {
 			info.append(pair.getKey());
