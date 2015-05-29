@@ -1,7 +1,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-
 	<!--
  *
  * @author Julian Mendez
@@ -33,7 +32,10 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-		<mainClass>${project.groupId}.plugin.main.UelStandalone</mainClass>
+		<mainClass>de.tudresden.inf.lat.uel.plugin.main.UelStandalone</mainClass>
+		
+		<bundle.jars>lib/org/ow2/sat4j/org.ow2.sat4j.core/2.3.5/org.ow2.sat4j.core-2.3.5.jar,lib/org/ow2/sat4j/org.ow2.sat4j.pb/2.3.5/org.ow2.sat4j.pb-2.3.5.jar,lib/org/ow2/sat4j/org.ow2.sat4j.maxsat/2.3.5/org.ow2.sat4j.maxsat-2.3.5.jar,lib/commons-cli/commons-cli/1.1/commons-cli-1.1.jar,lib/com/sun/java/jlfgr/1.0/jlfgr-1.0.jar,lib/net/sourceforge/owlapi/owlapi-distribution/3.5.0/owlapi-distribution-3.5.0.jar,lib/org/codehaus/jackson/jackson-core-asl/1.9.13/jackson-core-asl-1.9.13.jar,lib/org/codehaus/jackson/jackson-mapper-asl/1.9.13/jackson-mapper-asl-1.9.13.jar</bundle.jars>
+		<bundle.licenses>lib/com/sun/java/jlfgr/1.0/*.txt</bundle.licenses>
 	</properties>
 
 	<build>
@@ -43,32 +45,13 @@
 		<plugins>
 
 			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>properties-maven-plugin</artifactId>
-				<version>1.0-alpha-2</version>
-				<executions>
-					<execution>
-						<phase>initialize</phase>
-						<goals>
-							<goal>read-project-properties</goal>
-						</goals>
-						<configuration>
-							<files>
-								<file>build.properties</file>
-							</files>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-
-			<plugin>
 				<groupId>org.apache.felix</groupId>
 				<artifactId>maven-bundle-plugin</artifactId>
 				<version>2.3.4</version>
 				<extensions>true</extensions>
 				<configuration>
 					<instructions>
-						<Bundle-SymbolicName>de.tudresden.inf.lat.uel;singleton:=true</Bundle-SymbolicName>
+						<Bundle-SymbolicName>${project.groupId};singleton:=true</Bundle-SymbolicName>
 						<Bundle-Name>UEL</Bundle-Name>
 						<Bundle-Version>${project.version}</Bundle-Version>
 						<Bundle-Activator>org.protege.editor.core.plugin.DefaultPluginActivator</Bundle-Activator>
@@ -77,8 +60,10 @@
 						<Bundle-Vendor>Chair of Automata Theory - TU Dresden</Bundle-Vendor>
 						<Bundle-DocURL>http://lat.inf.tu-dresden.de</Bundle-DocURL>
 						<Bundle-ClassPath>${bundle.classpath}</Bundle-ClassPath>
-						<Import-Package>javax.accessibility, javax.swing, javax.swing.border, org.osgi.framework, org.protege.editor.core.ui.workspace, *</Import-Package>
-						<Main-Class>${mainclass}</Main-Class>
+						<Import-Package>javax.accessibility, javax.swing,
+							javax.swing.border, org.osgi.framework,
+							org.protege.editor.core.ui.workspace, *</Import-Package>
+						<Main-Class>${mainClass}</Main-Class>
 						<Include-Resource>
 							{maven-resources}, {maven-dependencies},
 							@uel-type-${project.version}.jar,
