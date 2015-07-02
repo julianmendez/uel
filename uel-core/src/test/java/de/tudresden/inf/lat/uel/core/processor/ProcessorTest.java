@@ -148,7 +148,7 @@ public class ProcessorTest {
 		owlOntologies.add(owlOntology);
 		Set<OWLClass> clsSet = owlOntology.getClassesInSignature();
 		for (OWLClass cls : clsSet) {
-			idClassMap.put(cls.getIRI().getFragment(), cls);
+			idClassMap.put(cls.getIRI().getShortForm(), cls);
 		}
 
 		OWLOntology positiveProblem = ontologyManager.createOntology();
@@ -183,9 +183,8 @@ public class ProcessorTest {
 		}
 
 		List<Set<Equation>> unifiers = uelModel.getUnifierList();
-		KRSSRenderer renderer = new KRSSRenderer(
-				goal.getAtomManager(), goal.getUserVariables(),
-				goal.getAuxiliaryVariables(), null);
+		KRSSRenderer renderer = new KRSSRenderer(goal.getAtomManager(),
+				goal.getUserVariables(), goal.getAuxiliaryVariables(), null);
 		String goalStr = renderer.printDefinitions(goal.getUelInput()
 				.getDefinitions());
 

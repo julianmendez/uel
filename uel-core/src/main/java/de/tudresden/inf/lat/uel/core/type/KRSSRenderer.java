@@ -59,7 +59,7 @@ public class KRSSRenderer {
 		if (alias) {
 			return "\"" + label + "\"";
 		} else {
-			return IRI.create(label).getFragment();
+			return IRI.create(label).getShortForm();
 		}
 	}
 
