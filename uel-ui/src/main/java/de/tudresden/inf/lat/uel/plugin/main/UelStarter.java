@@ -6,11 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.protege.editor.owl.model.OWLModelManager;
-import org.protege.editor.owl.model.event.EventType;
-import org.protege.editor.owl.model.event.OWLModelManagerChangeEvent;
-import org.protege.editor.owl.model.event.OWLModelManagerListener;
-import org.protege.editor.owl.ui.renderer.OWLModelManagerEntityRenderer;
 import org.semanticweb.owlapi.model.OWLAnnotation;
 import org.semanticweb.owlapi.model.OWLAnnotationProperty;
 import org.semanticweb.owlapi.model.OWLEntity;
@@ -30,36 +25,12 @@ import de.tudresden.inf.lat.uel.plugin.ui.UelView;
  * @author Julian Mendez
  */
 public class UelStarter implements OWLOntologyChangeListener,
-		OWLOntologyLoaderListener, OWLModelManagerListener {
+		OWLOntologyLoaderListener {
 
-	private static final long serialVersionUID = 6179913079038852014L;
+	private static final long serialVersionUID = 923181447002031980L;
 
-	private final OWLModelManager modelManager;
 	private final OWLOntologyManager ontologyManager;
 	private final UelController panel;
-	private OWLModelManagerEntityRenderer renderer = null;
-
-	/**
-	 * Constructs a new UEL starter.
-	 * 
-	 * @param modelManager
-	 *            OWL model manager
-	 */
-	public UelStarter(OWLModelManager modelManager) {
-		if (modelManager == null) {
-			throw new IllegalArgumentException("Null argument.");
-		}
-
-		this.modelManager = modelManager;
-		this.ontologyManager = modelManager.getOWLOntologyManager();
-		this.panel = new UelController(new UelView(new UelModel()),
-				this.ontologyManager);
-		this.renderer = modelManager.getOWLEntityRenderer();
-		modelManager.addListener(this);
-		getOWLOntologyManager().addOntologyLoaderListener(this);
-		getOWLOntologyManager().addOntologyChangeListener(this);
-		reset();
-	}
 
 	/**
 	 * Constructs a new UEL starter.
@@ -72,7 +43,6 @@ public class UelStarter implements OWLOntologyChangeListener,
 			throw new IllegalArgumentException("Null argument.");
 		}
 
-		this.modelManager = null;
 		this.ontologyManager = manager;
 		this.panel = new UelController(new UelView(new UelModel()),
 				this.ontologyManager);
@@ -89,8 +59,7 @@ public class UelStarter implements OWLOntologyChangeListener,
 			entities.addAll(ontology.getObjectPropertiesInSignature());
 
 			for (OWLEntity entity : entities) {
-				String shortForm = this.renderer != null ? this.renderer
-						.getShortForm(entity) : getShortForm(entity, ontology);
+				String shortForm = getShortForm(entity, ontology);
 				shortFormMap.put(entity, removeQuotes(shortForm));
 			}
 		}
@@ -136,14 +105,6 @@ public class UelStarter implements OWLOntologyChangeListener,
 		reset();
 	}
 
-	public void removeListeners() {
-		if (modelManager != null) {
-			this.modelManager.removeListener(this);
-		}
-		getOWLOntologyManager().removeOntologyLoaderListener(this);
-		getOWLOntologyManager().removeOntologyChangeListener(this);
-	}
-
 	private String removeQuotes(String str) {
 		String ret = str;
 		if ((str.startsWith("\"") && str.endsWith("\""))
@@ -162,20 +123,6 @@ public class UelStarter implements OWLOntologyChangeListener,
 	public void startedLoadingOntology(LoadingStartedEvent event) {
 		if (event == null) {
 			throw new IllegalArgumentException("Null argument.");
-		}
-	}
-
-	@Override
-	public void handleChange(OWLModelManagerChangeEvent event) {
-		if (event == null) {
-			throw new IllegalArgumentException("Null argument");
-		}
-
-		EventType type = event.getType();
-		if ((type == EventType.ONTOLOGY_CREATED)
-				|| (type == EventType.ONTOLOGY_LOADED)
-				|| (type == EventType.ONTOLOGY_RELOADED)) {
-			reset();
 		}
 	}
 
