@@ -67,6 +67,9 @@ public class UelModel {
 	 * already computed.
 	 * 
 	 * @return <code>true</code> if and only if more unifiers can be computed
+	 * 
+	 * @throws InterruptedException
+	 *             if the process is interrupted
 	 */
 	public boolean computeNextUnifier() throws InterruptedException {
 		while (this.uelProcessor.computeNextUnifier()) {

@@ -308,6 +308,9 @@ public class SatProcessor implements UelProcessor {
 	 *
 	 * @return an object representing the DIMACS CNF encoding of the input
 	 *         subsumptions
+	 * 
+	 * @throws InterruptedException
+	 *             if the process is interrupted
 	 */
 	public SatInput computeSatInput() throws InterruptedException {
 		SatInput ret = new SatInput();

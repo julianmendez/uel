@@ -15,13 +15,16 @@ public interface UelProcessor {
 	 * Clean up used resources.
 	 */
 	void cleanup();
-	
+
 	/**
 	 * Computes the next unifier. Returns <code>true</code> if and only if the
 	 * unifier has been successfully computed.
 	 * 
 	 * @return <code>true</code> if and only if the unifier has been
 	 *         successfully computed
+	 * 
+	 * @throws InterruptedException
+	 *             if the process is interrupted
 	 */
 	boolean computeNextUnifier() throws InterruptedException;
 
@@ -44,9 +47,10 @@ public interface UelProcessor {
 	/**
 	 * Returns the result of the last computation.
 	 * 
+	 * @return the result of the last computation
+	 * 
 	 * @throws IllegalStateException
 	 *             if invoked before the first computation
-	 * @return the result of the last computation
 	 */
 	UelOutput getUnifier();
 

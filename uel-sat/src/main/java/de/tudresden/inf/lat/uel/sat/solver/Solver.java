@@ -59,6 +59,8 @@ public interface Solver {
 	 * @return the output of the SAT solver
 	 * @throws IOException
 	 *             if an I/O error occurs
+	 * @throws InterruptedException
+	 *             if the process is interrupted
 	 */
 	SatOutput solve(SatInput input) throws IOException, InterruptedException;
 
@@ -71,6 +73,8 @@ public interface Solver {
 	 * @return the output of the SAT solver
 	 * @throws IOException
 	 *             if an I/O error occurs
+	 * @throws InterruptedException
+	 *             if the process is interrupted
 	 */
 	SatOutput update(Set<Integer> clause) throws IOException,
 			InterruptedException;

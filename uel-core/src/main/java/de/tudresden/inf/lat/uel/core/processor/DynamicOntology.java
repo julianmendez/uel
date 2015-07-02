@@ -144,6 +144,11 @@ public class DynamicOntology implements Ontology {
 		return ret;
 	}
 
+	/**
+	 * Returns the ontology builder.
+	 * 
+	 * @return the ontology builder
+	 */
 	public OntologyBuilder getOntologyBuilder() {
 		return this.ontologyBuilder;
 	}
@@ -172,6 +177,9 @@ public class DynamicOntology implements Ontology {
 
 	/**
 	 * Loads an OWL ontology.
+	 * 
+	 * @param ontologies
+	 *            set of ontologies
 	 */
 	public void load(Set<OWLOntology> ontologies) {
 		load(ontologies, null);
