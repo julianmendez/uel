@@ -22,6 +22,7 @@
 		<module>uel-asp</module>
 		<module>uel-core</module>
 		<module>uel-ui</module>
+		<module>uel-protege</module>
 		<module>uel-build/uel-library</module>
 		<module>uel-build/uel-plugin</module>
 		<module>uel-build/uel-standalone</module>

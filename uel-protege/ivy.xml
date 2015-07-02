@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ivy-module version="2.0">
+
+	<info organisation="de.tudresden.inf.lat.uel" module="uel-protege" />
+
+	<configurations defaultconfmapping="compile->default">
+		<conf name="compile" />
+		<conf name="runtime" extends="compile" />
+		<conf name="test" extends="runtime" />
+		<conf name="sources" />
+		<conf name="javadoc" />
+	</configurations>
+
+	<dependencies>
+		<dependency name="uel-type" rev="latest.integration" />
+		<dependency name="uel-core" rev="latest.integration" />
+		<dependency org="edu.stanford.protege" name="org.protege.editor.owl" rev="4.3.0"
+			conf="javadoc->javadoc;sources->sources;compile->default" />
+		<dependency org="edu.stanford.protege" name="org.protege.editor.core.application" rev="4.3.0"
+			conf="javadoc->javadoc;sources->sources;compile->default" />
+	</dependencies>
+
+</ivy-module>
+
