@@ -4,16 +4,15 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.StringWriter;
 
-import org.coode.owlapi.owlxml.renderer.OWLXMLRenderer;
-import org.coode.owlapi.rdf.rdfxml.RDFXMLRenderer;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.io.OWLRendererException;
+import org.semanticweb.owlapi.krss2.renderer.KRSS2OWLSyntaxRenderer;
+import org.semanticweb.owlapi.manchestersyntax.renderer.ManchesterOWLSyntaxRenderer;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
-
-import uk.ac.manchester.cs.owl.owlapi.mansyntaxrenderer.ManchesterOWLSyntaxRenderer;
-import de.uulm.ecs.ai.owlapi.krssrenderer.KRSS2OWLSyntaxRenderer;
+import org.semanticweb.owlapi.owlxml.renderer.OWLXMLRenderer;
+import org.semanticweb.owlapi.rdf.rdfxml.renderer.RDFXMLRenderer;
 
 /**
  * An object of this class can read OWL ontologies from strings and also write

@@ -34,7 +34,7 @@
 
 		<mainClass>de.tudresden.inf.lat.uel.plugin.main.UelStandalone</mainClass>
 		
-		<bundle.jars>lib/org/ow2/sat4j/org.ow2.sat4j.core/2.3.5/org.ow2.sat4j.core-2.3.5.jar,lib/org/ow2/sat4j/org.ow2.sat4j.pb/2.3.5/org.ow2.sat4j.pb-2.3.5.jar,lib/org/ow2/sat4j/org.ow2.sat4j.maxsat/2.3.5/org.ow2.sat4j.maxsat-2.3.5.jar,lib/commons-cli/commons-cli/1.1/commons-cli-1.1.jar,lib/com/sun/java/jlfgr/1.0/jlfgr-1.0.jar,lib/net/sourceforge/owlapi/owlapi-distribution/3.5.0/owlapi-distribution-3.5.0.jar,lib/org/codehaus/jackson/jackson-core-asl/1.9.13/jackson-core-asl-1.9.13.jar,lib/org/codehaus/jackson/jackson-mapper-asl/1.9.13/jackson-mapper-asl-1.9.13.jar</bundle.jars>
+		<bundle.jars>lib/org/ow2/sat4j/org.ow2.sat4j.core/2.3.5/org.ow2.sat4j.core-2.3.5.jar,lib/org/ow2/sat4j/org.ow2.sat4j.pb/2.3.5/org.ow2.sat4j.pb-2.3.5.jar,lib/org/ow2/sat4j/org.ow2.sat4j.maxsat/2.3.5/org.ow2.sat4j.maxsat-2.3.5.jar,lib/commons-cli/commons-cli/1.1/commons-cli-1.1.jar,lib/com/sun/java/jlfgr/1.0/jlfgr-1.0.jar,lib/net/sourceforge/owlapi/owlapi-distribution/4.0.2/owlapi-distribution-4.0.2.jar,lib/org/codehaus/jackson/jackson-core-asl/1.9.13/jackson-core-asl-1.9.13.jar,lib/org/codehaus/jackson/jackson-mapper-asl/1.9.13/jackson-mapper-asl-1.9.13.jar</bundle.jars>
 		<bundle.licenses>lib/com/sun/java/jlfgr/1.0/*.txt</bundle.licenses>
 	</properties>
 
@@ -77,7 +77,7 @@
 							@org.ow2.sat4j.maxsat-2.3.5.jar,
 							@commons-cli-1.1.jar,
 							@jlfgr-1.0.jar,
-							@owlapi-distribution-3.5.0.jar,
+							@owlapi-distribution-4.0.2.jar,
 							@jackson-core-asl-1.9.13.jar,
 							@jackson-mapper-asl-1.9.13.jar
 						</Include-Resource>

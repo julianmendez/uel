@@ -12,6 +12,7 @@ import org.protege.editor.owl.model.event.OWLModelManagerChangeEvent;
 import org.protege.editor.owl.model.event.OWLModelManagerListener;
 import org.protege.editor.owl.ui.renderer.OWLModelManagerEntityRenderer;
 import org.semanticweb.owlapi.model.OWLAnnotation;
+import org.semanticweb.owlapi.model.OWLAnnotationProperty;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyChange;
@@ -30,6 +31,8 @@ import de.tudresden.inf.lat.uel.plugin.ui.UelView;
  */
 public class UelStarter implements OWLOntologyChangeListener,
 		OWLOntologyLoaderListener, OWLModelManagerListener {
+
+	private static final long serialVersionUID = 6179913079038852014L;
 
 	private final OWLModelManager modelManager;
 	private final OWLOntologyManager ontologyManager;
@@ -112,9 +115,13 @@ public class UelStarter implements OWLOntologyChangeListener,
 	}
 
 	private String getShortForm(OWLEntity entity, OWLOntology ontology) {
-		String ret = entity.getIRI().getFragment();
-		for (OWLAnnotation annotation : entity.getAnnotations(ontology)) {
-			if (annotation.getProperty().isLabel()) {
+		String ret = entity.getIRI().getShortForm();
+		Set<OWLAnnotation> annotations = ontology.getAnnotations();
+		for (OWLAnnotation annotation : annotations) {
+			OWLAnnotationProperty annotationProperty = annotation.getProperty();
+			if (annotationProperty.isLabel()
+					&& entity.getAnnotationPropertiesInSignature().contains(
+							annotationProperty)) {
 				ret = annotation.getValue().toString();
 			}
 		}
