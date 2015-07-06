@@ -23,6 +23,7 @@
 	<property name="module.3.name" value="uel-asp" />
 	<property name="module.4.name" value="uel-core" />
 	<property name="module.5.name" value="uel-ui" />
+	<property name="module.6.name" value="uel-protege" />
 	<property name="build.0.name" value="uel-library" />
 	<property name="build.1.name" value="uel-plugin" />
 	<property name="build.2.name" value="uel-standalone" />
@@ -41,6 +42,7 @@
 		<subant antfile="${_root.directory}/${module.3.name}/build.xml" buildpath="." target="${target}" />
 		<subant antfile="${_root.directory}/${module.4.name}/build.xml" buildpath="." target="${target}" />
 		<subant antfile="${_root.directory}/${module.5.name}/build.xml" buildpath="." target="${target}" />
+		<subant antfile="${_root.directory}/${module.6.name}/build.xml" buildpath="." target="${target}" />
 	</target>
 
 	<!-- Calls other build files. -->

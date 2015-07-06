@@ -14,6 +14,7 @@
 	<dependencies>
 		<dependency name="uel-type" rev="latest.integration" />
 		<dependency name="uel-core" rev="latest.integration" />
+		<dependency name="uel-ui" rev="latest.integration" />
 
 		<dependency org="net.sourceforge.owlapi" name="owlapi-distribution"
 			rev="4.0.2" conf="javadoc->javadoc;sources->sources;compile->default" />
