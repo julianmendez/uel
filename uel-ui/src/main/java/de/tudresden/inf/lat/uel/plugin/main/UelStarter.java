@@ -88,11 +88,25 @@ public class UelStarter implements OWLOntologyChangeListener,
 		Set<OWLAnnotation> annotations = ontology.getAnnotations();
 		for (OWLAnnotation annotation : annotations) {
 			OWLAnnotationProperty annotationProperty = annotation.getProperty();
+
+			
+			// for OWL API 3.5.1
+
 			if (annotationProperty.isLabel()
-					&& entity.getAnnotationPropertiesInSignature().contains(
+					&& entity.getAnnotations(ontology).contains(
 							annotationProperty)) {
 				ret = annotation.getValue().toString();
 			}
+
+			
+			// for OWL API 4.0.2
+
+			// if (annotationProperty.isLabel()
+			// && entity.getAnnotationPropertiesInSignature().contains(
+			// annotationProperty)) {
+			// ret = annotation.getValue().toString();
+			// }
+
 		}
 		return ret;
 	}

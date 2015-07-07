@@ -15,7 +15,7 @@
 		<dependency name="uel-type" rev="latest.integration" />
 		<dependency name="uel-core" rev="latest.integration" />
 		<dependency org="org.ow2.sat4j" name="org.ow2.sat4j.maxsat" rev="2.3.5" />
-		<dependency org="net.sourceforge.owlapi" name="owlapi-distribution" rev="4.0.2"
+		<dependency org="net.sourceforge.owlapi" name="owlapi-distribution" rev="3.5.1"
 			conf="javadoc->javadoc;sources->sources;compile->default" />
 		<dependency org="com.sun.java" name="jlfgr" rev="1.0" />
 		<dependency org="junit" name="junit" rev="4.11"

@@ -32,7 +32,7 @@ import de.tudresden.inf.lat.uel.plugin.ui.UelView;
 public class UelProtegeStarter implements OWLOntologyChangeListener,
 		OWLOntologyLoaderListener, OWLModelManagerListener {
 
-	private static final long serialVersionUID = -8760277761148468455L;
+	static final long serialVersionUID = -8760277761148468455L;
 
 	private final OWLModelManager modelManager;
 	private final OWLOntologyManager ontologyManager;
@@ -99,11 +99,25 @@ public class UelProtegeStarter implements OWLOntologyChangeListener,
 		Set<OWLAnnotation> annotations = ontology.getAnnotations();
 		for (OWLAnnotation annotation : annotations) {
 			OWLAnnotationProperty annotationProperty = annotation.getProperty();
+
+			
+			// for OWL API 3.5.1
+
 			if (annotationProperty.isLabel()
-					&& entity.getAnnotationPropertiesInSignature().contains(
+					&& entity.getAnnotations(ontology).contains(
 							annotationProperty)) {
 				ret = annotation.getValue().toString();
 			}
+
+			
+			// for OWL API 4.0.2
+
+			// if (annotationProperty.isLabel()
+			// && entity.getAnnotationPropertiesInSignature().contains(
+			// annotationProperty)) {
+			// ret = annotation.getValue().toString();
+			// }
+
 		}
 		return ret;
 	}
