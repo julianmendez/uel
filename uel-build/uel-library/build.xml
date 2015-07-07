@@ -44,7 +44,9 @@
 	<property name="module.2.name" value="uel-sat" />
 	<property name="module.3.name" value="uel-asp" />
 	<property name="module.4.name" value="uel-core" />
-	<property name="lastmodule.name" value="${module.4.name}" />
+	<property name="module.5.name" value="uel-ui" />
+	<property name="module.6.name" value="uel-protege" />
+	<property name="lastmodule.name" value="${module.6.name}" />
 
 	<!-- Cleans everything. -->
 	<target name="clean">
@@ -84,6 +86,12 @@
 		</antcall>
 		<antcall target="getjar">
 			<param name="module.name" value="${module.4.name}" />
+		</antcall>
+		<antcall target="getjar">
+			<param name="module.name" value="${module.5.name}" />
+		</antcall>
+		<antcall target="getjar">
+			<param name="module.name" value="${module.6.name}" />
 		</antcall>
 	</target>
 
