@@ -28,7 +28,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-		<bundle.version>1.4.0-SNAPSHOT</bundle.version>
+		<bundle.version>1.4.0.SNAPSHOT</bundle.version>
 		<bundle.activator>org.protege.editor.core.plugin.DefaultPluginActivator</bundle.activator>
 		<bundle.jars>lib/uel/uel-type/1.4.0-SNAPSHOT/uel-type-1.4.0-SNAPSHOT.jar,lib/uel/uel-rule/1.4.0-SNAPSHOT/uel-rule-1.4.0-SNAPSHOT.jar,lib/uel/uel-sat/1.4.0-SNAPSHOT/uel-sat-1.4.0-SNAPSHOT.jar,lib/uel/uel-asp/1.4.0-SNAPSHOT/uel-asp-1.4.0-SNAPSHOT.jar,lib/uel/uel-core/1.4.0-SNAPSHOT/uel-core-1.4.0-SNAPSHOT.jar,lib/uel/uel-ui/1.4.0-SNAPSHOT/uel-ui-1.4.0-SNAPSHOT.jar,lib/org/ow2/sat4j/org.ow2.sat4j.core/2.3.5/org.ow2.sat4j.core-2.3.5.jar,lib/org/ow2/sat4j/org.ow2.sat4j.pb/2.3.5/org.ow2.sat4j.pb-2.3.5.jar,lib/org/ow2/sat4j/org.ow2.sat4j.maxsat/2.3.5/org.ow2.sat4j.maxsat-2.3.5.jar,lib/commons-cli/commons-cli/1.1/commons-cli-1.1.jar,lib/org/codehaus/jackson/jackson-core-asl/1.9.13/jackson-core-asl-1.9.13.jar,lib/org/codehaus/jackson/jackson-mapper-asl/1.9.13/jackson-mapper-asl-1.9.13.jar,lib/com/sun/java/jlfgr/1.0/jlfgr-1.0.jar</bundle.jars>
 		<bundle.licenses>lib/com/sun/java/jlfgr/1.0/*.txt</bundle.licenses>
