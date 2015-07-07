@@ -123,8 +123,8 @@
 				<attribute name="Bundle-Vendor" value="Chair of Automata Theory - TU Dresden" />
 				<attribute name="Bundle-DocURL" value="http://lat.inf.tu-dresden.de" />
 				<attribute name="Bundle-ClassPath" value="${project.properties.bundle.classpath}" />
-				<attribute name="Import-Package" value="${import.package}" />
-				<attribute name="Require-Bundle" value="${require.bundle}" />
+				<attribute name="Import-Package" value="${project.properties.import.package}" />
+				<attribute name="Require-Bundle" value="${project.properties.require.bundle}" />
 			</manifest>
 		</jar>
 	</target>
