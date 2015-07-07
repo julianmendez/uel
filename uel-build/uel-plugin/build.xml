@@ -24,6 +24,8 @@
 	<fail unless="project.properties.bundle.jars">Error: 'project.properties.bundle.jars' is undefined.</fail>
 	<fail unless="project.properties.bundle.licenses">Error: 'project.properties.bundle.licenses' is undefined.</fail>
 	<fail unless="project.properties.bundle.classpath">Error: 'project.properties.bundle.classpath' is undefined.</fail>
+	<fail unless="project.properties.import.package">Error: 'project.properties.import.package' is undefined.</fail>
+	<fail unless="project.properties.require.bundle">Error: 'project.properties.require.bundle' is undefined.</fail>
 
 	<property name="src.directory" value="src" />
 
@@ -35,8 +37,8 @@
 	<property name="localrepository.directory" value="../lib" />
 	<property name="project.build.outputDirectory" value="${project.build.directory}/classes" />
 	<property name="_bundle.directory" value="${project.build.directory}" />
-	<property name="_bundlejars.directory" value="${project.build.directory}" />
-	<property name="_bundleresources.directory" value="${basedir}/src/main/resources" />
+	<property name="_bundle.jars.directory" value="${project.build.directory}" />
+	<property name="_bundle.resources.directory" value="${basedir}/src/main/resources" />
 	<property name="_bundle.name" value="${project.groupId}" />
 
 	<property name="module.0.name" value="uel-type" />
@@ -47,7 +49,7 @@
 	<property name="module.5.name" value="uel-ui" />
 	<property name="module.6.name" value="uel-protege" />
 	<property name="lastmodule.name" value="${module.6.name}" />
-	<property name="_bundleclasses.directory" value="${_root.directory}/${lastmodule.name}/target/classes" />
+	<property name="_bundle.classes.directory" value="${_root.directory}/${lastmodule.name}/target/classes" />
 
 	<!-- Cleans everything. -->
 	<target name="clean">
@@ -108,10 +110,10 @@
 	<target name="bundle">
 		<mkdir dir="${_bundle.directory}" />
 		<jar destfile="${_bundle.directory}/${_bundle.name}.jar">
-			<fileset dir="${_bundleresources.directory}" />
-			<fileset dir="${_bundleclasses.directory}" />
-			<fileset dir="${_bundlejars.directory}" includes="${project.properties.bundle.jars}" />
-			<fileset dir="${_bundlejars.directory}" includes="${project.properties.bundle.licenses}" />
+			<fileset dir="${_bundle.resources.directory}" />
+			<fileset dir="${_bundle.classes.directory}" />
+			<fileset dir="${_bundle.jars.directory}" includes="${project.properties.bundle.jars}" />
+			<fileset dir="${_bundle.jars.directory}" includes="${project.properties.bundle.licenses}" />
 			<manifest>
 				<attribute name="Bundle-ManifestVersion" value="2" />
 				<attribute name="Bundle-SymbolicName" value="${project.groupId};singleton:=true" />
