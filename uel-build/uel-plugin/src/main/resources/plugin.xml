@@ -2,7 +2,7 @@
 <plugin>
 	<extension id="UelMain" point="org.protege.editor.core.application.ViewComponent">
 		<label value="UEL"/>
-		<class value="de.tudresden.inf.lat.uel.plugin.main.Main"/>
+		<class value="de.tudresden.inf.lat.uel.plugin.protege.Main"/>
 		<headerColor value="@org.protege.classcolor"/>
 		<category value="@org.protege.classcategory"/>
 	</extension>
