@@ -21,18 +21,18 @@
 	<parent>
 		<groupId>de.tudresden.inf.lat.uel</groupId>
 		<artifactId>uel-parent</artifactId>
-		<version>1.3.0</version>
+		<version>1.4.0-SNAPSHOT</version>
 		<relativePath>../..</relativePath>
 	</parent>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-		<bundle.version>1.3.0</bundle.version>
+		<bundle.version>1.4.0-SNAPSHOT</bundle.version>
 		<bundle.activator>org.protege.editor.core.plugin.DefaultPluginActivator</bundle.activator>
-		<bundle.jars>lib/uel/uel-type/1.3.0/uel-type-1.3.0.jar,lib/uel/uel-rule/1.3.0/uel-rule-1.3.0.jar,lib/uel/uel-sat/1.3.0/uel-sat-1.3.0.jar,lib/uel/uel-asp/1.3.0/uel-asp-1.3.0.jar,lib/uel/uel-core/1.3.0/uel-core-1.3.0.jar,lib/uel/uel-ui/1.3.0/uel-ui-1.3.0.jar,lib/org/ow2/sat4j/org.ow2.sat4j.core/2.3.5/org.ow2.sat4j.core-2.3.5.jar,lib/org/ow2/sat4j/org.ow2.sat4j.pb/2.3.5/org.ow2.sat4j.pb-2.3.5.jar,lib/org/ow2/sat4j/org.ow2.sat4j.maxsat/2.3.5/org.ow2.sat4j.maxsat-2.3.5.jar,lib/commons-cli/commons-cli/1.1/commons-cli-1.1.jar,lib/org/codehaus/jackson/jackson-core-asl/1.9.13/jackson-core-asl-1.9.13.jar,lib/org/codehaus/jackson/jackson-mapper-asl/1.9.13/jackson-mapper-asl-1.9.13.jar,lib/com/sun/java/jlfgr/1.0/jlfgr-1.0.jar</bundle.jars>
+		<bundle.jars>lib/uel/uel-type/1.4.0-SNAPSHOT/uel-type-1.4.0-SNAPSHOT.jar,lib/uel/uel-rule/1.4.0-SNAPSHOT/uel-rule-1.4.0-SNAPSHOT.jar,lib/uel/uel-sat/1.4.0-SNAPSHOT/uel-sat-1.4.0-SNAPSHOT.jar,lib/uel/uel-asp/1.4.0-SNAPSHOT/uel-asp-1.4.0-SNAPSHOT.jar,lib/uel/uel-core/1.4.0-SNAPSHOT/uel-core-1.4.0-SNAPSHOT.jar,lib/uel/uel-ui/1.4.0-SNAPSHOT/uel-ui-1.4.0-SNAPSHOT.jar,lib/org/ow2/sat4j/org.ow2.sat4j.core/2.3.5/org.ow2.sat4j.core-2.3.5.jar,lib/org/ow2/sat4j/org.ow2.sat4j.pb/2.3.5/org.ow2.sat4j.pb-2.3.5.jar,lib/org/ow2/sat4j/org.ow2.sat4j.maxsat/2.3.5/org.ow2.sat4j.maxsat-2.3.5.jar,lib/commons-cli/commons-cli/1.1/commons-cli-1.1.jar,lib/org/codehaus/jackson/jackson-core-asl/1.9.13/jackson-core-asl-1.9.13.jar,lib/org/codehaus/jackson/jackson-mapper-asl/1.9.13/jackson-mapper-asl-1.9.13.jar,lib/com/sun/java/jlfgr/1.0/jlfgr-1.0.jar</bundle.jars>
 		<bundle.licenses>lib/com/sun/java/jlfgr/1.0/*.txt</bundle.licenses>
-		<bundle.classpath>.,lib/uel/uel-type/1.3.0/uel-type-1.3.0.jar,lib/uel/uel-rule/1.3.0/uel-rule-1.3.0.jar,lib/uel/uel-sat/1.3.0/uel-sat-1.3.0.jar,lib/uel/uel-asp/1.3.0/uel-asp-1.3.0.jar,lib/uel/uel-core/1.3.0/uel-core-1.3.0.jar,lib/uel/uel-ui/1.3.0/uel-ui-1.3.0.jar,lib/org/ow2/sat4j/org.ow2.sat4j.core/2.3.5/org.ow2.sat4j.core-2.3.5.jar,lib/org/ow2/sat4j/org.ow2.sat4j.pb/2.3.5/org.ow2.sat4j.pb-2.3.5.jar,lib/org/ow2/sat4j/org.ow2.sat4j.maxsat/2.3.5/org.ow2.sat4j.maxsat-2.3.5.jar,lib/commons-cli/commons-cli/1.1/commons-cli-1.1.jar,lib/org/codehaus/jackson/jackson-core-asl/1.9.13/jackson-core-asl-1.9.13.jar,lib/org/codehaus/jackson/jackson-mapper-asl/1.9.13/jackson-mapper-asl-1.9.13.jar,lib/com/sun/java/jlfgr/1.0/jlfgr-1.0.jar</bundle.classpath>
+		<bundle.classpath>.,lib/uel/uel-type/1.4.0-SNAPSHOT/uel-type-1.4.0-SNAPSHOT.jar,lib/uel/uel-rule/1.4.0-SNAPSHOT/uel-rule-1.4.0-SNAPSHOT.jar,lib/uel/uel-sat/1.4.0-SNAPSHOT/uel-sat-1.4.0-SNAPSHOT.jar,lib/uel/uel-asp/1.4.0-SNAPSHOT/uel-asp-1.4.0-SNAPSHOT.jar,lib/uel/uel-core/1.4.0-SNAPSHOT/uel-core-1.4.0-SNAPSHOT.jar,lib/uel/uel-ui/1.4.0-SNAPSHOT/uel-ui-1.4.0-SNAPSHOT.jar,lib/org/ow2/sat4j/org.ow2.sat4j.core/2.3.5/org.ow2.sat4j.core-2.3.5.jar,lib/org/ow2/sat4j/org.ow2.sat4j.pb/2.3.5/org.ow2.sat4j.pb-2.3.5.jar,lib/org/ow2/sat4j/org.ow2.sat4j.maxsat/2.3.5/org.ow2.sat4j.maxsat-2.3.5.jar,lib/commons-cli/commons-cli/1.1/commons-cli-1.1.jar,lib/org/codehaus/jackson/jackson-core-asl/1.9.13/jackson-core-asl-1.9.13.jar,lib/org/codehaus/jackson/jackson-mapper-asl/1.9.13/jackson-mapper-asl-1.9.13.jar,lib/com/sun/java/jlfgr/1.0/jlfgr-1.0.jar</bundle.classpath>
 		<import.package>javax.accessibility,javax.swing,javax.swing.border,org.osgi.framework,org.protege.editor.core.ui.workspace,org.semanticweb.*;resolution:=optional,org.joda.time.*;resolution:=optional,*</import.package>
 		<require.bundle>org.eclipse.equinox.registry,org.eclipse.equinox.common,org.protege.editor.core.application,org.protege.editor.owl,org.semanticweb.owl.owlapi</require.bundle>
 	</properties>
