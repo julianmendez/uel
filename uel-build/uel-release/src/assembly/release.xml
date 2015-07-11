@@ -32,9 +32,9 @@
 		<fileSet>
 			<directory>${basedir}/../uel-library/target</directory>
 			<includes>
-				<include>uel-${project.version}-javadoc.jar</include>
-				<include>uel-${project.version}-sources.jar</include>
 				<include>uel-${project.version}.jar</include>
+				<include>uel-${project.version}-sources.jar</include>
+				<include>uel-${project.version}-javadoc.jar</include>
 			</includes>
 			<outputDirectory>library</outputDirectory>
 		</fileSet>
