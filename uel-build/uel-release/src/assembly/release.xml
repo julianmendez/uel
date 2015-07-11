@@ -1,13 +1,9 @@
-<assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2"
+<assembly
+	xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
 
-
-	<!--
- *
- * @author Julian Mendez
- *
--->
+	<!-- @author Julian Mendez -->
 
 	<id>release</id>
 
@@ -15,22 +11,8 @@
 		<format>zip</format>
 	</formats>
 
+
 	<files>
-
-		<file>
-			<source>${basedir}/../uel-library/target/uel-${project.version}.jar</source>
-			<outputDirectory>library</outputDirectory>
-		</file>
-
-		<file>
-			<source>${basedir}/../uel-library/target/uel-${project.version}-sources.jar</source>
-			<outputDirectory>library</outputDirectory>
-		</file>
-
-		<file>
-			<source>${basedir}/../uel-library/target/uel-${project.version}-javadoc.jar</source>
-			<outputDirectory>library</outputDirectory>
-		</file>
 
 		<file>
 			<source>${basedir}/../uel-plugin/target/de.tudresden.inf.lat.uel.jar</source>
@@ -42,97 +24,93 @@
 			<outputDirectory>standalone</outputDirectory>
 		</file>
 
-		<file>
-			<source>${basedir}/../../uel-type/target/uel-type-${project.version}.jar</source>
-			<outputDirectory>modules</outputDirectory>
-		</file>
-
-		<file>
-			<source>${basedir}/../../uel-type/target/uel-type-${project.version}-sources.jar</source>
-			<outputDirectory>modules</outputDirectory>
-		</file>
-
-		<file>
-			<source>${basedir}/../../uel-type/target/uel-type-${project.version}-javadoc.jar</source>
-			<outputDirectory>modules</outputDirectory>
-		</file>
-
-		<file>
-			<source>${basedir}/../../uel-sat/target/uel-sat-${project.version}.jar</source>
-			<outputDirectory>modules</outputDirectory>
-		</file>
-
-		<file>
-			<source>${basedir}/../../uel-sat/target/uel-sat-${project.version}-sources.jar</source>
-			<outputDirectory>modules</outputDirectory>
-		</file>
-
-		<file>
-			<source>${basedir}/../../uel-sat/target/uel-sat-${project.version}-javadoc.jar</source>
-			<outputDirectory>modules</outputDirectory>
-		</file>
-
-		<file>
-			<source>${basedir}/../../uel-rule/target/uel-rule-${project.version}.jar</source>
-			<outputDirectory>modules</outputDirectory>
-		</file>
-
-		<file>
-			<source>${basedir}/../../uel-rule/target/uel-rule-${project.version}-sources.jar</source>
-			<outputDirectory>modules</outputDirectory>
-		</file>
-
-		<file>
-			<source>${basedir}/../../uel-rule/target/uel-rule-${project.version}-javadoc.jar</source>
-			<outputDirectory>modules</outputDirectory>
-		</file>
-
-		<file>
-			<source>${basedir}/../../uel-asp/target/uel-asp-${project.version}.jar</source>
-			<outputDirectory>modules</outputDirectory>
-		</file>
-
-		<file>
-			<source>${basedir}/../../uel-asp/target/uel-asp-${project.version}-sources.jar</source>
-			<outputDirectory>modules</outputDirectory>
-		</file>
-
-		<file>
-			<source>${basedir}/../../uel-asp/target/uel-asp-${project.version}-javadoc.jar</source>
-			<outputDirectory>modules</outputDirectory>
-		</file>
-
-		<file>
-			<source>${basedir}/../../uel-core/target/uel-core-${project.version}.jar</source>
-			<outputDirectory>modules</outputDirectory>
-		</file>
-
-		<file>
-			<source>${basedir}/../../uel-core/target/uel-core-${project.version}-sources.jar</source>
-			<outputDirectory>modules</outputDirectory>
-		</file>
-
-		<file>
-			<source>${basedir}/../../uel-core/target/uel-core-${project.version}-javadoc.jar</source>
-			<outputDirectory>modules</outputDirectory>
-		</file>
-
-		<file>
-			<source>${basedir}/../../uel-ui/target/uel-ui-${project.version}.jar</source>
-			<outputDirectory>modules</outputDirectory>
-		</file>
-
-		<file>
-			<source>${basedir}/../../uel-ui/target/uel-ui-${project.version}-sources.jar</source>
-			<outputDirectory>modules</outputDirectory>
-		</file>
-
-		<file>
-			<source>${basedir}/../../uel-ui/target/uel-ui-${project.version}-javadoc.jar</source>
-			<outputDirectory>modules</outputDirectory>
-		</file>
-
 	</files>
 
+
+	<fileSets>
+
+		<fileSet>
+			<directory>${basedir}/../uel-library/target</directory>
+			<includes>
+				<include>uel-${project.version}-javadoc.jar</include>
+				<include>uel-${project.version}-sources.jar</include>
+				<include>uel-${project.version}.jar</include>
+			</includes>
+			<outputDirectory>library</outputDirectory>
+		</fileSet>
+
+		<fileSet>
+			<directory>${basedir}/../../uel-type/target</directory>
+			<includes>
+				<include>uel-type-${project.version}.jar</include>
+				<include>uel-type-${project.version}-sources.jar</include>
+				<include>uel-type-${project.version}-javadoc.jar</include>
+			</includes>
+			<outputDirectory>modules</outputDirectory>
+		</fileSet>
+
+		<fileSet>
+			<directory>${basedir}/../../uel-sat/target</directory>
+			<includes>
+				<include>uel-sat-${project.version}.jar</include>
+				<include>uel-sat-${project.version}-sources.jar</include>
+				<include>uel-sat-${project.version}-javadoc.jar</include>
+			</includes>
+			<outputDirectory>modules</outputDirectory>
+		</fileSet>
+
+		<fileSet>
+			<directory>${basedir}/../../uel-rule/target</directory>
+			<includes>
+				<include>uel-rule-${project.version}.jar</include>
+				<include>uel-rule-${project.version}-sources.jar</include>
+				<include>uel-rule-${project.version}-javadoc.jar</include>
+			</includes>
+			<outputDirectory>modules</outputDirectory>
+		</fileSet>
+
+		<fileSet>
+			<directory>${basedir}/../../uel-asp/target</directory>
+			<includes>
+				<include>uel-asp-${project.version}.jar</include>
+				<include>uel-asp-${project.version}-sources.jar</include>
+				<include>uel-asp-${project.version}-javadoc.jar</include>
+			</includes>
+			<outputDirectory>modules</outputDirectory>
+		</fileSet>
+
+		<fileSet>
+			<directory>${basedir}/../../uel-core/target</directory>
+			<includes>
+				<include>uel-core-${project.version}.jar</include>
+				<include>uel-core-${project.version}-sources.jar</include>
+				<include>uel-core-${project.version}-javadoc.jar</include>
+			</includes>
+			<outputDirectory>modules</outputDirectory>
+		</fileSet>
+
+		<fileSet>
+			<directory>${basedir}/../../uel-ui/target</directory>
+			<includes>
+				<include>uel-ui-${project.version}.jar</include>
+				<include>uel-ui-${project.version}-sources.jar</include>
+				<include>uel-ui-${project.version}-javadoc.jar</include>
+			</includes>
+			<outputDirectory>modules</outputDirectory>
+		</fileSet>
+
+		<fileSet>
+			<directory>${basedir}/../../uel-protege/target</directory>
+			<includes>
+				<include>uel-protege-${project.version}.jar</include>
+				<include>uel-protege-${project.version}-sources.jar</include>
+				<include>uel-protege-${project.version}-javadoc.jar</include>
+			</includes>
+			<outputDirectory>modules</outputDirectory>
+		</fileSet>
+
+	</fileSets>
+
 </assembly>
+
 
