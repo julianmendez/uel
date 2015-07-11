@@ -2,12 +2,7 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
 
-
-	<!--
- *
- * @author Julian Mendez
- *
--->
+	<!-- @author Julian Mendez -->
 
 	<id>javadoc</id>
 
@@ -20,14 +15,23 @@
 	<fileSets>
 
 		<fileSet>
-			<directory>${basedir}/../../uel-ui/target/apidocs/</directory>
+			<directory>${basedir}/../../uel-protege/target</directory>
 			<outputDirectory>.</outputDirectory>
 			<includes>
-				<include>**</include>
+				<include>apidocs/**</include>
+			</includes>
+		</fileSet>
+
+		<fileSet>
+			<directory>${basedir}/../..</directory>
+			<outputDirectory>.</outputDirectory>
+			<includes>
+				<include>README.md</include>
 			</includes>
 		</fileSet>
 
 	</fileSets>
 
 </assembly>
+
 
