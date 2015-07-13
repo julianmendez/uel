@@ -50,9 +50,10 @@
 				<version>2.3</version>
 				<executions>
 					<execution>
+						<id>sources-jar</id>
 						<phase>package</phase>
 						<goals>
-							<goal>jar</goal>
+							<goal>jar-no-fork</goal>
 						</goals>
 					</execution>
 				</executions>
@@ -64,6 +65,7 @@
 				<version>2.9.1</version>
 				<executions>
 					<execution>
+						<id>javadoc-jar</id>
 						<phase>package</phase>
 						<goals>
 							<goal>jar</goal>
