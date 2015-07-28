@@ -1,0 +1,126 @@
+
+
+A {
+	text-decoration: none;
+}
+
+
+A:link { 
+	color: blue;
+	text-decoration: none;
+}
+
+
+A:visited { 
+	color: blue;
+	text-decoration: none;
+}
+
+
+A:active { 
+	color: green;
+	text-decoration: none;
+}
+
+
+A:hover { 
+	color: green;
+	text-decoration: none;
+}
+
+
+body {
+	text-align: center;
+	background: url("img/background.jpg") #000000;
+}
+
+
+.body_content {
+	color: #555555;
+	background-color: #FFFFFF;
+	margin: auto;
+	width: 740px;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 14px;
+	line-height: 18px;
+	list-style: disc;
+}
+
+
+.menu {
+	padding-left: 40px;
+	padding-top: 20px;
+	padding-bottom: 20px;
+	font-size: 16px;
+	text-align: left;
+	font-weight: 100;
+}
+
+
+.menu_item {
+	padding-left: 10px;
+	padding-right: 10px;
+	font-weight: 100;
+	font-size: 16px;
+}
+
+
+.menu_td {
+	text-align: center;
+	width: 96px;
+}
+
+
+.menu_img {
+	border: 0pt none;
+}
+
+
+.title {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	line-height: normal;
+	font-size: 40px;
+	padding-left: 40px;
+	padding-bottom: 20px;
+	padding-top: 20px;
+	color: #477E2A;
+	border-color: #FFFFFF;
+	font-weight: 100;
+	text-align: left;
+}
+
+
+.subtitle {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	line-height: normal;
+	font-size: 30px;
+	padding-left: 60px;
+	padding-bottom: 20px;
+	padding-top: 20px;
+	color: #477E2A;
+	border-color: #FFFFFF;
+	font-weight: 100;
+	text-align: left;
+}
+
+
+.content {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	padding-left: 100px;
+	padding-right: 50px;
+	color: #555555;
+	border-color: #FFFFFF;
+	text-align: left;
+}
+
+
+.footer {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	color: #FFFFFF;
+	border-color: #FFFFFF;
+	background: #477E2A;
+	text-align: center;
+	font-size: 10px;
+}
+
+
