@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/julianmendez/uel.png?branch=master)](https://travis-ci.org/julianmendez/uel)
 
-UEL, Unifier for the [description logic](http://dl.kr.org/) EL, is a plug-in for [Protégé](http://protege.stanford.edu/) that uses the [OWL API](http://owlcs.github.io/owlapi/).
+**UEL**, Unifier for the [description logic](http://dl.kr.org/) EL, is a plug-in for [Protégé](http://protege.stanford.edu/) that uses the [OWL API](http://owlcs.github.io/owlapi/).
 
 
 ## Source code
