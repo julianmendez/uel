@@ -30,22 +30,20 @@ $ mvn clean install
 ## [Download](http://sourceforge.net/projects/uel/files/uel/1.3.0/zip/uel-1.3.0.zip/download)
 
   * download [uel-1.3.0](http://sourceforge.net/projects/uel/files/uel/1.3.0/zip/uel-1.3.0.zip/download) (2015-04-15)
-  * all versions:
+  * [all versions](http://sourceforge.net/projects/uel/files/):
 
 
-| version 	         | zip 	 | release date |	Java | OWL API |	Protégé      |
+| version 	          | zip 	 | release date |	Java | OWL API |	Protégé       |
 |:-------------------|:------|:-------------|:----:|:--------|:--------------|
-| uel-1.4.0-SNAPSHOT |			 |              | 7    | 3.5.1   | 5.0.0-beta-17 |
-| [uel-1.3.0](http://sourceforge.net/projects/uel/files/uel/1.3.0/plugin/de.tudresden.inf.lat.uel.jar/download) 	   | [(zip)](http://sourceforge.net/projects/uel/files/uel/1.3.0/zip/uel-1.3.0.zip/download) |	2015-04-15  | 7    | 3.5.0   | 4.3           |
-| [uel-1.2.0](http://sourceforge.net/projects/uel/files/uel/1.2.0/plugin/de.tudresden.inf.lat.uel.jar/download) 	   | [(zip)](http://sourceforge.net/projects/uel/files/uel/1.2.0/zip/uel-1.2.0.zip/download) |	2012-04-30  | 6    | 3.2.4   | 4.1           |
-| [uel-1.1.0](http://sourceforge.net/projects/uel/files/uel/1.1.0/plugin/de.tudresden.inf.lat.uel.jar/download) 	   | [(zip)](http://sourceforge.net/projects/uel/files/uel/1.1.0/zip/uel-1.1.0.zip/download) |	2012-03-09  | 6    | 3.2.4   | 4.1           |
-| [uel-1.0.0](http://sourceforge.net/projects/uel/files/uel/1.0.0/plugin/de.tudresden.inf.lat.uel.jar/download) 	   | [(zip)](http://sourceforge.net/projects/uel/files/uel/1.0.0/zip/uel-1.0.0.zip/download) |	2012-01-27  | 6    | 3.2.4   | 4.1           |
+| uel-1.4.0-SNAPSHOT |	      |              | 7    | 3.5.1   | 5.0.0-beta-17 |
+| [uel-1.3.0](http://sourceforge.net/projects/uel/files/uel/1.3.0/plugin/de.tudresden.inf.lat.uel.jar/download)   | [(zip)](http://sourceforge.net/projects/uel/files/uel/1.3.0/zip/uel-1.3.0.zip/download) |	2015-04-15  | 7    | 3.5.0   | 4.3           |
+| [uel-1.2.0](http://sourceforge.net/projects/uel/files/uel/1.2.0/plugin/de.tudresden.inf.lat.uel.jar/download) 	 | [(zip)](http://sourceforge.net/projects/uel/files/uel/1.2.0/zip/uel-1.2.0.zip/download) |	2012-04-30  | 6    | 3.2.4   | 4.1           |
+| [uel-1.1.0](http://sourceforge.net/projects/uel/files/uel/1.1.0/plugin/de.tudresden.inf.lat.uel.jar/download) 	 | [(zip)](http://sourceforge.net/projects/uel/files/uel/1.1.0/zip/uel-1.1.0.zip/download) |	2012-03-09  | 6    | 3.2.4   | 4.1           |
+| [uel-1.0.0](http://sourceforge.net/projects/uel/files/uel/1.0.0/plugin/de.tudresden.inf.lat.uel.jar/download) 	 | [(zip)](http://sourceforge.net/projects/uel/files/uel/1.0.0/zip/uel-1.0.0.zip/download) |	2012-01-27  | 6    | 3.2.4   | 4.1           |
 
 
-## [download area](http://sourceforge.net/projects/uel/files/)
 
-
-## tutorial
+## Tutorial
 
 [example: UEL as application](http://julianmendez.github.io/uel/example.html)
 
@@ -53,17 +51,17 @@ $ mvn clean install
 
 
 
-installation and use
-as a plugin:
-download de.tudresden.inf.lat.uel.jar and copy it into Protege_4.3/plugins.
+## Installation and use
 
-as a library:
-download the zip containing uel-1.3.0.jar in directory uel/uel-library
-and use all of them as libraries.
+* as a **plugin**:
+download [de.tudresden.inf.lat.uel.jar](http://sourceforge.net/projects/uel/files/uel/1.3.0/plugin/de.tudresden.inf.lat.uel.jar/download) and copy it into `Protege_4.3/plugins`.
 
-as a standalone:
+* as a **library**:
+download the [zip](http://sourceforge.net/projects/uel/files/uel/1.3.0/zip/uel-1.3.0.zip/download) containing `uel-1.3.0.jar` in directory uel/uel-library and use all of them as libraries.
 
-To start the standalone application, you can use the following script.
+* as a **standalone**:
+
+To start the standalone application, you can use the following [script](http://julianmendez.github.io/uel/extra/start-uel.sh.txt).
 
 
 
@@ -73,11 +71,11 @@ clone the source code using Git
 git clone https://github.com/julianmendez/uel.git
 ```
 
-browse repository
-In Eclipse, it requires the m2e plug-in.
+[browse repository](https://github.com/julianmendez/uel)
+In [Eclipse](http://www.eclipse.org/), it requires the [m2e](http://www.eclipse.org/m2e-wtp/) plug-in.
 
 
-## build instructions
+## Build instructions
 * **master** (trunk)
   to compile with Apache Maven (3.0.3+):
   ```
@@ -87,7 +85,7 @@ In Eclipse, it requires the m2e plug-in.
   ```
   ant
   ```
-  release: uel-build/target/uel-version.zip
+  release: `uel-build/target/uel-version.zip`
 
 * **v1.3.0**
   ```
@@ -140,7 +138,7 @@ In Eclipse, it requires the m2e plug-in.
   release: `uel-build/target/uel-version.zip`
 
 
-## changes
+## Changes
 * **v1.3.0**
  * added capability to handle dissubsumptions to SAT-based algorithm
  * added ASP-based algorithm (experimental)
@@ -156,6 +154,6 @@ In Eclipse, it requires the m2e plug-in.
 
 
 
-## [support](http://lat.inf.tu-dresden.de/~mendez)
+## [Support](http://lat.inf.tu-dresden.de/~mendez)
 
 
