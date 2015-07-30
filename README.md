@@ -157,3 +157,27 @@ In [Eclipse](http://www.eclipse.org/), it requires the [m2e](http://www.eclipse.
 ## [Support](http://lat.inf.tu-dresden.de/~mendez)
 
 
+## Tutorial - UEL as Java library
+
+This small tutorial gives an example of how to use UEL as a Java library. The class `AlternativeUelStarter` in the **uel-plugin** module provides a basic [OWL API](http://owlcs.github.io/owlapi/) interface to UEL. Its use is illustrated by the code of `AlternativeUelStarterTest` and is summarized by the following steps:
+
+* Construct an `AlternativeUelStarter` with the background ontology (an `OWLOntology`) as argument. As of February 2015, only acyclic EL terminologies are supported.
+
+* Call the method `modifyOntologyAndSolve` with the following arguments:
+
+ * The subsumptions and equations of the unification problem that is to be solved (either as an `OWLOntology`, or a `Set<OWLSubClassOfAxiom>` and a `Set<OWLEquivalentClassesAxiom>`). Axioms of types other than `OWLSubClassOfAxiom` or `OWLEquivalentClassesAxiom` in the input ontology are ignored. Furthermore, all `OWLEquivalentClassesAxioms` should contain exactly two `OWLClassExpressions`.
+
+ * The subsumptions and equations that are to be made false by the unifiers ("dissubsumptions" and "disequations"). The input format is the same as above. Dissubsumptions and disequations are currently only supported by the SAT processor (see #4 below).
+ * A `Set<OWLClass>` containing all class names that are to be treated as variables for the unification.
+
+ * A `String` designating the unification algorithm ("processor") to be used, as defined in `UelProcessorFactory`. There is an inefficient RULE_BASED_ALGORITHM, a more mature SAT_BASED_ALGORITHM (using the [Sat4j library](http://www.sat4j.org/)) with the option to only return "subset-minimal" solutions[1], and an ASP_BASED_ALGORITHM (using the ASP solver [Clingo](http://potassco.sourceforge.net/)) that as of February 2015 is still under development. Normal unification problems can already be solved by the ASP encoding, but dissubsumptions are not yet supported. If you want to try the ASP algorithm, we can send you more detailed information on how to install Clingo and set up UEL to use it.
+
+* You get back an iterator that gives you unifiers in the form of `Set<OWLUelClassDefinition>` specifying a substitution for every variable. Each `OWLUelClassDefinition` can be converted into an `OWLEquivalentClassesAxiom`. It should be the case that the background ontology, extended by the `OWLEquivalentClassesAxioms` given by one unifier, entails all input subsumptions and does not entail any of the dissubsumptions.
+
+`AlternativeUelStarter` also provides a simple command-line interface that can be accessed by starting Java directly on this class. The execution options are not documented yet, but can be found in the in the source code of the main method.
+
+## References
+
+[1] Franz Baader, Stefan Borgwardt, Julian Alfredo Mendez, and Barbara Morawska. UEL: Unification solver for EL. In Proc. DL 2012. [(PDF)](http://ceur-ws.org/Vol-846/paper_8.pdf)
+
+
