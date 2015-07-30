@@ -9,11 +9,11 @@
 
 To clone and compile the project:
 
-~~~
+```
 $ git clone https://github.com/julianmendez/uel.git
 $ cd uel
 $ mvn clean install
-~~~
+```
 
 
 ## Authors
@@ -47,7 +47,7 @@ $ mvn clean install
 download [de.tudresden.inf.lat.uel.jar](http://sourceforge.net/projects/uel/files/uel/1.3.0/plugin/de.tudresden.inf.lat.uel.jar/download) and copy it into `Protege_4.3/plugins`.
 
 * as a **library**:
-download the [zip](http://sourceforge.net/projects/uel/files/uel/1.3.0/zip/uel-1.3.0.zip/download) containing `uel-1.3.0.jar` in directory uel/uel-library and use all of them as libraries.
+download the [zip](http://sourceforge.net/projects/uel/files/uel/1.3.0/zip/uel-1.3.0.zip/download) containing `uel-1.3.0.jar` in directory `uel/uel-library` and use all of them as libraries.
 
 * as a **standalone**:
 
