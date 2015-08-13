@@ -16,7 +16,7 @@
 	<fileSets>
 
 		<fileSet>
-			<directory>${basedir}/../../uel-type/src/main/java/</directory>
+			<directory>${basedir}/../uel-type/src/main/java/</directory>
 			<outputDirectory>.</outputDirectory>
 			<includes>
 				<include>**</include>
@@ -24,7 +24,7 @@
 		</fileSet>
 
 		<fileSet>
-			<directory>${basedir}/../../uel-type/src/main/resources/</directory>
+			<directory>${basedir}/../uel-type/src/main/resources/</directory>
 			<outputDirectory>.</outputDirectory>
 			<includes>
 				<include>**</include>
@@ -32,7 +32,7 @@
 		</fileSet>
 
 		<fileSet>
-			<directory>${basedir}/../../uel-sat/src/main/java/</directory>
+			<directory>${basedir}/../uel-sat/src/main/java/</directory>
 			<outputDirectory>.</outputDirectory>
 			<includes>
 				<include>**</include>
@@ -40,7 +40,7 @@
 		</fileSet>
 
 		<fileSet>
-			<directory>${basedir}/../../uel-sat/src/main/resources/</directory>
+			<directory>${basedir}/../uel-sat/src/main/resources/</directory>
 			<outputDirectory>.</outputDirectory>
 			<includes>
 				<include>**</include>
@@ -48,7 +48,7 @@
 		</fileSet>
 
 		<fileSet>
-			<directory>${basedir}/../../uel-rule/src/main/java/</directory>
+			<directory>${basedir}/../uel-rule/src/main/java/</directory>
 			<outputDirectory>.</outputDirectory>
 			<includes>
 				<include>**</include>
@@ -56,7 +56,7 @@
 		</fileSet>
 
 		<fileSet>
-			<directory>${basedir}/../../uel-rule/src/main/resources/</directory>
+			<directory>${basedir}/../uel-rule/src/main/resources/</directory>
 			<outputDirectory>.</outputDirectory>
 			<includes>
 				<include>**</include>
@@ -64,7 +64,7 @@
 		</fileSet>
 
 		<fileSet>
-			<directory>${basedir}/../../uel-asp/src/main/java/</directory>
+			<directory>${basedir}/../uel-asp/src/main/java/</directory>
 			<outputDirectory>.</outputDirectory>
 			<includes>
 				<include>**</include>
@@ -72,7 +72,7 @@
 		</fileSet>
 
 		<fileSet>
-			<directory>${basedir}/../../uel-asp/src/main/resources/</directory>
+			<directory>${basedir}/../uel-asp/src/main/resources/</directory>
 			<outputDirectory>.</outputDirectory>
 			<includes>
 				<include>**</include>
@@ -80,7 +80,7 @@
 		</fileSet>
 
 		<fileSet>
-			<directory>${basedir}/../../uel-core/src/main/java/</directory>
+			<directory>${basedir}/../uel-core/src/main/java/</directory>
 			<outputDirectory>.</outputDirectory>
 			<includes>
 				<include>**</include>
@@ -88,7 +88,7 @@
 		</fileSet>
 
 		<fileSet>
-			<directory>${basedir}/../../uel-core/src/main/resources/</directory>
+			<directory>${basedir}/../uel-core/src/main/resources/</directory>
 			<outputDirectory>.</outputDirectory>
 			<includes>
 				<include>**</include>
@@ -96,7 +96,7 @@
 		</fileSet>
 
 		<fileSet>
-			<directory>${basedir}/../../uel-ui/src/main/java/</directory>
+			<directory>${basedir}/../uel-ui/src/main/java/</directory>
 			<outputDirectory>.</outputDirectory>
 			<includes>
 				<include>**</include>
@@ -104,23 +104,7 @@
 		</fileSet>
 
 		<fileSet>
-			<directory>${basedir}/../../uel-ui/src/main/resources/</directory>
-			<outputDirectory>.</outputDirectory>
-			<includes>
-				<include>**</include>
-			</includes>
-		</fileSet>
-
-		<fileSet>
-			<directory>${basedir}/../../uel-protege/src/main/java/</directory>
-			<outputDirectory>.</outputDirectory>
-			<includes>
-				<include>**</include>
-			</includes>
-		</fileSet>
-
-		<fileSet>
-			<directory>${basedir}/../../uel-protege/src/main/resources/</directory>
+			<directory>${basedir}/../uel-ui/src/main/resources/</directory>
 			<outputDirectory>.</outputDirectory>
 			<includes>
 				<include>**</include>

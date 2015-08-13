@@ -15,7 +15,7 @@
 	<!-- Imports 'project.groupId', 'project.artifactId', 'project.version',
 	'project.properties.bundle.jars', 'project.properties.bundle.licenses', and 'project.properties.bundle.classpath' properties. -->
 	<xmlproperty file="pom.xml" />
-	<xmlproperty file="../../pom.xml" />
+	<xmlproperty file="../pom.xml" />
 
 	<!-- Project-specific properties. -->
 	<fail unless="project.groupId">Error: 'project.groupId' is undefined. This property should have the group identifier.</fail>
@@ -31,12 +31,12 @@
 
 	<property name="src.directory" value="src" />
 
-	<property name="_root.directory" value="../.." />
+	<property name="_root.directory" value=".." />
 	<property name="_lib.directory" value="${project.build.directory}/lib" />
 	<property name="_targetlib.directory" value="target" />
 	<property name="groupId.directory" value="uel" />
-	<property name="repository.directory" value="../target/jars/lib" />
-	<property name="localrepository.directory" value="../lib" />
+	<property name="repository.directory" value="../uel-build/target/jars/lib" />
+	<property name="localrepository.directory" value="../uel-build/lib" />
 	<property name="project.build.outputDirectory" value="${project.build.directory}/classes" />
 	<property name="_bundle.directory" value="${project.build.directory}" />
 	<property name="_bundle.jars.directory" value="${project.build.directory}" />

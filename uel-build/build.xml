@@ -24,14 +24,14 @@
 	<property name="module.4.name" value="uel-core" />
 	<property name="module.5.name" value="uel-ui" />
 	<property name="module.6.name" value="uel-protege" />
-	<property name="build.0.name" value="uel-library" />
-	<property name="build.1.name" value="uel-plugin" />
-	<property name="build.2.name" value="uel-standalone" />
-	<property name="build.3.name" value="uel-release" />
-	<property name="releasebuild.name" value="uel-release" />
+	<property name="build.0.name" value="uel-build-library" />
+	<property name="build.1.name" value="uel-build-plugin" />
+	<property name="build.2.name" value="uel-build-standalone" />
+	<property name="build.3.name" value="uel-build-release" />
+	<property name="releasebuild.name" value="uel-build-release" />
 
 	<property name="_release.name" value="uel-${project.version}" />
-	<property name="_release.directory" value="${releasebuild.name}/target" />
+	<property name="_release.directory" value="${_root.directory}/${releasebuild.name}/target" />
 
 
 	<!-- Calls subprojects. -->
@@ -47,10 +47,10 @@
 
 	<!-- Calls other build files. -->
 	<target name="callbuilds">
-		<subant antfile="${build.0.name}/build.xml" buildpath="." target="${target}" />
-		<subant antfile="${build.1.name}/build.xml" buildpath="." target="${target}" />
-		<subant antfile="${build.2.name}/build.xml" buildpath="." target="${target}" />
-		<subant antfile="${build.3.name}/build.xml" buildpath="." target="${target}" />
+		<subant antfile="${_root.directory}/${build.0.name}/build.xml" buildpath="." target="${target}" />
+		<subant antfile="${_root.directory}/${build.1.name}/build.xml" buildpath="." target="${target}" />
+		<subant antfile="${_root.directory}/${build.2.name}/build.xml" buildpath="." target="${target}" />
+		<subant antfile="${_root.directory}/${build.3.name}/build.xml" buildpath="." target="${target}" />
 	</target>
 
 	<!-- Cleans compiled files. -->

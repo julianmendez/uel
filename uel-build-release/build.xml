@@ -14,7 +14,7 @@
 
 	<!-- Imports 'project.groupId', 'project.artifactId', and 'project.version' properties. -->
 	<xmlproperty file="pom.xml" />
-	<xmlproperty file="../../pom.xml" />
+	<xmlproperty file="../pom.xml" />
 
 	<!-- Project-specific properties. -->
 	<fail unless="project.groupId">Error: 'project.groupId' is undefined. This property should have the group identifier.</fail>
@@ -23,7 +23,7 @@
 
 	<property name="src.directory" value="src" />
 
-	<property name="_root.directory" value="../../" />
+	<property name="_root.directory" value=".." />
 
 	<property name="module.0.name" value="uel-type" />
 	<property name="module.1.name" value="uel-rule" />
@@ -31,13 +31,13 @@
 	<property name="module.3.name" value="uel-asp" />
 	<property name="module.4.name" value="uel-core" />
 	<property name="module.5.name" value="uel-ui" />
-	<property name="build.0.name" value="uel-library" />
+	<property name="build.0.name" value="uel-build-library" />
 	<property name="build.0.output.name" value="library" />
 	<property name="build.0.filename" value="uel-${project.version}" />
-	<property name="build.1.name" value="uel-plugin" />
+	<property name="build.1.name" value="uel-build-plugin" />
 	<property name="build.1.output.name" value="plugin" />
 	<property name="build.1.filename" value="de.tudresden.inf.lat.uel" />
-	<property name="build.2.name" value="uel-standalone" />
+	<property name="build.2.name" value="uel-build-standalone" />
 	<property name="build.2.output.name" value="standalone" />
 	<property name="build.2.filename" value="uel" />
 

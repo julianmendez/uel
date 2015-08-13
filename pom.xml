@@ -18,10 +18,10 @@
 		<module>uel-core</module>
 		<module>uel-ui</module>
 		<module>uel-protege</module>
-		<module>uel-build/uel-library</module>
-		<module>uel-build/uel-plugin</module>
-		<module>uel-build/uel-standalone</module>
-		<module>uel-build/uel-release</module>
+		<module>uel-build-library</module>
+		<module>uel-build-plugin</module>
+		<module>uel-build-standalone</module>
+		<module>uel-build-release</module>
 	</modules>
 
 	<properties>

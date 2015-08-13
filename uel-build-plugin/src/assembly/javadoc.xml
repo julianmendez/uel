@@ -15,7 +15,7 @@
 	<fileSets>
 
 		<fileSet>
-			<directory>${basedir}/../../uel-ui/target</directory>
+			<directory>${basedir}/../uel-protege/target</directory>
 			<outputDirectory>.</outputDirectory>
 			<includes>
 				<include>apidocs/**</include>
@@ -23,7 +23,7 @@
 		</fileSet>
 
 		<fileSet>
-			<directory>${basedir}/../..</directory>
+			<directory>${basedir}/..</directory>
 			<outputDirectory>.</outputDirectory>
 			<includes>
 				<include>README.md</include>

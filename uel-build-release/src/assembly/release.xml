@@ -15,12 +15,12 @@
 	<files>
 
 		<file>
-			<source>${basedir}/../uel-plugin/target/de.tudresden.inf.lat.uel.jar</source>
+			<source>${basedir}/../uel-build-plugin/target/de.tudresden.inf.lat.uel.jar</source>
 			<outputDirectory>plugin</outputDirectory>
 		</file>
 
 		<file>
-			<source>${basedir}/../uel-standalone/target/uel.jar</source>
+			<source>${basedir}/../uel-build-standalone/target/uel.jar</source>
 			<outputDirectory>standalone</outputDirectory>
 		</file>
 
@@ -30,7 +30,7 @@
 	<fileSets>
 
 		<fileSet>
-			<directory>${basedir}/../uel-library/target</directory>
+			<directory>${basedir}/../uel-build-library/target</directory>
 			<includes>
 				<include>uel-${project.version}.jar</include>
 				<include>uel-${project.version}-sources.jar</include>
@@ -40,7 +40,7 @@
 		</fileSet>
 
 		<fileSet>
-			<directory>${basedir}/../../uel-type/target</directory>
+			<directory>${basedir}/../uel-type/target</directory>
 			<includes>
 				<include>uel-type-${project.version}.jar</include>
 				<include>uel-type-${project.version}-sources.jar</include>
@@ -50,7 +50,7 @@
 		</fileSet>
 
 		<fileSet>
-			<directory>${basedir}/../../uel-sat/target</directory>
+			<directory>${basedir}/../uel-sat/target</directory>
 			<includes>
 				<include>uel-sat-${project.version}.jar</include>
 				<include>uel-sat-${project.version}-sources.jar</include>
@@ -60,7 +60,7 @@
 		</fileSet>
 
 		<fileSet>
-			<directory>${basedir}/../../uel-rule/target</directory>
+			<directory>${basedir}/../uel-rule/target</directory>
 			<includes>
 				<include>uel-rule-${project.version}.jar</include>
 				<include>uel-rule-${project.version}-sources.jar</include>
@@ -70,7 +70,7 @@
 		</fileSet>
 
 		<fileSet>
-			<directory>${basedir}/../../uel-asp/target</directory>
+			<directory>${basedir}/../uel-asp/target</directory>
 			<includes>
 				<include>uel-asp-${project.version}.jar</include>
 				<include>uel-asp-${project.version}-sources.jar</include>
@@ -80,7 +80,7 @@
 		</fileSet>
 
 		<fileSet>
-			<directory>${basedir}/../../uel-core/target</directory>
+			<directory>${basedir}/../uel-core/target</directory>
 			<includes>
 				<include>uel-core-${project.version}.jar</include>
 				<include>uel-core-${project.version}-sources.jar</include>
@@ -90,7 +90,7 @@
 		</fileSet>
 
 		<fileSet>
-			<directory>${basedir}/../../uel-ui/target</directory>
+			<directory>${basedir}/../uel-ui/target</directory>
 			<includes>
 				<include>uel-ui-${project.version}.jar</include>
 				<include>uel-ui-${project.version}-sources.jar</include>
@@ -100,7 +100,7 @@
 		</fileSet>
 
 		<fileSet>
-			<directory>${basedir}/../../uel-protege/target</directory>
+			<directory>${basedir}/../uel-protege/target</directory>
 			<includes>
 				<include>uel-protege-${project.version}.jar</include>
 				<include>uel-protege-${project.version}-sources.jar</include>
