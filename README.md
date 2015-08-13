@@ -56,26 +56,26 @@ To start the standalone application, you can use the following [script](http://j
 
 ## Build instructions
 * **master** (trunk)
-  to compile with Apache Maven (3.0.3+):
+  to compile it with Apache Maven (3.0.3+):
   ```
   mvn clean package
   ```
-  to compile with Apache Ant (1.8.3+):
+  to compile it with Apache Ant (1.8.3+):
   ```
   ant
   ```
-  release: `uel-build/target/uel-version.zip`
+  release: `target/uel-version.zip`
 
 * **v1.3.0**
   ```
   git checkout v1.3.0
   ```
-  to compile with Apache Maven (3.0.3+):
+  to compile it with Apache Maven (3.0.3+):
   ```
   cd uel
   mvn clean package
   ```
-  to compile with Apache Ant (1.8.3+):
+  to compile it with Apache Ant (1.8.3+):
   ```
   cd uel
   ant
@@ -106,15 +106,15 @@ To start the standalone application, you can use the following [script](http://j
   release: `uel/uel.plugin/target/de.tudresden.inf.lat.uel.jar`
 
 * **master** (trunk) (for offline development)
-  to verify dependencies with Apache Maven before going offline:
+  to download the dependencies with Apache Maven before going offline:
   ```
   mvn dependency:go-offline
   ```
-  to compile with Apache Maven:
+  to compile it with Apache Maven:
   ```
   mvn --offline clean package
   ```
-  release: `uel-build/target/uel-version.zip`
+  release: `target/uel-version.zip`
 
 
 ## Changes
