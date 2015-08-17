@@ -1,368 +1,330 @@
-<?xml version="1.0" encoding="utf-8"?>
-
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
-
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-  <link type="text/css" rel="stylesheet" href="style.css" />
-
-  <title>uel</title>
-</head>
-
-<body>
-  <div class="body_content">
-    <div><img src="img/banner.png" alt="uel" /></div>
-
-    <div class="footer">
-     <br />
-    </div>
-
-    <div>
-      <br />
-      <br />
-      <br />
-      <br />
-
-      <div class="content">
-
-        <b>UEL</b>, Unifier for the <a href="http://dl.kr.org/">description logic</a> <i>EL</i>,
-        is a plug-in for <a href="http://protege.stanford.edu/">Prot&eacute;g&eacute;</a> that
-        uses the <a href="http://owlapi.sourceforge.net/">OWL API</a>.
-      </div>
-
-      <p>
-      <br />
-      <br />
-      </p>
-
-     <div>
-     <a href="http://sourceforge.net/projects/uel/files/uel/1.3.0/zip/uel-1.3.0.zip/download">
-     <img src="http://www.babylondownload.com/download_button.png" alt="download" width="160"/>
-     </a>
-     </div>
-
-    <div class="content">
-
-      <ul>
-        <li>download
-
-        <ul>
-
-        <li>download <a href="http://sourceforge.net/projects/uel/files/uel/1.3.0/zip/uel-1.3.0.zip/download">uel-1.3.0</a> (2015-04-15)
-        </li>
-
-        <li>all versions:
-        <table summary="" border="0">
-        <tr>
-        <th>version</th>
-        <th>zip</th>
-        <th>release date</th>
-        <th>Java</th>
-        <th>OWL API</th>
-        <th>Prot&eacute;g&eacute;</th>
-        </tr>
-        <tr>
-        <td>
-          uel-1.4.0-SNAPSHOT 
-        </td>
-        <td></td>
-        <td></td>
-        <td>7</td>
-        <td>3.5.1</td>
-        <td>5.0.0-beta-17</td>
-        </tr>
-        <tr>
-        <td>
-          <a href="http://sourceforge.net/projects/uel/files/uel/1.3.0/plugin/de.tudresden.inf.lat.uel.jar/download">uel-1.3.0</a></td>
-        <td>
-          <a href="http://sourceforge.net/projects/uel/files/uel/1.3.0/zip/uel-1.3.0.zip/download">(zip)</a>
-        </td>
-        <td>2015-04-15</td>
-        <td>7</td>
-        <td>3.5.0</td>
-        <td>4.3</td>
-        </tr>
-        <tr>
-        <td>
-          <a href="http://sourceforge.net/projects/uel/files/uel/1.2.0/plugin/de.tudresden.inf.lat.uel.jar/download">uel-1.2.0</a></td>
-        <td>
-          <a href="http://sourceforge.net/projects/uel/files/uel/1.2.0/zip/uel-1.2.0.zip/download">(zip)</a>
-        </td>
-        <td>2012-04-30</td>
-        <td>6</td>
-        <td>3.2.4</td>
-        <td>4.1</td>
-        </tr>
-        <tr>
-        <td>
-          <a href="http://sourceforge.net/projects/uel/files/uel/1.1.0/plugin/de.tudresden.inf.lat.uel.jar/download">uel-1.1.0</a></td>
-        <td>
-          <a href="http://sourceforge.net/projects/uel/files/uel/1.1.0/zip/uel-1.1.0.zip/download">(zip)</a>
-        </td>
-        <td>2012-03-09</td>
-        <td>6</td>
-        <td>3.2.4</td>
-        <td>4.1</td>
-        </tr>
-        <tr>
-        <td>
-          <a href="http://sourceforge.net/projects/uel/files/uel/1.0.0/plugin/de.tudresden.inf.lat.uel.jar/download">uel-1.0.0</a></td>
-        <td>
-          <a href="http://sourceforge.net/projects/uel/files/uel/1.0.0/zip/uel-1.0.0.zip/download">(zip)</a>
-        </td>
-        <td>2012-01-27</td>
-        <td>6</td>
-        <td>3.2.4</td>
-        <td>4.1</td>
-        </tr>
-        </table>
-        </li>
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>UEL by julianmendez</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">UEL</h1>
+      <h2 class="project-tagline">Unifier for Description Logic EL</h2>
+      <a href="https://github.com/julianmendez/uel" class="btn">View on GitHub</a>
+      <a href="https://github.com/julianmendez/uel/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/julianmendez/uel/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
+
+    <section class="main-content">
+      <h1>
+<a id="uel" class="anchor" href="#uel" aria-hidden="true"><span class="octicon octicon-link"></span></a><a href="http://julianmendez.github.io/uel/">UEL</a>
+</h1>
+
+<p><a href="https://travis-ci.org/julianmendez/uel"><img src="https://travis-ci.org/julianmendez/uel.png?branch=master" alt="Build Status"></a></p>
+
+<p><strong>UEL</strong>, Unifier for the <a href="http://dl.kr.org/">description logic</a> EL, is a plug-in for <a href="http://protege.stanford.edu/">Protégé</a> that uses the <a href="http://owlcs.github.io/owlapi/">OWL API</a>.</p>
+
+<h2>
+<a id="source-code" class="anchor" href="#source-code" aria-hidden="true"><span class="octicon octicon-link"></span></a>Source code</h2>
+
+<p>To clone and compile the project:</p>
+
+<pre><code>$ git clone https://github.com/julianmendez/uel.git
+$ cd uel
+$ mvn clean install
+</code></pre>
+
+<h2>
+<a id="authors" class="anchor" href="#authors" aria-hidden="true"><span class="octicon octicon-link"></span></a>Authors</h2>
+
+<p><a href="http://lat.inf.tu-dresden.de/%7Emorawska/">Barbara Morawska</a>, <a href="http://lat.inf.tu-dresden.de/%7Estefborg/">Stefan Borgwardt</a>, <a href="http://lat.inf.tu-dresden.de/%7Emendez/">Julian Mendez</a></p>
+
+<h2>
+<a id="license" class="anchor" href="#license" aria-hidden="true"><span class="octicon octicon-link"></span></a>License</h2>
+
+<p><a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache License Version 2.0</a>, <a href="http://www.gnu.org/licenses/lgpl-3.0.txt">GNU Lesser General Public License version 3</a></p>
+
+<h2>
+<a id="download" class="anchor" href="#download" aria-hidden="true"><span class="octicon octicon-link"></span></a><a href="http://sourceforge.net/projects/uel/files/uel/1.3.0/zip/uel-1.3.0.zip/download">Download</a>
+</h2>
+
+<ul>
+<li>download <a href="http://sourceforge.net/projects/uel/files/uel/1.3.0/zip/uel-1.3.0.zip/download">uel-1.3.0</a> (2015-04-15)</li>
+<li>
+<a href="http://sourceforge.net/projects/uel/files/">all versions</a>:</li>
+</ul>
+
+<table>
+<thead>
+<tr>
+<th align="left">version</th>
+<th align="left">zip</th>
+<th align="left">release date</th>
+<th align="center">Java</th>
+<th align="left">OWL API</th>
+<th align="left">Protégé</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">uel-1.4.0-SNAPSHOT</td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="center">7</td>
+<td align="left">3.5.1</td>
+<td align="left">5.0.0-beta-17</td>
+</tr>
+<tr>
+<td align="left"><a href="http://sourceforge.net/projects/uel/files/uel/1.3.0/plugin/de.tudresden.inf.lat.uel.jar/download">uel-1.3.0</a></td>
+<td align="left"><a href="http://sourceforge.net/projects/uel/files/uel/1.3.0/zip/uel-1.3.0.zip/download">(zip)</a></td>
+<td align="left">2015-04-15</td>
+<td align="center">7</td>
+<td align="left">3.5.0</td>
+<td align="left">4.3</td>
+</tr>
+<tr>
+<td align="left"><a href="http://sourceforge.net/projects/uel/files/uel/1.2.0/plugin/de.tudresden.inf.lat.uel.jar/download">uel-1.2.0</a></td>
+<td align="left"><a href="http://sourceforge.net/projects/uel/files/uel/1.2.0/zip/uel-1.2.0.zip/download">(zip)</a></td>
+<td align="left">2012-04-30</td>
+<td align="center">6</td>
+<td align="left">3.2.4</td>
+<td align="left">4.1</td>
+</tr>
+<tr>
+<td align="left"><a href="http://sourceforge.net/projects/uel/files/uel/1.1.0/plugin/de.tudresden.inf.lat.uel.jar/download">uel-1.1.0</a></td>
+<td align="left"><a href="http://sourceforge.net/projects/uel/files/uel/1.1.0/zip/uel-1.1.0.zip/download">(zip)</a></td>
+<td align="left">2012-03-09</td>
+<td align="center">6</td>
+<td align="left">3.2.4</td>
+<td align="left">4.1</td>
+</tr>
+<tr>
+<td align="left"><a href="http://sourceforge.net/projects/uel/files/uel/1.0.0/plugin/de.tudresden.inf.lat.uel.jar/download">uel-1.0.0</a></td>
+<td align="left"><a href="http://sourceforge.net/projects/uel/files/uel/1.0.0/zip/uel-1.0.0.zip/download">(zip)</a></td>
+<td align="left">2012-01-27</td>
+<td align="center">6</td>
+<td align="left">3.2.4</td>
+<td align="left">4.1</td>
+</tr>
+</tbody>
+</table>
 
-        <li><a href="http://sourceforge.net/projects/uel/files/">download area</a></li>
+<h2>
+<a id="installation-and-use" class="anchor" href="#installation-and-use" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installation and use</h2>
 
-        </ul>
+<ul>
+<li><p>as a <strong>plugin</strong>:
+download <a href="http://sourceforge.net/projects/uel/files/uel/1.3.0/plugin/de.tudresden.inf.lat.uel.jar/download">de.tudresden.inf.lat.uel.jar</a> and copy it into <code>Protege_4.3/plugins</code>.</p></li>
+<li><p>as a <strong>library</strong>:
+download the <a href="http://sourceforge.net/projects/uel/files/uel/1.3.0/zip/uel-1.3.0.zip/download">zip</a> containing <code>uel-1.3.0.jar</code> in directory <code>uel/uel-library</code> and use all of them as libraries.</p></li>
+<li><p>as a <strong>standalone</strong>:</p></li>
+</ul>
+
+<p>To start the standalone application, you can use the following <a href="http://julianmendez.github.io/uel/extra/start-uel.sh.txt">script</a>.</p>
+
+<h2>
+<a id="build-instructions" class="anchor" href="#build-instructions" aria-hidden="true"><span class="octicon octicon-link"></span></a>Build instructions</h2>
+
+<ul>
+<li>
+<p><strong>master</strong> (trunk)
+to compile it with Apache Maven (3.0.3+):</p>
+
+<pre><code>mvn clean package
+</code></pre>
+
+<p>to compile it with Apache Ant (1.8.3+):</p>
+
+<pre><code>ant
+</code></pre>
+
+<p>release: <code>target/uel-version.zip</code></p>
+</li>
+<li>
+<p><strong>v1.3.0</strong></p>
+
+<pre><code>git checkout v1.3.0
+</code></pre>
+
+<p>to compile it with Apache Maven (3.0.3+):</p>
+
+<pre><code>cd uel
+mvn clean package
+</code></pre>
+
+<p>to compile it with Apache Ant (1.8.3+):</p>
+
+<pre><code>cd uel
+ant
+</code></pre>
 
-        <br /> <br /> <br /> </li>
+<p>release: <code>uel/uel-build/target/uel-1.3.0.zip</code></p>
+</li>
+<li>
+<p><strong>v1.2.0</strong></p>
 
-        <li>tutorial
+<pre><code>git checkout v1.2.0
+cd uel/uel.distribution
+</code></pre>
 
-        <br /> <br />
+<p>with Apache Ant:</p>
 
-        <ul style="list-style: none;">
-        <li>
-        <a href="example.html"> <img src="img/01_standalone.png" alt="example" width="400" /> </a> <br /> <br />
+<pre><code>ant
+</code></pre>
 
-        <big><a href="example.html">example: UEL as application</a></big>
-        <br />
-        <br />
-        <big><a href="example-code.html">example: UEL as Java library</a></big>
-        </li>
-        </ul>
+<p>with Apache Maven:</p>
 
-        <br /> <br /> <br /> </li>
+<pre><code>mvn clean package javadoc:javadoc source:jar
+</code></pre>
 
-        <li>installation and use
+<p>release: <code>uel/uel.distribution/target/uel-1.2.0.zip</code></p>
+</li>
+<li>
+<p><strong>v1.0.0</strong> and <strong>v1.1.0</strong></p>
 
-        <ul>
-        <li>as a <b>plugin</b>:
+<pre><code>git checkout v1.1.0      (or git checkout v1.0.0)
+cd uel/uel.plugin
+ant -buildfile build-bundle.xml
+</code></pre>
 
-        <br />
+<p>release: <code>uel/uel.plugin/target/de.tudresden.inf.lat.uel.jar</code></p>
+</li>
+<li>
+<p><strong>master</strong> (trunk) (for offline development)
+to download the dependencies with Apache Maven before going offline:</p>
 
-        download <a href="http://sourceforge.net/projects/uel/files/uel/1.3.0/plugin/de.tudresden.inf.lat.uel.jar/download">
-        de.tudresden.inf.lat.uel.jar</a> and copy it into <tt>Protege_4.3/plugins</tt>.
+<pre><code>mvn dependency:go-offline
+</code></pre>
 
-        <br /> <br /> </li>
+<p>to compile it with Apache Maven:</p>
 
-        <li>as a <b>library</b>:
+<pre><code>mvn --offline clean package
+</code></pre>
 
-        <br />
+<p>release: <code>target/uel-version.zip</code></p>
+</li>
+</ul>
 
-        download the <a href="http://sourceforge.net/projects/uel/files/uel/1.3.0/zip/uel-1.3.0.zip/download">zip</a> 
-        containing <tt>uel-1.3.0.jar</tt> in directory <tt>uel/uel-library</tt>
+<h2>
+<a id="changes" class="anchor" href="#changes" aria-hidden="true"><span class="octicon octicon-link"></span></a>Changes</h2>
 
-        <br />
+<ul>
+<li>
+<p><strong>v1.3.0</strong></p>
 
-        and use all of them as libraries.
+<ul>
+<li>added capability to handle dissubsumptions to SAT-based algorithm</li>
+<li>added ASP-based algorithm (experimental)</li>
+</ul>
+</li>
+<li>
+<p><strong>v1.2.0</strong></p>
 
-        <br /> <br /> </li>
+<ul>
+<li>added possibility to restrict SAT-based algorithm to minimal assignments</li>
+</ul>
+</li>
+<li>
+<p><strong>v1.1.0</strong></p>
 
-        <li>as a <b>standalone</b>:
+<ul>
+<li>addded Rule-based algorithm</li>
+</ul>
+</li>
+<li>
+<p><strong>v1.0.0</strong></p>
 
-        <br /> <br />
-        To start the standalone application, you can use the following <a href="extra/start-uel.sh.txt">script</a>.
+<ul>
+<li>basic SAT-based algorithm</li>
+</ul>
+</li>
+</ul>
 
-        </li>
+<h2>
+<a id="support" class="anchor" href="#support" aria-hidden="true"><span class="octicon octicon-link"></span></a><a href="http://lat.inf.tu-dresden.de/%7Emendez">Support</a>
+</h2>
 
-        </ul>
+<h2>
+<a id="tutorial---uel-as-application" class="anchor" href="#tutorial---uel-as-application" aria-hidden="true"><span class="octicon octicon-link"></span></a>Tutorial - UEL as application</h2>
 
-        <br /> <br /> <br /> </li>
+<p>The following tutorial shows how to use UEL. It can be run as a standalone application ...</p>
 
-        <li>source
+<p><img src="http://julianmendez.github.io/uel/img/01_standalone.png" alt="UEL as a standalone application"></p>
 
-        <ul>
+<p>... or as a plug-in inside Protégé:</p>
 
-        <li>clone the source code using <a href="http://git-scm.com/">Git</a><br />
-        <tt>git clone https://github.com/julianmendez/uel.git</tt><br /><br /></li>
+<p><img src="http://julianmendez.github.io/uel/img/02_protege.png" alt="UEL as a Protégé plug-in"></p>
 
-        <li><a href="https://github.com/julianmendez/uel">browse repository</a></li>
+<p>The user interface is the same in both cases. One can open the ontologies describing background knowledge and the unification problems using the "open" button of UEL, or using the Protégé menu (all ontologies to be used have to be opened in the same Protégé window).</p>
 
-        </ul>
-        In <a href="http://www.eclipse.org">Eclipse</a>, it requires the <a href="http://www.eclipse.org/m2e-wtp/">m2e</a> plug-in.
+<p><img src="http://julianmendez.github.io/uel/img/03_open_ontology.png" alt="open an ontology using UEL"></p>
 
-        <br /> <br /> <br /> </li>
+<p>For our example, we have openend the ontologies headinjury.owl and headinjury-dissubsumption.owl and selected them as the positive and the negative part of the (dis)unification problem, respectively. This small example consists of one equation and two dissubsumptions. A more detailed description can be found in Franz Baader, Stefan Borgwardt, and Barbara Morawska: Dismatching and Disunification in EL. In Proc. RTA, 2015. UEL only recognizes OWL axioms of types subClassOf and equivalentClass in these input ontologies. Additionally, up to two background ontologies can be selected to provide background knowledge in the form of acyclic definitions. It is important that all OWL classes that should be shared between the selected ontologies are identified by the same IRIs in all ontologies.</p>
 
-        <li>build instructions
-        <ul>
-        <li><b>master</b> (trunk)
-        <ul>
-        <li>to compile with <a href="http://maven.apache.org">Apache Maven</a> (3.0.3+):
-        <br /><b><tt>mvn clean package</tt></b></li>
-        <li>to compile with <a href="http://ant.apache.org">Apache Ant</a> (1.8.3+):
-        <br /><b><tt>ant</tt></b></li>
-        <li>release: <b><tt>uel-build/target/uel-</tt></b><i>version</i><b><tt>.zip</tt></b></li>
-        </ul>
+<p><img src="http://julianmendez.github.io/uel/img/04_ontologies_selected.png" alt="example ontologies selected in UEL"></p>
 
-        <br /> </li>
+<p>The next step is to select a unification algorithm to solve the problem. There are different advantages and disadvantages to each of them, which are discussed in the following publications. The SAT-based algorithm was developed in Franz Baader and Barbara Morawska: SAT Encoding of Unification in EL. In Proc. LPAR, 2010, the rule-based one Franz Baader and Barbara Morawska: Unification in the Description Logic EL. Logical Methods in Computer Science 6(3), 2010. Additionally, an experimental encoding into ASP (answer set programming) has been implemented, which however requires the ASP solver clingo to be installed and available via the PATH environment variable of the JVM instance UEL is running in. Both the SAT and the ASP encoding provide the option to compute only so-called minimal assignments; for details, see Franz Baader, Stefan Borgwardt, Julian Alfredo Mendez, and Barbara Morawska: UEL: Unification Solver for EL. In Proc. DL, 2012. It should be noted that negative constraints (dissubsumptions and disequations) are currently only supported by the SAT-based algorithm.</p>
 
-        <li><b>v1.3.0</b>
-        <ul>
-        <li><b><tt>git checkout v1.3.0</tt></b></li>
-        <li>to compile with <a href="http://maven.apache.org">Apache Maven</a> (3.0.3+):
-        <br /><b><tt>cd uel</tt></b>
-        <br /><b><tt>mvn clean package</tt></b></li>
-        <li>to compile with <a href="http://ant.apache.org">Apache Ant</a> (1.8.3+):
-        <br /><b><tt>cd uel</tt></b>
-        <br /><b><tt>ant</tt></b></li>
-        <li>release: <b><tt>uel/uel-build/target/uel-1.3.0.zip</tt></b></li>
-        </ul>
+<p><img src="http://julianmendez.github.io/uel/img/05_choose_processor.png" alt="choose the unification algorithm"></p>
 
-        <br /> </li>
+<p>Once an algorithm has been chosen, a click on the arrow button opens a new window that allows to choose which OWL classes are supposed to be treated as variables, and which as constants. Initially, all classes are marked as constants, which are listed in the left column. Using the two first buttons, one can move classes to the second column, to designate them as variables, and back.</p>
 
-        <li><b>v1.2.0</b>
-        <ul>
-        <li><b><tt>git checkout v1.2.0</tt></b></li>
-        <li><b><tt>cd uel/uel.distribution</tt></b></li>
-        <li>with <a href="http://ant.apache.org">Apache Ant</a>:
-        <br /><b><tt>ant</tt></b></li>
-        <li>with <a href="http://maven.apache.org">Apache Maven</a>:
-        <br /><b><tt>mvn clean package javadoc:javadoc source:jar</tt></b></li>
-        <li>release: <b><tt>uel/uel.distribution/target/uel-1.2.0.zip</tt></b></li>
-        </ul>
+<p><img src="http://julianmendez.github.io/uel/img/06_select_variables.png" alt="select some concept names as variables"></p>
 
-        <br /> </li>
+<p>A click on the third button starts the unification process.</p>
 
-        <li><b>v1.0.0</b> and <b>v1.1.0</b>
-        <ul>
-        <li><b><tt>git checkout v1.1.0</tt></b> &nbsp;&nbsp;&nbsp;&nbsp; (or <b><tt>git checkout v1.0.0</tt></b>)</li>
-        <li><b><tt>cd uel/uel.plugin</tt></b></li>
-        <li><b><tt>ant -buildfile build-bundle.xml</tt></b></li>
-        <li>release: <b><tt>uel/uel.plugin/target/de.tudresden.inf.lat.uel.jar</tt></b></li>
-        </ul>
+<p><img src="http://julianmendez.github.io/uel/img/08_request_unifiers.png" alt="start the unification algorithm"></p>
 
-        <br /> </li>
+<p>Using the arrow buttons in the next window, one can request the computation of the next unifier, as well as navigate within the set of already computed unifiers. The first and fourth button jump to the first and last unifier, respectively. In case the problem has no solution, the text "[not unifiable]" will be displayed after the first unifier has been requested. Depending on the size of the problem and the chosen unification algorithm, the computation may take a long time, even to get just the first unifier.</p>
 
-        <li><b>master</b> (trunk) (for offline development)
-        <ul>
-        <li>to verify dependencies with <a href="http://maven.apache.org">Apache Maven</a> before going offline:
-        <br /><b><tt>mvn dependency:go-offline</tt></b></li>
-        <li>to compile with <a href="http://maven.apache.org">Apache Maven</a>:
-        <br /><b><tt>mvn --offline clean package</tt></b></li>
-        <li>release: <b><tt>uel-build/target/uel-</tt></b><i>version</i><b><tt>.zip</tt></b></li>
-        </ul>
+<p><img src="http://julianmendez.github.io/uel/img/08_request_unifiers.png" alt="request next unifier"></p>
 
-        <br /> </li>
+<p>In this view, one can also save the currently displayed unifier into an ontology file that contains the displayed definitions for the variables. The recognized file extensions are .krss (for KRSS format as displayed), .owl (for OWL/XML format), and .rdf (for RDF/XML format).</p>
 
-        </ul>
+<p><img src="http://julianmendez.github.io/uel/img/09_save_unifier.png" alt="save the current unifier to an ontology file"></p>
 
-        <br /> <br /> <br /> </li>
+<p>Using the last button, a new window is opened that contains additonal information about the actual (dis)unification problem that was sent to the unification algorithm. Due to some preprocessing, additional auxiliary variables may have been introduced. This representation can be saved as a text file. In the bottom, some additional statistics about the unification process are displayed, such as the number of generated clauses for the SAT encoding.</p>
 
-        <li>changes
+<p><img src="http://julianmendez.github.io/uel/img/10_information.png" alt="window showing extra information"></p>
 
-        <ul>
+<h2>
+<a id="tutorial---uel-as-java-library" class="anchor" href="#tutorial---uel-as-java-library" aria-hidden="true"><span class="octicon octicon-link"></span></a>Tutorial - UEL as Java library</h2>
 
-        <li><b>v1.3.0</b>
-        <ul>
-          <li>added capability to handle dissubsumptions to SAT-based algorithm</li>
-          <li>added ASP-based algorithm (experimental)</li>
-        </ul><br />
-        </li>
+<p>This small tutorial gives an example of how to use UEL as a Java library. The class <code>AlternativeUelStarter</code> in the <strong>uel-plugin</strong> module provides a basic <a href="http://owlcs.github.io/owlapi/">OWL API</a> interface to UEL. Its use is illustrated by the code of <code>AlternativeUelStarterTest</code> and is summarized by the following steps:</p>
 
-        <li><b>v1.2.0</b>
-        <ul>
-          <li>added possibility to restrict SAT-based algorithm to minimal assignments</li>
-        </ul><br />
-        </li>
+<ul>
+<li><p>Construct an <code>AlternativeUelStarter</code> with the background ontology (an <code>OWLOntology</code>) as argument. As of February 2015, only acyclic EL terminologies are supported.</p></li>
+<li>
+<p>Call the method <code>modifyOntologyAndSolve</code> with the following arguments:</p>
 
-        <li><b>v1.1.0</b>
-        <ul>
-          <li>addded Rule-based algorithm</li>
-        </ul><br />
-        </li>
+<ul>
+<li><p>The subsumptions and equations of the unification problem that is to be solved (either as an <code>OWLOntology</code>, or a <code>Set&lt;OWLSubClassOfAxiom&gt;</code> and a <code>Set&lt;OWLEquivalentClassesAxiom&gt;</code>). Axioms of types other than <code>OWLSubClassOfAxiom</code> or <code>OWLEquivalentClassesAxiom</code> in the input ontology are ignored. Furthermore, all <code>OWLEquivalentClassesAxioms</code> should contain exactly two <code>OWLClassExpressions</code>.</p></li>
+<li><p>The subsumptions and equations that are to be made false by the unifiers ("dissubsumptions" and "disequations"). The input format is the same as above. Dissubsumptions and disequations are currently only supported by the SAT processor (see #4 below).</p></li>
+<li><p>A <code>Set&lt;OWLClass&gt;</code> containing all class names that are to be treated as variables for the unification.</p></li>
+<li><p>A <code>String</code> designating the unification algorithm ("processor") to be used, as defined in <code>UelProcessorFactory</code>. There is an inefficient <em>RULE_BASED_ALGORITHM</em>, a more mature <em>SAT_BASED_ALGORITHM</em> (using the <a href="http://www.sat4j.org/">Sat4j library</a>) with the option to only return "subset-minimal" solutions[1], and an <em>ASP_BASED_ALGORITHM</em> (using the ASP solver <a href="http://potassco.sourceforge.net/">Clingo</a>) that as of February 2015 is still under development. Normal unification problems can already be solved by the ASP encoding, but dissubsumptions are not yet supported. If you want to try the ASP algorithm, we can send you more detailed information on how to install Clingo and set up UEL to use it.</p></li>
+</ul>
+</li>
+<li><p>You get back an iterator that gives you unifiers in the form of <code>Set&lt;OWLUelClassDefinition&gt;</code> specifying a substitution for every variable. Each <code>OWLUelClassDefinition</code> can be converted into an <code>OWLEquivalentClassesAxiom</code>. It should be the case that the background ontology, extended by the <code>OWLEquivalentClassesAxioms</code> given by one unifier, entails all input subsumptions and does not entail any of the dissubsumptions.</p></li>
+</ul>
 
-        <li><b>v1.0.0</b>
-        <ul>
-          <li>basic SAT-based algorithm</li>
-        </ul><br />
-        </li>
+<p><code>AlternativeUelStarter</code> also provides a simple command-line interface that can be accessed by starting Java directly on this class. The execution options are not documented yet, but can be found in the in the source code of the main method.</p>
 
-        </ul>
+<h2>
+<a id="references" class="anchor" href="#references" aria-hidden="true"><span class="octicon octicon-link"></span></a>References</h2>
 
-        <br /> <br /> <br /> </li>
+<p>[1] Franz Baader, Stefan Borgwardt, Julian Alfredo Mendez, and Barbara Morawska. UEL: Unification solver for EL. In Proc. DL 2012. <a href="http://ceur-ws.org/Vol-846/paper_8.pdf">(PDF)</a></p>
 
-        <li>development
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/julianmendez/uel">UEL</a> is maintained by <a href="https://github.com/julianmendez">julianmendez</a>.</span>
 
-        <ul>
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
 
-        <li><a href="http://github.com/julianmendez/uel">GitHub</a></li>
+    </section>
 
-        </ul>
-
-        <br /> <br /> <br /> </li>
-
-        <li>support
-
-        <ul>
-
-        <li><a href="http://lat.inf.tu-dresden.de/~mendez">contact</a> </li>
-
-        </ul>
-
-        <br /> <br /> <br /> </li>
-
-        <li>licenses
-
-        <ul>
-
-        <li>
-          <b>UEL</b> is <b>free software</b> and is licensed under
-          <a href="http://www.gnu.org/licenses/lgpl.txt">GNU Lesser General Public License version 3</a>
-          and <a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache License, Version 2.0</a></li>
-
-        </ul>
-
-        </li>
-      </ul>
-    </div>
-
-
-      <p><br />
-      <br />
-      <br />
-      <br />
-      <br />
-      <br />
-      <br />
-      <br />
-      </p>
-
-
-
-
-      <div id="footer">
-        <p><a href="http://sourceforge.net/p/uel"><img style="border:0;" src=
-        "http://sourceforge.net/sflogo.php?group_id=1111" alt="SourceForge Logo" /></a>
-        <a href="http://validator.w3.org/check?uri=referer"><img style="border:0;" src=
-        "http://www.w3.org/Icons/valid-xhtml-rdfa" alt="Valid XHTML + RDFa" height="31"
-        width="88" /></a> <a href=
-        "http://jigsaw.w3.org/css-validator/check/referer"><img style=
-        "border:0;width:88px;height:31px" src=
-        "http://jigsaw.w3.org/css-validator/images/vcss" alt=
-        "Valid CSS!" /></a></p><span>2015-07-07</span>
-      </div><br />
-      <br />
-      <br />
-      <br />
-      <br />
-      <br />
-      <br />
-      <br />
-    </div>
-
-    <div class="footer">
-      Copyright 2015
-    </div>
-  </div>
-</body>
+  
+  </body>
 </html>
-
