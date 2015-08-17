@@ -43,20 +43,16 @@
 		<dependency>
 			<groupId>net.sourceforge.owlapi</groupId>
 			<artifactId>owlapi-distribution</artifactId>
-			<version>3.5.1</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.sun.java</groupId>
 			<artifactId>jlfgr</artifactId>
-			<version>1.0</version>
 		</dependency>
 
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.11</version>
-			<scope>test</scope>
 		</dependency>
 
 	</dependencies>

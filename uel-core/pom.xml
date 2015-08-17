@@ -37,21 +37,16 @@
 		<dependency>
 			<groupId>net.sourceforge.owlapi</groupId>
 			<artifactId>owlapi-distribution</artifactId>
-			<version>3.5.1</version>
 		</dependency>
 
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.11</version>
-			<scope>test</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>de.tudresden.inf.lat.jcel</groupId>
 			<artifactId>jcel</artifactId>
-			<version>0.20.0</version>
-			<scope>test</scope>
 		</dependency>
 
 	</dependencies>
