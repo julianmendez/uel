@@ -69,7 +69,7 @@
 			<fileset dir="${_root.directory}/${module.name}">
 				<include name="copying.txt" />
 				<include name="copying-lesser.txt" />
-				<include name="license-2.0.txt" />
+				<include name="LICENSE.txt" />
 			</fileset>
 		</copy>
 	</target>
