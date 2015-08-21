@@ -99,7 +99,10 @@
 							@uel-rule-${project.version}.jar,
 							@uel-sat-${project.version}.jar,
 							@uel-core-${project.version}.jar,
-							@uel-ui-${project.version}.jar
+							@uel-ui-${project.version}.jar,
+							LICENSE.txt=../LICENSE.txt,
+							copying.txt=../copying.txt,
+							copying-lesser.txt=../copying-lesser.txt
 						</Include-Resource>
 					</instructions>
 				</configuration>
