@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<project name="uel-release" default="dist" basedir=".">
+<project name="uel-distribution" default="dist" basedir=".">
 
 	<!--
  *
@@ -31,13 +31,13 @@
 	<property name="module.3.name" value="uel-asp" />
 	<property name="module.4.name" value="uel-core" />
 	<property name="module.5.name" value="uel-ui" />
-	<property name="build.0.name" value="uel-build-library" />
+	<property name="build.0.name" value="uel-library" />
 	<property name="build.0.output.name" value="library" />
 	<property name="build.0.filename" value="uel-${project.version}" />
-	<property name="build.1.name" value="uel-build-plugin" />
+	<property name="build.1.name" value="uel-plugin" />
 	<property name="build.1.output.name" value="plugin" />
 	<property name="build.1.filename" value="de.tudresden.inf.lat.uel" />
-	<property name="build.2.name" value="uel-build-standalone" />
+	<property name="build.2.name" value="uel-standalone" />
 	<property name="build.2.output.name" value="standalone" />
 	<property name="build.2.filename" value="uel" />
 

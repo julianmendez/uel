@@ -5,7 +5,7 @@
 
 	<modelVersion>4.0.0</modelVersion>
 
-	<artifactId>uel-release</artifactId>
+	<artifactId>uel-distribution</artifactId>
 	<packaging>pom</packaging>
 
 	<parent>
@@ -27,7 +27,7 @@
 				<executions>
 
 					<execution>
-						<id>create-release</id>
+						<id>distro-assembly</id>
 						<phase>package</phase>
 						<goals>
 							<goal>single</goal>
@@ -36,7 +36,7 @@
 							<finalName>uel-${project.version}</finalName>
 							<appendAssemblyId>false</appendAssemblyId>
 							<descriptors>
-								<descriptor>${basedir}/src/assembly/release.xml</descriptor>
+								<descriptor>src/assembly/bin.xml</descriptor>
 							</descriptors>
 						</configuration>
 					</execution>
