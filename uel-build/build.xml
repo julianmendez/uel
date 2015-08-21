@@ -24,11 +24,11 @@
 	<property name="module.4.name" value="uel-core" />
 	<property name="module.5.name" value="uel-ui" />
 	<property name="module.6.name" value="uel-protege" />
-	<property name="build.0.name" value="uel-build-library" />
-	<property name="build.1.name" value="uel-build-plugin" />
-	<property name="build.2.name" value="uel-build-standalone" />
-	<property name="build.3.name" value="uel-build-release" />
-	<property name="releasebuild.name" value="uel-build-release" />
+	<property name="build.0.name" value="uel-library" />
+	<property name="build.1.name" value="uel-plugin" />
+	<property name="build.2.name" value="uel-standalone" />
+	<property name="build.3.name" value="uel-distribution" />
+	<property name="releasebuild.name" value="uel-distribution" />
 
 	<property name="_release.name" value="uel-${project.version}" />
 	<property name="_release.directory" value="${_root.directory}/${releasebuild.name}/target" />
