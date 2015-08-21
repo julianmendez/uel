@@ -11,32 +11,15 @@
 		<format>zip</format>
 	</formats>
 
-
-	<files>
-
-		<file>
-			<source>${basedir}/../uel-build-plugin/target/de.tudresden.inf.lat.uel.jar</source>
-			<outputDirectory>plugin</outputDirectory>
-		</file>
-
-		<file>
-			<source>${basedir}/../uel-build-standalone/target/uel.jar</source>
-			<outputDirectory>standalone</outputDirectory>
-		</file>
-
-	</files>
-
-
 	<fileSets>
 
 		<fileSet>
-			<directory>${basedir}/../uel-build-library/target</directory>
+			<directory>${basedir}/../target</directory>
 			<includes>
-				<include>uel-${project.version}.jar</include>
-				<include>uel-${project.version}-sources.jar</include>
-				<include>uel-${project.version}-javadoc.jar</include>
+				<include>uel-parent-${project.version}.pom</include>
+				<include>uel-parent-${project.version}.pom.asc</include>
 			</includes>
-			<outputDirectory>library</outputDirectory>
+			<outputDirectory>modules/uel-parent</outputDirectory>
 		</fileSet>
 
 		<fileSet>
@@ -45,18 +28,13 @@
 				<include>uel-type-${project.version}.jar</include>
 				<include>uel-type-${project.version}-sources.jar</include>
 				<include>uel-type-${project.version}-javadoc.jar</include>
+				<include>uel-type-${project.version}.pom</include>
+				<include>uel-type-${project.version}.jar.asc</include>
+				<include>uel-type-${project.version}-sources.jar.asc</include>
+				<include>uel-type-${project.version}-javadoc.jar.asc</include>
+				<include>uel-type-${project.version}.pom.asc</include>
 			</includes>
-			<outputDirectory>modules</outputDirectory>
-		</fileSet>
-
-		<fileSet>
-			<directory>${basedir}/../uel-sat/target</directory>
-			<includes>
-				<include>uel-sat-${project.version}.jar</include>
-				<include>uel-sat-${project.version}-sources.jar</include>
-				<include>uel-sat-${project.version}-javadoc.jar</include>
-			</includes>
-			<outputDirectory>modules</outputDirectory>
+			<outputDirectory>modules/uel-type</outputDirectory>
 		</fileSet>
 
 		<fileSet>
@@ -65,8 +43,28 @@
 				<include>uel-rule-${project.version}.jar</include>
 				<include>uel-rule-${project.version}-sources.jar</include>
 				<include>uel-rule-${project.version}-javadoc.jar</include>
+				<include>uel-rule-${project.version}.pom</include>
+				<include>uel-rule-${project.version}.jar.asc</include>
+				<include>uel-rule-${project.version}-sources.jar.asc</include>
+				<include>uel-rule-${project.version}-javadoc.jar.asc</include>
+				<include>uel-rule-${project.version}.pom.asc</include>
 			</includes>
-			<outputDirectory>modules</outputDirectory>
+			<outputDirectory>modules/uel-rule</outputDirectory>
+		</fileSet>
+
+		<fileSet>
+			<directory>${basedir}/../uel-sat/target</directory>
+			<includes>
+				<include>uel-sat-${project.version}.jar</include>
+				<include>uel-sat-${project.version}-sources.jar</include>
+				<include>uel-sat-${project.version}-javadoc.jar</include>
+				<include>uel-sat-${project.version}.pom</include>
+				<include>uel-sat-${project.version}.jar.asc</include>
+				<include>uel-sat-${project.version}-sources.jar.asc</include>
+				<include>uel-sat-${project.version}-javadoc.jar.asc</include>
+				<include>uel-sat-${project.version}.pom.asc</include>
+			</includes>
+			<outputDirectory>modules/uel-sat</outputDirectory>
 		</fileSet>
 
 		<fileSet>
@@ -75,8 +73,13 @@
 				<include>uel-asp-${project.version}.jar</include>
 				<include>uel-asp-${project.version}-sources.jar</include>
 				<include>uel-asp-${project.version}-javadoc.jar</include>
+				<include>uel-asp-${project.version}.pom</include>
+				<include>uel-asp-${project.version}.jar.asc</include>
+				<include>uel-asp-${project.version}-sources.jar.asc</include>
+				<include>uel-asp-${project.version}-javadoc.jar.asc</include>
+				<include>uel-asp-${project.version}.pom.asc</include>
 			</includes>
-			<outputDirectory>modules</outputDirectory>
+			<outputDirectory>modules/uel-asp</outputDirectory>
 		</fileSet>
 
 		<fileSet>
@@ -85,8 +88,13 @@
 				<include>uel-core-${project.version}.jar</include>
 				<include>uel-core-${project.version}-sources.jar</include>
 				<include>uel-core-${project.version}-javadoc.jar</include>
+				<include>uel-core-${project.version}.pom</include>
+				<include>uel-core-${project.version}.jar.asc</include>
+				<include>uel-core-${project.version}-sources.jar.asc</include>
+				<include>uel-core-${project.version}-javadoc.jar.asc</include>
+				<include>uel-core-${project.version}.pom.asc</include>
 			</includes>
-			<outputDirectory>modules</outputDirectory>
+			<outputDirectory>modules/uel-core</outputDirectory>
 		</fileSet>
 
 		<fileSet>
@@ -95,8 +103,13 @@
 				<include>uel-ui-${project.version}.jar</include>
 				<include>uel-ui-${project.version}-sources.jar</include>
 				<include>uel-ui-${project.version}-javadoc.jar</include>
+				<include>uel-ui-${project.version}.pom</include>
+				<include>uel-ui-${project.version}.jar.asc</include>
+				<include>uel-ui-${project.version}-sources.jar.asc</include>
+				<include>uel-ui-${project.version}-javadoc.jar.asc</include>
+				<include>uel-ui-${project.version}.pom.asc</include>
 			</includes>
-			<outputDirectory>modules</outputDirectory>
+			<outputDirectory>modules/uel-ui</outputDirectory>
 		</fileSet>
 
 		<fileSet>
@@ -105,8 +118,54 @@
 				<include>uel-protege-${project.version}.jar</include>
 				<include>uel-protege-${project.version}-sources.jar</include>
 				<include>uel-protege-${project.version}-javadoc.jar</include>
+				<include>uel-protege-${project.version}.pom</include>
+				<include>uel-protege-${project.version}.jar.asc</include>
+				<include>uel-protege-${project.version}-sources.jar.asc</include>
+				<include>uel-protege-${project.version}-javadoc.jar.asc</include>
+				<include>uel-protege-${project.version}.pom.asc</include>
 			</includes>
-			<outputDirectory>modules</outputDirectory>
+			<outputDirectory>modules/uel-protege</outputDirectory>
+		</fileSet>
+
+		<fileSet>
+			<directory>${basedir}/../uel-library/target</directory>
+			<includes>
+				<include>uel-${project.version}.jar</include>
+				<include>uel-${project.version}-sources.jar</include>
+				<include>uel-${project.version}-javadoc.jar</include>
+				<include>uel-${project.version}.pom</include>
+				<include>uel-${project.version}.jar.asc</include>
+				<include>uel-${project.version}-sources.jar.asc</include>
+				<include>uel-${project.version}-javadoc.jar.asc</include>
+				<include>uel-${project.version}.pom.asc</include>
+			</includes>
+			<outputDirectory>library</outputDirectory>
+		</fileSet>
+
+		<fileSet>
+			<directory>${basedir}/../uel-plugin/target</directory>
+			<includes>
+				<include>${project.groupId}-${project.version}.jar</include>
+				<include>${project.groupId}-${project.version}-sources.jar</include>
+				<include>${project.groupId}-${project.version}-javadoc.jar</include>
+				<include>${project.groupId}-${project.version}.pom</include>
+				<include>${project.groupId}-${project.version}.jar.asc</include>
+				<include>${project.groupId}-${project.version}-sources.jar.asc</include>
+				<include>${project.groupId}-${project.version}-javadoc.jar.asc</include>
+				<include>${project.groupId}-${project.version}.pom.asc</include>
+			</includes>
+			<outputDirectory>plugin</outputDirectory>
+		</fileSet>
+
+		<fileSet>
+			<directory>${basedir}/../uel-standalone/target</directory>
+			<includes>
+				<include>uel.jar</include>
+				<include>uel.jar.asc</include>
+				<include>uel.pom</include>
+				<include>uel.pom.asc</include>
+			</includes>
+			<outputDirectory>standalone</outputDirectory>
 		</fileSet>
 
 	</fileSets>
