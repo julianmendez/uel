@@ -36,7 +36,7 @@
 	<property name="build.0.filename" value="uel-${project.version}" />
 	<property name="build.1.name" value="uel-plugin" />
 	<property name="build.1.output.name" value="plugin" />
-	<property name="build.1.filename" value="de.tudresden.inf.lat.uel" />
+	<property name="build.1.filename" value="${project.groupId}-${project.version}" />
 	<property name="build.2.name" value="uel-standalone" />
 	<property name="build.2.output.name" value="standalone" />
 	<property name="build.2.filename" value="uel" />
@@ -52,7 +52,7 @@
 
 	<!-- Prepares the jars for the release. -->
 	<target name="preparejars">
-		<copy todir="${_release.directory}/modules">
+		<copy todir="${_release.directory}/modules/${module.name}">
 			<fileset dir="${_root.directory}/${module.name}/target" includes="${module.name}-${project.version}.jar" />
 			<fileset dir="${_root.directory}/${module.name}/target" includes="${module.name}-${project.version}-sources.jar" />
 			<fileset dir="${_root.directory}/${module.name}/target" includes="${module.name}-${project.version}-javadoc.jar" />
@@ -88,6 +88,8 @@
 
 		<copy todir="${_release.directory}/${build.1.output.name}">
 			<fileset dir="../${build.1.name}/target" includes="${build.1.filename}.jar" />
+			<fileset dir="../${build.1.name}/target" includes="${build.1.filename}-sources.jar" />
+			<fileset dir="../${build.1.name}/target" includes="${build.1.filename}-javadoc.jar" />
 		</copy>
 
 		<copy todir="${_release.directory}/${build.2.output.name}">
