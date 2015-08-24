@@ -60,7 +60,7 @@
 	</dependencies>
 
 	<parent>
-		<groupId>de.tudresden.inf.lat.uel</groupId>
+		<groupId>de.tu-dresden.inf.lat.uel</groupId>
 		<artifactId>uel-parent</artifactId>
 		<version>1.4.0-SNAPSHOT</version>
 	</parent>
