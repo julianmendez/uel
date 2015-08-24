@@ -21,7 +21,7 @@
 			conf="javadoc->javadoc;sources->sources;compile->default" />
 		<dependency org="junit" name="junit" rev="4.12"
 			conf="javadoc->javadoc;sources->sources;compile->default" />
-		<dependency org="de.tu-dresden.inf.lat.jcel" name="jcel" rev="0.20.0" />
+		<dependency org="de.tu-dresden.inf.lat.jcel" name="jcel" rev="0.22.0" />
 	</dependencies>
 
 </ivy-module>

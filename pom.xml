@@ -41,8 +41,8 @@
 
 			<dependency>
 				<groupId>de.tu-dresden.inf.lat.jcel</groupId>
-				<artifactId>jcel</artifactId>
-				<version>0.20.0</version>
+				<artifactId>jcel-owlapi</artifactId>
+				<version>0.22.0</version>
 				<scope>test</scope>
 			</dependency>
 
