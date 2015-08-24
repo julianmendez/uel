@@ -179,7 +179,7 @@
 
 	<description>Unifier for the description logic EL.</description>
 
-	<url>http://uel.sourceforge.net</url>
+	<url>https://github.com/julianmendez/uel</url>
 
 	<inceptionYear>2011</inceptionYear>
 
@@ -223,6 +223,12 @@
 		</developer>
 
 	</developers>
+
+	<scm>
+		<url>https://github.com/julianmendez/uel.git</url>
+		<connection>scm:git:https://github.com/julianmendez/uel.git</connection>
+		<developerConnection>scm:git:https://github.com/julianmendez/uel.git</developerConnection>
+	</scm>
 
 	<repositories>
 
