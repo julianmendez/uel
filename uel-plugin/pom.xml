@@ -27,7 +27,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-		<mainClass>${project.groupId}.plugin.main.UelStandalone</mainClass>
+		<mainClass>de.tudresden.inf.lat.uel.plugin.main.UelStandalone</mainClass>
 
 		<bundle.version>1.4.0.SNAPSHOT</bundle.version>
 		<bundle.activator>org.protege.editor.core.plugin.DefaultPluginActivator</bundle.activator>
