@@ -40,7 +40,7 @@
 			</dependency>
 
 			<dependency>
-				<groupId>de.tudresden.inf.lat.jcel</groupId>
+				<groupId>de.tu-dresden.inf.lat.jcel</groupId>
 				<artifactId>jcel</artifactId>
 				<version>0.20.0</version>
 				<scope>test</scope>

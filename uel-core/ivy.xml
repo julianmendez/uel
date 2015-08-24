@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ivy-module version="2.0">
 
-	<info organisation="de.tudresden.inf.lat.uel" module="uel-core" />
+	<info organisation="de.tu-dresden.inf.lat.uel" module="uel-core" />
 
 	<configurations defaultconfmapping="compile->default">
 		<conf name="compile" />
@@ -21,7 +21,7 @@
 			conf="javadoc->javadoc;sources->sources;compile->default" />
 		<dependency org="junit" name="junit" rev="4.12"
 			conf="javadoc->javadoc;sources->sources;compile->default" />
-		<dependency org="de.tudresden.inf.lat.jcel" name="jcel" rev="0.20.0" />
+		<dependency org="de.tu-dresden.inf.lat.jcel" name="jcel" rev="0.20.0" />
 	</dependencies>
 
 </ivy-module>
