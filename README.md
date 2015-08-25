@@ -57,15 +57,11 @@ To start the standalone application, you can use the following [script](http://j
 
 ## Build instructions
 * **master** (trunk)
-  to compile it with Apache Maven (3.0.3+):
+  to compile it with [Apache Maven](http://maven.apache.org/) (3.0.3+):
   ```
   mvn clean package
   ```
-  to compile it with Apache Ant (1.8.3+):
-  ```
-  ant
-  ```
-  release: `target/uel-version.zip`
+  release: `target/uel-1.4.0-SNAPSHOT.zip`
 
 * **v1.3.0**
   ```
