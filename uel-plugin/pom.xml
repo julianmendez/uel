@@ -30,7 +30,7 @@
 		<mainClass>de.tudresden.inf.lat.uel.plugin.main.UelStandalone</mainClass>
 
 		<bundle.activator>org.protege.editor.core.plugin.DefaultPluginActivator</bundle.activator>
-		<bundle.classpath>.,lib/uel/uel-type/1.4.0-SNAPSHOT/uel-type-1.4.0-SNAPSHOT.jar,lib/uel/uel-rule/1.4.0-SNAPSHOT/uel-rule-1.4.0-SNAPSHOT.jar,lib/uel/uel-sat/1.4.0-SNAPSHOT/uel-sat-1.4.0-SNAPSHOT.jar,lib/uel/uel-asp/1.4.0-SNAPSHOT/uel-asp-1.4.0-SNAPSHOT.jar,lib/uel/uel-core/1.4.0-SNAPSHOT/uel-core-1.4.0-SNAPSHOT.jar,lib/uel/uel-ui/1.4.0-SNAPSHOT/uel-ui-1.4.0-SNAPSHOT.jar,lib/org/ow2/sat4j/org.ow2.sat4j.core/2.3.5/org.ow2.sat4j.core-2.3.5.jar,lib/org/ow2/sat4j/org.ow2.sat4j.pb/2.3.5/org.ow2.sat4j.pb-2.3.5.jar,lib/org/ow2/sat4j/org.ow2.sat4j.maxsat/2.3.5/org.ow2.sat4j.maxsat-2.3.5.jar,lib/commons-cli/commons-cli/1.1/commons-cli-1.1.jar,lib/org/codehaus/jackson/jackson-core-asl/1.9.13/jackson-core-asl-1.9.13.jar,lib/org/codehaus/jackson/jackson-mapper-asl/1.9.13/jackson-mapper-asl-1.9.13.jar,lib/com/sun/java/jlfgr/1.0/jlfgr-1.0.jar</bundle.classpath>
+		<bundle.classpath>.,lib/org/ow2/sat4j/org.ow2.sat4j.core/2.3.5/org.ow2.sat4j.core-2.3.5.jar,lib/org/ow2/sat4j/org.ow2.sat4j.pb/2.3.5/org.ow2.sat4j.pb-2.3.5.jar,lib/org/ow2/sat4j/org.ow2.sat4j.maxsat/2.3.5/org.ow2.sat4j.maxsat-2.3.5.jar,lib/commons-cli/commons-cli/1.1/commons-cli-1.1.jar,lib/org/codehaus/jackson/jackson-core-asl/1.9.13/jackson-core-asl-1.9.13.jar,lib/org/codehaus/jackson/jackson-mapper-asl/1.9.13/jackson-mapper-asl-1.9.13.jar,lib/com/sun/java/jlfgr/1.0/jlfgr-1.0.jar</bundle.classpath>
 		<import.package>javax.accessibility,javax.swing,javax.swing.border,org.osgi.framework,org.protege.editor.core.ui.workspace,org.semanticweb.*;resolution:=optional,org.joda.time.*;resolution:=optional,*</import.package>
 		<require.bundle>org.eclipse.equinox.registry,org.eclipse.equinox.common,org.protege.editor.core.application,org.protege.editor.owl,org.semanticweb.owl.owlapi</require.bundle>
 	</properties>
@@ -97,13 +97,13 @@
 						<Require-Bundle>${require.bundle}</Require-Bundle>
 						<Include-Resource>
 							{maven-resources}, {maven-dependencies},
+							@uel-type-${project.version}.jar,
+							@uel-asp-${project.version}.jar,
+							@uel-rule-${project.version}.jar,
+							@uel-sat-${project.version}.jar,
+							@uel-core-${project.version}.jar,
+							@uel-ui-${project.version}.jar,
 							@uel-protege-${project.version}.jar,
-							lib/uel/uel-type/${project.version}/uel-type-${project.version}.jar=uel-type-${project.version}.jar,
-							lib/uel/uel-rule/${project.version}/uel-rule-${project.version}.jar=uel-rule-${project.version}.jar,
-							lib/uel/uel-sat/${project.version}/uel-sat-${project.version}.jar=uel-sat-${project.version}.jar,
-							lib/uel/uel-asp/${project.version}/uel-asp-${project.version}.jar=uel-asp-${project.version}.jar,
-							lib/uel/uel-core/${project.version}/uel-core-${project.version}.jar=uel-core-${project.version}.jar,
-							lib/uel/uel-ui/${project.version}/uel-ui-${project.version}.jar=uel-ui-${project.version}.jar,
 							lib/org/ow2/sat4j/org.ow2.sat4j.core/2.3.5/org.ow2.sat4j.core-2.3.5.jar=org.ow2.sat4j.core-2.3.5.jar,
 							lib/org/ow2/sat4j/org.ow2.sat4j.pb/2.3.5/org.ow2.sat4j.pb-2.3.5.jar=org.ow2.sat4j.pb-2.3.5.jar,
 							lib/org/ow2/sat4j/org.ow2.sat4j.maxsat/2.3.5/org.ow2.sat4j.maxsat-2.3.5.jar=org.ow2.sat4j.maxsat-2.3.5.jar,
