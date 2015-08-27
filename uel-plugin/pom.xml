@@ -112,8 +112,8 @@
 							lib/org/codehaus/jackson/jackson-mapper-asl/1.9.13/jackson-mapper-asl-1.9.13.jar=jackson-mapper-asl-1.9.13.jar,
 							lib/com/sun/java/jlfgr/1.0/jlfgr-1.0.jar=jlfgr-1.0.jar,
 							LICENSE.txt=../LICENSE.txt,
-							copying.txt=../copying.txt,
-							copying-lesser.txt=../copying-lesser.txt
+							COPYING.txt=../COPYING.txt,
+							COPYING-LESSER.txt=../COPYING-LESSER.txt
 						</Include-Resource>
 					</instructions>
 				</configuration>
