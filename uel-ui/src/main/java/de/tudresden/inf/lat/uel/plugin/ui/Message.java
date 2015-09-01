@@ -23,10 +23,10 @@ public interface Message {
 	String iconBack = "icons/back-16x16.png";
 	String iconFastForward = "icons/fastforward-16x16.png";
 	String iconForward = "icons/forward-16x16.png";
-	String iconHistory = "toolbarButtonGraphics/general/History16.gif";
+	String iconHistory = "icons/statistics-16x16.png";
 	String iconOpen = "icons/openfolder-16x16.png";
 	String iconRewind = "icons/rewind-16x16.png";
-	String iconSave = "toolbarButtonGraphics/general/Save16.gif";
+	String iconSave = "icons/floppydisk-16x16.png";
 	String iconStepBack = "icons/stepback-16x16.png";
 	String iconStepForward = "icons/stepforward-16x16.png";
 	String titleError = "Error";
