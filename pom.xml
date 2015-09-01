@@ -58,12 +58,6 @@
 				<version>1.9.13</version>
 			</dependency>
 
-			<dependency>
-				<groupId>com.sun.java</groupId>
-				<artifactId>jlfgr</artifactId>
-				<version>1.0</version>
-			</dependency>
-
 		</dependencies>
 
 	</dependencyManagement>

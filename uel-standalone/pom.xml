@@ -212,7 +212,6 @@
 							@commons-cli-1.1.jar,
 							@jackson-core-asl-1.9.13.jar,
 							@jackson-mapper-asl-1.9.13.jar,
-							@jlfgr-1.0.jar,
 							@owlapi-distribution-3.5.1.jar,
 							@slf4j-api-1.7.7.jar,
 							@guava-18.0.jar,
