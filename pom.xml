@@ -230,16 +230,6 @@
 		<developerConnection>scm:git:https://github.com/julianmendez/uel.git</developerConnection>
 	</scm>
 
-	<repositories>
-
-		<repository>
-			<id>uelrepository</id>
-			<name>UEL local Maven repository</name>
-			<url>file:${project.basedir}/../uel-build/lib</url>
-		</repository>
-
-	</repositories>
-
 	<profiles>
 
 		<profile>
