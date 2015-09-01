@@ -46,11 +46,6 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.sun.java</groupId>
-			<artifactId>jlfgr</artifactId>
-		</dependency>
-
-		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 		</dependency>
