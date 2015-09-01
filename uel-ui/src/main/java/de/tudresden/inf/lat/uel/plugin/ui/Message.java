@@ -24,7 +24,7 @@ public interface Message {
 	String iconFastForward = "toolbarButtonGraphics/media/FastForward16.gif";
 	String iconForward = "toolbarButtonGraphics/navigation/Forward16.gif";
 	String iconHistory = "toolbarButtonGraphics/general/History16.gif";
-	String iconOpen = "toolbarButtonGraphics/general/Open16.gif";
+	String iconOpen = "icons/openfolder-16x16.png";
 	String iconRewind = "toolbarButtonGraphics/media/Rewind16.gif";
 	String iconSave = "toolbarButtonGraphics/general/Save16.gif";
 	String iconStepBack = "toolbarButtonGraphics/media/StepBack16.gif";
