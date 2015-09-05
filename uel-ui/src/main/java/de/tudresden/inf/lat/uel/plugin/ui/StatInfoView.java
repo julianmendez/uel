@@ -4,22 +4,15 @@ import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionListener;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.StringReader;
 import java.util.Map;
-import java.util.StringTokenizer;
 
 import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.WindowConstants;
-
-import de.tudresden.inf.lat.uel.type.cons.KRSSKeyword;
 
 /**
  * This is the panel that shows statistical information.
@@ -81,8 +74,7 @@ class StatInfoView extends JDialog {
 		goalPanel.add(scrollPaneVars);
 
 		JPanel buttonPanel = new JPanel();
-		this.saveButton = new JButton(new ImageIcon(this.getClass()
-				.getClassLoader().getResource(Message.iconSave)));
+		this.saveButton = new JButton(UelIcon.ICON_SAVE);
 		this.saveButton.setToolTipText(Message.tooltipSaveGoal);
 		this.saveButton.setMinimumSize(new Dimension(56, 28));
 		this.saveButton.setMaximumSize(new Dimension(74, 28));

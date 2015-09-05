@@ -8,7 +8,6 @@ import java.util.List;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListCellRenderer;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -31,10 +30,8 @@ public class UelView extends JPanel {
 
 	private static final long serialVersionUID = 9096602357606632334L;
 
-	private JButton buttonOpen = new JButton(new ImageIcon(this.getClass()
-			.getClassLoader().getResource(Message.iconOpen)));
-	private JButton buttonSelectVariables = new JButton(new ImageIcon(this
-			.getClass().getClassLoader().getResource(Message.iconForward)));
+	private JButton buttonOpen = new JButton(UelIcon.ICON_OPEN);
+	private JButton buttonSelectVariables = new JButton(UelIcon.ICON_FORWARD);
 	private JComboBox<OWLOntology> listOntologyNameBg00 = new JComboBox<OWLOntology>();
 	private JComboBox<OWLOntology> listOntologyNameBg01 = new JComboBox<OWLOntology>();
 	private JComboBox<OWLOntology> listOntologyNamePos = new JComboBox<OWLOntology>();
@@ -51,8 +48,7 @@ public class UelView extends JPanel {
 		add(createSelectionPanel());
 	}
 
-	public void addButtonOpenListener(ActionListener listener,
-			String actionCommand) {
+	public void addButtonOpenListener(ActionListener listener, String actionCommand) {
 		if (listener == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
@@ -64,8 +60,7 @@ public class UelView extends JPanel {
 		this.buttonOpen.setActionCommand(actionCommand);
 	}
 
-	public void addButtonSelectVariablesListener(ActionListener listener,
-			String actionCommand) {
+	public void addButtonSelectVariablesListener(ActionListener listener, String actionCommand) {
 		if (listener == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
@@ -77,8 +72,7 @@ public class UelView extends JPanel {
 		this.buttonSelectVariables.setActionCommand(actionCommand);
 	}
 
-	public void addComboBoxOntologyBg00Listener(ActionListener listener,
-			String actionCommand) {
+	public void addComboBoxOntologyBg00Listener(ActionListener listener, String actionCommand) {
 		if (listener == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
@@ -90,8 +84,7 @@ public class UelView extends JPanel {
 		this.listOntologyNameBg00.setActionCommand(actionCommand);
 	}
 
-	public void addComboBoxOntologyBg01Listener(ActionListener listener,
-			String actionCommand) {
+	public void addComboBoxOntologyBg01Listener(ActionListener listener, String actionCommand) {
 		if (listener == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
@@ -103,8 +96,7 @@ public class UelView extends JPanel {
 		this.listOntologyNameBg01.setActionCommand(actionCommand);
 	}
 
-	public void addComboBoxOntologyPosListener(ActionListener listener,
-			String actionCommand) {
+	public void addComboBoxOntologyPosListener(ActionListener listener, String actionCommand) {
 		if (listener == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
@@ -116,8 +108,7 @@ public class UelView extends JPanel {
 		this.listOntologyNamePos.setActionCommand(actionCommand);
 	}
 
-	public void addComboBoxOntologyNegListener(ActionListener listener,
-			String actionCommand) {
+	public void addComboBoxOntologyNegListener(ActionListener listener, String actionCommand) {
 		if (listener == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
@@ -147,8 +138,7 @@ public class UelView extends JPanel {
 		smallPanel.add(this.listProcessor);
 		this.buttonOpen.setToolTipText(Message.tooltipOpen);
 		smallPanel.add(this.buttonOpen);
-		this.buttonSelectVariables
-				.setToolTipText(Message.tooltipSelectVariables);
+		this.buttonSelectVariables.setToolTipText(Message.tooltipSelectVariables);
 		smallPanel.add(this.buttonSelectVariables);
 		ret.add(smallPanel);
 
@@ -165,8 +155,7 @@ public class UelView extends JPanel {
 		largePanel.add(labelOntologyNameBg00);
 
 		this.listOntologyNameBg00.setRenderer(new ComboBoxRenderer());
-		this.listOntologyNameBg00
-				.setToolTipText(Message.tooltipComboBoxOntologyBg00);
+		this.listOntologyNameBg00.setToolTipText(Message.tooltipComboBoxOntologyBg00);
 		// this.listOntologyNameBg00
 		// .setPreferredSize(new Dimension(width, height));
 		this.listOntologyNameBg00.setAlignmentX(LEFT_ALIGNMENT);
@@ -180,8 +169,7 @@ public class UelView extends JPanel {
 		largePanel.add(labelOntologyNameBg01);
 
 		this.listOntologyNameBg01.setRenderer(new ComboBoxRenderer());
-		this.listOntologyNameBg01
-				.setToolTipText(Message.tooltipComboBoxOntologyBg01);
+		this.listOntologyNameBg01.setToolTipText(Message.tooltipComboBoxOntologyBg01);
 		// this.listOntologyNameBg01
 		// .setPreferredSize(new Dimension(width, height));
 		this.listOntologyNameBg01.setAlignmentX(LEFT_ALIGNMENT);
@@ -195,8 +183,7 @@ public class UelView extends JPanel {
 		largePanel.add(labelOntologyNamePos);
 
 		this.listOntologyNamePos.setRenderer(new ComboBoxRenderer());
-		this.listOntologyNamePos
-				.setToolTipText(Message.tooltipComboBoxOntologyPos);
+		this.listOntologyNamePos.setToolTipText(Message.tooltipComboBoxOntologyPos);
 		// this.listOntologyNamePos.setPreferredSize(new Dimension(width,
 		// height));
 		this.listOntologyNamePos.setAlignmentX(LEFT_ALIGNMENT);
@@ -210,8 +197,7 @@ public class UelView extends JPanel {
 		largePanel.add(labelOntologyNameNeg);
 
 		this.listOntologyNameNeg.setRenderer(new ComboBoxRenderer());
-		this.listOntologyNameNeg
-				.setToolTipText(Message.tooltipComboBoxOntologyNeg);
+		this.listOntologyNameNeg.setToolTipText(Message.tooltipComboBoxOntologyNeg);
 		this.listOntologyNameNeg.setMinimumSize(new Dimension(width, height));
 		this.listOntologyNameNeg.setAlignmentX(LEFT_ALIGNMENT);
 		largePanel.add(this.listOntologyNameNeg);
@@ -291,12 +277,10 @@ public class UelView extends JPanel {
 		private static final long serialVersionUID = -2411864526023749022L;
 
 		@Override
-		public Component getListCellRendererComponent(JList<?> list,
-				Object value, int index, boolean isSelected,
+		public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected,
 				boolean cellHasFocus) {
 
-			super.getListCellRendererComponent(list, value, index, isSelected,
-					cellHasFocus);
+			super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 
 			if (value instanceof OWLOntology) {
 				OWLOntologyID id = ((OWLOntology) value).getOntologyID();

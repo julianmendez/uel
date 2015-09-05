@@ -11,7 +11,6 @@ import java.util.TreeSet;
 import java.util.Vector;
 
 import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JList;
@@ -28,16 +27,13 @@ class VarSelectionView extends JDialog {
 
 	private static final long serialVersionUID = 1742164773153032359L;
 
-	private final JButton acceptVarButton = new JButton(new ImageIcon(this
-			.getClass().getClassLoader().getResource(Message.iconForward)));
+	private final JButton acceptVarButton = new JButton(UelIcon.ICON_FORWARD);
 	private JList listConstants = null;
 	private List<LabelId> listOfConstants = null;
 	private List<LabelId> listOfVariables = null;
 	private JList listVariables = null;
-	private final JButton makeConsButton = new JButton(new ImageIcon(this
-			.getClass().getClassLoader().getResource(Message.iconStepBack)));
-	private final JButton makeVarButton = new JButton(new ImageIcon(this
-			.getClass().getClassLoader().getResource(Message.iconStepForward)));;
+	private final JButton makeConsButton = new JButton(UelIcon.ICON_STEP_BACK);
+	private final JButton makeVarButton = new JButton(UelIcon.ICON_STEP_FORWARD);
 	private final VarSelectionModel model;
 
 	public VarSelectionView(VarSelectionModel m) {
@@ -52,8 +48,7 @@ class VarSelectionView extends JDialog {
 		updateLists();
 	}
 
-	public void addAcceptVarButtonListener(ActionListener listener,
-			String actionCommand) {
+	public void addAcceptVarButtonListener(ActionListener listener, String actionCommand) {
 		if (listener == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
@@ -65,8 +60,7 @@ class VarSelectionView extends JDialog {
 		this.acceptVarButton.setActionCommand(actionCommand);
 	}
 
-	public void addMakeConsButtonListener(ActionListener listener,
-			String actionCommand) {
+	public void addMakeConsButtonListener(ActionListener listener, String actionCommand) {
 		if (listener == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
@@ -78,8 +72,7 @@ class VarSelectionView extends JDialog {
 		this.makeConsButton.setActionCommand(actionCommand);
 	}
 
-	public void addMakeVarButtonListener(ActionListener listener,
-			String actionCommand) {
+	public void addMakeVarButtonListener(ActionListener listener, String actionCommand) {
 		if (listener == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
@@ -98,15 +91,13 @@ class VarSelectionView extends JDialog {
 		this.listConstants = new JList();
 		this.listConstants.setToolTipText("constants");
 		JScrollPane scrollPaneCons = new JScrollPane(this.listConstants);
-		scrollPaneCons
-				.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		scrollPaneCons.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		scrollPaneCons.setPreferredSize(new Dimension(360, 480));
 
 		this.listVariables = new JList();
 		this.listVariables.setToolTipText("variables");
 		JScrollPane scrollPaneVars = new JScrollPane(this.listVariables);
-		scrollPaneVars
-				.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		scrollPaneVars.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		scrollPaneVars.setPreferredSize(new Dimension(360, 480));
 
 		JPanel varSelPanel = new JPanel();

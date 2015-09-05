@@ -20,15 +20,6 @@ public interface Message {
 	String buttonSaveGoal = "Save";
 	String buttonSelectVariables = ">";
 	String buttonShowStatInfo = "Stat";
-	String iconBack = "icons/back-16x16.png";
-	String iconFastForward = "icons/fastforward-16x16.png";
-	String iconForward = "icons/forward-16x16.png";
-	String iconHistory = "icons/statistics-16x16.png";
-	String iconOpen = "icons/openfolder-16x16.png";
-	String iconRewind = "icons/rewind-16x16.png";
-	String iconSave = "icons/floppydisk-16x16.png";
-	String iconStepBack = "icons/stepback-16x16.png";
-	String iconStepForward = "icons/stepforward-16x16.png";
 	String titleError = "Error";
 	String textOntologyBg00 = "First background ontology:";
 	String textOntologyBg01 = "Second background ontology:";

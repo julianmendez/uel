@@ -6,7 +6,6 @@ import java.awt.GridBagLayout;
 import java.awt.event.ActionListener;
 
 import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
@@ -25,18 +24,12 @@ public class UnifierView extends JDialog {
 
 	private static final long serialVersionUID = 7965907233259580732L;
 
-	private JButton buttonFirst = new JButton(new ImageIcon(this.getClass()
-			.getClassLoader().getResource(Message.iconRewind)));
-	private JButton buttonLast = new JButton(new ImageIcon(this.getClass()
-			.getClassLoader().getResource(Message.iconFastForward)));
-	private JButton buttonNext = new JButton(new ImageIcon(this.getClass()
-			.getClassLoader().getResource(Message.iconForward)));
-	private JButton buttonPrevious = new JButton(new ImageIcon(this.getClass()
-			.getClassLoader().getResource(Message.iconBack)));
-	private JButton buttonSave = new JButton(new ImageIcon(this.getClass()
-			.getClassLoader().getResource(Message.iconSave)));
-	private JButton buttonShowStatInfo = new JButton(new ImageIcon(this
-			.getClass().getClassLoader().getResource(Message.iconHistory)));
+	private JButton buttonFirst = new JButton(UelIcon.ICON_REWIND);
+	private JButton buttonLast = new JButton(UelIcon.ICON_FAST_FORWARD);
+	private JButton buttonNext = new JButton(UelIcon.ICON_FORWARD);
+	private JButton buttonPrevious = new JButton(UelIcon.ICON_BACK);
+	private JButton buttonSave = new JButton(UelIcon.ICON_SAVE);
+	private JButton buttonShowStatInfo = new JButton(UelIcon.ICON_HISTORY);
 	private final UelModel model;
 	private JTextArea textUnifier = new JTextArea();
 	private JTextArea textUnifierId = new JTextArea();
@@ -52,8 +45,7 @@ public class UnifierView extends JDialog {
 		initFrame();
 	}
 
-	public void addButtonFirstListener(ActionListener listener,
-			String actionCommand) {
+	public void addButtonFirstListener(ActionListener listener, String actionCommand) {
 		if (listener == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
@@ -65,8 +57,7 @@ public class UnifierView extends JDialog {
 		this.buttonFirst.setActionCommand(actionCommand);
 	}
 
-	public void addButtonLastListener(ActionListener listener,
-			String actionCommand) {
+	public void addButtonLastListener(ActionListener listener, String actionCommand) {
 		if (listener == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
@@ -78,8 +69,7 @@ public class UnifierView extends JDialog {
 		this.buttonLast.setActionCommand(actionCommand);
 	}
 
-	public void addButtonNextListener(ActionListener listener,
-			String actionCommand) {
+	public void addButtonNextListener(ActionListener listener, String actionCommand) {
 		if (listener == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
@@ -91,8 +81,7 @@ public class UnifierView extends JDialog {
 		this.buttonNext.setActionCommand(actionCommand);
 	}
 
-	public void addButtonPreviousListener(ActionListener listener,
-			String actionCommand) {
+	public void addButtonPreviousListener(ActionListener listener, String actionCommand) {
 		if (listener == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
@@ -104,8 +93,7 @@ public class UnifierView extends JDialog {
 		this.buttonPrevious.setActionCommand(actionCommand);
 	}
 
-	public void addButtonSaveListener(ActionListener listener,
-			String actionCommand) {
+	public void addButtonSaveListener(ActionListener listener, String actionCommand) {
 		if (listener == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
@@ -117,8 +105,7 @@ public class UnifierView extends JDialog {
 		this.buttonSave.setActionCommand(actionCommand);
 	}
 
-	public void addButtonShowStatInfoListener(ActionListener listener,
-			String actionCommand) {
+	public void addButtonShowStatInfoListener(ActionListener listener, String actionCommand) {
 		if (listener == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
@@ -163,8 +150,7 @@ public class UnifierView extends JDialog {
 		smallPanel.add(this.buttonShowStatInfo);
 
 		JScrollPane scrollPane = new JScrollPane(this.textUnifier);
-		scrollPane
-				.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		scrollPane.setPreferredSize(new Dimension(640, 480));
 
 		ret.add(smallPanel);
