@@ -16,27 +16,27 @@ import javax.swing.ImageIcon;
  */
 public class UelIcon {
 
-	public static final String iconBack = "icons/back.png";
-	public static final String iconFastForward = "icons/fastforward.png";
-	public static final String iconForward = "icons/forward.png";
-	public static final String iconHistory = "icons/statistics.png";
-	public static final String iconOpen = "icons/openfolder.png";
-	public static final String iconRewind = "icons/rewind.png";
-	public static final String iconSave = "icons/floppydisk.png";
-	public static final String iconStepBack = "icons/stepback.png";
-	public static final String iconStepForward = "icons/stepforward.png";
+	public static final String PATH_BACK = "icons/back.png";
+	public static final String PATH_FAST_FORWARD = "icons/fastforward.png";
+	public static final String PATH_FORWARD = "icons/forward.png";
+	public static final String PATH_STATISTICS = "icons/statistics.png";
+	public static final String PATH_OPEN = "icons/openfolder.png";
+	public static final String PATH_REWIND = "icons/rewind.png";
+	public static final String PATH_SAVE = "icons/floppydisk.png";
+	public static final String PATH_STEP_BACK = "icons/stepback.png";
+	public static final String PATH_STEP_FORWARD = "icons/stepforward.png";
 
 	public static final int DEFAULT_ICON_SIZE = 16;
 
-	public static final ImageIcon ICON_BACK = createIcon(iconBack);
-	public static final ImageIcon ICON_FAST_FORWARD = createIcon(iconFastForward);
-	public static final ImageIcon ICON_FORWARD = createIcon(iconForward);
-	public static final ImageIcon ICON_HISTORY = createIcon(iconHistory);
-	public static final ImageIcon ICON_OPEN = createIcon(iconOpen);
-	public static final ImageIcon ICON_REWIND = createIcon(iconRewind);
-	public static final ImageIcon ICON_SAVE = createIcon(iconSave);
-	public static final ImageIcon ICON_STEP_BACK = createIcon(iconStepBack);
-	public static final ImageIcon ICON_STEP_FORWARD = createIcon(iconStepForward);
+	public static final ImageIcon ICON_BACK = createIcon(PATH_BACK);
+	public static final ImageIcon ICON_FAST_FORWARD = createIcon(PATH_FAST_FORWARD);
+	public static final ImageIcon ICON_FORWARD = createIcon(PATH_FORWARD);
+	public static final ImageIcon ICON_STATISTICS = createIcon(PATH_STATISTICS);
+	public static final ImageIcon ICON_OPEN = createIcon(PATH_OPEN);
+	public static final ImageIcon ICON_REWIND = createIcon(PATH_REWIND);
+	public static final ImageIcon ICON_SAVE = createIcon(PATH_SAVE);
+	public static final ImageIcon ICON_STEP_BACK = createIcon(PATH_STEP_BACK);
+	public static final ImageIcon ICON_STEP_FORWARD = createIcon(PATH_STEP_FORWARD);
 
 	/**
 	 * Creates an icon with the given size. If the path is invalid, this method

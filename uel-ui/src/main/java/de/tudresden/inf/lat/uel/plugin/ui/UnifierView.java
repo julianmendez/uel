@@ -29,7 +29,7 @@ public class UnifierView extends JDialog {
 	private JButton buttonNext = new JButton(UelIcon.ICON_FORWARD);
 	private JButton buttonPrevious = new JButton(UelIcon.ICON_BACK);
 	private JButton buttonSave = new JButton(UelIcon.ICON_SAVE);
-	private JButton buttonShowStatInfo = new JButton(UelIcon.ICON_HISTORY);
+	private JButton buttonShowStatInfo = new JButton(UelIcon.ICON_STATISTICS);
 	private final UelModel model;
 	private JTextArea textUnifier = new JTextArea();
 	private JTextArea textUnifierId = new JTextArea();
