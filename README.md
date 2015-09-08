@@ -1,9 +1,21 @@
 # [UEL](http://julianmendez.github.io/uel/)
 
 [![Build Status](https://travis-ci.org/julianmendez/uel.png?branch=master)](https://travis-ci.org/julianmendez/uel)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/de.tu-dresden.inf.lat.uel/uel-parent/badge.svg)](http://search.maven.org/#search|ga|1|g%3A%22de.tu-dresden.inf.lat.uel%22)
+
 
 **UEL**, Unifier for the [description logic](http://dl.kr.org/) EL, is a plug-in for [Protégé](http://protege.stanford.edu/) that uses the [OWL API](http://owlcs.github.io/owlapi/).
 
+
+## Dependency
+
+```xml
+<dependency>
+  <groupId>de.tu-dresden.inf.lat.uel</groupId>
+  <artifactId>uel-protege</artifactId>
+  <version>1.3.1</version>
+</dependency>
+```
 
 
 ## Source code
@@ -27,16 +39,16 @@ $ mvn clean install
 [Apache License Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt), [GNU Lesser General Public License version 3](http://www.gnu.org/licenses/lgpl-3.0.txt)
 
 
-## [Download](http://sourceforge.net/projects/uel/files/uel/1.3.0/zip/uel-1.3.0.zip/download)
+## [Download](http://sourceforge.net/projects/uel/files/uel/1.3.1/zip/uel-1.3.1.zip/download)
 
-  * download [uel-1.3.0](http://sourceforge.net/projects/uel/files/uel/1.3.0/zip/uel-1.3.0.zip/download) (2015-04-15)
+  * download [uel-1.3.1](http://sourceforge.net/projects/uel/files/uel/1.3.1/zip/uel-1.3.1.zip/download) (2015-04-15)
   * [all versions](http://sourceforge.net/projects/uel/files/):
 
 
 | version            | zip   | release date | Java | OWL API | Protégé       |
 |:-------------------|:------|:-------------|:----:|:--------|:--------------|
 | uel-1.4.0-SNAPSHOT |       |              | 7    | 3.5.1   | 5.0.0-beta-17 |
-| uel-1.3.1          |       |              | 7    | 3.5.1   | 5.0.0-beta-17 |
+|[uel-1.3.1](http://sourceforge.net/projects/uel/files/uel/1.3.1/plugin/de.tudresden.inf.lat.uel.jar/download)   | [(zip)](http://sourceforge.net/projects/uel/files/uel/1.3.1/zip/uel-1.3.1.zip/download)   |             | 7    | 3.5.1   | 5.0.0-beta-17 |
 | [uel-1.3.0](http://sourceforge.net/projects/uel/files/uel/1.3.0/plugin/de.tudresden.inf.lat.uel.jar/download)   | [(zip)](http://sourceforge.net/projects/uel/files/uel/1.3.0/zip/uel-1.3.0.zip/download) |	2015-04-15  | 7    | 3.5.0   | 4.3           |
 | [uel-1.2.0](http://sourceforge.net/projects/uel/files/uel/1.2.0/plugin/de.tudresden.inf.lat.uel.jar/download)   | [(zip)](http://sourceforge.net/projects/uel/files/uel/1.2.0/zip/uel-1.2.0.zip/download) |	2012-04-30  | 6    | 3.2.4   | 4.1           |
 | [uel-1.1.0](http://sourceforge.net/projects/uel/files/uel/1.1.0/plugin/de.tudresden.inf.lat.uel.jar/download)   | [(zip)](http://sourceforge.net/projects/uel/files/uel/1.1.0/zip/uel-1.1.0.zip/download) |	2012-03-09  | 6    | 3.2.4   | 4.1           |
@@ -46,23 +58,31 @@ $ mvn clean install
 ## Installation and use
 
 * as a **plugin**:
-download [de.tudresden.inf.lat.uel.jar](http://sourceforge.net/projects/uel/files/uel/1.3.0/plugin/de.tudresden.inf.lat.uel.jar/download) and copy it into `Protege_4.3/plugins`.
+download [de.tu-dresden.inf.lat.uel-1.3.1.jar](http://sourceforge.net/projects/uel/files/uel/1.3.1/plugin/de.tu-dresden.inf.lat.uel-1.3.1.jar/download) and copy it into `Protege-5.0.0-beta-17/plugins`.
 
 * as a **library**:
-download the [zip](http://sourceforge.net/projects/uel/files/uel/1.3.0/zip/uel-1.3.0.zip/download) containing `uel-1.3.0.jar` in directory `uel/uel-library` and use all of them as libraries.
+download the [zip](http://sourceforge.net/projects/uel/files/uel/1.3.1/zip/uel-1.3.1.zip/download) containing `uel-1.3.1.jar` in directory `uel/uel-library` and use all of them as libraries.
 
 * as a **standalone**:
 
 To start the standalone application, you can use the following [script](http://julianmendez.github.io/uel/extra/start-uel.sh.txt).
 
 
-## Build instructions
-* **master** (trunk)
+## Build instructions for older versions
+* **master**
   to compile it with [Apache Maven](http://maven.apache.org/) (3.0.3+):
   ```
-  $ mvn clean package
+  $ mvn clean install
   ```
   release: `target/uel-1.4.0-SNAPSHOT.zip`
+
+* **v1.3.1**
+  to compile it with Apache Maven (3.0.3+):
+  ```
+  $ git checkout v1.3.1
+  $ mvn clean install
+  ```
+  release: `target/uel-1.3.1.zip`
 
 * **v1.3.0**
   ```
