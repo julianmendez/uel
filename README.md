@@ -135,19 +135,8 @@ To start the standalone application, you can use the following [script](http://j
   release: `target/uel-version.zip`
 
 
-## Changes
-* **v1.3.0**
- * added capability to handle dissubsumptions to SAT-based algorithm
- * added ASP-based algorithm (experimental)
-
-* **v1.2.0**
- * added possibility to restrict SAT-based algorithm to minimal assignments
-
-* **v1.1.0**
- * addded Rule-based algorithm
-
-* **v1.0.0**
- * basic SAT-based algorithm
+## Release Notes
+See [release notes](http://github.com/julianmendez/uel/blob/master/RELEASE-NOTES.md).
 
 
 ## [Support](http://lat.inf.tu-dresden.de/~mendez)
