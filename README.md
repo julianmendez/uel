@@ -62,8 +62,8 @@ The library, its sources and its Javadoc will be in `uel-library/target`, the pl
 
 ## [Download](http://sourceforge.net/projects/uel/files/uel/1.3.1/zip/uel-1.3.1.zip/download)
 
-  * download [uel-1.3.1](http://sourceforge.net/projects/uel/files/uel/1.3.1/zip/uel-1.3.1.zip/download) (2015-04-15)
-  * [all versions](http://sourceforge.net/projects/uel/files/):
+  * download all-in-one ZIP file [uel-1.3.1](http://sourceforge.net/projects/uel/files/uel/1.3.1/zip/uel-1.3.1.zip/download)
+  * [older versions](http://sourceforge.net/projects/uel/files/):
 
 
 | version            | zip   | release date | Java | OWL API | Protégé       |
