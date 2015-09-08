@@ -69,7 +69,7 @@ The library, its sources and its Javadoc will be in `uel-library/target`, the pl
 | version            | zip   | release date | Java | OWL API | Protégé       |
 |:-------------------|:------|:-------------|:----:|:--------|:--------------|
 | uel-1.4.0-SNAPSHOT |       |              | 7    | 3.5.1   | 5.0.0-beta-17 |
-|[uel-1.3.1](http://sourceforge.net/projects/uel/files/uel/1.3.1/plugin/de.tudresden.inf.lat.uel.jar/download)   | [(zip)](http://sourceforge.net/projects/uel/files/uel/1.3.1/zip/uel-1.3.1.zip/download)   |             | 7    | 3.5.1   | 5.0.0-beta-17 |
+|[uel-1.3.1](http://sourceforge.net/projects/uel/files/uel/1.3.1/plugin/de.tudresden.inf.lat.uel.jar/download)   | [(zip)](http://sourceforge.net/projects/uel/files/uel/1.3.1/zip/uel-1.3.1.zip/download)   | 2015-09-09  | 7    | 3.5.1   | 5.0.0-beta-17 |
 | [uel-1.3.0](http://sourceforge.net/projects/uel/files/uel/1.3.0/plugin/de.tudresden.inf.lat.uel.jar/download)   | [(zip)](http://sourceforge.net/projects/uel/files/uel/1.3.0/zip/uel-1.3.0.zip/download) |	2015-04-15  | 7    | 3.5.0   | 4.3           |
 | [uel-1.2.0](http://sourceforge.net/projects/uel/files/uel/1.2.0/plugin/de.tudresden.inf.lat.uel.jar/download)   | [(zip)](http://sourceforge.net/projects/uel/files/uel/1.2.0/zip/uel-1.2.0.zip/download) |	2012-04-30  | 6    | 3.2.4   | 4.1           |
 | [uel-1.1.0](http://sourceforge.net/projects/uel/files/uel/1.1.0/plugin/de.tudresden.inf.lat.uel.jar/download)   | [(zip)](http://sourceforge.net/projects/uel/files/uel/1.1.0/zip/uel-1.1.0.zip/download) |	2012-03-09  | 6    | 3.2.4   | 4.1           |
