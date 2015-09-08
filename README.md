@@ -44,7 +44,7 @@ $ mvn clean install -DperformRelease=true
 and then on each module:
 ```
 $ cd target
-$ jar -cf bundle.jar jcel-*
+$ jar -cf bundle.jar uel-*
 ```
 
 The library, its sources and its Javadoc will be in `uel-library/target`, the plug-in will be in `uel-plugin/target`, the standalone will be in `uel-standalone/target`, and the release ZIP file will be in `target`.
