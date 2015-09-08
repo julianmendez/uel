@@ -60,7 +60,7 @@ The library, its sources and its Javadoc will be in `uel-library/target`, the pl
 [Apache License Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt), [GNU Lesser General Public License version 3](http://www.gnu.org/licenses/lgpl-3.0.txt)
 
 
-## [Download](http://sourceforge.net/projects/uel/files/uel/1.3.1/zip/uel-1.3.1.zip/download)
+## Download
 
   * download all-in-one ZIP file [uel-1.3.1](http://sourceforge.net/projects/uel/files/uel/1.3.1/zip/uel-1.3.1.zip/download)
   * [older versions](http://sourceforge.net/projects/uel/files/):
@@ -89,7 +89,8 @@ The library, its sources and its Javadoc will be in `uel-library/target`, the pl
 See [release notes](http://github.com/julianmendez/uel/blob/master/RELEASE-NOTES.md).
 
 
-## [Support](http://lat.inf.tu-dresden.de/~mendez)
+## Support
+See [this page](http://lat.inf.tu-dresden.de/~mendez).
 
 
 ## Tutorial - UEL as application
