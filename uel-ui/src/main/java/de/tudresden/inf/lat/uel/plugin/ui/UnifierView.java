@@ -128,9 +128,11 @@ public class UnifierView extends JDialog {
 		JPanel smallPanel = new JPanel();
 
 		this.buttonFirst.setToolTipText(Message.tooltipFirst);
+		UelIcon.setBorder(buttonFirst);
 		smallPanel.add(this.buttonFirst);
 
 		this.buttonPrevious.setToolTipText(Message.tooltipPrevious);
+		UelIcon.setBorder(buttonPrevious);
 		smallPanel.add(this.buttonPrevious);
 
 		this.textUnifierId.setToolTipText(Message.tooltipUnifierId);
@@ -138,15 +140,19 @@ public class UnifierView extends JDialog {
 		smallPanel.add(this.textUnifierId);
 
 		this.buttonNext.setToolTipText(Message.tooltipNext);
+		UelIcon.setBorder(buttonNext);
 		smallPanel.add(this.buttonNext);
 
 		this.buttonLast.setToolTipText(Message.tooltipLast);
+		UelIcon.setBorder(buttonLast);
 		smallPanel.add(this.buttonLast);
 
 		this.buttonSave.setToolTipText(Message.tooltipSave);
+		UelIcon.setBorder(buttonSave);
 		smallPanel.add(this.buttonSave);
 
 		this.buttonShowStatInfo.setToolTipText(Message.tooltipShowStatInfo);
+		UelIcon.setBorder(buttonShowStatInfo);
 		smallPanel.add(this.buttonShowStatInfo);
 
 		JScrollPane scrollPane = new JScrollPane(this.textUnifier);

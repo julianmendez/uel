@@ -48,7 +48,8 @@ class VarSelectionView extends JDialog {
 		updateLists();
 	}
 
-	public void addAcceptVarButtonListener(ActionListener listener, String actionCommand) {
+	public void addAcceptVarButtonListener(ActionListener listener,
+			String actionCommand) {
 		if (listener == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
@@ -60,7 +61,8 @@ class VarSelectionView extends JDialog {
 		this.acceptVarButton.setActionCommand(actionCommand);
 	}
 
-	public void addMakeConsButtonListener(ActionListener listener, String actionCommand) {
+	public void addMakeConsButtonListener(ActionListener listener,
+			String actionCommand) {
 		if (listener == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
@@ -72,7 +74,8 @@ class VarSelectionView extends JDialog {
 		this.makeConsButton.setActionCommand(actionCommand);
 	}
 
-	public void addMakeVarButtonListener(ActionListener listener, String actionCommand) {
+	public void addMakeVarButtonListener(ActionListener listener,
+			String actionCommand) {
 		if (listener == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
@@ -91,13 +94,15 @@ class VarSelectionView extends JDialog {
 		this.listConstants = new JList();
 		this.listConstants.setToolTipText("constants");
 		JScrollPane scrollPaneCons = new JScrollPane(this.listConstants);
-		scrollPaneCons.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		scrollPaneCons
+				.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		scrollPaneCons.setPreferredSize(new Dimension(360, 480));
 
 		this.listVariables = new JList();
 		this.listVariables.setToolTipText("variables");
 		JScrollPane scrollPaneVars = new JScrollPane(this.listVariables);
-		scrollPaneVars.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		scrollPaneVars
+				.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		scrollPaneVars.setPreferredSize(new Dimension(360, 480));
 
 		JPanel varSelPanel = new JPanel();
@@ -109,16 +114,19 @@ class VarSelectionView extends JDialog {
 		this.makeConsButton.setToolTipText(Message.tooltipMakeCons);
 		this.makeConsButton.setMinimumSize(new Dimension(56, 28));
 		this.makeConsButton.setMaximumSize(new Dimension(74, 28));
+		UelIcon.setBorder(makeConsButton);
 		buttonPanel.add(this.makeConsButton);
 
 		this.makeVarButton.setToolTipText(Message.tooltipMakeVar);
 		this.makeVarButton.setMinimumSize(new Dimension(56, 28));
 		this.makeVarButton.setMaximumSize(new Dimension(74, 28));
+		UelIcon.setBorder(makeVarButton);
 		buttonPanel.add(this.makeVarButton);
 
 		this.acceptVarButton.setToolTipText(Message.tooltipAcceptVar);
 		this.acceptVarButton.setMinimumSize(new Dimension(56, 28));
 		this.acceptVarButton.setMaximumSize(new Dimension(74, 28));
+		UelIcon.setBorder(acceptVarButton);
 		buttonPanel.add(this.acceptVarButton);
 
 		ret.add(buttonPanel);

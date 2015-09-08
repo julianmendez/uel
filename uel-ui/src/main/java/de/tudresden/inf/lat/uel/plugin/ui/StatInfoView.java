@@ -78,6 +78,7 @@ class StatInfoView extends JDialog {
 		this.saveButton.setToolTipText(Message.tooltipSaveGoal);
 		this.saveButton.setMinimumSize(new Dimension(56, 28));
 		this.saveButton.setMaximumSize(new Dimension(74, 28));
+		UelIcon.setBorder(saveButton);
 		buttonPanel.add(this.saveButton);
 
 		this.textInfo = new JTextArea();
