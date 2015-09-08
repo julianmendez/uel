@@ -62,7 +62,7 @@ The library, its sources and its Javadoc will be in `uel-library/target`, the pl
 
 ## Download
 
-  * download all-in-one ZIP file [uel-1.3.1](http://sourceforge.net/projects/uel/files/uel/1.3.1/zip/uel-1.3.1.zip/download)
+  * [all-in-one ZIP file](http://sourceforge.net/projects/uel/files/uel/1.3.1/zip/uel-1.3.1.zip/download)
   * [older versions](http://sourceforge.net/projects/uel/files/):
 
 
