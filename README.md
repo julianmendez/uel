@@ -78,15 +78,11 @@ The library, its sources and its Javadoc will be in `uel-library/target`, the pl
 
 ## Installation and use
 
-* as a **plugin**:
-download [de.tu-dresden.inf.lat.uel-1.3.1.jar](http://sourceforge.net/projects/uel/files/uel/1.3.1/plugin/de.tu-dresden.inf.lat.uel-1.3.1.jar/download) and copy it into `Protege-5.0.0-beta-17/plugins`.
+* as a **plugin**: in the all-in-one ZIP file, find the JAR file in directory `.../plugin` copy it into the Protege plugin directory (`.../plugins`).
 
-* as a **library**:
-download the [zip](http://sourceforge.net/projects/uel/files/uel/1.3.1/zip/uel-1.3.1.zip/download) containing `uel-1.3.1.jar` in directory `uel/uel-library` and use all of them as libraries.
+* as a **library**: in the all-in-one ZIP file, find the JAR file in directory `.../library` and use it as library.
 
-* as a **standalone**:
-
-To start the standalone application, you can use the following [script](http://julianmendez.github.io/uel/extra/start-uel.sh.txt).
+* as a **standalone**: in the all-in-one ZIP file, find the JAR file in directory `.../standalone` and run it with `java -jar uel.jar`.
 
 
 ## Release Notes
