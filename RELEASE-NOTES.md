@@ -27,18 +27,17 @@ $ mvn clean install
 *(2015-04-15)*
 * added capability to handle dissubsumptions to SAT-based algorithm
 * added ASP-based algorithm (experimental)
-```
-$ git checkout v1.3.0
-```
-to compile it with Apache Maven (3.0.3+):
+* build commands:
 ```
 $ cd uel
-$ mvn clean package
 ```
-to compile it with Apache Ant (1.8.3+):
+if using Apache Ant (1.8.3+):
 ```
-$ cd uel
 $ ant
+```
+if using Apache Maven (3.0.3+):
+```
+$ mvn clean package
 ```
 release: `uel/uel-build/target/uel-1.3.0.zip`
 
@@ -50,11 +49,11 @@ release: `uel/uel-build/target/uel-1.3.0.zip`
 $ git checkout v1.2.0
 $ cd uel/uel.distribution
 ```
-with Apache Ant:
+if using Apache Ant (1.8.3+):
 ```
 $ ant
 ```
-with Apache Maven:
+if using Apache Maven (3.0.3+):
 ```
 $ mvn clean package javadoc:javadoc source:jar
 ```
