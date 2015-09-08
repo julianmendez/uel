@@ -68,61 +68,6 @@ download the [zip](http://sourceforge.net/projects/uel/files/uel/1.3.1/zip/uel-1
 To start the standalone application, you can use the following [script](http://julianmendez.github.io/uel/extra/start-uel.sh.txt).
 
 
-## Build instructions for older versions
-* **master**
-  to compile it with [Apache Maven](http://maven.apache.org/) (3.0.3+):
-  ```
-  $ mvn clean install
-  ```
-  release: `target/uel-1.4.0-SNAPSHOT.zip`
-
-* **v1.3.1**
-  to compile it with Apache Maven (3.0.3+):
-  ```
-  $ git checkout v1.3.1
-  $ mvn clean install
-  ```
-  release: `target/uel-1.3.1.zip`
-
-* **v1.3.0**
-  ```
-  $ git checkout v1.3.0
-  ```
-  to compile it with Apache Maven (3.0.3+):
-  ```
-  $ cd uel
-  $ mvn clean package
-  ```
-  to compile it with Apache Ant (1.8.3+):
-  ```
-  $ cd uel
-  $ ant
-  ```
-  release: `uel/uel-build/target/uel-1.3.0.zip`
-
-* **v1.2.0**
-  ``` 
-  $ git checkout v1.2.0
-  $ cd uel/uel.distribution
-  ```
-  with Apache Ant:
-  ```
-  $ ant
-  ```
-  with Apache Maven:
-  ```
-  $ mvn clean package javadoc:javadoc source:jar
-  ```
-  release: `uel/uel.distribution/target/uel-1.2.0.zip`
-
-* **v1.0.0** and **v1.1.0**
-  ```
-  $ git checkout v1.1.0      (or git checkout v1.0.0)
-  $ cd uel/uel.plugin
-  $ ant -buildfile build-bundle.xml
-  ```
-  release: `uel/uel.plugin/target/de.tudresden.inf.lat.uel.jar`
-
 * **master** (trunk) (for offline development)
   to download the dependencies with Apache Maven before going offline:
   ```
