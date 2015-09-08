@@ -28,6 +28,27 @@ $ cd uel
 $ mvn clean install
 ```
 
+To compile the project offline, first download the dependencies:
+```
+$ mvn dependency:go-offline
+```
+and once offline, use:
+```
+$ mvn --offline clean install
+```
+
+The bundles uploaded to [Sonatype](https://oss.sonatype.org/) are created with:
+```
+$ mvn clean install -DperformRelease=true
+```
+and then on each module:
+```
+$ cd target
+$ jar -cf bundle.jar jcel-*
+```
+
+The library, its sources and its Javadoc will be in `uel-library/target`, the plug-in will be in `uel-plugin/target`, the standalone will be in `uel-standalone/target`, and the release ZIP file will be in `target`.
+
 
 ## Authors
 
@@ -66,18 +87,6 @@ download the [zip](http://sourceforge.net/projects/uel/files/uel/1.3.1/zip/uel-1
 * as a **standalone**:
 
 To start the standalone application, you can use the following [script](http://julianmendez.github.io/uel/extra/start-uel.sh.txt).
-
-
-* **master** (trunk) (for offline development)
-  to download the dependencies with Apache Maven before going offline:
-  ```
-  $ mvn dependency:go-offline
-  ```
-  to compile it with Apache Maven:
-  ```
-  $ mvn --offline clean package
-  ```
-  release: `target/uel-version.zip`
 
 
 ## Release Notes
