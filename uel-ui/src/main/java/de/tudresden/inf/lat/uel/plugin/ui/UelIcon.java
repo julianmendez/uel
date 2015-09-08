@@ -47,7 +47,7 @@ public class UelIcon {
 	/**
 	 * Returns an icon created with the default size for the given path.
 	 * 
-	 * @path path of icon
+	 * @param path of icon
 	 */
 	public static ImageIcon createIcon(String path) {
 		return createIcon(path, DEFAULT_ICON_SIZE);
