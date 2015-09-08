@@ -46,7 +46,6 @@ release: `uel/uel-build/target/uel-1.3.0.zip`
 * added possibility to restrict SAT-based algorithm to minimal assignments
 * build commands: 
 ``` 
-$ git checkout v1.2.0
 $ cd uel/uel.distribution
 ```
 if using Apache Ant (1.8.3+):
@@ -65,7 +64,6 @@ release: `uel/uel.distribution/target/uel-1.2.0.zip`
 * addded Rule-based algorithm
 * build commands: 
 ```
-$ git checkout v1.1.0
 $ cd uel/uel.plugin
 $ ant -buildfile build-bundle.xml
 ```
@@ -77,7 +75,6 @@ $ ant -buildfile build-bundle.xml
 * basic SAT-based algorithm
 * build commands: 
 ```
-$ git checkout v1.0.0
 $ cd uel/uel.plugin
 $ ant -buildfile build-bundle.xml
 ```
