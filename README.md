@@ -36,6 +36,7 @@ $ mvn clean install
 | version            | zip   | release date | Java | OWL API | Protégé       |
 |:-------------------|:------|:-------------|:----:|:--------|:--------------|
 | uel-1.4.0-SNAPSHOT |       |              | 7    | 3.5.1   | 5.0.0-beta-17 |
+| uel-1.3.1          |       |              | 7    | 3.5.1   | 5.0.0-beta-17 |
 | [uel-1.3.0](http://sourceforge.net/projects/uel/files/uel/1.3.0/plugin/de.tudresden.inf.lat.uel.jar/download)   | [(zip)](http://sourceforge.net/projects/uel/files/uel/1.3.0/zip/uel-1.3.0.zip/download) |	2015-04-15  | 7    | 3.5.0   | 4.3           |
 | [uel-1.2.0](http://sourceforge.net/projects/uel/files/uel/1.2.0/plugin/de.tudresden.inf.lat.uel.jar/download)   | [(zip)](http://sourceforge.net/projects/uel/files/uel/1.2.0/zip/uel-1.2.0.zip/download) |	2012-04-30  | 6    | 3.2.4   | 4.1           |
 | [uel-1.1.0](http://sourceforge.net/projects/uel/files/uel/1.1.0/plugin/de.tudresden.inf.lat.uel.jar/download)   | [(zip)](http://sourceforge.net/projects/uel/files/uel/1.1.0/zip/uel-1.1.0.zip/download) |	2012-03-09  | 6    | 3.2.4   | 4.1           |
@@ -59,57 +60,57 @@ To start the standalone application, you can use the following [script](http://j
 * **master** (trunk)
   to compile it with [Apache Maven](http://maven.apache.org/) (3.0.3+):
   ```
-  mvn clean package
+  $ mvn clean package
   ```
   release: `target/uel-1.4.0-SNAPSHOT.zip`
 
 * **v1.3.0**
   ```
-  git checkout v1.3.0
+  $ git checkout v1.3.0
   ```
   to compile it with Apache Maven (3.0.3+):
   ```
-  cd uel
-  mvn clean package
+  $ cd uel
+  $ mvn clean package
   ```
   to compile it with Apache Ant (1.8.3+):
   ```
-  cd uel
-  ant
+  $ cd uel
+  $ ant
   ```
   release: `uel/uel-build/target/uel-1.3.0.zip`
 
 * **v1.2.0**
   ``` 
-  git checkout v1.2.0
-  cd uel/uel.distribution
+  $ git checkout v1.2.0
+  $ cd uel/uel.distribution
   ```
   with Apache Ant:
   ```
-  ant
+  $ ant
   ```
   with Apache Maven:
   ```
-  mvn clean package javadoc:javadoc source:jar
+  $ mvn clean package javadoc:javadoc source:jar
   ```
   release: `uel/uel.distribution/target/uel-1.2.0.zip`
 
 * **v1.0.0** and **v1.1.0**
   ```
-  git checkout v1.1.0      (or git checkout v1.0.0)
-  cd uel/uel.plugin
-  ant -buildfile build-bundle.xml
+  $ git checkout v1.1.0      (or git checkout v1.0.0)
+  $ cd uel/uel.plugin
+  $ ant -buildfile build-bundle.xml
   ```
   release: `uel/uel.plugin/target/de.tudresden.inf.lat.uel.jar`
 
 * **master** (trunk) (for offline development)
   to download the dependencies with Apache Maven before going offline:
   ```
-  mvn dependency:go-offline
+  $ mvn dependency:go-offline
   ```
   to compile it with Apache Maven:
   ```
-  mvn --offline clean package
+  $ mvn --offline clean package
   ```
   release: `target/uel-version.zip`
 
