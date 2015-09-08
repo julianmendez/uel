@@ -78,9 +78,9 @@ The library, its sources and its Javadoc will be in `uel-library/target`, the pl
 
 ## Installation and use
 
-* as a **plugin**: in the all-in-one ZIP file, find the JAR file in directory `.../plugin` copy it into the Protege plugin directory (`.../plugins`).
+* as a **plugin**: in the all-in-one ZIP file, find the JAR file in directory `.../plugin` and copy it into the Protege plugin directory (`.../plugins`).
 
-* as a **library**: in the all-in-one ZIP file, find the JAR file in directory `.../library` and use it as library.
+* as a **library**: in the all-in-one ZIP file, find the JAR file in directory `.../library` and use it as a library.
 
 * as a **standalone**: in the all-in-one ZIP file, find the JAR file in directory `.../standalone` and run it with `java -jar uel.jar`.
 
