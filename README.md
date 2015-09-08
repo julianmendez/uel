@@ -12,7 +12,7 @@
 ```xml
 <dependency>
   <groupId>de.tu-dresden.inf.lat.uel</groupId>
-  <artifactId>uel-protege</artifactId>
+  <artifactId>uel-ui</artifactId>
   <version>1.3.1</version>
 </dependency>
 ```
