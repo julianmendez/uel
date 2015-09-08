@@ -3,7 +3,7 @@
 
 | version | release date | Java | OWL API | Protégé       |
 |:--------|:-------------|:----:|:--------|:--------------|
-| v1.3.1  |              | 7    | 3.5.1   | 5.0.0-beta-17 |
+| v1.3.1  | 2015-09-09   | 7    | 3.5.1   | 5.0.0-beta-17 |
 | v1.3.0  | 2015-04-15   | 7    | 3.5.0   | 4.3           |
 | v1.2.0  | 2012-04-30   | 6    | 3.2.4   | 4.1           |
 | v1.1.0  | 2012-03-09   | 6    | 3.2.4   | 4.1           |
@@ -11,7 +11,7 @@
 
 
 ### v1.3.1
-*(unreleased)*
+*(2015-09-09)*
 * has new icons
 * does not longer have [Apache Ant + Apache Ivy](http://ant.apache.org/ivy/) build files
 * includes Maven POM files to be deployed in [Sonatype](https://oss.sonatype.org/)
