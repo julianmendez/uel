@@ -28,6 +28,8 @@ $ cd uel
 $ mvn clean install
 ```
 
+The library, its sources and its Javadoc will be in `uel-library/target`, the plug-in will be in `uel-plugin/target`, the standalone will be in `uel-standalone/target`, and the release ZIP file will be in `target`.
+
 To compile the project offline, first download the dependencies:
 ```
 $ mvn dependency:go-offline
@@ -46,8 +48,11 @@ and then on each module:
 $ cd target
 $ jar -cf bundle.jar uel-*
 ```
-
-The library, its sources and its Javadoc will be in `uel-library/target`, the plug-in will be in `uel-plugin/target`, the standalone will be in `uel-standalone/target`, and the release ZIP file will be in `target`.
+and on the main directory:
+```
+$ cd target
+$ jar -cf bundle.jar uel-parent-*
+```
 
 
 ## Authors
