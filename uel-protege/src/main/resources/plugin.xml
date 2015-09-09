@@ -9,7 +9,7 @@
 	<extension id="UelTab" point="org.protege.editor.core.application.WorkspaceTab">
 		<label value="UEL"/>
 		<class value="org.protege.editor.core.ui.workspace.WorkspaceViewsTab"/>
-		<defaultViewConfigFileName value="viewconfig-ueltab.xml"/>
+		<defaultViewConfigFileName value="uel.layout.xml"/>
 		<index value="A"/>
 		<editorKitId value="OWLEditorKit"/>
 	</extension>
