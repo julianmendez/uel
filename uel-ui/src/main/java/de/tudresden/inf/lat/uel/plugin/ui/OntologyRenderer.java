@@ -1,8 +1,13 @@
 package de.tudresden.inf.lat.uel.plugin.ui;
 
+import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringWriter;
+
+import javax.swing.JFileChooser;
 
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.io.OWLRendererException;
@@ -41,7 +46,7 @@ public class OntologyRenderer {
 	public OntologyRenderer() {
 	}
 
-	public OWLOntology parseOntology(String ontology)
+	public static OWLOntology parseOntology(String ontology)
 			throws OWLOntologyCreationException {
 		OWLOntologyManager ontologyManager = OWLManager
 				.createOWLOntologyManager();
@@ -50,7 +55,7 @@ public class OntologyRenderer {
 		return ontologyManager.loadOntologyFromOntologyDocument(input);
 	}
 
-	public String renderKRSS(OWLOntology owlOntology)
+	public static String renderKRSS(OWLOntology owlOntology)
 			throws OWLRendererException {
 		StringWriter writer = new StringWriter();
 		KRSS2OWLSyntaxRenderer renderer = new KRSS2OWLSyntaxRenderer();
@@ -59,22 +64,47 @@ public class OntologyRenderer {
 		return writer.toString();
 	}
 
-	public String renderOWL(OWLOntology owlOntology)
+	public static String renderOWL(OWLOntology owlOntology)
 			throws OWLRendererException {
 		StringWriter writer = new StringWriter();
 		OWLXMLRenderer renderer = new OWLXMLRenderer();
-		new ManchesterOWLSyntaxRenderer();
 		renderer.render(owlOntology, writer);
 		writer.flush();
 		return writer.toString();
 	}
 
-	public String renderRDF(OWLOntology owlOntology) throws IOException {
+	public static String renderRDF(OWLOntology owlOntology) throws IOException {
 		StringWriter writer = new StringWriter();
 		RDFXMLRenderer renderer = new RDFXMLRenderer(owlOntology, writer);
 		renderer.render();
 		writer.flush();
 		return writer.toString();
+	}
+
+	public static void saveToOntologyFile(String ontology, File file) {
+		if (file != null) {
+			try {
+				OWLOntology owlOntology = parseOntology(ontology);
+				if (file.getName().endsWith(OntologyRenderer.EXTENSION_RDF)) {
+					ontology = renderRDF(owlOntology);
+				} else if (file.getName().endsWith(OntologyRenderer.EXTENSION_OWL)) {
+					ontology = renderOWL(owlOntology);
+				} else if (file.getName().endsWith(OntologyRenderer.EXTENSION_KRSS)) {
+					ontology = renderKRSS(owlOntology);
+				}
+
+				BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+				writer.write(ontology);
+				writer.flush();
+				writer.close();
+			} catch (OWLRendererException e) {
+				throw new RuntimeException(e);
+			} catch (OWLOntologyCreationException e) {
+				throw new RuntimeException(e);
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		}
 	}
 
 }

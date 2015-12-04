@@ -40,6 +40,9 @@ public class UelController implements ActionListener {
 	private static final String actionOpen = "open";
 	private static final String actionRejectVar = "reject var";
 	private static final String actionSelectVariables = "get var candidate";
+	private static final String actionRefine = "refine";
+	private static final String actionSaveDissubsumptions = "save dissubs";
+	private static final String actionRecompute = "recompute";
 
 	private Map<String, String> mapIdLabel = new HashMap<String, String>();
 	private List<OWLOntology> ontologyList = new ArrayList<OWLOntology>();
@@ -52,6 +55,7 @@ public class UelController implements ActionListener {
 	private UnifierController unifierController;
 	private VarSelectionController varWindow = null;
 	private final UelView view;
+	private DissubsumptionView dview;
 
 	/**
 	 * Constructs a new controller.
@@ -73,26 +77,68 @@ public class UelController implements ActionListener {
 			throw new IllegalArgumentException("Null argument.");
 		}
 
-		String cmd = e.getActionCommand();
-		if (cmd.equals(actionOpen)) {
+		switch (e.getActionCommand()) {
+		case actionOpen:
 			executeActionOpen();
-		} else if (cmd.equals(actionOntologyBg00Selected)) {
+			break;
+		case actionOntologyBg00Selected:
 			executeActionOntologyBg00Selected();
-		} else if (cmd.equals(actionOntologyBg01Selected)) {
+			break;
+		case actionOntologyBg01Selected:
 			executeActionOntologyBg01Selected();
-		} else if (cmd.equals(actionOntologyPosSelected)) {
+			break;
+		case actionOntologyPosSelected:
 			executeActionOntologyPosSelected();
-		} else if (cmd.equals(actionOntologyNegSelected)) {
+			break;
+		case actionOntologyNegSelected:
 			executeActionOntologyNegSelected();
-		} else if (cmd.equals(actionSelectVariables)) {
+			break;
+		case actionSelectVariables:
 			executeActionSelectVariables();
-		} else if (cmd.equals(actionAcceptVar)) {
+			break;
+		case actionAcceptVar:
 			executeActionAcceptVar();
-		} else if (cmd.equals(actionRejectVar)) {
+			break;
+		case actionRejectVar:
 			executeActionRejectVar();
-		} else {
+			break;
+		case actionRefine:
+			executeActionRefine();
+			break;
+		case actionSaveDissubsumptions:
+			executeActionSaveDissubsumptions();
+			break;
+		case actionRecompute:
+			executeActionRecompute();
+			break;
+		default:
 			throw new IllegalStateException();
 		}
+	}
+
+	private void executeActionRecompute() {
+		// TODO Auto-generated method stub
+
+	}
+
+	private void executeActionSaveDissubsumptions() {
+		String allDissubsumptions = dview.getDissubsumptions();
+		saveToOntologyFile(allDissubsumptions);
+	}
+
+	private void executeActionRefine() {
+		if (getModel().getUnifierList().size() == 0) {
+			return;
+		}
+
+		if (dview != null) {
+			dview.close();
+		}
+
+		dview = new DissubsumptionView(unifierController.getCurrentUnifier(), unifierController.getKRSSRenderer());
+		dview.addSaveButtonListener(this, actionSaveDissubsumptions);
+		dview.addRecomputeButtonListener(this, actionRecompute);
+
 	}
 
 	private void executeActionAcceptVar() {
@@ -103,11 +149,10 @@ public class UelController implements ActionListener {
 
 			this.varWindow.close();
 
-			UelProcessor processor = UelProcessorFactory.createProcessor(
-					getView().getSelectedProcessor(), g.getUelInput());
+			UelProcessor processor = UelProcessorFactory.createProcessor(getView().getSelectedProcessor(),
+					g.getUelInput());
 			getModel().setUelProcessor(processor);
-			getUnifier().setStatInfo(
-					new StatInfo(g, processor.getInfo(), this.mapIdLabel));
+			getUnifier().setStatInfo(new StatInfo(g, processor.getInfo(), this.mapIdLabel));
 		}
 
 		getUnifier().getView().setUnifierButtons(false);
@@ -117,8 +162,7 @@ public class UelController implements ActionListener {
 	}
 
 	private void executeActionOntologyBg00Selected() {
-		executeActionOntologyBg00Selected(getView()
-				.getSelectedOntologyNameBg00());
+		executeActionOntologyBg00Selected(getView().getSelectedOntologyNameBg00());
 	}
 
 	private void executeActionOntologyBg00Selected(int ontologyIndex) {
@@ -132,8 +176,7 @@ public class UelController implements ActionListener {
 	}
 
 	private void executeActionOntologyBg01Selected() {
-		executeActionOntologyBg01Selected(getView()
-				.getSelectedOntologyNameBg01());
+		executeActionOntologyBg01Selected(getView().getSelectedOntologyNameBg01());
 	}
 
 	private void executeActionOntologyBg01Selected(int ontologyIndex) {
@@ -208,8 +251,7 @@ public class UelController implements ActionListener {
 		bgOntologies.add(this.owlOntologyBg00);
 		bgOntologies.add(this.owlOntologyBg01);
 
-		getModel()
-				.configure(bgOntologies, owlOntologyPos, owlOntologyNeg, null);
+		getModel().configure(bgOntologies, owlOntologyPos, owlOntologyNeg, null);
 
 		this.varWindow = initVarWindow(getModel().getPluginGoal());
 		this.varWindow.open();
@@ -242,22 +284,17 @@ public class UelController implements ActionListener {
 	private void init() {
 		getView().addButtonOpenListener(this, actionOpen);
 		getView().addButtonSelectVariablesListener(this, actionSelectVariables);
-		getView().addComboBoxOntologyBg00Listener(this,
-				actionOntologyBg00Selected);
-		getView().addComboBoxOntologyBg01Listener(this,
-				actionOntologyBg01Selected);
-		getView().addComboBoxOntologyPosListener(this,
-				actionOntologyPosSelected);
-		getView().addComboBoxOntologyNegListener(this,
-				actionOntologyNegSelected);
+		getView().addComboBoxOntologyBg00Listener(this, actionOntologyBg00Selected);
+		getView().addComboBoxOntologyBg01Listener(this, actionOntologyBg01Selected);
+		getView().addComboBoxOntologyPosListener(this, actionOntologyPosSelected);
+		getView().addComboBoxOntologyNegListener(this, actionOntologyNegSelected);
 
 		reset();
 	}
 
 	private VarSelectionController initVarWindow(PluginGoal goal) {
 		VarSelectionController ret = new VarSelectionController(
-				new VarSelectionView(new VarSelectionModel(this.mapIdLabel,
-						goal)));
+				new VarSelectionView(new VarSelectionModel(this.mapIdLabel, goal)));
 		ret.addAcceptVarButtonListener(this, actionAcceptVar);
 		return ret;
 	}
@@ -265,8 +302,7 @@ public class UelController implements ActionListener {
 	private void recomputeShortForm() {
 		this.mapIdLabel.clear();
 		for (OWLEntity entity : this.shortFormMap.keySet()) {
-			this.mapIdLabel.put(entity.getIRI().toURI().toString(),
-					this.shortFormMap.get(entity));
+			this.mapIdLabel.put(entity.getIRI().toURI().toString(), this.shortFormMap.get(entity));
 		}
 	}
 
@@ -282,8 +318,7 @@ public class UelController implements ActionListener {
 		getView().setButtonSelectVariablesEnabled(false);
 		this.ontologyList.clear();
 		try {
-			this.ontologyList.add(OWLManager.createOWLOntologyManager()
-					.createOntology(IRI.create("empty")));
+			this.ontologyList.add(OWLManager.createOWLOntologyManager().createOntology(IRI.create("empty")));
 		} catch (OWLOntologyCreationException e) {
 		}
 		this.ontologyList.addAll(getOWLOntologyManager().getOntologies());
@@ -293,8 +328,8 @@ public class UelController implements ActionListener {
 	}
 
 	private void resetUnifierController() {
-		this.unifierController = new UnifierController(new UnifierView(
-				view.getModel()), this.mapIdLabel);
+		this.unifierController = new UnifierController(new UnifierView(view.getModel()), this.mapIdLabel);
+		unifierController.addRefineButtonListener(this, actionRefine);
 	}
 
 	public void setShortFormMap(Map<OWLEntity, String> map) {

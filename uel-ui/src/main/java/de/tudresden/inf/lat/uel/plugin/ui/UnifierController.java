@@ -1,23 +1,18 @@
 package de.tudresden.inf.lat.uel.plugin.ui;
 
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 
 import javax.swing.JFileChooser;
 
-import org.semanticweb.owlapi.io.OWLRendererException;
-import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLOntologyCreationException;
-
 import de.tudresden.inf.lat.uel.core.processor.UelModel;
 import de.tudresden.inf.lat.uel.core.type.AtomManager;
 import de.tudresden.inf.lat.uel.core.type.KRSSRenderer;
+import de.tudresden.inf.lat.uel.type.api.Equation;
 
 /**
  * This is the controller for the panel that shows the unifiers.
@@ -32,7 +27,6 @@ public class UnifierController implements ActionListener {
 	private static final String actionPrevious = "previous";
 	private static final String actionSave = "save";
 	private static final String actionShowStatInfo = "show statistic info";
-	private static final String actionRefine = "refine";
 
 	private boolean allUnifiersFound = false;
 	private final Map<String, String> mapIdLabel;
@@ -52,27 +46,28 @@ public class UnifierController implements ActionListener {
 			throw new IllegalArgumentException("Null argument.");
 		}
 
-		String cmd = e.getActionCommand();
-		if (cmd.equals(actionFirst)) {
+		switch (e.getActionCommand()) {
+		case actionFirst:
 			executeActionFirst();
-		} else if (cmd.equals(actionPrevious)) {
+			break;
+		case actionPrevious:
 			executeActionPrevious();
-		} else if (cmd.equals(actionNext)) {
+			break;
+		case actionNext:
 			executeActionNext();
-		} else if (cmd.equals(actionLast)) {
+			break;
+		case actionLast:
 			executeActionLast();
-		} else if (cmd.equals(actionSave)) {
+			break;
+		case actionSave:
 			executeActionSave();
-		} else if (cmd.equals(actionShowStatInfo)) {
+			break;
+		case actionShowStatInfo:
 			executeActionShowStatInfo();
-		} else if (cmd.equals(actionRefine)) {
-			executeActionRefine();
+			break;
+		default:
+			throw new IllegalStateException();
 		}
-	}
-
-	private void executeActionRefine() {
-		// TODO Auto-generated method stub
-		
 	}
 
 	private void executeActionFirst() {
@@ -125,51 +120,28 @@ public class UnifierController implements ActionListener {
 		updateUnifier();
 	}
 
+	public static File showSaveFileDialog(Component parent) {
+		JFileChooser fileChooser = new JFileChooser();
+		int returnVal = fileChooser.showSaveDialog(parent);
+		File file = null;
+		if (returnVal == JFileChooser.APPROVE_OPTION) {
+			file = fileChooser.getSelectedFile();
+		}
+		return file;
+	}
+
 	private void executeActionSave() {
 		if (getModel().getUnifierList().size() == 0) {
 			return;
 		}
 
-		JFileChooser fileChooser = new JFileChooser();
-		int returnVal = fileChooser.showSaveDialog(getView());
-		File file = null;
-		if (returnVal == JFileChooser.APPROVE_OPTION) {
-			file = fileChooser.getSelectedFile();
-		}
-
-		if (file != null) {
-			try {
-				String unifier = printCurrentUnifier(false);
-				OntologyRenderer renderer = new OntologyRenderer();
-				OWLOntology owlOntology = renderer.parseOntology(unifier);
-				if (file.getName().endsWith(OntologyRenderer.EXTENSION_RDF)) {
-					unifier = renderer.renderRDF(owlOntology);
-				} else if (file.getName().endsWith(
-						OntologyRenderer.EXTENSION_OWL)) {
-					unifier = renderer.renderOWL(owlOntology);
-				} else if (file.getName().endsWith(
-						OntologyRenderer.EXTENSION_KRSS)) {
-					unifier = renderer.renderKRSS(owlOntology);
-				}
-
-				BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-				writer.write(unifier);
-				writer.flush();
-				writer.close();
-			} catch (OWLRendererException e) {
-				throw new RuntimeException(e);
-			} catch (OWLOntologyCreationException e) {
-				throw new RuntimeException(e);
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
-		}
+		File file = showSaveFileDialog(getView());
+		OntologyRenderer.saveToOntologyFile(printCurrentUnifier(), file);
 	}
 
 	private void executeActionShowStatInfo() {
 		statInfo.setInfo(getModel().getUelProcessor().getInfo());
-		StatInfoController statInfoWindow = new StatInfoController(
-				new StatInfoView(this.statInfo));
+		StatInfoController statInfoWindow = new StatInfoController(new StatInfoView(this.statInfo));
 		statInfoWindow.open();
 	}
 
@@ -198,28 +170,31 @@ public class UnifierController implements ActionListener {
 		this.statInfo = info;
 	}
 
-	private String printCurrentUnifier(boolean shortForm) {
+	private Set<Equation> getCurrentUnifier() {
+		return getModel().getUnifierList().get(this.unifierIndex);
+	}
+
+	private String printCurrentUnifier() {
+		KRSSRenderer renderer = getKRSSRenderer();
+		return renderer.printUnifier(getCurrentUnifier());
+	}
+
+	private KRSSRenderer getKRSSRenderer() {
 		AtomManager atomManager = getModel().getAtomManager();
-		Set<Integer> userVariables = getModel().getPluginGoal()
-				.getUserVariables();
-		Set<Integer> auxVariables = getModel().getPluginGoal()
-				.getAuxiliaryVariables();
-		KRSSRenderer renderer = new KRSSRenderer(atomManager, userVariables,
-				auxVariables, mapIdLabel);
-		return renderer.printUnifier(getModel().getUnifierList().get(
-				this.unifierIndex));
+		Set<Integer> userVariables = getModel().getPluginGoal().getUserVariables();
+		Set<Integer> auxVariables = getModel().getPluginGoal().getAuxiliaryVariables();
+		KRSSRenderer renderer = new KRSSRenderer(atomManager, userVariables, auxVariables, mapIdLabel);
+		return renderer;
 	}
 
 	private void updateUnifier() {
 		if (getModel().getUnifierList().size() > 0) {
-			getView().getUnifier().setText(printCurrentUnifier(true));
+			getView().getUnifier().setText(printCurrentUnifier());
 		} else {
 			getView().getUnifier().setText("[not unifiable]");
 		}
-		getView().getUnifierId().setText(
-				" "
-						+ (getModel().getUnifierList().isEmpty() ? 0
-								: (this.unifierIndex + 1)) + " ");
+		getView().getUnifierId()
+				.setText(" " + (getModel().getUnifierList().isEmpty() ? 0 : (this.unifierIndex + 1)) + " ");
 		if (this.unifierIndex == 0) {
 			getView().setButtonPreviousEnabled(false);
 			getView().setButtonFirstEnabled(false);
@@ -227,8 +202,7 @@ public class UnifierController implements ActionListener {
 			getView().setButtonPreviousEnabled(true);
 			getView().setButtonFirstEnabled(true);
 		}
-		if (this.allUnifiersFound
-				&& this.unifierIndex >= getModel().getUnifierList().size() - 1) {
+		if (this.allUnifiersFound && this.unifierIndex >= getModel().getUnifierList().size() - 1) {
 			getView().setButtonNextEnabled(false);
 			getView().setButtonLastEnabled(false);
 		} else {
