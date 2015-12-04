@@ -9,7 +9,7 @@ package de.tudresden.inf.lat.uel.plugin.ui;
 class LabelId implements Comparable<LabelId> {
 
 	private int hashCode = 0;
-	private String id = null;
+	private Integer id = null;
 	private String label = null;
 
 	/**
@@ -20,7 +20,7 @@ class LabelId implements Comparable<LabelId> {
 	 * @param id
 	 *            identifier
 	 */
-	public LabelId(String label, String id) {
+	public LabelId(String label, Integer id) {
 		if (label == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
@@ -58,7 +58,7 @@ class LabelId implements Comparable<LabelId> {
 		return ret;
 	}
 
-	public String getId() {
+	public Integer getId() {
 		return id;
 	}
 
@@ -73,7 +73,7 @@ class LabelId implements Comparable<LabelId> {
 
 	@Override
 	public String toString() {
-		return getId() + " " + getLabel();
+		return getLabel();
 	}
 
 }

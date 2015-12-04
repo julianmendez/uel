@@ -4,11 +4,8 @@ import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.Vector;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -28,10 +25,8 @@ class VarSelectionView extends JDialog {
 	private static final long serialVersionUID = 1742164773153032359L;
 
 	private final JButton acceptVarButton = new JButton(UelIcon.ICON_FORWARD);
-	private JList listConstants = null;
-	private List<LabelId> listOfConstants = null;
-	private List<LabelId> listOfVariables = null;
-	private JList listVariables = null;
+	private JList<LabelId> listConstants = null;
+	private JList<LabelId> listVariables = null;
 	private final JButton makeConsButton = new JButton(UelIcon.ICON_STEP_BACK);
 	private final JButton makeVarButton = new JButton(UelIcon.ICON_STEP_FORWARD);
 	private final VarSelectionModel model;
@@ -48,8 +43,7 @@ class VarSelectionView extends JDialog {
 		updateLists();
 	}
 
-	public void addAcceptVarButtonListener(ActionListener listener,
-			String actionCommand) {
+	public void addAcceptVarButtonListener(ActionListener listener, String actionCommand) {
 		if (listener == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
@@ -61,8 +55,7 @@ class VarSelectionView extends JDialog {
 		this.acceptVarButton.setActionCommand(actionCommand);
 	}
 
-	public void addMakeConsButtonListener(ActionListener listener,
-			String actionCommand) {
+	public void addMakeConsButtonListener(ActionListener listener, String actionCommand) {
 		if (listener == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
@@ -74,8 +67,7 @@ class VarSelectionView extends JDialog {
 		this.makeConsButton.setActionCommand(actionCommand);
 	}
 
-	public void addMakeVarButtonListener(ActionListener listener,
-			String actionCommand) {
+	public void addMakeVarButtonListener(ActionListener listener, String actionCommand) {
 		if (listener == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
@@ -91,18 +83,16 @@ class VarSelectionView extends JDialog {
 		JPanel ret = new JPanel();
 		ret.setLayout(new BoxLayout(ret, BoxLayout.Y_AXIS));
 
-		this.listConstants = new JList();
+		this.listConstants = new JList<LabelId>();
 		this.listConstants.setToolTipText("constants");
 		JScrollPane scrollPaneCons = new JScrollPane(this.listConstants);
-		scrollPaneCons
-				.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		scrollPaneCons.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		scrollPaneCons.setPreferredSize(new Dimension(360, 480));
 
-		this.listVariables = new JList();
+		this.listVariables = new JList<LabelId>();
 		this.listVariables.setToolTipText("variables");
 		JScrollPane scrollPaneVars = new JScrollPane(this.listVariables);
-		scrollPaneVars
-				.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		scrollPaneVars.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		scrollPaneVars.setPreferredSize(new Dimension(360, 480));
 
 		JPanel varSelPanel = new JPanel();
@@ -135,24 +125,16 @@ class VarSelectionView extends JDialog {
 		return ret;
 	}
 
-	public LabelId getConstant(int index) {
-		return this.listOfConstants.get(index);
-	}
-
 	public VarSelectionModel getModel() {
 		return this.model;
 	}
 
-	public int[] getSelectedConstants() {
-		return this.listConstants.getSelectedIndices();
+	public Collection<LabelId> getSelectedConstants() {
+		return this.listConstants.getSelectedValuesList();
 	}
 
-	public int[] getSelectedVariables() {
-		return this.listVariables.getSelectedIndices();
-	}
-
-	public LabelId getVariable(int index) {
-		return this.listOfVariables.get(index);
+	public Collection<LabelId> getSelectedVariables() {
+		return this.listVariables.getSelectedValuesList();
 	}
 
 	private void initVarFrame() {
@@ -165,35 +147,17 @@ class VarSelectionView extends JDialog {
 	}
 
 	private void updateListOfConstants() {
-		Set<LabelId> setOfConstants = new TreeSet<LabelId>();
-		for (String str : getModel().getConstants()) {
-			setOfConstants.add(new LabelId(getModel().getLabel(str), str));
-		}
-		this.listOfConstants = new ArrayList<LabelId>();
-		this.listOfConstants.addAll(setOfConstants);
-
-		Vector<String> vectorOfLabelsOfConstants = new Vector<String>();
-		for (LabelId elem : this.listOfConstants) {
-			vectorOfLabelsOfConstants.add(elem.getLabel());
-		}
-		this.listConstants.setListData(vectorOfLabelsOfConstants);
-		this.listConstants.setSelectedIndices(new int[0]);
+		List<LabelId> list = getModel().getConstants();
+		LabelId[] array = list.toArray(new LabelId[list.size()]);
+		this.listConstants.setListData(array);
+		this.listConstants.clearSelection();
 	}
 
 	private void updateListOfVariables() {
-		Set<LabelId> setOfVariables = new TreeSet<LabelId>();
-		for (String str : getModel().getVariables()) {
-			setOfVariables.add(new LabelId(getModel().getLabel(str), str));
-		}
-		this.listOfVariables = new ArrayList<LabelId>();
-		this.listOfVariables.addAll(setOfVariables);
-
-		Vector<String> vectorOfLabelsOfVariables = new Vector<String>();
-		for (LabelId elem : this.listOfVariables) {
-			vectorOfLabelsOfVariables.add(elem.getLabel());
-		}
-		this.listVariables.setListData(vectorOfLabelsOfVariables);
-		this.listVariables.setSelectedIndices(new int[0]);
+		List<LabelId> list = getModel().getVariables();
+		LabelId[] array = list.toArray(new LabelId[list.size()]);
+		this.listVariables.setListData(array);
+		this.listVariables.clearSelection();
 	}
 
 	public void updateLists() {

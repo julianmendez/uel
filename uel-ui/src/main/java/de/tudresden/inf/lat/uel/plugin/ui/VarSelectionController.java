@@ -52,21 +52,13 @@ class VarSelectionController implements ActionListener {
 	}
 
 	private void executeMakeCons() {
-		int[] options = getView().getSelectedVariables();
-		for (int i = 0; i < options.length; i++) {
-			getView().getModel().makeConstant(
-					getView().getVariable(options[i]).getId());
-		}
+		getModel().makeConstants(getView().getSelectedVariables());
 		getView().updateLists();
 
 	}
 
 	private void executeMakeVar() {
-		int[] options = getView().getSelectedConstants();
-		for (int i = 0; i < options.length; i++) {
-			getView().getModel().makeVariable(
-					getView().getConstant(options[i]).getId());
-		}
+		getModel().makeVariables(getView().getSelectedConstants());
 		getView().updateLists();
 	}
 

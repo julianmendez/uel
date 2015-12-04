@@ -16,11 +16,9 @@ import javax.swing.JComboBox;
  * @author Julian Mendez
  * @see javax.swing.JComboBox
  */
-public class JComboBoxOfLabelId extends JComboBox {
+public class JComboBoxOfLabelId extends JComboBox<LabelId> {
 
 	private static final long serialVersionUID = -1589168297784841281L;
-
-	private final List<LabelId> list = new ArrayList<LabelId>();
 
 	public JComboBoxOfLabelId() {
 		super();
@@ -32,7 +30,7 @@ public class JComboBoxOfLabelId extends JComboBox {
 	public void actionPerformed(ActionEvent event) {
 		String lastText = event.getActionCommand();
 		if (!lastText.equals(getActionCommand())) {
-			int itemIndex = binarySearch(this.list, lastText);
+			int itemIndex = binarySearch(lastText);
 			this.setSelectedIndex(itemIndex);
 		}
 	}
@@ -44,17 +42,17 @@ public class JComboBoxOfLabelId extends JComboBox {
 	 *             always because this method is not supported
 	 */
 	@Override
-	public void addItem(Object anObject) {
+	public void addItem(LabelId s) {
 		throw new UnsupportedOperationException();
 	}
 
-	private int binarySearch(List<LabelId> list, String key) {
+	private int binarySearch(String key) {
 		int left = 0;
-		int right = list.size();
+		int right = getItemCount();
 		int mid = left;
 		while (left < (right - 1)) {
 			mid = (left + right) / 2;
-			LabelId current = list.get(mid);
+			LabelId current = getItemAt(mid);
 			if (current.getLabel().equals(key)) {
 				left = mid;
 				right = mid;
@@ -64,24 +62,23 @@ public class JComboBoxOfLabelId extends JComboBox {
 				right = mid;
 			}
 		}
-		int ret = (left < (list.size() - 1))
-				&& (list.get(left).getLabel().compareTo(key) < 0) ? left + 1
+		int ret = (left < (getItemCount() - 1))
+				&& (getItemAt(left).getLabel().compareTo(key) < 0) ? left + 1
 				: left;
 		return ret;
 	}
 
 	public LabelId getSelectedElement() {
-		return this.list.get(getSelectedIndex());
+		return getItemAt(getSelectedIndex());
 	}
 
 	public void setItemList(List<LabelId> origList) {
-		this.list.clear();
-		this.list.addAll(origList);
-		Collections.sort(this.list);
-		DefaultComboBoxModel model = new DefaultComboBoxModel();
-		for (LabelId label : this.list) {
-			model.addElement(label.getLabel());
-		}
+		List<LabelId> list = new ArrayList<LabelId>();
+		list.addAll(origList);
+		Collections.sort(list);
+
+		LabelId[] array = list.toArray(new LabelId[list.size()]);
+		DefaultComboBoxModel<LabelId> model = new DefaultComboBoxModel<LabelId>(array);
 		super.setModel(model);
 	}
 

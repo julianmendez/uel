@@ -27,8 +27,6 @@ import de.tudresden.inf.lat.uel.plugin.ui.UelView;
 public class UelStarter implements OWLOntologyChangeListener,
 		OWLOntologyLoaderListener {
 
-	private static final long serialVersionUID = 923181447002031980L;
-
 	private final OWLOntologyManager ontologyManager;
 	private final UelController panel;
 

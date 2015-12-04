@@ -1,15 +1,13 @@
 package de.tudresden.inf.lat.uel.plugin.ui;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
 
 import de.tudresden.inf.lat.uel.core.processor.PluginGoal;
 import de.tudresden.inf.lat.uel.core.type.AtomManager;
-import de.tudresden.inf.lat.uel.type.api.Atom;
-import de.tudresden.inf.lat.uel.type.impl.ConceptName;
 
 /**
  * An object of this class can manage which concept names are considered by the
@@ -34,29 +32,30 @@ class VarSelectionModel {
 		this.pluginGoal = g;
 	}
 
-	public Set<String> getConstants() {
-		Set<String> ret = new HashSet<String>();
-		for (Integer atomId : getGoal().getConstants()) {
-			ret.add(getGoal().getAtomManager().getConceptName(atomId));
+	public List<LabelId> getConstants() {
+		List<LabelId> ret = new ArrayList<LabelId>();
+		for (Integer atomId : getPluginGoal().getConstants()) {
+			Integer id = getPluginGoal().getAtomManager().getAtoms().get(atomId).getConceptNameId();
+			ret.add(new LabelId(getLabel(id), id));
 		}
-		return Collections.unmodifiableSet(ret);
+		return Collections.unmodifiableList(ret);
 	}
 
-	public PluginGoal getGoal() {
+	public PluginGoal getPluginGoal() {
 		return this.pluginGoal;
 	}
 
-	public String getLabel(String id) {
+	private String getLabel(Integer id) {
 		if (id == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
 
-		String ret = this.idLabelMap.get(id);
+		String name = getPluginGoal().getAtomManager().getConceptName(id);
+		String ret = this.idLabelMap.get(name);
 
 		if (ret == null) {
-			if (id.endsWith(AtomManager.UNDEF_SUFFIX)) {
-				String origId = id.substring(0, id.length()
-						- AtomManager.UNDEF_SUFFIX.length());
+			if (name.endsWith(AtomManager.UNDEF_SUFFIX)) {
+				String origId = name.substring(0, name.length() - AtomManager.UNDEF_SUFFIX.length());
 				ret = this.idLabelMap.get(origId);
 				if (ret != null) {
 					ret += AtomManager.UNDEF_SUFFIX;
@@ -65,61 +64,35 @@ class VarSelectionModel {
 		}
 
 		if (ret == null) {
-			int p = id.indexOf("#");
+			int p = name.indexOf("#");
 			if (p != -1) {
-				ret = id.substring(p + 1);
+				ret = name.substring(p + 1);
 			} else {
-				ret = id;
+				ret = name;
 			}
 		}
 
 		return ret;
 	}
 
-	public PluginGoal getPluginGoal() {
-		return this.pluginGoal;
+	public List<LabelId> getVariables() {
+		List<LabelId> ret = new ArrayList<LabelId>();
+		for (Integer id : getPluginGoal().getUelInput().getUserVariables()) {
+			ret.add(new LabelId(getLabel(id), id));
+		}
+		return Collections.unmodifiableList(ret);
 	}
 
-	public Set<String> getVariables() {
-		Set<String> ret = new HashSet<String>();
-		for (Integer atomId : getGoal().getVariables()) {
-			Atom atom = getGoal().getAtomManager().getAtoms().get(atomId);
-
-			if (atom.isConceptName()) {
-				ConceptName concept = (ConceptName) atom;
-				if (getGoal().getUelInput().getUserVariables()
-						.contains(concept.getConceptNameId())) {
-					String name = getGoal().getAtomManager().getConceptName(
-							atom.getConceptNameId());
-					ret.add(name);
-				}
-			}
+	public void makeConstants(Collection<LabelId> lids) {
+		for (LabelId lid : lids) {
+			getPluginGoal().makeConstant(lid.getId());
 		}
-		return Collections.unmodifiableSet(ret);
 	}
 
-	public void makeConstant(String id) {
-		if (id == null) {
-			throw new IllegalArgumentException("Null argument.");
+	public void makeVariables(Collection<LabelId> lids) {
+		for (LabelId lid : lids) {
+			getPluginGoal().makeUserVariable(lid.getId());
 		}
-
-		Integer atomId = getGoal().getAtomManager().getConceptIndex(id);
-		if (atomId == null) {
-			throw new IllegalArgumentException("Unkown atom:'" + id + "'.");
-		}
-		this.pluginGoal.makeConstant(atomId);
-	}
-
-	public void makeVariable(String id) {
-		if (id == null) {
-			throw new IllegalArgumentException("Null argument.");
-		}
-
-		Integer atomId = getGoal().getAtomManager().getConceptIndex(id);
-		if (atomId == null) {
-			throw new IllegalArgumentException("Unkown atom :'" + id + "'.");
-		}
-		this.pluginGoal.makeUserVariable(atomId);
 	}
 
 }

@@ -23,7 +23,6 @@ class StatInfoView extends JDialog {
 
 	private static final String colon = ": ";
 	private static final String newLine = "\n";
-	private static final String quotes = "\"";
 	private static final long serialVersionUID = -4153981096827550491L;
 
 	private final StatInfo model;

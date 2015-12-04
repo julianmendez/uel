@@ -10,21 +10,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 
 import javax.swing.JFileChooser;
 
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.IRI;
-import org.semanticweb.owlapi.model.OWLAxiom;
-import org.semanticweb.owlapi.model.OWLClass;
-import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLEntity;
-import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
-import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 
 import de.tudresden.inf.lat.uel.core.processor.PluginGoal;
 import de.tudresden.inf.lat.uel.core.processor.UelModel;
@@ -105,7 +99,7 @@ public class UelController implements ActionListener {
 		resetUnifierController();
 
 		if (getModel().getUnifierList().isEmpty()) {
-			PluginGoal g = this.varWindow.getView().getModel().getPluginGoal();
+			PluginGoal g = getModel().getPluginGoal();
 
 			this.varWindow.close();
 
@@ -192,8 +186,7 @@ public class UelController implements ActionListener {
 		}
 		if (file != null) {
 			try {
-				OWLOntology owlOntology = this.owlOntologyManager
-						.loadOntologyFromOntologyDocument(file);
+				this.owlOntologyManager.loadOntologyFromOntologyDocument(file);
 				reset();
 			} catch (OWLOntologyCreationException e) {
 				throw new RuntimeException(e);

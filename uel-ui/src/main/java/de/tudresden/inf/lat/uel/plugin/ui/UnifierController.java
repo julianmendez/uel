@@ -32,7 +32,7 @@ public class UnifierController implements ActionListener {
 	private static final String actionPrevious = "previous";
 	private static final String actionSave = "save";
 	private static final String actionShowStatInfo = "show statistic info";
-	private static final String quotes = "\"";
+	private static final String actionRefine = "refine";
 
 	private boolean allUnifiersFound = false;
 	private final Map<String, String> mapIdLabel;
@@ -65,7 +65,14 @@ public class UnifierController implements ActionListener {
 			executeActionSave();
 		} else if (cmd.equals(actionShowStatInfo)) {
 			executeActionShowStatInfo();
+		} else if (cmd.equals(actionRefine)) {
+			executeActionRefine();
 		}
+	}
+
+	private void executeActionRefine() {
+		// TODO Auto-generated method stub
+		
 	}
 
 	private void executeActionFirst() {
