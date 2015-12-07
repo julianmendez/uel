@@ -38,6 +38,7 @@ public interface Message {
 	String tooltipNext = "shows the next unifier, it unifies the chosen class names using the selected variables";
 	String tooltipOpen = "opens an ontology";
 	String tooltipPrevious = "shows the previous unifier";
+	String tooltipRefine = "refine unifier using dissubsumptions";
 	String tooltipRejectVar = "cancels this selection of variables";
 	String tooltipSave = "saves the current unifier into a file";
 	String tooltipSaveGoal = "saves the goal to a file";

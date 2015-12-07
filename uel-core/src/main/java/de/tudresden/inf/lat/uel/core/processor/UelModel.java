@@ -25,6 +25,7 @@ import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 
 import de.tudresden.inf.lat.uel.core.type.AtomManager;
 import de.tudresden.inf.lat.uel.core.type.AtomManagerImpl;
+import de.tudresden.inf.lat.uel.core.type.KRSSRenderer;
 import de.tudresden.inf.lat.uel.type.api.Equation;
 import de.tudresden.inf.lat.uel.type.api.UelProcessor;
 import de.tudresden.inf.lat.uel.type.impl.ConceptName;
@@ -53,12 +54,10 @@ public class UelModel {
 	private PluginGoal pluginGoal = null;
 	private OWLOntology auxOntology = null;
 	private Map<OWLClassExpression, Integer> mapOfAuxClassExpr = new HashMap<OWLClassExpression, Integer>();
+	private Map<String, String> mapIdLabel = null;
 
 	private int classCounter = 0;
 
-	/**
-	 * Constructs a new processor.
-	 */
 	public UelModel() {
 	}
 
@@ -73,8 +72,7 @@ public class UelModel {
 	 */
 	public boolean computeNextUnifier() throws InterruptedException {
 		while (this.uelProcessor.computeNextUnifier()) {
-			Set<Equation> result = this.uelProcessor.getUnifier()
-					.getEquations();
+			Set<Equation> result = this.uelProcessor.getUnifier().getEquations();
 			if (!this.unifierSet.contains(result)) {
 				this.unifierList.add(result);
 				this.unifierSet.add(result);
@@ -84,26 +82,28 @@ public class UelModel {
 		return false;
 	}
 
-	public void configure(Set<OWLOntology> bgOntologies,
-			OWLOntology positiveProblem, OWLOntology negativeProblem,
-			OWLClass owlThingAlias) {
-		configure(bgOntologies,
-				positiveProblem.getAxioms(AxiomType.SUBCLASS_OF),
-				positiveProblem.getAxioms(AxiomType.EQUIVALENT_CLASSES),
-				negativeProblem.getAxioms(AxiomType.SUBCLASS_OF),
-				negativeProblem.getAxioms(AxiomType.EQUIVALENT_CLASSES),
-				owlThingAlias);
+	public void setMapIdLabel(Map<String, String> map) {
+		mapIdLabel = map;
 	}
 
-	public void configure(Set<OWLOntology> bgOntologies,
-			Set<OWLSubClassOfAxiom> subsumptions,
-			Set<OWLEquivalentClassesAxiom> equations,
-			Set<OWLSubClassOfAxiom> dissubsumptions,
+	// public Map<String, String> getMapIdLabel() {
+	// return mapIdLabel;
+	// }
+
+	public void configure(Set<OWLOntology> bgOntologies, OWLOntology positiveProblem, OWLOntology negativeProblem,
+			OWLClass owlThingAlias) {
+		configure(bgOntologies, positiveProblem.getAxioms(AxiomType.SUBCLASS_OF),
+				positiveProblem.getAxioms(AxiomType.EQUIVALENT_CLASSES),
+				negativeProblem.getAxioms(AxiomType.SUBCLASS_OF),
+				negativeProblem.getAxioms(AxiomType.EQUIVALENT_CLASSES), owlThingAlias);
+	}
+
+	public void configure(Set<OWLOntology> bgOntologies, Set<OWLSubClassOfAxiom> subsumptions,
+			Set<OWLEquivalentClassesAxiom> equations, Set<OWLSubClassOfAxiom> dissubsumptions,
 			Set<OWLEquivalentClassesAxiom> disequations, OWLClass owlThingAlias) {
 
 		try {
-			this.auxOntology = OWLManager.createOWLOntologyManager()
-					.createOntology();
+			this.auxOntology = OWLManager.createOWLOntologyManager().createOntology();
 		} catch (OWLOntologyCreationException e) {
 			throw new RuntimeException(e);
 		}
@@ -123,10 +123,8 @@ public class UelModel {
 		// construct disequations from the dissubsumptions ...
 		Set<Equation> myDisequations = new HashSet<Equation>();
 		for (OWLSubClassOfAxiom dissubsumption : dissubsumptions) {
-			Integer subClassId = findAuxiliaryDefinition(dissubsumption
-					.getSubClass());
-			Integer superClassId = findAuxiliaryDefinition(dissubsumption
-					.getSuperClass());
+			Integer subClassId = findAuxiliaryDefinition(dissubsumption.getSubClass());
+			Integer superClassId = findAuxiliaryDefinition(dissubsumption.getSuperClass());
 
 			Set<Integer> rightIds = new HashSet<Integer>();
 			rightIds.add(subClassId);
@@ -136,28 +134,24 @@ public class UelModel {
 		// ... and replace original disequations by ones between flat atoms
 		// (we assume that all equations contain exactly two class expressions)
 		for (OWLEquivalentClassesAxiom disequation : disequations) {
-			List<OWLClassExpression> exprs = disequation
-					.getClassExpressionsAsList();
+			List<OWLClassExpression> exprs = disequation.getClassExpressionsAsList();
 			Integer atomId1 = findAuxiliaryDefinition(exprs.get(0));
 			Integer atomId2 = findAuxiliaryDefinition(exprs.get(1));
 
 			myDisequations.add(new EquationImpl(atomId1, atomId2, false));
 		}
 
-		DynamicOntology dynamicOntology = new DynamicOntology(
-				new OntologyBuilder(getAtomManager()));
+		DynamicOntology dynamicOntology = new DynamicOntology(new OntologyBuilder(atomManager));
 		Set<OWLOntology> ontologies = new HashSet<OWLOntology>();
 		ontologies.addAll(bgOntologies);
 		ontologies.add(auxOntology);
 		dynamicOntology.load(ontologies, owlThingAlias);
-		this.pluginGoal = new PluginGoal(getAtomManager(), dynamicOntology);
+		this.pluginGoal = new PluginGoal(atomManager, dynamicOntology);
 
 		// add the subsumptions themselves to the PluginGoal ...
 		for (OWLSubClassOfAxiom subsumption : subsumptions) {
-			Integer subClassId = findAuxiliaryDefinition(subsumption
-					.getSubClass());
-			Integer superClassId = findAuxiliaryDefinition(subsumption
-					.getSuperClass());
+			Integer subClassId = findAuxiliaryDefinition(subsumption.getSubClass());
+			Integer superClassId = findAuxiliaryDefinition(subsumption.getSuperClass());
 
 			// System.out.println(subClassId + " subsumed by " + superClassId);
 
@@ -165,8 +159,7 @@ public class UelModel {
 		}
 		// ... and do the same for the equations
 		for (OWLEquivalentClassesAxiom equation : equations) {
-			List<OWLClassExpression> exprs = equation
-					.getClassExpressionsAsList();
+			List<OWLClassExpression> exprs = equation.getClassExpressionsAsList();
 			Integer classId1 = findAuxiliaryDefinition(exprs.get(0));
 			Integer classId2 = findAuxiliaryDefinition(exprs.get(1));
 
@@ -205,8 +198,7 @@ public class UelModel {
 							"Argument is neither a concept name, nor a conjunction, nor an existential restriction.");
 				}
 				OWLObjectSomeValuesFrom exists = (OWLObjectSomeValuesFrom) expr;
-				String roleName = exists.getProperty().getNamedProperty()
-						.toStringID();
+				String roleName = exists.getProperty().getNamedProperty().toStringID();
 				OWLClassExpression filler = exists.getFiller();
 
 				Integer fillerId;
@@ -219,22 +211,18 @@ public class UelModel {
 					}
 				}
 
-				ConceptName fillerConceptName = (ConceptName) getAtomManager()
-						.getAtoms().get(fillerId);
-				ExistentialRestriction exprExistentialRestriction = getAtomManager()
-						.createExistentialRestriction(roleName,
-								fillerConceptName);
-				return getAtomManager().getAtoms().addAndGetIndex(
-						exprExistentialRestriction);
+				ConceptName fillerConceptName = (ConceptName) atomManager.getAtoms().get(fillerId);
+				ExistentialRestriction exprExistentialRestriction = atomManager.createExistentialRestriction(roleName,
+						fillerConceptName);
+				return atomManager.getAtoms().addAndGetIndex(exprExistentialRestriction);
 			}
 		}
 
 	}
 
 	public Integer getAtomId(OWLClass owlClass) {
-		ConceptName conceptName = getAtomManager().createConceptName(
-				getId(owlClass), false);
-		return getAtomManager().getAtoms().addAndGetIndex(conceptName);
+		ConceptName conceptName = atomManager.createConceptName(getId(owlClass), false);
+		return atomManager.getAtoms().addAndGetIndex(conceptName);
 	}
 
 	private Integer abbreviateClassExpression(OWLClassExpression expr) {
@@ -247,8 +235,7 @@ public class UelModel {
 
 		this.mapOfAuxClassExpr.put(expr, ret);
 
-		OWLAxiom newDefinition = factory.getOWLEquivalentClassesAxiom(newClass,
-				expr);
+		OWLAxiom newDefinition = factory.getOWLEquivalentClassesAxiom(newClass, expr);
 		manager.addAxiom(auxOntology, newDefinition);
 
 		return ret;
@@ -270,8 +257,45 @@ public class UelModel {
 		return this.uelProcessor;
 	}
 
+	public KRSSRenderer getRenderer() {
+		return new KRSSRenderer(atomManager, pluginGoal.getUserVariables(), pluginGoal.getAuxiliaryVariables(),
+				mapIdLabel);
+	}
+
 	public List<Set<Equation>> getUnifierList() {
 		return Collections.unmodifiableList(this.unifierList);
+	}
+
+	public String printPluginGoal() {
+		return pluginGoal.print(getRenderer());
+	}
+
+	public String getLabel(Integer id) {
+		String name = atomManager.getConceptName(id);
+		return getRenderer().getLabel(name, false);
+		// String ret = model.getMapIdLabel().get(name);
+		//
+		// if (ret == null) {
+		// if (name.endsWith(AtomManager.UNDEF_SUFFIX)) {
+		// String origId = name.substring(0, name.length() -
+		// AtomManager.UNDEF_SUFFIX.length());
+		// ret = model.getMapIdLabel().get(origId);
+		// if (ret != null) {
+		// ret += AtomManager.UNDEF_SUFFIX;
+		// }
+		// }
+		// }
+		//
+		// if (ret == null) {
+		// int p = name.indexOf("#");
+		// if (p != -1) {
+		// ret = name.substring(p + 1);
+		// } else {
+		// ret = name;
+		// }
+		// }
+		//
+		// return ret;
 	}
 
 	public void reset() {
@@ -286,8 +310,7 @@ public class UelModel {
 
 	public void setProcessorName(String name) {
 		if (!UelProcessorFactory.getProcessorNames().contains(name)) {
-			throw new IllegalArgumentException("Processor name is invalid: '"
-					+ name + "'.");
+			throw new IllegalArgumentException("Processor name is invalid: '" + name + "'.");
 		}
 		this.processorName = name;
 	}

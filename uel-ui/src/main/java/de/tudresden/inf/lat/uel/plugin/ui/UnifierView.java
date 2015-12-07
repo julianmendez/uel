@@ -1,19 +1,18 @@
 package de.tudresden.inf.lat.uel.plugin.ui;
 
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionListener;
 
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.WindowConstants;
-
-import de.tudresden.inf.lat.uel.core.processor.UelModel;
 
 /**
  * This is the panel that shows the unifiers.
@@ -30,151 +29,114 @@ public class UnifierView extends JDialog {
 	private JButton buttonPrevious = new JButton(UelIcon.ICON_BACK);
 	private JButton buttonSave = new JButton(UelIcon.ICON_SAVE);
 	private JButton buttonShowStatInfo = new JButton(UelIcon.ICON_STATISTICS);
-	private final UelModel model;
+	private JButton buttonRefine = new JButton(UelIcon.ICON_REFINE);
 	private JTextArea textUnifier = new JTextArea();
 	private JTextArea textUnifierId = new JTextArea();
 
-	public UnifierView(UelModel processor) {
+	public UnifierView() {
 		super((Frame) null, "Unifier", true);
-
-		if (processor == null) {
-			throw new IllegalArgumentException("Null argument.");
-		}
-
-		this.model = processor;
 		initFrame();
 	}
 
 	public void addButtonFirstListener(ActionListener listener, String actionCommand) {
-		if (listener == null) {
-			throw new IllegalArgumentException("Null argument.");
-		}
-		if (actionCommand == null) {
-			throw new IllegalArgumentException("Null argument.");
-		}
-
 		this.buttonFirst.addActionListener(listener);
 		this.buttonFirst.setActionCommand(actionCommand);
 	}
 
 	public void addButtonLastListener(ActionListener listener, String actionCommand) {
-		if (listener == null) {
-			throw new IllegalArgumentException("Null argument.");
-		}
-		if (actionCommand == null) {
-			throw new IllegalArgumentException("Null argument.");
-		}
-
 		this.buttonLast.addActionListener(listener);
 		this.buttonLast.setActionCommand(actionCommand);
 	}
 
 	public void addButtonNextListener(ActionListener listener, String actionCommand) {
-		if (listener == null) {
-			throw new IllegalArgumentException("Null argument.");
-		}
-		if (actionCommand == null) {
-			throw new IllegalArgumentException("Null argument.");
-		}
-
 		this.buttonNext.addActionListener(listener);
 		this.buttonNext.setActionCommand(actionCommand);
 	}
 
 	public void addButtonPreviousListener(ActionListener listener, String actionCommand) {
-		if (listener == null) {
-			throw new IllegalArgumentException("Null argument.");
-		}
-		if (actionCommand == null) {
-			throw new IllegalArgumentException("Null argument.");
-		}
-
 		this.buttonPrevious.addActionListener(listener);
 		this.buttonPrevious.setActionCommand(actionCommand);
 	}
 
 	public void addButtonSaveListener(ActionListener listener, String actionCommand) {
-		if (listener == null) {
-			throw new IllegalArgumentException("Null argument.");
-		}
-		if (actionCommand == null) {
-			throw new IllegalArgumentException("Null argument.");
-		}
-
 		this.buttonSave.addActionListener(listener);
 		this.buttonSave.setActionCommand(actionCommand);
 	}
 
 	public void addButtonShowStatInfoListener(ActionListener listener, String actionCommand) {
-		if (listener == null) {
-			throw new IllegalArgumentException("Null argument.");
-		}
-		if (actionCommand == null) {
-			throw new IllegalArgumentException("Null argument.");
-		}
-
 		this.buttonShowStatInfo.addActionListener(listener);
 		this.buttonShowStatInfo.setActionCommand(actionCommand);
 	}
 
-	private JPanel createUnifierPanel() {
-		JPanel ret = new JPanel();
-		ret.setLayout(new BoxLayout(ret, BoxLayout.Y_AXIS));
+	public void addButtonRefineListener(ActionListener listener, String actionCommand) {
+		this.buttonRefine.addActionListener(listener);
+		this.buttonRefine.setActionCommand(actionCommand);
+	}
+
+	private Container createUnifierPanel() {
+		Container ret = new Box(BoxLayout.Y_AXIS);
 
 		this.textUnifier.setToolTipText(Message.tooltipUnifier);
 		this.textUnifier.setWrapStyleWord(true);
 		this.textUnifier.setLineWrap(true);
 
-		JPanel smallPanel = new JPanel();
+		Container navigateButtons = new Box(BoxLayout.X_AXIS);
 
 		this.buttonFirst.setToolTipText(Message.tooltipFirst);
 		UelIcon.setBorder(buttonFirst);
-		smallPanel.add(this.buttonFirst);
+		navigateButtons.add(this.buttonFirst);
 
 		this.buttonPrevious.setToolTipText(Message.tooltipPrevious);
 		UelIcon.setBorder(buttonPrevious);
-		smallPanel.add(this.buttonPrevious);
+		navigateButtons.add(this.buttonPrevious);
 
 		this.textUnifierId.setToolTipText(Message.tooltipUnifierId);
 		this.textUnifierId.setEditable(false);
-		smallPanel.add(this.textUnifierId);
+		navigateButtons.add(this.textUnifierId);
 
 		this.buttonNext.setToolTipText(Message.tooltipNext);
 		UelIcon.setBorder(buttonNext);
-		smallPanel.add(this.buttonNext);
+		navigateButtons.add(this.buttonNext);
 
 		this.buttonLast.setToolTipText(Message.tooltipLast);
 		UelIcon.setBorder(buttonLast);
-		smallPanel.add(this.buttonLast);
+		navigateButtons.add(this.buttonLast);
 
-		this.buttonSave.setToolTipText(Message.tooltipSave);
-		UelIcon.setBorder(buttonSave);
-		smallPanel.add(this.buttonSave);
+		navigateButtons.add(Box.createHorizontalStrut(40));
 
 		this.buttonShowStatInfo.setToolTipText(Message.tooltipShowStatInfo);
 		UelIcon.setBorder(buttonShowStatInfo);
-		smallPanel.add(this.buttonShowStatInfo);
+		navigateButtons.add(this.buttonShowStatInfo);
+
+		ret.add(navigateButtons);
 
 		JScrollPane scrollPane = new JScrollPane(this.textUnifier);
 		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		scrollPane.setPreferredSize(new Dimension(640, 480));
 
-		ret.add(smallPanel);
 		ret.add(scrollPane);
+
+		Container unifierButtons = new Box(BoxLayout.X_AXIS);
+
+		this.buttonSave.setToolTipText(Message.tooltipSave);
+		UelIcon.setBorder(buttonSave);
+		unifierButtons.add(this.buttonSave);
+
+		this.buttonRefine.setToolTipText(Message.tooltipRefine);
+		UelIcon.setBorder(buttonRefine);
+		unifierButtons.add(this.buttonRefine);
+
+		ret.add(unifierButtons);
 
 		return ret;
 	}
 
-	public UelModel getModel() {
-		return this.model;
+	public void setUnifier(String text) {
+		textUnifier.setText(text);
 	}
 
-	public JTextArea getUnifier() {
-		return this.textUnifier;
-	}
-
-	public JTextArea getUnifierId() {
-		return this.textUnifierId;
+	public void setUnifierId(String text) {
+		textUnifierId.setText(text);
 	}
 
 	private void initFrame() {
@@ -186,37 +148,29 @@ public class UnifierView extends JDialog {
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 	}
 
-	public void setButtonFirstEnabled(boolean b) {
-		this.buttonFirst.setEnabled(b);
+	public void initializeButtons() {
+		buttonFirst.setEnabled(false);
+		buttonPrevious.setEnabled(false);
+		buttonNext.setEnabled(true);
+		buttonLast.setEnabled(false);
+		buttonSave.setEnabled(false);
+		buttonRefine.setEnabled(false);
+		buttonShowStatInfo.setEnabled(true);
 	}
 
-	public void setButtonLastEnabled(boolean b) {
-		this.buttonLast.setEnabled(b);
+	public void setFirstPreviousButtons(boolean state) {
+		buttonFirst.setEnabled(state);
+		buttonPrevious.setEnabled(state);
 	}
 
-	public void setButtonNextEnabled(boolean b) {
-		this.buttonNext.setEnabled(b);
+	public void setNextLastButtons(boolean state) {
+		buttonNext.setEnabled(state);
+		buttonLast.setEnabled(state);
 	}
 
-	public void setButtonPreviousEnabled(boolean b) {
-		this.buttonPrevious.setEnabled(b);
-	}
-
-	public void setButtonSaveEnabled(boolean b) {
-		this.buttonSave.setEnabled(b);
-	}
-
-	public void setButtonShowStatInfoEnabled(boolean b) {
-		this.buttonShowStatInfo.setEnabled(b);
-	}
-
-	public void setUnifierButtons(boolean b) {
-		setButtonFirstEnabled(b);
-		setButtonPreviousEnabled(b);
-		setButtonNextEnabled(b);
-		setButtonLastEnabled(b);
-		setButtonSaveEnabled(b);
-		setButtonShowStatInfoEnabled(b);
+	public void setSaveRefineButtons(boolean state) {
+		buttonSave.setEnabled(state);
+		buttonRefine.setEnabled(state);
 	}
 
 }

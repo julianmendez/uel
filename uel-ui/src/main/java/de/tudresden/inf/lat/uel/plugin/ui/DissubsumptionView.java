@@ -3,19 +3,21 @@
  */
 package de.tudresden.inf.lat.uel.plugin.ui;
 
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.event.ActionListener;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JList;
-import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.WindowConstants;
 
-import de.tudresden.inf.lat.uel.core.type.KRSSRenderer;
+import de.tudresden.inf.lat.uel.core.processor.UelModel;
 import de.tudresden.inf.lat.uel.type.api.Equation;
 
 /**
@@ -30,23 +32,23 @@ public class DissubsumptionView extends JDialog {
 	private JButton buttonSave;
 	private int n;
 
-	private KRSSRenderer renderer;
+	private UelModel model;
 	private Set<Equation> unifier;
-	private JList[] lists;
+	private JList<LabelId>[] lists;
 
-	public DissubsumptionView(Set<Equation> unifier, KRSSRenderer renderer) {
+	public DissubsumptionView(Set<Equation> unifier, UelModel model) {
 		this.unifier = unifier;
-		this.renderer = renderer;
+		this.model = model;
 		n = unifier.size();
 		init();
 	}
 
-	public void addRecomputeButtonListener(ActionListener listener, String actionCommand) {
+	public void addButtonRecomputeListener(ActionListener listener, String actionCommand) {
 		buttonRecompute.addActionListener(listener);
 		buttonRecompute.setActionCommand(actionCommand);
 	}
 
-	public void addSaveButtonListener(ActionListener listener, String actionCommand) {
+	public void addButtonSaveListener(ActionListener listener, String actionCommand) {
 		buttonSave.addActionListener(listener);
 		buttonSave.setActionCommand(actionCommand);
 	}
@@ -61,28 +63,29 @@ public class DissubsumptionView extends JDialog {
 		for (int i = 0; i < n; i++) {
 			// TODO transform each marked atom into an equation
 		}
-		return renderer.printUnifier(dissubsumptions);
+		return model.getRenderer().printUnifier(dissubsumptions);
 	}
 
 	private void init() {
 		setSize(new Dimension(800, 600));
 		setMinimumSize(new Dimension(200, 200));
-		setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+		getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.X_AXIS));
 		getContentPane().add(createButtonPanel());
 		getContentPane().add(createSelectionPanels());
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 	}
-	
-	private JPanel createButtonPanel() {
-		JPanel buttonPanel = new JPanel();
+
+	private Container createButtonPanel() {
+		Container buttonPanel = new Box(BoxLayout.X_AXIS);
 		// TODO two buttons
 		return buttonPanel;
 	}
 
-	private JPanel createSelectionPanels() {
-		JPanel panel = new JPanel();
+	private Container createSelectionPanels() {
+		Container panel = new Box(BoxLayout.X_AXIS);
 		// TODO jlists for each equation, everything in a scrollpane
-		return panel;
+		JScrollPane scrollPane = new JScrollPane(panel);
+		return scrollPane;
 	}
 
 }

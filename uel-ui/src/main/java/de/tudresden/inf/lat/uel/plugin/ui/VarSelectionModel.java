@@ -4,10 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
-import de.tudresden.inf.lat.uel.core.processor.PluginGoal;
-import de.tudresden.inf.lat.uel.core.type.AtomManager;
+import de.tudresden.inf.lat.uel.core.processor.UelModel;
 
 /**
  * An object of this class can manage which concept names are considered by the
@@ -16,82 +14,45 @@ import de.tudresden.inf.lat.uel.core.type.AtomManager;
  * @author Julian Mendez
  */
 class VarSelectionModel {
+	
+	
+	// TODO merge into UelModel
 
-	private final Map<String, String> idLabelMap;
-	private final PluginGoal pluginGoal;
+	private final UelModel model;
 
-	public VarSelectionModel(Map<String, String> labels, PluginGoal g) {
-		if (labels == null) {
+	public VarSelectionModel(UelModel model) {
+		if (model == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
-		if (g == null) {
-			throw new IllegalArgumentException("Null argument.");
-		}
 
-		this.idLabelMap = labels;
-		this.pluginGoal = g;
+		this.model = model;
 	}
 
 	public List<LabelId> getConstants() {
 		List<LabelId> ret = new ArrayList<LabelId>();
-		for (Integer atomId : getPluginGoal().getConstants()) {
-			Integer id = getPluginGoal().getAtomManager().getAtoms().get(atomId).getConceptNameId();
-			ret.add(new LabelId(getLabel(id), id));
+		for (Integer id : model.getPluginGoal().getConstants()) {
+			ret.add(new LabelId(model.getLabel(id), id));
 		}
 		return Collections.unmodifiableList(ret);
 	}
 
-	public PluginGoal getPluginGoal() {
-		return this.pluginGoal;
-	}
-
-	private String getLabel(Integer id) {
-		if (id == null) {
-			throw new IllegalArgumentException("Null argument.");
-		}
-
-		String name = getPluginGoal().getAtomManager().getConceptName(id);
-		String ret = this.idLabelMap.get(name);
-
-		if (ret == null) {
-			if (name.endsWith(AtomManager.UNDEF_SUFFIX)) {
-				String origId = name.substring(0, name.length() - AtomManager.UNDEF_SUFFIX.length());
-				ret = this.idLabelMap.get(origId);
-				if (ret != null) {
-					ret += AtomManager.UNDEF_SUFFIX;
-				}
-			}
-		}
-
-		if (ret == null) {
-			int p = name.indexOf("#");
-			if (p != -1) {
-				ret = name.substring(p + 1);
-			} else {
-				ret = name;
-			}
-		}
-
-		return ret;
-	}
-
 	public List<LabelId> getVariables() {
 		List<LabelId> ret = new ArrayList<LabelId>();
-		for (Integer id : getPluginGoal().getUelInput().getUserVariables()) {
-			ret.add(new LabelId(getLabel(id), id));
+		for (Integer id : model.getPluginGoal().getUserVariables()) {
+			ret.add(new LabelId(model.getLabel(id), id));
 		}
 		return Collections.unmodifiableList(ret);
 	}
 
 	public void makeConstants(Collection<LabelId> lids) {
 		for (LabelId lid : lids) {
-			getPluginGoal().makeConstant(lid.getId());
+			model.getPluginGoal().makeConstant(lid.getId());
 		}
 	}
 
 	public void makeVariables(Collection<LabelId> lids) {
 		for (LabelId lid : lids) {
-			getPluginGoal().makeUserVariable(lid.getId());
+			model.getPluginGoal().makeUserVariable(lid.getId());
 		}
 	}
 

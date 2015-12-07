@@ -2,7 +2,6 @@ package de.tudresden.inf.lat.uel.core.processor;
 
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import de.tudresden.inf.lat.uel.core.type.AtomManager;
@@ -132,28 +131,6 @@ public class PluginGoal {
 		}
 	}
 
-	private void appendDisequations(StringBuffer buf, KRSSRenderer renderer,
-			Set<SmallEquation> disequations) {
-		for (SmallEquation eq : disequations) {
-			buf.append(renderer.printAtom(eq.getLeft()));
-			buf.append(" ≢ ");
-			buf.append(renderer.printAtom(eq.getRight()));
-			buf.append(System.lineSeparator());
-			buf.append(System.lineSeparator());
-		}
-	}
-
-	private void appendEquations(StringBuffer buf, KRSSRenderer renderer,
-			Set<Equation> equations) {
-		for (Equation eq : equations) {
-			buf.append(renderer.printAtom(eq.getLeft()));
-			buf.append(" ≡ ");
-			buf.append(renderer.printConjunction(eq.getRight()));
-			buf.append(System.lineSeparator());
-			buf.append(System.lineSeparator());
-		}
-	}
-
 	private Set<Equation> extractModules(Integer leftId, Integer rightId) {
 		Set<Integer> atomIds = new HashSet<Integer>();
 		atomIds.add(leftId);
@@ -271,19 +248,12 @@ public class PluginGoal {
 		return new EquationImpl(e.getLeft(), newRightSet, false);
 	}
 
-	@Override
-	public String toString() {
-		return toString(null);
-	}
-
-	public String toString(Map<String, String> mapIdLabel) {
-		KRSSRenderer renderer = new KRSSRenderer(atomManager, userVariables,
-				auxiliaryVariables, mapIdLabel);
-		StringBuffer buf = new StringBuffer();
-		appendEquations(buf, renderer, definitions);
-		appendEquations(buf, renderer, goalEquations);
-		appendDisequations(buf, renderer, goalDisequations);
-		return buf.toString();
+	public String print(KRSSRenderer renderer) {
+		StringBuffer sbuf = new StringBuffer();
+		renderer.appendCustomEquations(sbuf, definitions, " ≡ ");
+		renderer.appendCustomEquations(sbuf, goalEquations, " ≡ ");
+		renderer.appendCustomSmallEquations(sbuf, goalDisequations, " ≢ ");
+		return sbuf.toString();
 	}
 
 	private void updateIndexSets(Set<Equation> equationSet) {

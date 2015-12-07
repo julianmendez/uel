@@ -29,8 +29,8 @@ import de.tudresden.inf.lat.uel.plugin.ui.UelView;
  * 
  * @author Julian Mendez
  */
-public class UelProtegeStarter implements OWLOntologyChangeListener,
-		OWLOntologyLoaderListener, OWLModelManagerListener {
+public class UelProtegeStarter
+		implements OWLOntologyChangeListener, OWLOntologyLoaderListener, OWLModelManagerListener {
 
 	static final long serialVersionUID = -8760277761148468455L;
 
@@ -52,8 +52,7 @@ public class UelProtegeStarter implements OWLOntologyChangeListener,
 
 		this.modelManager = modelManager;
 		this.ontologyManager = modelManager.getOWLOntologyManager();
-		this.panel = new UelController(new UelView(new UelModel()),
-				this.ontologyManager);
+		this.panel = new UelController(new UelView(), new UelModel(), this.ontologyManager);
 		this.renderer = modelManager.getOWLEntityRenderer();
 		modelManager.addListener(this);
 		getOWLOntologyManager().addOntologyLoaderListener(this);
@@ -69,8 +68,8 @@ public class UelProtegeStarter implements OWLOntologyChangeListener,
 			entities.addAll(ontology.getObjectPropertiesInSignature());
 
 			for (OWLEntity entity : entities) {
-				String shortForm = this.renderer != null ? this.renderer
-						.getShortForm(entity) : getShortForm(entity, ontology);
+				String shortForm = this.renderer != null ? this.renderer.getShortForm(entity)
+						: getShortForm(entity, ontology);
 				shortFormMap.put(entity, removeQuotes(shortForm));
 			}
 		}
@@ -100,16 +99,12 @@ public class UelProtegeStarter implements OWLOntologyChangeListener,
 		for (OWLAnnotation annotation : annotations) {
 			OWLAnnotationProperty annotationProperty = annotation.getProperty();
 
-			
 			// for OWL API 3.5.1
 
-			if (annotationProperty.isLabel()
-					&& entity.getAnnotations(ontology).contains(
-							annotationProperty)) {
+			if (annotationProperty.isLabel() && entity.getAnnotations(ontology).contains(annotationProperty)) {
 				ret = annotation.getValue().toString();
 			}
 
-			
 			// for OWL API 4.0.2
 
 			// if (annotationProperty.isLabel()
@@ -140,8 +135,7 @@ public class UelProtegeStarter implements OWLOntologyChangeListener,
 
 	private String removeQuotes(String str) {
 		String ret = str;
-		if ((str.startsWith("\"") && str.endsWith("\""))
-				|| (str.startsWith("'") && str.endsWith("'"))) {
+		if ((str.startsWith("\"") && str.endsWith("\"")) || (str.startsWith("'") && str.endsWith("'"))) {
 			ret = str.substring(1, str.length() - 1);
 		}
 		return ret;
@@ -166,8 +160,7 @@ public class UelProtegeStarter implements OWLOntologyChangeListener,
 		}
 
 		EventType type = event.getType();
-		if ((type == EventType.ONTOLOGY_CREATED)
-				|| (type == EventType.ONTOLOGY_LOADED)
+		if ((type == EventType.ONTOLOGY_CREATED) || (type == EventType.ONTOLOGY_LOADED)
 				|| (type == EventType.ONTOLOGY_RELOADED)) {
 			reset();
 		}

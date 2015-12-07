@@ -8,7 +8,7 @@ import java.net.URL;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
@@ -28,6 +28,7 @@ public class UelIcon {
 	public static final String PATH_FAST_FORWARD = "icons/fastforward.png";
 	public static final String PATH_FORWARD = "icons/forward.png";
 	public static final String PATH_OPEN = "icons/openfolder.png";
+	public static final String PATH_REFINE = "icons/refine.png";
 	public static final String PATH_REWIND = "icons/rewind.png";
 	public static final String PATH_SAVE = "icons/floppydisk.png";
 	public static final String PATH_STATISTICS = "icons/statistics.png";
@@ -38,6 +39,7 @@ public class UelIcon {
 	public static final ImageIcon ICON_FAST_FORWARD = createIcon(PATH_FAST_FORWARD);
 	public static final ImageIcon ICON_FORWARD = createIcon(PATH_FORWARD);
 	public static final ImageIcon ICON_OPEN = createIcon(PATH_OPEN);
+	public static final ImageIcon ICON_REFINE = createIcon(PATH_REFINE);
 	public static final ImageIcon ICON_REWIND = createIcon(PATH_REWIND);
 	public static final ImageIcon ICON_SAVE = createIcon(PATH_SAVE);
 	public static final ImageIcon ICON_STATISTICS = createIcon(PATH_STATISTICS);
@@ -88,11 +90,11 @@ public class UelIcon {
 		return ret;
 	}
 
-	public static void setBorder(JButton button) {
+	public static void setBorder(JComponent component) {
 		Border line = new LineBorder(new Color(150, 150, 150));
 		Border margin = new EmptyBorder(0, 4, 0, 4);
 		Border compound = new CompoundBorder(line, margin);
-		button.setBorder(compound);
+		component.setBorder(compound);
 	}
 
 }

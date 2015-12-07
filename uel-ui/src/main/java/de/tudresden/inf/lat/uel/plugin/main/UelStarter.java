@@ -24,8 +24,7 @@ import de.tudresden.inf.lat.uel.plugin.ui.UelView;
  * 
  * @author Julian Mendez
  */
-public class UelStarter implements OWLOntologyChangeListener,
-		OWLOntologyLoaderListener {
+public class UelStarter implements OWLOntologyChangeListener, OWLOntologyLoaderListener {
 
 	private final OWLOntologyManager ontologyManager;
 	private final UelController panel;
@@ -42,8 +41,7 @@ public class UelStarter implements OWLOntologyChangeListener,
 		}
 
 		this.ontologyManager = manager;
-		this.panel = new UelController(new UelView(new UelModel()),
-				this.ontologyManager);
+		this.panel = new UelController(new UelView(), new UelModel(), this.ontologyManager);
 		getOWLOntologyManager().addOntologyLoaderListener(this);
 		getOWLOntologyManager().addOntologyChangeListener(this);
 		reset();
@@ -87,16 +85,12 @@ public class UelStarter implements OWLOntologyChangeListener,
 		for (OWLAnnotation annotation : annotations) {
 			OWLAnnotationProperty annotationProperty = annotation.getProperty();
 
-			
 			// for OWL API 3.5.1
 
-			if (annotationProperty.isLabel()
-					&& entity.getAnnotations(ontology).contains(
-							annotationProperty)) {
+			if (annotationProperty.isLabel() && entity.getAnnotations(ontology).contains(annotationProperty)) {
 				ret = annotation.getValue().toString();
 			}
 
-			
 			// for OWL API 4.0.2
 
 			// if (annotationProperty.isLabel()
@@ -119,8 +113,7 @@ public class UelStarter implements OWLOntologyChangeListener,
 
 	private String removeQuotes(String str) {
 		String ret = str;
-		if ((str.startsWith("\"") && str.endsWith("\""))
-				|| (str.startsWith("'") && str.endsWith("'"))) {
+		if ((str.startsWith("\"") && str.endsWith("\"")) || (str.startsWith("'") && str.endsWith("'"))) {
 			ret = str.substring(1, str.length() - 1);
 		}
 		return ret;

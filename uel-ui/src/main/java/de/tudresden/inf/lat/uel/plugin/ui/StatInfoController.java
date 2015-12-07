@@ -6,8 +6,9 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Map;
 
-import javax.swing.JFileChooser;
+import de.tudresden.inf.lat.uel.core.processor.UelModel;
 
 /**
  * This is the controller of the panel that shows statistical information.
@@ -16,12 +17,16 @@ import javax.swing.JFileChooser;
  */
 class StatInfoController implements ActionListener {
 
+	private static final String colon = ": ";
+	private static final String newLine = "\n";
 	private static final String actionSaveButton = "save goal";
 
-	private StatInfoView view = null;
+	private StatInfoView view;
+	private UelModel model;
 
-	public StatInfoController(StatInfoView v) {
-		this.view = v;
+	public StatInfoController(StatInfoView view, UelModel model) {
+		this.view = view;
+		this.model = model;
 		init();
 	}
 
@@ -39,49 +44,41 @@ class StatInfoController implements ActionListener {
 		}
 	}
 
-	public void close() {
-		getView().setVisible(false);
-		getView().dispose();
-	}
-
 	private void executeSaveGoal() {
-		JFileChooser fileChooser = new JFileChooser();
-		int returnVal = fileChooser.showSaveDialog(getView());
-		File file = null;
-		if (returnVal == JFileChooser.APPROVE_OPTION) {
-			file = fileChooser.getSelectedFile();
+		File file = UelController.showSaveFileDialog(view);
+		if (file == null) {
+			return;
 		}
-		if (file != null) {
-			try {
-				BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-				writer.write(getModel().printPluginGoal());
-				writer.flush();
-				writer.close();
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
+
+		try {
+			BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+			writer.write(model.printPluginGoal());
+			writer.flush();
+			writer.close();
+		} catch (IOException e) {
+			throw new RuntimeException(e);
 		}
-	}
-
-	public StatInfo getModel() {
-		return getView().getModel();
-	}
-
-	public StatInfoView getView() {
-		return this.view;
 	}
 
 	private void init() {
-		getView().addSaveButtonListener(this, actionSaveButton);
+		view.addSaveButtonListener(this, actionSaveButton);
 	}
 
 	public void open() {
-		getView().update();
-		getView().setVisible(true);
+		updateView();
+		view.setVisible(true);
 	}
 
-	public void update() {
-		getView().update();
+	public void updateView() {
+		view.setGoalText(model.printPluginGoal());
+		StringBuffer info = new StringBuffer();
+		for (Map.Entry<String, String> pair : model.getUelProcessor().getInfo()) {
+			info.append(pair.getKey());
+			info.append(colon);
+			info.append(pair.getValue());
+			info.append(newLine);
+		}
+		view.setInfoText(info.toString());
 	}
 
 }

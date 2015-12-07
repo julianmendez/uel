@@ -4,7 +4,6 @@ import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionListener;
-import java.util.Map;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -21,28 +20,19 @@ import javax.swing.WindowConstants;
  */
 class StatInfoView extends JDialog {
 
-	private static final String colon = ": ";
-	private static final String newLine = "\n";
 	private static final long serialVersionUID = -4153981096827550491L;
 
-	private final StatInfo model;
 	private JButton saveButton = null;
 	private JTextArea textGoal = null;
 	private JTextArea textInfo = null;
 
-	public StatInfoView(StatInfo info) {
+	public StatInfoView() {
 		super((Frame) null, "Statistical information", true);
 
-		if (info == null) {
-			throw new IllegalArgumentException("Null argument.");
-		}
-
-		this.model = info;
 		initFrame();
 	}
 
-	public void addSaveButtonListener(ActionListener listener,
-			String actionCommand) {
+	public void addSaveButtonListener(ActionListener listener, String actionCommand) {
 		if (listener == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
@@ -63,8 +53,7 @@ class StatInfoView extends JDialog {
 		this.textGoal.setWrapStyleWord(true);
 		this.textGoal.setLineWrap(true);
 		JScrollPane scrollPaneVars = new JScrollPane(this.textGoal);
-		scrollPaneVars
-				.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		scrollPaneVars.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		scrollPaneVars.setMinimumSize(new Dimension(640, 240));
 		scrollPaneVars.setPreferredSize(new Dimension(640, 480));
 
@@ -83,8 +72,7 @@ class StatInfoView extends JDialog {
 		this.textInfo = new JTextArea();
 		this.textInfo.setToolTipText(Message.tooltipTextInfo);
 		JScrollPane scrollPaneInfo = new JScrollPane(this.textInfo);
-		scrollPaneVars
-				.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		scrollPaneVars.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		scrollPaneInfo.setMinimumSize(new Dimension(640, 120));
 		scrollPaneInfo.setPreferredSize(new Dimension(640, 240));
 
@@ -99,10 +87,6 @@ class StatInfoView extends JDialog {
 		return ret;
 	}
 
-	public StatInfo getModel() {
-		return this.model;
-	}
-
 	private void initFrame() {
 		setLocation(400, 400);
 		setSize(new Dimension(800, 600));
@@ -112,16 +96,12 @@ class StatInfoView extends JDialog {
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 	}
 
-	public void update() {
-		this.textGoal.setText(getModel().printPluginGoal());
-		StringBuffer info = new StringBuffer();
-		for (Map.Entry<String, String> pair : getModel().getInfo()) {
-			info.append(pair.getKey());
-			info.append(colon);
-			info.append(pair.getValue());
-			info.append(newLine);
-		}
-		this.textInfo.setText(info.toString());
+	public void setGoalText(String text) {
+		textGoal.setText(text);
+	}
+
+	public void setInfoText(String text) {
+		textInfo.setText(text);
 	}
 
 }
