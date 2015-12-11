@@ -18,10 +18,9 @@ public class UelStandalone {
 	}
 
 	public void run() {
-		UelStarter starter = new UelStarter(
-				OWLManager.createOWLOntologyManager());
+		UelStarter starter = new UelStarter(OWLManager.createOWLOntologyManager());
 		JFrame frame = new JFrame();
-		frame.add(starter.getPanel().getView());
+		frame.add(starter.getView());
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		frame.setSize(new Dimension(1024, 400));
 		frame.setVisible(true);

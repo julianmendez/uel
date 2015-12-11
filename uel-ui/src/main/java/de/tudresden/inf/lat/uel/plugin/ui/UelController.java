@@ -12,8 +12,10 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 
 import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.io.OWLRendererException;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLOntology;
@@ -117,8 +119,8 @@ public class UelController implements ActionListener {
 	}
 
 	private void executeActionRecompute() {
-		// TODO Auto-generated method stub
-
+		addNewDissubsumptions();
+		recomputeUnifiers();
 	}
 
 	private void executeActionSaveDissubsumptions() {
@@ -127,8 +129,25 @@ public class UelController implements ActionListener {
 			return;
 		}
 
-		String allDissubsumptions = dview.getDissubsumptions();
-		OntologyRenderer.saveToOntologyFile(allDissubsumptions, file);
+		addNewDissubsumptions();
+		try {
+			String dissubsumptions = OntologyRenderer.renderKRSS(owlOntologyNeg);
+			OntologyRenderer.saveToOntologyFile(dissubsumptions, file);
+		} catch (OWLRendererException ex) {
+			JOptionPane.showMessageDialog(dview, "Failed to save ontology: " + System.lineSeparator() + ex.toString());
+			return;
+		}
+		recomputeUnifiers();
+	}
+
+	private void addNewDissubsumptions() {
+		// TODO add dissubsumptions from dview to owlOntologyNeg
+		String dissubsumptions = dview.getDissubsumptions();
+	}
+
+	private void recomputeUnifiers() {
+		// TODO close dview and restart computation
+		dview.close();
 	}
 
 	public static File showSaveFileDialog(Component parent) {
@@ -153,6 +172,7 @@ public class UelController implements ActionListener {
 		dview = new DissubsumptionView(unifierController.getCurrentUnifier(), getModel());
 		dview.addButtonSaveListener(this, actionSaveDissubsumptions);
 		dview.addButtonRecomputeListener(this, actionRecompute);
+		dview.setVisible(true);
 
 	}
 
@@ -250,7 +270,8 @@ public class UelController implements ActionListener {
 
 		getModel().configure(bgOntologies, owlOntologyPos, owlOntologyNeg, null);
 
-		this.varWindow = initVarWindow();
+		this.varWindow = new VarSelectionController(new VarSelectionView(), getModel());
+		this.varWindow.addAcceptVarButtonListener(this, actionAcceptVar);
 		this.varWindow.open();
 	}
 
@@ -277,13 +298,6 @@ public class UelController implements ActionListener {
 		reset();
 	}
 
-	private VarSelectionController initVarWindow() {
-		VarSelectionController ret = new VarSelectionController(
-				new VarSelectionView(new VarSelectionModel(getModel())));
-		ret.addAcceptVarButtonListener(this, actionAcceptVar);
-		return ret;
-	}
-
 	private void updateOntologySelection() {
 		executeActionOntologyBg00Selected();
 		executeActionOntologyBg01Selected();
@@ -292,6 +306,8 @@ public class UelController implements ActionListener {
 	}
 
 	public void reset() {
+		// TODO is it always necessary to reset everything? can we keep the
+		// selected ontologies (if they still exist?)
 		resetUnifierController();
 		getView().setButtonSelectVariablesEnabled(false);
 		this.ontologyList.clear();

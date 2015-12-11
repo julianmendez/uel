@@ -2,6 +2,11 @@ package de.tudresden.inf.lat.uel.plugin.ui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import de.tudresden.inf.lat.uel.core.processor.UelModel;
 
 /**
  * This is the controller of the panel to select the variables in a given
@@ -14,14 +19,19 @@ class VarSelectionController implements ActionListener {
 	private static final String BUTTON_CONS = "make constant";
 	private static final String BUTTON_VAR = "make variable";
 
+	private final UelModel model;
 	private final VarSelectionView view;
 
-	public VarSelectionController(VarSelectionView v) {
-		if (v == null) {
+	public VarSelectionController(VarSelectionView view, UelModel model) {
+		if (view == null) {
+			throw new IllegalArgumentException("Null argument.");
+		}
+		if (model == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
 
-		this.view = v;
+		this.view = view;
+		this.model = model;
 		init();
 	}
 
@@ -31,52 +41,72 @@ class VarSelectionController implements ActionListener {
 			throw new IllegalArgumentException("Null argument.");
 		}
 
-		String cmd = e.getActionCommand();
-
-		if (cmd.equals(BUTTON_VAR)) {
+		switch (e.getActionCommand()) {
+		case BUTTON_VAR:
 			executeMakeVar();
-		} else if (cmd.equals(BUTTON_CONS)) {
+			break;
+		case BUTTON_CONS:
 			executeMakeCons();
+			break;
+		default:
+			throw new IllegalStateException();
 		}
 	}
 
-	public void addAcceptVarButtonListener(ActionListener listener,
-			String actionCommand) {
-		getView().addAcceptVarButtonListener(listener, actionCommand);
-
+	public void addAcceptVarButtonListener(ActionListener listener, String actionCommand) {
+		view.addAcceptVarButtonListener(listener, actionCommand);
 	}
 
 	public void close() {
-		getView().setVisible(false);
-		getView().dispose();
+		view.setVisible(false);
+		view.dispose();
 	}
 
 	private void executeMakeCons() {
-		getModel().makeConstants(getView().getSelectedVariables());
-		getView().updateLists();
+		for (LabelId variable : view.getSelectedVariables()) {
+			model.getPluginGoal().makeConstant(variable.getId());
+		}
 
+		updateLists();
 	}
 
 	private void executeMakeVar() {
-		getModel().makeVariables(getView().getSelectedConstants());
-		getView().updateLists();
+		for (LabelId constant : view.getSelectedConstants()) {
+			model.getPluginGoal().makeUserVariable(constant.getId());
+		}
+
+		updateLists();
 	}
 
-	public VarSelectionModel getModel() {
-		return getView().getModel();
+	public List<LabelId> getLabelledConstants() {
+		List<LabelId> ret = new ArrayList<LabelId>();
+		for (Integer id : model.getPluginGoal().getConstants()) {
+			ret.add(new LabelId(model.getLabel(id), id));
+		}
+		return Collections.unmodifiableList(ret);
 	}
 
-	public VarSelectionView getView() {
-		return this.view;
+	public List<LabelId> getLabelledVariables() {
+		List<LabelId> ret = new ArrayList<LabelId>();
+		for (Integer id : model.getPluginGoal().getUserVariables()) {
+			ret.add(new LabelId(model.getLabel(id), id));
+		}
+		return Collections.unmodifiableList(ret);
 	}
 
 	private void init() {
-		getView().addMakeConsButtonListener(this, BUTTON_CONS);
-		getView().addMakeVarButtonListener(this, BUTTON_VAR);
+		view.addMakeConsButtonListener(this, BUTTON_CONS);
+		view.addMakeVarButtonListener(this, BUTTON_VAR);
+		updateLists();
 	}
 
 	public void open() {
-		getView().setVisible(true);
+		view.setVisible(true);
+	}
+
+	private void updateLists() {
+		view.setConstants(getLabelledConstants());
+		view.setVariables(getLabelledVariables());
 	}
 
 }

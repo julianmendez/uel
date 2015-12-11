@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.semanticweb.owlapi.model.OWLAnnotation;
-import org.semanticweb.owlapi.model.OWLAnnotationProperty;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyChange;
@@ -42,14 +41,14 @@ public class UelStarter implements OWLOntologyChangeListener, OWLOntologyLoaderL
 
 		this.ontologyManager = manager;
 		this.panel = new UelController(new UelView(), new UelModel(), this.ontologyManager);
-		getOWLOntologyManager().addOntologyLoaderListener(this);
-		getOWLOntologyManager().addOntologyChangeListener(this);
+		ontologyManager.addOntologyLoaderListener(this);
+		ontologyManager.addOntologyChangeListener(this);
 		reset();
 	}
 
 	private Map<OWLEntity, String> createShortFormMap() {
 		Map<OWLEntity, String> shortFormMap = new HashMap<OWLEntity, String>();
-		for (OWLOntology ontology : getOWLOntologyManager().getOntologies()) {
+		for (OWLOntology ontology : ontologyManager.getOntologies()) {
 			Set<OWLEntity> entities = new HashSet<OWLEntity>();
 			entities.addAll(ontology.getClassesInSignature());
 			entities.addAll(ontology.getObjectPropertiesInSignature());
@@ -71,34 +70,21 @@ public class UelStarter implements OWLOntologyChangeListener, OWLOntologyLoaderL
 		reset();
 	}
 
-	public OWLOntologyManager getOWLOntologyManager() {
-		return this.ontologyManager;
+	public UelView getView() {
+		return panel.getView();
 	}
 
-	public UelController getPanel() {
-		return this.panel;
+	public void removeListeners() {
+		ontologyManager.removeOntologyLoaderListener(this);
+		ontologyManager.removeOntologyChangeListener(this);
 	}
 
-	private String getShortForm(OWLEntity entity, OWLOntology ontology) {
+	protected String getShortForm(OWLEntity entity, OWLOntology ontology) {
 		String ret = entity.getIRI().getShortForm();
-		Set<OWLAnnotation> annotations = ontology.getAnnotations();
-		for (OWLAnnotation annotation : annotations) {
-			OWLAnnotationProperty annotationProperty = annotation.getProperty();
-
-			// for OWL API 3.5.1
-
-			if (annotationProperty.isLabel() && entity.getAnnotations(ontology).contains(annotationProperty)) {
+		for (OWLAnnotation annotation : entity.getAnnotations(ontology)) {
+			if (annotation.getProperty().isLabel()) {
 				ret = annotation.getValue().toString();
 			}
-
-			// for OWL API 4.0.2
-
-			// if (annotationProperty.isLabel()
-			// && entity.getAnnotationPropertiesInSignature().contains(
-			// annotationProperty)) {
-			// ret = annotation.getValue().toString();
-			// }
-
 		}
 		return ret;
 	}

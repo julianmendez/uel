@@ -3,8 +3,10 @@
  */
 package de.tudresden.inf.lat.uel.plugin.ui;
 
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.Frame;
 import java.awt.event.ActionListener;
 import java.util.HashSet;
 import java.util.Set;
@@ -14,11 +16,13 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JList;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.WindowConstants;
 
 import de.tudresden.inf.lat.uel.core.processor.UelModel;
 import de.tudresden.inf.lat.uel.type.api.Equation;
+
+// TODO split into view and controller?
 
 /**
  * @author Stefan Borgwardt
@@ -28,8 +32,8 @@ public class DissubsumptionView extends JDialog {
 
 	private static final long serialVersionUID = 6093665334232206919L;
 
-	private JButton buttonRecompute;
-	private JButton buttonSave;
+	private final JButton buttonRecompute = new JButton();
+	private final JButton buttonSave = new JButton();
 	private int n;
 
 	private UelModel model;
@@ -37,10 +41,11 @@ public class DissubsumptionView extends JDialog {
 	private JList<LabelId>[] lists;
 
 	public DissubsumptionView(Set<Equation> unifier, UelModel model) {
+		super((Frame) null, "Refine unifier", true);
 		this.unifier = unifier;
 		this.model = model;
 		n = unifier.size();
-		init();
+		UelUI.setupWindow(this, createRefinePanel());
 	}
 
 	public void addButtonRecomputeListener(ActionListener listener, String actionCommand) {
@@ -66,26 +71,35 @@ public class DissubsumptionView extends JDialog {
 		return model.getRenderer().printUnifier(dissubsumptions);
 	}
 
-	private void init() {
-		setSize(new Dimension(800, 600));
-		setMinimumSize(new Dimension(200, 200));
-		getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.X_AXIS));
-		getContentPane().add(createButtonPanel());
-		getContentPane().add(createSelectionPanels());
-		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+	private Container createRefinePanel() {
+		Container ret = new Box(BoxLayout.Y_AXIS);
+
+		ret.add(createButtons());
+
+		ret.add(Box.createVerticalStrut(UelUI.GAP_SIZE));
+
+		UelUI.setupScrollPane(ret, createSelectionPanels(), "", new Dimension(640, 480));
+
+		JScrollPane scrollPane = new JScrollPane(createSelectionPanels());
+		ret.add(scrollPane);
+
+		return ret;
 	}
 
-	private Container createButtonPanel() {
-		Container buttonPanel = new Box(BoxLayout.X_AXIS);
-		// TODO two buttons
+	private Component createButtons() {
+		Container buttonPanel = new JPanel();
+
+		UelUI.setupButton(buttonPanel, buttonRecompute, UelUI.ICON_FORWARD, Message.tooltipRecompute);
+
+		UelUI.setupButton(buttonPanel, buttonSave, UelUI.ICON_SAVE, Message.tooltipSaveDissub);
+
 		return buttonPanel;
 	}
 
-	private Container createSelectionPanels() {
+	private Component createSelectionPanels() {
 		Container panel = new Box(BoxLayout.X_AXIS);
-		// TODO jlists for each equation, everything in a scrollpane
-		JScrollPane scrollPane = new JScrollPane(panel);
-		return scrollPane;
+		// TODO jlists for each equation
+		return panel;
 	}
 
 }

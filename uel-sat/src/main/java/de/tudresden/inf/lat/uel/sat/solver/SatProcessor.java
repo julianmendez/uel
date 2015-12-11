@@ -219,19 +219,6 @@ public class SatProcessor implements UelProcessor {
 				.add(new AbstractMap.SimpleEntry<String, String>(key, value));
 	}
 
-	private void addSmallSubsumptions(SatInput input) {
-		// TODO: remove?
-		// for (Equation e : getEquations()) {
-		// if (e.getRight().size() == 1) {
-		// Set<Integer> clause = new HashSet<Integer>();
-		// Integer subsumed = e.getRight().iterator().next();
-		// Integer subsuming = e.getLeft();
-		// clause.add(getMinusSubOrDissubLiteral(subsumed, subsuming));
-		// input.add(clause);
-		// }
-		// }
-	}
-
 	private boolean addToSetOfSubsumers(Integer atomId1, Integer atomId2) {
 		Set<Integer> ret = this.subsumers.get(atomId1);
 		if (ret == null) {
@@ -366,8 +353,6 @@ public class SatProcessor implements UelProcessor {
 			// disunification
 			logger.finer("adding clauses for dissubsumptions ...");
 			addClausesForDissubsumptions(ret);
-
-			addSmallSubsumptions(ret);
 		}
 
 		if (this.onlyMinimalAssignments) {

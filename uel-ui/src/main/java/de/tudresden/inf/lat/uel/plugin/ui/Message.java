@@ -30,6 +30,7 @@ public interface Message {
 	String tooltipComboBoxOntologyBg01 = "select second background ontology";
 	String tooltipComboBoxOntologyPos = "select ontology containing subsumptions and equations";
 	String tooltipComboBoxOntologyNeg = "select ontology containing dissubsumptions and disequations";
+	String tooltipConstants = "constants";
 	String tooltipFirst = "shows the first unifier";
 	String tooltipGoal = "goal";
 	String tooltipLast = "computes all unifiers and shows the last unifier";
@@ -38,9 +39,11 @@ public interface Message {
 	String tooltipNext = "shows the next unifier, it unifies the chosen class names using the selected variables";
 	String tooltipOpen = "opens an ontology";
 	String tooltipPrevious = "shows the previous unifier";
+	String tooltipRecompute = "extend the negative ontology and recompute unifiers";
 	String tooltipRefine = "refine unifier using dissubsumptions";
 	String tooltipRejectVar = "cancels this selection of variables";
 	String tooltipSave = "saves the current unifier into a file";
+	String tooltipSaveDissub = "save extended negative ontology and recompute unifiers";
 	String tooltipSaveGoal = "saves the goal to a file";
 	String tooltipSelectProcessor = "selects the processor";
 	String tooltipSelectVariables = "gets candidates for variables";
@@ -48,5 +51,6 @@ public interface Message {
 	String tooltipTextInfo = "statistical information given by the processor";
 	String tooltipUnifier = "unifier";
 	String tooltipUnifierId = "unifier id";
+	String tooltipVariables = "variables";
 
 }

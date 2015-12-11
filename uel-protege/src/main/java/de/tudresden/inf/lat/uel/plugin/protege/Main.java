@@ -29,7 +29,7 @@ public class Main extends AbstractOWLClassViewComponent {
 	public void initialiseClassView() {
 		this.uelStarter = new UelProtegeStarter(getOWLModelManager());
 		this.setLayout(new BorderLayout());
-		add(this.uelStarter.getPanel().getView(), BorderLayout.CENTER);
+		add(this.uelStarter.getView(), BorderLayout.CENTER);
 	}
 
 	@Override

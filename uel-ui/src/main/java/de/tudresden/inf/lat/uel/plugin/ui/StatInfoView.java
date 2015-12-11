@@ -1,17 +1,18 @@
 package de.tudresden.inf.lat.uel.plugin.ui;
 
+import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Frame;
-import java.awt.GridBagLayout;
 import java.awt.event.ActionListener;
 
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.WindowConstants;
 
 /**
  * This is the panel that shows statistical information.
@@ -22,9 +23,9 @@ class StatInfoView extends JDialog {
 
 	private static final long serialVersionUID = -4153981096827550491L;
 
-	private JButton saveButton = null;
-	private JTextArea textGoal = null;
-	private JTextArea textInfo = null;
+	private final JButton saveButton = new JButton();
+	private final JTextArea textGoal = new JTextArea();
+	private final JTextArea textInfo = new JTextArea();
 
 	public StatInfoView() {
 		super((Frame) null, "Statistical information", true);
@@ -44,56 +45,27 @@ class StatInfoView extends JDialog {
 		this.saveButton.setActionCommand(actionCommand);
 	}
 
-	private JPanel createMainPanel() {
-		JPanel ret = new JPanel();
-		ret.setLayout(new BoxLayout(ret, BoxLayout.Y_AXIS));
+	private Component createMainPanel() {
+		Container ret = new Box(BoxLayout.Y_AXIS);
 
-		this.textGoal = new JTextArea();
-		this.textGoal.setToolTipText(Message.tooltipGoal);
-		this.textGoal.setWrapStyleWord(true);
-		this.textGoal.setLineWrap(true);
-		JScrollPane scrollPaneVars = new JScrollPane(this.textGoal);
-		scrollPaneVars.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-		scrollPaneVars.setMinimumSize(new Dimension(640, 240));
-		scrollPaneVars.setPreferredSize(new Dimension(640, 480));
-
-		JPanel goalPanel = new JPanel();
-		goalPanel.setLayout(new BoxLayout(goalPanel, BoxLayout.X_AXIS));
-		goalPanel.add(scrollPaneVars);
-
-		JPanel buttonPanel = new JPanel();
-		this.saveButton = new JButton(UelIcon.ICON_SAVE);
-		this.saveButton.setToolTipText(Message.tooltipSaveGoal);
-		this.saveButton.setMinimumSize(new Dimension(56, 28));
-		this.saveButton.setMaximumSize(new Dimension(74, 28));
-		UelIcon.setBorder(saveButton);
-		buttonPanel.add(this.saveButton);
-
-		this.textInfo = new JTextArea();
-		this.textInfo.setToolTipText(Message.tooltipTextInfo);
-		JScrollPane scrollPaneInfo = new JScrollPane(this.textInfo);
-		scrollPaneVars.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-		scrollPaneInfo.setMinimumSize(new Dimension(640, 120));
-		scrollPaneInfo.setPreferredSize(new Dimension(640, 240));
-
-		JPanel infoPanel = new JPanel();
-		infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.X_AXIS));
-		infoPanel.add(scrollPaneInfo);
-
+		JComponent buttonPanel = new JPanel();
+		buttonPanel.setAlignmentX(CENTER_ALIGNMENT);
+		UelUI.setupButton(buttonPanel, saveButton, UelUI.ICON_SAVE, Message.tooltipSaveGoal);
 		ret.add(buttonPanel);
-		ret.add(goalPanel);
-		ret.add(infoPanel);
+
+		ret.add(Box.createVerticalStrut(UelUI.GAP_SIZE));
+
+		UelUI.setupScrollTextArea(ret, textGoal, Message.tooltipGoal, new Dimension(640, 240));
+
+		ret.add(Box.createVerticalStrut(UelUI.GAP_SIZE));
+
+		UelUI.setupScrollTextArea(ret, textInfo, Message.tooltipTextInfo, new Dimension(640, 120));
 
 		return ret;
 	}
 
 	private void initFrame() {
-		setLocation(400, 400);
-		setSize(new Dimension(800, 600));
-		setMinimumSize(new Dimension(200, 200));
-		setLayout(new GridBagLayout());
-		getContentPane().add(createMainPanel());
-		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+		UelUI.setupWindow(this, createMainPanel());
 	}
 
 	public void setGoalText(String text) {
