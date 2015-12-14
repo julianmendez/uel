@@ -18,7 +18,7 @@ import de.tudresden.inf.lat.uel.type.api.UelInput;
  */
 public class UelInputImpl implements UelInput {
 
-	private final IndexedSet<Atom> atomManager;
+	private final IndexedSet<Atom> atoms;
 	private final Set<Equation> definitions;
 	private final Set<Equation> goalEquations;
 	private final Set<SmallEquation> goalDisequations;
@@ -28,8 +28,8 @@ public class UelInputImpl implements UelInput {
 	/**
 	 * Constructs a new UEL input based on a specified ontology.
 	 * 
-	 * @param manager
-	 *            atom manager
+	 * @param atoms
+	 *            atoms
 	 * @param defs
 	 *            set of definitions
 	 * @param goalEqs
@@ -39,10 +39,10 @@ public class UelInputImpl implements UelInput {
 	 * @param vars
 	 *            set of user variables
 	 */
-	public UelInputImpl(IndexedSet<Atom> manager, Set<Equation> defs,
+	public UelInputImpl(IndexedSet<Atom> atoms, Set<Equation> defs,
 			Set<Equation> goalEqs, Set<SmallEquation> goalDiseqs,
 			Set<Integer> vars) {
-		this.atomManager = manager;
+		this.atoms = atoms;
 		this.definitions = defs;
 		this.goalEquations = goalEqs;
 		this.goalDisequations = goalDiseqs;
@@ -53,8 +53,8 @@ public class UelInputImpl implements UelInput {
 	}
 
 	@Override
-	public IndexedSet<Atom> getAtomManager() {
-		return this.atomManager;
+	public IndexedSet<Atom> getAtoms() {
+		return this.atoms;
 	}
 
 	@Override

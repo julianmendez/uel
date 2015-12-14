@@ -4,15 +4,14 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import de.tudresden.inf.lat.uel.core.type.AtomManager;
 import de.tudresden.inf.lat.uel.core.type.KRSSRenderer;
 import de.tudresden.inf.lat.uel.type.api.Atom;
+import de.tudresden.inf.lat.uel.type.api.AtomManager;
 import de.tudresden.inf.lat.uel.type.api.Equation;
 import de.tudresden.inf.lat.uel.type.api.SmallEquation;
 import de.tudresden.inf.lat.uel.type.api.UelInput;
 import de.tudresden.inf.lat.uel.type.impl.ConceptName;
 import de.tudresden.inf.lat.uel.type.impl.EquationImpl;
-import de.tudresden.inf.lat.uel.type.impl.ExistentialRestriction;
 import de.tudresden.inf.lat.uel.type.impl.SmallEquationImpl;
 import de.tudresden.inf.lat.uel.type.impl.UelInputImpl;
 
@@ -58,27 +57,23 @@ public class PluginGoal {
 	}
 
 	public void addGoalDisequation(Equation disequation) {
-		Set<Equation> equationSet = extractModules(disequation.getLeft(),
-				disequation.getRight());
+		Set<Equation> equationSet = extractModules(disequation.getLeft(), disequation.getRight());
 
 		Integer rightId;
 		if (disequation.getRight().size() == 1) {
 			rightId = disequation.getRight().iterator().next();
 		} else {
-			ConceptName abbrev = ((DynamicOntology) this.ontology)
-					.getOntologyBuilder().createNewAtom();
+			ConceptName abbrev = ((DynamicOntology) this.ontology).getOntologyBuilder().createNewAtom();
 			abbrev.setAuxiliaryVariable(true);
 			rightId = getAtomManager().getAtoms().addAndGetIndex(abbrev);
 			makeAuxiliaryVariable(rightId);
 
-			Equation newDef = new EquationImpl(rightId, disequation.getRight(),
-					false);
+			Equation newDef = new EquationImpl(rightId, disequation.getRight(), false);
 			equationSet.add(newDef);
 			this.definitions.add(newDef);
 		}
 
-		SmallEquation newGoalDisequation = new SmallEquationImpl(
-				disequation.getLeft(), rightId);
+		SmallEquation newGoalDisequation = new SmallEquationImpl(disequation.getLeft(), rightId);
 
 		this.goalDisequations.add(newGoalDisequation);
 		updateIndexSets(equationSet);
@@ -109,16 +104,8 @@ public class PluginGoal {
 	}
 
 	private void addModule(Set<Equation> equationSet, Integer atomId) {
-		Atom atom = getAtomManager().getAtoms().get(atomId);
-		ConceptName conceptName;
-		if (atom.isConceptName()) {
-			conceptName = (ConceptName) atom;
-		} else {
-			conceptName = ((ExistentialRestriction) atom).getChild();
-		}
-
-		Integer conceptNameId = getAtomManager().getAtoms().addAndGetIndex(
-				conceptName);
+		ConceptName conceptName = getAtomManager().getAtom(atomId).getConceptName();
+		Integer conceptNameId = getAtomManager().getAtoms().getIndex(conceptName);
 		Set<Equation> module = this.ontology.getModule(conceptNameId);
 		// System.out.println("module size: " + module.size());
 
@@ -180,47 +167,26 @@ public class PluginGoal {
 	}
 
 	public void makeAuxiliaryVariable(Integer atomId) {
-		Atom atom = getAtomManager().getAtoms().get(atomId);
-		if ((atom == null) || !atom.isConceptName()) {
-			throw new IllegalArgumentException(
-					"Argument is not a concept name identifier: '" + atomId
-							+ "'.");
-		}
-		ConceptName conceptName = (ConceptName) atom;
 		if (getVariables().contains(atomId)) {
-			this.auxiliaryVariables.add(conceptName.getConceptNameId());
+			this.auxiliaryVariables.add(atomId);
 		}
 	}
 
 	public void makeConstant(Integer atomId) {
-		Atom atom = getAtomManager().getAtoms().get(atomId);
-		if (!atom.isConceptName()) {
-			throw new IllegalArgumentException(
-					"Argument is not a concept name identifier: '" + atomId
-							+ "'.");
-		}
-		ConceptName conceptName = (ConceptName) atom;
 		if (getVariables().contains(atomId)) {
 			this.variables.remove(atomId);
 			this.constants.add(atomId);
-			this.userVariables.remove(conceptName.getConceptNameId());
-			conceptName.setVariable(false);
+			this.userVariables.remove(atomId);
+			getAtomManager().getConceptName(atomId).setVariable(false);
 		}
 	}
 
 	public void makeUserVariable(Integer atomId) {
-		Atom atom = getAtomManager().getAtoms().get(atomId);
-		if ((atom == null) || !atom.isConceptName()) {
-			throw new IllegalArgumentException(
-					"Argument is not a concept name identifier: '" + atomId
-							+ "'.");
-		}
-		ConceptName conceptName = (ConceptName) atom;
 		if (getConstants().contains(atomId)) {
 			this.constants.remove(atomId);
 			this.variables.add(atomId);
-			this.userVariables.add(conceptName.getConceptNameId());
-			conceptName.setVariable(true);
+			this.userVariables.add(atomId);
+			getAtomManager().getConceptName(atomId).setVariable(true);
 		}
 	}
 
@@ -228,19 +194,16 @@ public class PluginGoal {
 		for (Equation eq : equationSet) {
 			Integer atomId = eq.getLeft();
 			this.variables.add(atomId);
-			ConceptName concept = (ConceptName) getAtomManager().getAtoms()
-					.get(atomId);
-			concept.setVariable(true);
-			this.userVariables.remove(concept.getConceptNameId());
+			this.userVariables.remove(atomId);
+			getAtomManager().getConceptName(atomId).setVariable(true);
 		}
 	}
 
 	private Equation processPrimitiveDefinition(Equation e) {
 		Atom leftAtom = getAtomManager().getAtoms().get(e.getLeft());
-		ConceptName b = (ConceptName) leftAtom;
-		ConceptName var = this.atomManager.createUndefConceptName(b, false);
-		this.userVariables.remove(var.getConceptNameId());
-		Integer varId = getAtomManager().getAtoms().addAndGetIndex(var);
+		ConceptName var = atomManager.createUndefConceptName((ConceptName) leftAtom, false);
+		Integer varId = getAtomManager().getAtoms().getIndex(var);
+		this.userVariables.remove(varId);
 
 		Set<Integer> newRightSet = new HashSet<Integer>();
 		newRightSet.addAll(e.getRight());
@@ -278,34 +241,30 @@ public class PluginGoal {
 			Atom atom = getAtomManager().getAtoms().get(usedAtomId);
 			if (atom.isConceptName()) {
 				conceptNameIds.add(usedAtomId);
-			} else if (atom.isExistentialRestriction()) {
-				ConceptName child = ((ExistentialRestriction) atom).getChild();
-				Integer childId = getAtomManager().getAtoms().addAndGetIndex(
-						child);
+			} else {
+				ConceptName child = atom.getConceptName();
+				Integer childId = getAtomManager().getAtoms().getIndex(child);
 				conceptNameIds.add(childId);
 			}
 		}
 
 		for (Integer atomId : conceptNameIds) {
 			Atom atom = getAtomManager().getAtoms().get(atomId);
-			if (atom.isConceptName()) {
-				if (((ConceptName) atom).isVariable()) {
-					this.variables.add(atomId);
-					if (((ConceptName) atom).isAuxiliaryVariable()) {
-						this.auxiliaryVariables.add(atomId);
-					}
-				} else {
-					this.constants.add(atomId);
+			if (atom.isVariable()) {
+				this.variables.add(atomId);
+				if (((ConceptName) atom).isAuxiliaryVariable()) {
+					this.auxiliaryVariables.add(atomId);
 				}
+			} else {
+				this.constants.add(atomId);
 			}
 		}
 
 	}
 
 	public void updateUelInput() {
-		this.uelInput = new UelInputImpl(getAtomManager().getAtoms(),
-				this.definitions, this.goalEquations, this.goalDisequations,
-				this.userVariables);
+		this.uelInput = new UelInputImpl(getAtomManager().getAtoms(), this.definitions, this.goalEquations,
+				this.goalDisequations, this.userVariables);
 	}
 
 }

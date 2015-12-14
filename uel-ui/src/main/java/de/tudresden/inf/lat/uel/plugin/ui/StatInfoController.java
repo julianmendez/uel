@@ -45,14 +45,14 @@ class StatInfoController implements ActionListener {
 	}
 
 	private void executeSaveGoal() {
-		File file = UelController.showSaveFileDialog(view);
+		File file = UelUI.showSaveFileDialog(view);
 		if (file == null) {
 			return;
 		}
 
 		try {
 			BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-			writer.write(model.printPluginGoal());
+			writer.write(model.printPluginGoal(false));
 			writer.flush();
 			writer.close();
 		} catch (IOException e) {
@@ -70,7 +70,7 @@ class StatInfoController implements ActionListener {
 	}
 
 	public void updateView() {
-		view.setGoalText(model.printPluginGoal());
+		view.setGoalText(model.printPluginGoal(true));
 		StringBuffer info = new StringBuffer();
 		for (Map.Entry<String, String> pair : model.getUelProcessor().getInfo()) {
 			info.append(pair.getKey());

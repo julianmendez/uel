@@ -21,8 +21,8 @@ import de.tudresden.inf.lat.uel.type.api.UelInput;
  * @author Stefan Borgwardt
  */
 class Goal implements Set<Subsumption> {
-	private Map<Integer, Set<Subsumption>> variableBodyIndex;
-	private Map<Integer, Set<Subsumption>> variableHeadIndex;
+	private Map<Atom, Set<Subsumption>> variableBodyIndex;
+	private Map<Atom, Set<Subsumption>> variableHeadIndex;
 	private Set<Subsumption> goal;
 	private int maxSize;
 
@@ -35,24 +35,23 @@ class Goal implements Set<Subsumption> {
 	Goal(UelInput input) {
 		goal = convertInput(input);
 		maxSize = goal.size();
-		variableBodyIndex = new HashMap<Integer, Set<Subsumption>>();
-		variableHeadIndex = new HashMap<Integer, Set<Subsumption>>();
+		variableBodyIndex = new HashMap<Atom, Set<Subsumption>>();
+		variableHeadIndex = new HashMap<Atom, Set<Subsumption>>();
 		for (Subsumption sub : goal) {
 			addToIndex(sub);
 		}
 	}
 
 	private static Set<Subsumption> convertInput(UelInput input) {
-		Set<Equation> equations = input.getEquations();
-		IndexedSet<Atom> atomManager = input.getAtomManager();
+		IndexedSet<Atom> atoms = input.getAtoms();
 
 		Set<Subsumption> subsumptions = new HashSet<Subsumption>();
-		for (Equation eq : equations) {
+		for (Equation eq : input.getEquations()) {
 			// look up atom IDs in the atom manager
-			Atom head = atomManager.get(eq.getLeft());
+			Atom head = atoms.get(eq.getLeft());
 			List<Atom> body = new ArrayList<Atom>();
 			for (Integer id : eq.getRight()) {
-				body.add(atomManager.get(id));
+				body.add(atoms.get(id));
 			}
 
 			// create subsumptions representing the equation
@@ -77,8 +76,8 @@ class Goal implements Set<Subsumption> {
 	 *            the variable index
 	 * @return the set of all subsumptions satisfying the condition
 	 */
-	Set<Subsumption> getSubsumptionsByBodyVariable(Integer var) {
-		return getOrInitLHSIndex(var);
+	protected Set<Subsumption> getSubsumptionsByBodyVariable(Atom var) {
+		return getOrInitBodyIndex(var);
 	}
 
 	/**
@@ -89,18 +88,18 @@ class Goal implements Set<Subsumption> {
 	 *            the variable index
 	 * @return the set of all subsumptions satisfying the condition
 	 */
-	Set<Subsumption> getSubsumptionsByHeadVariable(Integer var) {
-		return getOrInitRHSIndex(var);
+	protected Set<Subsumption> getSubsumptionsByHeadVariable(Atom var) {
+		return getOrInitHeadIndex(var);
 	}
 
-	private Set<Subsumption> getOrInitLHSIndex(Integer var) {
+	private Set<Subsumption> getOrInitBodyIndex(Atom var) {
 		if (!variableBodyIndex.containsKey(var)) {
 			variableBodyIndex.put(var, new HashSet<Subsumption>());
 		}
 		return variableBodyIndex.get(var);
 	}
 
-	private Set<Subsumption> getOrInitRHSIndex(Integer var) {
+	private Set<Subsumption> getOrInitHeadIndex(Atom var) {
 		if (!variableHeadIndex.containsKey(var)) {
 			variableHeadIndex.put(var, new HashSet<Subsumption>());
 		}
@@ -206,22 +205,22 @@ class Goal implements Set<Subsumption> {
 	private void addToIndex(Subsumption sub) {
 		for (Atom at : sub.getBody()) {
 			if (at.isVariable()) {
-				getOrInitLHSIndex(at.getConceptNameId()).add(sub);
+				getOrInitBodyIndex(at).add(sub);
 			}
 		}
 		if (sub.getHead().isVariable()) {
-			getOrInitRHSIndex(sub.getHead().getConceptNameId()).add(sub);
+			getOrInitHeadIndex(sub.getHead()).add(sub);
 		}
 	}
 
 	private void removeFromIndex(Subsumption sub) {
 		for (Atom at : sub.getBody()) {
 			if (at.isVariable()) {
-				variableBodyIndex.get(at.getConceptNameId()).remove(sub);
+				variableBodyIndex.get(at).remove(sub);
 			}
 		}
 		if (sub.getHead().isVariable()) {
-			variableHeadIndex.get(sub.getHead().getConceptNameId()).remove(sub);
+			variableHeadIndex.get(sub.getHead()).remove(sub);
 		}
 	}
 
@@ -263,8 +262,8 @@ class Goal implements Set<Subsumption> {
 	 */
 	Set<Subsumption> expand(Assignment assign) {
 		Set<Subsumption> newSubs = new HashSet<Subsumption>();
-		for (Integer var : assign.getKeys()) {
-			for (Subsumption sub : getOrInitRHSIndex(var)) {
+		for (Atom var : assign.getKeys()) {
+			for (Subsumption sub : getOrInitHeadIndex(var)) {
 				expand(sub, assign.getSubsumers(var), newSubs);
 			}
 		}

@@ -15,7 +15,7 @@ public interface UelInput {
 	 * 
 	 * @return the atom manager
 	 */
-	IndexedSet<Atom> getAtomManager();
+	IndexedSet<Atom> getAtoms();
 
 	/**
 	 * Returns the set of flattened definitions.

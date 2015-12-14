@@ -42,27 +42,26 @@ import de.tudresden.inf.lat.uel.type.impl.UelOutputImpl;
  * consists of the following clauses:
  *
  * <ul>
- * <li>(1) Translation of the equations of &Gamma;. For every equation
- * A<sub>1</sub> \u2293 &hellip; \u2293 A<sub>m</sub> &equiv;<sup>?</sup>
- * B<sub>1</sub> \u2293 &hellip; \u2293 B<sub>n</sub> of &Gamma;, we create the
+ * <li>(1) Translation of the equations of &Gamma;. For every equation A
+ * <sub>1</sub> \u2293 &hellip; \u2293 A<sub>m</sub> &equiv;<sup>?</sup> B
+ * <sub>1</sub> \u2293 &hellip; \u2293 B<sub>n</sub> of &Gamma;, we create the
  * following Horn clauses, which express that any atom that occurs as a
  * top-level conjunct on one side of an equivalence must subsume a top-level
  * conjunct on the other side:
  *
  * <ul>
- * <li>1. For every non-variable atom C &isin; {A<sub>1</sub>, &hellip; ,
- * A<sub>m</sub>}:<br>
+ * <li>1. For every non-variable atom C &isin; {A<sub>1</sub>, &hellip; , A
+ * <sub>m</sub>}:<br>
  * [B<sub>1</sub> \u22E2 C] &and; &hellip; &and; [B<sub>n</sub> \u22E2 C] &rarr;
  * </li>
  *
- * <li>2. For every non-variable atom C &isin; {B<sub>1</sub>, &hellip; ,
- * B<sub>n</sub>}:<br>
+ * <li>2. For every non-variable atom C &isin; {B<sub>1</sub>, &hellip; , B
+ * <sub>n</sub>}:<br>
  * [A<sub>1</sub> \u22E2 C] &and; &hellip; &and; [A<sub>m</sub> \u22E2 C] &rarr;
  * </li>
  *
- * <li>3. For every non-variable atom C of &Gamma; s.t. C &notin;
- * {A<sub>1</sub>, &hellip; A<sub>m</sub>, B<sub>1</sub>, &hellip;,
- * B<sub>n</sub>}:<br>
+ * <li>3. For every non-variable atom C of &Gamma; s.t. C &notin; {A<sub>1</sub>
+ * , &hellip; A<sub>m</sub>, B<sub>1</sub>, &hellip;, B<sub>n</sub>}:<br>
  * [A<sub>1</sub> \u22E2 C] &and; &hellip; &and; [A<sub>m</sub> \u22E2 C] &rarr;
  * [B<sub>j</sub> \u22E2 C] for j = 1, &hellip;, n<br>
  * [B<sub>1</sub> \u22E2 C] &and; &hellip; &and; [B<sub>n</sub> \u22E2 C] &rarr;
@@ -77,31 +76,33 @@ import de.tudresden.inf.lat.uel.type.impl.UelOutputImpl;
  * &Gamma;, we say that A cannot be subsumed by B:<br>
  * &rarr; [A \u22E2 B]</li>
  *
- * <li>2. For every pair of distinct role names r, s and atoms
- * &exist;r<i>.</i>A, &exist;s<i>.</i>B of &Gamma;, we say that
- * &exist;r<i>.</i>A cannot be subsumed by &exist;s<i>.</i>B:<br>
+ * <li>2. For every pair of distinct role names r, s and atoms &exist;r<i>.</i>
+ * A, &exist;s<i>.</i>B of &Gamma;, we say that &exist;r<i>.</i>A cannot be
+ * subsumed by &exist;s<i>.</i>B:<br>
  * &rarr; [&exist;r<i>.</i>A \u22E2 &exist;s<i>.</i>B]</li>
  *
  * <li>3. For every pair &exist;r<i>.</i>A, &exist;r<i>.</i>B of atoms of
- * &Gamma;, we say that &exist;r<i>.</i>A can only be subsumed by
- * &exist;r<i>.</i>B if A is already subsumed by B:<br>
+ * &Gamma;, we say that &exist;r<i>.</i>A can only be subsumed by &exist;r
+ * <i>.</i>B if A is already subsumed by B:<br>
  * [A \u22E2 B] &rarr; [&exist;r<i>.</i>A \u22E2 &exist;r<i>.</i>B]</li>
  *
  * <li>4. For every concept constant A and every atom &exist;r<i>.</i>B of
  * &Gamma;, we say that A and &exist;r<i>.</i>B are not in a subsumption
  * relationship<br>
- * &rarr; [A \u22E2 &exist;r<i>.</i>B] and &rarr; [&exist;r<i>.</i>B \u22E2 A]</li>
+ * &rarr; [A \u22E2 &exist;r<i>.</i>B] and &rarr; [&exist;r<i>.</i>B \u22E2 A]
+ * </li>
  *
- * <li>5. Transitivity of subsumption is expressed using the non-Horn clauses:<br>
- * [C<sub>1</sub> \u22E2 C<sub>3</sub>] &rarr; [C<sub>1</sub> \u22E2
- * C<sub>2</sub>] &or; [C<sub>2</sub> \u22E2 C<sub>3</sub>] where C<sub>1</sub>,
+ * <li>5. Transitivity of subsumption is expressed using the non-Horn clauses:
+ * <br>
+ * [C<sub>1</sub> \u22E2 C<sub>3</sub>] &rarr; [C<sub>1</sub> \u22E2 C
+ * <sub>2</sub>] &or; [C<sub>2</sub> \u22E2 C<sub>3</sub>] where C<sub>1</sub>,
  * C<sub>2</sub>, C<sub>3</sub> are atoms of &Gamma;.<br>
  * </li>
  * </ul>
  * Note that there are further properties that hold for subsumption in <i>EL</i>
- * (e.g., the fact that A \u2291 B implies &exist;r<i>.</i>A \u2291
- * &exist;r<i>.</i>B), but that are not needed to ensure soundness of our
- * translation.</li>
+ * (e.g., the fact that A \u2291 B implies &exist;r<i>.</i>A \u2291 &exist;r
+ * <i>.</i>B), but that are not needed to ensure soundness of our translation.
+ * </li>
  *
  * <li>(3) Translation of the relevant properties of &gt;.
  *
@@ -131,8 +132,7 @@ public class SatProcessor implements UelProcessor {
 	private static final String keyNumberOfClauses = "Number of clauses";
 	private static final String keyNumberOfPropositions = "Number of propositions";
 	private static final String keyNumberOfVariables = "Number of variables";
-	private static final Logger logger = Logger.getLogger(SatProcessor.class
-			.getName());
+	private static final Logger logger = Logger.getLogger(SatProcessor.class.getName());
 	private static final String notUsingMinimalAssignments = "all local assignments";
 	private static final String processorName = "SAT-based algorithm";
 	private static final String usingMinimalAssignments = "only minimal assignments";
@@ -161,23 +161,20 @@ public class SatProcessor implements UelProcessor {
 	 * @param useMinimalAssignments
 	 *            a flag to use minimal assignments
 	 */
-	public SatProcessor(UelInput input, boolean inv,
-			boolean useMinimalAssignments) {
+	public SatProcessor(UelInput input, boolean inv, boolean useMinimalAssignments) {
 		if (input == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
 
 		this.uelInput = input;
 		this.extUelInput = new ExtendedUelInput(input);
-		this.hasDisequations = (getDisequations() != null)
-				&& !getDisequations().isEmpty();
+		this.hasDisequations = (getDisequations() != null) && !getDisequations().isEmpty();
 		this.invertLiteral = inv;
 		this.onlyMinimalAssignments = useMinimalAssignments;
 		setLiterals();
 	}
 
-	private void addClausesForDissubsumptions(SatInput ret)
-			throws InterruptedException {
+	private void addClausesForDissubsumptions(SatInput ret) throws InterruptedException {
 		for (Integer c : getUsedAtomIds()) {
 			for (Integer x : getVariables()) {
 				Set<Integer> mainClause = new HashSet<Integer>();
@@ -197,8 +194,7 @@ public class SatProcessor implements UelProcessor {
 		}
 	}
 
-	private void addClausesForDissubsumptions(SatInput ret, Integer c,
-			Integer x, Integer d, Set<Integer> mainClause) {
+	private void addClausesForDissubsumptions(SatInput ret, Integer c, Integer x, Integer d, Set<Integer> mainClause) {
 		Integer p = getAuxiliaryLiteral(c, x, d);
 		mainClause.add(p);
 
@@ -213,10 +209,8 @@ public class SatProcessor implements UelProcessor {
 		ret.add(clause2);
 	}
 
-	private boolean addEntry(List<Map.Entry<String, String>> list, String key,
-			String value) {
-		return list
-				.add(new AbstractMap.SimpleEntry<String, String>(key, value));
+	private boolean addEntry(List<Map.Entry<String, String>> list, String key, String value) {
+		return list.add(new AbstractMap.SimpleEntry<String, String>(key, value));
 	}
 
 	private boolean addToSetOfSubsumers(Integer atomId1, Integer atomId2) {
@@ -228,13 +222,9 @@ public class SatProcessor implements UelProcessor {
 		return ret.add(atomId2);
 	}
 
-	private ConceptName asConceptName(Atom atom) {
-		return (ConceptName) atom;
-	}
-
-	private ExistentialRestriction asExistentialRestriction(Atom atom) {
-		return (ExistentialRestriction) atom;
-	}
+	// private ConceptName asConceptName(Atom atom) {
+	// return (ConceptName) atom;
+	// }
 
 	@Override
 	public void cleanup() {
@@ -274,8 +264,7 @@ public class SatProcessor implements UelProcessor {
 
 		reset();
 		if (unifiable) {
-			this.result = new UelOutputImpl(getAtomManager(),
-					toTBox(satoutput.getOutput()));
+			this.result = new UelOutputImpl(toTBox(satoutput.getOutput()));
 		} else {
 			// release resources used by the solver after all unifiers have been
 			// computed
@@ -360,17 +349,15 @@ public class SatProcessor implements UelProcessor {
 			for (Integer var : getVariables()) {
 				if (isUserVariable(var)) {
 					for (Integer con : getConstants()) {
-						Literal literal = this.invertLiteral ? new SubsumptionLiteral(
-								var, con) : new DissubsumptionLiteral(var, con);
-						Integer literalId = this.literalManager
-								.addAndGetIndex(literal);
+						Literal literal = this.invertLiteral ? new SubsumptionLiteral(var, con)
+								: new DissubsumptionLiteral(var, con);
+						Integer literalId = this.literalManager.addAndGetIndex(literal);
 						ret.addMinimizeLiteral(literalId);
 					}
 					for (Integer eat : getEAtoms()) {
-						Literal literal = this.invertLiteral ? new SubsumptionLiteral(
-								var, eat) : new DissubsumptionLiteral(var, eat);
-						Integer literalId = this.literalManager
-								.addAndGetIndex(literal);
+						Literal literal = this.invertLiteral ? new SubsumptionLiteral(var, eat)
+								: new DissubsumptionLiteral(var, eat);
+						Integer literalId = this.literalManager.addAndGetIndex(literal);
 						ret.addMinimizeLiteral(literalId);
 					}
 				}
@@ -392,19 +379,14 @@ public class SatProcessor implements UelProcessor {
 		set.addAll(getConstants());
 		set.addAll(getEAtoms());
 		for (Integer firstAtomId : getVariables()) {
-			Atom firstAtom = getAtomManager().get(firstAtomId);
+			Atom firstAtom = getAtom(firstAtomId);
 			if (firstAtom.isConceptName() && isUserVariable(firstAtomId)) {
 				for (Integer secondAtomId : set) {
-					Literal literal = this.invertLiteral ? new SubsumptionLiteral(
-							firstAtomId, secondAtomId)
-							: new DissubsumptionLiteral(firstAtomId,
-									secondAtomId);
-					Integer literalId = this.literalManager
-							.addAndGetIndex(literal);
-					if (!this.onlyMinimalAssignments
-							|| (getLiteralValue(literalId) == this.invertLiteral)) {
-						ret.add(getLiteralValue(literalId) ? (-1) * literalId
-								: literalId);
+					Literal literal = this.invertLiteral ? new SubsumptionLiteral(firstAtomId, secondAtomId)
+							: new DissubsumptionLiteral(firstAtomId, secondAtomId);
+					Integer literalId = this.literalManager.addAndGetIndex(literal);
+					if (!this.onlyMinimalAssignments || (getLiteralValue(literalId) == this.invertLiteral)) {
+						ret.add(getLiteralValue(literalId) ? (-1) * literalId : literalId);
 					}
 				}
 			}
@@ -412,13 +394,16 @@ public class SatProcessor implements UelProcessor {
 		return ret;
 	}
 
-	private IndexedSet<Atom> getAtomManager() {
-		return this.extUelInput.getAtomManager();
+	private Atom getAtom(Integer atomId) {
+		return extUelInput.getAtoms().get(atomId);
+	}
+
+	private Integer getIndex(Atom atom) {
+		return extUelInput.getAtoms().getIndex(atom);
 	}
 
 	private Integer getAuxiliaryLiteral(Integer d, Integer x, Integer e) {
-		return this.literalManager
-				.addAndGetIndex(new AuxiliaryLiteral(d, x, e));
+		return this.literalManager.addAndGetIndex(new AuxiliaryLiteral(d, x, e));
 	}
 
 	private Set<Integer> getConstants() {
@@ -449,12 +434,10 @@ public class SatProcessor implements UelProcessor {
 		}
 
 		if (this.literalManager != null) {
-			addEntry(ret, keyNumberOfPropositions,
-					"" + this.literalManager.size());
+			addEntry(ret, keyNumberOfPropositions, "" + this.literalManager.size());
 		}
 		addEntry(ret, keyNumberOfClauses, "" + this.numberOfClauses);
-		addEntry(ret, keyNumberOfVariables, ""
-				+ this.extUelInput.getVariables().size());
+		addEntry(ret, keyNumberOfVariables, "" + this.extUelInput.getVariables().size());
 		return Collections.unmodifiableList(ret);
 	}
 
@@ -503,8 +486,8 @@ public class SatProcessor implements UelProcessor {
 	}
 
 	private Integer getSubOrDissubLiteral(Integer atomId1, Integer atomId2) {
-		Literal literal = this.invertLiteral ? new SubsumptionLiteral(atomId1,
-				atomId2) : new DissubsumptionLiteral(atomId1, atomId2);
+		Literal literal = this.invertLiteral ? new SubsumptionLiteral(atomId1, atomId2)
+				: new DissubsumptionLiteral(atomId1, atomId2);
 		int val = this.literalManager.addAndGetIndex(literal);
 		return this.invertLiteral ? (-1) * val : val;
 	}
@@ -524,8 +507,7 @@ public class SatProcessor implements UelProcessor {
 			// Atom leftPart = getAtomManager().get(leftPartId);
 			// if (leftPart.isConceptName()
 			// && isUserVariable(leftPartId)) {
-			ret.add(new EquationImpl(leftPartId, new HashSet<Integer>(
-					getSetOfSubsumers(leftPartId)), false));
+			ret.add(new EquationImpl(leftPartId, new HashSet<Integer>(getSetOfSubsumers(leftPartId)), false));
 			// }
 		}
 
@@ -541,8 +523,8 @@ public class SatProcessor implements UelProcessor {
 	}
 
 	private boolean isTop(Integer atomId) {
-		Atom atom = getAtomManager().get(atomId);
-		return (atom.isConceptName() && asConceptName(atom).isTop());
+		Atom atom = getAtom(atomId);
+		return (atom.isConceptName() && ((ConceptName) atom).isTop());
 	}
 
 	private boolean isUserVariable(Integer atomId) {
@@ -630,8 +612,7 @@ public class SatProcessor implements UelProcessor {
 				clause.add(getSubOrDissubLiteral(atomId2, atomId1));
 				input.add(clause);
 
-			} else if (!e.getLeft().equals(atomId1)
-					&& e.getRight().contains(atomId1)) {
+			} else if (!e.getLeft().equals(atomId1) && e.getRight().contains(atomId1)) {
 
 				/*
 				 * constant of the right but not on the left
@@ -642,8 +623,7 @@ public class SatProcessor implements UelProcessor {
 				clause.add(getMinusSubOrDissubLiteral(atomId2, atomId1));
 				input.add(clause);
 
-			} else if (e.getLeft().equals(atomId1)
-					&& !e.getRight().contains(atomId1)) {
+			} else if (e.getLeft().equals(atomId1) && !e.getRight().contains(atomId1)) {
 
 				/*
 				 * constant on the left but not on the right
@@ -694,8 +674,7 @@ public class SatProcessor implements UelProcessor {
 				clause.add(getSubOrDissubLiteral(atomId2, atomId1));
 				input.add(clause);
 
-			} else if (!e.getLeft().equals(atomId1)
-					&& e.getRight().contains(atomId1)) {
+			} else if (!e.getLeft().equals(atomId1) && e.getRight().contains(atomId1)) {
 
 				/*
 				 * existential atom on the right but not on the left side of an
@@ -709,8 +688,7 @@ public class SatProcessor implements UelProcessor {
 
 				// end of outer if; key1 is not on the left, ask if it
 				// is on the right
-			} else if (e.getLeft().equals(atomId1)
-					&& !e.getRight().contains(atomId1)) {
+			} else if (e.getLeft().equals(atomId1) && !e.getRight().contains(atomId1)) {
 
 				/*
 				 * existential atom on the left but not on the right side of
@@ -790,13 +768,11 @@ public class SatProcessor implements UelProcessor {
 				if (!atomId1.equals(atomId2)) {
 					for (Integer atomId3 : atomIds) {
 
-						if (!atomId1.equals(atomId3)
-								&& !atomId2.equals(atomId3)) {
+						if (!atomId1.equals(atomId3) && !atomId2.equals(atomId3)) {
 							Set<Integer> clause = new HashSet<Integer>();
 							clause.add(getSubOrDissubLiteral(atomId1, atomId2));
 							clause.add(getSubOrDissubLiteral(atomId2, atomId3));
-							clause.add(getMinusSubOrDissubLiteral(atomId1,
-									atomId3));
+							clause.add(getMinusSubOrDissubLiteral(atomId1, atomId3));
 							input.add(clause);
 						}
 					}
@@ -860,17 +836,16 @@ public class SatProcessor implements UelProcessor {
 	private void runStep3_2(SatInput input) {
 		for (Integer atomId1 : getEAtoms()) {
 
-			Atom eatom = getAtomManager().get(atomId1);
+			Atom eatom = getAtom(atomId1);
 			if (!eatom.isExistentialRestriction()) {
 				throw new IllegalStateException();
 			}
-			Atom child = asExistentialRestriction(eatom).getChild();
+			ConceptName child = eatom.getConceptName();
 
-			if (child.isConceptName() && asConceptName(child).isVariable()) {
-
+			if (child.isVariable()) {
 				for (Integer atomId2 : getVariables()) {
 					Set<Integer> clause = new HashSet<Integer>();
-					Integer childId = getAtomManager().addAndGetIndex(child);
+					Integer childId = getIndex(child);
 					clause.add(getOrderLiteral(atomId2, childId));
 					clause.add(getSubOrDissubLiteral(atomId2, atomId1));
 					input.add(clause);
@@ -889,10 +864,8 @@ public class SatProcessor implements UelProcessor {
 
 				if (!atomId1.equals(atomId2)) {
 
-					ExistentialRestriction ex1 = asExistentialRestriction(getAtomManager()
-							.get(atomId1));
-					ExistentialRestriction ex2 = asExistentialRestriction(getAtomManager()
-							.get(atomId2));
+					ExistentialRestriction ex1 = (ExistentialRestriction) getAtom(atomId1);
+					ExistentialRestriction ex2 = (ExistentialRestriction) getAtom(atomId2);
 					Integer role1 = ex1.getRoleId();
 					Integer role2 = ex2.getRoleId();
 
@@ -910,18 +883,12 @@ public class SatProcessor implements UelProcessor {
 						 */
 					} else {
 
-						Atom child1 = ex1.getChild();
-						Integer child1Id = getAtomManager().addAndGetIndex(
-								child1);
+						Integer child1 = getIndex(ex1.getConceptName());
+						Integer child2 = getIndex(ex2.getConceptName());
 
-						Atom child2 = ex2.getChild();
-						Integer child2Id = getAtomManager().addAndGetIndex(
-								child2);
-
-						if (!child1Id.equals(child2Id)) {
+						if (!child1.equals(child2)) {
 							Set<Integer> clause = new HashSet<Integer>();
-							clause.add(getMinusSubOrDissubLiteral(child1Id,
-									child2Id));
+							clause.add(getMinusSubOrDissubLiteral(child1, child2));
 							clause.add(getSubOrDissubLiteral(atomId1, atomId2));
 							input.add(clause);
 						}
@@ -930,9 +897,8 @@ public class SatProcessor implements UelProcessor {
 							// converse clause needed for soundness of
 							// disunification
 							Set<Integer> clause = new HashSet<Integer>();
-							clause.add(getMinusSubOrDissubLiteral(atomId1,
-									atomId2));
-							clause.add(getSubOrDissubLiteral(child1Id, child2Id));
+							clause.add(getMinusSubOrDissubLiteral(atomId1, atomId2));
+							clause.add(getSubOrDissubLiteral(child1, child2));
 							input.add(clause);
 						}
 
@@ -965,9 +931,8 @@ public class SatProcessor implements UelProcessor {
 
 		for (Integer atomId1 : getUsedAtomIds()) {
 			for (Integer atomId2 : getUsedAtomIds()) {
-				Literal literal = this.invertLiteral ? new SubsumptionLiteral(
-						atomId1, atomId2) : new DissubsumptionLiteral(atomId1,
-						atomId2);
+				Literal literal = this.invertLiteral ? new SubsumptionLiteral(atomId1, atomId2)
+						: new DissubsumptionLiteral(atomId1, atomId2);
 
 				this.literalManager.add(literal);
 			}

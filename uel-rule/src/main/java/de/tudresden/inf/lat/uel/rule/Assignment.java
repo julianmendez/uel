@@ -3,8 +3,8 @@ package de.tudresden.inf.lat.uel.rule;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import de.tudresden.inf.lat.uel.type.api.Atom;
 
@@ -16,7 +16,7 @@ import de.tudresden.inf.lat.uel.type.api.Atom;
  */
 class Assignment {
 
-	private final Map<Integer, Set<Atom>> subs = new HashMap<Integer, Set<Atom>>();
+	private final Map<Atom, Set<Atom>> subs = new HashMap<Atom, Set<Atom>>();
 
 	/**
 	 * Create an empty assignment.
@@ -42,7 +42,7 @@ class Assignment {
 	 *            the new atom
 	 * @return true iff the assignment was changed as a result of this operation
 	 */
-	boolean add(Integer var, Atom at) {
+	boolean add(Atom var, Atom at) {
 		if (at == null) {
 			throw new IllegalArgumentException();
 		}
@@ -59,7 +59,7 @@ class Assignment {
 	 *            the new atoms
 	 * @return true iff the assignment was changed as a result of this operation
 	 */
-	boolean addAll(Integer var, Set<Atom> at) {
+	boolean addAll(Atom var, Set<Atom> at) {
 		if (at == null)
 			return false;
 		Set<Atom> flatAtoms = getOrInit(var);
@@ -77,7 +77,7 @@ class Assignment {
 		if (other == null)
 			return false;
 		boolean ret = false;
-		for (Entry<Integer, Set<Atom>> entry : other.subs.entrySet()) {
+		for (Entry<Atom, Set<Atom>> entry : other.subs.entrySet()) {
 			if (addAll(entry.getKey(), entry.getValue()))
 				ret = true;
 		}
@@ -93,7 +93,7 @@ class Assignment {
 	 *            the atoms to be removed
 	 * @return true iff the assignment was changed as a result of this operation
 	 */
-	boolean removeAll(Integer var, Set<Atom> at) {
+	boolean removeAll(Atom var, Set<Atom> at) {
 		if (at == null)
 			return false;
 		if (subs.get(var) == null)
@@ -112,7 +112,7 @@ class Assignment {
 		if (other == null)
 			return false;
 		boolean ret = false;
-		for (Entry<Integer, Set<Atom>> entry : other.subs.entrySet()) {
+		for (Entry<Atom, Set<Atom>> entry : other.subs.entrySet()) {
 			if (removeAll(entry.getKey(), entry.getValue()))
 				ret = true;
 		}
@@ -126,7 +126,7 @@ class Assignment {
 	 *            the variable
 	 * @return the set of assigned subsumers
 	 */
-	Set<Atom> getSubsumers(Integer var) {
+	Set<Atom> getSubsumers(Atom var) {
 		return getOrInit(var);
 	}
 
@@ -138,11 +138,11 @@ class Assignment {
 	 * @return a set containing the indices of all variables involved in this
 	 *         assignment
 	 */
-	Set<Integer> getKeys() {
+	Set<Atom> getKeys() {
 		return subs.keySet();
 	}
 
-	private Set<Atom> getOrInit(Integer var) {
+	private Set<Atom> getOrInit(Atom var) {
 		Set<Atom> flatAtoms = subs.get(var);
 		if (flatAtoms == null) {
 			flatAtoms = new HashSet<Atom>();
@@ -176,10 +176,10 @@ class Assignment {
 	 *            the goal variable
 	 * @return true iff 'a' depends on 'b'
 	 */
-	boolean dependsOn(Integer a, Integer b) {
+	boolean dependsOn(Atom a, Atom b) {
 		for (Atom at : getSubsumers(a)) {
 			if (!at.isGround()) {
-				Integer nextVar = at.getConceptNameId();
+				Atom nextVar = at.getConceptName();
 				if (nextVar.equals(b)) {
 					return true;
 				}
@@ -200,10 +200,10 @@ class Assignment {
 	 *            the new atom
 	 * @return true iff the resulting assignment would be cyclic
 	 */
-	boolean makesCyclic(Integer var, Atom at) {
+	boolean makesCyclic(Atom var, Atom at) {
 		if (at.isGround())
 			return false;
-		Integer conceptName = at.getConceptNameId();
+		Atom conceptName = at.getConceptName();
 		if (conceptName.equals(var))
 			return true;
 		return dependsOn(conceptName, var);
@@ -218,7 +218,7 @@ class Assignment {
 	 *            the new atoms
 	 * @return true iff the resulting assignment would be cyclic
 	 */
-	boolean makesCyclic(Integer var, Iterable<Atom> newAtoms) {
+	boolean makesCyclic(Atom var, Iterable<Atom> newAtoms) {
 		for (Atom at : newAtoms) {
 			if (makesCyclic(var, at)) {
 				return true;
@@ -227,51 +227,11 @@ class Assignment {
 		return false;
 	}
 
-	/**
-	 * Check if the current assignment is cyclic.
-	 * 
-	 * In the event of a simultaneous application of several eager extension
-	 * rules, the assignment might have become cyclic without any of the
-	 * individual rule applications being at fault.
-	 * 
-	 * @return true iff this assignment induces a cyclic dependency relation
-	 *         between variables
-	 */
-	// boolean isCyclic() {
-	// Set<Integer> vars = getDomain();
-	// while (!vars.isEmpty()) {
-	// Deque<Integer> stack = new ArrayDeque<Integer>();
-	// stack.push(vars.iterator().next());
-	// while (!stack.isEmpty()) {
-	// Integer var = stack.getFirst();
-	// vars.remove(var);
-	// boolean succ = false;
-	// for (FlatAtom at : getSubsumers(var)) {
-	// if (!at.isGround()) {
-	// Integer nextVar = at.getConceptName();
-	// if (stack.contains(nextVar)) {
-	// return true;
-	// }
-	// if (vars.contains(nextVar)) {
-	// stack.push(nextVar);
-	// succ = true;
-	// break;
-	// }
-	// }
-	// }
-	// if (!succ) {
-	// stack.pop();
-	// }
-	// }
-	// }
-	// return false;
-	// }
-
 	@Override
 	public String toString() {
 		StringBuffer buf = new StringBuffer();
 		buf.append("[");
-		for (Entry<Integer, Set<Atom>> e : subs.entrySet()) {
+		for (Entry<Atom, Set<Atom>> e : subs.entrySet()) {
 			buf.append(e.getKey());
 			buf.append("=");
 			buf.append(e.getValue());

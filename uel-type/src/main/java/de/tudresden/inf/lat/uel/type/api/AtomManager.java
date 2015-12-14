@@ -1,7 +1,5 @@
-package de.tudresden.inf.lat.uel.core.type;
+package de.tudresden.inf.lat.uel.type.api;
 
-import de.tudresden.inf.lat.uel.type.api.Atom;
-import de.tudresden.inf.lat.uel.type.api.IndexedSet;
 import de.tudresden.inf.lat.uel.type.impl.ConceptName;
 import de.tudresden.inf.lat.uel.type.impl.ExistentialRestriction;
 
@@ -63,8 +61,7 @@ public interface AtomManager {
 	 * @return a new existential restriction atom registered in this atom
 	 *         manager
 	 */
-	ExistentialRestriction createExistentialRestriction(String roleName,
-			ConceptName child);
+	ExistentialRestriction createExistentialRestriction(String roleName, ConceptName child);
 
 	/**
 	 * Creates a new concept name atom taking another concept name atom as
@@ -88,40 +85,16 @@ public interface AtomManager {
 	 */
 	IndexedSet<Atom> getAtoms();
 
-	/**
-	 * Returns the index of the given concept name.
-	 * 
-	 * @param conceptName
-	 *            concept name
-	 * @return the index of the given concept name.
-	 */
-	Integer getConceptIndex(String conceptName);
+	Atom getAtom(Integer atomId);
 
-	/**
-	 * Returns the concept name of the given index.
-	 * 
-	 * @param id
-	 *            index
-	 * @return the concept name of the given index
-	 */
-	String getConceptName(Integer id);
+	Integer getIndex(Atom atom);
 
-	/**
-	 * Returns the index of the given role name.
-	 * 
-	 * @param roleName
-	 *            role name
-	 * @return the index of the given role name
-	 */
-	Integer getRoleIndex(String roleName);
+	ConceptName getConceptName(Integer atomId);
 
-	/**
-	 * Returns the role name of the given index.
-	 * 
-	 * @param id
-	 *            index
-	 * @return the role name of the given index
-	 */
-	String getRoleName(Integer id);
+	ExistentialRestriction getExistentialRestriction(Integer atomId);
+
+	String printConceptName(Atom atom);
+
+	String printRoleName(Atom atom);
 
 }

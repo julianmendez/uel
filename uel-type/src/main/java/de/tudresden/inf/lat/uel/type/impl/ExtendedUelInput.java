@@ -53,15 +53,11 @@ public class ExtendedUelInput implements UelInput {
 		{
 			Set<Integer> conceptNameIds = new HashSet<Integer>();
 			for (Integer index : usedAtomsIds) {
-				Atom atom = getAtomManager().get(index);
+				Atom atom = getAtoms().get(index);
 				if (atom.isExistentialRestriction()) {
 					this.eatoms.add(index);
-					ConceptName child = ((ExistentialRestriction) atom)
-							.getChild();
-					Integer childId = getAtomManager().addAndGetIndex(child);
-					conceptNameIds.add(childId);
-				} else {
-					conceptNameIds.add(index);
+					ConceptName child = atom.getConceptName();
+					conceptNameIds.add(getAtoms().getIndex(child));
 				}
 			}
 			usedAtomsIds.addAll(conceptNameIds);
@@ -69,7 +65,7 @@ public class ExtendedUelInput implements UelInput {
 
 		for (Integer index : usedAtomsIds) {
 			this.usedAtomIds.add(index);
-			Atom atom = getAtomManager().get(index);
+			Atom atom = getAtoms().get(index);
 			if (atom.isConceptName()) {
 				if (atom.isVariable()) {
 					this.variables.add(index);
@@ -94,8 +90,8 @@ public class ExtendedUelInput implements UelInput {
 	}
 
 	@Override
-	public IndexedSet<Atom> getAtomManager() {
-		return this.uelInput.getAtomManager();
+	public IndexedSet<Atom> getAtoms() {
+		return this.uelInput.getAtoms();
 	}
 
 	/**

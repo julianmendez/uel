@@ -1,6 +1,5 @@
 package de.tudresden.inf.lat.uel.plugin.ui;
 
-import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -22,7 +21,6 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 
-import de.tudresden.inf.lat.uel.core.processor.PluginGoal;
 import de.tudresden.inf.lat.uel.core.processor.UelModel;
 import de.tudresden.inf.lat.uel.core.processor.UelProcessorFactory;
 import de.tudresden.inf.lat.uel.type.api.UelProcessor;
@@ -52,11 +50,11 @@ public class UelController implements ActionListener {
 	private OWLOntology owlOntologyPos = null;
 	private OWLOntology owlOntologyNeg = null;
 	private final OWLOntologyManager owlOntologyManager;
+	private VarSelectionController varSelectionController = null;
 	private UnifierController unifierController;
-	private VarSelectionController varWindow = null;
+	private RefineController refineController = null;
 	private final UelView view;
 	private final UelModel model;
-	private DissubsumptionView dview;
 
 	/**
 	 * Constructs a new controller.
@@ -124,7 +122,7 @@ public class UelController implements ActionListener {
 	}
 
 	private void executeActionSaveDissubsumptions() {
-		File file = showSaveFileDialog(dview);
+		File file = UelUI.showSaveFileDialog(refineController.getView());
 		if (file == null) {
 			return;
 		}
@@ -134,30 +132,20 @@ public class UelController implements ActionListener {
 			String dissubsumptions = OntologyRenderer.renderKRSS(owlOntologyNeg);
 			OntologyRenderer.saveToOntologyFile(dissubsumptions, file);
 		} catch (OWLRendererException ex) {
-			JOptionPane.showMessageDialog(dview, "Failed to save ontology: " + System.lineSeparator() + ex.toString());
-			return;
+			JOptionPane.showMessageDialog(refineController.getView(),
+					"Failed to save ontology: " + System.lineSeparator() + ex.toString());
 		}
 		recomputeUnifiers();
 	}
 
 	private void addNewDissubsumptions() {
 		// TODO add dissubsumptions from dview to owlOntologyNeg
-		String dissubsumptions = dview.getDissubsumptions();
+		String dissubsumptions = refineController.getDissubsumptions();
 	}
 
 	private void recomputeUnifiers() {
 		// TODO close dview and restart computation
-		dview.close();
-	}
-
-	public static File showSaveFileDialog(Component parent) {
-		JFileChooser fileChooser = new JFileChooser();
-		int returnVal = fileChooser.showSaveDialog(parent);
-		File file = null;
-		if (returnVal == JFileChooser.APPROVE_OPTION) {
-			file = fileChooser.getSelectedFile();
-		}
-		return file;
+		refineController.close();
 	}
 
 	private void executeActionRefine() {
@@ -165,31 +153,24 @@ public class UelController implements ActionListener {
 			return;
 		}
 
-		if (dview != null) {
-			dview.close();
-		}
-
-		dview = new DissubsumptionView(unifierController.getCurrentUnifier(), getModel());
-		dview.addButtonSaveListener(this, actionSaveDissubsumptions);
-		dview.addButtonRecomputeListener(this, actionRecompute);
-		dview.setVisible(true);
-
+		refineController = new RefineController(new RefineView(), getModel());
+		refineController.addButtonSaveListener(this, actionSaveDissubsumptions);
+		refineController.addButtonRecomputeListener(this, actionRecompute);
+		refineController.open();
 	}
 
 	private void executeActionAcceptVar() {
-		resetUnifierController();
+		varSelectionController.close();
 
 		if (getModel().getUnifierList().isEmpty()) {
-			PluginGoal g = getModel().getPluginGoal();
-
-			this.varWindow.close();
-
 			UelProcessor processor = UelProcessorFactory.createProcessor(getView().getSelectedProcessor(),
-					g.getUelInput());
+					getModel().getPluginGoal().getUelInput());
 			getModel().setUelProcessor(processor);
 		}
 
-		unifierController.showView();
+		unifierController = new UnifierController(new UnifierView(), getModel());
+		unifierController.addButtonRefineListener(this, actionRefine);
+		unifierController.open();
 	}
 
 	private void executeActionOntologyBg00Selected() {
@@ -258,7 +239,7 @@ public class UelController implements ActionListener {
 	}
 
 	private void executeActionRejectVar() {
-		this.varWindow.close();
+		this.varSelectionController.close();
 	}
 
 	private void executeActionSelectVariables() {
@@ -270,9 +251,9 @@ public class UelController implements ActionListener {
 
 		getModel().configure(bgOntologies, owlOntologyPos, owlOntologyNeg, null);
 
-		this.varWindow = new VarSelectionController(new VarSelectionView(), getModel());
-		this.varWindow.addAcceptVarButtonListener(this, actionAcceptVar);
-		this.varWindow.open();
+		this.varSelectionController = new VarSelectionController(new VarSelectionView(), getModel());
+		this.varSelectionController.addAcceptVarButtonListener(this, actionAcceptVar);
+		this.varSelectionController.open();
 	}
 
 	private UelModel getModel() {
@@ -308,7 +289,6 @@ public class UelController implements ActionListener {
 	public void reset() {
 		// TODO is it always necessary to reset everything? can we keep the
 		// selected ontologies (if they still exist?)
-		resetUnifierController();
 		getView().setButtonSelectVariablesEnabled(false);
 		this.ontologyList.clear();
 		try {
@@ -319,11 +299,6 @@ public class UelController implements ActionListener {
 
 		getView().reloadOntologies(this.ontologyList);
 		updateOntologySelection();
-	}
-
-	private void resetUnifierController() {
-		this.unifierController = new UnifierController(new UnifierView(), getModel());
-		unifierController.addButtonRefineListener(this, actionRefine);
 	}
 
 	public void setShortFormMap(Map<OWLEntity, String> map) {

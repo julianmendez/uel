@@ -22,8 +22,7 @@ final class EagerConflictRule extends EagerRule {
 					return null;
 				}
 				if (at.isConstant()) {
-					if (sub.getHead().getConceptNameId().equals(
-							at.getConceptNameId())) {
+					if (sub.getHead().equals(at)) {
 						return null;
 					}
 				}

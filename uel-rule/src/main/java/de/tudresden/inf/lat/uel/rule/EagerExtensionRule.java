@@ -14,16 +14,18 @@ final class EagerExtensionRule extends EagerRule {
 	Application getFirstApplication(Subsumption sub, Assignment assign) {
 		// extract a variable from the body of sub
 		// if there is more than one such variable, this rule does not apply
-		Integer var = -1;
+		Atom var = null;
 		for (Atom at : sub.getBody()) {
 			if (at.isVariable()) {
-				if ((var > -1) && (var != at.getConceptNameId())) {
+				if ((var != null) && (!var.equals(at))) {
+					// two different variables have beend found
 					return null;
 				}
-				var = at.getConceptNameId();
+				var = at;
 			}
 		}
-		if (var == -1) {
+		if (var == null) {
+			// no variable has been found
 			return null;
 		}
 		// check whether the rest of the body is contained in the assignment of
@@ -59,9 +61,9 @@ final class EagerExtensionRule extends EagerRule {
 
 	private final class Application extends Rule.Application {
 
-		protected Integer var;
+		protected Atom var;
 
-		protected Application(Integer var) {
+		protected Application(Atom var) {
 			this.var = var;
 		}
 

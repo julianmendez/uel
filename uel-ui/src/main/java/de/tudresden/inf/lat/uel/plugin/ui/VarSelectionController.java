@@ -3,10 +3,10 @@ package de.tudresden.inf.lat.uel.plugin.ui;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import de.tudresden.inf.lat.uel.core.processor.UelModel;
+import de.tudresden.inf.lat.uel.core.type.KRSSRenderer;
 
 /**
  * This is the controller of the panel to select the variables in a given
@@ -66,7 +66,6 @@ class VarSelectionController implements ActionListener {
 		for (LabelId variable : view.getSelectedVariables()) {
 			model.getPluginGoal().makeConstant(variable.getId());
 		}
-
 		updateLists();
 	}
 
@@ -74,24 +73,7 @@ class VarSelectionController implements ActionListener {
 		for (LabelId constant : view.getSelectedConstants()) {
 			model.getPluginGoal().makeUserVariable(constant.getId());
 		}
-
 		updateLists();
-	}
-
-	public List<LabelId> getLabelledConstants() {
-		List<LabelId> ret = new ArrayList<LabelId>();
-		for (Integer id : model.getPluginGoal().getConstants()) {
-			ret.add(new LabelId(model.getLabel(id), id));
-		}
-		return Collections.unmodifiableList(ret);
-	}
-
-	public List<LabelId> getLabelledVariables() {
-		List<LabelId> ret = new ArrayList<LabelId>();
-		for (Integer id : model.getPluginGoal().getUserVariables()) {
-			ret.add(new LabelId(model.getLabel(id), id));
-		}
-		return Collections.unmodifiableList(ret);
 	}
 
 	private void init() {
@@ -105,8 +87,19 @@ class VarSelectionController implements ActionListener {
 	}
 
 	private void updateLists() {
-		view.setConstants(getLabelledConstants());
-		view.setVariables(getLabelledVariables());
+		KRSSRenderer renderer = model.getRenderer(true);
+
+		List<LabelId> constants = new ArrayList<LabelId>();
+		for (Integer id : model.getPluginGoal().getConstants()) {
+			constants.add(new LabelId(renderer.getName(id, false), id));
+		}
+		view.setConstants(constants);
+
+		List<LabelId> variables = new ArrayList<LabelId>();
+		for (Integer id : model.getPluginGoal().getUserVariables()) {
+			variables.add(new LabelId(renderer.getName(id, false), id));
+		}
+		view.setVariables(variables);
 	}
 
 }

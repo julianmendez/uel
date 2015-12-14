@@ -8,19 +8,17 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.event.ActionListener;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-
-import de.tudresden.inf.lat.uel.core.processor.UelModel;
-import de.tudresden.inf.lat.uel.type.api.Equation;
 
 // TODO split into view and controller?
 
@@ -28,23 +26,17 @@ import de.tudresden.inf.lat.uel.type.api.Equation;
  * @author Stefan Borgwardt
  *
  */
-public class DissubsumptionView extends JDialog {
+public class RefineView extends JDialog {
 
 	private static final long serialVersionUID = 6093665334232206919L;
 
 	private final JButton buttonRecompute = new JButton();
 	private final JButton buttonSave = new JButton();
-	private int n;
+	private final Container mainPanel = new Box(BoxLayout.X_AXIS);
+	private Map<LabelId, JList<LabelId>> content = null;
 
-	private UelModel model;
-	private Set<Equation> unifier;
-	private JList<LabelId>[] lists;
-
-	public DissubsumptionView(Set<Equation> unifier, UelModel model) {
+	public RefineView() {
 		super((Frame) null, "Refine unifier", true);
-		this.unifier = unifier;
-		this.model = model;
-		n = unifier.size();
 		UelUI.setupWindow(this, createRefinePanel());
 	}
 
@@ -58,19 +50,6 @@ public class DissubsumptionView extends JDialog {
 		buttonSave.setActionCommand(actionCommand);
 	}
 
-	public void close() {
-		setVisible(false);
-		dispose();
-	}
-
-	public String getDissubsumptions() {
-		Set<Equation> dissubsumptions = new HashSet<Equation>();
-		for (int i = 0; i < n; i++) {
-			// TODO transform each marked atom into an equation
-		}
-		return model.getRenderer().printUnifier(dissubsumptions);
-	}
-
 	private Container createRefinePanel() {
 		Container ret = new Box(BoxLayout.Y_AXIS);
 
@@ -78,10 +57,7 @@ public class DissubsumptionView extends JDialog {
 
 		ret.add(Box.createVerticalStrut(UelUI.GAP_SIZE));
 
-		UelUI.setupScrollPane(ret, createSelectionPanels(), "", new Dimension(640, 480));
-
-		JScrollPane scrollPane = new JScrollPane(createSelectionPanels());
-		ret.add(scrollPane);
+		UelUI.setupScrollPane(ret, mainPanel, "", new Dimension(640, 480));
 
 		return ret;
 	}
@@ -96,10 +72,22 @@ public class DissubsumptionView extends JDialog {
 		return buttonPanel;
 	}
 
-	private Component createSelectionPanels() {
-		Container panel = new Box(BoxLayout.X_AXIS);
-		// TODO jlists for each equation
-		return panel;
+	public void updateSelectionPanels(Map<LabelId, List<LabelId>> unifier) {
+		mainPanel.removeAll();
+		content = new HashMap<LabelId, JList<LabelId>>();
+
+		for (LabelId var : unifier.keySet()) {
+			Container varPanel = new Box(BoxLayout.Y_AXIS);
+
+			JLabel label = new JLabel(var.getLabel());
+			JList<LabelId> list = new JList<LabelId>();
+			label.setLabelFor(list);
+			// setup jlist
+			content.put(var, list);
+
+			mainPanel.add(varPanel);
+			mainPanel.add(Box.createHorizontalStrut(UelUI.GAP_SIZE));
+		}
 	}
 
 }

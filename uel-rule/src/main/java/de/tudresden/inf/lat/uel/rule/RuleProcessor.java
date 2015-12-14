@@ -18,7 +18,6 @@ import de.tudresden.inf.lat.uel.type.api.IndexedSet;
 import de.tudresden.inf.lat.uel.type.api.UelInput;
 import de.tudresden.inf.lat.uel.type.api.UelOutput;
 import de.tudresden.inf.lat.uel.type.api.UelProcessor;
-import de.tudresden.inf.lat.uel.type.impl.ConceptName;
 import de.tudresden.inf.lat.uel.type.impl.EquationImpl;
 import de.tudresden.inf.lat.uel.type.impl.ExtendedUelInput;
 import de.tudresden.inf.lat.uel.type.impl.UelOutputImpl;
@@ -74,10 +73,8 @@ public class RuleProcessor implements UelProcessor {
 	public RuleProcessor(UelInput input) {
 		this.goal = new Goal(input);
 		this.input = input;
-		if ((input.getGoalDisequations() != null)
-				&& (input.getGoalDisequations().size() > 0)) {
-			throw new UnsupportedOperationException(
-					"The rule processor cannot deal with disequations!");
+		if ((input.getGoalDisequations() != null) && (input.getGoalDisequations().size() > 0)) {
+			throw new UnsupportedOperationException("The rule processor cannot deal with disequations!");
 		}
 		this.assignment = new Assignment();
 		this.initialSize = goal.size();
@@ -105,10 +102,8 @@ public class RuleProcessor implements UelProcessor {
 		return input;
 	}
 
-	private boolean addEntry(List<Map.Entry<String, String>> list, String key,
-			String value) {
-		return list
-				.add(new AbstractMap.SimpleEntry<String, String>(key, value));
+	private boolean addEntry(List<Map.Entry<String, String>> list, String key, String value) {
+		return list.add(new AbstractMap.SimpleEntry<String, String>(key, value));
 	}
 
 	public List<Map.Entry<String, String>> getInfo() {
@@ -181,30 +176,18 @@ public class RuleProcessor implements UelProcessor {
 	@Override
 	public UelOutput getUnifier() {
 		// convert current assignment to a set of equations
-		IndexedSet<Atom> atomManager = input.getAtomManager();
+		IndexedSet<Atom> atoms = input.getAtoms();
 		Set<Equation> equations = new HashSet<Equation>();
-		for (Atom at : atomManager) {
-			if (at.isConceptName()) {
-				ConceptName name = (ConceptName) at;
-				if (name.isVariable()) {
-					Integer nameId = name.getConceptNameId();
-					Set<Integer> body = new HashSet<Integer>();
-					for (Atom subsumer : assignment.getSubsumers(nameId)) {
-						body.add(atomManager.addAndGetIndex(subsumer));
-					}
-					equations.add(new EquationImpl(nameId, body, false));
+		for (Atom atom : atoms) {
+			if (atom.isVariable()) {
+				Set<Integer> body = new HashSet<Integer>();
+				for (Atom subsumer : assignment.getSubsumers(atom)) {
+					body.add(atoms.getIndex(subsumer));
 				}
+				equations.add(new EquationImpl(atoms.getIndex(atom), body, false));
 			}
 		}
-		// for (Integer userVar : input.getUserVariables()) {
-		// Set<Integer> body = new HashSet<Integer>();
-		// for (Atom at : assignment.getSubsumers(atomManager.get(userVar)
-		// .getConceptNameId())) {
-		// body.add(atomManager.addAndGetIndex(at));
-		// }
-		// equations.add(new EquationImpl(userVar, body, false));
-		// }
-		return new UelOutputImpl(atomManager, equations);
+		return new UelOutputImpl(equations);
 	}
 
 	private boolean solve() throws InterruptedException {
@@ -229,8 +212,7 @@ public class RuleProcessor implements UelProcessor {
 		while (!searchStack.isEmpty()) {
 			Result res = searchStack.pop();
 			rollBackResult(res);
-			if (applyNextNondeterministicRule(res.getSubsumption(),
-					res.getApplication())) {
+			if (applyNextNondeterministicRule(res.getSubsumption(), res.getApplication())) {
 				return true;
 			}
 		}
@@ -245,8 +227,7 @@ public class RuleProcessor implements UelProcessor {
 		return null;
 	}
 
-	private Result applyEagerRules(Collection<Subsumption> subs,
-			List<EagerRule> rules, Assignment currentAssignment) {
+	private Result applyEagerRules(Collection<Subsumption> subs, List<EagerRule> rules, Assignment currentAssignment) {
 		Result res = new Result(null, null);
 		for (Subsumption sub : subs) {
 			if (!sub.isSolved()) {
@@ -268,11 +249,9 @@ public class RuleProcessor implements UelProcessor {
 		return res;
 	}
 
-	private boolean applyNextNondeterministicRule(Subsumption sub,
-			Rule.Application previous) {
+	private boolean applyNextNondeterministicRule(Subsumption sub, Rule.Application previous) {
 		Iterator<Rule> iter = nondeterministicRules
-				.listIterator((previous == null) ? 0 : nondeterministicRules
-						.indexOf(previous.rule()));
+				.listIterator((previous == null) ? 0 : nondeterministicRules.indexOf(previous.rule()));
 
 		while (iter.hasNext()) {
 			Rule rule = iter.next();
@@ -327,27 +306,21 @@ public class RuleProcessor implements UelProcessor {
 
 			// apply dynamic eager rules to each new unsolved subsumption
 			{
-				Result res = applyEagerRules(
-						currentResult.getNewUnsolvedSubsumptions(),
-						dynamicEagerRules, tmp);
+				Result res = applyEagerRules(currentResult.getNewUnsolvedSubsumptions(), dynamicEagerRules, tmp);
 				if (!res.wasSuccessful())
 					return false;
-				nextResult.getSolvedSubsumptions().addAll(
-						res.getSolvedSubsumptions());
+				nextResult.getSolvedSubsumptions().addAll(res.getSolvedSubsumptions());
 				nextResult.getNewSubsumers().addAll(res.getNewSubsumers());
 			}
 
 			// apply dynamic eager rules for each new assignment
 			Assignment newSubsumers = currentResult.getNewSubsumers();
-			for (Integer var : newSubsumers.getKeys()) {
+			for (Atom var : newSubsumers.getKeys()) {
 				if (!newSubsumers.getSubsumers(var).isEmpty()) {
-					Result res = applyEagerRules(
-							goal.getSubsumptionsByBodyVariable(var),
-							dynamicEagerRules, tmp);
+					Result res = applyEagerRules(goal.getSubsumptionsByBodyVariable(var), dynamicEagerRules, tmp);
 					if (!res.wasSuccessful())
 						return false;
-					nextResult.getSolvedSubsumptions().addAll(
-							res.getSolvedSubsumptions());
+					nextResult.getSolvedSubsumptions().addAll(res.getSolvedSubsumptions());
 					nextResult.getNewSubsumers().addAll(res.getNewSubsumers());
 				}
 			}
@@ -360,8 +333,7 @@ public class RuleProcessor implements UelProcessor {
 			currentResult = nextResult;
 			nextResult = new Result(null, null);
 			tmp = new Assignment(assignment);
-		} while (!currentResult.getNewSubsumers().isEmpty()
-				|| !currentResult.getNewUnsolvedSubsumptions().isEmpty());
+		} while (!currentResult.getNewSubsumers().isEmpty() || !currentResult.getNewUnsolvedSubsumptions().isEmpty());
 
 		return true;
 	}
@@ -378,8 +350,7 @@ public class RuleProcessor implements UelProcessor {
 	 * @return the result of the rule application or 'null' if no more rule
 	 *         applications are possible
 	 */
-	private Result tryApplyRule(Subsumption sub, Rule rule,
-			Application previous, Assignment currentAssignment) {
+	private Result tryApplyRule(Subsumption sub, Rule rule, Application previous, Assignment currentAssignment) {
 		Rule.Application next;
 		if (previous == null) {
 			next = rule.getFirstApplication(sub, currentAssignment);
@@ -425,38 +396,15 @@ public class RuleProcessor implements UelProcessor {
 				res.getNewSolvedSubsumptions().add(sub);
 			}
 		}
-		res.getNewUnsolvedSubsumptions().removeAll(
-				res.getNewSolvedSubsumptions());
-
-		// {
-		// Iterator<Subsumption> iter =
-		// res.getNewUnsolvedSubsumptions().iterator();
-		// while (iter.hasNext()) {
-		// Subsumption newUnsolvedSub = iter.next();
-		// if (!goal.add(newUnsolvedSub)) {
-		// // if 'newUnsolvedSub' is already in the goal, we can ignore it
-		// iter.remove();
-		// } else {
-		// if (newUnsolvedSub.getHead().isVariable()) {
-		// // subsumptions with a variable on the right-hand side are always
-		// solved
-		// iter.remove();
-		// newUnsolvedSub.setSolved(true);
-		// res.getNewSolvedSubsumptions().add(newUnsolvedSub);
-		// }
-		// }
-		// }
-		// }
+		res.getNewUnsolvedSubsumptions().removeAll(res.getNewSolvedSubsumptions());
 
 		// goal expansion (I)
 		for (Subsumption sub : res.getNewSolvedSubsumptions()) {
 			/*
-			 * we can assume that all new solved subsumptions have a variable on
-			 * the right-hand side
+			 * we can assume that all new solved subsumptions have a variable in
+			 * the head
 			 */
-			Integer var = sub.getHead().getConceptNameId();
-			Set<Subsumption> newSubs = goal.expand(sub,
-					assignment.getSubsumers(var));
+			Set<Subsumption> newSubs = goal.expand(sub, assignment.getSubsumers(sub.getHead()));
 			res.getNewUnsolvedSubsumptions().addAll(newSubs);
 		}
 
@@ -477,37 +425,8 @@ public class RuleProcessor implements UelProcessor {
 		Set<Subsumption> newSubs = goal.expand(res.getNewSubsumers());
 		res.getNewUnsolvedSubsumptions().addAll(newSubs);
 
-		// Assignment newSubsumers = res.getNewSubsumers();
-		// if (!newSubsumers.isEmpty()) {
-		// // add new subsumers to the current assignment
-		// for (Integer var : newSubsumers.getKeys()) {
-		// Iterator<FlatAtom> iter = newSubsumers.getSubsumers(var).iterator();
-		// while (iter.hasNext()) {
-		// FlatAtom newAtom = iter.next();
-		// if (!assignment.add(var, newAtom)) {
-		// // if 'newAtom' is already in the assignment, we can ignore it
-		// iter.remove();
-		// }
-		// }
-		//
-		// // goal expansion (II)
-		// Set<Subsumption> newSubs = goal.expand(var,
-		// newSubsumers.getSubsumers(var));
-		// res.getNewUnsolvedSubsumptions().addAll(newSubs);
-		// }
-		//
-		// /* check assignment for cycles again since this result might have
-		// come from a bulk
-		// * application of eager rules
-		// */
-		// if (newSubsumers.getDomain().size() > 1) {
-		// if (assignment.isCyclic()) return false;
-		// }
-		// }
-
 		// try to solve new unsolved subsumptions by static eager rules
-		Result eagerRes = applyEagerRules(res.getNewUnsolvedSubsumptions(),
-				staticEagerRules, null);
+		Result eagerRes = applyEagerRules(res.getNewUnsolvedSubsumptions(), staticEagerRules, null);
 		if (!eagerRes.wasSuccessful())
 			return false;
 		for (Subsumption sub : eagerRes.getSolvedSubsumptions()) {

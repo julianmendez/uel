@@ -28,13 +28,13 @@ public class ConceptName implements Atom {
 
 	/**
 	 * Construct a new concept name.
-	 * @param conceptName
-	 *            the concept name
+	 * @param conceptNameId
+	 *            the concept name identifier
 	 * @param isVar
 	 *            a flag indicating whether the concept name is a variable
 	 */
-	public ConceptName(Integer conceptName, boolean isVar) {
-		this.conceptNameId = conceptName;
+	protected ConceptName(Integer conceptNameId, boolean isVar) {
+		this.conceptNameId = conceptNameId;
 		this.isVariable = isVar;
 	}
 
@@ -57,8 +57,11 @@ public class ConceptName implements Atom {
 		return true;
 	}
 
-	@Override
-	public Integer getConceptNameId() {
+	public ConceptName getConceptName() {
+		return this;
+	}
+
+	protected Integer getConceptNameId() {
 		return conceptNameId;
 	}
 

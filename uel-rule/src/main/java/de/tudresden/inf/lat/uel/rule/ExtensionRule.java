@@ -46,11 +46,11 @@ final class ExtensionRule extends Rule {
 					"Expected rule application of type ExtensionRule.Application.");
 		}
 		Application appl = (Application) application;
-		if (assign.makesCyclic(appl.at.getConceptNameId(), sub.getHead())) {
+		if (assign.makesCyclic(appl.at, sub.getHead())) {
 			return new Result(sub, application, false);
 		}
 		Result res = new Result(sub, application);
-		res.getNewSubsumers().add(appl.at.getConceptNameId(), sub.getHead());
+		res.getNewSubsumers().add(appl.at, sub.getHead());
 		return res;
 	}
 

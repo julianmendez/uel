@@ -47,20 +47,9 @@ public class ExistentialRestriction implements Atom {
 		return true;
 	}
 
-	/**
-	 * Return the 'FlatAtom' object that represents the concept name of this
-	 * atom.
-	 * 
-	 * @return the concept name of this atom encapsulated in an object of type
-	 *         'FlatAtom'
-	 */
-	public ConceptName getChild() {
-		return conceptName;
-	}
-
 	@Override
-	public Integer getConceptNameId() {
-		return conceptName.getConceptNameId();
+	public ConceptName getConceptName() {
+		return conceptName;
 	}
 
 	/**
@@ -119,7 +108,7 @@ public class ExistentialRestriction implements Atom {
 	 */
 	@Override
 	public boolean isGround() {
-		return getChild().isGround();
+		return getConceptName().isGround();
 	}
 
 	/**

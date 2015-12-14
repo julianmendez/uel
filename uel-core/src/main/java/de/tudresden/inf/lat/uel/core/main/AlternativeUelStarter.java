@@ -27,10 +27,10 @@ import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 import de.tudresden.inf.lat.uel.core.processor.PluginGoal;
 import de.tudresden.inf.lat.uel.core.processor.UelModel;
 import de.tudresden.inf.lat.uel.core.processor.UelProcessorFactory;
-import de.tudresden.inf.lat.uel.core.type.AtomManager;
 import de.tudresden.inf.lat.uel.core.type.OWLUelClassDefinition;
 import de.tudresden.inf.lat.uel.core.type.UnifierTranslator;
 import de.tudresden.inf.lat.uel.type.api.Atom;
+import de.tudresden.inf.lat.uel.type.api.AtomManager;
 import de.tudresden.inf.lat.uel.type.api.UelInput;
 import de.tudresden.inf.lat.uel.type.api.UelProcessor;
 
@@ -52,8 +52,7 @@ public class AlternativeUelStarter {
 		this.ontologies.add(ontology);
 	}
 
-	public AlternativeUelStarter(OWLOntologyManager ontologyManager,
-			Set<OWLOntology> ontologies) {
+	public AlternativeUelStarter(OWLOntologyManager ontologyManager, Set<OWLOntology> ontologies) {
 		if (ontologies == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
@@ -128,12 +127,10 @@ public class AlternativeUelStarter {
 
 		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
 		OWLDataFactory factory = manager.getOWLDataFactory();
-		AlternativeUelStarter starter = new AlternativeUelStarter(loadOntology(
-				mainFilename, manager));
+		AlternativeUelStarter starter = new AlternativeUelStarter(loadOntology(mainFilename, manager));
 		starter.setVerbose(printInfo);
 		if (!owlThingAliasName.isEmpty()) {
-			starter.setOwlThingAlias(factory.getOWLClass(IRI
-					.create(owlThingAliasName)));
+			starter.setOwlThingAlias(factory.getOWLClass(IRI.create(owlThingAliasName)));
 		}
 
 		OWLOntology subsumptions = loadOntology(subsFilename, manager);
@@ -155,16 +152,14 @@ public class AlternativeUelStarter {
 		}
 		String processorName = processorNames.get(processorIdx);
 
-		Iterator<Set<OWLUelClassDefinition>> result = starter
-				.modifyOntologyAndSolve(subsumptions, dissubsumptions,
-						variables, processorName);
+		Iterator<Set<OWLUelClassDefinition>> result = starter.modifyOntologyAndSolve(subsumptions, dissubsumptions,
+				variables, processorName);
 		int unifierIdx = 1;
 		while (result.hasNext()) {
 			System.out.println("Unifier " + unifierIdx + ":");
 			Set<OWLUelClassDefinition> unifier = result.next();
 			for (OWLUelClassDefinition def : unifier) {
-				System.out
-						.println(def.asOWLEquivalentClassesAxiom().toString());
+				System.out.println(def.asOWLEquivalentClassesAxiom().toString());
 			}
 			System.out.println();
 			unifierIdx++;
@@ -183,19 +178,17 @@ public class AlternativeUelStarter {
 	}
 
 	private static void printSyntax() {
-		System.out
-				.println("Usage: uel [-s subsumptions.owl] [-d dissubsumptions.owl] [-v variables.txt] [-t owl:Thing_alias] [-p processorIndex] [-h] [-i] [ontology.owl]");
+		System.out.println(
+				"Usage: uel [-s subsumptions.owl] [-d dissubsumptions.owl] [-v variables.txt] [-t owl:Thing_alias] [-p processorIndex] [-h] [-i] [ontology.owl]");
 	}
 
-	public static Set<OWLClass> loadVariables(String filename,
-			OWLDataFactory factory) {
+	public static Set<OWLClass> loadVariables(String filename, OWLDataFactory factory) {
 		if (filename.isEmpty()) {
 			return Collections.emptySet();
 		}
 		try {
 
-			BufferedReader input = new BufferedReader(new FileReader(new File(
-					filename)));
+			BufferedReader input = new BufferedReader(new FileReader(new File(filename)));
 			Set<OWLClass> variables = new HashSet<OWLClass>();
 			String line = "";
 			while (line != null) {
@@ -210,15 +203,13 @@ public class AlternativeUelStarter {
 			System.err.println("Could not find file '" + filename + "'.");
 			return null;
 		} catch (IOException e) {
-			System.err.println("Unknown I/O error while reading file '"
-					+ filename + "'.");
+			System.err.println("Unknown I/O error while reading file '" + filename + "'.");
 			System.err.println(e.getMessage());
 			return null;
 		}
 	}
 
-	public static OWLOntology loadOntology(String filename,
-			OWLOntologyManager manager) {
+	public static OWLOntology loadOntology(String filename, OWLOntologyManager manager) {
 		try {
 			if (filename.isEmpty()) {
 				return manager.createOntology();
@@ -229,40 +220,33 @@ public class AlternativeUelStarter {
 			System.err.println("Could not find file '" + filename + "'.");
 			return null;
 		} catch (OWLOntologyCreationException e) {
-			System.err.println("Could not create ontology from file '"
-					+ filename + "'.");
+			System.err.println("Could not create ontology from file '" + filename + "'.");
 			System.err.println(e.getMessage());
 			return null;
 		}
 	}
 
-	public Iterator<Set<OWLUelClassDefinition>> modifyOntologyAndSolve(
-			OWLOntology positiveProblem, OWLOntology negativeProblem,
-			Set<OWLClass> variables, String processorName) {
+	public Iterator<Set<OWLUelClassDefinition>> modifyOntologyAndSolve(OWLOntology positiveProblem,
+			OWLOntology negativeProblem, Set<OWLClass> variables, String processorName) {
 
 		UelModel uelModel = new UelModel();
-		uelModel.configure(ontologies, positiveProblem, negativeProblem,
-				owlThingAlias);
+		uelModel.configure(ontologies, positiveProblem, negativeProblem, owlThingAlias);
 
 		return modifyOntologyAndSolve(uelModel, variables, processorName);
 	}
 
-	public Iterator<Set<OWLUelClassDefinition>> modifyOntologyAndSolve(
-			Set<OWLSubClassOfAxiom> subsumptions,
-			Set<OWLEquivalentClassesAxiom> equations,
-			Set<OWLSubClassOfAxiom> dissubsumptions,
-			Set<OWLEquivalentClassesAxiom> disequations,
-			Set<OWLClass> variables, String processorName) {
+	public Iterator<Set<OWLUelClassDefinition>> modifyOntologyAndSolve(Set<OWLSubClassOfAxiom> subsumptions,
+			Set<OWLEquivalentClassesAxiom> equations, Set<OWLSubClassOfAxiom> dissubsumptions,
+			Set<OWLEquivalentClassesAxiom> disequations, Set<OWLClass> variables, String processorName) {
 
 		UelModel uelModel = new UelModel();
-		uelModel.configure(ontologies, subsumptions, equations,
-				dissubsumptions, disequations, owlThingAlias);
+		uelModel.configure(ontologies, subsumptions, equations, dissubsumptions, disequations, owlThingAlias);
 
 		return modifyOntologyAndSolve(uelModel, variables, processorName);
 	}
 
-	private Iterator<Set<OWLUelClassDefinition>> modifyOntologyAndSolve(
-			UelModel uelModel, Set<OWLClass> variables, String processorName) {
+	private Iterator<Set<OWLUelClassDefinition>> modifyOntologyAndSolve(UelModel uelModel, Set<OWLClass> variables,
+			String processorName) {
 
 		AtomManager atomManager = uelModel.getAtomManager();
 		PluginGoal goal = uelModel.getPluginGoal();
@@ -277,11 +261,9 @@ public class AlternativeUelStarter {
 			// mark all "_UNDEF" variables as user variables
 			for (Atom at : atomManager.getAtoms()) {
 				if (at.isConceptName()) {
-					String name = atomManager.getConceptName(at
-							.getConceptNameId());
+					String name = atomManager.printConceptName(at);
 					if (name.endsWith(AtomManager.UNDEF_SUFFIX)) {
-						goal.makeUserVariable(atomManager.getAtoms().getIndex(
-								at));
+						goal.makeUserVariable(atomManager.getAtoms().getIndex(at));
 					}
 				}
 			}
@@ -292,25 +274,18 @@ public class AlternativeUelStarter {
 
 		// output unification problem
 		if (verbose) {
-			System.out.println("Final number of atoms: "
-					+ goal.getUelInput().getAtomManager().size());
-			System.out.println("Final number of constants: "
-					+ goal.getConstants().size());
-			System.out.println("Final number of variables: "
-					+ goal.getVariables().size());
-			System.out.println("Final number of user variables: "
-					+ goal.getUelInput().getUserVariables().size());
-			System.out.println("Final number of equations: "
-					+ goal.getUelInput().getEquations().size());
+			System.out.println("Final number of atoms: " + goal.getUelInput().getAtoms().size());
+			System.out.println("Final number of constants: " + goal.getConstants().size());
+			System.out.println("Final number of variables: " + goal.getVariables().size());
+			System.out.println("Final number of user variables: " + goal.getUelInput().getUserVariables().size());
+			System.out.println("Final number of equations: " + goal.getUelInput().getEquations().size());
 			System.out.println("Unification problem:");
 			System.out.println(goal.toString());
 		}
 
-		uelProcessor = UelProcessorFactory
-				.createProcessor(processorName, input);
+		uelProcessor = UelProcessorFactory.createProcessor(processorName, input);
 
-		UnifierTranslator translator = new UnifierTranslator(
-				ontologyManager.getOWLDataFactory(), atomManager,
+		UnifierTranslator translator = new UnifierTranslator(ontologyManager.getOWLDataFactory(), atomManager,
 				input.getUserVariables(), goal.getAuxiliaryVariables());
 		return new UnifierIterator(uelProcessor, translator);
 	}

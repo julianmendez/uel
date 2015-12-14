@@ -15,7 +15,6 @@ import de.tudresden.inf.lat.uel.type.api.Equation;
 import de.tudresden.inf.lat.uel.type.api.UelInput;
 import de.tudresden.inf.lat.uel.type.api.UelOutput;
 import de.tudresden.inf.lat.uel.type.api.UelProcessor;
-import de.tudresden.inf.lat.uel.type.impl.ConceptName;
 import de.tudresden.inf.lat.uel.type.impl.EquationImpl;
 import de.tudresden.inf.lat.uel.type.impl.UelOutputImpl;
 
@@ -31,9 +30,7 @@ public class AspProcessor implements UelProcessor {
 
 	public AspProcessor(UelInput input, boolean minimize) {
 		this.uelInput = input;
-		this.aspInput = new AspInput(input.getEquations(),
-				input.getGoalDisequations(), input.getAtomManager(),
-				input.getUserVariables());
+		this.aspInput = new AspInput(input);
 		this.initialized = false;
 		this.currentUnifier = null;
 		this.isSynchronized = false;
@@ -53,8 +50,7 @@ public class AspProcessor implements UelProcessor {
 	public boolean computeNextUnifier() throws InterruptedException {
 		// TODO: implement asynchronous execution of ClingoSolver
 		if (!initialized) {
-			AspSolver solver = new ClingoSolver(!uelInput.getGoalDisequations()
-					.isEmpty(), false, minimize);
+			AspSolver solver = new ClingoSolver(!uelInput.getGoalDisequations().isEmpty(), false, minimize);
 			try {
 				aspOutput = solver.solve(aspInput);
 			} catch (IOException e) {
@@ -73,8 +69,7 @@ public class AspProcessor implements UelProcessor {
 
 	@Override
 	public List<Entry<String, String>> getInfo() {
-		Entry<String, String> e = new AbstractMap.SimpleEntry<String, String>(
-				"ASP encoding", aspInput.getProgram());
+		Entry<String, String> e = new AbstractMap.SimpleEntry<String, String>("ASP encoding", aspInput.getProgram());
 		List<Entry<String, String>> res = new ArrayList<Entry<String, String>>();
 		res.add(e);
 		return res;
@@ -88,8 +83,7 @@ public class AspProcessor implements UelProcessor {
 	@Override
 	public UelOutput getUnifier() {
 		if (aspOutput == null) {
-			throw new IllegalStateException(
-					"The unifiers have not been computed yet.");
+			throw new IllegalStateException("The unifiers have not been computed yet.");
 		}
 		if (!aspOutput.hasNext()) {
 			throw new IllegalStateException("There are no more unifiers.");
@@ -99,22 +93,19 @@ public class AspProcessor implements UelProcessor {
 			currentUnifier = toUnifier(aspOutput.next());
 			isSynchronized = true;
 		}
-		return new UelOutputImpl(uelInput.getAtomManager(), currentUnifier);
+		return new UelOutputImpl(currentUnifier);
 	}
 
 	private Set<Equation> toUnifier(Map<Integer, Set<Integer>> assignment) {
 		Set<Equation> equations = new HashSet<Equation>();
-		for (Atom at : uelInput.getAtomManager()) {
-			if (at.isConceptName()) {
-				ConceptName name = (ConceptName) at;
-				if (name.isVariable()) {
-					Integer nameId = name.getConceptNameId();
-					Set<Integer> body = assignment.get(nameId);
-					if (body == null) {
-						body = Collections.emptySet();
-					}
-					equations.add(new EquationImpl(nameId, body, false));
+		for (Atom at : uelInput.getAtoms()) {
+			if (at.isConceptName() && at.isVariable()) {
+				Integer varId = uelInput.getAtoms().getIndex(at);
+				Set<Integer> body = assignment.get(varId);
+				if (body == null) {
+					body = Collections.emptySet();
 				}
+				equations.add(new EquationImpl(varId, body, false));
 			}
 		}
 		return equations;

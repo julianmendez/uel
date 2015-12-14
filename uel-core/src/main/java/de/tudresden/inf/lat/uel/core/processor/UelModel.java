@@ -23,11 +23,11 @@ import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 
-import de.tudresden.inf.lat.uel.core.type.AtomManager;
-import de.tudresden.inf.lat.uel.core.type.AtomManagerImpl;
 import de.tudresden.inf.lat.uel.core.type.KRSSRenderer;
+import de.tudresden.inf.lat.uel.type.api.AtomManager;
 import de.tudresden.inf.lat.uel.type.api.Equation;
 import de.tudresden.inf.lat.uel.type.api.UelProcessor;
+import de.tudresden.inf.lat.uel.type.impl.AtomManagerImpl;
 import de.tudresden.inf.lat.uel.type.impl.ConceptName;
 import de.tudresden.inf.lat.uel.type.impl.EquationImpl;
 import de.tudresden.inf.lat.uel.type.impl.ExistentialRestriction;
@@ -50,11 +50,12 @@ public class UelModel {
 	private String processorName;
 	private UelProcessor uelProcessor = null;
 	private List<Set<Equation>> unifierList = new ArrayList<Set<Equation>>();
-	private Set<Set<Equation>> unifierSet = new HashSet<Set<Equation>>();
 	private PluginGoal pluginGoal = null;
 	private OWLOntology auxOntology = null;
 	private Map<OWLClassExpression, Integer> mapOfAuxClassExpr = new HashMap<OWLClassExpression, Integer>();
 	private Map<String, String> mapIdLabel = null;
+	private int currentUnifierIndex = -1;
+	private boolean allUnifiersFound = false;
 
 	private int classCounter = 0;
 
@@ -71,14 +72,16 @@ public class UelModel {
 	 *             if the process is interrupted
 	 */
 	public boolean computeNextUnifier() throws InterruptedException {
-		while (this.uelProcessor.computeNextUnifier()) {
-			Set<Equation> result = this.uelProcessor.getUnifier().getEquations();
-			if (!this.unifierSet.contains(result)) {
-				this.unifierList.add(result);
-				this.unifierSet.add(result);
-				return true;
+		if (!allUnifiersFound) {
+			while (this.uelProcessor.computeNextUnifier()) {
+				Set<Equation> result = this.uelProcessor.getUnifier().getEquations();
+				if (!this.unifierList.contains(result)) {
+					this.unifierList.add(result);
+					return true;
+				}
 			}
 		}
+		allUnifiersFound = true;
 		return false;
 	}
 
@@ -86,9 +89,23 @@ public class UelModel {
 		mapIdLabel = map;
 	}
 
-	// public Map<String, String> getMapIdLabel() {
-	// return mapIdLabel;
-	// }
+	public void setCurrentUnifierIndex(int index) {
+		if (index < 0) {
+			currentUnifierIndex = -1;
+		} else if (index >= unifierList.size()) {
+			currentUnifierIndex = unifierList.size() - 1;
+		} else {
+			currentUnifierIndex = index;
+		}
+	}
+
+	public int getCurrentUnifierIndex() {
+		return currentUnifierIndex;
+	}
+
+	public boolean allUnifiersFound() {
+		return allUnifiersFound;
+	}
 
 	public void configure(Set<OWLOntology> bgOntologies, OWLOntology positiveProblem, OWLOntology negativeProblem,
 			OWLClass owlThingAlias) {
@@ -257,45 +274,32 @@ public class UelModel {
 		return this.uelProcessor;
 	}
 
-	public KRSSRenderer getRenderer() {
+	public KRSSRenderer getRenderer(boolean shortForm) {
 		return new KRSSRenderer(atomManager, pluginGoal.getUserVariables(), pluginGoal.getAuxiliaryVariables(),
-				mapIdLabel);
+				shortForm ? mapIdLabel : null);
+	}
+
+	public Set<Equation> getCurrentUnifier() {
+		if (unifierList.size() == 0) {
+			return null;
+		}
+		return unifierList.get(currentUnifierIndex);
+	}
+
+	public String printCurrentUnifier(boolean shortForm) {
+		Set<Equation> unifier = getCurrentUnifier();
+		if (unifier == null) {
+			return "";
+		}
+		return getRenderer(shortForm).printUnifier(getCurrentUnifier());
 	}
 
 	public List<Set<Equation>> getUnifierList() {
 		return Collections.unmodifiableList(this.unifierList);
 	}
 
-	public String printPluginGoal() {
-		return pluginGoal.print(getRenderer());
-	}
-
-	public String getLabel(Integer id) {
-		String name = atomManager.getConceptName(id);
-		return getRenderer().getLabel(name, false);
-		// String ret = model.getMapIdLabel().get(name);
-		//
-		// if (ret == null) {
-		// if (name.endsWith(AtomManager.UNDEF_SUFFIX)) {
-		// String origId = name.substring(0, name.length() -
-		// AtomManager.UNDEF_SUFFIX.length());
-		// ret = model.getMapIdLabel().get(origId);
-		// if (ret != null) {
-		// ret += AtomManager.UNDEF_SUFFIX;
-		// }
-		// }
-		// }
-		//
-		// if (ret == null) {
-		// int p = name.indexOf("#");
-		// if (p != -1) {
-		// ret = name.substring(p + 1);
-		// } else {
-		// ret = name;
-		// }
-		// }
-		//
-		// return ret;
+	public String printPluginGoal(boolean shortForm) {
+		return pluginGoal.print(getRenderer(shortForm));
 	}
 
 	public void reset() {
@@ -305,7 +309,6 @@ public class UelModel {
 		this.classCounter = 0;
 		this.auxOntology = null;
 		this.unifierList.clear();
-		this.unifierSet.clear();
 	}
 
 	public void setProcessorName(String name) {

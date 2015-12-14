@@ -3,10 +3,8 @@ package de.tudresden.inf.lat.uel.plugin.ui;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.util.Set;
 
 import de.tudresden.inf.lat.uel.core.processor.UelModel;
-import de.tudresden.inf.lat.uel.type.api.Equation;
 
 /**
  * This is the controller for the panel that shows the unifiers.
@@ -22,8 +20,6 @@ public class UnifierController implements ActionListener {
 	private static final String actionSave = "save";
 	private static final String actionShowStatInfo = "show statistic info";
 
-	private boolean allUnifiersFound = false;
-	private int unifierIndex = -1;
 	private UnifierView view;
 	private UelModel model;
 
@@ -64,67 +60,54 @@ public class UnifierController implements ActionListener {
 	}
 
 	private void executeActionFirst() {
-		this.unifierIndex = 0;
+		getModel().setCurrentUnifierIndex(0);
 		updateUnifierView();
 	}
 
 	private void executeActionLast() {
-		while (!this.allUnifiersFound) {
-			int previousSize = getModel().getUnifierList().size();
+		while (!getModel().allUnifiersFound()) {
 			try {
 				getModel().computeNextUnifier();
 			} catch (InterruptedException ex) {
 			}
-			if (getModel().getUnifierList().size() == previousSize) {
-				this.allUnifiersFound = true;
-			}
 		}
-		this.unifierIndex = getModel().getUnifierList().size() - 1;
+		getModel().setCurrentUnifierIndex(getModel().getUnifierList().size() - 1);
 		updateUnifierView();
 	}
 
-	public void showView() {
+	public void open() {
 		getView().initializeButtons();
 		getView().setVisible(true);
 	}
 
 	private void executeActionNext() {
-		this.unifierIndex++;
-		if (this.unifierIndex >= getModel().getUnifierList().size()) {
-			int previousSize = getModel().getUnifierList().size();
+		if (getModel().getCurrentUnifierIndex() == getModel().getUnifierList().size() - 1) {
 			try {
 				getModel().computeNextUnifier();
 			} catch (InterruptedException ex) {
 			}
-			if (getModel().getUnifierList().size() == previousSize) {
-				this.allUnifiersFound = true;
-				this.unifierIndex = getModel().getUnifierList().size() - 1;
-			}
 		}
+		getModel().setCurrentUnifierIndex(getModel().getCurrentUnifierIndex() + 1);
 		updateUnifierView();
 	}
 
 	private void executeActionPrevious() {
-		this.unifierIndex--;
-		if (this.unifierIndex < 0) {
-			this.unifierIndex = 0;
-		}
+		getModel().setCurrentUnifierIndex(getModel().getCurrentUnifierIndex() - 1);
 		updateUnifierView();
 	}
 
 	private void executeActionSave() {
-		File file = UelController.showSaveFileDialog(getView());
+		File file = UelUI.showSaveFileDialog(getView());
 		if (file == null) {
 			return;
 		}
 
-		String unifier = printCurrentUnifier();
+		String unifier = getModel().printCurrentUnifier(false);
 		OntologyRenderer.saveToOntologyFile(unifier, file);
 	}
 
 	private void executeActionShowStatInfo() {
-		StatInfoController statInfoWindow = new StatInfoController(new StatInfoView(), getModel());
-		statInfoWindow.open();
+		new StatInfoController(new StatInfoView(), getModel()).open();
 	}
 
 	private UnifierView getView() {
@@ -148,36 +131,22 @@ public class UnifierController implements ActionListener {
 		getView().addButtonRefineListener(listener, actionCommand);
 	}
 
-	public Set<Equation> getCurrentUnifier() {
-		if (getModel().getUnifierList().size() == 0) {
-			return null;
-		}
-		return getModel().getUnifierList().get(this.unifierIndex);
-	}
-
-	private String printCurrentUnifier() {
-		Set<Equation> unifier = getCurrentUnifier();
-		if (unifier == null) {
-			return "";
-		}
-		return getModel().getRenderer().printUnifier(getCurrentUnifier());
-	}
-
 	private void updateUnifierView() {
-		if (getModel().getUnifierList().size() > 0) {
-			getView().setUnifier(printCurrentUnifier());
+		int index = getModel().getCurrentUnifierIndex();
+		if (index > -1) {
+			getView().setUnifier(getModel().printCurrentUnifier(true));
 			getView().setSaveRefineButtons(true);
 		} else {
 			getView().setUnifier("[not unifiable]");
 			getView().setSaveRefineButtons(false);
 		}
-		getView().setUnifierId(" " + (getModel().getUnifierList().isEmpty() ? 0 : (this.unifierIndex + 1)) + " ");
-		if (this.unifierIndex == 0) {
+		getView().setUnifierId(" " + (index + 1) + " ");
+		if (index == 0) {
 			getView().setFirstPreviousButtons(false);
 		} else {
 			getView().setFirstPreviousButtons(true);
 		}
-		if (this.allUnifiersFound && this.unifierIndex >= getModel().getUnifierList().size() - 1) {
+		if (getModel().allUnifiersFound() && index >= getModel().getUnifierList().size() - 1) {
 			getView().setNextLastButtons(false);
 		} else {
 			getView().setNextLastButtons(true);

@@ -1,5 +1,7 @@
 package de.tudresden.inf.lat.uel.type.api;
 
+import de.tudresden.inf.lat.uel.type.impl.ConceptName;
+
 /**
  * Represents a flat EL-atom, which can be a concept name or an existential
  * restriction.
@@ -14,7 +16,7 @@ public interface Atom {
 	 * 
 	 * @return the concept name
 	 */
-	Integer getConceptNameId();
+	ConceptName getConceptName();
 
 	/**
 	 * Tells whether this flat atom is a concept name.

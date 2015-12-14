@@ -8,11 +8,11 @@ import java.util.Set;
 import org.semanticweb.owlapi.model.IRI;
 
 import de.tudresden.inf.lat.uel.type.api.Atom;
+import de.tudresden.inf.lat.uel.type.api.AtomManager;
 import de.tudresden.inf.lat.uel.type.api.Equation;
 import de.tudresden.inf.lat.uel.type.api.SmallEquation;
 import de.tudresden.inf.lat.uel.type.cons.KRSSKeyword;
 import de.tudresden.inf.lat.uel.type.impl.ConceptName;
-import de.tudresden.inf.lat.uel.type.impl.ExistentialRestriction;
 
 public class KRSSRenderer {
 
@@ -33,15 +33,23 @@ public class KRSSRenderer {
 		this.mapIdLabel = mapIdLabel;
 	}
 
-	private void appendName(StringBuffer sbuf, ConceptName child) {
-		String childName = atomManager.getConceptName(child.getConceptNameId());
+	private String getName(Atom atom, boolean quotes) {
+		String name = atomManager.printConceptName(atom);
 		if (mapIdLabel != null) {
-			childName = getLabel(childName);
+			name = getLabel(name, quotes);
 		}
-		sbuf.append(childName);
+		return name;
 	}
 
-	public String getLabel(String id) {
+	public String getName(Integer id, boolean quotes) {
+		return getName(atomManager.getAtom(id), quotes);
+	}
+
+	private void appendName(StringBuffer sbuf, ConceptName child) {
+		sbuf.append(getName(child, false));
+	}
+
+	private String getLabel(String id) {
 		return getLabel(id, true);
 	}
 
@@ -170,13 +178,13 @@ public class KRSSRenderer {
 
 	private void appendAtom(StringBuffer sbuf, Atom atom, Set<Equation> equations, boolean restrictToUserVariables) {
 		if (atom.isExistentialRestriction()) {
-			ConceptName child = ((ExistentialRestriction) atom).getChild();
+			ConceptName child = atom.getConceptName();
 			Integer conceptId = atomManager.getAtoms().getIndex(child);
 
 			sbuf.append(KRSSKeyword.open);
 			sbuf.append(KRSSKeyword.some);
 			sbuf.append(KRSSKeyword.space);
-			String roleName = atomManager.getRoleName(((ExistentialRestriction) atom).getRoleId());
+			String roleName = atomManager.printRoleName(atom);
 			if (mapIdLabel != null) {
 				roleName = getLabel(roleName);
 			}

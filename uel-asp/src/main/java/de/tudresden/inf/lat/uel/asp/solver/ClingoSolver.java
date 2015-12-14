@@ -76,7 +76,7 @@ public class ClingoSolver implements AspSolver {
 		programBuilder.append(input.getProgram());
 		this.program = programBuilder.toString();
 		// System.out.println(program);
-		return new ClingoOutput(this, input.getAtomManager());
+		return new ClingoOutput(this, input.getAtoms());
 	}
 
 	public boolean computeMoreSolutions() {

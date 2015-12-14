@@ -15,7 +15,7 @@ final class EagerSolving2Rule extends EagerRule {
 		Atom head = sub.getHead();
 		for (Atom at : sub.getBody()) {
 			if (at.isVariable()) {
-				if (assign.getSubsumers(at.getConceptNameId()).contains(head)) {
+				if (assign.getSubsumers(at).contains(head)) {
 					return new Application();
 				}
 			}

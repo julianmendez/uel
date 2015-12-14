@@ -12,7 +12,7 @@ import org.semanticweb.owlapi.model.OWLOntology;
 
 import de.tudresden.inf.lat.uel.type.api.Atom;
 import de.tudresden.inf.lat.uel.type.api.Equation;
-import de.tudresden.inf.lat.uel.type.impl.ExistentialRestriction;
+import de.tudresden.inf.lat.uel.type.impl.ConceptName;
 
 /**
  * An object of this class is a UEL ontology that reuses a previously build OWL
@@ -91,11 +91,9 @@ public class DynamicOntology implements Ontology {
 		if (ret == null) {
 			OWLClass cls = this.nameMap.get(id);
 			if (cls != null) {
-				OWLClassExpression clExpr = this.owlDefinitionSet
-						.getDefinition(cls);
+				OWLClassExpression clExpr = this.owlDefinitionSet.getDefinition(cls);
 				if (clExpr != null) {
-					updateCache(getOntologyBuilder().processDefinition(cls,
-							clExpr));
+					updateCache(getOntologyBuilder().processDefinition(cls, clExpr));
 					ret = this.definitionCache.get(id);
 				}
 			}
@@ -130,10 +128,9 @@ public class DynamicOntology implements Ontology {
 					Atom atom = this.ontologyBuilder.getAtoms().get(c);
 					if (atom.isConceptName()) {
 						toVisit.add(c);
-					} else if (atom.isExistentialRestriction()) {
-						Atom child = ((ExistentialRestriction) atom).getChild();
-						Integer childId = this.ontologyBuilder.getAtoms()
-								.addAndGetIndex(child);
+					} else {
+						ConceptName child = atom.getConceptName();
+						Integer childId = this.ontologyBuilder.getAtoms().getIndex(child);
 						toVisit.add(childId);
 					}
 				}
@@ -163,11 +160,9 @@ public class DynamicOntology implements Ontology {
 		if (ret == null) {
 			OWLClass cls = this.nameMap.get(id);
 			if (cls != null) {
-				Set<OWLClassExpression> clExprSet = this.owlDefinitionSet
-						.getPrimitiveDefinition(cls);
+				Set<OWLClassExpression> clExprSet = this.owlDefinitionSet.getPrimitiveDefinition(cls);
 				if (clExprSet != null) {
-					updateCache(getOntologyBuilder()
-							.processPrimitiveDefinition(cls, clExprSet));
+					updateCache(getOntologyBuilder().processPrimitiveDefinition(cls, clExprSet));
 					ret = this.primitiveDefinitionCache.get(id);
 				}
 			}

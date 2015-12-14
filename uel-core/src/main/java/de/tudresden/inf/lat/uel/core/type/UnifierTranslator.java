@@ -11,9 +11,9 @@ import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
 
 import de.tudresden.inf.lat.uel.type.api.Atom;
+import de.tudresden.inf.lat.uel.type.api.AtomManager;
 import de.tudresden.inf.lat.uel.type.api.Equation;
 import de.tudresden.inf.lat.uel.type.impl.ConceptName;
-import de.tudresden.inf.lat.uel.type.impl.ExistentialRestriction;
 
 public class UnifierTranslator {
 
@@ -22,8 +22,8 @@ public class UnifierTranslator {
 	private final Set<Integer> userVariables;
 	private final Set<Integer> auxiliaryVariables;
 
-	public UnifierTranslator(OWLDataFactory factory, AtomManager atomManager,
-			Set<Integer> userVariables, Set<Integer> auxiliaryVariables) {
+	public UnifierTranslator(OWLDataFactory factory, AtomManager atomManager, Set<Integer> userVariables,
+			Set<Integer> auxiliaryVariables) {
 		this.dataFactory = factory;
 		this.atomManager = atomManager;
 		this.userVariables = userVariables;
@@ -34,86 +34,74 @@ public class UnifierTranslator {
 		return this.atomManager;
 	}
 
-	public Set<OWLUelClassDefinition> createOWLUelClassDefinition(
-			Set<Equation> equations) {
+	public Set<OWLUelClassDefinition> createOWLUelClassDefinition(Set<Equation> equations) {
 
 		Set<OWLUelClassDefinition> ret = new HashSet<OWLUelClassDefinition>();
 		for (Equation equation : equations) {
 			if (userVariables.contains(equation.getLeft())) {
-				OWLClass definiendum = getClassFor(equation.getLeft());
+				OWLClass definiendum = getClassFor(atomManager.getAtom(equation.getLeft()));
 
 				Set<Atom> right = new HashSet<Atom>();
 				for (Integer atomId : equation.getRight()) {
-					right.add(this.atomManager.getAtoms().get(atomId));
+					right.add(atomManager.getAtom(atomId));
 				}
 
-				OWLClassExpression definiens = toOWLClassExpression(right,
-						equations);
+				OWLClassExpression definiens = toOWLClassExpression(right, equations);
 
-				ret.add(new OWLUelClassDefinitionImpl(definiendum, definiens,
-						this.dataFactory));
+				ret.add(new OWLUelClassDefinitionImpl(definiendum, definiens, dataFactory));
 			}
 		}
 		return ret;
 	}
 
-	private OWLClass getClassFor(Integer conceptId) {
-		String conceptName = this.atomManager.getConceptName(conceptId);
+	private OWLClass getClassFor(Atom atom) {
+		String conceptName = this.atomManager.printConceptName(atom);
 		return this.dataFactory.getOWLClass(IRI.create(conceptName));
 	}
 
-	private OWLObjectProperty getObjectPropertyFor(Integer objectPropertyId) {
-		String roleName = this.atomManager.getRoleName(objectPropertyId);
+	private OWLObjectProperty getObjectPropertyFor(Atom atom) {
+		String roleName = this.atomManager.printRoleName(atom);
 		return this.dataFactory.getOWLObjectProperty(IRI.create(roleName));
 	}
 
-	private OWLClassExpression getOWLClassExpression(Atom atom,
-			Set<Equation> equations) {
+	private OWLClassExpression getOWLClassExpression(Atom atom, Set<Equation> equations) {
 		OWLClassExpression ret = null;
 
 		if (atom.isExistentialRestriction()) {
 
-			ConceptName child = ((ExistentialRestriction) atom).getChild();
-			Integer conceptId = this.atomManager.getAtoms().getIndex(child);
+			ConceptName child = atom.getConceptName();
+			Integer childId = this.atomManager.getAtoms().getIndex(child);
 
-			OWLObjectProperty objectProperty = getObjectPropertyFor(((ExistentialRestriction) atom)
-					.getRoleId());
+			OWLObjectProperty objectProperty = getObjectPropertyFor(atom);
 
 			OWLClassExpression classExpression;
-			if (this.auxiliaryVariables.contains(conceptId)) {
-				classExpression = toOWLClassExpression(
-						getSetOfSubsumers(child, equations), equations);
+			if (this.auxiliaryVariables.contains(childId)) {
+				classExpression = toOWLClassExpression(getSetOfSubsumers(child, equations), equations);
 			} else {
-				classExpression = getClassFor(child.getConceptNameId());
+				classExpression = getClassFor(child);
 			}
 
-			ret = this.dataFactory.getOWLObjectSomeValuesFrom(objectProperty,
-					classExpression);
+			ret = this.dataFactory.getOWLObjectSomeValuesFrom(objectProperty, classExpression);
 
 		} else {
-			ConceptName concept = (ConceptName) atom;
-			Integer conceptId = this.atomManager.getAtoms().getIndex(concept);
-			ret = getClassFor(conceptId);
+			ret = getClassFor(atom);
 		}
 		return ret;
 	}
 
-	private Collection<Atom> getSetOfSubsumers(Atom atom,
-			Set<Equation> equations) {
+	private Collection<Atom> getSetOfSubsumers(Atom atom, Set<Equation> equations) {
 		Set<Atom> ret = new HashSet<Atom>();
 		for (Equation equation : equations) {
-			if (equation.getLeft().equals(
-					this.atomManager.getAtoms().addAndGetIndex(atom))) {
+			if (equation.getLeft().equals(atomManager.getIndex(atom))) {
 				for (Integer id : equation.getRight()) {
-					ret.add(this.atomManager.getAtoms().get(id));
+					ret.add(atomManager.getAtom(id));
 				}
 			}
 		}
 		return ret;
 	}
 
-	private OWLClassExpression toOWLClassExpression(
-			Collection<Atom> setOfSubsumers, Set<Equation> equations) {
+	private OWLClassExpression toOWLClassExpression(Collection<Atom> setOfSubsumers, Set<Equation> equations) {
 
 		OWLClassExpression ret = null;
 

@@ -1,11 +1,10 @@
 package de.tudresden.inf.lat.uel.asp.solver;
 
-import java.util.Set;
-
 import de.tudresden.inf.lat.uel.type.api.Atom;
 import de.tudresden.inf.lat.uel.type.api.Equation;
 import de.tudresden.inf.lat.uel.type.api.IndexedSet;
 import de.tudresden.inf.lat.uel.type.api.SmallEquation;
+import de.tudresden.inf.lat.uel.type.api.UelInput;
 import de.tudresden.inf.lat.uel.type.impl.ExistentialRestriction;
 
 /**
@@ -16,19 +15,12 @@ import de.tudresden.inf.lat.uel.type.impl.ExistentialRestriction;
  */
 public class AspInput {
 
-	private Set<Equation> equations;
-	private Set<SmallEquation> disequations;
-	private IndexedSet<Atom> atomManager;
-	private Set<Integer> userVariables;
+	private UelInput uelInput;
 	private boolean changed;
 	private String program;
 
-	public AspInput(Set<Equation> equations, Set<SmallEquation> disequations,
-			IndexedSet<Atom> atomManager, Set<Integer> userVariables) {
-		this.equations = equations;
-		this.disequations = disequations;
-		this.atomManager = atomManager;
-		this.userVariables = userVariables;
+	public AspInput(UelInput uelInput) {
+		this.uelInput = uelInput;
 		this.changed = true;
 	}
 
@@ -40,23 +32,23 @@ public class AspInput {
 		return program;
 	}
 
-	public IndexedSet<Atom> getAtomManager() {
-		return this.atomManager;
+	public IndexedSet<Atom> getAtoms() {
+		return uelInput.getAtoms();
 	}
 
 	private void updateProgram() {
 		StringBuilder encoding = new StringBuilder();
 		int i = 1;
-		for (Equation eq : equations) {
+		for (Equation eq : uelInput.getEquations()) {
 			encodeEquation(encoding, eq, i);
 			i++;
 		}
 		i = 1;
-		for (SmallEquation eq : disequations) {
+		for (SmallEquation eq : uelInput.getGoalDisequations()) {
 			encodeDisequation(encoding, eq, i);
 			i++;
 		}
-		for (Integer var : userVariables) {
+		for (Integer var : uelInput.getUserVariables()) {
 			encoding.append("relevant(x");
 			encoding.append(var);
 			encoding.append(").\n");
@@ -83,16 +75,16 @@ public class AspInput {
 		encoding.append(index);
 		encoding.append("\n");
 		encoding.append("diseq(");
-		encodeAtom(encoding, atomManager.get(eq.getLeft()));
+		encodeAtom(encoding, uelInput.getAtoms().get(eq.getLeft()));
 		encoding.append(", ");
-		encodeAtom(encoding, atomManager.get(eq.getRight()));
+		encodeAtom(encoding, uelInput.getAtoms().get(eq.getRight()));
 		encoding.append(").\n\n");
 	}
 
 	private void encodeAtom(StringBuilder encoding, Integer atomId, int side,
 			int equationId) {
 		encoding.append("hasatom(");
-		encodeAtom(encoding, atomManager.get(atomId));
+		encodeAtom(encoding, uelInput.getAtoms().get(atomId));
 		encoding.append(", ");
 		encoding.append(side);
 		encoding.append(", ");
@@ -106,14 +98,14 @@ public class AspInput {
 			encoding.append("exists(r");
 			encoding.append(ex.getRoleId());
 			encoding.append(", ");
-			encodeAtom(encoding, ex.getChild());
+			encodeAtom(encoding, ex.getConceptName());
 		} else {
 			if (atom.isVariable()) {
 				encoding.append("var(x");
 			} else {
 				encoding.append("cname(a");
 			}
-			encoding.append(atom.getConceptNameId());
+			encoding.append(uelInput.getAtoms().getIndex(atom));
 		}
 		encoding.append(")");
 	}

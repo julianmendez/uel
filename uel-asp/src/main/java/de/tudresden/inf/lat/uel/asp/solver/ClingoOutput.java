@@ -32,15 +32,15 @@ public class ClingoOutput implements AspOutput {
 	private static String OPTIMUM_FOUND = "OPTIMUM FOUND";
 
 	private ClingoSolver solver;
-	private IndexedSet<Atom> atomManager;
+	private IndexedSet<Atom> atoms;
 	private List<Map<Integer, Set<Integer>>> assignments;
 	private List<Entry<String, String>> stats;
 	private int currentIndex;
 	private boolean finished;
 
-	public ClingoOutput(ClingoSolver solver, IndexedSet<Atom> atomManager) {
+	public ClingoOutput(ClingoSolver solver, IndexedSet<Atom> atoms) {
 		this.solver = solver;
-		this.atomManager = atomManager;
+		this.atoms = atoms;
 		this.assignments = new ArrayList<Map<Integer, Set<Integer>>>();
 		this.currentIndex = -1;
 		this.finished = false;
@@ -91,13 +91,11 @@ public class ClingoOutput implements AspOutput {
 	private void extendAssignment(Map<Integer, Set<Integer>> assignment,
 			String subsumption) throws IOException {
 		int parenthesisIndex = subsumption.indexOf(')');
-		Integer cnameId = Integer.parseInt(subsumption.substring(13,
+		Integer varId = Integer.parseInt(subsumption.substring(13,
 				parenthesisIndex));
-		Integer varId = atomManager.addAndGetIndex(new ConceptName(cnameId,
-				true));
 		Atom nonVarAtom = parseAtom(subsumption.substring(parenthesisIndex + 2,
 				subsumption.length() - 1));
-		Integer atomId = atomManager.addAndGetIndex(nonVarAtom);
+		Integer atomId = atoms.getIndex(nonVarAtom);
 
 		Set<Integer> subsumers = assignment.get(varId);
 		if (subsumers == null) {
@@ -117,13 +115,13 @@ public class ClingoOutput implements AspOutput {
 					.substring(commaIndex + 1, encoding.length() - 1));
 			return new ExistentialRestriction(roleId, conceptName);
 		case 'c':
-			Integer cnameId = Integer.parseInt(encoding.substring(7,
+			Integer atomId = Integer.parseInt(encoding.substring(7,
 					encoding.length() - 1));
-			return new ConceptName(cnameId, false);
+			return atoms.get(atomId);
 		case 'v':
-			cnameId = Integer.parseInt(encoding.substring(5,
+			atomId = Integer.parseInt(encoding.substring(5,
 					encoding.length() - 1));
-			return new ConceptName(cnameId, true);
+			return atoms.get(atomId);
 		default:
 			throw new IOException("Invalid atom encoding.");
 		}
