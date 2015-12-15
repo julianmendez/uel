@@ -14,47 +14,19 @@ import de.tudresden.inf.lat.uel.core.type.KRSSRenderer;
  * 
  * @author Julian Mendez
  */
-class VarSelectionController implements ActionListener {
-
-	private static final String BUTTON_CONS = "make constant";
-	private static final String BUTTON_VAR = "make variable";
+class VarSelectionController {
 
 	private final UelModel model;
 	private final VarSelectionView view;
 
-	public VarSelectionController(VarSelectionView view, UelModel model) {
-		if (view == null) {
-			throw new IllegalArgumentException("Null argument.");
-		}
-		if (model == null) {
-			throw new IllegalArgumentException("Null argument.");
-		}
-
-		this.view = view;
+	public VarSelectionController(UelModel model) {
+		this.view = new VarSelectionView();
 		this.model = model;
 		init();
 	}
 
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		if (e == null) {
-			throw new IllegalArgumentException("Null argument.");
-		}
-
-		switch (e.getActionCommand()) {
-		case BUTTON_VAR:
-			executeMakeVar();
-			break;
-		case BUTTON_CONS:
-			executeMakeCons();
-			break;
-		default:
-			throw new IllegalStateException();
-		}
-	}
-
-	public void addAcceptVarButtonListener(ActionListener listener, String actionCommand) {
-		view.addAcceptVarButtonListener(listener, actionCommand);
+	public void addAcceptVarListener(ActionListener listener) {
+		view.addAcceptVarListener(listener);
 	}
 
 	public void close() {
@@ -77,8 +49,16 @@ class VarSelectionController implements ActionListener {
 	}
 
 	private void init() {
-		view.addMakeConsButtonListener(this, BUTTON_CONS);
-		view.addMakeVarButtonListener(this, BUTTON_VAR);
+		view.addMakeConsListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				executeMakeCons();
+			}
+		});
+		view.addMakeVarListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				executeMakeVar();
+			}
+		});
 		updateLists();
 	}
 

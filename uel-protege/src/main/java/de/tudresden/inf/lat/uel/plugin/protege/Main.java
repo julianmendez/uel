@@ -18,7 +18,7 @@ public class Main extends AbstractOWLClassViewComponent {
 
 	@Override
 	public void disposeView() {
-		this.uelStarter.removeListeners();
+		uelStarter.removeListeners();
 	}
 
 	/**
@@ -27,9 +27,8 @@ public class Main extends AbstractOWLClassViewComponent {
 	 */
 	@Override
 	public void initialiseClassView() {
-		this.uelStarter = new UelProtegeStarter(getOWLModelManager());
-		this.setLayout(new BorderLayout());
-		add(this.uelStarter.getView(), BorderLayout.CENTER);
+		setLayout(new BorderLayout());
+		uelStarter = new UelProtegeStarter(this, getOWLModelManager());
 	}
 
 	@Override

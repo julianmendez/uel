@@ -29,43 +29,30 @@ class StatInfoView extends JDialog {
 
 	public StatInfoView() {
 		super((Frame) null, "Statistical information", true);
-
-		initFrame();
+		UelUI.setupWindow(this, createMainPanel());
 	}
 
-	public void addSaveButtonListener(ActionListener listener, String actionCommand) {
-		if (listener == null) {
-			throw new IllegalArgumentException("Null argument.");
-		}
-		if (actionCommand == null) {
-			throw new IllegalArgumentException("Null argument.");
-		}
-
-		this.saveButton.addActionListener(listener);
-		this.saveButton.setActionCommand(actionCommand);
+	public void addSaveListener(ActionListener listener) {
+		saveButton.addActionListener(listener);
 	}
 
 	private Component createMainPanel() {
-		Container ret = new Box(BoxLayout.Y_AXIS);
+		Container mainPanel = new Box(BoxLayout.Y_AXIS);
 
 		JComponent buttonPanel = new JPanel();
 		buttonPanel.setAlignmentX(CENTER_ALIGNMENT);
 		UelUI.setupButton(buttonPanel, saveButton, UelUI.ICON_SAVE, Message.tooltipSaveGoal);
-		ret.add(buttonPanel);
+		mainPanel.add(buttonPanel);
 
-		ret.add(Box.createVerticalStrut(UelUI.GAP_SIZE));
+		mainPanel.add(Box.createVerticalStrut(UelUI.GAP_SIZE));
 
-		UelUI.setupScrollTextArea(ret, textGoal, Message.tooltipGoal, new Dimension(640, 240));
+		UelUI.setupScrollTextArea(mainPanel, textGoal, Message.tooltipGoal, new Dimension(640, 240));
 
-		ret.add(Box.createVerticalStrut(UelUI.GAP_SIZE));
+		mainPanel.add(Box.createVerticalStrut(UelUI.GAP_SIZE));
 
-		UelUI.setupScrollTextArea(ret, textInfo, Message.tooltipTextInfo, new Dimension(640, 120));
+		UelUI.setupScrollTextArea(mainPanel, textInfo, Message.tooltipTextInfo, new Dimension(640, 120));
 
-		return ret;
-	}
-
-	private void initFrame() {
-		UelUI.setupWindow(this, createMainPanel());
+		return mainPanel;
 	}
 
 	public void setGoalText(String text) {

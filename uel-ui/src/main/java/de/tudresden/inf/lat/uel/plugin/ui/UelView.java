@@ -7,17 +7,15 @@ import java.util.List;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.SwingConstants;
 
 import org.semanticweb.owlapi.model.OWLOntology;
 
 import de.tudresden.inf.lat.uel.core.processor.UelProcessorFactory;
-import de.tudresden.inf.lat.uel.plugin.ui.UelUI.ComboBoxRenderer;
 
 /**
  * This is the main panel of the UEL system.
@@ -29,45 +27,23 @@ public class UelView extends JPanel {
 	private static final long serialVersionUID = 9096602357606632334L;
 
 	private final JButton buttonOpen = new JButton();
-	private final JButton buttonSelectVariables = new JButton(UelUI.ICON_FORWARD);
-	private final JComboBox<OWLOntology> listOntologyNameBg00 = new JComboBox<OWLOntology>();
-	private final JComboBox<OWLOntology> listOntologyNameBg01 = new JComboBox<OWLOntology>();
-	private final JComboBox<OWLOntology> listOntologyNamePos = new JComboBox<OWLOntology>();
-	private final JComboBox<OWLOntology> listOntologyNameNeg = new JComboBox<OWLOntology>();
+	private final JButton buttonSelectVariables = new JButton();
+	private final JComboBox<OWLOntology> listOntologyBg00 = new JComboBox<OWLOntology>();
+	private final JComboBox<OWLOntology> listOntologyBg01 = new JComboBox<OWLOntology>();
+	private final JComboBox<OWLOntology> listOntologyPos = new JComboBox<OWLOntology>();
+	private final JComboBox<OWLOntology> listOntologyNeg = new JComboBox<OWLOntology>();
 	private final JComboBox<String> listProcessor = new JComboBox<String>();
 
 	public UelView() {
 		add(createSelectionPanel());
 	}
 
-	public void addButtonOpenListener(ActionListener listener, String actionCommand) {
-		this.buttonOpen.addActionListener(listener);
-		this.buttonOpen.setActionCommand(actionCommand);
+	public void addOpenListener(ActionListener listener) {
+		buttonOpen.addActionListener(listener);
 	}
 
-	public void addButtonSelectVariablesListener(ActionListener listener, String actionCommand) {
-		this.buttonSelectVariables.addActionListener(listener);
-		this.buttonSelectVariables.setActionCommand(actionCommand);
-	}
-
-	public void addComboBoxOntologyBg00Listener(ActionListener listener, String actionCommand) {
-		this.listOntologyNameBg00.addActionListener(listener);
-		this.listOntologyNameBg00.setActionCommand(actionCommand);
-	}
-
-	public void addComboBoxOntologyBg01Listener(ActionListener listener, String actionCommand) {
-		this.listOntologyNameBg01.addActionListener(listener);
-		this.listOntologyNameBg01.setActionCommand(actionCommand);
-	}
-
-	public void addComboBoxOntologyPosListener(ActionListener listener, String actionCommand) {
-		this.listOntologyNamePos.addActionListener(listener);
-		this.listOntologyNamePos.setActionCommand(actionCommand);
-	}
-
-	public void addComboBoxOntologyNegListener(ActionListener listener, String actionCommand) {
-		this.listOntologyNameNeg.addActionListener(listener);
-		this.listOntologyNameNeg.setActionCommand(actionCommand);
+	public void addSelectVariablesListener(ActionListener listener) {
+		buttonSelectVariables.addActionListener(listener);
 	}
 
 	private Component createSelectionPanel() {
@@ -86,46 +62,27 @@ public class UelView extends JPanel {
 		JComponent largePanel = new Box(BoxLayout.Y_AXIS);
 		largePanel.setAlignmentX(CENTER_ALIGNMENT);
 
-		// TODO clean up
+		UelUI.addLabel(largePanel, Message.textOntologyBg00);
 
-		JLabel labelOntologyNameBg00 = new JLabel(Message.textOntologyBg00);
-		labelOntologyNameBg00.setAlignmentX(LEFT_ALIGNMENT);
-		largePanel.add(labelOntologyNameBg00);
-
-		this.listOntologyNameBg00.setRenderer(new ComboBoxRenderer());
-		this.listOntologyNameBg00.setToolTipText(Message.tooltipComboBoxOntologyBg00);
-		this.listOntologyNameBg00.setAlignmentX(LEFT_ALIGNMENT);
-		largePanel.add(this.listOntologyNameBg00);
+		UelUI.setupComboBox(largePanel, listOntologyBg00, Message.tooltipComboBoxOntologyBg00);
 
 		largePanel.add(Box.createVerticalStrut(UelUI.GAP_SIZE));
 
-		JLabel labelOntologyNameBg01 = new JLabel(Message.textOntologyBg01);
-		labelOntologyNameBg01.setAlignmentX(LEFT_ALIGNMENT);
-		largePanel.add(labelOntologyNameBg01);
+		UelUI.addLabel(largePanel, Message.textOntologyBg01);
 
-		this.listOntologyNameBg01.setRenderer(new ComboBoxRenderer());
-		this.listOntologyNameBg01.setToolTipText(Message.tooltipComboBoxOntologyBg01);
-		this.listOntologyNameBg01.setAlignmentX(LEFT_ALIGNMENT);
-		largePanel.add(this.listOntologyNameBg01);
+		UelUI.setupComboBox(largePanel, listOntologyBg01, Message.tooltipComboBoxOntologyBg01);
 
 		largePanel.add(Box.createVerticalStrut(UelUI.GAP_SIZE));
 
-		JLabel labelOntologyNamePos = new JLabel(Message.textOntologyPos);
-		labelOntologyNamePos.setAlignmentX(LEFT_ALIGNMENT);
-		largePanel.add(labelOntologyNamePos);
+		UelUI.addLabel(largePanel, Message.textOntologyPos);
 
-		this.listOntologyNamePos.setRenderer(new ComboBoxRenderer());
-		this.listOntologyNamePos.setToolTipText(Message.tooltipComboBoxOntologyPos);
-		this.listOntologyNamePos.setAlignmentX(LEFT_ALIGNMENT);
-		largePanel.add(this.listOntologyNamePos);
+		UelUI.setupComboBox(largePanel, listOntologyPos, Message.tooltipComboBoxOntologyPos);
 
 		largePanel.add(Box.createVerticalStrut(UelUI.GAP_SIZE));
 
-		JLabel labelOntologyNameNeg = new JLabel(Message.textOntologyNeg);
-		labelOntologyNameNeg.setHorizontalAlignment(SwingConstants.CENTER);
-		largePanel.add(labelOntologyNameNeg);
+		UelUI.addLabel(largePanel, Message.textOntologyNeg);
 
-		UelUI.setupComboBox(largePanel, listOntologyNameNeg, Message.tooltipComboBoxOntologyNeg);
+		UelUI.setupComboBox(largePanel, listOntologyNeg, Message.tooltipComboBoxOntologyNeg);
 
 		return largePanel;
 	}
@@ -146,40 +103,40 @@ public class UelView extends JPanel {
 		return topPanel;
 	}
 
-	public int getSelectedOntologyNameBg00() {
-		return this.listOntologyNameBg00.getSelectedIndex();
+	public OWLOntology getSelectedOntologyBg00() {
+		return (OWLOntology) listOntologyBg00.getSelectedItem();
 	}
 
-	public int getSelectedOntologyNameBg01() {
-		return this.listOntologyNameBg01.getSelectedIndex();
+	public OWLOntology getSelectedOntologyBg01() {
+		return (OWLOntology) listOntologyBg01.getSelectedItem();
 	}
 
-	public int getSelectedOntologyNamePos() {
-		return this.listOntologyNamePos.getSelectedIndex();
+	public OWLOntology getSelectedOntologyPos() {
+		return (OWLOntology) listOntologyPos.getSelectedItem();
 	}
 
-	public int getSelectedOntologyNameNeg() {
-		return this.listOntologyNameNeg.getSelectedIndex();
+	public OWLOntology getSelectedOntologyNeg() {
+		return (OWLOntology) listOntologyNeg.getSelectedItem();
 	}
 
 	public String getSelectedProcessor() {
-		return this.listProcessor.getSelectedItem().toString();
+		return (String) listProcessor.getSelectedItem();
 	}
 
-	public void reloadOntologies(List<OWLOntology> listOfOntologies) {
-		if (listOfOntologies == null) {
-			throw new IllegalArgumentException("Null argument.");
-		}
+	public void reloadOntologies(List<OWLOntology> list) {
+		OWLOntology[] ontologies = list.toArray(new OWLOntology[list.size()]);
+		resetModelAndRestoreSelection(listOntologyBg00, ontologies);
+		resetModelAndRestoreSelection(listOntologyBg01, ontologies);
+		resetModelAndRestoreSelection(listOntologyPos, ontologies);
+		resetModelAndRestoreSelection(listOntologyNeg, ontologies);
+	}
 
-		this.listOntologyNameBg00.removeAllItems();
-		this.listOntologyNameBg01.removeAllItems();
-		this.listOntologyNamePos.removeAllItems();
-		this.listOntologyNameNeg.removeAllItems();
-		for (OWLOntology ontology : listOfOntologies) {
-			this.listOntologyNameBg00.addItem(ontology);
-			this.listOntologyNameBg01.addItem(ontology);
-			this.listOntologyNamePos.addItem(ontology);
-			this.listOntologyNameNeg.addItem(ontology);
+	@SuppressWarnings("unchecked")
+	public static <T> void resetModelAndRestoreSelection(JComboBox<T> comboBox, T[] data) {
+		T selection = (T) comboBox.getSelectedItem();
+		comboBox.setModel(new DefaultComboBoxModel<T>(data));
+		if (selection != null) {
+			comboBox.setSelectedItem(selection);
 		}
 	}
 
@@ -191,20 +148,20 @@ public class UelView extends JPanel {
 		this.buttonSelectVariables.setEnabled(b);
 	}
 
-	public void setComboBoxOntologyNameBg00Enabled(boolean b) {
-		this.listOntologyNameBg00.setEnabled(b);
+	public void setComboBoxOntologyBg00Enabled(boolean b) {
+		this.listOntologyBg00.setEnabled(b);
 	}
 
-	public void setComboBoxOntologyNameBg01Enabled(boolean b) {
-		this.listOntologyNameBg01.setEnabled(b);
+	public void setComboBoxOntologyBg01Enabled(boolean b) {
+		this.listOntologyBg01.setEnabled(b);
 	}
 
-	public void setComboBoxOntologyNamePosEnabled(boolean b) {
-		this.listOntologyNamePos.setEnabled(b);
+	public void setComboBoxOntologyPosEnabled(boolean b) {
+		this.listOntologyPos.setEnabled(b);
 	}
 
-	public void setComboBoxOntologyNameNegEnabled(boolean b) {
-		this.listOntologyNameNeg.setEnabled(b);
+	public void setComboBoxOntologyNegEnabled(boolean b) {
+		this.listOntologyNeg.setEnabled(b);
 	}
 
 }

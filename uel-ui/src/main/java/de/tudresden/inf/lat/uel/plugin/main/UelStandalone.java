@@ -1,5 +1,6 @@
 package de.tudresden.inf.lat.uel.plugin.main;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 
 import javax.swing.JFrame;
@@ -18,9 +19,9 @@ public class UelStandalone {
 	}
 
 	public void run() {
-		UelStarter starter = new UelStarter(OWLManager.createOWLOntologyManager());
 		JFrame frame = new JFrame();
-		frame.add(starter.getView());
+		frame.getContentPane().setLayout(new BorderLayout());
+		new UelStarter(frame.getContentPane(), OWLManager.createOWLOntologyManager(), null);
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		frame.setSize(new Dimension(1024, 400));
 		frame.setVisible(true);

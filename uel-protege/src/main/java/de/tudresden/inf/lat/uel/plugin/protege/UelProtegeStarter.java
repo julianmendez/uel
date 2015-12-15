@@ -1,12 +1,11 @@
 package de.tudresden.inf.lat.uel.plugin.protege;
 
+import java.awt.Container;
+
 import org.protege.editor.owl.model.OWLModelManager;
 import org.protege.editor.owl.model.event.EventType;
 import org.protege.editor.owl.model.event.OWLModelManagerChangeEvent;
 import org.protege.editor.owl.model.event.OWLModelManagerListener;
-import org.protege.editor.owl.ui.renderer.OWLModelManagerEntityRenderer;
-import org.semanticweb.owlapi.model.OWLEntity;
-import org.semanticweb.owlapi.model.OWLOntology;
 
 import de.tudresden.inf.lat.uel.plugin.main.UelStarter;
 
@@ -20,7 +19,6 @@ public class UelProtegeStarter extends UelStarter implements OWLModelManagerList
 	static final long serialVersionUID = -8760277761148468455L;
 
 	private final OWLModelManager modelManager;
-	private OWLModelManagerEntityRenderer renderer = null;
 
 	/**
 	 * Constructs a new UEL starter.
@@ -28,18 +26,13 @@ public class UelProtegeStarter extends UelStarter implements OWLModelManagerList
 	 * @param modelManager
 	 *            OWL model manager
 	 */
-	public UelProtegeStarter(OWLModelManager modelManager) {
-		super(modelManager.getOWLOntologyManager());
+	public UelProtegeStarter(Container parent, OWLModelManager modelManager) {
+		super(parent, modelManager.getOWLOntologyManager(), modelManager.getOWLEntityRenderer());
 		this.modelManager = modelManager;
-		this.renderer = modelManager.getOWLEntityRenderer();
 		modelManager.addListener(this);
 		reset();
 	}
 
-	@Override
-	protected String getShortForm(OWLEntity entity, OWLOntology ontology) {
-		return (renderer != null) ? renderer.getShortForm(entity) : super.getShortForm(entity,ontology);
-	}
 
 	@Override
 	public void removeListeners() {

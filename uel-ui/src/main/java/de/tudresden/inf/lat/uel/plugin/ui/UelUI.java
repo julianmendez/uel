@@ -19,9 +19,11 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
@@ -108,11 +110,18 @@ public class UelUI {
 	public static final ImageIcon ICON_STEP_BACK = createIcon(PATH_STEP_BACK);
 	public static final ImageIcon ICON_STEP_FORWARD = createIcon(PATH_STEP_FORWARD);
 
+	public static void addLabel(Container parent, String text) {
+		JLabel label = new JLabel(text);
+		label.setHorizontalAlignment(SwingConstants.CENTER);
+		parent.add(label);
+	}
+
 	/**
 	 * Returns an icon created with the default size for the given path.
 	 * 
 	 * @param path
 	 *            of icon
+	 * @return an icon, or <code>null</code> if the path is invalid
 	 */
 	public static ImageIcon createIcon(String path) {
 		return createIcon(path, DEFAULT_ICON_SIZE);
@@ -174,11 +183,21 @@ public class UelUI {
 		comboBox.setRenderer(new ComboBoxRenderer());
 		comboBox.setToolTipText(tooltipText);
 		comboBox.setAlignmentX(Component.LEFT_ALIGNMENT);
+		comboBox.setEditable(false);
 		parent.add(comboBox);
 	}
 
+	public static void setupLabel(Container parent, JLabel label, String tooltipText, Dimension preferredSize) {
+		label.setToolTipText(tooltipText);
+		label.setHorizontalAlignment(SwingConstants.CENTER);
+		if (preferredSize != null) {
+			label.setPreferredSize(preferredSize);
+		}
+		parent.add(label);
+	}
+
 	public static void setupScrollPane(Container parent, Component child, String tooltipText, Dimension preferredSize) {
-		if (tooltipText.equals("")) {
+		if (!tooltipText.equals("")) {
 			((JComponent) child).setToolTipText(tooltipText);
 		}
 		JScrollPane scrollPane = new JScrollPane(child);
@@ -198,12 +217,20 @@ public class UelUI {
 
 	public static File showSaveFileDialog(Component parent) {
 		JFileChooser fileChooser = new JFileChooser();
-		int returnVal = fileChooser.showSaveDialog(parent);
-		File file = null;
-		if (returnVal == JFileChooser.APPROVE_OPTION) {
-			file = fileChooser.getSelectedFile();
+		if (fileChooser.showSaveDialog(parent) == JFileChooser.APPROVE_OPTION) {
+			return fileChooser.getSelectedFile();
+		} else {
+			return null;
 		}
-		return file;
+	}
+
+	public static File showOpenFileDialog(Component parent) {
+		JFileChooser fileChooser = new JFileChooser();
+		if (fileChooser.showOpenDialog(parent) == JFileChooser.APPROVE_OPTION) {
+			return fileChooser.getSelectedFile();
+		} else {
+			return null;
+		}
 	}
 
 }

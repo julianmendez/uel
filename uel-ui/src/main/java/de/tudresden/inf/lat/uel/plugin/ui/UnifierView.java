@@ -11,6 +11,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
@@ -31,46 +32,39 @@ public class UnifierView extends JDialog {
 	private JButton buttonShowStatInfo = new JButton();
 	private JButton buttonRefine = new JButton();
 	private JTextArea textUnifier = new JTextArea();
-	private JTextArea textUnifierId = new JTextArea();
+	private JLabel labelUnifierId = new JLabel();
 
 	public UnifierView() {
 		super((Frame) null, "Unifier", true);
 		UelUI.setupWindow(this, createUnifierPanel());
 	}
 
-	public void addButtonFirstListener(ActionListener listener, String actionCommand) {
-		this.buttonFirst.addActionListener(listener);
-		this.buttonFirst.setActionCommand(actionCommand);
+	public void addFirstListener(ActionListener listener) {
+		buttonFirst.addActionListener(listener);
 	}
 
-	public void addButtonLastListener(ActionListener listener, String actionCommand) {
-		this.buttonLast.addActionListener(listener);
-		this.buttonLast.setActionCommand(actionCommand);
+	public void addLastListener(ActionListener listener) {
+		buttonLast.addActionListener(listener);
 	}
 
-	public void addButtonNextListener(ActionListener listener, String actionCommand) {
-		this.buttonNext.addActionListener(listener);
-		this.buttonNext.setActionCommand(actionCommand);
+	public void addNextListener(ActionListener listener) {
+		buttonNext.addActionListener(listener);
 	}
 
-	public void addButtonPreviousListener(ActionListener listener, String actionCommand) {
-		this.buttonPrevious.addActionListener(listener);
-		this.buttonPrevious.setActionCommand(actionCommand);
+	public void addPreviousListener(ActionListener listener) {
+		buttonPrevious.addActionListener(listener);
 	}
 
-	public void addButtonSaveListener(ActionListener listener, String actionCommand) {
-		this.buttonSave.addActionListener(listener);
-		this.buttonSave.setActionCommand(actionCommand);
+	public void addSaveListener(ActionListener listener) {
+		buttonSave.addActionListener(listener);
 	}
 
-	public void addButtonShowStatInfoListener(ActionListener listener, String actionCommand) {
-		this.buttonShowStatInfo.addActionListener(listener);
-		this.buttonShowStatInfo.setActionCommand(actionCommand);
+	public void addShowStatInfoListener(ActionListener listener) {
+		buttonShowStatInfo.addActionListener(listener);
 	}
 
-	public void addButtonRefineListener(ActionListener listener, String actionCommand) {
-		this.buttonRefine.addActionListener(listener);
-		this.buttonRefine.setActionCommand(actionCommand);
+	public void addRefineListener(ActionListener listener) {
+		buttonRefine.addActionListener(listener);
 	}
 
 	private Component createUnifierPanel() {
@@ -108,11 +102,7 @@ public class UnifierView extends JDialog {
 
 		UelUI.setupButton(navigateButtons, buttonPrevious, UelUI.ICON_BACK, Message.tooltipPrevious);
 
-		textUnifierId.setToolTipText(Message.tooltipUnifierId);
-		textUnifierId.setEditable(false);
-		textUnifierId.setRows(1);
-		textUnifierId.setColumns(5);
-		navigateButtons.add(textUnifierId);
+		UelUI.setupLabel(navigateButtons, labelUnifierId, Message.tooltipUnifierId, new Dimension(40, 20));
 
 		UelUI.setupButton(navigateButtons, buttonNext, UelUI.ICON_FORWARD, Message.tooltipNext);
 
@@ -130,7 +120,7 @@ public class UnifierView extends JDialog {
 	}
 
 	public void setUnifierId(String text) {
-		textUnifierId.setText(text);
+		labelUnifierId.setText(text);
 	}
 
 	public void initializeButtons() {

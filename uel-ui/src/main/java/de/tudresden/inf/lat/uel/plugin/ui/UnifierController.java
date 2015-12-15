@@ -11,145 +11,124 @@ import de.tudresden.inf.lat.uel.core.processor.UelModel;
  * 
  * @author Julian Mendez
  */
-public class UnifierController implements ActionListener {
+public class UnifierController {
 
-	private static final String actionFirst = "first";
-	private static final String actionLast = "last";
-	private static final String actionNext = "next";
-	private static final String actionPrevious = "previous";
-	private static final String actionSave = "save";
-	private static final String actionShowStatInfo = "show statistic info";
+	private final UelModel model;
+	private final UnifierView view;
 
-	private UnifierView view;
-	private UelModel model;
-
-	public UnifierController(UnifierView view, UelModel model) {
-		this.view = view;
+	public UnifierController(UelModel model) {
+		this.view = new UnifierView();
 		this.model = model;
 		init();
 	}
 
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		if (e == null) {
-			throw new IllegalArgumentException("Null argument.");
-		}
-
-		switch (e.getActionCommand()) {
-		case actionFirst:
-			executeActionFirst();
-			break;
-		case actionPrevious:
-			executeActionPrevious();
-			break;
-		case actionNext:
-			executeActionNext();
-			break;
-		case actionLast:
-			executeActionLast();
-			break;
-		case actionSave:
-			executeActionSave();
-			break;
-		case actionShowStatInfo:
-			executeActionShowStatInfo();
-			break;
-		default:
-			throw new IllegalStateException();
-		}
+	public void addRefineListener(ActionListener listener) {
+		view.addRefineListener(listener);
 	}
 
-	private void executeActionFirst() {
-		getModel().setCurrentUnifierIndex(0);
+	private void executeFirst() {
+		model.setCurrentUnifierIndex(0);
 		updateUnifierView();
 	}
 
-	private void executeActionLast() {
-		while (!getModel().allUnifiersFound()) {
+	private void executeLast() {
+		while (!model.allUnifiersFound()) {
 			try {
-				getModel().computeNextUnifier();
+				model.computeNextUnifier();
 			} catch (InterruptedException ex) {
 			}
 		}
-		getModel().setCurrentUnifierIndex(getModel().getUnifierList().size() - 1);
+		model.setCurrentUnifierIndex(model.getUnifierList().size() - 1);
 		updateUnifierView();
 	}
 
-	public void open() {
-		getView().initializeButtons();
-		getView().setVisible(true);
-	}
-
-	private void executeActionNext() {
-		if (getModel().getCurrentUnifierIndex() == getModel().getUnifierList().size() - 1) {
+	private void executeNext() {
+		if (model.getCurrentUnifierIndex() == model.getUnifierList().size() - 1) {
 			try {
-				getModel().computeNextUnifier();
+				model.computeNextUnifier();
 			} catch (InterruptedException ex) {
 			}
 		}
-		getModel().setCurrentUnifierIndex(getModel().getCurrentUnifierIndex() + 1);
+		model.setCurrentUnifierIndex(model.getCurrentUnifierIndex() + 1);
 		updateUnifierView();
 	}
 
-	private void executeActionPrevious() {
-		getModel().setCurrentUnifierIndex(getModel().getCurrentUnifierIndex() - 1);
+	private void executePrevious() {
+		model.setCurrentUnifierIndex(model.getCurrentUnifierIndex() - 1);
 		updateUnifierView();
 	}
 
-	private void executeActionSave() {
-		File file = UelUI.showSaveFileDialog(getView());
+	private void executeSave() {
+		File file = UelUI.showSaveFileDialog(view);
 		if (file == null) {
 			return;
 		}
 
-		String unifier = getModel().printCurrentUnifier(false);
+		String unifier = model.printCurrentUnifier(false);
 		OntologyRenderer.saveToOntologyFile(unifier, file);
 	}
 
-	private void executeActionShowStatInfo() {
-		new StatInfoController(new StatInfoView(), getModel()).open();
-	}
-
-	private UnifierView getView() {
-		return view;
-	}
-
-	private UelModel getModel() {
-		return model;
+	private void executeShowStatInfo() {
+		new StatInfoController(model).open();
 	}
 
 	private void init() {
-		getView().addButtonFirstListener(this, actionFirst);
-		getView().addButtonPreviousListener(this, actionPrevious);
-		getView().addButtonNextListener(this, actionNext);
-		getView().addButtonLastListener(this, actionLast);
-		getView().addButtonSaveListener(this, actionSave);
-		getView().addButtonShowStatInfoListener(this, actionShowStatInfo);
+		view.addFirstListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				executeFirst();
+			}
+		});
+		view.addPreviousListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				executePrevious();
+			}
+		});
+		view.addNextListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				executeNext();
+			}
+		});
+		view.addLastListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				executeLast();
+			}
+		});
+		view.addSaveListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				executeSave();
+			}
+		});
+		view.addShowStatInfoListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				executeShowStatInfo();
+			}
+		});
 	}
 
-	public void addButtonRefineListener(ActionListener listener, String actionCommand) {
-		getView().addButtonRefineListener(listener, actionCommand);
+	public void open() {
+		view.initializeButtons();
+		view.setVisible(true);
 	}
 
 	private void updateUnifierView() {
-		int index = getModel().getCurrentUnifierIndex();
+		int index = model.getCurrentUnifierIndex();
 		if (index > -1) {
-			getView().setUnifier(getModel().printCurrentUnifier(true));
-			getView().setSaveRefineButtons(true);
+			view.setUnifier(model.printCurrentUnifier(true));
+			view.setSaveRefineButtons(true);
 		} else {
-			getView().setUnifier("[not unifiable]");
-			getView().setSaveRefineButtons(false);
+			view.setUnifier("[not unifiable]");
+			view.setSaveRefineButtons(false);
 		}
-		getView().setUnifierId(" " + (index + 1) + " ");
+		view.setUnifierId(" " + (index + 1) + " ");
 		if (index == 0) {
-			getView().setFirstPreviousButtons(false);
+			view.setFirstPreviousButtons(false);
 		} else {
-			getView().setFirstPreviousButtons(true);
+			view.setFirstPreviousButtons(true);
 		}
-		if (getModel().allUnifiersFound() && index >= getModel().getUnifierList().size() - 1) {
-			getView().setNextLastButtons(false);
+		if (model.allUnifiersFound() && index >= model.getUnifierList().size() - 1) {
+			view.setNextLastButtons(false);
 		} else {
-			getView().setNextLastButtons(true);
+			view.setNextLastButtons(true);
 		}
 	}
 

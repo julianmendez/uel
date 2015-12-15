@@ -30,12 +30,9 @@ public class PluginGoal {
 	private final Set<Equation> definitions = new HashSet<Equation>();
 	private final Set<SmallEquation> goalDisequations = new HashSet<SmallEquation>();
 	private final Set<Equation> goalEquations = new HashSet<Equation>();
-
 	private final Ontology ontology;
-
 	private UelInput uelInput;
 	private final Set<Integer> userVariables = new HashSet<Integer>();
-
 	private final Set<Integer> variables = new HashSet<Integer>();
 
 	/**
@@ -49,7 +46,7 @@ public class PluginGoal {
 	public PluginGoal(AtomManager manager, Ontology ont) {
 		this.atomManager = manager;
 		this.ontology = ont;
-		for (Atom atom : getAtomManager().getAtoms()) {
+		for (Atom atom : atomManager.getAtoms()) {
 			if (atom.isConceptName()) {
 				((ConceptName) atom).setVariable(false);
 			}
@@ -65,7 +62,7 @@ public class PluginGoal {
 		} else {
 			ConceptName abbrev = ((DynamicOntology) this.ontology).getOntologyBuilder().createNewAtom();
 			abbrev.setAuxiliaryVariable(true);
-			rightId = getAtomManager().getAtoms().addAndGetIndex(abbrev);
+			rightId = atomManager.getAtoms().addAndGetIndex(abbrev);
 			makeAuxiliaryVariable(rightId);
 
 			Equation newDef = new EquationImpl(rightId, disequation.getRight(), false);
@@ -104,8 +101,8 @@ public class PluginGoal {
 	}
 
 	private void addModule(Set<Equation> equationSet, Integer atomId) {
-		ConceptName conceptName = getAtomManager().getAtom(atomId).getConceptName();
-		Integer conceptNameId = getAtomManager().getAtoms().getIndex(conceptName);
+		ConceptName conceptName = atomManager.getAtom(atomId).getConceptName();
+		Integer conceptNameId = atomManager.getAtoms().getIndex(conceptName);
 		Set<Equation> module = this.ontology.getModule(conceptNameId);
 		// System.out.println("module size: " + module.size());
 
@@ -142,10 +139,6 @@ public class PluginGoal {
 		return equationSet;
 	}
 
-	public AtomManager getAtomManager() {
-		return this.atomManager;
-	}
-
 	public Set<Integer> getAuxiliaryVariables() {
 		return Collections.unmodifiableSet(this.auxiliaryVariables);
 	}
@@ -177,7 +170,7 @@ public class PluginGoal {
 			this.variables.remove(atomId);
 			this.constants.add(atomId);
 			this.userVariables.remove(atomId);
-			getAtomManager().getConceptName(atomId).setVariable(false);
+			atomManager.getConceptName(atomId).setVariable(false);
 		}
 	}
 
@@ -186,7 +179,7 @@ public class PluginGoal {
 			this.constants.remove(atomId);
 			this.variables.add(atomId);
 			this.userVariables.add(atomId);
-			getAtomManager().getConceptName(atomId).setVariable(true);
+			atomManager.getConceptName(atomId).setVariable(true);
 		}
 	}
 
@@ -195,20 +188,8 @@ public class PluginGoal {
 			Integer atomId = eq.getLeft();
 			this.variables.add(atomId);
 			this.userVariables.remove(atomId);
-			getAtomManager().getConceptName(atomId).setVariable(true);
+			atomManager.getConceptName(atomId).setVariable(true);
 		}
-	}
-
-	private Equation processPrimitiveDefinition(Equation e) {
-		Atom leftAtom = getAtomManager().getAtoms().get(e.getLeft());
-		ConceptName var = atomManager.createUndefConceptName((ConceptName) leftAtom, false);
-		Integer varId = getAtomManager().getAtoms().getIndex(var);
-		this.userVariables.remove(varId);
-
-		Set<Integer> newRightSet = new HashSet<Integer>();
-		newRightSet.addAll(e.getRight());
-		newRightSet.add(varId);
-		return new EquationImpl(e.getLeft(), newRightSet, false);
 	}
 
 	public String print(KRSSRenderer renderer) {
@@ -217,6 +198,18 @@ public class PluginGoal {
 		renderer.appendCustomEquations(sbuf, goalEquations, " ≡ ");
 		renderer.appendCustomSmallEquations(sbuf, goalDisequations, " ≢ ");
 		return sbuf.toString();
+	}
+
+	private Equation processPrimitiveDefinition(Equation e) {
+		Atom leftAtom = atomManager.getAtoms().get(e.getLeft());
+		ConceptName var = atomManager.createUndefConceptName((ConceptName) leftAtom, false);
+		Integer varId = atomManager.getAtoms().getIndex(var);
+		this.userVariables.remove(varId);
+
+		Set<Integer> newRightSet = new HashSet<Integer>();
+		newRightSet.addAll(e.getRight());
+		newRightSet.add(varId);
+		return new EquationImpl(e.getLeft(), newRightSet, false);
 	}
 
 	private void updateIndexSets(Set<Equation> equationSet) {
@@ -238,18 +231,18 @@ public class PluginGoal {
 	private void updateIndexSetsWithAtoms(Set<Integer> usedAtomIds) {
 		Set<Integer> conceptNameIds = new HashSet<Integer>();
 		for (Integer usedAtomId : usedAtomIds) {
-			Atom atom = getAtomManager().getAtoms().get(usedAtomId);
+			Atom atom = atomManager.getAtoms().get(usedAtomId);
 			if (atom.isConceptName()) {
 				conceptNameIds.add(usedAtomId);
 			} else {
 				ConceptName child = atom.getConceptName();
-				Integer childId = getAtomManager().getAtoms().getIndex(child);
+				Integer childId = atomManager.getAtoms().getIndex(child);
 				conceptNameIds.add(childId);
 			}
 		}
 
 		for (Integer atomId : conceptNameIds) {
-			Atom atom = getAtomManager().getAtoms().get(atomId);
+			Atom atom = atomManager.getAtoms().get(atomId);
 			if (atom.isVariable()) {
 				this.variables.add(atomId);
 				if (((ConceptName) atom).isAuxiliaryVariable()) {
@@ -263,7 +256,7 @@ public class PluginGoal {
 	}
 
 	public void updateUelInput() {
-		this.uelInput = new UelInputImpl(getAtomManager().getAtoms(), this.definitions, this.goalEquations,
+		this.uelInput = new UelInputImpl(atomManager.getAtoms(), this.definitions, this.goalEquations,
 				this.goalDisequations, this.userVariables);
 	}
 

@@ -18,9 +18,9 @@ import de.tudresden.inf.lat.uel.type.impl.ConceptName;
 public class UnifierTranslator {
 
 	private final AtomManager atomManager;
+	private final Set<Integer> auxiliaryVariables;
 	private final OWLDataFactory dataFactory;
 	private final Set<Integer> userVariables;
-	private final Set<Integer> auxiliaryVariables;
 
 	public UnifierTranslator(OWLDataFactory factory, AtomManager atomManager, Set<Integer> userVariables,
 			Set<Integer> auxiliaryVariables) {
@@ -30,12 +30,7 @@ public class UnifierTranslator {
 		this.auxiliaryVariables = auxiliaryVariables;
 	}
 
-	public AtomManager getAtomManager() {
-		return this.atomManager;
-	}
-
 	public Set<OWLUelClassDefinition> createOWLUelClassDefinition(Set<Equation> equations) {
-
 		Set<OWLUelClassDefinition> ret = new HashSet<OWLUelClassDefinition>();
 		for (Equation equation : equations) {
 			if (userVariables.contains(equation.getLeft())) {
@@ -52,6 +47,10 @@ public class UnifierTranslator {
 			}
 		}
 		return ret;
+	}
+
+	public AtomManager getAtomManager() {
+		return this.atomManager;
 	}
 
 	private OWLClass getClassFor(Atom atom) {

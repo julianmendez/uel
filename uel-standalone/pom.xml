@@ -172,7 +172,7 @@
 
 		<mainClass>de.tudresden.inf.lat.uel.plugin.main.UelStandalone</mainClass>
 
-		<import.package>javax.accessibility,javax.swing,javax.swing.border, org.osgi.framework,org.protege.editor.core.ui.workspace,*</import.package>
+		<import.package>javax.accessibility,javax.swing,javax.swing.border, org.osgi.framework,org.protege.editor.core.ui.workspace</import.package>
 	</properties>
 
 	<build>

@@ -20,8 +20,6 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 
-// TODO split into view and controller?
-
 /**
  * @author Stefan Borgwardt
  *
@@ -40,14 +38,13 @@ public class RefineView extends JDialog {
 		UelUI.setupWindow(this, createRefinePanel());
 	}
 
-	public void addButtonRecomputeListener(ActionListener listener, String actionCommand) {
+	public void addRecomputeListener(ActionListener listener) {
 		buttonRecompute.addActionListener(listener);
-		buttonRecompute.setActionCommand(actionCommand);
 	}
 
-	public void addButtonSaveListener(ActionListener listener, String actionCommand) {
+	public void addSaveListener(ActionListener listener) {
 		buttonSave.addActionListener(listener);
-		buttonSave.setActionCommand(actionCommand);
+
 	}
 
 	private Container createRefinePanel() {
@@ -82,7 +79,7 @@ public class RefineView extends JDialog {
 			JLabel label = new JLabel(var.getLabel());
 			JList<LabelId> list = new JList<LabelId>();
 			label.setLabelFor(list);
-			// setup jlist
+			// TODO setup jlist
 			content.put(var, list);
 
 			mainPanel.add(varPanel);

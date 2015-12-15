@@ -1,5 +1,6 @@
 package de.tudresden.inf.lat.uel.core.processor;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -11,6 +12,7 @@ import java.util.Set;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLAnnotation;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
@@ -22,6 +24,7 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
+import org.semanticweb.owlapi.util.ShortFormProvider;
 
 import de.tudresden.inf.lat.uel.core.type.KRSSRenderer;
 import de.tudresden.inf.lat.uel.type.api.AtomManager;
@@ -32,6 +35,8 @@ import de.tudresden.inf.lat.uel.type.impl.ConceptName;
 import de.tudresden.inf.lat.uel.type.impl.EquationImpl;
 import de.tudresden.inf.lat.uel.type.impl.ExistentialRestriction;
 
+// TODO make this a singleton?
+
 /**
  * An object of this class connects the graphical user interface with the
  * processor.
@@ -41,36 +46,66 @@ import de.tudresden.inf.lat.uel.type.impl.ExistentialRestriction;
 public class UelModel {
 
 	public static final String classPrefix = "http://uel.sourceforge.net/entities/auxclass#A";
+	private static final OWLOntology emptyOntology = createEmptyOntology();
 
-	public static String getId(OWLEntity entity) {
+	private static OWLOntology createEmptyOntology() {
+		try {
+			return OWLManager.createOWLOntologyManager().createOntology(IRI.create("empty"));
+		} catch (OWLOntologyCreationException e) {
+			throw new Error(e);
+		}
+	}
+
+	private static String getId(OWLEntity entity) {
 		return entity.getIRI().toURI().toString();
 	}
 
-	private AtomManager atomManager = new AtomManagerImpl();
-	private String processorName;
-	private UelProcessor uelProcessor = null;
-	private List<Set<Equation>> unifierList = new ArrayList<Set<Equation>>();
-	private PluginGoal pluginGoal = null;
-	private OWLOntology auxOntology = null;
-	private Map<OWLClassExpression, Integer> mapOfAuxClassExpr = new HashMap<OWLClassExpression, Integer>();
-	private Map<String, String> mapIdLabel = null;
-	private int currentUnifierIndex = -1;
-	private boolean allUnifiersFound = false;
-
+	private boolean allUnifiersFound;
+	private AtomManager atomManager;
+	private OWLOntology auxOntology;
 	private int classCounter = 0;
+	private int currentUnifierIndex;
+	private Map<OWLClassExpression, Integer> mapOfAuxClassExpr;
+	private OWLOntologyManager ontologyManager;
+	private PluginGoal pluginGoal;
+	private Map<String, String> shortFormMap;
+	private ShortFormProvider shortFormProvider;
+	private UelProcessor uelProcessor;
+	private List<Set<Equation>> unifierList;
 
-	public UelModel() {
+	public UelModel(OWLOntologyManager ontologyManager, ShortFormProvider shortFormProvider) {
+		this.ontologyManager = ontologyManager;
+		this.shortFormProvider = shortFormProvider;
+		reset();
 	}
 
-	/**
-	 * Computes the next unifier. This unifier can be equivalent to another one
-	 * already computed.
-	 * 
-	 * @return <code>true</code> if and only if more unifiers can be computed
-	 * 
-	 * @throws InterruptedException
-	 *             if the process is interrupted
-	 */
+	private Integer abbreviateClassExpression(OWLClassExpression expr) {
+		this.classCounter++;
+		OWLOntologyManager manager = this.auxOntology.getOWLOntologyManager();
+		OWLDataFactory factory = manager.getOWLDataFactory();
+		IRI iri = IRI.create(classPrefix + classCounter);
+		OWLClass newClass = factory.getOWLClass(iri);
+		Integer ret = getAtomId(newClass);
+
+		this.mapOfAuxClassExpr.put(expr, ret);
+
+		OWLAxiom newDefinition = factory.getOWLEquivalentClassesAxiom(newClass, expr);
+		manager.addAxiom(auxOntology, newDefinition);
+
+		return ret;
+	}
+
+	private void addAllShortForms(OWLOntology ontology, Set<? extends OWLEntity> entities) {
+		for (OWLEntity entity : entities) {
+			String shortForm = getShortForm(entity, ontology);
+			shortFormMap.put(getId(entity), removeQuotes(shortForm));
+		}
+	}
+
+	public boolean allUnifiersFound() {
+		return allUnifiersFound;
+	}
+
 	public boolean computeNextUnifier() throws InterruptedException {
 		if (!allUnifiersFound) {
 			while (this.uelProcessor.computeNextUnifier()) {
@@ -85,8 +120,155 @@ public class UelModel {
 		return false;
 	}
 
-	public void setMapIdLabel(Map<String, String> map) {
-		mapIdLabel = map;
+	public void createUelProcessor(String name) {
+		uelProcessor = UelProcessorFactory.createProcessor(name, getPluginGoal().getUelInput());
+	}
+
+	private Integer findAuxiliaryDefinition(OWLClassExpression expr) {
+
+		Integer ret = this.mapOfAuxClassExpr.get(expr);
+		if (ret != null) {
+			return ret;
+		}
+
+		if (!expr.isAnonymous()) {
+			return getAtomId(expr.asOWLClass());
+		} else {
+			if (expr.asConjunctSet().size() > 1) {
+				return abbreviateClassExpression(expr);
+			} else {
+				if (!(expr instanceof OWLObjectSomeValuesFrom)) {
+					throw new IllegalArgumentException(
+							"Argument is neither a concept name, nor a conjunction, nor an existential restriction.");
+				}
+				OWLObjectSomeValuesFrom exists = (OWLObjectSomeValuesFrom) expr;
+				String roleName = exists.getProperty().getNamedProperty().toStringID();
+				OWLClassExpression filler = exists.getFiller();
+
+				Integer fillerId;
+				if (!filler.isAnonymous()) {
+					fillerId = getAtomId(filler.asOWLClass());
+				} else {
+					fillerId = this.mapOfAuxClassExpr.get(filler);
+					if (fillerId == null) {
+						fillerId = abbreviateClassExpression(filler);
+					}
+				}
+
+				ConceptName fillerConceptName = (ConceptName) atomManager.getAtom(fillerId);
+				ExistentialRestriction exprExistentialRestriction = atomManager.createExistentialRestriction(roleName,
+						fillerConceptName);
+				return atomManager.getAtoms().getIndex(exprExistentialRestriction);
+			}
+		}
+
+	}
+
+	public Integer getAtomId(OWLClass owlClass) {
+		ConceptName conceptName = atomManager.createConceptName(getId(owlClass), false);
+		return atomManager.getAtoms().getIndex(conceptName);
+	}
+
+	public AtomManager getAtomManager() {
+		return this.atomManager;
+	}
+
+	public Set<Equation> getCurrentUnifier() {
+		if (unifierList.size() == 0) {
+			return null;
+		}
+		return unifierList.get(currentUnifierIndex);
+	}
+
+	public int getCurrentUnifierIndex() {
+		return currentUnifierIndex;
+	}
+
+	public List<OWLOntology> getOntologyList() {
+		List<OWLOntology> list = new ArrayList<OWLOntology>();
+		list.add(emptyOntology);
+		list.addAll(ontologyManager.getOntologies());
+		return list;
+	}
+
+	public PluginGoal getPluginGoal() {
+		return this.pluginGoal;
+	}
+
+	public KRSSRenderer getRenderer(boolean shortForm) {
+		return new KRSSRenderer(atomManager, pluginGoal.getUserVariables(), pluginGoal.getAuxiliaryVariables(),
+				shortForm ? shortFormMap : null);
+	}
+
+	private String getShortForm(OWLEntity entity, OWLOntology ontology) {
+		if (shortFormProvider != null) {
+			return shortFormProvider.getShortForm(entity);
+		}
+
+		for (OWLAnnotation annotation : entity.getAnnotations(ontology,
+				ontologyManager.getOWLDataFactory().getRDFSLabel())) {
+			return annotation.getValue().toString();
+		}
+
+		return entity.getIRI().getShortForm();
+	}
+
+	public UelProcessor getUelProcessor() {
+		return this.uelProcessor;
+	}
+
+	public List<Set<Equation>> getUnifierList() {
+		return Collections.unmodifiableList(this.unifierList);
+	}
+
+	public void loadOntology(File file) {
+		try {
+			ontologyManager.loadOntologyFromOntologyDocument(file);
+		} catch (OWLOntologyCreationException e) {
+			throw new RuntimeException(e);
+		}
+		recomputeShortFormMap();
+	}
+
+	public String printCurrentUnifier(boolean shortForm) {
+		Set<Equation> unifier = getCurrentUnifier();
+		if (unifier == null) {
+			return "";
+		}
+		return getRenderer(shortForm).printUnifier(getCurrentUnifier());
+	}
+
+	public String printPluginGoal(boolean shortForm) {
+		return pluginGoal.print(getRenderer(shortForm));
+	}
+
+	public void recomputeShortFormMap() {
+		shortFormMap = new HashMap<String, String>();
+		for (OWLOntology ontology : ontologyManager.getOntologies()) {
+			addAllShortForms(ontology, ontology.getClassesInSignature());
+			addAllShortForms(ontology, ontology.getObjectPropertiesInSignature());
+		}
+	}
+
+	private String removeQuotes(String str) {
+		String ret = str;
+		if ((str.startsWith("\"") && str.endsWith("\"")) || (str.startsWith("'") && str.endsWith("'"))) {
+			ret = str.substring(1, str.length() - 1);
+		}
+		return ret;
+	}
+
+	public void reset() {
+		atomManager = new AtomManagerImpl();
+		uelProcessor = null;
+		pluginGoal = null;
+		mapOfAuxClassExpr = new HashMap<OWLClassExpression, Integer>();
+		classCounter = 0;
+		auxOntology = null;
+		unifierList = new ArrayList<Set<Equation>>();
+		currentUnifierIndex = -1;
+		allUnifiersFound = false;
+		recomputeShortFormMap();
 	}
 
 	public void setCurrentUnifierIndex(int index) {
@@ -99,23 +281,19 @@ public class UelModel {
 		}
 	}
 
-	public int getCurrentUnifierIndex() {
-		return currentUnifierIndex;
+	public void setShortFormMap(Map<String, String> map) {
+		shortFormMap = map;
 	}
 
-	public boolean allUnifiersFound() {
-		return allUnifiersFound;
-	}
-
-	public void configure(Set<OWLOntology> bgOntologies, OWLOntology positiveProblem, OWLOntology negativeProblem,
+	public void setupPluginGoal(Set<OWLOntology> bgOntologies, OWLOntology positiveProblem, OWLOntology negativeProblem,
 			OWLClass owlThingAlias) {
-		configure(bgOntologies, positiveProblem.getAxioms(AxiomType.SUBCLASS_OF),
+		setupPluginGoal(bgOntologies, positiveProblem.getAxioms(AxiomType.SUBCLASS_OF),
 				positiveProblem.getAxioms(AxiomType.EQUIVALENT_CLASSES),
 				negativeProblem.getAxioms(AxiomType.SUBCLASS_OF),
 				negativeProblem.getAxioms(AxiomType.EQUIVALENT_CLASSES), owlThingAlias);
 	}
 
-	public void configure(Set<OWLOntology> bgOntologies, Set<OWLSubClassOfAxiom> subsumptions,
+	public void setupPluginGoal(Set<OWLOntology> bgOntologies, Set<OWLSubClassOfAxiom> subsumptions,
 			Set<OWLEquivalentClassesAxiom> equations, Set<OWLSubClassOfAxiom> dissubsumptions,
 			Set<OWLEquivalentClassesAxiom> disequations, OWLClass owlThingAlias) {
 
@@ -195,131 +373,6 @@ public class UelModel {
 
 		pluginGoal.updateUelInput();
 
-	}
-
-	public Integer findAuxiliaryDefinition(OWLClassExpression expr) {
-
-		Integer ret = this.mapOfAuxClassExpr.get(expr);
-		if (ret != null) {
-			return ret;
-		}
-
-		if (!expr.isAnonymous()) {
-			return getAtomId(expr.asOWLClass());
-		} else {
-			if (expr.asConjunctSet().size() > 1) {
-				return abbreviateClassExpression(expr);
-			} else {
-				if (!(expr instanceof OWLObjectSomeValuesFrom)) {
-					throw new IllegalArgumentException(
-							"Argument is neither a concept name, nor a conjunction, nor an existential restriction.");
-				}
-				OWLObjectSomeValuesFrom exists = (OWLObjectSomeValuesFrom) expr;
-				String roleName = exists.getProperty().getNamedProperty().toStringID();
-				OWLClassExpression filler = exists.getFiller();
-
-				Integer fillerId;
-				if (!filler.isAnonymous()) {
-					fillerId = getAtomId(filler.asOWLClass());
-				} else {
-					fillerId = this.mapOfAuxClassExpr.get(filler);
-					if (fillerId == null) {
-						fillerId = abbreviateClassExpression(filler);
-					}
-				}
-
-				ConceptName fillerConceptName = (ConceptName) atomManager.getAtoms().get(fillerId);
-				ExistentialRestriction exprExistentialRestriction = atomManager.createExistentialRestriction(roleName,
-						fillerConceptName);
-				return atomManager.getAtoms().addAndGetIndex(exprExistentialRestriction);
-			}
-		}
-
-	}
-
-	public Integer getAtomId(OWLClass owlClass) {
-		ConceptName conceptName = atomManager.createConceptName(getId(owlClass), false);
-		return atomManager.getAtoms().addAndGetIndex(conceptName);
-	}
-
-	private Integer abbreviateClassExpression(OWLClassExpression expr) {
-		this.classCounter++;
-		OWLOntologyManager manager = this.auxOntology.getOWLOntologyManager();
-		OWLDataFactory factory = manager.getOWLDataFactory();
-		IRI iri = IRI.create(classPrefix + classCounter);
-		OWLClass newClass = factory.getOWLClass(iri);
-		Integer ret = getAtomId(newClass);
-
-		this.mapOfAuxClassExpr.put(expr, ret);
-
-		OWLAxiom newDefinition = factory.getOWLEquivalentClassesAxiom(newClass, expr);
-		manager.addAxiom(auxOntology, newDefinition);
-
-		return ret;
-	}
-
-	public AtomManager getAtomManager() {
-		return this.atomManager;
-	}
-
-	public PluginGoal getPluginGoal() {
-		return this.pluginGoal;
-	}
-
-	public String getProcessorName() {
-		return this.processorName;
-	}
-
-	public UelProcessor getUelProcessor() {
-		return this.uelProcessor;
-	}
-
-	public KRSSRenderer getRenderer(boolean shortForm) {
-		return new KRSSRenderer(atomManager, pluginGoal.getUserVariables(), pluginGoal.getAuxiliaryVariables(),
-				shortForm ? mapIdLabel : null);
-	}
-
-	public Set<Equation> getCurrentUnifier() {
-		if (unifierList.size() == 0) {
-			return null;
-		}
-		return unifierList.get(currentUnifierIndex);
-	}
-
-	public String printCurrentUnifier(boolean shortForm) {
-		Set<Equation> unifier = getCurrentUnifier();
-		if (unifier == null) {
-			return "";
-		}
-		return getRenderer(shortForm).printUnifier(getCurrentUnifier());
-	}
-
-	public List<Set<Equation>> getUnifierList() {
-		return Collections.unmodifiableList(this.unifierList);
-	}
-
-	public String printPluginGoal(boolean shortForm) {
-		return pluginGoal.print(getRenderer(shortForm));
-	}
-
-	public void reset() {
-		this.atomManager = new AtomManagerImpl();
-		this.pluginGoal = null;
-		this.mapOfAuxClassExpr.clear();
-		this.classCounter = 0;
-		this.auxOntology = null;
-		this.unifierList.clear();
-	}
-
-	public void setProcessorName(String name) {
-		if (!UelProcessorFactory.getProcessorNames().contains(name)) {
-			throw new IllegalArgumentException("Processor name is invalid: '" + name + "'.");
-		}
-		this.processorName = name;
-	}
-
-	public void setUelProcessor(UelProcessor processor) {
-		this.uelProcessor = processor;
 	}
 
 }

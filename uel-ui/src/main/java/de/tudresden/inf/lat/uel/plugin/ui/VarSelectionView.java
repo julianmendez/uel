@@ -35,19 +35,16 @@ class VarSelectionView extends JDialog {
 		UelUI.setupWindow(this, createMainPanel());
 	}
 
-	public void addAcceptVarButtonListener(ActionListener listener, String actionCommand) {
-		this.acceptVarButton.addActionListener(listener);
-		this.acceptVarButton.setActionCommand(actionCommand);
+	public void addAcceptVarListener(ActionListener listener) {
+		acceptVarButton.addActionListener(listener);
 	}
 
-	public void addMakeConsButtonListener(ActionListener listener, String actionCommand) {
-		this.makeConsButton.addActionListener(listener);
-		this.makeConsButton.setActionCommand(actionCommand);
+	public void addMakeConsListener(ActionListener listener) {
+		makeConsButton.addActionListener(listener);
 	}
 
-	public void addMakeVarButtonListener(ActionListener listener, String actionCommand) {
-		this.makeVarButton.addActionListener(listener);
-		this.makeVarButton.setActionCommand(actionCommand);
+	public void addMakeVarListener(ActionListener listener) {
+		makeVarButton.addActionListener(listener);
 	}
 
 	private Component createButtons() {

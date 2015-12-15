@@ -47,7 +47,7 @@ public interface Message {
 	String tooltipSaveGoal = "saves the goal to a file";
 	String tooltipSelectProcessor = "selects the processor";
 	String tooltipSelectVariables = "gets candidates for variables";
-	String tooltipShowStatInfo = "shows statistical information before computing the first unifier";
+	String tooltipShowStatInfo = "shows additional information about the computation";
 	String tooltipTextInfo = "statistical information given by the processor";
 	String tooltipUnifier = "unifier";
 	String tooltipUnifierId = "unifier id";

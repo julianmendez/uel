@@ -229,8 +229,8 @@ public class AlternativeUelStarter {
 	public Iterator<Set<OWLUelClassDefinition>> modifyOntologyAndSolve(OWLOntology positiveProblem,
 			OWLOntology negativeProblem, Set<OWLClass> variables, String processorName) {
 
-		UelModel uelModel = new UelModel();
-		uelModel.configure(ontologies, positiveProblem, negativeProblem, owlThingAlias);
+		UelModel uelModel = new UelModel(ontologyManager, null);
+		uelModel.setupPluginGoal(ontologies, positiveProblem, negativeProblem, owlThingAlias);
 
 		return modifyOntologyAndSolve(uelModel, variables, processorName);
 	}
@@ -239,8 +239,8 @@ public class AlternativeUelStarter {
 			Set<OWLEquivalentClassesAxiom> equations, Set<OWLSubClassOfAxiom> dissubsumptions,
 			Set<OWLEquivalentClassesAxiom> disequations, Set<OWLClass> variables, String processorName) {
 
-		UelModel uelModel = new UelModel();
-		uelModel.configure(ontologies, subsumptions, equations, dissubsumptions, disequations, owlThingAlias);
+		UelModel uelModel = new UelModel(ontologyManager, null);
+		uelModel.setupPluginGoal(ontologies, subsumptions, equations, dissubsumptions, disequations, owlThingAlias);
 
 		return modifyOntologyAndSolve(uelModel, variables, processorName);
 	}

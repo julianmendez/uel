@@ -15,33 +15,18 @@ import de.tudresden.inf.lat.uel.core.processor.UelModel;
  * 
  * @author Julian Mendez
  */
-class StatInfoController implements ActionListener {
+class StatInfoController {
 
 	private static final String colon = ": ";
 	private static final String newLine = "\n";
-	private static final String actionSaveButton = "save goal";
 
-	private StatInfoView view;
-	private UelModel model;
+	private final UelModel model;
+	private final StatInfoView view;
 
-	public StatInfoController(StatInfoView view, UelModel model) {
-		this.view = view;
+	public StatInfoController(UelModel model) {
+		this.view = new StatInfoView();
 		this.model = model;
 		init();
-	}
-
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		if (e == null) {
-			throw new IllegalArgumentException("Null argument.");
-		}
-
-		String cmd = e.getActionCommand();
-		if (cmd.equals(actionSaveButton)) {
-			executeSaveGoal();
-		} else {
-			throw new IllegalStateException();
-		}
 	}
 
 	private void executeSaveGoal() {
@@ -61,7 +46,11 @@ class StatInfoController implements ActionListener {
 	}
 
 	private void init() {
-		view.addSaveButtonListener(this, actionSaveButton);
+		view.addSaveListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				executeSaveGoal();
+			}
+		});
 	}
 
 	public void open() {

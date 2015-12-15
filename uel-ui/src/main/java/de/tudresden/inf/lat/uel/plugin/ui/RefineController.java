@@ -4,6 +4,7 @@
 package de.tudresden.inf.lat.uel.plugin.ui;
 
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -16,39 +17,35 @@ import de.tudresden.inf.lat.uel.type.api.Equation;
  */
 public class RefineController {
 
-	private RefineView view;
-	private UelModel model;
+	private final RefineView view;
+	private final UelModel model;
 
-	public RefineController(RefineView view, UelModel model) {
-		this.view = view;
+	public RefineController(UelModel model) {
+		this.view = new RefineView();
 		this.model = model;
 	}
 
-	public void addButtonRecomputeListener(ActionListener listener, String actionCommand) {
-		getView().addButtonRecomputeListener(listener, actionCommand);
+	public void addRecomputeListener(ActionListener listener) {
+		view.addRecomputeListener(listener);
 	}
 
-	public void addButtonSaveListener(ActionListener listener, String actionCommand) {
-		getView().addButtonSaveListener(listener, actionCommand);
-	}
-
-	public RefineView getView() {
-		return view;
-	}
-
-	private UelModel getModel() {
-		return model;
+	public void addSaveListener(ActionListener listener) {
+		view.addSaveListener(listener);
 	}
 
 	public String getDissubsumptions() {
 		Set<Equation> dissubsumptions = new HashSet<Equation>();
 		// TODO transform each marked atom into a dissubsumption
-		return getModel().getRenderer(false).printUnifier(dissubsumptions);
+		return model.getRenderer(false).printUnifier(dissubsumptions);
 	}
 
 	public void open() {
 		updateView();
-		getView().setVisible(true);
+		view.setVisible(true);
+	}
+
+	public File showSaveFileDialog() {
+		return UelUI.showSaveFileDialog(view);
 	}
 
 	private void updateView() {
@@ -56,8 +53,8 @@ public class RefineController {
 	}
 
 	public void close() {
-		getView().setVisible(false);
-		getView().dispose();
+		view.setVisible(false);
+		view.dispose();
 	}
 
 }
