@@ -26,6 +26,11 @@ public class UnifierController {
 		view.addRefineListener(listener);
 	}
 
+	public void close() {
+		view.setVisible(false);
+		view.dispose();
+	}
+
 	private void executeFirst() {
 		model.setCurrentUnifierIndex(0);
 		updateUnifierView();

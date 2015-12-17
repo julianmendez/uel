@@ -141,7 +141,7 @@ public class KRSSRenderer {
 		return getLabel(id, true);
 	}
 
-	public String getLabel(String id, boolean quotes) {
+	private String getLabel(String id, boolean quotes) {
 		boolean alias = false;
 		String label = id;
 		if (id.endsWith(AtomManager.UNDEF_SUFFIX)) {
@@ -189,8 +189,12 @@ public class KRSSRenderer {
 	}
 
 	public String printAtom(Integer atomId) {
+		return printAtom(atomId, new HashSet<Equation>(), false);
+	}
+
+	public String printAtom(Integer atomId, Set<Equation> equations, boolean restrictToUserVariables) {
 		StringBuffer sbuf = new StringBuffer();
-		appendAtomId(sbuf, atomId);
+		appendAtomId(sbuf, atomId, equations, restrictToUserVariables);
 		return sbuf.toString();
 	}
 

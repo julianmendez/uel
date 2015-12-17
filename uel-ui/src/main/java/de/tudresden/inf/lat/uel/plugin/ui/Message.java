@@ -20,6 +20,7 @@ public interface Message {
 	String buttonSaveGoal = "Save";
 	String buttonSelectVariables = ">";
 	String buttonShowStatInfo = "Stat";
+	String textRefineExplanation = "Select the atoms that should not subsume the respective variable:";
 	String titleError = "Error";
 	String textOntologyBg00 = "First background ontology:";
 	String textOntologyBg01 = "Second background ontology:";
@@ -41,6 +42,7 @@ public interface Message {
 	String tooltipPrevious = "shows the previous unifier";
 	String tooltipRecompute = "extend the negative ontology and recompute unifiers";
 	String tooltipRefine = "refine unifier using dissubsumptions";
+	String tooltipRefineAtoms = "choose atoms that should not subsume the variable";
 	String tooltipRejectVar = "cancels this selection of variables";
 	String tooltipSave = "saves the current unifier into a file";
 	String tooltipSaveDissub = "save extended negative ontology and recompute unifiers";
@@ -51,6 +53,7 @@ public interface Message {
 	String tooltipTextInfo = "statistical information given by the processor";
 	String tooltipUnifier = "unifier";
 	String tooltipUnifierId = "unifier id";
+	String tooltipVariableName = "subsumed variable";
 	String tooltipVariables = "variables";
 
 }

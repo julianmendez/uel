@@ -33,7 +33,6 @@ import de.tudresden.inf.lat.jcel.owlapi.main.JcelReasonerFactory;
 import de.tudresden.inf.lat.uel.core.type.KRSSRenderer;
 import de.tudresden.inf.lat.uel.type.api.AtomManager;
 import de.tudresden.inf.lat.uel.type.api.Equation;
-import de.tudresden.inf.lat.uel.type.impl.ConceptName;
 
 @RunWith(value = Parameterized.class)
 public class ProcessorTest {
@@ -76,12 +75,10 @@ public class ProcessorTest {
 	}
 
 	private void makeVariable(UelModel model, String atomName, boolean undef) {
-		AtomManager atomManager = model.getAtomManager();
 		if (undef) {
 			atomName += AtomManager.UNDEF_SUFFIX;
 		}
-		ConceptName conceptName = atomManager.createConceptName(atomName, true);
-		model.getPluginGoal().makeUserVariable(atomManager.getAtoms().getIndex(conceptName));
+		model.getPluginGoal().makeUserVariable(model.getAtomId(atomName));
 	}
 
 	@Parameters(name = "{index}: {0}, {4}")
@@ -164,8 +161,7 @@ public class ProcessorTest {
 		}
 
 		List<Set<Equation>> unifiers = uelModel.getUnifierList();
-		KRSSRenderer renderer = new KRSSRenderer(uelModel.getAtomManager(), uelModel.getPluginGoal().getUserVariables(),
-				uelModel.getPluginGoal().getAuxiliaryVariables(), null);
+		KRSSRenderer renderer = uelModel.getRenderer(false);
 		String goalStr = renderer.printDefinitions(uelModel.getPluginGoal().getUelInput().getDefinitions());
 
 		for (Set<Equation> unifier : unifiers) {

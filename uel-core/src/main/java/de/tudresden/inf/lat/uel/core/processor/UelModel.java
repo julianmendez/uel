@@ -27,6 +27,8 @@ import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 import org.semanticweb.owlapi.util.ShortFormProvider;
 
 import de.tudresden.inf.lat.uel.core.type.KRSSRenderer;
+import de.tudresden.inf.lat.uel.core.type.UnifierTranslator;
+import de.tudresden.inf.lat.uel.type.api.Atom;
 import de.tudresden.inf.lat.uel.type.api.AtomManager;
 import de.tudresden.inf.lat.uel.type.api.Equation;
 import de.tudresden.inf.lat.uel.type.api.UelProcessor;
@@ -46,13 +48,13 @@ import de.tudresden.inf.lat.uel.type.impl.ExistentialRestriction;
 public class UelModel {
 
 	public static final String classPrefix = "http://uel.sourceforge.net/entities/auxclass#A";
-	private static final OWLOntology emptyOntology = createEmptyOntology();
+	public static final OWLOntology emptyOntology = createEmptyOntology();
 
 	private static OWLOntology createEmptyOntology() {
 		try {
 			return OWLManager.createOWLOntologyManager().createOntology(IRI.create("empty"));
 		} catch (OWLOntologyCreationException e) {
-			throw new Error(e);
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -120,6 +122,14 @@ public class UelModel {
 		return false;
 	}
 
+	public OWLOntology createOntology(String name) {
+		try {
+			return ontologyManager.createOntology(IRI.create(name));
+		} catch (OWLOntologyCreationException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 	public void createUelProcessor(String name) {
 		uelProcessor = UelProcessorFactory.createProcessor(name, getPluginGoal().getUelInput());
 	}
@@ -161,16 +171,23 @@ public class UelModel {
 				return atomManager.getAtoms().getIndex(exprExistentialRestriction);
 			}
 		}
+	}
 
+	public Integer getAtomId(Atom atom) {
+		return atomManager.getAtoms().getIndex(atom);
 	}
 
 	public Integer getAtomId(OWLClass owlClass) {
-		ConceptName conceptName = atomManager.createConceptName(getId(owlClass), false);
+		return getAtomId(getId(owlClass));
+	}
+
+	public Integer getAtomId(String name) {
+		ConceptName conceptName = atomManager.createConceptName(name, false);
 		return atomManager.getAtoms().getIndex(conceptName);
 	}
 
-	public AtomManager getAtomManager() {
-		return this.atomManager;
+	public String getAtomName(Integer id) {
+		return atomManager.printConceptName(atomManager.getAtom(id));
 	}
 
 	public Set<Equation> getCurrentUnifier() {
@@ -213,6 +230,11 @@ public class UelModel {
 		return entity.getIRI().getShortForm();
 	}
 
+	public UnifierTranslator getTranslator() {
+		return new UnifierTranslator(ontologyManager.getOWLDataFactory(), atomManager,
+				pluginGoal.getUelInput().getUserVariables(), pluginGoal.getAuxiliaryVariables());
+	}
+
 	public UelProcessor getUelProcessor() {
 		return this.uelProcessor;
 	}
@@ -228,6 +250,18 @@ public class UelModel {
 			throw new RuntimeException(e);
 		}
 		recomputeShortFormMap();
+	}
+
+	public void markUndefAsUserVariables() {
+		// mark all "_UNDEF" variables as user variables
+		for (Atom at : atomManager.getAtoms()) {
+			if (at.isConceptName()) {
+				String name = atomManager.printConceptName(at);
+				if (name.endsWith(AtomManager.UNDEF_SUFFIX)) {
+					pluginGoal.makeUserVariable(getAtomId(at));
+				}
+			}
+		}
 	}
 
 	public String printCurrentUnifier(boolean shortForm) {
@@ -250,7 +284,7 @@ public class UelModel {
 		}
 	}
 
-	private String removeQuotes(String str) {
+	public static String removeQuotes(String str) {
 		String ret = str;
 		if ((str.startsWith("\"") && str.endsWith("\"")) || (str.startsWith("'") && str.endsWith("'"))) {
 			ret = str.substring(1, str.length() - 1);
@@ -372,7 +406,6 @@ public class UelModel {
 		}
 
 		pluginGoal.updateUelInput();
-
 	}
 
 }

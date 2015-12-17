@@ -3,10 +3,8 @@
  */
 package de.tudresden.inf.lat.uel.plugin.ui;
 
-import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.Frame;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
 import java.util.List;
@@ -15,27 +13,23 @@ import java.util.Map;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
 import javax.swing.JList;
-import javax.swing.JPanel;
 
 /**
  * @author Stefan Borgwardt
  *
  */
-public class RefineView extends JDialog {
+public final class RefineView extends UelDialog {
 
 	private static final long serialVersionUID = 6093665334232206919L;
 
 	private final JButton buttonRecompute = new JButton();
 	private final JButton buttonSave = new JButton();
-	private final Container mainPanel = new Box(BoxLayout.X_AXIS);
+	private final Box selectionPanel = new Box(BoxLayout.X_AXIS);
 	private Map<LabelId, JList<LabelId>> content = null;
 
 	public RefineView() {
-		super((Frame) null, "Refine unifier", true);
-		UelUI.setupWindow(this, createRefinePanel());
+		setup("Refine unifier");
 	}
 
 	public void addRecomputeListener(ActionListener listener) {
@@ -47,44 +41,59 @@ public class RefineView extends JDialog {
 
 	}
 
-	private Container createRefinePanel() {
-		Container ret = new Box(BoxLayout.Y_AXIS);
+	@Override
+	protected void addMainPanel(Container parent) {
+		Container mainPanel = UelUI.addVerticalPanel(parent);
 
-		ret.add(createButtons());
+		addButtonPanel(mainPanel);
 
-		ret.add(Box.createVerticalStrut(UelUI.GAP_SIZE));
+		UelUI.addStrut(mainPanel);
 
-		UelUI.setupScrollPane(ret, mainPanel, "", new Dimension(640, 480));
+		Container auxPanel = UelUI.addVerticalPanel(mainPanel);
+		UelUI.addLabel(auxPanel, Message.textRefineExplanation);
 
-		return ret;
+		UelUI.addStrut(auxPanel);
+
+		selectionPanel.setAlignmentX(LEFT_ALIGNMENT);
+		UelUI.addScrollPane(auxPanel, selectionPanel, "", new Dimension(640, 480));
 	}
 
-	private Component createButtons() {
-		Container buttonPanel = new JPanel();
+	private void addButtonPanel(Container parent) {
+		Container buttonPanel = UelUI.addButtonPanel(parent);
 
 		UelUI.setupButton(buttonPanel, buttonRecompute, UelUI.ICON_FORWARD, Message.tooltipRecompute);
 
 		UelUI.setupButton(buttonPanel, buttonSave, UelUI.ICON_SAVE, Message.tooltipSaveDissub);
+	}
 
-		return buttonPanel;
+	public Map<LabelId, List<LabelId>> getSelectedAtoms() {
+		Map<LabelId, List<LabelId>> map = new HashMap<LabelId, List<LabelId>>();
+
+		for (LabelId var : content.keySet()) {
+			map.put(var, content.get(var).getSelectedValuesList());
+		}
+
+		return map;
 	}
 
 	public void updateSelectionPanels(Map<LabelId, List<LabelId>> unifier) {
-		mainPanel.removeAll();
+		selectionPanel.removeAll();
 		content = new HashMap<LabelId, JList<LabelId>>();
 
 		for (LabelId var : unifier.keySet()) {
-			Container varPanel = new Box(BoxLayout.Y_AXIS);
+			List<LabelId> atoms = unifier.get(var);
 
-			JLabel label = new JLabel(var.getLabel());
-			JList<LabelId> list = new JList<LabelId>();
-			label.setLabelFor(list);
-			// TODO setup jlist
+			Container varPanel = UelUI.addVerticalPanel(selectionPanel);
+
+			UelUI.addLabel(varPanel, var.getLabel(), Message.tooltipVariableName);
+
+			UelUI.addStrut(varPanel);
+
+			JList<LabelId> list = UelUI.addList(varPanel, atoms, Message.tooltipRefineAtoms);
 			content.put(var, list);
-
-			mainPanel.add(varPanel);
-			mainPanel.add(Box.createHorizontalStrut(UelUI.GAP_SIZE));
 		}
+
+		UelUI.addGlue(selectionPanel);
 	}
 
 }

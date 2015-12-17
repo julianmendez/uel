@@ -41,10 +41,14 @@ public class OntologyRenderer {
 	public OntologyRenderer() {
 	}
 
-	public static OWLOntology parseOntology(String ontology) throws OWLOntologyCreationException {
-		OWLOntologyManager ontologyManager = OWLManager.createOWLOntologyManager();
-		ByteArrayInputStream input = new ByteArrayInputStream(ontology.getBytes());
-		return ontologyManager.loadOntologyFromOntologyDocument(input);
+	public static OWLOntology parseOntology(String ontology) {
+		try {
+			OWLOntologyManager ontologyManager = OWLManager.createOWLOntologyManager();
+			ByteArrayInputStream input = new ByteArrayInputStream(ontology.getBytes());
+			return ontologyManager.loadOntologyFromOntologyDocument(input);
+		} catch (OWLOntologyCreationException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	private static String renderKRSS(OWLOntology owlOntology) throws OWLRendererException {
@@ -72,11 +76,7 @@ public class OntologyRenderer {
 	}
 
 	public static void saveToOntologyFile(String ontology, File file) {
-		try {
-			saveToOntologyFile(parseOntology(ontology), file);
-		} catch (OWLOntologyCreationException e) {
-			throw new RuntimeException(e);
-		}
+		saveToOntologyFile(parseOntology(ontology), file);
 	}
 
 	public static void saveToOntologyFile(OWLOntology owlOntology, File file) {
@@ -95,9 +95,7 @@ public class OntologyRenderer {
 				writer.write(ontology);
 				writer.flush();
 				writer.close();
-			} catch (OWLRendererException e) {
-				throw new RuntimeException(e);
-			} catch (IOException e) {
+			} catch (OWLRendererException | IOException e) {
 				throw new RuntimeException(e);
 			}
 		}

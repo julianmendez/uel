@@ -6,13 +6,19 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridBagLayout;
 import java.awt.Image;
-import java.awt.image.BufferedImage;
+import java.awt.LayoutManager;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.List;
+import java.util.Vector;
 
 import javax.imageio.ImageIO;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.DefaultListCellRenderer;
+import javax.swing.DefaultListSelectionModel;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -21,9 +27,9 @@ import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
@@ -85,8 +91,34 @@ public class UelUI {
 		}
 	}
 
-	public static final int DEFAULT_ICON_SIZE = 18;
-	public static final int GAP_SIZE = 6;
+	static class ToggleListSelectionModel extends DefaultListSelectionModel {
+
+		private static final long serialVersionUID = -187853559553210017L;
+
+		boolean gestureStarted = false;
+
+		@Override
+		public void setSelectionInterval(int index0, int index1) {
+			if (!gestureStarted) {
+				if (isSelectedIndex(index0)) {
+					super.removeSelectionInterval(index0, index1);
+				} else {
+					super.addSelectionInterval(index0, index1);
+				}
+			}
+			gestureStarted = true;
+		}
+
+		@Override
+		public void setValueIsAdjusting(boolean isAdjusting) {
+			if (isAdjusting == false) {
+				gestureStarted = false;
+			}
+		}
+	}
+
+	private static final int DEFAULT_ICON_SIZE = 18;
+	private static final int GAP_SIZE = 6;
 
 	public static final String PATH_BACK = "icons/back.png";
 	public static final String PATH_FAST_FORWARD = "icons/fastforward.png";
@@ -99,21 +131,101 @@ public class UelUI {
 	public static final String PATH_STEP_BACK = "icons/stepback.png";
 	public static final String PATH_STEP_FORWARD = "icons/stepforward.png";
 
-	public static final ImageIcon ICON_BACK = createIcon(PATH_BACK);
-	public static final ImageIcon ICON_FAST_FORWARD = createIcon(PATH_FAST_FORWARD);
-	public static final ImageIcon ICON_FORWARD = createIcon(PATH_FORWARD);
-	public static final ImageIcon ICON_OPEN = createIcon(PATH_OPEN);
-	public static final ImageIcon ICON_REFINE = createIcon(PATH_REFINE);
-	public static final ImageIcon ICON_REWIND = createIcon(PATH_REWIND);
-	public static final ImageIcon ICON_SAVE = createIcon(PATH_SAVE);
-	public static final ImageIcon ICON_STATISTICS = createIcon(PATH_STATISTICS);
-	public static final ImageIcon ICON_STEP_BACK = createIcon(PATH_STEP_BACK);
-	public static final ImageIcon ICON_STEP_FORWARD = createIcon(PATH_STEP_FORWARD);
+	public static final Icon ICON_BACK = createIcon(PATH_BACK);
+	public static final Icon ICON_FAST_FORWARD = createIcon(PATH_FAST_FORWARD);
+	public static final Icon ICON_FORWARD = createIcon(PATH_FORWARD);
+	public static final Icon ICON_OPEN = createIcon(PATH_OPEN);
+	public static final Icon ICON_REFINE = createIcon(PATH_REFINE);
+	public static final Icon ICON_REWIND = createIcon(PATH_REWIND);
+	public static final Icon ICON_SAVE = createIcon(PATH_SAVE);
+	public static final Icon ICON_STATISTICS = createIcon(PATH_STATISTICS);
+	public static final Icon ICON_STEP_BACK = createIcon(PATH_STEP_BACK);
+	public static final Icon ICON_STEP_FORWARD = createIcon(PATH_STEP_FORWARD);
 
-	public static void addLabel(Container parent, String text) {
+	public static void setBorder(JComponent comp) {
+		Border line = new LineBorder(new Color(150, 150, 150));
+		Border margin = new EmptyBorder(0, 4, 0, 4);
+		Border compound = new CompoundBorder(line, margin);
+		comp.setBorder(compound);
+	}
+
+	public static Container addButtonPanel(Container parent) {
+		JPanel panel = new JPanel();
+		setupContainer(parent, panel);
+		return panel;
+	}
+
+	public static void addGlue(Container parent) {
+		LayoutManager layout = parent.getLayout();
+		if ((layout instanceof BoxLayout) && (((BoxLayout) layout).getAxis() == BoxLayout.Y_AXIS)) {
+			parent.add(Box.createVerticalGlue());
+		} else {
+			parent.add(Box.createHorizontalGlue());
+		}
+	}
+
+	public static Container addHorizontalPanel(Container parent) {
+		Box box = Box.createHorizontalBox();
+		setupContainer(parent, box);
+		return box;
+	}
+
+	public static JLabel addLabel(Container parent, String text) {
+		return addLabel(parent, text, "");
+	}
+
+	public static JLabel addLabel(Container parent, String text, String tooltipText) {
 		JLabel label = new JLabel(text);
-		label.setHorizontalAlignment(SwingConstants.CENTER);
-		parent.add(label);
+		setupLabel(parent, label, tooltipText, null);
+		return label;
+	}
+
+	public static <T> JList<T> addList(Container parent, List<T> data, String tooltipText) {
+		JList<T> list = new JList<T>(new Vector<T>(data));
+		list.setToolTipText(tooltipText);
+		list.setAlignmentX(Component.LEFT_ALIGNMENT);
+		list.setSelectionModel(new ToggleListSelectionModel());
+		setBorder(list);
+		parent.add(list);
+		return list;
+	}
+
+	public static JScrollPane addScrollPane(Container parent, Component child, String tooltipText,
+			Dimension preferredSize) {
+		if (!tooltipText.equals("")) {
+			((JComponent) child).setToolTipText(tooltipText);
+		}
+		JScrollPane scrollPane = new JScrollPane(child);
+		if (preferredSize != null) {
+			scrollPane.setPreferredSize(preferredSize);
+		}
+		scrollPane.setOpaque(false);
+		scrollPane.getViewport().setOpaque(false);
+		setBorder(scrollPane);
+		parent.add(scrollPane);
+		return scrollPane;
+	}
+
+	public static JScrollPane addScrollTextArea(Container parent, JTextArea textArea, String tooltipText,
+			Dimension preferredSize) {
+		textArea.setWrapStyleWord(true);
+		textArea.setLineWrap(true);
+		return addScrollPane(parent, textArea, tooltipText, preferredSize);
+	}
+
+	public static void addStrut(Container parent) {
+		LayoutManager layout = parent.getLayout();
+		if ((layout instanceof BoxLayout) && (((BoxLayout) layout).getAxis() == BoxLayout.Y_AXIS)) {
+			parent.add(Box.createVerticalStrut(GAP_SIZE));
+		} else {
+			parent.add(Box.createHorizontalStrut(GAP_SIZE));
+		}
+	}
+
+	public static Container addVerticalPanel(Container parent) {
+		Box box = Box.createVerticalBox();
+		setupContainer(parent, box);
+		return box;
 	}
 
 	/**
@@ -123,7 +235,7 @@ public class UelUI {
 	 *            of icon
 	 * @return an icon, or <code>null</code> if the path is invalid
 	 */
-	public static ImageIcon createIcon(String path) {
+	public static Icon createIcon(String path) {
 		return createIcon(path, DEFAULT_ICON_SIZE);
 	}
 
@@ -138,45 +250,31 @@ public class UelUI {
 	 * @return an icon with the given size, or <code>null</code> if the path is
 	 *         invalid
 	 */
-	public static ImageIcon createIcon(String path, int size) {
-		ImageIcon ret = null;
+	public static Icon createIcon(String path, int size) {
 		try {
 			URL url = UelUI.class.getClassLoader().getResource(path);
 			if (url == null) {
-				try {
-					throw new IllegalArgumentException("Icon has an invalid path: '" + path + "'.");
-				} catch (IllegalArgumentException e) {
-					e.printStackTrace();
-				}
-
+				throw new IllegalArgumentException("Icon has an invalid path: '" + path + "'.");
 			} else {
-				BufferedImage img = ImageIO.read(url);
-				ret = new ImageIcon(img.getScaledInstance(size, size, Image.SCALE_SMOOTH));
-
+				return new ImageIcon(ImageIO.read(url).getScaledInstance(size, size, Image.SCALE_SMOOTH));
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
-		return ret;
 	}
 
-	public static void setupWindow(JDialog window, Component child) {
-		window.setLocation(200, 200);
-		window.setSize(new Dimension(800, 600));
-		window.setMinimumSize(new Dimension(200, 200));
-		window.setLayout(new GridBagLayout());
-		window.add(child);
-		window.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-	}
-
-	public static void setupButton(Container parent, JButton button, ImageIcon icon, String toolTipText) {
+	public static void setupButton(Container parent, JButton button, Icon icon, String toolTipText) {
 		button.setIcon(icon);
 		button.setToolTipText(toolTipText);
-		Border line = new LineBorder(new Color(150, 150, 150));
-		Border margin = new EmptyBorder(0, 4, 0, 4);
-		Border compound = new CompoundBorder(line, margin);
-		button.setBorder(compound);
+		setBorder(button);
 		parent.add(button);
+	}
+
+	private static void setupContainer(Container parent, JComponent comp) {
+		comp.setAlignmentX(Component.CENTER_ALIGNMENT);
+		comp.setAlignmentY(Component.TOP_ALIGNMENT);
+		comp.setMinimumSize(new Dimension(0, 0));
+		parent.add(comp);
 	}
 
 	public static <E> void setupComboBox(Container parent, JComboBox<E> comboBox, String tooltipText) {
@@ -189,44 +287,33 @@ public class UelUI {
 
 	public static void setupLabel(Container parent, JLabel label, String tooltipText, Dimension preferredSize) {
 		label.setToolTipText(tooltipText);
-		label.setHorizontalAlignment(SwingConstants.CENTER);
+		label.setAlignmentX(Component.LEFT_ALIGNMENT);
 		if (preferredSize != null) {
 			label.setPreferredSize(preferredSize);
 		}
 		parent.add(label);
 	}
 
-	public static void setupScrollPane(Container parent, Component child, String tooltipText, Dimension preferredSize) {
-		if (!tooltipText.equals("")) {
-			((JComponent) child).setToolTipText(tooltipText);
-		}
-		JScrollPane scrollPane = new JScrollPane(child);
-		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-		if (preferredSize != null) {
-			scrollPane.setPreferredSize(preferredSize);
-		}
-		parent.add(scrollPane);
+	public static void setupWindow(JDialog window) {
+		window.setLocation(200, 200);
+		window.setSize(new Dimension(800, 600));
+		window.setMinimumSize(new Dimension(200, 200));
+		window.setLayout(new GridBagLayout());
+		window.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 	}
 
-	public static void setupScrollTextArea(Container parent, JTextArea textArea, String tooltipText,
-			Dimension preferredSize) {
-		textArea.setWrapStyleWord(true);
-		textArea.setLineWrap(true);
-		setupScrollPane(parent, textArea, tooltipText, preferredSize);
-	}
-
-	public static File showSaveFileDialog(Component parent) {
+	public static File showOpenFileDialog(Component parent) {
 		JFileChooser fileChooser = new JFileChooser();
-		if (fileChooser.showSaveDialog(parent) == JFileChooser.APPROVE_OPTION) {
+		if (fileChooser.showOpenDialog(parent) == JFileChooser.APPROVE_OPTION) {
 			return fileChooser.getSelectedFile();
 		} else {
 			return null;
 		}
 	}
 
-	public static File showOpenFileDialog(Component parent) {
+	public static File showSaveFileDialog(Component parent) {
 		JFileChooser fileChooser = new JFileChooser();
-		if (fileChooser.showOpenDialog(parent) == JFileChooser.APPROVE_OPTION) {
+		if (fileChooser.showSaveDialog(parent) == JFileChooser.APPROVE_OPTION) {
 			return fileChooser.getSelectedFile();
 		} else {
 			return null;

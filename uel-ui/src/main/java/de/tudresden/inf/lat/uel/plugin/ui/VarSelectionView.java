@@ -1,26 +1,21 @@
 package de.tudresden.inf.lat.uel.plugin.ui;
 
-import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.Frame;
 import java.awt.event.ActionListener;
 import java.util.Collection;
 import java.util.List;
+import java.util.Vector;
 
-import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JList;
-import javax.swing.JPanel;
 
 /**
  * This is the panel to select the variables in a given unification problem.
  * 
  * @author Julian Mendez
  */
-class VarSelectionView extends JDialog {
+public final class VarSelectionView extends UelDialog {
 
 	private static final long serialVersionUID = 1742164773153032359L;
 
@@ -31,8 +26,7 @@ class VarSelectionView extends JDialog {
 	private final JButton makeVarButton = new JButton();
 
 	public VarSelectionView() {
-		super((Frame) null, "Variable selection", true);
-		UelUI.setupWindow(this, createMainPanel());
+		setup("Variable selection");
 	}
 
 	public void addAcceptVarListener(ActionListener listener) {
@@ -47,38 +41,35 @@ class VarSelectionView extends JDialog {
 		makeVarButton.addActionListener(listener);
 	}
 
-	private Component createButtons() {
-		Container buttonPanel = new JPanel();
+	private void addButtonPanel(Container parent) {
+		Container buttonPanel = UelUI.addButtonPanel(parent);
 
 		UelUI.setupButton(buttonPanel, makeConsButton, UelUI.ICON_STEP_BACK, Message.tooltipMakeCons);
 
 		UelUI.setupButton(buttonPanel, makeVarButton, UelUI.ICON_STEP_FORWARD, Message.tooltipMakeVar);
 
+		UelUI.addStrut(buttonPanel);
+
 		UelUI.setupButton(buttonPanel, acceptVarButton, UelUI.ICON_FORWARD, Message.tooltipAcceptVar);
-
-		return buttonPanel;
 	}
 
-	private Component createMainPanel() {
-		Container ret = new Box(BoxLayout.Y_AXIS);
+	@Override
+	protected void addMainPanel(Container parent) {
+		Container mainPanel = UelUI.addVerticalPanel(parent);
 
-		ret.add(createButtons());
+		addButtonPanel(mainPanel);
 
-		ret.add(Box.createVerticalStrut(UelUI.GAP_SIZE));
+		UelUI.addStrut(mainPanel);
 
-		ret.add(createVarSelectionPanel());
-
-		return ret;
+		addVarSelectionPanel(mainPanel);
 	}
 
-	private Component createVarSelectionPanel() {
-		Container varSelPanel = new Box(BoxLayout.X_AXIS);
+	private void addVarSelectionPanel(Container parent) {
+		Container varSelectionPanel = UelUI.addHorizontalPanel(parent);
 
-		UelUI.setupScrollPane(varSelPanel, listConstants, Message.tooltipConstants, new Dimension(360, 480));
+		UelUI.addScrollPane(varSelectionPanel, listConstants, Message.tooltipConstants, new Dimension(360, 480));
 
-		UelUI.setupScrollPane(varSelPanel, listVariables, Message.tooltipVariables, new Dimension(360, 480));
-
-		return varSelPanel;
+		UelUI.addScrollPane(varSelectionPanel, listVariables, Message.tooltipVariables, new Dimension(360, 480));
 	}
 
 	public Collection<LabelId> getSelectedConstants() {
@@ -90,14 +81,12 @@ class VarSelectionView extends JDialog {
 	}
 
 	public void setConstants(List<LabelId> constants) {
-		LabelId[] array = constants.toArray(new LabelId[constants.size()]);
-		this.listConstants.setListData(array);
+		this.listConstants.setListData(new Vector<LabelId>(constants));
 		this.listConstants.clearSelection();
 	}
 
 	public void setVariables(List<LabelId> variables) {
-		LabelId[] array = variables.toArray(new LabelId[variables.size()]);
-		this.listVariables.setListData(array);
+		this.listVariables.setListData(new Vector<LabelId>(variables));
 		this.listVariables.clearSelection();
 	}
 

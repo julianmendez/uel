@@ -1,16 +1,12 @@
 package de.tudresden.inf.lat.uel.plugin.ui;
 
-import java.awt.Component;
 import java.awt.Container;
 import java.awt.event.ActionListener;
 import java.util.List;
 
-import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JComponent;
 import javax.swing.JPanel;
 
 import org.semanticweb.owlapi.model.OWLOntology;
@@ -35,7 +31,7 @@ public class UelView extends JPanel {
 	private final JComboBox<String> listProcessor = new JComboBox<String>();
 
 	public UelView() {
-		add(createSelectionPanel());
+		addMainPanel(this);
 	}
 
 	public void addOpenListener(ActionListener listener) {
@@ -46,50 +42,44 @@ public class UelView extends JPanel {
 		buttonSelectVariables.addActionListener(listener);
 	}
 
-	private Component createSelectionPanel() {
-		Container ret = new Box(BoxLayout.Y_AXIS);
+	private void addMainPanel(Container parent) {
+		Container mainPanel = UelUI.addVerticalPanel(parent);
 
-		ret.add(createTopPanel());
+		addTopPanel(mainPanel);
 
-		ret.add(Box.createVerticalStrut(UelUI.GAP_SIZE));
+		UelUI.addStrut(mainPanel);
 
-		ret.add(createOntologyPanel());
-
-		return ret;
+		addOntologyPanel(mainPanel);
 	}
 
-	private Component createOntologyPanel() {
-		JComponent largePanel = new Box(BoxLayout.Y_AXIS);
-		largePanel.setAlignmentX(CENTER_ALIGNMENT);
+	private void addOntologyPanel(Container parent) {
+		Container ontologyPanel = UelUI.addVerticalPanel(parent);
 
-		UelUI.addLabel(largePanel, Message.textOntologyBg00);
+		UelUI.addLabel(ontologyPanel, Message.textOntologyBg00);
 
-		UelUI.setupComboBox(largePanel, listOntologyBg00, Message.tooltipComboBoxOntologyBg00);
+		UelUI.setupComboBox(ontologyPanel, listOntologyBg00, Message.tooltipComboBoxOntologyBg00);
 
-		largePanel.add(Box.createVerticalStrut(UelUI.GAP_SIZE));
+		UelUI.addStrut(ontologyPanel);
 
-		UelUI.addLabel(largePanel, Message.textOntologyBg01);
+		UelUI.addLabel(ontologyPanel, Message.textOntologyBg01);
 
-		UelUI.setupComboBox(largePanel, listOntologyBg01, Message.tooltipComboBoxOntologyBg01);
+		UelUI.setupComboBox(ontologyPanel, listOntologyBg01, Message.tooltipComboBoxOntologyBg01);
 
-		largePanel.add(Box.createVerticalStrut(UelUI.GAP_SIZE));
+		UelUI.addStrut(ontologyPanel);
 
-		UelUI.addLabel(largePanel, Message.textOntologyPos);
+		UelUI.addLabel(ontologyPanel, Message.textOntologyPos);
 
-		UelUI.setupComboBox(largePanel, listOntologyPos, Message.tooltipComboBoxOntologyPos);
+		UelUI.setupComboBox(ontologyPanel, listOntologyPos, Message.tooltipComboBoxOntologyPos);
 
-		largePanel.add(Box.createVerticalStrut(UelUI.GAP_SIZE));
+		UelUI.addStrut(ontologyPanel);
 
-		UelUI.addLabel(largePanel, Message.textOntologyNeg);
+		UelUI.addLabel(ontologyPanel, Message.textOntologyNeg);
 
-		UelUI.setupComboBox(largePanel, listOntologyNeg, Message.tooltipComboBoxOntologyNeg);
-
-		return largePanel;
+		UelUI.setupComboBox(ontologyPanel, listOntologyNeg, Message.tooltipComboBoxOntologyNeg);
 	}
 
-	private Component createTopPanel() {
-		JComponent topPanel = new JPanel();
-		topPanel.setAlignmentX(CENTER_ALIGNMENT);
+	private void addTopPanel(Container parent) {
+		Container topPanel = UelUI.addButtonPanel(parent);
 
 		UelUI.setupComboBox(topPanel, listProcessor, Message.tooltipSelectProcessor);
 		for (String processorName : UelProcessorFactory.getProcessorNames()) {
@@ -99,8 +89,6 @@ public class UelView extends JPanel {
 		UelUI.setupButton(topPanel, buttonOpen, UelUI.ICON_OPEN, Message.tooltipOpen);
 
 		UelUI.setupButton(topPanel, buttonSelectVariables, UelUI.ICON_FORWARD, Message.tooltipSelectVariables);
-
-		return topPanel;
 	}
 
 	public OWLOntology getSelectedOntologyBg00() {
@@ -117,6 +105,10 @@ public class UelView extends JPanel {
 
 	public OWLOntology getSelectedOntologyNeg() {
 		return (OWLOntology) listOntologyNeg.getSelectedItem();
+	}
+
+	public void setSelectedOntologyNeg(OWLOntology ontology) {
+		listOntologyNeg.setSelectedItem(ontology);
 	}
 
 	public String getSelectedProcessor() {

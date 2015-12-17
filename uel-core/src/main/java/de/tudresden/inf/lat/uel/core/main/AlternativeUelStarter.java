@@ -28,9 +28,6 @@ import de.tudresden.inf.lat.uel.core.processor.PluginGoal;
 import de.tudresden.inf.lat.uel.core.processor.UelModel;
 import de.tudresden.inf.lat.uel.core.processor.UelProcessorFactory;
 import de.tudresden.inf.lat.uel.core.type.OWLUelClassDefinition;
-import de.tudresden.inf.lat.uel.core.type.UnifierTranslator;
-import de.tudresden.inf.lat.uel.type.api.Atom;
-import de.tudresden.inf.lat.uel.type.api.AtomManager;
 import de.tudresden.inf.lat.uel.type.api.UelInput;
 import de.tudresden.inf.lat.uel.type.api.UelProcessor;
 
@@ -248,7 +245,6 @@ public class AlternativeUelStarter {
 	private Iterator<Set<OWLUelClassDefinition>> modifyOntologyAndSolve(UelModel uelModel, Set<OWLClass> variables,
 			String processorName) {
 
-		AtomManager atomManager = uelModel.getAtomManager();
 		PluginGoal goal = uelModel.getPluginGoal();
 
 		// translate the variables to the IDs, and mark them as variables in the
@@ -258,15 +254,7 @@ public class AlternativeUelStarter {
 		}
 
 		if (markUndefAsVariables) {
-			// mark all "_UNDEF" variables as user variables
-			for (Atom at : atomManager.getAtoms()) {
-				if (at.isConceptName()) {
-					String name = atomManager.printConceptName(at);
-					if (name.endsWith(AtomManager.UNDEF_SUFFIX)) {
-						goal.makeUserVariable(atomManager.getAtoms().getIndex(at));
-					}
-				}
-			}
+			uelModel.markUndefAsUserVariables();
 		}
 
 		goal.updateUelInput();
@@ -274,20 +262,18 @@ public class AlternativeUelStarter {
 
 		// output unification problem
 		if (verbose) {
-			System.out.println("Final number of atoms: " + goal.getUelInput().getAtoms().size());
+			System.out.println("Final number of atoms: " + input.getAtoms().size());
 			System.out.println("Final number of constants: " + goal.getConstants().size());
 			System.out.println("Final number of variables: " + goal.getVariables().size());
-			System.out.println("Final number of user variables: " + goal.getUelInput().getUserVariables().size());
-			System.out.println("Final number of equations: " + goal.getUelInput().getEquations().size());
+			System.out.println("Final number of user variables: " + input.getUserVariables().size());
+			System.out.println("Final number of equations: " + input.getEquations().size());
 			System.out.println("Unification problem:");
 			System.out.println(goal.toString());
 		}
 
 		uelProcessor = UelProcessorFactory.createProcessor(processorName, input);
 
-		UnifierTranslator translator = new UnifierTranslator(ontologyManager.getOWLDataFactory(), atomManager,
-				input.getUserVariables(), goal.getAuxiliaryVariables());
-		return new UnifierIterator(uelProcessor, translator);
+		return new UnifierIterator(uelProcessor, uelModel.getTranslator());
 	}
 
 	public List<Entry<String, String>> getStats() {

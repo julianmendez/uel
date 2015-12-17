@@ -1,17 +1,10 @@
 package de.tudresden.inf.lat.uel.plugin.ui;
 
-import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.Frame;
 import java.awt.event.ActionListener;
 
-import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
 /**
@@ -19,7 +12,7 @@ import javax.swing.JTextArea;
  * 
  * @author Julian Mendez
  */
-class StatInfoView extends JDialog {
+class StatInfoView extends UelDialog {
 
 	private static final long serialVersionUID = -4153981096827550491L;
 
@@ -28,31 +21,28 @@ class StatInfoView extends JDialog {
 	private final JTextArea textInfo = new JTextArea();
 
 	public StatInfoView() {
-		super((Frame) null, "Statistical information", true);
-		UelUI.setupWindow(this, createMainPanel());
+		setup("Statistical information");
 	}
 
 	public void addSaveListener(ActionListener listener) {
 		saveButton.addActionListener(listener);
 	}
 
-	private Component createMainPanel() {
-		Container mainPanel = new Box(BoxLayout.Y_AXIS);
+	@Override
+	protected void addMainPanel(Container parent) {
+		Container mainPanel = UelUI.addVerticalPanel(parent);
 
-		JComponent buttonPanel = new JPanel();
-		buttonPanel.setAlignmentX(CENTER_ALIGNMENT);
+		Container buttonPanel = UelUI.addButtonPanel(mainPanel);
+
 		UelUI.setupButton(buttonPanel, saveButton, UelUI.ICON_SAVE, Message.tooltipSaveGoal);
-		mainPanel.add(buttonPanel);
 
-		mainPanel.add(Box.createVerticalStrut(UelUI.GAP_SIZE));
+		UelUI.addStrut(mainPanel);
 
-		UelUI.setupScrollTextArea(mainPanel, textGoal, Message.tooltipGoal, new Dimension(640, 240));
+		UelUI.addScrollTextArea(mainPanel, textGoal, Message.tooltipGoal, new Dimension(640, 240));
 
-		mainPanel.add(Box.createVerticalStrut(UelUI.GAP_SIZE));
+		UelUI.addStrut(mainPanel);
 
-		UelUI.setupScrollTextArea(mainPanel, textInfo, Message.tooltipTextInfo, new Dimension(640, 120));
-
-		return mainPanel;
+		UelUI.addScrollTextArea(mainPanel, textInfo, Message.tooltipTextInfo, new Dimension(640, 120));
 	}
 
 	public void setGoalText(String text) {

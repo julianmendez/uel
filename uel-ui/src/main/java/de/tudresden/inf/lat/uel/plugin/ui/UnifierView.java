@@ -1,18 +1,11 @@
 package de.tudresden.inf.lat.uel.plugin.ui;
 
-import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.Frame;
 import java.awt.event.ActionListener;
 
-import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
 /**
@@ -20,7 +13,7 @@ import javax.swing.JTextArea;
  * 
  * @author Julian Mendez
  */
-public class UnifierView extends JDialog {
+public class UnifierView extends UelDialog {
 
 	private static final long serialVersionUID = 7965907233259580732L;
 
@@ -35,8 +28,7 @@ public class UnifierView extends JDialog {
 	private JLabel labelUnifierId = new JLabel();
 
 	public UnifierView() {
-		super((Frame) null, "Unifier", true);
-		UelUI.setupWindow(this, createUnifierPanel());
+		setup("Unifier");
 	}
 
 	public void addFirstListener(ActionListener listener) {
@@ -67,36 +59,31 @@ public class UnifierView extends JDialog {
 		buttonRefine.addActionListener(listener);
 	}
 
-	private Component createUnifierPanel() {
-		Container ret = new Box(BoxLayout.Y_AXIS);
+	@Override
+	protected void addMainPanel(Container parent) {
+		Container mainPanel = UelUI.addVerticalPanel(parent);
 
-		ret.add(createNavigateButtons(UelUI.GAP_SIZE));
+		addNavigateButtons(mainPanel);
 
-		ret.add(Box.createVerticalStrut(UelUI.GAP_SIZE));
+		UelUI.addStrut(mainPanel);
 
-		UelUI.setupScrollTextArea(ret, textUnifier, Message.tooltipUnifier, new Dimension(640, 480));
+		UelUI.addScrollTextArea(mainPanel, textUnifier, Message.tooltipUnifier, new Dimension(640, 480));
 
-		ret.add(Box.createVerticalStrut(UelUI.GAP_SIZE));
+		UelUI.addStrut(mainPanel);
 
-		ret.add(createUnifierButtons());
-
-		return ret;
+		addUnifierButtons(mainPanel);
 	}
 
-	private Component createUnifierButtons() {
-		JComponent unifierButtons = new JPanel();
-		unifierButtons.setAlignmentX(CENTER_ALIGNMENT);
+	private void addUnifierButtons(Container parent) {
+		Container unifierButtons = UelUI.addButtonPanel(parent);
 
 		UelUI.setupButton(unifierButtons, buttonSave, UelUI.ICON_SAVE, Message.tooltipSave);
 
 		UelUI.setupButton(unifierButtons, buttonRefine, UelUI.ICON_REFINE, Message.tooltipRefine);
-
-		return unifierButtons;
 	}
 
-	private Component createNavigateButtons(int gap) {
-		JComponent navigateButtons = new JPanel();
-		navigateButtons.setAlignmentX(CENTER_ALIGNMENT);
+	private void addNavigateButtons(Container parent) {
+		Container navigateButtons = UelUI.addButtonPanel(parent);
 
 		UelUI.setupButton(navigateButtons, buttonFirst, UelUI.ICON_REWIND, Message.tooltipFirst);
 
@@ -108,11 +95,9 @@ public class UnifierView extends JDialog {
 
 		UelUI.setupButton(navigateButtons, buttonLast, UelUI.ICON_FAST_FORWARD, Message.tooltipLast);
 
-		navigateButtons.add(Box.createHorizontalStrut(gap));
+		UelUI.addStrut(navigateButtons);
 
 		UelUI.setupButton(navigateButtons, buttonShowStatInfo, UelUI.ICON_STATISTICS, Message.tooltipShowStatInfo);
-
-		return navigateButtons;
 	}
 
 	public void setUnifier(String text) {

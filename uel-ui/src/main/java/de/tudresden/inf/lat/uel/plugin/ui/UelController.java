@@ -6,6 +6,7 @@ import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.OWLOntology;
 
 import de.tudresden.inf.lat.uel.core.processor.UelModel;
@@ -17,11 +18,11 @@ import de.tudresden.inf.lat.uel.core.processor.UelModel;
  */
 public class UelController {
 
-	private VarSelectionController varSelectionController = null;
-	private UnifierController unifierController = null;
-	private RefineController refineController = null;
-	private final UelView view;
 	private final UelModel model;
+	private RefineController refineController = null;
+	private UnifierController unifierController = null;
+	private VarSelectionController varSelectionController = null;
+	private final UelView view;
 
 	public UelController(UelView view, UelModel model) {
 		this.view = view;
@@ -29,32 +30,40 @@ public class UelController {
 		init();
 	}
 
-	private void executeRecompute() {
-		addNewDissubsumptions();
-		recomputeUnifiers();
+	private void addNewDissubsumptions() {
+		OWLOntology negOntology = view.getSelectedOntologyNeg();
+		if (negOntology.equals(UelModel.emptyOntology)) {
+			negOntology = model.createOntology("dissubsumptions");
+			updateView();
+			view.setSelectedOntologyNeg(negOntology);
+		}
+
+		String dissubsumptions = refineController.getDissubsumptions();
+		OWLOntology add = OntologyRenderer.parseOntology(dissubsumptions);
+		if (add.getAxiomCount() - add.getAxiomCount(AxiomType.SUBCLASS_OF) > 0) {
+			throw new IllegalStateException("Expected dissubsumptions to be encoded as OWLSubClassOfAxioms.");
+		}
+		negOntology.getOWLOntologyManager().addAxioms(negOntology, add.getAxioms());
 	}
 
-	private void executeSaveDissubsumptions() {
-		File file = refineController.showSaveFileDialog();
+	private void executeAcceptVar() {
+		varSelectionController.close();
+
+		setupComputation();
+	}
+
+	private void executeOpen() {
+		File file = UelUI.showOpenFileDialog(view);
 		if (file == null) {
 			return;
 		}
+		model.loadOntology(file);
+		updateView();
+	}
 
+	private void executeRecompute() {
 		addNewDissubsumptions();
-		OntologyRenderer.saveToOntologyFile(view.getSelectedOntologyNeg(), file);
 		recomputeUnifiers();
-	}
-
-	private void addNewDissubsumptions() {
-		// TODO add dissubsumptions from dview to owlOntologyNeg
-		// TODO if this ontology does not yet exist, create it, add it to the
-		// ontologyManager, and update the selection in the uelView
-		String dissubsumptions = refineController.getDissubsumptions();
-	}
-
-	private void recomputeUnifiers() {
-		// TODO close dview and restart computation, see executeSelectVariables
-		refineController.close();
 	}
 
 	private void executeRefine() {
@@ -76,37 +85,19 @@ public class UelController {
 		refineController.open();
 	}
 
-	private void executeAcceptVar() {
-		varSelectionController.close();
-
-		model.createUelProcessor(view.getSelectedProcessor());
-
-		unifierController = new UnifierController(model);
-		unifierController.addRefineListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				executeRefine();
-			}
-		});
-		unifierController.open();
-	}
-
-	private void executeOpen() {
-		File file = UelUI.showOpenFileDialog(view);
+	private void executeSaveDissubsumptions() {
+		File file = refineController.showSaveFileDialog();
 		if (file == null) {
 			return;
 		}
-		model.loadOntology(file);
-		updateView();
+
+		addNewDissubsumptions();
+		OntologyRenderer.saveToOntologyFile(view.getSelectedOntologyNeg(), file);
+		recomputeUnifiers();
 	}
 
 	private void executeSelectVariables() {
-		model.reset();
-
-		Set<OWLOntology> bgOntologies = new HashSet<OWLOntology>();
-		bgOntologies.add(view.getSelectedOntologyBg00());
-		bgOntologies.add(view.getSelectedOntologyBg01());
-
-		model.setupPluginGoal(bgOntologies, view.getSelectedOntologyPos(), view.getSelectedOntologyNeg(), null);
+		setupModel();
 
 		this.varSelectionController = new VarSelectionController(model);
 		this.varSelectionController.addAcceptVarListener(new ActionListener() {
@@ -131,13 +122,51 @@ public class UelController {
 		updateView();
 	}
 
-	public void updateView() {
-		view.reloadOntologies(model.getOntologyList());
+	private void recomputeUnifiers() {
+		refineController.close();
+		unifierController.close();
+
+		Set<String> userVariables = new HashSet<String>();
+		for (Integer id : model.getPluginGoal().getUserVariables()) {
+			userVariables.add(model.getAtomName(id));
+		}
+
+		setupModel();
+
+		for (String name : userVariables) {
+			model.getPluginGoal().makeUserVariable(model.getAtomId(name));
+		}
+
+		setupComputation();
 	}
-	
+
 	public void reload() {
 		model.recomputeShortFormMap();
 		updateView();
+	}
+
+	public void setupComputation() {
+		model.createUelProcessor(view.getSelectedProcessor());
+
+		unifierController = new UnifierController(model);
+		unifierController.addRefineListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				executeRefine();
+			}
+		});
+		unifierController.open();
+	}
+
+	public void setupModel() {
+		model.reset();
+		Set<OWLOntology> bgOntologies = new HashSet<OWLOntology>();
+		bgOntologies.add(view.getSelectedOntologyBg00());
+		bgOntologies.add(view.getSelectedOntologyBg01());
+		model.setupPluginGoal(bgOntologies, view.getSelectedOntologyPos(), view.getSelectedOntologyNeg(), null);
+	}
+
+	public void updateView() {
+		view.reloadOntologies(model.getOntologyList());
 	}
 
 }
