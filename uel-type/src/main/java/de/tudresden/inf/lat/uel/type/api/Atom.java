@@ -58,4 +58,11 @@ public interface Atom {
 	 */
 	boolean isVariable();
 
+	/**
+	 * Check whether this atom is the special concept name representing the top
+	 * concept.
+	 * 
+	 * @return <code>true</code> if and only if this atom represents top
+	 */
+	boolean isTop();
 }

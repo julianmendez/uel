@@ -24,7 +24,6 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
-import org.semanticweb.owlapi.util.ShortFormProvider;
 
 import de.tudresden.inf.lat.uel.core.type.KRSSRenderer;
 import de.tudresden.inf.lat.uel.core.type.UnifierTranslator;
@@ -47,8 +46,9 @@ import de.tudresden.inf.lat.uel.type.impl.ExistentialRestriction;
  */
 public class UelModel {
 
-	public static final String classPrefix = "http://uel.sourceforge.net/entities/auxclass#A";
-	public static final OWLOntology emptyOntology = createEmptyOntology();
+	public static final String UEL_IRI_PREFIX = "http://uel.sourceforge.net/";
+	public static final String UEL_AUX_CLASS_PREFIX = UEL_IRI_PREFIX + "entities/auxclass#A";
+	public static final OWLOntology EMPTY_ONTOLOGY = createEmptyOntology();
 
 	private static OWLOntology createEmptyOntology() {
 		try {
@@ -68,24 +68,21 @@ public class UelModel {
 	private int classCounter = 0;
 	private int currentUnifierIndex;
 	private Map<OWLClassExpression, Integer> mapOfAuxClassExpr;
-	private OWLOntologyManager ontologyManager;
 	private PluginGoal pluginGoal;
 	private Map<String, String> shortFormMap;
-	private ShortFormProvider shortFormProvider;
+	private UelOntologyProvider provider;
 	private UelProcessor uelProcessor;
 	private List<Set<Equation>> unifierList;
 
-	public UelModel(OWLOntologyManager ontologyManager, ShortFormProvider shortFormProvider) {
-		this.ontologyManager = ontologyManager;
-		this.shortFormProvider = shortFormProvider;
-		reset();
+	public UelModel(UelOntologyProvider provider) {
+		this.provider = provider;
 	}
 
 	private Integer abbreviateClassExpression(OWLClassExpression expr) {
 		this.classCounter++;
 		OWLOntologyManager manager = this.auxOntology.getOWLOntologyManager();
 		OWLDataFactory factory = manager.getOWLDataFactory();
-		IRI iri = IRI.create(classPrefix + classCounter);
+		IRI iri = IRI.create(UEL_AUX_CLASS_PREFIX + classCounter);
 		OWLClass newClass = factory.getOWLClass(iri);
 		Integer ret = getAtomId(newClass);
 
@@ -122,12 +119,8 @@ public class UelModel {
 		return false;
 	}
 
-	public OWLOntology createOntology(String name) {
-		try {
-			return ontologyManager.createOntology(IRI.create(name));
-		} catch (OWLOntologyCreationException e) {
-			throw new RuntimeException(e);
-		}
+	public OWLOntology createOntology() {
+		return provider.createOntology();
 	}
 
 	public void createUelProcessor(String name) {
@@ -174,7 +167,7 @@ public class UelModel {
 	}
 
 	public Integer getAtomId(Atom atom) {
-		return atomManager.getAtoms().getIndex(atom);
+		return atomManager.getAtoms().addAndGetIndex(atom);
 	}
 
 	public Integer getAtomId(OWLClass owlClass) {
@@ -183,7 +176,7 @@ public class UelModel {
 
 	public Integer getAtomId(String name) {
 		ConceptName conceptName = atomManager.createConceptName(name, false);
-		return atomManager.getAtoms().getIndex(conceptName);
+		return atomManager.getAtoms().addAndGetIndex(conceptName);
 	}
 
 	public String getAtomName(Integer id) {
@@ -203,8 +196,8 @@ public class UelModel {
 
 	public List<OWLOntology> getOntologyList() {
 		List<OWLOntology> list = new ArrayList<OWLOntology>();
-		list.add(emptyOntology);
-		list.addAll(ontologyManager.getOntologies());
+		list.add(EMPTY_ONTOLOGY);
+		list.addAll(provider.getOntologies());
 		return list;
 	}
 
@@ -218,12 +211,12 @@ public class UelModel {
 	}
 
 	private String getShortForm(OWLEntity entity, OWLOntology ontology) {
-		if (shortFormProvider != null) {
-			return shortFormProvider.getShortForm(entity);
+		if (provider.providesShortForms()) {
+			return provider.getShortForm(entity);
 		}
 
 		for (OWLAnnotation annotation : entity.getAnnotations(ontology,
-				ontologyManager.getOWLDataFactory().getRDFSLabel())) {
+				OWLManager.getOWLDataFactory().getRDFSLabel())) {
 			return annotation.getValue().toString();
 		}
 
@@ -231,8 +224,8 @@ public class UelModel {
 	}
 
 	public UnifierTranslator getTranslator() {
-		return new UnifierTranslator(ontologyManager.getOWLDataFactory(), atomManager,
-				pluginGoal.getUelInput().getUserVariables(), pluginGoal.getAuxiliaryVariables());
+		return new UnifierTranslator(atomManager, pluginGoal.getUelInput().getUserVariables(),
+				pluginGoal.getAuxiliaryVariables());
 	}
 
 	public UelProcessor getUelProcessor() {
@@ -244,11 +237,7 @@ public class UelModel {
 	}
 
 	public void loadOntology(File file) {
-		try {
-			ontologyManager.loadOntologyFromOntologyDocument(file);
-		} catch (OWLOntologyCreationException e) {
-			throw new RuntimeException(e);
-		}
+		provider.loadOntology(file);
 		recomputeShortFormMap();
 	}
 
@@ -269,7 +258,7 @@ public class UelModel {
 		if (unifier == null) {
 			return "";
 		}
-		return getRenderer(shortForm).printUnifier(getCurrentUnifier());
+		return getRenderer(shortForm).printUnifier(unifier);
 	}
 
 	public String printPluginGoal(boolean shortForm) {
@@ -278,7 +267,7 @@ public class UelModel {
 
 	public void recomputeShortFormMap() {
 		shortFormMap = new HashMap<String, String>();
-		for (OWLOntology ontology : ontologyManager.getOntologies()) {
+		for (OWLOntology ontology : provider.getOntologies()) {
 			addAllShortForms(ontology, ontology.getClassesInSignature());
 			addAllShortForms(ontology, ontology.getObjectPropertiesInSignature());
 		}
@@ -290,19 +279,6 @@ public class UelModel {
 			ret = str.substring(1, str.length() - 1);
 		}
 		return ret;
-	}
-
-	public void reset() {
-		atomManager = new AtomManagerImpl();
-		uelProcessor = null;
-		pluginGoal = null;
-		mapOfAuxClassExpr = new HashMap<OWLClassExpression, Integer>();
-		classCounter = 0;
-		auxOntology = null;
-		unifierList = new ArrayList<Set<Equation>>();
-		currentUnifierIndex = -1;
-		allUnifiersFound = false;
-		recomputeShortFormMap();
 	}
 
 	public void setCurrentUnifierIndex(int index) {
@@ -330,6 +306,18 @@ public class UelModel {
 	public void setupPluginGoal(Set<OWLOntology> bgOntologies, Set<OWLSubClassOfAxiom> subsumptions,
 			Set<OWLEquivalentClassesAxiom> equations, Set<OWLSubClassOfAxiom> dissubsumptions,
 			Set<OWLEquivalentClassesAxiom> disequations, OWLClass owlThingAlias) {
+
+		OWLClass top = (owlThingAlias != null) ? owlThingAlias : OWLManager.getOWLDataFactory().getOWLThing();
+		atomManager = new AtomManagerImpl(getId(top));
+		uelProcessor = null;
+		pluginGoal = null;
+		mapOfAuxClassExpr = new HashMap<OWLClassExpression, Integer>();
+		classCounter = 0;
+		auxOntology = null;
+		unifierList = new ArrayList<Set<Equation>>();
+		currentUnifierIndex = -1;
+		allUnifiersFound = false;
+		recomputeShortFormMap();
 
 		try {
 			this.auxOntology = OWLManager.createOWLOntologyManager().createOntology();

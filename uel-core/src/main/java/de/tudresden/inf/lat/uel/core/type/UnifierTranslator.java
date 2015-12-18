@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
@@ -22,9 +23,8 @@ public class UnifierTranslator {
 	private final OWLDataFactory dataFactory;
 	private final Set<Integer> userVariables;
 
-	public UnifierTranslator(OWLDataFactory factory, AtomManager atomManager, Set<Integer> userVariables,
-			Set<Integer> auxiliaryVariables) {
-		this.dataFactory = factory;
+	public UnifierTranslator(AtomManager atomManager, Set<Integer> userVariables, Set<Integer> auxiliaryVariables) {
+		this.dataFactory = OWLManager.getOWLDataFactory();
 		this.atomManager = atomManager;
 		this.userVariables = userVariables;
 		this.auxiliaryVariables = auxiliaryVariables;
@@ -43,7 +43,7 @@ public class UnifierTranslator {
 
 				OWLClassExpression definiens = toOWLClassExpression(right, equations);
 
-				ret.add(new OWLUelClassDefinitionImpl(definiendum, definiens, dataFactory));
+				ret.add(new OWLUelClassDefinitionImpl(definiendum, definiens));
 			}
 		}
 		return ret;

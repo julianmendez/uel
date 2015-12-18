@@ -56,11 +56,12 @@ public class RefineController {
 			}
 		}
 
-		return model.getRenderer(false).printUnifier(dissubsumptions);
+		return model.getRenderer(false).printUnifier(dissubsumptions, model.getCurrentUnifier());
 	}
 
 	public void open() {
 		updateView();
+		view.pack();
 		view.setVisible(true);
 	}
 
@@ -88,7 +89,7 @@ public class RefineController {
 			}
 		}
 
-		view.updateSelectionPanels(map);
+		view.updateSelectionPanel(map);
 	}
 
 }

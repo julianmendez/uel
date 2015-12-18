@@ -7,6 +7,7 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JTextArea;
+import javax.swing.SwingConstants;
 
 /**
  * This is the panel that shows the unifiers.
@@ -28,7 +29,7 @@ public class UnifierView extends UelDialog {
 	private JLabel labelUnifierId = new JLabel();
 
 	public UnifierView() {
-		setup("Unifier");
+		setup("Unifiers");
 	}
 
 	public void addFirstListener(ActionListener listener) {
@@ -67,7 +68,7 @@ public class UnifierView extends UelDialog {
 
 		UelUI.addStrut(mainPanel);
 
-		UelUI.addScrollTextArea(mainPanel, textUnifier, Message.tooltipUnifier, new Dimension(640, 480));
+		UelUI.addScrollableTextArea(mainPanel, textUnifier, Message.tooltipUnifier, new Dimension(640, 480));
 
 		UelUI.addStrut(mainPanel);
 
@@ -90,6 +91,7 @@ public class UnifierView extends UelDialog {
 		UelUI.setupButton(navigateButtons, buttonPrevious, UelUI.ICON_BACK, Message.tooltipPrevious);
 
 		UelUI.setupLabel(navigateButtons, labelUnifierId, Message.tooltipUnifierId, new Dimension(40, 20));
+		labelUnifierId.setHorizontalAlignment(SwingConstants.CENTER);
 
 		UelUI.setupButton(navigateButtons, buttonNext, UelUI.ICON_FORWARD, Message.tooltipNext);
 
@@ -112,7 +114,7 @@ public class UnifierView extends UelDialog {
 		buttonFirst.setEnabled(false);
 		buttonPrevious.setEnabled(false);
 		buttonNext.setEnabled(true);
-		buttonLast.setEnabled(false);
+		buttonLast.setEnabled(true);
 		buttonSave.setEnabled(false);
 		buttonRefine.setEnabled(false);
 		buttonShowStatInfo.setEnabled(true);

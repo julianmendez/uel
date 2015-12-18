@@ -55,6 +55,7 @@ class StatInfoController {
 
 	public void open() {
 		updateView();
+		view.pack();
 		view.setVisible(true);
 	}
 

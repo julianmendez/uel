@@ -9,18 +9,6 @@ import de.tudresden.inf.lat.uel.type.api.Atom;
  */
 public class ConceptName implements Atom {
 
-	/**
-	 * Create a concept name representing the top concept.
-	 * 
-	 * @param id
-	 *            the identifier of the top concept
-	 * @return a new instance of top
-	 */
-	public static ConceptName createTop(Integer id) {
-		ConceptName ret = new ConceptName(id, false);
-		return ret;
-	}
-
 	private final Integer conceptNameId;
 	private boolean isVariable;
 	private boolean isAuxiliaryVariable = false;
@@ -28,6 +16,7 @@ public class ConceptName implements Atom {
 
 	/**
 	 * Construct a new concept name.
+	 * 
 	 * @param conceptNameId
 	 *            the concept name identifier
 	 * @param isVar
@@ -111,13 +100,13 @@ public class ConceptName implements Atom {
 		return isConstant();
 	}
 
-	/**
-	 * Check whether this flat atom is top.
-	 * 
-	 * @return true iff this atom is top
-	 */
+	@Override
 	public boolean isTop() {
 		return this.isTop;
+	}
+
+	protected void setTop() {
+		isTop = true;
 	}
 
 	/**
@@ -140,19 +129,18 @@ public class ConceptName implements Atom {
 	public void setVariable(boolean isVar) {
 		this.isVariable = isVar;
 	}
-	
+
 	public void setAuxiliaryVariable(boolean isAuxiliaryVar) {
 		this.isAuxiliaryVariable = isAuxiliaryVar;
 	}
-	
+
 	public boolean isAuxiliaryVariable() {
 		return this.isAuxiliaryVariable;
 	}
 
 	@Override
 	public String toString() {
-		return conceptNameId.toString() + " {" + (isVariable() ? "v" : "c")
-				+ "}";
+		return conceptNameId.toString() + " {" + (isVariable() ? "v" : "c") + "}";
 	}
 
 }

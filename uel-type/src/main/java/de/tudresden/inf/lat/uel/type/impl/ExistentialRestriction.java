@@ -111,14 +111,13 @@ public class ExistentialRestriction implements Atom {
 		return getConceptName().isGround();
 	}
 
-	/**
-	 * Check whether this flat atom is a variable.
-	 * 
-	 * @return true iff this atom is not an existential restriction and is not
-	 *         ground
-	 */
 	@Override
 	public boolean isVariable() {
+		return false;
+	}
+
+	@Override
+	public boolean isTop() {
 		return false;
 	}
 

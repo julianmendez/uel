@@ -21,7 +21,7 @@ class StatInfoView extends UelDialog {
 	private final JTextArea textInfo = new JTextArea();
 
 	public StatInfoView() {
-		setup("Statistical information");
+		setup("Additional information");
 	}
 
 	public void addSaveListener(ActionListener listener) {
@@ -38,11 +38,11 @@ class StatInfoView extends UelDialog {
 
 		UelUI.addStrut(mainPanel);
 
-		UelUI.addScrollTextArea(mainPanel, textGoal, Message.tooltipGoal, new Dimension(640, 240));
+		UelUI.addScrollableTextArea(mainPanel, textGoal, Message.tooltipGoal, new Dimension(640, 240));
 
 		UelUI.addStrut(mainPanel);
 
-		UelUI.addScrollTextArea(mainPanel, textInfo, Message.tooltipTextInfo, new Dimension(640, 120));
+		UelUI.addScrollableTextArea(mainPanel, textInfo, Message.tooltipTextInfo, new Dimension(640, 120));
 	}
 
 	public void setGoalText(String text) {

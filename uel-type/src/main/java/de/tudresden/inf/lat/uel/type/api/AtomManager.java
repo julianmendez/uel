@@ -97,4 +97,5 @@ public interface AtomManager {
 
 	String printRoleName(Atom atom);
 
+	Atom getTopConcept();
 }

@@ -49,15 +49,20 @@ class Goal implements Set<Subsumption> {
 		for (Equation eq : input.getEquations()) {
 			// look up atom IDs in the atom manager
 			Atom head = atoms.get(eq.getLeft());
-			List<Atom> body = new ArrayList<Atom>();
-			for (Integer id : eq.getRight()) {
-				body.add(atoms.get(id));
-			}
+			if (!head.isTop()) {
+				List<Atom> body = new ArrayList<Atom>();
+				for (Integer id : eq.getRight()) {
+					Atom atom = atoms.get(id);
+					if (!atom.isTop()) {
+						body.add(atom);
+					}
+				}
 
-			// create subsumptions representing the equation
-			subsumptions.add(new Subsumption(body, head));
-			for (Atom at : body) {
-				subsumptions.add(new Subsumption(head, at));
+				// create subsumptions representing the equation
+				subsumptions.add(new Subsumption(body, head));
+				for (Atom at : body) {
+					subsumptions.add(new Subsumption(head, at));
+				}
 			}
 		}
 		return subsumptions;
@@ -224,8 +229,7 @@ class Goal implements Set<Subsumption> {
 		}
 	}
 
-	private void expand(Subsumption sub, Set<Atom> subsumers,
-			Set<Subsumption> collection) {
+	private void expand(Subsumption sub, Set<Atom> subsumers, Set<Subsumption> collection) {
 		for (Atom at : subsumers) {
 			Subsumption newSub = new Subsumption(sub.getBody(), at);
 			if (add(newSub)) {

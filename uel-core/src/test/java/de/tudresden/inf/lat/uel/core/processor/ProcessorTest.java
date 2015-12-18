@@ -128,7 +128,7 @@ public class ProcessorTest {
 		Map<String, OWLClass> idClassMap = new HashMap<String, OWLClass>();
 		OWLOntology owlOntology = createOntology(new FileInputStream(ontologyName));
 		OWLOntologyManager ontologyManager = owlOntology.getOWLOntologyManager();
-		UelModel uelModel = new UelModel(ontologyManager, null);
+		UelModel uelModel = new UelModel(new BasicOntologyProvider(ontologyManager));
 		Set<OWLClass> clsSet = owlOntology.getClassesInSignature();
 		for (OWLClass cls : clsSet) {
 			idClassMap.put(cls.getIRI().getShortForm(), cls);

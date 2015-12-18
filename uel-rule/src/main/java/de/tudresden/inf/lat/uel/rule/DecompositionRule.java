@@ -1,5 +1,8 @@
 package de.tudresden.inf.lat.uel.rule;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import de.tudresden.inf.lat.uel.type.api.Atom;
 import de.tudresden.inf.lat.uel.type.impl.ConceptName;
 import de.tudresden.inf.lat.uel.type.impl.ExistentialRestriction;
@@ -53,8 +56,14 @@ final class DecompositionRule extends Rule {
 		}
 		Result res = new Result(sub, application);
 		ConceptName head = sub.getHead().getConceptName();
-		ConceptName body = ((Application) application).at.getConceptName();
-		res.getNewUnsolvedSubsumptions().add(new Subsumption(body, head));
+		if (!head.isTop()) {
+			ConceptName body = ((Application) application).at.getConceptName();
+			List<Atom> bodyAtoms = new ArrayList<Atom>();
+			if (!body.isTop()) {
+				bodyAtoms.add(body);
+			}
+			res.getNewUnsolvedSubsumptions().add(new Subsumption(bodyAtoms, head));
+		}
 		return res;
 	}
 

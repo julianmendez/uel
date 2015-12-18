@@ -112,6 +112,7 @@ public class UnifierController {
 
 	public void open() {
 		view.initializeButtons();
+		view.pack();
 		view.setVisible(true);
 	}
 

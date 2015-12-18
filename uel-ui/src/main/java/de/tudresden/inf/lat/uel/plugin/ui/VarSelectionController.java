@@ -63,6 +63,7 @@ class VarSelectionController {
 	}
 
 	public void open() {
+		view.pack();
 		view.setVisible(true);
 	}
 

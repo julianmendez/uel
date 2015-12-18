@@ -67,9 +67,11 @@ public final class VarSelectionView extends UelDialog {
 	private void addVarSelectionPanel(Container parent) {
 		Container varSelectionPanel = UelUI.addHorizontalPanel(parent);
 
-		UelUI.addScrollPane(varSelectionPanel, listConstants, Message.tooltipConstants, new Dimension(360, 480));
+		UelUI.setupList(listConstants, Message.tooltipConstants);
+		UelUI.addScrollPane(varSelectionPanel, listConstants, "", new Dimension(360, 480));
 
-		UelUI.addScrollPane(varSelectionPanel, listVariables, Message.tooltipVariables, new Dimension(360, 480));
+		UelUI.setupList(listVariables, Message.tooltipVariables);
+		UelUI.addScrollPane(varSelectionPanel, listVariables, "", new Dimension(360, 480));
 	}
 
 	public Collection<LabelId> getSelectedConstants() {

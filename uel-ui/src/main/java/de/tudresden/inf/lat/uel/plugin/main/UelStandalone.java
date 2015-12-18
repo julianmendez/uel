@@ -5,8 +5,6 @@ import java.awt.Dimension;
 
 import javax.swing.JFrame;
 
-import org.semanticweb.owlapi.apibinding.OWLManager;
-
 /**
  * This is used to start UEL without Protege.
  * 
@@ -21,7 +19,7 @@ public class UelStandalone {
 	public void run() {
 		JFrame frame = new JFrame();
 		frame.getContentPane().setLayout(new BorderLayout());
-		new UelStarter(frame.getContentPane(), OWLManager.createOWLOntologyManager(), null);
+		new UelStarter(frame.getContentPane());
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		frame.setSize(new Dimension(1024, 400));
 		frame.setVisible(true);

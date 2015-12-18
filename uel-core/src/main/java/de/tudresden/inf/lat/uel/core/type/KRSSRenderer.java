@@ -205,10 +205,10 @@ public class KRSSRenderer {
 	}
 
 	public String printDefinitions(Set<Equation> definitions) {
-		return printEquations(definitions, false);
+		return printEquations(definitions, definitions, false);
 	}
 
-	private String printEquations(Set<Equation> equations, boolean restrictToUserVariables) {
+	private String printEquations(Set<Equation> equations, Set<Equation> background, boolean restrictToUserVariables) {
 		StringBuffer sbuf = new StringBuffer();
 		for (Equation eq : equations) {
 			if (!restrictToUserVariables || userVariables.contains(eq.getLeft())) {
@@ -219,9 +219,9 @@ public class KRSSRenderer {
 					sbuf.append(KRSSKeyword.define_concept);
 				}
 				sbuf.append(KRSSKeyword.space);
-				appendAtomId(sbuf, eq.getLeft(), equations, restrictToUserVariables);
+				appendAtomId(sbuf, eq.getLeft(), background, restrictToUserVariables);
 				sbuf.append(KRSSKeyword.space);
-				appendConjunctionIds(sbuf, eq.getRight(), equations, restrictToUserVariables);
+				appendConjunctionIds(sbuf, eq.getRight(), background, restrictToUserVariables);
 				sbuf.append(KRSSKeyword.close);
 				sbuf.append(System.lineSeparator());
 				sbuf.append(System.lineSeparator());
@@ -230,8 +230,12 @@ public class KRSSRenderer {
 		return sbuf.toString();
 	}
 
-	public String printUnifier(Set<Equation> equations) {
-		return printEquations(equations, true);
+	public String printUnifier(Set<Equation> unifier) {
+		return printUnifier(unifier, unifier);
+	}
+
+	public String printUnifier(Set<Equation> unifier, Set<Equation> background) {
+		return printEquations(unifier, background, true);
 	}
 
 	private Atom toAtom(Integer atomId) {

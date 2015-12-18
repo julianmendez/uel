@@ -13,14 +13,18 @@ import de.tudresden.inf.lat.uel.type.api.IndexedSet;
  */
 public class AtomManagerImpl implements AtomManager {
 
-	private IndexedSet<Atom> atoms = new IndexedSetImpl<Atom>();
-	private IndexedSet<String> conceptNames = new IndexedSetImpl<String>();
-	private IndexedSet<String> roleNames = new IndexedSetImpl<String>();
+	private final IndexedSet<Atom> atoms = new IndexedSetImpl<Atom>();
+	private final IndexedSet<String> conceptNames = new IndexedSetImpl<String>();
+	private final IndexedSet<String> roleNames = new IndexedSetImpl<String>();
+	private final ConceptName topConcept;
 
-	/**
-	 * Constructs a new atom manager.
-	 */
 	public AtomManagerImpl() {
+		topConcept = null;
+	}
+	
+	public AtomManagerImpl(String topConceptName) {
+		topConcept = createConceptName(topConceptName, false);
+		topConcept.setTop();
 	}
 
 	@Override
@@ -31,6 +35,11 @@ public class AtomManagerImpl implements AtomManager {
 	@Override
 	public Integer addRole(String str) {
 		return this.roleNames.addAndGetIndex(str);
+	}
+
+	@Override
+	public Atom getTopConcept() {
+		return topConcept;
 	}
 
 	@Override

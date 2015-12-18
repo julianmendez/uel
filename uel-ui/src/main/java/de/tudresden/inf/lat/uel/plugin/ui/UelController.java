@@ -32,8 +32,8 @@ public class UelController {
 
 	private void addNewDissubsumptions() {
 		OWLOntology negOntology = view.getSelectedOntologyNeg();
-		if (negOntology.equals(UelModel.emptyOntology)) {
-			negOntology = model.createOntology("dissubsumptions");
+		if (negOntology.equals(UelModel.EMPTY_ONTOLOGY)) {
+			negOntology = model.createOntology();
 			updateView();
 			view.setSelectedOntologyNeg(negOntology);
 		}
@@ -126,6 +126,7 @@ public class UelController {
 		refineController.close();
 		unifierController.close();
 
+		// store previously selected variables
 		Set<String> userVariables = new HashSet<String>();
 		for (Integer id : model.getPluginGoal().getUserVariables()) {
 			userVariables.add(model.getAtomName(id));
@@ -133,6 +134,7 @@ public class UelController {
 
 		setupModel();
 
+		// restore user variables
 		for (String name : userVariables) {
 			model.getPluginGoal().makeUserVariable(model.getAtomId(name));
 		}
@@ -158,7 +160,6 @@ public class UelController {
 	}
 
 	public void setupModel() {
-		model.reset();
 		Set<OWLOntology> bgOntologies = new HashSet<OWLOntology>();
 		bgOntologies.add(view.getSelectedOntologyBg00());
 		bgOntologies.add(view.getSelectedOntologyBg01());

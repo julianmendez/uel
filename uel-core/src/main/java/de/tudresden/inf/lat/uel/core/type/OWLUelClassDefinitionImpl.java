@@ -1,8 +1,8 @@
 package de.tudresden.inf.lat.uel.core.type;
 
+import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
-import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
 
 public class OWLUelClassDefinitionImpl implements OWLUelClassDefinition {
@@ -11,12 +11,10 @@ public class OWLUelClassDefinitionImpl implements OWLUelClassDefinition {
 	private final OWLClass definiendum;
 	private final OWLClassExpression definiens;
 
-	public OWLUelClassDefinitionImpl(OWLClass definiendum,
-			OWLClassExpression definiens, OWLDataFactory factory) {
+	public OWLUelClassDefinitionImpl(OWLClass definiendum, OWLClassExpression definiens) {
 		this.definiendum = definiendum;
 		this.definiens = definiens;
-		this.axiom = factory.getOWLEquivalentClassesAxiom(definiendum,
-				definiens);
+		this.axiom = OWLManager.getOWLDataFactory().getOWLEquivalentClassesAxiom(definiendum, definiens);
 	}
 
 	public OWLEquivalentClassesAxiom asOWLEquivalentClassesAxiom() {

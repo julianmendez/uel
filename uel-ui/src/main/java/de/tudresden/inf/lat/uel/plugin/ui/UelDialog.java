@@ -7,6 +7,8 @@ import java.awt.Container;
 import java.awt.Frame;
 
 import javax.swing.JDialog;
+import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
 
 /**
  * @author Stefan Borgwardt
@@ -19,11 +21,14 @@ public abstract class UelDialog extends JDialog {
 	public UelDialog() {
 		super((Frame) null, true);
 	}
-	
+
 	protected void setup(String title) {
 		setTitle(title);
 		UelUI.setupWindow(this);
-		addMainPanel(getContentPane());
+		JPanel panel = new JPanel();
+		panel.setBorder(new EmptyBorder(10, 10, 10, 10));
+		getContentPane().add(panel);
+		addMainPanel(panel);
 	}
 
 	protected abstract void addMainPanel(Container parent);
