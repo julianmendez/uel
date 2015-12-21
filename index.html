@@ -31,7 +31,7 @@
 <h2>
 <a id="dependency" class="anchor" href="#dependency" aria-hidden="true"><span class="octicon octicon-link"></span></a>Dependency</h2>
 
-<div class="highlight highlight-xml"><pre>&lt;<span class="pl-ent">dependency</span>&gt;
+<div class="highlight highlight-text-xml"><pre>&lt;<span class="pl-ent">dependency</span>&gt;
   &lt;<span class="pl-ent">groupId</span>&gt;de.tu-dresden.inf.lat.uel&lt;/<span class="pl-ent">groupId</span>&gt;
   &lt;<span class="pl-ent">artifactId</span>&gt;uel-ui&lt;/<span class="pl-ent">artifactId</span>&gt;
   &lt;<span class="pl-ent">version</span>&gt;1.3.1&lt;/<span class="pl-ent">version</span>&gt;
@@ -75,6 +75,13 @@ $ jar -cf bundle.jar uel-*
 <pre><code>$ cd target
 $ jar -cf bundle.jar uel-parent-*
 </code></pre>
+
+<p>The version number is updated with:</p>
+
+<pre><code>$ mvn versions:set -DnewVersion=NEW_VERSION
+</code></pre>
+
+<p>where <em>NEW_VERSION</em> is the new version.</p>
 
 <h2>
 <a id="authors" class="anchor" href="#authors" aria-hidden="true"><span class="octicon octicon-link"></span></a>Authors</h2>
