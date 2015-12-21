@@ -21,7 +21,6 @@
 ## Source code
 
 To clone and compile the project:
-
 ```
 $ git clone https://github.com/julianmendez/uel.git
 $ cd uel
@@ -53,6 +52,12 @@ and on the main directory:
 $ cd target
 $ jar -cf bundle.jar uel-parent-*
 ```
+
+The version number is updated with:
+```
+$ mvn versions:set -DnewVersion=NEW_VERSION
+```
+where *NEW_VERSION* is the new version.
 
 
 ## Authors
