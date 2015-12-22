@@ -12,7 +12,6 @@ import java.util.Set;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.IRI;
-import org.semanticweb.owlapi.model.OWLAnnotation;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
@@ -213,11 +212,6 @@ public class UelModel {
 	private String getShortForm(OWLEntity entity, OWLOntology ontology) {
 		if (provider.providesShortForms()) {
 			return provider.getShortForm(entity);
-		}
-
-		for (OWLAnnotation annotation : entity.getAnnotations(ontology,
-				OWLManager.getOWLDataFactory().getRDFSLabel())) {
-			return annotation.getValue().toString();
 		}
 
 		return entity.getIRI().getShortForm();
