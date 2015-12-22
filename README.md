@@ -73,6 +73,7 @@ where *NEW_VERSION* is the new version.
 ## Download
 
   * [all-in-one ZIP file](http://sourceforge.net/projects/uel/files/uel/1.3.1/zip/uel-1.3.1.zip/download)
+  * [The Central Repository](https://repo1.maven.org/maven2/de/tu-dresden/inf/lat/uel/)
   * [older versions](http://sourceforge.net/projects/uel/files/):
 
 
