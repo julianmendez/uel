@@ -31,8 +31,7 @@ import org.semanticweb.owlapi.reasoner.OWLReasoner;
 
 import de.tudresden.inf.lat.jcel.owlapi.main.JcelReasonerFactory;
 import de.tudresden.inf.lat.uel.core.type.KRSSRenderer;
-import de.tudresden.inf.lat.uel.type.api.AtomManager;
-import de.tudresden.inf.lat.uel.type.api.Equation;
+import de.tudresden.inf.lat.uel.type.impl.Unifier;
 
 @RunWith(value = Parameterized.class)
 public class ProcessorTest {
@@ -72,13 +71,6 @@ public class ProcessorTest {
 				.createNonBufferingReasoner(createOntology(new ByteArrayInputStream(ontologyStr.getBytes())));
 		reasoner.precomputeInferences();
 		return reasoner;
-	}
-
-	private void makeVariable(UelModel model, String atomName, boolean undef) {
-		if (undef) {
-			atomName += AtomManager.UNDEF_SUFFIX;
-		}
-		model.getPluginGoal().makeUserVariable(model.getAtomId(atomName));
 	}
 
 	@Parameters(name = "{index}: {0}, {4}")
@@ -139,33 +131,34 @@ public class ProcessorTest {
 				.getOWLEquivalentClassesAxiom(idClassMap.get(conceptC), idClassMap.get(conceptD)));
 		OWLOntology negativeProblem = ontologyManager.createOntology();
 
-		Set<OWLOntology> owlOntologies = new HashSet<OWLOntology>();
-		owlOntologies.add(owlOntology);
-		uelModel.setupPluginGoal(owlOntologies, positiveProblem, negativeProblem, null);
+		uelModel.setupGoal(Collections.singleton(owlOntology), positiveProblem, negativeProblem, null);
 
-		makeVariable(uelModel, idClassMap.get(conceptC).toStringID(), false);
-		makeVariable(uelModel, idClassMap.get(conceptD).toStringID(), false);
+		Set<OWLClass> variables = new HashSet<OWLClass>();
+		variables.add(idClassMap.get(conceptC));
+		variables.add(idClassMap.get(conceptD));
 		for (String var : varNames) {
-			makeVariable(uelModel, idClassMap.get(var).toStringID(), false);
+			variables.add(idClassMap.get(var));
 		}
+		uelModel.makeClassesUserVariables(variables);
+		variables.clear();
 		for (String var : undefVarNames) {
-			makeVariable(uelModel, idClassMap.get(var).toStringID(), true);
+			variables.add(idClassMap.get(var));
 		}
-		uelModel.getPluginGoal().updateUelInput();
+		uelModel.makeUndefClassesUserVariables(variables);
 
-		uelModel.createUelProcessor(processorName);
+		uelModel.initializeUelProcessor(processorName);
 
 		boolean hasUnifiers = true;
 		while (hasUnifiers) {
 			hasUnifiers = uelModel.computeNextUnifier();
 		}
 
-		List<Set<Equation>> unifiers = uelModel.getUnifierList();
+		List<Unifier> unifiers = uelModel.getUnifierList();
 		KRSSRenderer renderer = uelModel.getRenderer(false);
-		String goalStr = renderer.printDefinitions(uelModel.getPluginGoal().getUelInput().getDefinitions());
+		String goalStr = renderer.printDefinitions(uelModel.getGoal().getDefinitions(), false);
 
-		for (Set<Equation> unifier : unifiers) {
-			String extendedOntology = goalStr + renderer.printUnifier(unifier);
+		for (Unifier unifier : unifiers) {
+			String extendedOntology = goalStr + renderer.printDefinitions(unifier.getDefinitions(), true);
 			// System.out.println();
 			// System.out.println("---");
 			// System.out.println(extendedOntology);

@@ -11,7 +11,7 @@ import de.tudresden.inf.lat.uel.type.api.Atom;
 final class EagerExtensionRule extends EagerRule {
 
 	@Override
-	Application getFirstApplication(Subsumption sub, Assignment assign) {
+	Application getFirstApplication(FlatSubsumption sub, Assignment assign) {
 		// extract a variable from the body of sub
 		// if there is more than one such variable, this rule does not apply
 		Atom var = null;
@@ -39,7 +39,7 @@ final class EagerExtensionRule extends EagerRule {
 	}
 
 	@Override
-	Result apply(Subsumption sub, Assignment assign,
+	Result apply(FlatSubsumption sub, Assignment assign,
 			Rule.Application application) {
 		if (!(application instanceof Application)) {
 			throw new IllegalArgumentException(

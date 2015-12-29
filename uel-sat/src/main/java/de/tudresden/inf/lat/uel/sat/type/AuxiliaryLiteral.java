@@ -2,8 +2,8 @@ package de.tudresden.inf.lat.uel.sat.type;
 
 public class AuxiliaryLiteral implements Literal {
 
-	private Integer c, x, d;
-	private int hashCode = 0;
+	private final Integer c, x, d;
+	private final int hashCode;
 
 	public AuxiliaryLiteral(Integer c, Integer x, Integer d) {
 		if ((c == null) || (x == null) || (d == null)) {
@@ -40,21 +40,6 @@ public class AuxiliaryLiteral implements Literal {
 	@Override
 	public int hashCode() {
 		return hashCode;
-	}
-
-	@Override
-	public boolean isAuxiliary() {
-		return true;
-	}
-
-	@Override
-	public boolean isDissubsumption() {
-		return false;
-	}
-
-	@Override
-	public boolean isOrder() {
-		return false;
 	}
 
 	@Override

@@ -7,8 +7,8 @@
 %
 
 % definitions
-atom(A) :- hasatom(A,_,_).
-atom(A) :- hasatom(exists(_,A),_,_).
+atom(A) :- eqhasatom(A,_,_).
+atom(A) :- eqhasatom(exists(_,A),_,_).
 nonvaratom(X) :- atom(X), X!=var(V):atom(var(V)).
 
 
@@ -28,14 +28,14 @@ subs(X,Y) :- subs(exists(R,X),exists(R,Y)).
 
 
 % (I) a
-1 { subs(Y,X):hasatom(Y,|P-1|,E),not triviallyfalse(Y,X) } :- hasatom(X,P,E), nonvaratom(X).
+1 { subs(Y,X):eqhasatom(Y,|P-1|,E),not triviallyfalse(Y,X) } :- eqhasatom(X,P,E), nonvaratom(X).
 
-{ subs(X,C) } :- nonvaratom(C), hasatom(X,P,E), not hasatom(C,PX,E):hasatom(C,PX,E),
+{ subs(X,C) } :- nonvaratom(C), eqhasatom(X,P,E), not eqhasatom(C,PX,E):eqhasatom(C,PX,E),
                  not triviallyfalse(X,C).
 
 % (I) b
-1 { subs(Y,C):hasatom(Y,|P-1|,E),not triviallyfalse(Y,C) } :- subs(X,C), hasatom(X,P,E),
-                  nonvaratom(C), not hasatom(C,PX,E):hasatom(C,PX,E).
+1 { subs(Y,C):eqhasatom(Y,|P-1|,E),not triviallyfalse(Y,C) } :- subs(X,C), eqhasatom(X,P,E),
+                  nonvaratom(C), not eqhasatom(C,PX,E):eqhasatom(C,PX,E).
 
 
 % (VII)

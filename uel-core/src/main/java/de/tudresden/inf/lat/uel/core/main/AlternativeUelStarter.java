@@ -25,11 +25,11 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 
 import de.tudresden.inf.lat.uel.core.processor.BasicOntologyProvider;
-import de.tudresden.inf.lat.uel.core.processor.PluginGoal;
 import de.tudresden.inf.lat.uel.core.processor.UelModel;
 import de.tudresden.inf.lat.uel.core.processor.UelProcessorFactory;
 import de.tudresden.inf.lat.uel.core.type.OWLUelClassDefinition;
-import de.tudresden.inf.lat.uel.type.api.UelInput;
+import de.tudresden.inf.lat.uel.type.api.AtomManager;
+import de.tudresden.inf.lat.uel.type.api.Goal;
 import de.tudresden.inf.lat.uel.type.api.UelProcessor;
 
 public class AlternativeUelStarter {
@@ -228,7 +228,7 @@ public class AlternativeUelStarter {
 			OWLOntology negativeProblem, Set<OWLClass> variables, String processorName) {
 
 		UelModel uelModel = new UelModel(new BasicOntologyProvider(ontologyManager));
-		uelModel.setupPluginGoal(ontologies, positiveProblem, negativeProblem, owlThingAlias);
+		uelModel.setupGoal(ontologies, positiveProblem, negativeProblem, owlThingAlias);
 
 		return modifyOntologyAndSolve(uelModel, variables, processorName);
 	}
@@ -238,7 +238,7 @@ public class AlternativeUelStarter {
 			Set<OWLEquivalentClassesAxiom> disequations, Set<OWLClass> variables, String processorName) {
 
 		UelModel uelModel = new UelModel(new BasicOntologyProvider(ontologyManager));
-		uelModel.setupPluginGoal(ontologies, subsumptions, equations, dissubsumptions, disequations, owlThingAlias);
+		uelModel.setupGoal(ontologies, subsumptions, equations, dissubsumptions, disequations, owlThingAlias);
 
 		return modifyOntologyAndSolve(uelModel, variables, processorName);
 	}
@@ -246,35 +246,30 @@ public class AlternativeUelStarter {
 	private Iterator<Set<OWLUelClassDefinition>> modifyOntologyAndSolve(UelModel uelModel, Set<OWLClass> variables,
 			String processorName) {
 
-		PluginGoal goal = uelModel.getPluginGoal();
-
-		// translate the variables to the IDs, and mark them as variables in the
-		// PluginGoal
-		for (OWLClass var : variables) {
-			goal.makeUserVariable(uelModel.getAtomId(var));
-		}
+		uelModel.makeClassesUserVariables(variables);
 
 		if (markUndefAsVariables) {
 			uelModel.markUndefAsUserVariables();
 		}
 
-		goal.updateUelInput();
-		UelInput input = goal.getUelInput();
-
-		// output unification problem
 		if (verbose) {
-			System.out.println("Final number of atoms: " + input.getAtoms().size());
-			System.out.println("Final number of constants: " + goal.getConstants().size());
-			System.out.println("Final number of variables: " + goal.getVariables().size());
-			System.out.println("Final number of user variables: " + input.getUserVariables().size());
-			System.out.println("Final number of equations: " + input.getEquations().size());
-			System.out.println("Unification problem:");
-			System.out.println(goal.toString());
+			// output unification problem
+			Goal goal = uelModel.getGoal();
+			AtomManager atomManager = goal.getAtomManager();
+			System.out.println("Final number of atoms: " + atomManager.size());
+			System.out.println("Final number of constants: " + atomManager.getConstants().size());
+			System.out.println("Final number of variables: " + atomManager.getVariables().size());
+			System.out.println("Final number of user variables: " + atomManager.getUserVariables().size());
+			System.out.println("Final number of equations: " + goal.getEquations().size());
+			System.out.println("Final number of disequations: " + goal.getDisequations().size());
+			System.out.println("Final number of subsumptions: " + goal.getSubsumptions().size());
+			System.out.println("Final number of dissubsumptions: " + goal.getDissubsumptions().size());
+			System.out.println("(Dis-)Unification problem:");
+			System.out.println(uelModel.printGoal(true));
 		}
 
-		uelProcessor = UelProcessorFactory.createProcessor(processorName, input);
-
-		return new UnifierIterator(uelProcessor, uelModel.getTranslator());
+		uelModel.initializeUelProcessor(processorName);
+		return new UnifierIterator(uelModel.getUelProcessor(), uelModel.getTranslator());
 	}
 
 	public List<Entry<String, String>> getStats() {

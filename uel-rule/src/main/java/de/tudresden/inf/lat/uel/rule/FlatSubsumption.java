@@ -12,7 +12,7 @@ import de.tudresden.inf.lat.uel.type.api.Atom;
  * 
  * @author Stefan Borgwardt
  */
-class Subsumption {
+class FlatSubsumption {
 
 	private final List<Atom> body;
 	private final Atom head;
@@ -27,7 +27,7 @@ class Subsumption {
 	 * @param head
 	 *            the head of the new subsumption
 	 */
-	Subsumption(List<Atom> body, Atom head) {
+	FlatSubsumption(List<Atom> body, Atom head) {
 		if ((body == null) || (head == null)) {
 			throw new IllegalArgumentException("Body and head cannot be null.");
 		}
@@ -45,7 +45,7 @@ class Subsumption {
 	 * @param head
 	 *            the head of the new subsumption
 	 */
-	Subsumption(Atom body, Atom head) {
+	FlatSubsumption(Atom body, Atom head) {
 		if ((body == null) || (head == null)) {
 			throw new IllegalArgumentException("Body and head cannot be null.");
 		}
@@ -118,10 +118,10 @@ class Subsumption {
 			return false;
 		if (obj == this)
 			return true;
-		if (!(obj instanceof Subsumption))
+		if (!(obj instanceof FlatSubsumption))
 			return false;
 
-		Subsumption other = (Subsumption) obj;
+		FlatSubsumption other = (FlatSubsumption) obj;
 		if (!body.containsAll(other.body))
 			return false;
 		if (!other.body.containsAll(body))

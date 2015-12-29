@@ -6,6 +6,7 @@ package de.tudresden.inf.lat.uel.plugin.ui;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -14,8 +15,7 @@ import java.util.Set;
 
 import de.tudresden.inf.lat.uel.core.processor.UelModel;
 import de.tudresden.inf.lat.uel.core.type.KRSSRenderer;
-import de.tudresden.inf.lat.uel.type.api.Equation;
-import de.tudresden.inf.lat.uel.type.impl.EquationImpl;
+import de.tudresden.inf.lat.uel.type.api.Definition;
 
 /**
  * @author Stefan Borgwardt
@@ -45,18 +45,19 @@ public class RefineController {
 	}
 
 	public String getDissubsumptions() {
-		Set<Equation> dissubsumptions = new HashSet<Equation>();
+		Set<Definition> dissubsumptions = new HashSet<Definition>();
 		Map<LabelId, List<LabelId>> map = view.getSelectedAtoms();
 
-		// construct (primitive) equations representing dissubsumptions from
+		// construct (primitive) definitions representing dissubsumptions from
 		// selected atoms
 		for (LabelId var : map.keySet()) {
 			for (LabelId atom : map.get(var)) {
-				dissubsumptions.add(new EquationImpl(var.getId(), atom.getId(), true));
+				dissubsumptions.add(new Definition(var.getId(), Collections.singleton(atom.getId()), true));
 			}
 		}
 
-		return model.getRenderer(false).printUnifier(dissubsumptions, model.getCurrentUnifier());
+		return model.getRenderer(false).printDefinitions(dissubsumptions, model.getCurrentUnifier().getDefinitions(),
+				true);
 	}
 
 	public void open() {
@@ -72,17 +73,18 @@ public class RefineController {
 	private void updateView() {
 		Map<LabelId, List<LabelId>> map = new HashMap<LabelId, List<LabelId>>();
 		KRSSRenderer renderer = model.getRenderer(true);
-		Set<Equation> unifier = model.getCurrentUnifier();
+		Set<Definition> definitions = model.getCurrentUnifier().getDefinitions();
 
 		// convert unifier into map between LabelIds for the view
-		for (Equation eq : unifier) {
-			Integer varId = eq.getLeft();
-			if (model.getPluginGoal().getUserVariables().contains(varId)) {
+		for (Definition definition : definitions) {
+			Integer varId = definition.getDefiniendum();
+			if (model.getGoal().getAtomManager().getUserVariables().contains(varId)) {
 				LabelId var = new LabelId(renderer.getName(varId, false), varId);
 
 				List<LabelId> atoms = new ArrayList<LabelId>();
-				for (Integer atomId : eq.getRight()) {
-					atoms.add(new LabelId(UelModel.removeQuotes(renderer.printAtom(atomId, unifier, true)), atomId));
+				for (Integer atomId : definition.getRight()) {
+					String label = UelModel.removeQuotes(renderer.printAtom(atomId, definitions, true));
+					atoms.add(new LabelId(label, atomId));
 				}
 
 				map.put(var, atoms);

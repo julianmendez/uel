@@ -7,7 +7,7 @@ import java.util.List;
 import de.tudresden.inf.lat.uel.asp.solver.AspProcessor;
 import de.tudresden.inf.lat.uel.rule.RuleProcessor;
 import de.tudresden.inf.lat.uel.sat.solver.SatProcessor;
-import de.tudresden.inf.lat.uel.type.api.UelInput;
+import de.tudresden.inf.lat.uel.type.api.Goal;
 import de.tudresden.inf.lat.uel.type.api.UelProcessor;
 
 /**
@@ -32,14 +32,14 @@ public class UelProcessorFactory {
 	 *            UEL input
 	 * @return a new processor with a given UEL input
 	 */
-	public static UelProcessor createProcessor(String name, UelInput input) {
+	public static UelProcessor createProcessor(String name, Goal input) {
 		UelProcessor ret;
 		if (name.equals(RULE_BASED_ALGORITHM)) {
 			ret = new RuleProcessor(input);
 		} else if (name.equals(SAT_BASED_ALGORITHM)) {
-			ret = new SatProcessor(input, true, false);
+			ret = new SatProcessor(input, false);
 		} else if (name.equals(SAT_BASED_ALGORITHM_MINIMAL)) {
-			ret = new SatProcessor(input, true, true);
+			ret = new SatProcessor(input, true);
 		} else if (name.equals(ASP_BASED_ALGORITHM)) {
 			ret = new AspProcessor(input, false);
 		} else if (name.equals(ASP_BASED_ALGORITHM_MINIMAL)) {

@@ -10,27 +10,24 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import de.tudresden.inf.lat.uel.type.api.Atom;
-import de.tudresden.inf.lat.uel.type.api.Equation;
-import de.tudresden.inf.lat.uel.type.api.UelInput;
-import de.tudresden.inf.lat.uel.type.api.UelOutput;
+import de.tudresden.inf.lat.uel.type.api.Definition;
+import de.tudresden.inf.lat.uel.type.api.Goal;
 import de.tudresden.inf.lat.uel.type.api.UelProcessor;
-import de.tudresden.inf.lat.uel.type.impl.EquationImpl;
-import de.tudresden.inf.lat.uel.type.impl.UelOutputImpl;
+import de.tudresden.inf.lat.uel.type.impl.Unifier;
 
 public class AspProcessor implements UelProcessor {
 
-	private UelInput uelInput;
+	private Goal goal;
 	private AspInput aspInput;
 	private AspOutput aspOutput;
 	private boolean initialized;
-	private Set<Equation> currentUnifier;
+	private Unifier currentUnifier;
 	private boolean isSynchronized;
 	private boolean minimize;
 
-	public AspProcessor(UelInput input, boolean minimize) {
-		this.uelInput = input;
-		this.aspInput = new AspInput(input);
+	public AspProcessor(Goal goal, boolean minimize) {
+		this.goal = goal;
+		this.aspInput = new AspInput(goal);
 		this.initialized = false;
 		this.currentUnifier = null;
 		this.isSynchronized = false;
@@ -50,7 +47,7 @@ public class AspProcessor implements UelProcessor {
 	public boolean computeNextUnifier() throws InterruptedException {
 		// TODO: implement asynchronous execution of ClingoSolver
 		if (!initialized) {
-			AspSolver solver = new ClingoSolver(!uelInput.getGoalDisequations().isEmpty(), false, minimize);
+			AspSolver solver = new ClingoSolver(goal.hasNegativePart(), false, minimize);
 			try {
 				aspOutput = solver.solve(aspInput);
 			} catch (IOException e) {
@@ -76,12 +73,12 @@ public class AspProcessor implements UelProcessor {
 	}
 
 	@Override
-	public UelInput getInput() {
-		return this.uelInput;
+	public Goal getGoal() {
+		return this.goal;
 	}
 
 	@Override
-	public UelOutput getUnifier() {
+	public Unifier getUnifier() {
 		if (aspOutput == null) {
 			throw new IllegalStateException("The unifiers have not been computed yet.");
 		}
@@ -93,21 +90,18 @@ public class AspProcessor implements UelProcessor {
 			currentUnifier = toUnifier(aspOutput.next());
 			isSynchronized = true;
 		}
-		return new UelOutputImpl(currentUnifier);
+		return currentUnifier;
 	}
 
-	private Set<Equation> toUnifier(Map<Integer, Set<Integer>> assignment) {
-		Set<Equation> equations = new HashSet<Equation>();
-		for (Atom at : uelInput.getAtoms()) {
-			if (at.isConceptName() && at.isVariable()) {
-				Integer varId = uelInput.getAtoms().getIndex(at);
-				Set<Integer> body = assignment.get(varId);
-				if (body == null) {
-					body = Collections.emptySet();
-				}
-				equations.add(new EquationImpl(varId, body, false));
+	private Unifier toUnifier(Map<Integer, Set<Integer>> assignment) {
+		Set<Definition> definitions = new HashSet<Definition>();
+		for (Integer varId : goal.getAtomManager().getVariables()) {
+			Set<Integer> body = assignment.get(varId);
+			if (body == null) {
+				body = Collections.emptySet();
 			}
+			definitions.add(new Definition(varId, body, false));
 		}
-		return equations;
+		return new Unifier(definitions);
 	}
 }

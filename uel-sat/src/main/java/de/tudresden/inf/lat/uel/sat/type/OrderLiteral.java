@@ -8,7 +8,7 @@ package de.tudresden.inf.lat.uel.sat.type;
 public class OrderLiteral implements Literal {
 
 	private final Integer first;
-	private int hashCode = 0;
+	private final int hashCode;
 	private final Integer second;
 
 	/**
@@ -56,21 +56,6 @@ public class OrderLiteral implements Literal {
 	@Override
 	public int hashCode() {
 		return hashCode;
-	}
-
-	@Override
-	public boolean isAuxiliary() {
-		return false;
-	}
-
-	@Override
-	public boolean isDissubsumption() {
-		return false;
-	}
-
-	@Override
-	public boolean isOrder() {
-		return true;
 	}
 
 	@Override

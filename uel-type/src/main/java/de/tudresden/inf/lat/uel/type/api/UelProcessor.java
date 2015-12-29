@@ -3,6 +3,8 @@ package de.tudresden.inf.lat.uel.type.api;
 import java.util.List;
 import java.util.Map;
 
+import de.tudresden.inf.lat.uel.type.impl.Unifier;
+
 /**
  * An object implementing this interface computes unifiers.
  * 
@@ -42,7 +44,7 @@ public interface UelProcessor {
 	 * 
 	 * @return the input to be used to compute the next unifier
 	 */
-	UelInput getInput();
+	Goal getGoal();
 
 	/**
 	 * Returns the result of the last computation.
@@ -52,6 +54,6 @@ public interface UelProcessor {
 	 * @throws IllegalStateException
 	 *             if invoked before the first computation
 	 */
-	UelOutput getUnifier();
+	Unifier getUnifier();
 
 }

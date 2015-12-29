@@ -11,7 +11,7 @@ import de.tudresden.inf.lat.uel.type.api.Atom;
 final class ExtensionRule extends Rule {
 
 	@Override
-	Application getFirstApplication(Subsumption sub, Assignment assign) {
+	Application getFirstApplication(FlatSubsumption sub, Assignment assign) {
 		for (Atom at : sub.getBody()) {
 			if (at.isVariable()) {
 				return new Application(at);
@@ -21,7 +21,7 @@ final class ExtensionRule extends Rule {
 	}
 
 	@Override
-	Application getNextApplication(Subsumption sub, Assignment assign,
+	Application getNextApplication(FlatSubsumption sub, Assignment assign,
 			Rule.Application previous) {
 		if (!(previous instanceof Application)) {
 			throw new IllegalArgumentException(
@@ -39,7 +39,7 @@ final class ExtensionRule extends Rule {
 	}
 
 	@Override
-	Result apply(Subsumption sub, Assignment assign,
+	Result apply(FlatSubsumption sub, Assignment assign,
 			Rule.Application application) {
 		if (!(application instanceof Application)) {
 			throw new IllegalArgumentException(

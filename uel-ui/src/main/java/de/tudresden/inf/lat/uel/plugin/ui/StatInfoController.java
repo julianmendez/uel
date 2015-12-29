@@ -37,7 +37,7 @@ class StatInfoController {
 
 		try {
 			BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-			writer.write(model.printPluginGoal(false));
+			writer.write(model.printGoal(false));
 			writer.flush();
 			writer.close();
 		} catch (IOException e) {
@@ -60,7 +60,7 @@ class StatInfoController {
 	}
 
 	public void updateView() {
-		view.setGoalText(model.printPluginGoal(true));
+		view.setGoalText(model.printGoal(true));
 		StringBuffer info = new StringBuffer();
 		for (Map.Entry<String, String> pair : model.getUelProcessor().getInfo()) {
 			info.append(pair.getKey());

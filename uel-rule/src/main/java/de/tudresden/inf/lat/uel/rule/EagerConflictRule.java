@@ -13,7 +13,7 @@ import de.tudresden.inf.lat.uel.type.impl.ExistentialRestriction;
 final class EagerConflictRule extends EagerRule {
 
 	@Override
-	Application getFirstApplication(Subsumption sub, Assignment assign) {
+	Application getFirstApplication(FlatSubsumption sub, Assignment assign) {
 		if (sub.getHead().isConstant()) {
 			// check if the constant appears again in the body of the
 			// subsumption
@@ -49,7 +49,7 @@ final class EagerConflictRule extends EagerRule {
 	}
 
 	@Override
-	Result apply(Subsumption sub, Assignment assign, Application application) {
+	Result apply(FlatSubsumption sub, Assignment assign, Application application) {
 		return new Result(sub, application, false);
 	}
 

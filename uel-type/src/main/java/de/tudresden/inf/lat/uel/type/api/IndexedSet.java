@@ -1,6 +1,5 @@
 package de.tudresden.inf.lat.uel.type.api;
 
-import java.util.Collection;
 import java.util.Set;
 
 /**
@@ -66,7 +65,7 @@ public interface IndexedSet<T> extends Set<T> {
 	 * 
 	 * @return a collection containing the indices
 	 */
-	Collection<Integer> getIndices();
+	Set<Integer> getIndices();
 
 	/**
 	 * Returns the maximum index in this indexed set.

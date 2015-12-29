@@ -7,8 +7,8 @@ import java.util.Set;
 import de.tudresden.inf.lat.uel.core.type.OWLUelClassDefinition;
 import de.tudresden.inf.lat.uel.core.type.UnifierTranslator;
 import de.tudresden.inf.lat.uel.type.api.AtomManager;
-import de.tudresden.inf.lat.uel.type.api.UelOutput;
 import de.tudresden.inf.lat.uel.type.api.UelProcessor;
+import de.tudresden.inf.lat.uel.type.impl.Unifier;
 
 public class UnifierIterator implements Iterator<Set<OWLUelClassDefinition>> {
 
@@ -16,7 +16,7 @@ public class UnifierIterator implements Iterator<Set<OWLUelClassDefinition>> {
 	private boolean isComputed = false;
 	private UelProcessor processor;
 	private UnifierTranslator translator;
-	private UelOutput unifier;
+	private Unifier unifier;
 
 	public UnifierIterator(UelProcessor proc, UnifierTranslator translator) {
 		this.processor = proc;
@@ -67,7 +67,7 @@ public class UnifierIterator implements Iterator<Set<OWLUelClassDefinition>> {
 
 		isComputed = false;
 
-		return translator.createOWLUelClassDefinition(unifier.getEquations());
+		return translator.createOWLUelClassDefinitions(unifier.getDefinitions());
 	}
 
 	@Override

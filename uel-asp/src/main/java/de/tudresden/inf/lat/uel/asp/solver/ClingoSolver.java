@@ -30,15 +30,15 @@ public class ClingoSolver implements AspSolver {
 	private static String COMMON_ARGUMENTS = "--project --outf=2"; // --enum-mode=domRec";
 	private static String HEURISTIC_ARGUMENTS = "--dom-mod=5,16 --heu=Domain";
 
-	private boolean disequations;
+	private boolean hasNegativePart;
 	private boolean types;
 	private boolean minimize;
 	private int maxSolutions = 1;
 	private String program;
 	private File outputFile;
 
-	public ClingoSolver(boolean disequations, boolean types, boolean minimize) {
-		this.disequations = disequations;
+	public ClingoSolver(boolean hasNegativePart, boolean types, boolean minimize) {
+		this.hasNegativePart = hasNegativePart;
 		this.types = types;
 		this.minimize = minimize;
 		try {
@@ -66,7 +66,7 @@ public class ClingoSolver implements AspSolver {
 	public AspOutput solve(AspInput input) throws IOException {
 		StringBuilder programBuilder = new StringBuilder();
 		appendResource(UNIFICATION_PROGRAM, programBuilder);
-		if (disequations) {
+		if (hasNegativePart) {
 			appendResource(DISUNIFICATION_PROGRAM, programBuilder);
 		}
 		if (types) {
@@ -76,7 +76,7 @@ public class ClingoSolver implements AspSolver {
 		programBuilder.append(input.getProgram());
 		this.program = programBuilder.toString();
 		// System.out.println(program);
-		return new ClingoOutput(this, input.getAtoms());
+		return new ClingoOutput(this, input.getAtomManager());
 	}
 
 	public boolean computeMoreSolutions() {

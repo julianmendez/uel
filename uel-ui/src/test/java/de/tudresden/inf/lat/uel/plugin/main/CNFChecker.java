@@ -3,7 +3,6 @@ package de.tudresden.inf.lat.uel.plugin.main;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map.Entry;
@@ -11,14 +10,14 @@ import java.util.Set;
 
 import de.tudresden.inf.lat.uel.core.processor.UelProcessorFactory;
 import de.tudresden.inf.lat.uel.type.api.AtomManager;
+import de.tudresden.inf.lat.uel.type.api.Definition;
+import de.tudresden.inf.lat.uel.type.api.Disequation;
+import de.tudresden.inf.lat.uel.type.api.Dissubsumption;
 import de.tudresden.inf.lat.uel.type.api.Equation;
-import de.tudresden.inf.lat.uel.type.api.SmallEquation;
-import de.tudresden.inf.lat.uel.type.api.UelInput;
+import de.tudresden.inf.lat.uel.type.api.Goal;
+import de.tudresden.inf.lat.uel.type.api.Subsumption;
 import de.tudresden.inf.lat.uel.type.api.UelProcessor;
 import de.tudresden.inf.lat.uel.type.impl.AtomManagerImpl;
-import de.tudresden.inf.lat.uel.type.impl.ConceptName;
-import de.tudresden.inf.lat.uel.type.impl.EquationImpl;
-import de.tudresden.inf.lat.uel.type.impl.UelInputImpl;
 
 /**
  * This class is used to convert a given SAT problem in DIMACS CNF format into a
@@ -39,8 +38,7 @@ public class CNFChecker {
 
 	private static final String SPACES = "\\s+";
 
-	private UelInput input;
-	private AtomManager atomManager;
+	private Goal goal;
 
 	/**
 	 * Construct a new test object to run all different known processors on an
@@ -57,9 +55,8 @@ public class CNFChecker {
 
 	private void constructInput(String cnfFile) throws IOException {
 		BufferedReader reader = new BufferedReader(new FileReader(cnfFile));
-		atomManager = new AtomManagerImpl();
-		Set<Equation> equations = new HashSet<Equation>();
-		Set<Integer> userVariables = new HashSet<Integer>();
+		final AtomManager atomManager = new AtomManagerImpl();
+		final Set<Equation> equations = new HashSet<Equation>();
 
 		String[] line;
 		// ignore initial comments and empty lines
@@ -75,33 +72,29 @@ public class CNFChecker {
 		int numVariables = Integer.parseInt(line[2]);
 		int numClauses = Integer.parseInt(line[3]);
 
-		ConceptName conceptU = atomManager.createConceptName("U", true);
-		Integer uId = atomManager.getAtoms().getIndex(conceptU);
-		// userVariables.add(uId);
-		ConceptName conceptV = atomManager.createConceptName("V", true);
-		Integer vId = atomManager.getAtoms().getIndex(conceptV);
-		// userVariables.add(vId);
-		ConceptName conceptA = atomManager.createConceptName("A", false);
-		Integer aId = atomManager.getAtoms().getIndex(conceptA);
-		ConceptName conceptB = atomManager.createConceptName("B", false);
-		Integer bId = atomManager.getAtoms().getIndex(conceptB);
-		Integer raId = atomManager.getAtoms().getIndex(atomManager.createExistentialRestriction("r", conceptA));
-		Integer rbId = atomManager.getAtoms().getIndex(atomManager.createExistentialRestriction("r", conceptB));
+		Integer uId = atomManager.createConceptName("U");
+		atomManager.makeDefinitionVariable(uId);
+		Integer vId = atomManager.createConceptName("V");
+		atomManager.makeDefinitionVariable(vId);
+		Integer aId = atomManager.createConceptName("A");
+		Integer bId = atomManager.createConceptName("B");
+		Integer raId = atomManager.createExistentialRestriction("r", aId);
+		Integer rbId = atomManager.createExistentialRestriction("r", bId);
 
 		// ensure that Xi / Xni encode the truth value of variable i (A - true,
 		// B - false)
-		equations.add(new EquationImpl(uId, set(raId, rbId), false));
+		equations.add(new Equation(Collections.singleton(uId), set(raId, rbId)));
 		for (int var = 1; var <= numVariables; var++) {
-			ConceptName X = atomManager.createConceptName("X" + var, true);
-			userVariables.add(atomManager.getIndex(X));
-			ConceptName Xn = atomManager.createConceptName("Xn" + var, true);
-			userVariables.add(atomManager.getIndex(Xn));
-			Integer rx = atomManager.getAtoms().getIndex(atomManager.createExistentialRestriction("r", X));
-			Integer rxn = atomManager.getAtoms().getIndex(atomManager.createExistentialRestriction("r", Xn));
-			equations.add(new EquationImpl(uId, set(rx, rxn), false));
+			Integer xId = atomManager.createConceptName("X" + var);
+			atomManager.makeUserVariable(xId);
+			Integer xnId = atomManager.createConceptName("Xn" + var);
+			atomManager.makeUserVariable(xnId);
+			Integer rxId = atomManager.createExistentialRestriction("r", xId);
+			Integer rxnId = atomManager.createExistentialRestriction("r", xnId);
+			equations.add(new Equation(Collections.singleton(uId), set(rxId, rxnId)));
 		}
 
-		equations.add(new EquationImpl(vId, set(aId, bId), false));
+		equations.add(new Equation(Collections.singleton(vId), set(aId, bId)));
 		// translate all clauses
 		for (int clause = 1; clause <= numClauses; clause++) {
 			line = reader.readLine().split(SPACES);
@@ -111,31 +104,62 @@ public class CNFChecker {
 			}
 
 			// construct concept names for all literals in this clause
-			Integer[] literals = new Integer[line.length];
+			Set<Integer> literals = new HashSet<Integer>();
 			for (int litIdx = 0; litIdx < line.length - 1; litIdx++) {
 				int literal = Integer.parseInt(line[litIdx]);
 				if (literal == 0) {
 					reader.close();
 					throw new IOException("Input file is not in DIMACS CNF format!");
 				}
-				if (literal > 0) {
-					literals[litIdx] = atomManager.getAtoms()
-							.getIndex(atomManager.createConceptName("X" + literal, true));
-				} else {
-					literals[litIdx] = atomManager.getAtoms()
-							.getIndex(atomManager.createConceptName("Xn" + (-literal), true));
-				}
+				Integer atomId = (literal > 0) ? atomManager.createConceptName("X" + literal)
+						: atomManager.createConceptName("Xn" + (-literal));
+				atomManager.makeDefinitionVariable(atomId);
+				literals.add(atomId);
 			}
-			literals[line.length - 1] = bId;
+			literals.add(bId);
 
 			// encode the clause
-			equations.add(new EquationImpl(vId, set(literals), false));
+			equations.add(new Equation(Collections.singleton(vId), literals));
 		}
 		reader.close();
 
 		System.out.println("equations: " + equations.size());
-		input = new UelInputImpl(atomManager.getAtoms(), Collections.<Equation> emptySet(), equations,
-				Collections.<SmallEquation> emptySet(), userVariables);
+		goal = new Goal() {
+			@Override
+			public AtomManager getAtomManager() {
+				return atomManager;
+			}
+
+			@Override
+			public Set<Definition> getDefinitions() {
+				return Collections.emptySet();
+			}
+
+			@Override
+			public Set<Equation> getEquations() {
+				return equations;
+			}
+
+			@Override
+			public Set<Disequation> getDisequations() {
+				return Collections.emptySet();
+			}
+
+			@Override
+			public Set<Subsumption> getSubsumptions() {
+				return Collections.emptySet();
+			}
+
+			@Override
+			public Set<Dissubsumption> getDissubsumptions() {
+				return Collections.emptySet();
+			}
+
+			@Override
+			public boolean hasNegativePart() {
+				return false;
+			}
+		};
 	}
 
 	/**
@@ -173,7 +197,7 @@ public class CNFChecker {
 	 *            the string identifier of the processor
 	 */
 	public void runProcessor(String processorName) throws InterruptedException {
-		UelProcessor processor = UelProcessorFactory.createProcessor(processorName, input);
+		UelProcessor processor = UelProcessorFactory.createProcessor(processorName, goal);
 		int numberOfUnifiers = 0;
 		long startTime = System.nanoTime();
 		long firstTime = 0;
@@ -198,10 +222,6 @@ public class CNFChecker {
 		System.out.println("all: " + (endTime - startTime));
 		System.out.println("unifiers: " + numberOfUnifiers);
 		printInfo(processor);
-	}
-
-	private static <T> Set<T> set(T[] elements) {
-		return new HashSet<T>(Arrays.asList(elements));
 	}
 
 	private static <T> Set<T> set(T a, T b) {

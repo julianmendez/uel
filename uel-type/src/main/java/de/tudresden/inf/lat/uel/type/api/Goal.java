@@ -8,48 +8,50 @@ import java.util.Set;
  * @author Stefan Borgwardt
  * @author Julian Mendez
  */
-public interface UelInput {
+public interface Goal {
 
 	/**
 	 * Returns the atom manager.
 	 * 
 	 * @return the atom manager
 	 */
-	IndexedSet<Atom> getAtoms();
+	AtomManager getAtomManager();
 
 	/**
 	 * Returns the set of flattened definitions.
 	 * 
 	 * @return the set of definitions
 	 */
-	Set<Equation> getDefinitions();
+	Set<Definition> getDefinitions();
 
 	/**
 	 * Returns the set of flattened goal equations.
 	 * 
 	 * @return the set of goal equations
 	 */
-	Set<Equation> getGoalEquations();
+	Set<Equation> getEquations();
 
 	/**
 	 * Returns the set of flattened and small goal disequations.
 	 * 
 	 * @return the set of goal disequations
 	 */
-	Set<SmallEquation> getGoalDisequations();
+	Set<Disequation> getDisequations();
 
 	/**
 	 * Returns the set of all flattened equations (definitions and goal).
 	 * 
 	 * @return the set of equations
 	 */
-	Set<Equation> getEquations();
+	Set<Subsumption> getSubsumptions();
 
 	/**
 	 * Returns the set of user variables.
 	 * 
 	 * @return the set of user variables
 	 */
-	Set<Integer> getUserVariables();
+	Set<Dissubsumption> getDissubsumptions();
+
+	boolean hasNegativePart();
 
 }

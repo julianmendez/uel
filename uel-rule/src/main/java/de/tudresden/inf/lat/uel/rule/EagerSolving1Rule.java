@@ -11,7 +11,7 @@ import de.tudresden.inf.lat.uel.type.api.Atom;
 final class EagerSolving1Rule extends EagerRule {
 
 	@Override
-	Application getFirstApplication(Subsumption sub, Assignment assign) {
+	Application getFirstApplication(FlatSubsumption sub, Assignment assign) {
 		Atom head = sub.getHead();
 		for (Atom at : sub.getBody()) {
 			if (at.equals(head)) {
@@ -22,7 +22,7 @@ final class EagerSolving1Rule extends EagerRule {
 	}
 
 	@Override
-	Result apply(Subsumption sub, Assignment assign, Application application) {
+	Result apply(FlatSubsumption sub, Assignment assign, Application application) {
 		return new Result(sub, application);
 	}
 

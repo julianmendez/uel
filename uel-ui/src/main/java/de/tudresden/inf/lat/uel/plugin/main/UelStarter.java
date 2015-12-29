@@ -7,7 +7,7 @@ import org.semanticweb.owlapi.apibinding.OWLManager;
 
 import de.tudresden.inf.lat.uel.core.processor.BasicOntologyProvider;
 import de.tudresden.inf.lat.uel.core.processor.UelModel;
-import de.tudresden.inf.lat.uel.core.processor.UelOntologyProvider;
+import de.tudresden.inf.lat.uel.core.processor.OntologyProvider;
 import de.tudresden.inf.lat.uel.plugin.ui.UelController;
 import de.tudresden.inf.lat.uel.plugin.ui.UelView;
 
@@ -24,7 +24,7 @@ public class UelStarter {
 		this(parent, new BasicOntologyProvider(OWLManager.createOWLOntologyManager()));
 	}
 
-	protected UelStarter(Container parent, UelOntologyProvider provider) {
+	protected UelStarter(Container parent, OntologyProvider provider) {
 		if (parent == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}

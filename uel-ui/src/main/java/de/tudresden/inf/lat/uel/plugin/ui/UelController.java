@@ -127,17 +127,12 @@ public class UelController {
 		unifierController.close();
 
 		// store previously selected variables
-		Set<String> userVariables = new HashSet<String>();
-		for (Integer id : model.getPluginGoal().getUserVariables()) {
-			userVariables.add(model.getAtomName(id));
-		}
+		Set<String> userVariables = model.getUserVariableNames();
 
 		setupModel();
 
 		// restore user variables
-		for (String name : userVariables) {
-			model.getPluginGoal().makeUserVariable(model.getAtomId(name));
-		}
+		model.makeNamesUserVariables(userVariables);
 
 		setupComputation();
 	}
@@ -148,7 +143,7 @@ public class UelController {
 	}
 
 	public void setupComputation() {
-		model.createUelProcessor(view.getSelectedProcessor());
+		model.initializeUelProcessor(view.getSelectedProcessor());
 
 		unifierController = new UnifierController(model);
 		unifierController.addRefineListener(new ActionListener() {
@@ -163,7 +158,7 @@ public class UelController {
 		Set<OWLOntology> bgOntologies = new HashSet<OWLOntology>();
 		bgOntologies.add(view.getSelectedOntologyBg00());
 		bgOntologies.add(view.getSelectedOntologyBg01());
-		model.setupPluginGoal(bgOntologies, view.getSelectedOntologyPos(), view.getSelectedOntologyNeg(), null);
+		model.setupGoal(bgOntologies, view.getSelectedOntologyPos(), view.getSelectedOntologyNeg(), null);
 	}
 
 	public void updateView() {

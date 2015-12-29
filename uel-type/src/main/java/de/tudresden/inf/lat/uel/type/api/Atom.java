@@ -4,7 +4,7 @@ import de.tudresden.inf.lat.uel.type.impl.ConceptName;
 
 /**
  * Represents a flat EL-atom, which can be a concept name or an existential
- * restriction.
+ * restriction over a concept name (possibly the 'top concept name').
  * 
  * @author Stefan Borgwardt
  * @author Julian Mendez
@@ -57,6 +57,33 @@ public interface Atom {
 	 *         restriction and is not ground
 	 */
 	boolean isVariable();
+
+	/**
+	 * Check whether this flat atom is a user variable.
+	 * 
+	 * @return <code>true</code> if and only if this atom is not an existential
+	 *         restriction, is not ground, and was marked by the user
+	 */
+	boolean isUserVariable();
+	
+	/**
+	 * Check whether this flat atom is a variable that was used to import a
+	 * definition from a background ontology.
+	 * 
+	 * @return <code>true</code> if and only if this atom is not an existential
+	 *         restriction, is not ground, and was imported from a background
+	 *         ontology
+	 */
+	boolean isDefinitionVariable();
+	
+	/**
+	 * Check whether this flat atom is a variable that was used to flatten a
+	 * concept description.
+	 * 
+	 * @return <code>true</code> if and only if this atom is not an existential
+	 *         restriction, is not ground, and was introduced by flattening
+	 */
+	boolean isFlatteningVariable();
 
 	/**
 	 * Check whether this atom is the special concept name representing the top

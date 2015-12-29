@@ -23,7 +23,7 @@ abstract class Rule {
 	 * @return a rule application describing the arguments needed to apply this
 	 *         rule or 'null' if the rule is not applicable
 	 */
-	abstract Application getFirstApplication(Subsumption sub, Assignment assign);
+	abstract Application getFirstApplication(FlatSubsumption sub, Assignment assign);
 
 	/**
 	 * Returns the next application of this rule to the given subsumption. It is
@@ -40,7 +40,7 @@ abstract class Rule {
 	 * @return a rule application describing the arguments needed to apply this
 	 *         rule or 'null' if there are no more ways to apply this rule
 	 */
-	abstract Application getNextApplication(Subsumption sub, Assignment assign,
+	abstract Application getNextApplication(FlatSubsumption sub, Assignment assign,
 			Application previous);
 
 	/**
@@ -56,7 +56,7 @@ abstract class Rule {
 	 * @param application
 	 * @return the result of the application
 	 */
-	abstract Result apply(Subsumption sub, Assignment assign,
+	abstract Result apply(FlatSubsumption sub, Assignment assign,
 			Application application);
 
 	/**

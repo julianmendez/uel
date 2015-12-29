@@ -26,27 +26,6 @@ public interface Literal {
 	Integer getSecond();
 
 	/**
-	 * Tells whether this literal is an auxiliary literal.
-	 * 
-	 * @return <code>true</code> if and only if this is an auxiliary literal
-	 */
-	boolean isAuxiliary();
-
-	/**
-	 * Tells whether this literal is a dissubsumption literal.
-	 * 
-	 * @return <code>true</code> if and only if this is a dissubsumption literal
-	 */
-	boolean isDissubsumption();
-
-	/**
-	 * Tells whether this literal is an order literal.
-	 * 
-	 * @return <code>true</code> if and only if this is an order literal
-	 */
-	boolean isOrder();
-
-	/**
 	 * Tells whether this literal is a subsumption literal.
 	 * 
 	 * @return <code>true</code> if and only if this is a subsumption literal

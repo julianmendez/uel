@@ -1,91 +1,75 @@
 package de.tudresden.inf.lat.uel.core.type;
 
-import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import org.semanticweb.owlapi.model.IRI;
 
-import de.tudresden.inf.lat.uel.type.api.Atom;
 import de.tudresden.inf.lat.uel.type.api.AtomManager;
-import de.tudresden.inf.lat.uel.type.api.Equation;
-import de.tudresden.inf.lat.uel.type.api.SmallEquation;
+import de.tudresden.inf.lat.uel.type.api.Definition;
+import de.tudresden.inf.lat.uel.type.api.Axiom;
+import de.tudresden.inf.lat.uel.type.api.Goal;
 import de.tudresden.inf.lat.uel.type.cons.KRSSKeyword;
-import de.tudresden.inf.lat.uel.type.impl.ConceptName;
 
 public class KRSSRenderer {
 
 	private final AtomManager atomManager;
-	private final Set<Integer> auxiliaryVariables;
-	private final Map<String, String> mapIdLabel;
-	private final Set<Integer> userVariables;
+	private final Map<String, String> shortFormMap;
 
-	public KRSSRenderer(AtomManager atomManager, Set<Integer> userVariables, Set<Integer> auxiliaryVariables,
-			Map<String, String> mapIdLabel) {
+	public KRSSRenderer(AtomManager atomManager, Map<String, String> shortFormMap) {
 		this.atomManager = atomManager;
-		this.userVariables = userVariables;
-		if (auxiliaryVariables == null) {
-			this.auxiliaryVariables = new HashSet<Integer>();
-		} else {
-			this.auxiliaryVariables = auxiliaryVariables;
-		}
-		this.mapIdLabel = mapIdLabel;
+		this.shortFormMap = shortFormMap;
 	}
 
-	private void appendAtom(StringBuffer sbuf, Atom atom) {
-		appendAtom(sbuf, atom, new HashSet<Equation>(), false);
-	}
-
-	private void appendAtom(StringBuffer sbuf, Atom atom, Set<Equation> equations, boolean restrictToUserVariables) {
-		if (atom.isExistentialRestriction()) {
-			ConceptName child = atom.getConceptName();
-			Integer conceptId = atomManager.getAtoms().getIndex(child);
+	private void appendAtom(StringBuffer sbuf, Integer atomId, Set<Definition> background,
+			boolean restrictToUserVariables) {
+		if (atomManager.getExistentialRestrictions().contains(atomId)) {
+			Integer childId = atomManager.getChild(atomId);
 
 			sbuf.append(KRSSKeyword.open);
 			sbuf.append(KRSSKeyword.some);
 			sbuf.append(KRSSKeyword.space);
-			String roleName = atomManager.printRoleName(atom);
-			if (mapIdLabel != null) {
-				roleName = getLabel(roleName);
+			String roleName = atomManager.printRoleName(atomId);
+			if (shortFormMap != null) {
+				roleName = getShortForm(roleName, true);
 			}
 			sbuf.append(roleName);
 			sbuf.append(KRSSKeyword.space);
-			if (restrictToUserVariables && auxiliaryVariables.contains(conceptId)) {
-				appendConjunction(sbuf, getSetOfSubsumers(child, equations), equations, restrictToUserVariables);
+			if (restrictToUserVariables && atomManager.getFlatteningVariables().contains(childId)) {
+				appendConjunction(sbuf, getDefinition(childId, background), background, restrictToUserVariables);
 			} else {
-				appendName(sbuf, child);
+				appendName(sbuf, childId, true);
 			}
 			sbuf.append(KRSSKeyword.close);
 		} else {
-			appendName(sbuf, (ConceptName) atom);
+			appendName(sbuf, atomId, true);
 		}
 	}
 
-	private void appendAtomId(StringBuffer sbuf, Integer atomId) {
-		appendAtom(sbuf, toAtom(atomId));
+	private void appendAxioms(StringBuffer sbuf, Set<? extends Axiom> axioms) {
+		for (Axiom axiom : axioms) {
+			appendConjunction(sbuf, axiom.getLeft(), Collections.<Definition> emptySet(), false);
+			sbuf.append(" ");
+			sbuf.append(axiom.getConnective());
+			sbuf.append(" ");
+			appendConjunction(sbuf, axiom.getRight(), Collections.<Definition> emptySet(), false);
+			sbuf.append(System.lineSeparator());
+			sbuf.append(System.lineSeparator());
+		}
 	}
 
-	private void appendAtomId(StringBuffer sbuf, Integer atomId, Set<Equation> equations,
+	private void appendConjunction(StringBuffer sbuf, Set<Integer> atomIds, Set<Definition> background,
 			boolean restrictToUserVariables) {
-		appendAtom(sbuf, toAtom(atomId), equations, restrictToUserVariables);
-	}
 
-	private void appendConjunction(StringBuffer sbuf, Collection<Atom> atoms) {
-		appendConjunction(sbuf, atoms, new HashSet<Equation>(), false);
-	}
-
-	private void appendConjunction(StringBuffer sbuf, Collection<Atom> atoms, Set<Equation> equations,
-			boolean restrictToUserVariables) {
-
-		if (atoms.isEmpty()) {
+		if (atomIds.isEmpty()) {
 
 			sbuf.append(KRSSKeyword.top);
 
-		} else if (atoms.size() == 1) {
+		} else if (atomIds.size() == 1) {
 
-			Atom atom = atoms.iterator().next();
-			appendAtom(sbuf, atom, equations, restrictToUserVariables);
+			appendAtom(sbuf, atomIds.iterator().next(), background, restrictToUserVariables);
 
 		} else {
 
@@ -93,8 +77,8 @@ public class KRSSRenderer {
 			sbuf.append(KRSSKeyword.and);
 			sbuf.append(KRSSKeyword.space);
 
-			for (Atom atom : atoms) {
-				appendAtom(sbuf, atom, equations, restrictToUserVariables);
+			for (Integer atomId : atomIds) {
+				appendAtom(sbuf, atomId, background, restrictToUserVariables);
 				sbuf.append(KRSSKeyword.space);
 			}
 
@@ -103,52 +87,35 @@ public class KRSSRenderer {
 		}
 	}
 
-	private void appendConjunctionIds(StringBuffer sbuf, Collection<Integer> atomIds) {
-		appendConjunction(sbuf, toAtoms(atomIds), new HashSet<Equation>(), false);
+	private void appendName(StringBuffer sbuf, Integer atomId, boolean quotes) {
+		sbuf.append(getName(atomId, true));
 	}
 
-	private void appendConjunctionIds(StringBuffer sbuf, Collection<Integer> atomIds, Set<Equation> equations,
-			boolean restrictToUserVariables) {
-		appendConjunction(sbuf, toAtoms(atomIds), equations, restrictToUserVariables);
-	}
-
-	public void appendCustomEquations(StringBuffer sbuf, Collection<Equation> equations, String sep) {
-		for (Equation eq : equations) {
-			appendAtomId(sbuf, eq.getLeft());
-			sbuf.append(sep);
-			appendConjunctionIds(sbuf, eq.getRight());
-			sbuf.append(System.lineSeparator());
-			sbuf.append(System.lineSeparator());
+	private Set<Integer> getDefinition(Integer atomId, Set<Definition> background) {
+		for (Definition definition : background) {
+			if (definition.getDefiniendum().equals(atomId)) {
+				return definition.getRight();
+			}
 		}
+		throw new IllegalArgumentException("Atom has no definition.");
 	}
 
-	public void appendCustomSmallEquations(StringBuffer sbuf, Collection<SmallEquation> equations, String sep) {
-		for (SmallEquation eq : equations) {
-			appendAtomId(sbuf, eq.getLeft());
-			sbuf.append(sep);
-			appendAtomId(sbuf, eq.getRight());
-			sbuf.append(System.lineSeparator());
-			sbuf.append(System.lineSeparator());
+	public String getName(Integer atomId, boolean quotes) {
+		String name = atomManager.printConceptName(atomId);
+		if (shortFormMap != null) {
+			name = getShortForm(name, quotes);
 		}
-
+		return name;
 	}
 
-	private void appendName(StringBuffer sbuf, ConceptName child) {
-		sbuf.append(getName(child, true));
-	}
-
-	private String getLabel(String id) {
-		return getLabel(id, true);
-	}
-
-	private String getLabel(String id, boolean quotes) {
+	private String getShortForm(String id, boolean quotes) {
 		boolean alias = false;
 		String label = id;
 		if (id.endsWith(AtomManager.UNDEF_SUFFIX)) {
 			label = id.substring(0, id.length() - AtomManager.UNDEF_SUFFIX.length());
 		}
 
-		String str = this.mapIdLabel.get(label);
+		String str = shortFormMap.get(label);
 		if (str != null) {
 			alias = true;
 			label = str;
@@ -166,62 +133,41 @@ public class KRSSRenderer {
 		}
 	}
 
-	private String getName(Atom atom, boolean quotes) {
-		String name = atomManager.printConceptName(atom);
-		if (mapIdLabel != null) {
-			name = getLabel(name, quotes);
-		}
-		return name;
-	}
-
-	public String getName(Integer id, boolean quotes) {
-		return getName(atomManager.getAtom(id), quotes);
-	}
-
-	private Collection<Atom> getSetOfSubsumers(Atom atom, Set<Equation> equations) {
-		Integer atomId = atomManager.getAtoms().addAndGetIndex(atom);
-		for (Equation equation : equations) {
-			if (equation.getLeft().equals(atomId)) {
-				return toAtoms(equation.getRight());
-			}
-		}
-		throw new IllegalArgumentException("Atom has no definition.");
-	}
-
 	public String printAtom(Integer atomId) {
-		return printAtom(atomId, new HashSet<Equation>(), false);
+		return printAtom(atomId, new HashSet<Definition>(), false);
 	}
 
-	public String printAtom(Integer atomId, Set<Equation> equations, boolean restrictToUserVariables) {
+	public String printAtom(Integer atomId, Set<Definition> background, boolean restrictToUserVariables) {
 		StringBuffer sbuf = new StringBuffer();
-		appendAtomId(sbuf, atomId, equations, restrictToUserVariables);
+		appendAtom(sbuf, atomId, background, restrictToUserVariables);
 		return sbuf.toString();
 	}
 
-	public String printConjunction(Collection<Integer> conjuncts) {
+	public String printConjunction(Set<Integer> atomIds) {
 		StringBuffer sbuf = new StringBuffer();
-		appendConjunction(sbuf, toAtoms(conjuncts), new HashSet<Equation>(), false);
+		appendConjunction(sbuf, atomIds, Collections.<Definition> emptySet(), false);
 		return sbuf.toString();
 	}
 
-	public String printDefinitions(Set<Equation> definitions) {
-		return printEquations(definitions, definitions, false);
+	public String printDefinitions(Set<Definition> definitions, boolean restrictToUserVariables) {
+		return printDefinitions(definitions, definitions, restrictToUserVariables);
 	}
 
-	private String printEquations(Set<Equation> equations, Set<Equation> background, boolean restrictToUserVariables) {
+	public String printDefinitions(Set<Definition> definitions, Set<Definition> background,
+			boolean restrictToUserVariables) {
 		StringBuffer sbuf = new StringBuffer();
-		for (Equation eq : equations) {
-			if (!restrictToUserVariables || userVariables.contains(eq.getLeft())) {
+		for (Definition definition : definitions) {
+			if (!restrictToUserVariables || atomManager.getUserVariables().contains(definition.getDefiniendum())) {
 				sbuf.append(KRSSKeyword.open);
-				if (eq.isPrimitive()) {
+				if (definition.isPrimitive()) {
 					sbuf.append(KRSSKeyword.define_primitive_concept);
 				} else {
 					sbuf.append(KRSSKeyword.define_concept);
 				}
 				sbuf.append(KRSSKeyword.space);
-				appendAtomId(sbuf, eq.getLeft(), background, restrictToUserVariables);
+				appendAtom(sbuf, definition.getDefiniendum(), background, restrictToUserVariables);
 				sbuf.append(KRSSKeyword.space);
-				appendConjunctionIds(sbuf, eq.getRight(), background, restrictToUserVariables);
+				appendConjunction(sbuf, definition.getRight(), background, restrictToUserVariables);
 				sbuf.append(KRSSKeyword.close);
 				sbuf.append(System.lineSeparator());
 				sbuf.append(System.lineSeparator());
@@ -230,24 +176,13 @@ public class KRSSRenderer {
 		return sbuf.toString();
 	}
 
-	public String printUnifier(Set<Equation> unifier) {
-		return printUnifier(unifier, unifier);
+	public String printGoal(Goal input) {
+		StringBuffer sbuf = new StringBuffer();
+		appendAxioms(sbuf, input.getDefinitions());
+		appendAxioms(sbuf, input.getEquations());
+		appendAxioms(sbuf, input.getSubsumptions());
+		appendAxioms(sbuf, input.getDisequations());
+		appendAxioms(sbuf, input.getDissubsumptions());
+		return sbuf.toString();
 	}
-
-	public String printUnifier(Set<Equation> unifier, Set<Equation> background) {
-		return printEquations(unifier, background, true);
-	}
-
-	private Atom toAtom(Integer atomId) {
-		return atomManager.getAtoms().get(atomId);
-	}
-
-	private Collection<Atom> toAtoms(Collection<Integer> atomIds) {
-		Set<Atom> ret = new HashSet<Atom>();
-		for (Integer atomId : atomIds) {
-			ret.add(toAtom(atomId));
-		}
-		return ret;
-	}
-
 }

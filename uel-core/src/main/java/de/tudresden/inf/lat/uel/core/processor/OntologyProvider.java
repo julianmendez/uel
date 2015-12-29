@@ -13,7 +13,7 @@ import org.semanticweb.owlapi.model.OWLOntology;
  * @author Stefan Borgwardt
  *
  */
-public interface UelOntologyProvider {
+public interface OntologyProvider {
 
 	OWLOntology createOntology();
 	

@@ -13,14 +13,11 @@ import java.util.Set;
 
 import de.tudresden.inf.lat.uel.rule.Rule.Application;
 import de.tudresden.inf.lat.uel.type.api.Atom;
-import de.tudresden.inf.lat.uel.type.api.Equation;
-import de.tudresden.inf.lat.uel.type.api.IndexedSet;
-import de.tudresden.inf.lat.uel.type.api.UelInput;
-import de.tudresden.inf.lat.uel.type.api.UelOutput;
+import de.tudresden.inf.lat.uel.type.api.AtomManager;
+import de.tudresden.inf.lat.uel.type.api.Definition;
+import de.tudresden.inf.lat.uel.type.api.Goal;
 import de.tudresden.inf.lat.uel.type.api.UelProcessor;
-import de.tudresden.inf.lat.uel.type.impl.EquationImpl;
-import de.tudresden.inf.lat.uel.type.impl.ExtendedUelInput;
-import de.tudresden.inf.lat.uel.type.impl.UelOutputImpl;
+import de.tudresden.inf.lat.uel.type.impl.Unifier;
 
 /**
  * This class is used to solve a unification problem using a rule-based
@@ -53,8 +50,8 @@ public class RuleProcessor implements UelProcessor {
 	private List<EagerRule> dynamicEagerRules;
 	private List<Rule> nondeterministicRules;
 
-	private UelInput input;
-	private Goal goal;
+	private Goal input;
+	private NormalizedGoal goal;
 	private Assignment assignment;
 	private final int initialSize;
 	private int treeSize = 1;
@@ -70,18 +67,18 @@ public class RuleProcessor implements UelProcessor {
 	 *            a UelInput object that will return the subsumptions to be
 	 *            solved
 	 */
-	public RuleProcessor(UelInput input) {
-		this.goal = new Goal(input);
+	public RuleProcessor(Goal input) {
+		this.goal = new NormalizedGoal(input);
 		this.input = input;
-		if ((input.getGoalDisequations() != null) && (input.getGoalDisequations().size() > 0)) {
-			throw new UnsupportedOperationException("The rule processor cannot deal with disequations!");
+		if (input.hasNegativePart()) {
+			throw new UnsupportedOperationException(
+					"The rule processor cannot deal with dissubsubmptions or disequations!");
 		}
 		this.assignment = new Assignment();
 		this.initialSize = goal.size();
-		ExtendedUelInput extUelInput = new ExtendedUelInput(getInput());
-		this.numVariables = extUelInput.getVariables().size();
+		this.numVariables = input.getAtomManager().getVariables().size();
 
-		for (Subsumption sub : goal) {
+		for (FlatSubsumption sub : goal) {
 			if (sub.getHead().isVariable()) {
 				// subsumptions with a variable on the right-hand side are
 				// always solved
@@ -98,7 +95,7 @@ public class RuleProcessor implements UelProcessor {
 		searchStack = null;
 	}
 
-	public UelInput getInput() {
+	public Goal getGoal() {
 		return input;
 	}
 
@@ -150,7 +147,7 @@ public class RuleProcessor implements UelProcessor {
 			Result res = applyEagerRules(goal, staticEagerRules, null);
 			if (!res.wasSuccessful())
 				return false;
-			for (Subsumption sub : res.getSolvedSubsumptions()) {
+			for (FlatSubsumption sub : res.getSolvedSubsumptions()) {
 				sub.setSolved(true);
 			}
 			Assignment tmp = new Assignment();
@@ -174,20 +171,18 @@ public class RuleProcessor implements UelProcessor {
 	}
 
 	@Override
-	public UelOutput getUnifier() {
-		// convert current assignment to a set of equations
-		IndexedSet<Atom> atoms = input.getAtoms();
-		Set<Equation> equations = new HashSet<Equation>();
-		for (Atom atom : atoms) {
-			if (atom.isVariable()) {
-				Set<Integer> body = new HashSet<Integer>();
-				for (Atom subsumer : assignment.getSubsumers(atom)) {
-					body.add(atoms.getIndex(subsumer));
-				}
-				equations.add(new EquationImpl(atoms.getIndex(atom), body, false));
+	public Unifier getUnifier() {
+		// convert current assignment to a set of definitions
+		AtomManager atomManager = input.getAtomManager();
+		Set<Definition> definitions = new HashSet<Definition>();
+		for (Integer varId : atomManager.getVariables()) {
+			Set<Integer> body = new HashSet<Integer>();
+			for (Atom subsumer : assignment.getSubsumers(atomManager.getAtom(varId))) {
+				body.add(atomManager.getIndex(subsumer));
 			}
+			definitions.add(new Definition(varId, body, false));
 		}
-		return new UelOutputImpl(equations);
+		return new Unifier(definitions);
 	}
 
 	private boolean solve() throws InterruptedException {
@@ -197,7 +192,7 @@ public class RuleProcessor implements UelProcessor {
 				throw new InterruptedException();
 			}
 
-			Subsumption sub = chooseUnsolvedSubsumption();
+			FlatSubsumption sub = chooseUnsolvedSubsumption();
 			if (sub == null)
 				return true;
 			if (applyNextNondeterministicRule(sub, null))
@@ -219,17 +214,17 @@ public class RuleProcessor implements UelProcessor {
 		return false;
 	}
 
-	private Subsumption chooseUnsolvedSubsumption() {
-		for (Subsumption sub : goal) {
+	private FlatSubsumption chooseUnsolvedSubsumption() {
+		for (FlatSubsumption sub : goal) {
 			if (!sub.isSolved())
 				return sub;
 		}
 		return null;
 	}
 
-	private Result applyEagerRules(Collection<Subsumption> subs, List<EagerRule> rules, Assignment currentAssignment) {
+	private Result applyEagerRules(Collection<FlatSubsumption> subs, List<EagerRule> rules, Assignment currentAssignment) {
 		Result res = new Result(null, null);
-		for (Subsumption sub : subs) {
+		for (FlatSubsumption sub : subs) {
 			if (!sub.isSolved()) {
 				for (Rule rule : rules) {
 					Result r = tryApplyRule(sub, rule, null, currentAssignment);
@@ -249,7 +244,7 @@ public class RuleProcessor implements UelProcessor {
 		return res;
 	}
 
-	private boolean applyNextNondeterministicRule(Subsumption sub, Rule.Application previous) {
+	private boolean applyNextNondeterministicRule(FlatSubsumption sub, Rule.Application previous) {
 		Iterator<Rule> iter = nondeterministicRules
 				.listIterator((previous == null) ? 0 : nondeterministicRules.indexOf(previous.rule()));
 
@@ -350,7 +345,7 @@ public class RuleProcessor implements UelProcessor {
 	 * @return the result of the rule application or 'null' if no more rule
 	 *         applications are possible
 	 */
-	private Result tryApplyRule(Subsumption sub, Rule rule, Application previous, Assignment currentAssignment) {
+	private Result tryApplyRule(FlatSubsumption sub, Rule rule, Application previous, Assignment currentAssignment) {
 		Rule.Application next;
 		if (previous == null) {
 			next = rule.getFirstApplication(sub, currentAssignment);
@@ -388,7 +383,7 @@ public class RuleProcessor implements UelProcessor {
 		// add new unsolved subsumptions to the goal
 		res.getNewUnsolvedSubsumptions().removeAll(goal);
 		goal.addAll(res.getNewUnsolvedSubsumptions());
-		for (Subsumption sub : res.getNewUnsolvedSubsumptions()) {
+		for (FlatSubsumption sub : res.getNewUnsolvedSubsumptions()) {
 			if (sub.getHead().isVariable()) {
 				// subsumptions with a variable on the right-hand side are
 				// always solved
@@ -399,17 +394,17 @@ public class RuleProcessor implements UelProcessor {
 		res.getNewUnsolvedSubsumptions().removeAll(res.getNewSolvedSubsumptions());
 
 		// goal expansion (I)
-		for (Subsumption sub : res.getNewSolvedSubsumptions()) {
+		for (FlatSubsumption sub : res.getNewSolvedSubsumptions()) {
 			/*
 			 * we can assume that all new solved subsumptions have a variable in
 			 * the head
 			 */
-			Set<Subsumption> newSubs = goal.expand(sub, assignment.getSubsumers(sub.getHead()));
+			Set<FlatSubsumption> newSubs = goal.expand(sub, assignment.getSubsumers(sub.getHead()));
 			res.getNewUnsolvedSubsumptions().addAll(newSubs);
 		}
 
 		// solve subsumptions in 'res.solvedSubsumptions'
-		for (Subsumption sub : res.getSolvedSubsumptions()) {
+		for (FlatSubsumption sub : res.getSolvedSubsumptions()) {
 			sub.setSolved(true);
 		}
 
@@ -422,14 +417,14 @@ public class RuleProcessor implements UelProcessor {
 		}
 
 		// goal expansion (II)
-		Set<Subsumption> newSubs = goal.expand(res.getNewSubsumers());
+		Set<FlatSubsumption> newSubs = goal.expand(res.getNewSubsumers());
 		res.getNewUnsolvedSubsumptions().addAll(newSubs);
 
 		// try to solve new unsolved subsumptions by static eager rules
 		Result eagerRes = applyEagerRules(res.getNewUnsolvedSubsumptions(), staticEagerRules, null);
 		if (!eagerRes.wasSuccessful())
 			return false;
-		for (Subsumption sub : eagerRes.getSolvedSubsumptions()) {
+		for (FlatSubsumption sub : eagerRes.getSolvedSubsumptions()) {
 			sub.setSolved(true);
 		}
 		res.amend(eagerRes);
@@ -448,7 +443,7 @@ public class RuleProcessor implements UelProcessor {
 		goal.removeAll(res.getNewSolvedSubsumptions());
 		goal.removeAll(res.getNewUnsolvedSubsumptions());
 
-		for (Subsumption sub : res.getSolvedSubsumptions()) {
+		for (FlatSubsumption sub : res.getSolvedSubsumptions()) {
 			sub.setSolved(false);
 		}
 

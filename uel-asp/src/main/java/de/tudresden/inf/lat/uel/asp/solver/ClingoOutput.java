@@ -16,7 +16,7 @@ import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import de.tudresden.inf.lat.uel.type.api.Atom;
-import de.tudresden.inf.lat.uel.type.api.IndexedSet;
+import de.tudresden.inf.lat.uel.type.api.AtomManager;
 import de.tudresden.inf.lat.uel.type.impl.ConceptName;
 import de.tudresden.inf.lat.uel.type.impl.ExistentialRestriction;
 
@@ -32,15 +32,15 @@ public class ClingoOutput implements AspOutput {
 	private static String OPTIMUM_FOUND = "OPTIMUM FOUND";
 
 	private ClingoSolver solver;
-	private IndexedSet<Atom> atoms;
+	private AtomManager atomManager;
 	private List<Map<Integer, Set<Integer>>> assignments;
 	private List<Entry<String, String>> stats;
 	private int currentIndex;
 	private boolean finished;
 
-	public ClingoOutput(ClingoSolver solver, IndexedSet<Atom> atoms) {
+	public ClingoOutput(ClingoSolver solver, AtomManager atomManager) {
 		this.solver = solver;
-		this.atoms = atoms;
+		this.atomManager = atomManager;
 		this.assignments = new ArrayList<Map<Integer, Set<Integer>>>();
 		this.currentIndex = -1;
 		this.finished = false;
@@ -95,7 +95,7 @@ public class ClingoOutput implements AspOutput {
 				parenthesisIndex));
 		Atom nonVarAtom = parseAtom(subsumption.substring(parenthesisIndex + 2,
 				subsumption.length() - 1));
-		Integer atomId = atoms.getIndex(nonVarAtom);
+		Integer atomId = atomManager.getIndex(nonVarAtom);
 
 		Set<Integer> subsumers = assignment.get(varId);
 		if (subsumers == null) {
@@ -117,11 +117,11 @@ public class ClingoOutput implements AspOutput {
 		case 'c':
 			Integer atomId = Integer.parseInt(encoding.substring(7,
 					encoding.length() - 1));
-			return atoms.get(atomId);
+			return atomManager.getAtom(atomId);
 		case 'v':
 			atomId = Integer.parseInt(encoding.substring(5,
 					encoding.length() - 1));
-			return atoms.get(atomId);
+			return atomManager.getAtom(atomId);
 		default:
 			throw new IOException("Invalid atom encoding.");
 		}

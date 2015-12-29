@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import de.tudresden.inf.lat.uel.type.api.IndexedSet;
 
@@ -127,8 +128,8 @@ public class IndexedSetImpl<T> implements IndexedSet<T> {
 	}
 
 	@Override
-	public Collection<Integer> getIndices() {
-		return Collections.unmodifiableCollection(this.map.values());
+	public Set<Integer> getIndices() {
+		return Collections.unmodifiableSet(invMap.keySet());
 	}
 
 	@Override

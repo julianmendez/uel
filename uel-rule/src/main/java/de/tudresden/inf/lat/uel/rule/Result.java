@@ -14,11 +14,11 @@ import de.tudresden.inf.lat.uel.rule.Rule.Application;
  */
 final class Result {
 
-	private final Subsumption subsumption;
+	private final FlatSubsumption subsumption;
 	private final Application application;
-	private final Set<Subsumption> newUnsolvedSubsumptions = new HashSet<Subsumption>();
-	private final Set<Subsumption> newSolvedSubsumptions = new HashSet<Subsumption>();
-	private final Set<Subsumption> solvedSubsumptions = new HashSet<Subsumption>();
+	private final Set<FlatSubsumption> newUnsolvedSubsumptions = new HashSet<FlatSubsumption>();
+	private final Set<FlatSubsumption> newSolvedSubsumptions = new HashSet<FlatSubsumption>();
+	private final Set<FlatSubsumption> solvedSubsumptions = new HashSet<FlatSubsumption>();
 	private final Assignment newSubsumers = new Assignment();
 	private boolean successful;
 
@@ -32,7 +32,7 @@ final class Result {
 	 * @param successful
 	 *            a flag indicating whether the rule application was successful
 	 */
-	Result(Subsumption subsumption, Application application, boolean successful) {
+	Result(FlatSubsumption subsumption, Application application, boolean successful) {
 		this.subsumption = subsumption;
 		this.application = application;
 		this.successful = successful;
@@ -47,7 +47,7 @@ final class Result {
 	 * @param application
 	 *            the rule application
 	 */
-	Result(Subsumption subsumption, Application application) {
+	Result(FlatSubsumption subsumption, Application application) {
 		this(subsumption, application, true);
 	}
 
@@ -69,13 +69,13 @@ final class Result {
 
 		newUnsolvedSubsumptions.addAll(res.newUnsolvedSubsumptions);
 		newSolvedSubsumptions.addAll(res.newSolvedSubsumptions);
-		for (Subsumption sub : res.solvedSubsumptions) {
+		for (FlatSubsumption sub : res.solvedSubsumptions) {
 			solveSubsumption(sub);
 		}
 		newSubsumers.addAll(res.newSubsumers);
 	}
 
-	private void solveSubsumption(Subsumption sub) {
+	private void solveSubsumption(FlatSubsumption sub) {
 		if (newUnsolvedSubsumptions.remove(sub)) {
 			newSolvedSubsumptions.add(sub);
 		} else {
@@ -88,7 +88,7 @@ final class Result {
 	 * 
 	 * @return the triggering subsumption
 	 */
-	Subsumption getSubsumption() {
+	FlatSubsumption getSubsumption() {
 		return subsumption;
 	}
 
@@ -137,7 +137,7 @@ final class Result {
 	 * 
 	 * @return a set of new unsolved subsumptions
 	 */
-	Set<Subsumption> getNewUnsolvedSubsumptions() {
+	Set<FlatSubsumption> getNewUnsolvedSubsumptions() {
 		return newUnsolvedSubsumptions;
 	}
 
@@ -147,7 +147,7 @@ final class Result {
 	 * 
 	 * @return a set of new unsolved subsumptions
 	 */
-	Set<Subsumption> getNewSolvedSubsumptions() {
+	Set<FlatSubsumption> getNewSolvedSubsumptions() {
 		return newSolvedSubsumptions;
 	}
 
@@ -157,7 +157,7 @@ final class Result {
 	 * 
 	 * @return a set of solved subsumptions
 	 */
-	Set<Subsumption> getSolvedSubsumptions() {
+	Set<FlatSubsumption> getSolvedSubsumptions() {
 		return solvedSubsumptions;
 	}
 

@@ -15,7 +15,7 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
  * @author Stefan Borgwardt
  *
  */
-public class BasicOntologyProvider implements UelOntologyProvider {
+public class BasicOntologyProvider implements OntologyProvider {
 
 	private OWLOntologyManager manager;
 

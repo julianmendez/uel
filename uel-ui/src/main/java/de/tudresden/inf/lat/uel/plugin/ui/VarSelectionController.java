@@ -36,14 +36,14 @@ class VarSelectionController {
 
 	private void executeMakeCons() {
 		for (LabelId variable : view.getSelectedVariables()) {
-			model.getPluginGoal().makeConstant(variable.getId());
+			model.getGoal().getAtomManager().makeConstant(variable.getId());
 		}
 		updateLists();
 	}
 
 	private void executeMakeVar() {
 		for (LabelId constant : view.getSelectedConstants()) {
-			model.getPluginGoal().makeUserVariable(constant.getId());
+			model.getGoal().getAtomManager().makeUserVariable(constant.getId());
 		}
 		updateLists();
 	}
@@ -71,13 +71,13 @@ class VarSelectionController {
 		KRSSRenderer renderer = model.getRenderer(true);
 
 		List<LabelId> constants = new ArrayList<LabelId>();
-		for (Integer id : model.getPluginGoal().getConstants()) {
+		for (Integer id : model.getGoal().getAtomManager().getConstants()) {
 			constants.add(new LabelId(renderer.getName(id, false), id));
 		}
 		view.setConstants(constants);
 
 		List<LabelId> variables = new ArrayList<LabelId>();
-		for (Integer id : model.getPluginGoal().getUserVariables()) {
+		for (Integer id : model.getGoal().getAtomManager().getUserVariables()) {
 			variables.add(new LabelId(renderer.getName(id, false), id));
 		}
 		view.setVariables(variables);

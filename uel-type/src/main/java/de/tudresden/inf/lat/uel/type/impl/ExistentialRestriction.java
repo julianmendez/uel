@@ -9,20 +9,20 @@ import de.tudresden.inf.lat.uel.type.api.Atom;
  */
 public class ExistentialRestriction implements Atom {
 
-	private final ConceptName conceptName;
+	private final ConceptName child;
 	private final Integer role;
 
 	/**
 	 * Construct a new flat existential restriction.
 	 * 
 	 * @param role
-	 *            the role name
+	 *            the role name identifier
 	 * @param child
 	 *            the concept name
 	 */
 	public ExistentialRestriction(Integer role, ConceptName child) {
 		this.role = role;
-		this.conceptName = child;
+		this.child = child;
 	}
 
 	@Override
@@ -41,7 +41,7 @@ public class ExistentialRestriction implements Atom {
 		if (!other.role.equals(role)) {
 			return false;
 		}
-		if (!other.conceptName.equals(conceptName)) {
+		if (!other.child.equals(child)) {
 			return false;
 		}
 		return true;
@@ -49,11 +49,11 @@ public class ExistentialRestriction implements Atom {
 
 	@Override
 	public ConceptName getConceptName() {
-		return conceptName;
+		return child;
 	}
 
 	/**
-	 * Retrieve the role name of this flat atom.
+	 * Retrieve the role name of this existential restriction.
 	 * 
 	 * @return the role name
 	 */
@@ -65,54 +65,48 @@ public class ExistentialRestriction implements Atom {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + conceptName.hashCode();
+		result = prime * result + child.hashCode();
 		result = prime * result + role;
 		return result;
 	}
 
-	/**
-	 * Check whether this flat atom is a concept name.
-	 * 
-	 * @return true iff this atom has no associated role name
-	 */
 	@Override
 	public boolean isConceptName() {
 		return false;
 	}
 
-	/**
-	 * Check whether this flat atom is a constant.
-	 * 
-	 * @return true iff this atom is not an existential restriction adn is
-	 *         ground
-	 */
 	@Override
 	public boolean isConstant() {
 		return false;
 	}
 
-	/**
-	 * Check whether this flat atom is an existential restriction.
-	 * 
-	 * @return true iff this atom has an associated role name
-	 */
 	@Override
 	public boolean isExistentialRestriction() {
 		return true;
 	}
 
-	/**
-	 * Check whether this flat atom is ground.
-	 * 
-	 * @return true iff the concept name is not a variable
-	 */
 	@Override
 	public boolean isGround() {
-		return getConceptName().isGround();
+		return child.isGround();
 	}
 
 	@Override
 	public boolean isVariable() {
+		return false;
+	}
+
+	@Override
+	public boolean isUserVariable() {
+		return false;
+	}
+
+	@Override
+	public boolean isDefinitionVariable() {
+		return false;
+	}
+
+	@Override
+	public boolean isFlatteningVariable() {
 		return false;
 	}
 
@@ -123,7 +117,7 @@ public class ExistentialRestriction implements Atom {
 
 	@Override
 	public String toString() {
-		return "some " + role + " " + conceptName;
+		return "some " + role + " " + child;
 	}
 
 }

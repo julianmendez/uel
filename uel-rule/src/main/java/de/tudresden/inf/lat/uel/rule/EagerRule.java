@@ -10,7 +10,7 @@ package de.tudresden.inf.lat.uel.rule;
 abstract class EagerRule extends Rule {
 
 	@Override
-	final Rule.Application getNextApplication(Subsumption sub,
+	final Rule.Application getNextApplication(FlatSubsumption sub,
 			Assignment assign, Rule.Application previous) {
 		return null;
 	}

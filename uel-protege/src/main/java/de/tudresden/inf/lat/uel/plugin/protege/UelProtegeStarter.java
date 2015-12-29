@@ -13,7 +13,7 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 
-import de.tudresden.inf.lat.uel.core.processor.UelOntologyProvider;
+import de.tudresden.inf.lat.uel.core.processor.OntologyProvider;
 import de.tudresden.inf.lat.uel.plugin.main.UelStarter;
 
 /**
@@ -23,7 +23,7 @@ import de.tudresden.inf.lat.uel.plugin.main.UelStarter;
  */
 public class UelProtegeStarter extends UelStarter implements OWLModelManagerListener {
 
-	private static final class ExtendedOntologyProvider implements UelOntologyProvider {
+	private static final class ExtendedOntologyProvider implements OntologyProvider {
 
 		private final OWLModelManager modelManager;
 

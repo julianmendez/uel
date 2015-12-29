@@ -16,7 +16,7 @@ import de.tudresden.inf.lat.uel.type.impl.ExistentialRestriction;
 final class DecompositionRule extends Rule {
 
 	@Override
-	Application getFirstApplication(Subsumption sub, Assignment assign) {
+	Application getFirstApplication(FlatSubsumption sub, Assignment assign) {
 		if (!sub.getHead().isExistentialRestriction()) {
 			return null;
 		}
@@ -32,7 +32,7 @@ final class DecompositionRule extends Rule {
 	}
 
 	@Override
-	Application getNextApplication(Subsumption sub, Assignment assign, Rule.Application previous) {
+	Application getNextApplication(FlatSubsumption sub, Assignment assign, Rule.Application previous) {
 		if (!(previous instanceof Application)) {
 			throw new IllegalArgumentException("Expected rule application of type DecompositionRule.Application.");
 		}
@@ -50,7 +50,7 @@ final class DecompositionRule extends Rule {
 	}
 
 	@Override
-	Result apply(Subsumption sub, Assignment assign, Rule.Application application) {
+	Result apply(FlatSubsumption sub, Assignment assign, Rule.Application application) {
 		if (!(application instanceof Application)) {
 			throw new IllegalArgumentException("Expected rule application of type DecompositionRule.Application.");
 		}
@@ -62,7 +62,7 @@ final class DecompositionRule extends Rule {
 			if (!body.isTop()) {
 				bodyAtoms.add(body);
 			}
-			res.getNewUnsolvedSubsumptions().add(new Subsumption(bodyAtoms, head));
+			res.getNewUnsolvedSubsumptions().add(new FlatSubsumption(bodyAtoms, head));
 		}
 		return res;
 	}
