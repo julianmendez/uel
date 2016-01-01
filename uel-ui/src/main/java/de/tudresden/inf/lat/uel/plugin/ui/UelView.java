@@ -11,7 +11,7 @@ import javax.swing.JPanel;
 
 import org.semanticweb.owlapi.model.OWLOntology;
 
-import de.tudresden.inf.lat.uel.core.processor.UelProcessorFactory;
+import de.tudresden.inf.lat.uel.core.processor.UnificationAlgorithmFactory;
 
 /**
  * This is the main panel of the UEL system.
@@ -28,7 +28,7 @@ public class UelView extends JPanel {
 	private final JComboBox<OWLOntology> listOntologyBg01 = new JComboBox<OWLOntology>();
 	private final JComboBox<OWLOntology> listOntologyPos = new JComboBox<OWLOntology>();
 	private final JComboBox<OWLOntology> listOntologyNeg = new JComboBox<OWLOntology>();
-	private final JComboBox<String> listProcessor = new JComboBox<String>();
+	private final JComboBox<String> listAlgorithm = new JComboBox<String>();
 
 	public UelView() {
 		addMainPanel(this);
@@ -81,9 +81,9 @@ public class UelView extends JPanel {
 	private void addTopPanel(Container parent) {
 		Container topPanel = UelUI.addButtonPanel(parent);
 
-		UelUI.setupComboBox(topPanel, listProcessor, Message.tooltipSelectProcessor);
-		for (String processorName : UelProcessorFactory.getProcessorNames()) {
-			listProcessor.addItem(processorName);
+		UelUI.setupComboBox(topPanel, listAlgorithm, Message.tooltipSelectAlgorithm);
+		for (String algorithmName : UnificationAlgorithmFactory.getAlgorithmNames()) {
+			listAlgorithm.addItem(algorithmName);
 		}
 
 		UelUI.setupButton(topPanel, buttonOpen, UelUI.ICON_OPEN, Message.tooltipOpen);
@@ -111,8 +111,8 @@ public class UelView extends JPanel {
 		listOntologyNeg.setSelectedItem(ontology);
 	}
 
-	public String getSelectedProcessor() {
-		return (String) listProcessor.getSelectedItem();
+	public String getSelectedAlgorithm() {
+		return (String) listAlgorithm.getSelectedItem();
 	}
 
 	public void reloadOntologies(List<OWLOntology> list) {

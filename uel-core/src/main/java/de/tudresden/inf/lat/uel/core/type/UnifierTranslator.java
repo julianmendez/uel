@@ -26,7 +26,7 @@ public class UnifierTranslator {
 	public Set<OWLUelClassDefinition> createOWLUelClassDefinitions(Set<Definition> definitions) {
 		Set<OWLUelClassDefinition> ret = new HashSet<OWLUelClassDefinition>();
 		for (Definition definition : definitions) {
-			if (atomManager.getUserVariables().contains(definition.getLeft())) {
+			if (atomManager.getUserVariables().contains(definition.getDefiniendum())) {
 				OWLClass definiendum = getClassFor(definition.getDefiniendum());
 				OWLClassExpression definiens = toOWLClassExpression(definition.getRight(), definitions);
 				ret.add(new OWLUelClassDefinitionImpl(definiendum, definiens));

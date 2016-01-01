@@ -12,10 +12,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import de.tudresden.inf.lat.uel.sat.type.Choice;
-import de.tudresden.inf.lat.uel.sat.type.Literal;
-import de.tudresden.inf.lat.uel.sat.type.OrderLiteral;
-import de.tudresden.inf.lat.uel.sat.type.SubsumptionLiteral;
+import de.tudresden.inf.lat.uel.sat.literals.Choice;
+import de.tudresden.inf.lat.uel.sat.literals.ChoiceLiteral;
+import de.tudresden.inf.lat.uel.sat.literals.Literal;
+import de.tudresden.inf.lat.uel.sat.literals.OrderLiteral;
+import de.tudresden.inf.lat.uel.sat.literals.SubsumptionLiteral;
+import de.tudresden.inf.lat.uel.sat.type.SatInput;
+import de.tudresden.inf.lat.uel.sat.type.SatOutput;
+import de.tudresden.inf.lat.uel.sat.type.Solver;
 import de.tudresden.inf.lat.uel.type.api.Definition;
 import de.tudresden.inf.lat.uel.type.api.Disequation;
 import de.tudresden.inf.lat.uel.type.api.Dissubsumption;
@@ -23,7 +27,7 @@ import de.tudresden.inf.lat.uel.type.api.Equation;
 import de.tudresden.inf.lat.uel.type.api.Goal;
 import de.tudresden.inf.lat.uel.type.api.IndexedSet;
 import de.tudresden.inf.lat.uel.type.api.Subsumption;
-import de.tudresden.inf.lat.uel.type.api.UelProcessor;
+import de.tudresden.inf.lat.uel.type.api.UnificationAlgorithm;
 import de.tudresden.inf.lat.uel.type.impl.ExistentialRestriction;
 import de.tudresden.inf.lat.uel.type.impl.IndexedSetImpl;
 import de.tudresden.inf.lat.uel.type.impl.Unifier;
@@ -122,16 +126,16 @@ import de.tudresden.inf.lat.uel.type.impl.Unifier;
  * @author Barbara Morawska
  * @author Julian Mendez
  */
-public class SatProcessor implements UelProcessor {
+public class SatUnificationAlgorithm implements UnificationAlgorithm {
 
 	private static final String keyConfiguration = "Configuration";
 	private static final String keyName = "Name";
 	private static final String keyNumberOfClauses = "Number of clauses";
 	private static final String keyNumberOfPropositions = "Number of propositions";
 	private static final String keyNumberOfVariables = "Number of variables";
-	private static final Logger logger = Logger.getLogger(SatProcessor.class.getName());
+	private static final Logger logger = Logger.getLogger(SatUnificationAlgorithm.class.getName());
 	private static final String notUsingMinimalAssignments = "all local assignments";
-	private static final String processorName = "SAT-based algorithm";
+	private static final String algorithmName = "SAT-based algorithm";
 	private static final String usingMinimalAssignments = "only minimal assignments";
 
 	private boolean firstTime = true;
@@ -143,10 +147,11 @@ public class SatProcessor implements UelProcessor {
 	private final Map<Integer, Set<Integer>> subsumers = new HashMap<Integer, Set<Integer>>();
 	private final Set<Integer> trueLiterals = new HashSet<Integer>();
 	private final Set<Integer> nonVariableAtoms = new HashSet<Integer>();
+	private final Set<Integer> usedAtomIds = new HashSet<Integer>();
 	private final Goal goal;
 	private Set<Integer> update = new HashSet<Integer>();
 
-	public SatProcessor(Goal goal, boolean useMinimalAssignments) {
+	public SatUnificationAlgorithm(Goal goal, boolean useMinimalAssignments) {
 		if (goal == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
@@ -154,6 +159,9 @@ public class SatProcessor implements UelProcessor {
 		this.goal = goal;
 		this.nonVariableAtoms.addAll(goal.getAtomManager().getConstants());
 		this.nonVariableAtoms.addAll(goal.getAtomManager().getExistentialRestrictions());
+		// TODO exclude top from the used atom ids
+		this.usedAtomIds.addAll(nonVariableAtoms);
+		this.usedAtomIds.addAll(goal.getAtomManager().getVariables());
 		this.onlyMinimalAssignments = useMinimalAssignments;
 		setLiterals();
 	}
@@ -199,6 +207,39 @@ public class SatProcessor implements UelProcessor {
 					this.solver = new Sat4jSolver();
 				}
 				SatInput satInput = computeSatInput();
+				//// DEBUG
+				// StringBuffer sbuf = new StringBuffer();
+				// for (Set<Integer> clause : satInput.getClauses()) {
+				// for (Integer literalId : clause) {
+				// if (literalId < 0) {
+				// sbuf.append("-");
+				// }
+				// Literal literal = literalManager.get(Math.abs(literalId));
+				// sbuf.append("[");
+				// if (literal == null) {
+				// sbuf.append("NULL");
+				// } else if (literal instanceof OrderLiteral) {
+				// OrderLiteral ol = (OrderLiteral) literal;
+				// Integer f = ol.getFirst();
+				// Integer s = ol.getSecond();
+				// appendAtom(sbuf, f);
+				// sbuf.append(" > ");
+				// appendAtom(sbuf, s);
+				// } else if (literal instanceof SubsumptionLiteral) {
+				// SubsumptionLiteral sl = (SubsumptionLiteral) literal;
+				// Integer f = sl.getFirst();
+				// Integer s = sl.getSecond();
+				// appendAtom(sbuf, f);
+				// sbuf.append(" ⊑ ");
+				// appendAtom(sbuf, s);
+				// } else if (literal instanceof ChoiceLiteral) {
+				// sbuf.append("c");
+				// sbuf.append(((ChoiceLiteral) literal).hashCode());
+				// }
+				// sbuf.append("] ");
+				// }
+				// sbuf.append(Solver.NEWLINE);
+				// }
 				this.numberOfClauses = satInput.getClauses().size();
 				satoutput = this.solver.solve(satInput);
 				unifiable = satoutput.isSatisfiable();
@@ -229,6 +270,24 @@ public class SatProcessor implements UelProcessor {
 		return unifiable;
 	}
 
+	//// DEBUG
+	// private void appendAtom(StringBuffer sbuf, Integer atomId) {
+	// if (goal.getAtomManager().getExistentialRestrictions().contains(atomId))
+	// {
+	// sbuf.append("∃");
+	// sbuf.append(shortForm(goal.getAtomManager().printRoleName(atomId)));
+	// sbuf.append(".");
+	// appendAtom(sbuf, goal.getAtomManager().getChild(atomId));
+	// } else {
+	// sbuf.append(shortForm(goal.getAtomManager().printConceptName(atomId)));
+	// }
+	// }
+	//
+	// private String shortForm(String iri) {
+	// String[] parts = iri.split("#");
+	// return parts[parts.length - 1];
+	// }
+
 	/**
 	 * This method encodes equations into propositional clauses in DIMACS CNF
 	 * format, i.e. positive literal is represented by a positive number and a
@@ -242,7 +301,7 @@ public class SatProcessor implements UelProcessor {
 	 * @throws InterruptedException
 	 *             if the process is interrupted
 	 */
-	public SatInput computeSatInput() throws InterruptedException {
+	private SatInput computeSatInput() throws InterruptedException {
 		SatInput ret = new SatInput();
 
 		logger.finer("computing SAT input ...");
@@ -342,7 +401,7 @@ public class SatProcessor implements UelProcessor {
 	@Override
 	public List<Map.Entry<String, String>> getInfo() {
 		List<Map.Entry<String, String>> ret = new ArrayList<Map.Entry<String, String>>();
-		addEntry(ret, keyName, processorName);
+		addEntry(ret, keyName, algorithmName);
 
 		if (this.onlyMinimalAssignments) {
 			addEntry(ret, keyConfiguration, usingMinimalAssignments);
@@ -410,13 +469,13 @@ public class SatProcessor implements UelProcessor {
 	private Set<Definition> getUpdatedDefinitions() {
 		Set<Definition> definitions = new HashSet<Definition>();
 		for (Integer leftPartId : getVariables()) {
-			definitions.add(new Definition(leftPartId, getSetOfSubsumers(leftPartId), false));
+			definitions.add(new Definition(leftPartId, new HashSet<Integer>(getSetOfSubsumers(leftPartId)), false));
 		}
 		return definitions;
 	}
 
 	private Set<Integer> getUsedAtomIds() {
-		return goal.getAtomManager().getAtomIds();
+		return usedAtomIds;
 	}
 
 	private Set<Integer> getVariables() {
@@ -491,10 +550,10 @@ public class SatProcessor implements UelProcessor {
 		for (Integer rightId : s.getRight()) {
 			if (getVariables().contains(rightId)) {
 				runStep1SubsumptionVariable(s.getLeft(), rightId, input);
-			} else {
-				// 'rightId' is a non-variable atom
+			} else if (getNonVariableAtoms().contains(rightId)) {
 				runStep1SubsumptionNonVariableAtom(s.getLeft(), rightId, input);
 			}
+			// if top is on the right-hand side, do nothing
 		}
 	}
 
@@ -575,6 +634,9 @@ public class SatProcessor implements UelProcessor {
 
 			// ... and 'atomId' does not subsume any of the 'leftIds'.
 			runStep1DissubsumptionNonVariableAtom(currentChoiceLiterals, leftIds, atomId, input);
+
+			// next choice
+			j++;
 		}
 		c.ruleOutOtherChoices(input);
 	}

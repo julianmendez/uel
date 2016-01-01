@@ -11,10 +11,10 @@ import de.tudresden.inf.lat.uel.type.impl.Unifier;
  * @author Stefan Borgwardt
  * @author Julian Mendez
  */
-public interface UelProcessor {
+public interface UnificationAlgorithm {
 
 	/**
-	 * Clean up used resources.
+	 * Clean up used resources in case the algorithm thread was interrupted.
 	 */
 	void cleanup();
 

@@ -10,10 +10,7 @@ import de.tudresden.inf.lat.uel.type.api.Atom;
 public class ConceptName implements Atom {
 
 	private final Integer conceptNameId;
-	private boolean isDefinitionVariable = false;
-	private boolean isFlatteningVariable = false;
-	private boolean isTop = false;
-	private boolean isUserVariable = false;
+	private boolean isVariable = false;
 
 	/**
 	 * Construct a new concept name.
@@ -69,18 +66,8 @@ public class ConceptName implements Atom {
 	}
 
 	@Override
-	public boolean isDefinitionVariable() {
-		return isDefinitionVariable;
-	}
-
-	@Override
 	public boolean isExistentialRestriction() {
 		return false;
-	}
-
-	@Override
-	public boolean isFlatteningVariable() {
-		return isFlatteningVariable;
 	}
 
 	@Override
@@ -89,46 +76,16 @@ public class ConceptName implements Atom {
 	}
 
 	@Override
-	public boolean isTop() {
-		return isTop;
-	}
-
-	@Override
-	public boolean isUserVariable() {
-		return isUserVariable;
-	}
-
-	@Override
 	public boolean isVariable() {
-		return isUserVariable || isDefinitionVariable || isFlatteningVariable;
+		return isVariable;
 	}
 
 	void makeConstant() {
-		isUserVariable = false;
-		isFlatteningVariable = false;
-		isDefinitionVariable = false;
+		isVariable = false;
 	}
 
-	void makeDefinitionVariable() {
-		isDefinitionVariable = true;
-		isUserVariable = false;
-		isFlatteningVariable = false;
-	}
-
-	void makeFlatteningVariable() {
-		isFlatteningVariable = true;
-		isUserVariable = false;
-		isDefinitionVariable = false;
-	}
-
-	void makeUserVariable() {
-		isUserVariable = true;
-		isFlatteningVariable = false;
-		isDefinitionVariable = false;
-	}
-
-	void setTop() {
-		isTop = true;
+	void makeVariable() {
+		isVariable = true;
 	}
 
 	@Override

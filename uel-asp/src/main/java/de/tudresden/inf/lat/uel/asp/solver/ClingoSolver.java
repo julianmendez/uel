@@ -153,7 +153,7 @@ public class ClingoSolver implements AspSolver {
 	private void appendResource(String resourceName, StringBuilder output)
 			throws IOException {
 		BufferedReader reader = new BufferedReader(new InputStreamReader(
-				AspProcessor.class.getResourceAsStream(resourceName)));
+				AspUnificationAlgorithm.class.getResourceAsStream(resourceName)));
 		String line = null;
 		while ((line = reader.readLine()) != null) {
 			output.append(line);

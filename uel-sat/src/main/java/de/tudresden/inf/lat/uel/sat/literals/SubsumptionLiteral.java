@@ -1,4 +1,4 @@
-package de.tudresden.inf.lat.uel.sat.type;
+package de.tudresden.inf.lat.uel.sat.literals;
 
 /**
  * An object implementing this class is a subsumption.

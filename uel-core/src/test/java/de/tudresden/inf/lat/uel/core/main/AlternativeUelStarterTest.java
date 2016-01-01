@@ -23,7 +23,7 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 
 import de.tudresden.inf.lat.jcel.owlapi.main.JcelReasoner;
-import de.tudresden.inf.lat.uel.core.processor.UelProcessorFactory;
+import de.tudresden.inf.lat.uel.core.processor.UnificationAlgorithmFactory;
 import de.tudresden.inf.lat.uel.core.type.KRSSRenderer;
 import de.tudresden.inf.lat.uel.core.type.OWLUelClassDefinition;
 import de.tudresden.inf.lat.uel.type.api.AtomManager;
@@ -109,10 +109,10 @@ public class AlternativeUelStarterTest {
 		// starter.setVerbose(true);
 
 		UnifierIterator iterator = (UnifierIterator) starter.modifyOntologyAndSolve(subsumptions, dissubsumptions,
-				variables, UelProcessorFactory.SAT_BASED_ALGORITHM);
+				variables, UnificationAlgorithmFactory.SAT_BASED_ALGORITHM);
 
 		AtomManager atomManager = iterator.getAtomManager();
-		Goal goal = iterator.getProcessor().getGoal();
+		Goal goal = iterator.getAlgorithm().getGoal();
 		Set<Definition> definitions = goal.getDefinitions();
 		KRSSRenderer renderer = new KRSSRenderer(atomManager, null);
 		String krssDefinitions = renderer.printDefinitions(definitions, false);

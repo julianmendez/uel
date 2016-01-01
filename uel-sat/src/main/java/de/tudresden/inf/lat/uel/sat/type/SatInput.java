@@ -1,4 +1,4 @@
-package de.tudresden.inf.lat.uel.sat.solver;
+package de.tudresden.inf.lat.uel.sat.type;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -12,6 +12,41 @@ import java.util.Set;
  * @author Julian Mendez
  */
 public class SatInput {
+
+	public static void appendCNFClause(StringBuffer sbuf, Collection<Integer> clause) {
+		for (Integer literal : clause) {
+			sbuf.append(literal);
+			sbuf.append(Solver.SPACE);
+		}
+		sbuf.append(Solver.END_OF_CLAUSE);
+		sbuf.append(Solver.NEWLINE);
+	}
+
+	public static void appendCNFLine(StringBuffer sbuf, int nbVars, int nbClauses) {
+		sbuf.append(Solver.P_CNF);
+		sbuf.append(Solver.SPACE);
+		sbuf.append(nbVars);
+		sbuf.append(Solver.SPACE);
+		sbuf.append(nbClauses);
+		sbuf.append(Solver.NEWLINE);
+	}
+
+	public static void appendWCNFClause(StringBuffer sbuf, Set<Integer> clause, int weight) {
+		sbuf.append(weight);
+		sbuf.append(Solver.SPACE);
+		appendCNFClause(sbuf, clause);
+	}
+
+	public static void appendWCNFLine(StringBuffer sbuf, int nbVars, int nbClauses, int maxWeight) {
+		sbuf.append(Solver.P_WCNF);
+		sbuf.append(Solver.SPACE);
+		sbuf.append(nbVars);
+		sbuf.append(Solver.SPACE);
+		sbuf.append(nbClauses);
+		sbuf.append(Solver.SPACE);
+		sbuf.append(maxWeight);
+		sbuf.append(Solver.NEWLINE);
+	}
 
 	/**
 	 * Converts a given clause into an array of integers.
@@ -30,56 +65,8 @@ public class SatInput {
 		return ret;
 	}
 
-	/**
-	 * Formats a clause as "hard" clause in WCNF format.
-	 * 
-	 * @param clause
-	 *            the clause
-	 * @param weight
-	 *            the weight for the clause
-	 * @return a string containing the clause in WCNF format
-	 */
-	public static String toWCNF(Set<Integer> clause, int weight) {
-		StringBuffer sbuf = new StringBuffer();
-		sbuf.append(weight);
-		sbuf.append(Solver.SPACE);
-		for (Integer literal : clause) {
-			sbuf.append(literal);
-			sbuf.append(Solver.SPACE);
-		}
-		sbuf.append(Solver.END_OF_CLAUSE);
-		sbuf.append(Solver.NEWLINE);
-		return sbuf.toString();
-	}
-
-	/**
-	 * Produce the first line of a WCNF file.
-	 * 
-	 * @param nbVars
-	 *            the maximal number of variables of the problem
-	 * @param nbClauses
-	 *            the number of clauses of the problem
-	 * @param maxWeight
-	 *            the weight for the "hard" clauses
-	 * @return the "p wcnf ..." line starting a WCNF file
-	 */
-	public static String WCNFline(int nbVars, int nbClauses, int maxWeight) {
-		StringBuffer sbuf = new StringBuffer();
-		sbuf.append(Solver.P_WCNF);
-		sbuf.append(Solver.SPACE);
-		sbuf.append(nbVars);
-		sbuf.append(Solver.SPACE);
-		sbuf.append(nbClauses);
-		sbuf.append(Solver.SPACE);
-		sbuf.append(maxWeight);
-		sbuf.append(Solver.NEWLINE);
-		return sbuf.toString();
-	}
-
 	private Collection<Set<Integer>> clauses = new ArrayList<Set<Integer>>();
-
 	private Integer lastId = 0;
-
 	private Set<Integer> minimizeLiterals = new HashSet<Integer>();
 
 	/**
@@ -105,8 +92,7 @@ public class SatInput {
 			throw new IllegalArgumentException("Clause cannot be empty.");
 		}
 		if (clause.contains(Solver.END_OF_CLAUSE)) {
-			throw new IllegalArgumentException("Clause cannot contain "
-					+ Solver.END_OF_CLAUSE + ".");
+			throw new IllegalArgumentException("Clause cannot contain " + Solver.END_OF_CLAUSE + ".");
 		}
 
 		boolean ret = this.clauses.add(Collections.unmodifiableSet(clause));
@@ -171,8 +157,7 @@ public class SatInput {
 		boolean ret = (this == o);
 		if (!ret && o instanceof SatInput) {
 			SatInput other = (SatInput) o;
-			ret = this.clauses.equals(other.clauses)
-					&& this.lastId == other.lastId;
+			ret = this.clauses.equals(other.clauses) && this.lastId == other.lastId;
 		}
 		return ret;
 	}
@@ -216,19 +201,9 @@ public class SatInput {
 	 */
 	public String toCNF() {
 		StringBuffer sbuf = new StringBuffer();
-		sbuf.append(Solver.P_CNF);
-		sbuf.append(Solver.SPACE);
-		sbuf.append(this.lastId);
-		sbuf.append(Solver.SPACE);
-		sbuf.append(this.clauses.size());
-		sbuf.append(Solver.NEWLINE);
-		for (Collection<Integer> clause : this.clauses) {
-			for (Integer literal : clause) {
-				sbuf.append(literal);
-				sbuf.append(Solver.SPACE);
-			}
-			sbuf.append(Solver.END_OF_CLAUSE);
-			sbuf.append(Solver.NEWLINE);
+		appendCNFLine(sbuf, lastId, clauses.size());
+		for (Collection<Integer> clause : clauses) {
+			appendCNFClause(sbuf, clause);
 		}
 		return sbuf.toString();
 	}
@@ -247,18 +222,12 @@ public class SatInput {
 	 */
 	public String toWCNF(int maxWeight) {
 		StringBuffer sbuf = new StringBuffer();
-		sbuf.append(WCNFline(this.lastId, this.clauses.size()
-				+ this.minimizeLiterals.size(), maxWeight));
-		for (Set<Integer> clause : this.clauses) {
-			sbuf.append(toWCNF(clause, maxWeight));
+		appendWCNFLine(sbuf, lastId, clauses.size() + minimizeLiterals.size(), maxWeight);
+		for (Set<Integer> clause : clauses) {
+			appendWCNFClause(sbuf, clause, maxWeight);
 		}
-		for (Integer lit : this.minimizeLiterals) {
-			sbuf.append(1);
-			sbuf.append(Solver.SPACE);
-			sbuf.append(-lit);
-			sbuf.append(Solver.SPACE);
-			sbuf.append(Solver.END_OF_CLAUSE);
-			sbuf.append(Solver.NEWLINE);
+		for (Integer lit : minimizeLiterals) {
+			appendWCNFClause(sbuf, Collections.singleton(-lit), 1);
 		}
 		return sbuf.toString();
 	}
@@ -267,8 +236,8 @@ public class SatInput {
 		boolean ret = false;
 		for (Integer elem : newSet) {
 			Integer absElem = elem < 0 ? (-1) * elem : elem;
-			if (absElem > this.lastId) {
-				this.lastId = absElem;
+			if (absElem > lastId) {
+				lastId = absElem;
 				ret = true;
 			}
 		}

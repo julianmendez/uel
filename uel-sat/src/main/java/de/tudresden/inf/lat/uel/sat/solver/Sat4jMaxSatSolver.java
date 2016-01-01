@@ -12,6 +12,10 @@ import org.sat4j.specs.ContradictionException;
 import org.sat4j.specs.IOptimizationProblem;
 import org.sat4j.specs.TimeoutException;
 
+import de.tudresden.inf.lat.uel.sat.type.SatInput;
+import de.tudresden.inf.lat.uel.sat.type.SatOutput;
+import de.tudresden.inf.lat.uel.sat.type.Solver;
+
 /**
  * An object of this class uses the Sat4j MaxSAT solver to solve a SAT problem
  * in which a given subset of the propositional variables should be minimized

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package de.tudresden.inf.lat.uel.sat.type;
+package de.tudresden.inf.lat.uel.sat.literals;
 
 /**
  * @author Stefan Borgwardt

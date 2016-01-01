@@ -1,4 +1,4 @@
-package de.tudresden.inf.lat.uel.sat.type;
+package de.tudresden.inf.lat.uel.sat.literals;
 
 /**
  * A literal is defined by two strings and it can be a dis-subsumption or an

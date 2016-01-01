@@ -24,8 +24,6 @@ public interface AtomManager {
 
 	Atom getAtom(Integer atomId);
 
-	Set<Integer> getAtomIds();
-
 	Integer getChild(Integer atomId);
 
 	ConceptName getConceptName(Integer atomId);
@@ -41,8 +39,6 @@ public interface AtomManager {
 	Set<Integer> getFlatteningVariables();
 
 	Integer getIndex(Atom atom);
-
-	Integer getTopConcept();
 
 	Set<Integer> getUserVariables();
 

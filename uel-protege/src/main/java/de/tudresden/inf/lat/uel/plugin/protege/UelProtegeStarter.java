@@ -23,11 +23,11 @@ import de.tudresden.inf.lat.uel.plugin.main.UelStarter;
  */
 public class UelProtegeStarter extends UelStarter implements OWLModelManagerListener {
 
-	private static final class ExtendedOntologyProvider implements OntologyProvider {
+	private static final class ProtegeOntologyProvider implements OntologyProvider {
 
 		private final OWLModelManager modelManager;
 
-		private ExtendedOntologyProvider(OWLModelManager modelManager) {
+		private ProtegeOntologyProvider(OWLModelManager modelManager) {
 			this.modelManager = modelManager;
 		}
 
@@ -77,7 +77,7 @@ public class UelProtegeStarter extends UelStarter implements OWLModelManagerList
 	 *            OWL model manager
 	 */
 	public UelProtegeStarter(Container parent, OWLModelManager modelManager) {
-		super(parent, new ExtendedOntologyProvider(modelManager));
+		super(parent, new ProtegeOntologyProvider(modelManager));
 		this.modelManager = modelManager;
 		modelManager.addListener(this);
 	}

@@ -96,26 +96,6 @@ public class ExistentialRestriction implements Atom {
 	}
 
 	@Override
-	public boolean isUserVariable() {
-		return false;
-	}
-
-	@Override
-	public boolean isDefinitionVariable() {
-		return false;
-	}
-
-	@Override
-	public boolean isFlatteningVariable() {
-		return false;
-	}
-
-	@Override
-	public boolean isTop() {
-		return false;
-	}
-
-	@Override
 	public String toString() {
 		return "some " + role + " " + child;
 	}

@@ -143,7 +143,7 @@ public class UelController {
 	}
 
 	public void setupComputation() {
-		model.initializeUelProcessor(view.getSelectedProcessor());
+		model.initializeUnificationAlgorithm(view.getSelectedAlgorithm());
 
 		unifierController = new UnifierController(model);
 		unifierController.addRefineListener(new ActionListener() {

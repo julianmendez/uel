@@ -1,5 +1,8 @@
-package de.tudresden.inf.lat.uel.rule;
+package de.tudresden.inf.lat.uel.rule.rules;
 
+import de.tudresden.inf.lat.uel.rule.Assignment;
+import de.tudresden.inf.lat.uel.rule.FlatSubsumption;
+import de.tudresden.inf.lat.uel.rule.Result;
 import de.tudresden.inf.lat.uel.type.api.Atom;
 
 /**
@@ -8,10 +11,10 @@ import de.tudresden.inf.lat.uel.type.api.Atom;
  * 
  * @author Stefan Borgwardt
  */
-final class ExtensionRule extends Rule {
+public final class ExtensionRule extends Rule {
 
 	@Override
-	Application getFirstApplication(FlatSubsumption sub, Assignment assign) {
+	public Application getFirstApplication(FlatSubsumption sub, Assignment assign) {
 		for (Atom at : sub.getBody()) {
 			if (at.isVariable()) {
 				return new Application(at);
@@ -21,7 +24,7 @@ final class ExtensionRule extends Rule {
 	}
 
 	@Override
-	Application getNextApplication(FlatSubsumption sub, Assignment assign,
+	public Application getNextApplication(FlatSubsumption sub, Assignment assign,
 			Rule.Application previous) {
 		if (!(previous instanceof Application)) {
 			throw new IllegalArgumentException(
@@ -39,7 +42,7 @@ final class ExtensionRule extends Rule {
 	}
 
 	@Override
-	Result apply(FlatSubsumption sub, Assignment assign,
+	public Result apply(FlatSubsumption sub, Assignment assign,
 			Rule.Application application) {
 		if (!(application instanceof Application)) {
 			throw new IllegalArgumentException(

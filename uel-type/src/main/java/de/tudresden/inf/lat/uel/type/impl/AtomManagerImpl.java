@@ -19,25 +19,21 @@ public class AtomManagerImpl implements AtomManager {
 	private final Set<Integer> definitionVariables = new HashSet<Integer>();
 	private final Set<Integer> flatteningVariables = new HashSet<Integer>();
 	private final IndexedSet<String> roleNames = new IndexedSetImpl<String>();
-	private final Integer topConceptId;
 	private final Set<Integer> userVariables = new HashSet<Integer>();
 	private final Set<Integer> variables = new HashSet<Integer>();
 
 	public AtomManagerImpl() {
-		topConceptId = null;
-	}
-
-	public AtomManagerImpl(String topConceptName) {
-		topConceptId = createConceptName(topConceptName);
-		getConceptName(topConceptId).setTop();
-		constants.remove(topConceptId);
 	}
 
 	@Override
 	public Integer createConceptName(String conceptName) {
 		Integer conceptNameId = conceptNames.addAndGetIndex(conceptName);
 		Integer atomId = atoms.addAndGetIndex(new ConceptName(conceptNameId));
-		constants.add(atomId);
+		if (!variables.contains(atomId)) {
+			// if the concept name had already been created earlier and marked
+			// as a variable, then do not mark it as a constant
+			constants.add(atomId);
+		}
 		return atomId;
 	}
 
@@ -58,11 +54,6 @@ public class AtomManagerImpl implements AtomManager {
 	@Override
 	public Atom getAtom(Integer atomId) {
 		return atoms.get(atomId);
-	}
-
-	@Override
-	public Set<Integer> getAtomIds() {
-		return atoms.getIndices();
 	}
 
 	@Override
@@ -114,11 +105,6 @@ public class AtomManagerImpl implements AtomManager {
 	}
 
 	@Override
-	public Integer getTopConcept() {
-		return topConceptId;
-	}
-
-	@Override
 	public Set<Integer> getUserVariables() {
 		return Collections.unmodifiableSet(userVariables);
 	}
@@ -140,7 +126,7 @@ public class AtomManagerImpl implements AtomManager {
 
 	@Override
 	public void makeDefinitionVariable(Integer atomId) {
-		getConceptName(atomId).makeDefinitionVariable();
+		getConceptName(atomId).makeVariable();
 		constants.remove(atomId);
 		variables.add(atomId);
 		userVariables.remove(atomId);
@@ -150,7 +136,7 @@ public class AtomManagerImpl implements AtomManager {
 
 	@Override
 	public void makeFlatteningVariable(Integer atomId) {
-		getConceptName(atomId).makeFlatteningVariable();
+		getConceptName(atomId).makeVariable();
 		constants.remove(atomId);
 		variables.add(atomId);
 		userVariables.remove(atomId);
@@ -160,7 +146,7 @@ public class AtomManagerImpl implements AtomManager {
 
 	@Override
 	public void makeUserVariable(Integer atomId) {
-		getConceptName(atomId).makeUserVariable();
+		getConceptName(atomId).makeVariable();
 		constants.remove(atomId);
 		variables.add(atomId);
 		userVariables.add(atomId);

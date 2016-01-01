@@ -1,4 +1,4 @@
-package de.tudresden.inf.lat.uel.sat.solver;
+package de.tudresden.inf.lat.uel.sat.type;
 
 import java.io.IOException;
 import java.util.Set;

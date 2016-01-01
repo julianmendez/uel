@@ -8,7 +8,7 @@ import java.util.HashSet;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import de.tudresden.inf.lat.uel.core.processor.UelProcessorFactory;
+import de.tudresden.inf.lat.uel.core.processor.UnificationAlgorithmFactory;
 import de.tudresden.inf.lat.uel.type.api.AtomManager;
 import de.tudresden.inf.lat.uel.type.api.Definition;
 import de.tudresden.inf.lat.uel.type.api.Disequation;
@@ -16,7 +16,7 @@ import de.tudresden.inf.lat.uel.type.api.Dissubsumption;
 import de.tudresden.inf.lat.uel.type.api.Equation;
 import de.tudresden.inf.lat.uel.type.api.Goal;
 import de.tudresden.inf.lat.uel.type.api.Subsumption;
-import de.tudresden.inf.lat.uel.type.api.UelProcessor;
+import de.tudresden.inf.lat.uel.type.api.UnificationAlgorithm;
 import de.tudresden.inf.lat.uel.type.impl.AtomManagerImpl;
 
 /**
@@ -41,7 +41,7 @@ public class CNFChecker {
 	private Goal goal;
 
 	/**
-	 * Construct a new test object to run all different known processors on an
+	 * Construct a new test object to run all different known algorithms on an
 	 * input CNF file.
 	 * 
 	 * @param filename
@@ -174,30 +174,30 @@ public class CNFChecker {
 	public static void main(String[] args) throws IOException, InterruptedException {
 		if (args.length == 1) {
 			CNFChecker tester = new CNFChecker(args[0]);
-			tester.runProcessor(UelProcessorFactory.SAT_BASED_ALGORITHM);
-			tester.runProcessor(UelProcessorFactory.SAT_BASED_ALGORITHM_MINIMAL);
-			tester.runProcessor(UelProcessorFactory.RULE_BASED_ALGORITHM);
-			tester.runProcessor(UelProcessorFactory.ASP_BASED_ALGORITHM);
+			tester.runAlgorithm(UnificationAlgorithmFactory.SAT_BASED_ALGORITHM);
+			tester.runAlgorithm(UnificationAlgorithmFactory.SAT_BASED_ALGORITHM_MINIMAL);
+			tester.runAlgorithm(UnificationAlgorithmFactory.RULE_BASED_ALGORITHM);
+			tester.runAlgorithm(UnificationAlgorithmFactory.ASP_BASED_ALGORITHM);
 		} else {
 			System.out.println("Parameters: <input DIMACS CNF file>");
 		}
 	}
 
-	private static void printInfo(UelProcessor processor) {
-		for (Entry<String, String> info : processor.getInfo()) {
+	private static void printInfo(UnificationAlgorithm algorithm) {
+		for (Entry<String, String> info : algorithm.getInfo()) {
 			System.out.println(info.getKey() + ": " + info.getValue());
 		}
 		System.out.println();
 	}
 
 	/**
-	 * Run the test on a given UEL processor.
+	 * Run the test on a given unification algorithm.
 	 * 
-	 * @param processorName
-	 *            the string identifier of the processor
+	 * @param algorithmName
+	 *            the string identifier of the algorithm
 	 */
-	public void runProcessor(String processorName) throws InterruptedException {
-		UelProcessor processor = UelProcessorFactory.createProcessor(processorName, goal);
+	public void runAlgorithm(String algorithmName) throws InterruptedException {
+		UnificationAlgorithm algorithm = UnificationAlgorithmFactory.instantiateAlgorithm(algorithmName, goal);
 		int numberOfUnifiers = 0;
 		long startTime = System.nanoTime();
 		long firstTime = 0;
@@ -205,7 +205,7 @@ public class CNFChecker {
 		boolean hasUnifiers = true;
 		boolean first = true;
 		while (hasUnifiers) {
-			if (processor.computeNextUnifier()) {
+			if (algorithm.computeNextUnifier()) {
 				hasUnifiers = true;
 				numberOfUnifiers++;
 			} else {
@@ -221,7 +221,7 @@ public class CNFChecker {
 		System.out.println("first: " + (firstTime - startTime));
 		System.out.println("all: " + (endTime - startTime));
 		System.out.println("unifiers: " + numberOfUnifiers);
-		printInfo(processor);
+		printInfo(algorithm);
 	}
 
 	private static <T> Set<T> set(T a, T b) {

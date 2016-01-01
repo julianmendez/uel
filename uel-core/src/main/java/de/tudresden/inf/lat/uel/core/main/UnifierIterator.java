@@ -7,46 +7,41 @@ import java.util.Set;
 import de.tudresden.inf.lat.uel.core.type.OWLUelClassDefinition;
 import de.tudresden.inf.lat.uel.core.type.UnifierTranslator;
 import de.tudresden.inf.lat.uel.type.api.AtomManager;
-import de.tudresden.inf.lat.uel.type.api.UelProcessor;
+import de.tudresden.inf.lat.uel.type.api.UnificationAlgorithm;
 import de.tudresden.inf.lat.uel.type.impl.Unifier;
 
 public class UnifierIterator implements Iterator<Set<OWLUelClassDefinition>> {
 
 	private boolean hasNext = false;
 	private boolean isComputed = false;
-	private UelProcessor processor;
+	private UnificationAlgorithm algorithm;
 	private UnifierTranslator translator;
 	private Unifier unifier;
 
-	public UnifierIterator(UelProcessor proc, UnifierTranslator translator) {
-		this.processor = proc;
+	public UnifierIterator(UnificationAlgorithm algorithm, UnifierTranslator translator) {
+		this.algorithm = algorithm;
 		this.translator = translator;
 	}
 
-	protected UelProcessor getProcessor() {
-		return this.processor;
+	protected UnificationAlgorithm getAlgorithm() {
+		return this.algorithm;
 	}
 
 	protected AtomManager getAtomManager() {
 		return this.translator.getAtomManager();
 	}
 
-	public void cleanup() {
-		if (processor != null) {
-			processor.cleanup();
-		}
-	}
-
 	private void compute() {
 		if (!isComputed) {
 			try {
-				hasNext = processor.computeNextUnifier();
+				hasNext = algorithm.computeNextUnifier();
 			} catch (InterruptedException ex) {
 				Thread.currentThread().interrupt();
+				algorithm.cleanup();
 				hasNext = false;
 			}
 			if (hasNext) {
-				unifier = processor.getUnifier();
+				unifier = algorithm.getUnifier();
 			}
 			isComputed = true;
 		}

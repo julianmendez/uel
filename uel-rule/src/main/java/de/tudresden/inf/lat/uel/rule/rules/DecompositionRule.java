@@ -1,8 +1,10 @@
-package de.tudresden.inf.lat.uel.rule;
+package de.tudresden.inf.lat.uel.rule.rules;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collections;
 
+import de.tudresden.inf.lat.uel.rule.Assignment;
+import de.tudresden.inf.lat.uel.rule.FlatSubsumption;
+import de.tudresden.inf.lat.uel.rule.Result;
 import de.tudresden.inf.lat.uel.type.api.Atom;
 import de.tudresden.inf.lat.uel.type.impl.ConceptName;
 import de.tudresden.inf.lat.uel.type.impl.ExistentialRestriction;
@@ -13,10 +15,10 @@ import de.tudresden.inf.lat.uel.type.impl.ExistentialRestriction;
  * 
  * @author Stefan Borgwardt
  */
-final class DecompositionRule extends Rule {
+public final class DecompositionRule extends Rule {
 
 	@Override
-	Application getFirstApplication(FlatSubsumption sub, Assignment assign) {
+	public Application getFirstApplication(FlatSubsumption sub, Assignment assign) {
 		if (!sub.getHead().isExistentialRestriction()) {
 			return null;
 		}
@@ -32,7 +34,7 @@ final class DecompositionRule extends Rule {
 	}
 
 	@Override
-	Application getNextApplication(FlatSubsumption sub, Assignment assign, Rule.Application previous) {
+	public Application getNextApplication(FlatSubsumption sub, Assignment assign, Rule.Application previous) {
 		if (!(previous instanceof Application)) {
 			throw new IllegalArgumentException("Expected rule application of type DecompositionRule.Application.");
 		}
@@ -50,20 +52,15 @@ final class DecompositionRule extends Rule {
 	}
 
 	@Override
-	Result apply(FlatSubsumption sub, Assignment assign, Rule.Application application) {
+	public Result apply(FlatSubsumption sub, Assignment assign, Rule.Application application) {
 		if (!(application instanceof Application)) {
 			throw new IllegalArgumentException("Expected rule application of type DecompositionRule.Application.");
 		}
 		Result res = new Result(sub, application);
 		ConceptName head = sub.getHead().getConceptName();
-		if (!head.isTop()) {
-			ConceptName body = ((Application) application).at.getConceptName();
-			List<Atom> bodyAtoms = new ArrayList<Atom>();
-			if (!body.isTop()) {
-				bodyAtoms.add(body);
-			}
-			res.getNewUnsolvedSubsumptions().add(new FlatSubsumption(bodyAtoms, head));
-		}
+		ConceptName body = ((Application) application).at.getConceptName();
+		FlatSubsumption newSub = new FlatSubsumption(Collections.<Atom> singletonList(body), head);
+		res.getNewUnsolvedSubsumptions().add(newSub);
 		return res;
 	}
 

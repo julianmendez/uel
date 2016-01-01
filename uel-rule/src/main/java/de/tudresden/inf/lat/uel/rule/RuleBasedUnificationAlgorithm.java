@@ -11,12 +11,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import de.tudresden.inf.lat.uel.rule.Rule.Application;
+import de.tudresden.inf.lat.uel.rule.rules.DecompositionRule;
+import de.tudresden.inf.lat.uel.rule.rules.EagerConflictRule;
+import de.tudresden.inf.lat.uel.rule.rules.EagerExtensionRule;
+import de.tudresden.inf.lat.uel.rule.rules.EagerGroundSolvingRule;
+import de.tudresden.inf.lat.uel.rule.rules.EagerRule;
+import de.tudresden.inf.lat.uel.rule.rules.EagerSolving1Rule;
+import de.tudresden.inf.lat.uel.rule.rules.EagerSolving2Rule;
+import de.tudresden.inf.lat.uel.rule.rules.ExtensionRule;
+import de.tudresden.inf.lat.uel.rule.rules.Rule;
+import de.tudresden.inf.lat.uel.rule.rules.Rule.Application;
 import de.tudresden.inf.lat.uel.type.api.Atom;
 import de.tudresden.inf.lat.uel.type.api.AtomManager;
 import de.tudresden.inf.lat.uel.type.api.Definition;
 import de.tudresden.inf.lat.uel.type.api.Goal;
-import de.tudresden.inf.lat.uel.type.api.UelProcessor;
+import de.tudresden.inf.lat.uel.type.api.UnificationAlgorithm;
 import de.tudresden.inf.lat.uel.type.impl.Unifier;
 
 /**
@@ -36,7 +45,7 @@ import de.tudresden.inf.lat.uel.type.impl.Unifier;
  * 
  * @author Stefan Borgwardt
  */
-public class RuleProcessor implements UelProcessor {
+public class RuleBasedUnificationAlgorithm implements UnificationAlgorithm {
 
 	private static final String keyName = "Name";
 	private static final String keyInitialSubs = "Initial number of subsumptions";
@@ -44,7 +53,7 @@ public class RuleProcessor implements UelProcessor {
 	private static final String keyTreeSize = "Size of the search tree (so far)";
 	private static final String keyDeadEnds = "Number of encountered dead ends (so far)";
 	private static final String keyNumberOfVariables = "Number of variables";
-	private static final String processorName = "Rule-based algorithm";
+	private static final String algorithmName = "Rule-based algorithm";
 
 	private List<EagerRule> staticEagerRules;
 	private List<EagerRule> dynamicEagerRules;
@@ -67,12 +76,12 @@ public class RuleProcessor implements UelProcessor {
 	 *            a UelInput object that will return the subsumptions to be
 	 *            solved
 	 */
-	public RuleProcessor(Goal input) {
+	public RuleBasedUnificationAlgorithm(Goal input) {
 		this.goal = new NormalizedGoal(input);
 		this.input = input;
 		if (input.hasNegativePart()) {
 			throw new UnsupportedOperationException(
-					"The rule processor cannot deal with dissubsubmptions or disequations!");
+					"The rule-based algorithm cannot deal with dissubsubmptions or disequations!");
 		}
 		this.assignment = new Assignment();
 		this.initialSize = goal.size();
@@ -105,7 +114,7 @@ public class RuleProcessor implements UelProcessor {
 
 	public List<Map.Entry<String, String>> getInfo() {
 		List<Map.Entry<String, String>> ret = new ArrayList<Map.Entry<String, String>>();
-		addEntry(ret, keyName, processorName);
+		addEntry(ret, keyName, algorithmName);
 		addEntry(ret, keyInitialSubs, "" + initialSize);
 		addEntry(ret, keyMaxSubs, "" + goal.getMaxSize());
 		addEntry(ret, keyTreeSize, "" + treeSize);

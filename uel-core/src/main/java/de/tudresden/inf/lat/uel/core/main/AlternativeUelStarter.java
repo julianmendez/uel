@@ -26,17 +26,17 @@ import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 
 import de.tudresden.inf.lat.uel.core.processor.BasicOntologyProvider;
 import de.tudresden.inf.lat.uel.core.processor.UelModel;
-import de.tudresden.inf.lat.uel.core.processor.UelProcessorFactory;
+import de.tudresden.inf.lat.uel.core.processor.UnificationAlgorithmFactory;
 import de.tudresden.inf.lat.uel.core.type.OWLUelClassDefinition;
 import de.tudresden.inf.lat.uel.type.api.AtomManager;
 import de.tudresden.inf.lat.uel.type.api.Goal;
-import de.tudresden.inf.lat.uel.type.api.UelProcessor;
+import de.tudresden.inf.lat.uel.type.api.UnificationAlgorithm;
 
 public class AlternativeUelStarter {
 
 	private Set<OWLOntology> ontologies;
 	private OWLOntologyManager ontologyManager;
-	private UelProcessor uelProcessor;
+	private UnificationAlgorithm uelProcessor;
 	private boolean verbose = false;
 	private OWLClass owlThingAlias = null;
 	private boolean markUndefAsVariables = true;
@@ -78,7 +78,7 @@ public class AlternativeUelStarter {
 		String varFilename = "";
 		String owlThingAliasName = "";
 		boolean printInfo = false;
-		int processorIdx = 0;
+		int algorithmIdx = 0;
 		while (argIdx < args.length) {
 			if ((args[argIdx].length() == 2) && (args[argIdx].charAt(0) == '-')) {
 				switch (args[argIdx].charAt(1)) {
@@ -98,12 +98,12 @@ public class AlternativeUelStarter {
 					argIdx++;
 					owlThingAliasName = args[argIdx];
 					break;
-				case 'p':
+				case 'a':
 					argIdx++;
 					try {
-						processorIdx = Integer.parseInt(args[argIdx]) - 1;
+						algorithmIdx = Integer.parseInt(args[argIdx]) - 1;
 					} catch (NumberFormatException e) {
-						System.err.println("Invalid processor index.");
+						System.err.println("Invalid algorithm index.");
 						return;
 					}
 					break;
@@ -143,15 +143,15 @@ public class AlternativeUelStarter {
 		if (variables == null) {
 			return;
 		}
-		List<String> processorNames = UelProcessorFactory.getProcessorNames();
-		if ((processorIdx < 0) || (processorIdx >= processorNames.size())) {
-			System.err.println("Invalid processor index.");
+		List<String> algorithmNames = UnificationAlgorithmFactory.getAlgorithmNames();
+		if ((algorithmIdx < 0) || (algorithmIdx >= algorithmNames.size())) {
+			System.err.println("Invalid algorithm index.");
 			return;
 		}
-		String processorName = processorNames.get(processorIdx);
+		String algorithmName = algorithmNames.get(algorithmIdx);
 
 		Iterator<Set<OWLUelClassDefinition>> result = starter.modifyOntologyAndSolve(subsumptions, dissubsumptions,
-				variables, processorName);
+				variables, algorithmName);
 		int unifierIdx = 1;
 		while (result.hasNext()) {
 			System.out.println("Unifier " + unifierIdx + ":");
@@ -177,7 +177,7 @@ public class AlternativeUelStarter {
 
 	private static void printSyntax() {
 		System.out.println(
-				"Usage: uel [-s subsumptions.owl] [-d dissubsumptions.owl] [-v variables.txt] [-t owl:Thing_alias] [-p processorIndex] [-h] [-i] [ontology.owl]");
+				"Usage: uel [-s subsumptions.owl] [-d dissubsumptions.owl] [-v variables.txt] [-t owl:Thing_alias] [-a algorithmIndex] [-h] [-i] [ontology.owl]");
 	}
 
 	public static Set<OWLClass> loadVariables(String filename, OWLDataFactory factory) {
@@ -225,26 +225,26 @@ public class AlternativeUelStarter {
 	}
 
 	public Iterator<Set<OWLUelClassDefinition>> modifyOntologyAndSolve(OWLOntology positiveProblem,
-			OWLOntology negativeProblem, Set<OWLClass> variables, String processorName) {
+			OWLOntology negativeProblem, Set<OWLClass> variables, String algorithmName) {
 
 		UelModel uelModel = new UelModel(new BasicOntologyProvider(ontologyManager));
 		uelModel.setupGoal(ontologies, positiveProblem, negativeProblem, owlThingAlias);
 
-		return modifyOntologyAndSolve(uelModel, variables, processorName);
+		return modifyOntologyAndSolve(uelModel, variables, algorithmName);
 	}
 
 	public Iterator<Set<OWLUelClassDefinition>> modifyOntologyAndSolve(Set<OWLSubClassOfAxiom> subsumptions,
 			Set<OWLEquivalentClassesAxiom> equations, Set<OWLSubClassOfAxiom> dissubsumptions,
-			Set<OWLEquivalentClassesAxiom> disequations, Set<OWLClass> variables, String processorName) {
+			Set<OWLEquivalentClassesAxiom> disequations, Set<OWLClass> variables, String algorithmName) {
 
 		UelModel uelModel = new UelModel(new BasicOntologyProvider(ontologyManager));
 		uelModel.setupGoal(ontologies, subsumptions, equations, dissubsumptions, disequations, owlThingAlias);
 
-		return modifyOntologyAndSolve(uelModel, variables, processorName);
+		return modifyOntologyAndSolve(uelModel, variables, algorithmName);
 	}
 
 	private Iterator<Set<OWLUelClassDefinition>> modifyOntologyAndSolve(UelModel uelModel, Set<OWLClass> variables,
-			String processorName) {
+			String algorithmName) {
 
 		uelModel.makeClassesUserVariables(variables);
 
@@ -268,8 +268,8 @@ public class AlternativeUelStarter {
 			System.out.println(uelModel.printGoal(true));
 		}
 
-		uelModel.initializeUelProcessor(processorName);
-		return new UnifierIterator(uelModel.getUelProcessor(), uelModel.getTranslator());
+		uelModel.initializeUnificationAlgorithm(algorithmName);
+		return new UnifierIterator(uelModel.getUnificationAlgorithm(), uelModel.getTranslator());
 	}
 
 	public List<Entry<String, String>> getStats() {

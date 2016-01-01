@@ -1,5 +1,8 @@
-package de.tudresden.inf.lat.uel.rule;
+package de.tudresden.inf.lat.uel.rule.rules;
 
+import de.tudresden.inf.lat.uel.rule.Assignment;
+import de.tudresden.inf.lat.uel.rule.FlatSubsumption;
+import de.tudresden.inf.lat.uel.rule.Result;
 import de.tudresden.inf.lat.uel.type.api.Atom;
 
 /**
@@ -8,10 +11,10 @@ import de.tudresden.inf.lat.uel.type.api.Atom;
  * 
  * @author Stefan Borgwardt
  */
-final class EagerExtensionRule extends EagerRule {
+public final class EagerExtensionRule extends EagerRule {
 
 	@Override
-	Application getFirstApplication(FlatSubsumption sub, Assignment assign) {
+	public Application getFirstApplication(FlatSubsumption sub, Assignment assign) {
 		// extract a variable from the body of sub
 		// if there is more than one such variable, this rule does not apply
 		Atom var = null;
@@ -39,7 +42,7 @@ final class EagerExtensionRule extends EagerRule {
 	}
 
 	@Override
-	Result apply(FlatSubsumption sub, Assignment assign,
+	public Result apply(FlatSubsumption sub, Assignment assign,
 			Rule.Application application) {
 		if (!(application instanceof Application)) {
 			throw new IllegalArgumentException(

@@ -1,4 +1,7 @@
-package de.tudresden.inf.lat.uel.rule;
+package de.tudresden.inf.lat.uel.rule.rules;
+
+import de.tudresden.inf.lat.uel.rule.Assignment;
+import de.tudresden.inf.lat.uel.rule.FlatSubsumption;
 
 /**
  * This class represents the eager rules of the rule-based unification algorithm
@@ -7,10 +10,10 @@ package de.tudresden.inf.lat.uel.rule;
  * 
  * @author Stefan Borgwardt
  */
-abstract class EagerRule extends Rule {
+public abstract class EagerRule extends Rule {
 
 	@Override
-	final Rule.Application getNextApplication(FlatSubsumption sub,
+	public final Rule.Application getNextApplication(FlatSubsumption sub,
 			Assignment assign, Rule.Application previous) {
 		return null;
 	}

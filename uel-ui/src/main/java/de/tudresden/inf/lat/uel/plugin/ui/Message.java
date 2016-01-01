@@ -47,10 +47,10 @@ public interface Message {
 	String tooltipSave = "saves the current unifier into a file";
 	String tooltipSaveDissub = "save extended negative ontology and recompute unifiers";
 	String tooltipSaveGoal = "saves the goal to a file";
-	String tooltipSelectProcessor = "selects the processor";
+	String tooltipSelectAlgorithm = "selects the unification algorithm";
 	String tooltipSelectVariables = "gets candidates for variables";
 	String tooltipShowStatInfo = "shows additional information about the computation";
-	String tooltipTextInfo = "statistical information given by the processor";
+	String tooltipTextInfo = "statistical information about the unification algorithm";
 	String tooltipUnifier = "unifier";
 	String tooltipUnifierId = "unifier id";
 	String tooltipVariableName = "subsumed variable";

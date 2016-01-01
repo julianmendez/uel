@@ -1,13 +1,13 @@
 /**
  * 
  */
-package de.tudresden.inf.lat.uel.sat.type;
+package de.tudresden.inf.lat.uel.sat.literals;
 
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import de.tudresden.inf.lat.uel.sat.solver.SatInput;
+import de.tudresden.inf.lat.uel.sat.type.SatInput;
 import de.tudresden.inf.lat.uel.type.api.IndexedSet;
 
 /**

@@ -14,6 +14,7 @@ import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
@@ -23,14 +24,15 @@ import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 import de.tudresden.inf.lat.uel.core.type.KRSSRenderer;
 import de.tudresden.inf.lat.uel.core.type.UnifierTranslator;
 import de.tudresden.inf.lat.uel.type.api.AtomManager;
+import de.tudresden.inf.lat.uel.type.api.Definition;
 import de.tudresden.inf.lat.uel.type.api.Goal;
-import de.tudresden.inf.lat.uel.type.api.UelProcessor;
+import de.tudresden.inf.lat.uel.type.api.UnificationAlgorithm;
 import de.tudresden.inf.lat.uel.type.impl.AtomManagerImpl;
 import de.tudresden.inf.lat.uel.type.impl.Unifier;
 
 /**
  * An object of this class connects the graphical user interface with the
- * processor.
+ * unification algorithm.
  * 
  * @author Julian Mendez
  */
@@ -52,7 +54,7 @@ public class UelModel {
 	private UelOntologyGoal goal;
 	private Map<String, String> shortFormMap;
 	private OntologyProvider provider;
-	private UelProcessor uelProcessor;
+	private UnificationAlgorithm algorithm;
 	private List<Unifier> unifierList;
 
 	public UelModel(OntologyProvider provider) {
@@ -72,9 +74,9 @@ public class UelModel {
 
 	public boolean computeNextUnifier() throws InterruptedException {
 		if (!allUnifiersFound) {
-			while (uelProcessor.computeNextUnifier()) {
-				Unifier result = uelProcessor.getUnifier();
-				if (!unifierList.contains(result)) {
+			while (algorithm.computeNextUnifier()) {
+				Unifier result = algorithm.getUnifier();
+				if (isNew(result)) {
 					unifierList.add(result);
 					return true;
 				}
@@ -84,12 +86,34 @@ public class UelModel {
 		return false;
 	}
 
+	private boolean isNew(Unifier result) {
+		for (Unifier unifier : unifierList) {
+			if (equalsModuloUserVariables(unifier.getDefinitions(), result.getDefinitions())) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	private boolean equalsModuloUserVariables(Set<Definition> defs1, Set<Definition> defs2) {
+		// since both unifiers must define all variables, it suffices to check
+		// one inclusion
+		for (Definition def1 : defs1) {
+			if (atomManager.getUserVariables().contains(def1.getDefiniendum())) {
+				if (!defs2.contains(def1)) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
 	public OWLOntology createOntology() {
 		return provider.createOntology();
 	}
 
-	public void initializeUelProcessor(String name) {
-		uelProcessor = UelProcessorFactory.createProcessor(name, goal);
+	public void initializeUnificationAlgorithm(String name) {
+		algorithm = UnificationAlgorithmFactory.instantiateAlgorithm(name, goal);
 	}
 
 	// public Integer getAtomId(Atom atom) {
@@ -144,8 +168,8 @@ public class UelModel {
 		return new UnifierTranslator(atomManager);
 	}
 
-	public UelProcessor getUelProcessor() {
-		return this.uelProcessor;
+	public UnificationAlgorithm getUnificationAlgorithm() {
+		return this.algorithm;
 	}
 
 	public Set<String> getUserVariableNames() {
@@ -235,21 +259,26 @@ public class UelModel {
 			Set<OWLEquivalentClassesAxiom> equations, Set<OWLSubClassOfAxiom> dissubsumptions,
 			Set<OWLEquivalentClassesAxiom> disequations, OWLClass owlThingAlias) {
 
-		uelProcessor = null;
+		algorithm = null;
 		unifierList = new ArrayList<Unifier>();
 		currentUnifierIndex = -1;
 		allUnifiersFound = false;
 		recomputeShortFormMap();
+		atomManager = new AtomManagerImpl();
 
 		OWLClass top = (owlThingAlias != null) ? owlThingAlias : OWLManager.getOWLDataFactory().getOWLThing();
-		atomManager = new AtomManagerImpl(top.toStringID());
-
-		goal = new UelOntologyGoal(atomManager, new UelOntology(atomManager, bgOntologies, owlThingAlias));
+		goal = new UelOntologyGoal(atomManager, new UelOntology(atomManager, bgOntologies, top));
 
 		goal.addPositiveAxioms(subsumptions);
 		goal.addPositiveAxioms(equations);
 		goal.addNegativeAxioms(dissubsumptions);
 		goal.addNegativeAxioms(disequations);
+
+		// define top as the empty conjunction
+		OWLDataFactory factory = OWLManager.getOWLDataFactory();
+		goal.addEquation(factory.getOWLEquivalentClassesAxiom(top, factory.getOWLObjectIntersectionOf()));
+		Integer topId = atomManager.createConceptName(top.toStringID());
+		atomManager.makeDefinitionVariable(topId);
 
 		goal.disposeOntology();
 	}

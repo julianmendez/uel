@@ -35,21 +35,21 @@ public class UelOntology {
 	private final Map<Integer, OWLClass> nameMap = new HashMap<Integer, OWLClass>();
 	private final AtomManager atomManager;
 	private final Set<OWLOntology> ontologies;
-	private final OWLClass owlThingAlias;
+	private final OWLClass top;
 
-	public UelOntology(AtomManager atomManager, Set<OWLOntology> ontologies, OWLClass owlThingAlias) {
+	public UelOntology(AtomManager atomManager, Set<OWLOntology> ontologies, OWLClass top) {
 		this.atomManager = atomManager;
 		this.ontologies = ontologies;
-		this.owlThingAlias = owlThingAlias;
+		this.top = top;
 	}
 
-	private Integer createFlattenedAtom(String roleName, Set<Integer> atomIds, Set<Definition> newDefinitions) {
+	private Integer createFreshFlatteningDefinition(Set<Integer> atomIds, Set<Definition> newDefinitions) {
 		Integer varId = createFreshFlatteningVariable();
 		newDefinitions.add(new Definition(varId, atomIds, false));
-		return atomManager.createExistentialRestriction(roleName, varId);
+		return varId;
 	}
 
-	public Integer createFreshFlatteningVariable() {
+	private Integer createFreshFlatteningVariable() {
 		String str = flatteningVariablePrefix + flatteningVariableIndex;
 		flatteningVariableIndex++;
 		Integer varId = atomManager.createConceptName(str);
@@ -98,19 +98,24 @@ public class UelOntology {
 		}
 
 		String roleName = propertyExpr.getNamedProperty().toStringID();
-		Integer atomId = null;
 		Set<Integer> fillerIds = flattenClassExpression(existentialRestriction.getFiller(), newDefinitions, newNames);
+		Integer fillerId = null;
 
-		if (fillerIds.size() == 1) {
-			Integer fillerId = fillerIds.iterator().next();
-			if (atomManager.getAtom(fillerId).isConceptName()) {
-				atomId = atomManager.createExistentialRestriction(roleName, fillerId);
-			} else {
-				atomId = createFlattenedAtom(roleName, fillerIds, newDefinitions);
-			}
-		} else if (fillerIds.size() > 1) {
-			atomId = createFlattenedAtom(roleName, fillerIds, newDefinitions);
+		if (fillerIds.size() == 0) {
+			// the empty conjunction is top
+			fillerId = atomManager.createConceptName(top.toStringID());
+		} else if (fillerIds.size() == 1) {
+			fillerId = fillerIds.iterator().next();
 		}
+
+		if ((fillerId == null) || !atomManager.getAtom(fillerId).isConceptName()) {
+			// if we have more than one atom id in 'fillerIds' or the only atom
+			// id is not a concept name, then we need to introduce a new
+			// definition in order to obtain a flat atom
+			fillerId = createFreshFlatteningDefinition(fillerIds, newDefinitions);
+		}
+
+		Integer atomId = atomManager.createExistentialRestriction(roleName, fillerId);
 		return Collections.singleton(atomId);
 	}
 
@@ -132,6 +137,10 @@ public class UelOntology {
 
 	private void createFlatDefinition(Integer id, Set<Definition> newDefinitions, Set<Integer> toVisit) {
 		OWLClass cls = nameMap.get(id);
+		if (cls.equals(top)) {
+			// do not expand definitions beyond top
+			return;
+		}
 
 		OWLClassExpression definition = loadDefinition(cls);
 		OWLClassExpression primitiveDefinition = loadPrimitiveDefinition(cls);
@@ -182,7 +191,8 @@ public class UelOntology {
 		for (OWLOntology ontology : ontologies) {
 			for (OWLSubClassOfAxiom definingAxiom : ontology.getSubClassAxiomsForSubClass(cls)) {
 				OWLClassExpression superClass = definingAxiom.getSuperClass();
-				if (!superClass.isOWLThing() && !superClass.equals(owlThingAlias)) {
+				if (!superClass.equals(top)) {
+					// do not expand definitions beyond top
 					allDefinitions.add(definingAxiom.getSuperClass());
 				}
 			}

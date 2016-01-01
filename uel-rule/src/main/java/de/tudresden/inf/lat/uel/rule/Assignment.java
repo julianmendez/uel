@@ -14,7 +14,7 @@ import de.tudresden.inf.lat.uel.type.api.Atom;
  * 
  * @author Stefan Borgwardt
  */
-class Assignment {
+public class Assignment {
 
 	private final Map<Atom, Set<Atom>> subs = new HashMap<Atom, Set<Atom>>();
 
@@ -42,7 +42,7 @@ class Assignment {
 	 *            the new atom
 	 * @return true iff the assignment was changed as a result of this operation
 	 */
-	boolean add(Atom var, Atom at) {
+	public boolean add(Atom var, Atom at) {
 		if (at == null) {
 			throw new IllegalArgumentException();
 		}
@@ -59,7 +59,7 @@ class Assignment {
 	 *            the new atoms
 	 * @return true iff the assignment was changed as a result of this operation
 	 */
-	boolean addAll(Atom var, Set<Atom> at) {
+	public boolean addAll(Atom var, Set<Atom> at) {
 		if (at == null)
 			return false;
 		Set<Atom> flatAtoms = getOrInit(var);
@@ -73,7 +73,7 @@ class Assignment {
 	 *            the assignment to be merged into this one
 	 * @return true iff the assignment was changed as a result of this operation
 	 */
-	boolean addAll(Assignment other) {
+	public boolean addAll(Assignment other) {
 		if (other == null)
 			return false;
 		boolean ret = false;
@@ -126,7 +126,7 @@ class Assignment {
 	 *            the variable
 	 * @return the set of assigned subsumers
 	 */
-	Set<Atom> getSubsumers(Atom var) {
+	public Set<Atom> getSubsumers(Atom var) {
 		return getOrInit(var);
 	}
 
@@ -200,7 +200,7 @@ class Assignment {
 	 *            the new atom
 	 * @return true iff the resulting assignment would be cyclic
 	 */
-	boolean makesCyclic(Atom var, Atom at) {
+	public boolean makesCyclic(Atom var, Atom at) {
 		if (at.isGround())
 			return false;
 		Atom conceptName = at.getConceptName();
@@ -218,7 +218,7 @@ class Assignment {
 	 *            the new atoms
 	 * @return true iff the resulting assignment would be cyclic
 	 */
-	boolean makesCyclic(Atom var, Iterable<Atom> newAtoms) {
+	public boolean makesCyclic(Atom var, Iterable<Atom> newAtoms) {
 		for (Atom at : newAtoms) {
 			if (makesCyclic(var, at)) {
 				return true;

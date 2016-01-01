@@ -1,5 +1,8 @@
-package de.tudresden.inf.lat.uel.rule;
+package de.tudresden.inf.lat.uel.rule.rules;
 
+import de.tudresden.inf.lat.uel.rule.Assignment;
+import de.tudresden.inf.lat.uel.rule.FlatSubsumption;
+import de.tudresden.inf.lat.uel.rule.Result;
 import de.tudresden.inf.lat.uel.type.api.Atom;
 
 /**
@@ -8,10 +11,10 @@ import de.tudresden.inf.lat.uel.type.api.Atom;
  * 
  * @author Stefan Borgwardt
  */
-final class EagerSolving1Rule extends EagerRule {
+public final class EagerSolving1Rule extends EagerRule {
 
 	@Override
-	Application getFirstApplication(FlatSubsumption sub, Assignment assign) {
+	public Application getFirstApplication(FlatSubsumption sub, Assignment assign) {
 		Atom head = sub.getHead();
 		for (Atom at : sub.getBody()) {
 			if (at.equals(head)) {
@@ -22,7 +25,7 @@ final class EagerSolving1Rule extends EagerRule {
 	}
 
 	@Override
-	Result apply(FlatSubsumption sub, Assignment assign, Application application) {
+	public Result apply(FlatSubsumption sub, Assignment assign, Application application) {
 		return new Result(sub, application);
 	}
 

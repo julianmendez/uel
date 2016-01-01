@@ -48,15 +48,15 @@ public class ProcessorTest {
 	private Set<String> varNames;
 	private Set<String> undefVarNames;
 	private Integer numberOfUnifiers;
-	private String processorName;
+	private String algorithmName;
 
 	public ProcessorTest(String ontologyName, Set<String> varNames, Set<String> undefVarNames, Integer numberOfUnifiers,
-			String processorName) {
+			String algorithmName) {
 		this.ontologyName = ontologyName;
 		this.varNames = varNames;
 		this.undefVarNames = undefVarNames;
 		this.numberOfUnifiers = numberOfUnifiers;
-		this.processorName = processorName;
+		this.algorithmName = algorithmName;
 	}
 
 	private OWLOntology createOntology(InputStream input) throws OWLOntologyCreationException {
@@ -87,15 +87,16 @@ public class ProcessorTest {
 				Set<String> varNames = parseSet(configFile.readLine());
 				Set<String> undefVarNames = parseSet(configFile.readLine());
 
-				String processorName = configFile.readLine();
-				while (processorName != null) {
-					Integer numberOfUnifiers = Integer.parseInt(configFile.readLine());
-					if (!processorName.contains("ASP")) {
-						data.add(new Object[] { ontologyName, varNames, undefVarNames, numberOfUnifiers,
-								processorName });
+				String algorithmName = configFile.readLine();
+				while (algorithmName != null) {
+					Integer nbUnifiers = Integer.parseInt(configFile.readLine());
+					if (!algorithmName.contains("ASP")) {
+						if ((i == 8) && algorithmName.equals(UnificationAlgorithmFactory.SAT_BASED_ALGORITHM)) {
+							data.add(new Object[] { ontologyName, varNames, undefVarNames, nbUnifiers, algorithmName });
+						}
 					}
 
-					processorName = configFile.readLine();
+					algorithmName = configFile.readLine();
 				}
 				configFile.close();
 
@@ -146,7 +147,7 @@ public class ProcessorTest {
 		}
 		uelModel.makeUndefClassesUserVariables(variables);
 
-		uelModel.initializeUelProcessor(processorName);
+		uelModel.initializeUnificationAlgorithm(algorithmName);
 
 		boolean hasUnifiers = true;
 		while (hasUnifiers) {
@@ -159,6 +160,9 @@ public class ProcessorTest {
 
 		for (Unifier unifier : unifiers) {
 			String extendedOntology = goalStr + renderer.printDefinitions(unifier.getDefinitions(), true);
+			// String u = renderer.printDefinitions(unifier.getDefinitions(),
+			// false);
+			// System.out.println(u);
 			// System.out.println();
 			// System.out.println("---");
 			// System.out.println(extendedOntology);

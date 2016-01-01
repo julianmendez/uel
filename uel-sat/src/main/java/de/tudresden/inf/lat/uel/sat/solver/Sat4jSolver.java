@@ -11,6 +11,10 @@ import org.sat4j.specs.IProblem;
 import org.sat4j.specs.ISolver;
 import org.sat4j.specs.TimeoutException;
 
+import de.tudresden.inf.lat.uel.sat.type.SatInput;
+import de.tudresden.inf.lat.uel.sat.type.SatOutput;
+import de.tudresden.inf.lat.uel.sat.type.Solver;
+
 /**
  * An object of this class uses the Sat4j solver to solve a SAT problem.
  * 

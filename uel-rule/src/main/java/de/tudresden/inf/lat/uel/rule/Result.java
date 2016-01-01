@@ -3,7 +3,7 @@ package de.tudresden.inf.lat.uel.rule;
 import java.util.HashSet;
 import java.util.Set;
 
-import de.tudresden.inf.lat.uel.rule.Rule.Application;
+import de.tudresden.inf.lat.uel.rule.rules.Rule.Application;
 
 /**
  * Instances of this class describe the result of applying a rule of the
@@ -12,7 +12,7 @@ import de.tudresden.inf.lat.uel.rule.Rule.Application;
  * 
  * @author Stefan Borgwardt
  */
-final class Result {
+public final class Result {
 
 	private final FlatSubsumption subsumption;
 	private final Application application;
@@ -32,7 +32,7 @@ final class Result {
 	 * @param successful
 	 *            a flag indicating whether the rule application was successful
 	 */
-	Result(FlatSubsumption subsumption, Application application, boolean successful) {
+	public Result(FlatSubsumption subsumption, Application application, boolean successful) {
 		this.subsumption = subsumption;
 		this.application = application;
 		this.successful = successful;
@@ -47,7 +47,7 @@ final class Result {
 	 * @param application
 	 *            the rule application
 	 */
-	Result(FlatSubsumption subsumption, Application application) {
+	public Result(FlatSubsumption subsumption, Application application) {
 		this(subsumption, application, true);
 	}
 
@@ -127,7 +127,7 @@ final class Result {
 	 * @return an object specifying new non-variable atoms that were assigned to
 	 *         variables
 	 */
-	Assignment getNewSubsumers() {
+	public Assignment getNewSubsumers() {
 		return newSubsumers;
 	}
 
@@ -137,7 +137,7 @@ final class Result {
 	 * 
 	 * @return a set of new unsolved subsumptions
 	 */
-	Set<FlatSubsumption> getNewUnsolvedSubsumptions() {
+	public Set<FlatSubsumption> getNewUnsolvedSubsumptions() {
 		return newUnsolvedSubsumptions;
 	}
 

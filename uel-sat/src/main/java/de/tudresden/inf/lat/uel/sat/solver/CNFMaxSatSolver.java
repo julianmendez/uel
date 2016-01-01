@@ -11,6 +11,10 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import de.tudresden.inf.lat.uel.sat.type.SatInput;
+import de.tudresden.inf.lat.uel.sat.type.SatOutput;
+import de.tudresden.inf.lat.uel.sat.type.Solver;
+
 /**
  * This class runs an external MaxSAT solver on a constructed WCNF input file.
  *
@@ -57,15 +61,13 @@ public class CNFMaxSatSolver implements Solver {
 			break;
 		}
 	}
-	
+
 	public void cleanup() {
 	}
 
-	private SatOutput convertToSatOutput(Process p)
-			throws IOException {
+	private SatOutput convertToSatOutput(Process p) throws IOException {
 
-		BufferedReader reader = new BufferedReader(new InputStreamReader(
-				p.getInputStream()));
+		BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
 
 		Set<Integer> clause = new HashSet<Integer>();
 		String line = reader.readLine();
@@ -94,8 +96,7 @@ public class CNFMaxSatSolver implements Solver {
 		for (int i = 0; i < CLASP_OPTIONS.length; i++) {
 			this.commandOptions[i + 1] = CLASP_OPTIONS[i];
 		}
-		this.commandOptions[CLASP_OPTIONS.length + 1] = this.inputFile
-				.getPath();
+		this.commandOptions[CLASP_OPTIONS.length + 1] = this.inputFile.getPath();
 	}
 
 	private Process solve() throws IOException {
@@ -114,8 +115,7 @@ public class CNFMaxSatSolver implements Solver {
 	public SatOutput solve(SatInput input) throws IOException {
 
 		this.nbVars = input.getLastId();
-		BufferedWriter writer = new BufferedWriter(new FileWriter(
-				this.inputFile));
+		BufferedWriter writer = new BufferedWriter(new FileWriter(this.inputFile));
 		writer.write(input.toWCNF(this.nbVars + 1));
 		writer.close();
 
@@ -124,8 +124,7 @@ public class CNFMaxSatSolver implements Solver {
 
 	@Override
 	public SatOutput update(Set<Integer> clause) throws IOException {
-		BufferedReader reader = new BufferedReader(new FileReader(
-				this.inputFile));
+		BufferedReader reader = new BufferedReader(new FileReader(this.inputFile));
 		StringTokenizer stok = new StringTokenizer(reader.readLine());
 		stok.nextToken();
 		stok.nextToken();
@@ -133,11 +132,11 @@ public class CNFMaxSatSolver implements Solver {
 		int nbClauses = Integer.parseInt(stok.nextToken());
 		reader.close();
 
-		BufferedWriter writer = new BufferedWriter(new FileWriter(
-				this.inputFile));
-		writer.write(SatInput.WCNFline(this.nbVars, nbClauses + 1,
-				this.nbVars + 1));
-		writer.write(SatInput.toWCNF(clause, this.nbVars + 1));
+		BufferedWriter writer = new BufferedWriter(new FileWriter(this.inputFile));
+		StringBuffer sbuf = new StringBuffer();
+		SatInput.appendWCNFLine(sbuf, nbVars, nbClauses + 1, nbVars + 1);
+		SatInput.appendWCNFClause(sbuf, clause, nbVars + 1);
+		writer.write(sbuf.toString());
 		writer.close();
 
 		return convertToSatOutput(solve());

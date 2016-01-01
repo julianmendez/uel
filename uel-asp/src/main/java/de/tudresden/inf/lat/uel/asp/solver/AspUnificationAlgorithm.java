@@ -12,10 +12,10 @@ import java.util.Set;
 
 import de.tudresden.inf.lat.uel.type.api.Definition;
 import de.tudresden.inf.lat.uel.type.api.Goal;
-import de.tudresden.inf.lat.uel.type.api.UelProcessor;
+import de.tudresden.inf.lat.uel.type.api.UnificationAlgorithm;
 import de.tudresden.inf.lat.uel.type.impl.Unifier;
 
-public class AspProcessor implements UelProcessor {
+public class AspUnificationAlgorithm implements UnificationAlgorithm {
 
 	private Goal goal;
 	private AspInput aspInput;
@@ -25,7 +25,7 @@ public class AspProcessor implements UelProcessor {
 	private boolean isSynchronized;
 	private boolean minimize;
 
-	public AspProcessor(Goal goal, boolean minimize) {
+	public AspUnificationAlgorithm(Goal goal, boolean minimize) {
 		this.goal = goal;
 		this.aspInput = new AspInput(goal);
 		this.initialized = false;

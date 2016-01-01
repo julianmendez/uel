@@ -26,13 +26,11 @@ class NormalizedGoal implements Set<FlatSubsumption> {
 
 	private static void convert(Definition d, AtomManager atomManager, Set<FlatSubsumption> flatSubsumptions) {
 		Atom definiendum = atomManager.getAtom(d.getDefiniendum());
-		if (!definiendum.isTop()) {
-			List<Atom> right = toAtoms(d.getRight(), atomManager);
-			for (Atom rightAtom : right) {
-				flatSubsumptions.add(new FlatSubsumption(definiendum, rightAtom));
-			}
-			flatSubsumptions.add(new FlatSubsumption(right, definiendum));
+		List<Atom> right = toAtoms(d.getRight(), atomManager);
+		for (Atom rightAtom : right) {
+			flatSubsumptions.add(new FlatSubsumption(definiendum, rightAtom));
 		}
+		flatSubsumptions.add(new FlatSubsumption(right, definiendum));
 	}
 
 	private static void convert(Equation e, AtomManager atomManager, Set<FlatSubsumption> flatSubsumptions) {
@@ -72,10 +70,7 @@ class NormalizedGoal implements Set<FlatSubsumption> {
 	private static List<Atom> toAtoms(Set<Integer> atomIds, AtomManager atomManager) {
 		List<Atom> atoms = new ArrayList<Atom>();
 		for (Integer atomId : atomIds) {
-			Atom atom = atomManager.getAtom(atomId);
-			if (!atom.isTop()) {
-				atoms.add(atom);
-			}
+			atoms.add(atomManager.getAtom(atomId));
 		}
 		return atoms;
 	}

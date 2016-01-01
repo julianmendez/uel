@@ -10,6 +10,10 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import de.tudresden.inf.lat.uel.sat.type.SatInput;
+import de.tudresden.inf.lat.uel.sat.type.SatOutput;
+import de.tudresden.inf.lat.uel.sat.type.Solver;
+
 /**
  * An object of this class uses the MiniSat solver to solve a SAT problem.
  * 

@@ -62,7 +62,7 @@ class StatInfoController {
 	public void updateView() {
 		view.setGoalText(model.printGoal(true));
 		StringBuffer info = new StringBuffer();
-		for (Map.Entry<String, String> pair : model.getUelProcessor().getInfo()) {
+		for (Map.Entry<String, String> pair : model.getUnificationAlgorithm().getInfo()) {
 			info.append(pair.getKey());
 			info.append(colon);
 			info.append(pair.getValue());
