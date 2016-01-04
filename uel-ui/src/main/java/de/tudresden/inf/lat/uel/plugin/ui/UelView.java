@@ -11,6 +11,7 @@ import javax.swing.JComboBox;
 import javax.swing.JPanel;
 
 import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyID;
 
 import de.tudresden.inf.lat.uel.core.processor.UnificationAlgorithmFactory;
 
@@ -110,7 +111,7 @@ public class UelView extends JPanel {
 	}
 
 	public void setSelectedOntologyNeg(OWLOntology ontology) {
-		listOntologyNeg.setSelectedItem(ontology);
+		listOntologyNeg.setSelectedIndex(listOfOntologies.indexOf(ontology));
 	}
 
 	public String getSelectedAlgorithm() {
@@ -118,7 +119,12 @@ public class UelView extends JPanel {
 	}
 
 	String getName(OWLOntology ontology) {
-		return ontology.getOntologyID().getOntologyIRI().get().toString();
+		OWLOntologyID id = ontology.getOntologyID();
+		if (id.getOntologyIRI().isPresent()) {
+			return id.getOntologyIRI().get().toString();
+		} else {
+			return id.toString();
+		}
 	}
 
 	String[] getNames(List<OWLOntology> list) {

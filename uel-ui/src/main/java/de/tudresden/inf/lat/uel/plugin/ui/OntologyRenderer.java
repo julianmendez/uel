@@ -9,9 +9,12 @@ import java.io.StringWriter;
 
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.io.OWLRendererException;
+import org.semanticweb.owlapi.io.StreamDocumentSource;
+import org.semanticweb.owlapi.krss2.parser.KRSS2OWLParser;
 import org.semanticweb.owlapi.krss2.renderer.KRSS2OWLSyntaxRenderer;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
+import org.semanticweb.owlapi.model.OWLOntologyLoaderConfiguration;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.owlxml.renderer.OWLXMLRenderer;
 import org.semanticweb.owlapi.rdf.rdfxml.renderer.RDFXMLRenderer;
@@ -41,7 +44,20 @@ public class OntologyRenderer {
 		}
 	}
 
-	private static String renderKRSS(OWLOntology owlOntology) throws OWLRendererException {
+	public static OWLOntology parseKRSS(String ontologyString) {
+		try {
+			OWLOntologyManager ontologyManager = OWLManager.createOWLOntologyManager();
+			OWLOntology ontology = ontologyManager.createOntology();
+			KRSS2OWLParser parser = new KRSS2OWLParser();
+			ByteArrayInputStream input = new ByteArrayInputStream(ontologyString.getBytes());
+			parser.parse(new StreamDocumentSource(input), ontology, new OWLOntologyLoaderConfiguration());
+			return ontology;
+		} catch (IOException | OWLOntologyCreationException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	public static String renderKRSS(OWLOntology owlOntology) throws OWLRendererException {
 		StringWriter writer = new StringWriter();
 		KRSS2OWLSyntaxRenderer renderer = new KRSS2OWLSyntaxRenderer();
 		renderer.render(owlOntology, writer);
@@ -49,7 +65,7 @@ public class OntologyRenderer {
 		return writer.toString();
 	}
 
-	private static String renderOWL(OWLOntology owlOntology) throws OWLRendererException {
+	public static String renderOWL(OWLOntology owlOntology) throws OWLRendererException {
 		StringWriter writer = new StringWriter();
 		OWLXMLRenderer renderer = new OWLXMLRenderer();
 		renderer.render(owlOntology, writer);
@@ -57,7 +73,7 @@ public class OntologyRenderer {
 		return writer.toString();
 	}
 
-	private static String renderRDF(OWLOntology owlOntology) throws IOException {
+	public static String renderRDF(OWLOntology owlOntology) throws IOException {
 		StringWriter writer = new StringWriter();
 		RDFXMLRenderer renderer = new RDFXMLRenderer(owlOntology, writer);
 		renderer.render();

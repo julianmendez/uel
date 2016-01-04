@@ -2,12 +2,20 @@ package de.tudresden.inf.lat.uel.plugin.ui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.formats.KRSS2DocumentFormat;
+import org.semanticweb.owlapi.io.StreamDocumentSource;
+import org.semanticweb.owlapi.krss2.parser.KRSS2OWLParser;
 import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyLoaderConfiguration;
+import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 
 import de.tudresden.inf.lat.uel.core.processor.UelModel;
 
@@ -39,7 +47,8 @@ public class UelController {
 		}
 
 		String dissubsumptions = refineController.getDissubsumptions();
-		OWLOntology add = OntologyRenderer.parseOntology(dissubsumptions);
+		OWLOntology add = OntologyRenderer.parseKRSS(dissubsumptions);
+
 		if (add.getAxiomCount() - add.getAxiomCount(AxiomType.SUBCLASS_OF) > 0) {
 			throw new IllegalStateException("Expected dissubsumptions to be encoded as OWLSubClassOfAxioms.");
 		}

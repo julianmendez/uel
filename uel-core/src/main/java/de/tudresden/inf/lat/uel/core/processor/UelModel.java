@@ -116,14 +116,6 @@ public class UelModel {
 		algorithm = UnificationAlgorithmFactory.instantiateAlgorithm(name, goal);
 	}
 
-	// public Integer getAtomId(Atom atom) {
-	// return atomManager.getAtoms().addAndGetIndex(atom);
-	// }
-
-	// public Integer getAtomId(OWLClass owlClass) {
-	// return getAtomId(owlClass.toStringID());
-	// }
-
 	public Integer getAtomId(String name) {
 		return atomManager.createConceptName(name);
 	}
