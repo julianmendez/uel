@@ -16,13 +16,6 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.owlxml.renderer.OWLXMLRenderer;
 import org.semanticweb.owlapi.rdf.rdfxml.renderer.RDFXMLRenderer;
 
-// for OWL API 4.0.2
-
-//import org.semanticweb.owlapi.krss2.renderer.KRSS2OWLSyntaxRenderer;
-//import org.semanticweb.owlapi.manchestersyntax.renderer.ManchesterOWLSyntaxRenderer;
-//import org.semanticweb.owlapi.owlxml.renderer.OWLXMLRenderer;
-//import org.semanticweb.owlapi.rdf.rdfxml.renderer.RDFXMLRenderer;
-
 /**
  * An object of this class can read OWL ontologies from strings and also write
  * these ontologies as strings.

@@ -2,6 +2,7 @@ package de.tudresden.inf.lat.uel.plugin.ui;
 
 import java.awt.Container;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.DefaultComboBoxModel;
@@ -24,10 +25,11 @@ public class UelView extends JPanel {
 
 	private final JButton buttonOpen = new JButton();
 	private final JButton buttonSelectVariables = new JButton();
-	private final JComboBox<OWLOntology> listOntologyBg00 = new JComboBox<OWLOntology>();
-	private final JComboBox<OWLOntology> listOntologyBg01 = new JComboBox<OWLOntology>();
-	private final JComboBox<OWLOntology> listOntologyPos = new JComboBox<OWLOntology>();
-	private final JComboBox<OWLOntology> listOntologyNeg = new JComboBox<OWLOntology>();
+	private final List<OWLOntology> listOfOntologies = new ArrayList<OWLOntology>();
+	private final JComboBox<String> listOntologyBg00 = new JComboBox<String>();
+	private final JComboBox<String> listOntologyBg01 = new JComboBox<String>();
+	private final JComboBox<String> listOntologyPos = new JComboBox<String>();
+	private final JComboBox<String> listOntologyNeg = new JComboBox<String>();
 	private final JComboBox<String> listAlgorithm = new JComboBox<String>();
 
 	public UelView() {
@@ -92,19 +94,19 @@ public class UelView extends JPanel {
 	}
 
 	public OWLOntology getSelectedOntologyBg00() {
-		return (OWLOntology) listOntologyBg00.getSelectedItem();
+		return listOfOntologies.get(listOntologyBg00.getSelectedIndex());
 	}
 
 	public OWLOntology getSelectedOntologyBg01() {
-		return (OWLOntology) listOntologyBg01.getSelectedItem();
+		return listOfOntologies.get(listOntologyBg01.getSelectedIndex());
 	}
 
 	public OWLOntology getSelectedOntologyPos() {
-		return (OWLOntology) listOntologyPos.getSelectedItem();
+		return listOfOntologies.get(listOntologyPos.getSelectedIndex());
 	}
 
 	public OWLOntology getSelectedOntologyNeg() {
-		return (OWLOntology) listOntologyNeg.getSelectedItem();
+		return listOfOntologies.get(listOntologyNeg.getSelectedIndex());
 	}
 
 	public void setSelectedOntologyNeg(OWLOntology ontology) {
@@ -115,12 +117,26 @@ public class UelView extends JPanel {
 		return (String) listAlgorithm.getSelectedItem();
 	}
 
+	String getName(OWLOntology ontology) {
+		return ontology.getOntologyID().getOntologyIRI().get().toString();
+	}
+
+	String[] getNames(List<OWLOntology> list) {
+		String[] ret = new String[list.size()];
+		for (int i = 0; i < list.size(); i++) {
+			ret[i] = getName(list.get(i));
+		}
+		return ret;
+	}
+
 	public void reloadOntologies(List<OWLOntology> list) {
-		OWLOntology[] ontologies = list.toArray(new OWLOntology[list.size()]);
-		resetModelAndRestoreSelection(listOntologyBg00, ontologies);
-		resetModelAndRestoreSelection(listOntologyBg01, ontologies);
-		resetModelAndRestoreSelection(listOntologyPos, ontologies);
-		resetModelAndRestoreSelection(listOntologyNeg, ontologies);
+		this.listOfOntologies.clear();
+		this.listOfOntologies.addAll(list);
+		String[] ontologyNames = getNames(this.listOfOntologies);
+		resetModelAndRestoreSelection(listOntologyBg00, ontologyNames);
+		resetModelAndRestoreSelection(listOntologyBg01, ontologyNames);
+		resetModelAndRestoreSelection(listOntologyPos, ontologyNames);
+		resetModelAndRestoreSelection(listOntologyNeg, ontologyNames);
 	}
 
 	@SuppressWarnings("unchecked")
