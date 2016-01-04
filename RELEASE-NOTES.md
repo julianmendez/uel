@@ -26,7 +26,7 @@ $ mvn clean install
 ### v1.3.1
 *(2015-09-09)*
 * has new icons
-* does not longer have [Apache Ant + Apache Ivy](http://ant.apache.org/ivy/) build files
+* does not longer have [Apache Ant + Apache Ivy](https://ant.apache.org/ivy/) build files
 * includes Maven POM files to be deployed in [Sonatype](https://oss.sonatype.org/)
 * is available at [The Central Repository](https://repo1.maven.org/maven2/de/tu-dresden/inf/lat/uel/)
 * build commands: 
