@@ -200,6 +200,7 @@ public class UelUI {
 			Dimension preferredSize) {
 		textArea.setWrapStyleWord(true);
 		textArea.setLineWrap(true);
+		textArea.setEditable(false);
 		setBorder(textArea);
 		return addScrollPane(parent, textArea, tooltipText, preferredSize);
 	}
