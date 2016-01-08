@@ -11,7 +11,7 @@ import javax.swing.JButton;
 import javax.swing.JList;
 
 /**
- * This is the panel to select the variables in a given unification problem.
+ * This dialog allows to select the variables for the unification problem.
  * 
  * @author Julian Mendez
  */
@@ -25,6 +25,9 @@ public final class VarSelectionView extends UelDialog {
 	private final JButton makeConsButton = new JButton();
 	private final JButton makeVarButton = new JButton();
 
+	/**
+	 * Construct a new variable selection dialog.
+	 */
 	public VarSelectionView() {
 		setup("Variable selection");
 	}

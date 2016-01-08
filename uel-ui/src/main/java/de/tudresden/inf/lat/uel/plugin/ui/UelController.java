@@ -2,20 +2,12 @@ package de.tudresden.inf.lat.uel.plugin.ui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.formats.KRSS2DocumentFormat;
-import org.semanticweb.owlapi.io.StreamDocumentSource;
-import org.semanticweb.owlapi.krss2.parser.KRSS2OWLParser;
 import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLOntologyLoaderConfiguration;
-import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 
 import de.tudresden.inf.lat.uel.core.processor.UelModel;
 
@@ -81,16 +73,8 @@ public class UelController {
 		}
 
 		refineController = new RefineController(model);
-		refineController.addSaveListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				executeSaveDissubsumptions();
-			}
-		});
-		refineController.addRecomputeListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				executeRecompute();
-			}
-		});
+		refineController.addSaveListener(e -> executeSaveDissubsumptions());
+		refineController.addRecomputeListener(e -> executeRecompute());
 		refineController.open();
 	}
 
@@ -108,13 +92,9 @@ public class UelController {
 	private void executeSelectVariables() {
 		setupModel();
 
-		this.varSelectionController = new VarSelectionController(model);
-		this.varSelectionController.addAcceptVarListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				executeAcceptVar();
-			}
-		});
-		this.varSelectionController.open();
+		varSelectionController = new VarSelectionController(model);
+		varSelectionController.addAcceptVarListener(e -> executeAcceptVar());
+		varSelectionController.open();
 	}
 
 	private void init() {
@@ -123,11 +103,7 @@ public class UelController {
 				executeOpen();
 			}
 		});
-		view.addSelectVariablesListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				executeSelectVariables();
-			}
-		});
+		view.addSelectVariablesListener(e -> executeSelectVariables());
 		updateView();
 	}
 
@@ -155,11 +131,7 @@ public class UelController {
 		model.initializeUnificationAlgorithm(view.getSelectedAlgorithm());
 
 		unifierController = new UnifierController(model);
-		unifierController.addRefineListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				executeRefine();
-			}
-		});
+		unifierController.addRefineListener(e -> executeRefine());
 		unifierController.open();
 	}
 

@@ -119,7 +119,7 @@ public class UelUI {
 	}
 
 	static final int DEFAULT_ICON_SIZE = 18;
-	static final int GAP_SIZE = 6;
+	static final int GAP_SIZE = 5;
 
 	public static final String PATH_BACK = "icons/back.png";
 	public static final String PATH_FAST_FORWARD = "icons/fastforward.png";
@@ -271,13 +271,15 @@ public class UelUI {
 	static void setBorder(JComponent comp) {
 		boolean button = comp instanceof JButton;
 		Border line = new LineBorder(new Color(150, 150, 150));
-		Border margin = new EmptyBorder(button ? 0 : 4, 4, button ? 0 : 4, 4);
+		int vertical = button ? 0 : GAP_SIZE - 1;
+		int horizontal = GAP_SIZE - 1;
+		Border margin = new EmptyBorder(vertical, horizontal, vertical, horizontal);
 		Border compound = new CompoundBorder(line, margin);
 		comp.setBorder(compound);
 	}
 
 	static void setMargin(JComponent comp) {
-		comp.setBorder(new EmptyBorder(5, 5, 5, 5));
+		comp.setBorder(new EmptyBorder(GAP_SIZE, GAP_SIZE, GAP_SIZE, GAP_SIZE));
 	}
 
 	static void setupButton(Container parent, JButton button, Icon icon, String toolTipText) {
@@ -297,6 +299,7 @@ public class UelUI {
 	static void setupComponent(JComponent comp) {
 		comp.setAlignmentX(Component.LEFT_ALIGNMENT);
 		comp.setAlignmentY(Component.TOP_ALIGNMENT);
+//		comp.setBorder(new LineBorder(Color.BLACK));
 	}
 
 	static void setupComponent(Container parent, JComponent comp) {
@@ -308,6 +311,7 @@ public class UelUI {
 		comp.setAlignmentX(Component.CENTER_ALIGNMENT);
 		comp.setAlignmentY(Component.TOP_ALIGNMENT);
 		comp.setMinimumSize(new Dimension(0, 0));
+//		comp.setBorder(new LineBorder(Color.BLACK));
 	}
 
 	static void setupContainer(Container parent, JComponent comp) {

@@ -50,6 +50,7 @@ public interface Message {
 	String tooltipSelectAlgorithm = "selects the unification algorithm";
 	String tooltipSelectVariables = "gets candidates for variables";
 	String tooltipShowStatInfo = "shows additional information about the computation";
+	String tooltipSubsumedByTop = "no subsumers";
 	String tooltipTextInfo = "statistical information about the unification algorithm";
 	String tooltipUnifier = "unifier";
 	String tooltipUnifierId = "unifier id";

@@ -69,6 +69,7 @@ public class UnifierController {
 			return;
 		}
 
+		// TODO render directly as OWLOntology
 		String unifier = model.printCurrentUnifier(false);
 		OntologyRenderer.saveToOntologyFile(unifier, file);
 	}
@@ -78,36 +79,12 @@ public class UnifierController {
 	}
 
 	private void init() {
-		view.addFirstListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				executeFirst();
-			}
-		});
-		view.addPreviousListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				executePrevious();
-			}
-		});
-		view.addNextListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				executeNext();
-			}
-		});
-		view.addLastListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				executeLast();
-			}
-		});
-		view.addSaveListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				executeSave();
-			}
-		});
-		view.addShowStatInfoListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				executeShowStatInfo();
-			}
-		});
+		view.addFirstListener(e -> executeFirst());
+		view.addPreviousListener(e -> executePrevious());
+		view.addNextListener(e -> executeNext());
+		view.addLastListener(e -> executeLast());
+		view.addSaveListener(e -> executeSave());
+		view.addShowStatInfoListener(e -> executeShowStatInfo());
 	}
 
 	public void open() {

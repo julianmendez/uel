@@ -38,7 +38,6 @@ class StatInfoController {
 		try {
 			BufferedWriter writer = new BufferedWriter(new FileWriter(file));
 			writer.write(model.printGoal(false));
-			writer.flush();
 			writer.close();
 		} catch (IOException e) {
 			throw new RuntimeException(e);
@@ -46,11 +45,7 @@ class StatInfoController {
 	}
 
 	private void init() {
-		view.addSaveListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				executeSaveGoal();
-			}
-		});
+		view.addSaveListener(e -> executeSaveGoal());
 	}
 
 	public void open() {

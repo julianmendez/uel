@@ -2,6 +2,7 @@ package de.tudresden.inf.lat.uel.plugin.protege;
 
 import java.awt.Container;
 import java.io.File;
+import java.util.List;
 import java.util.Set;
 
 import org.protege.editor.owl.model.OWLModelManager;
@@ -9,7 +10,10 @@ import org.protege.editor.owl.model.event.EventType;
 import org.protege.editor.owl.model.event.OWLModelManagerChangeEvent;
 import org.protege.editor.owl.model.event.OWLModelManagerListener;
 import org.semanticweb.owlapi.model.OWLEntity;
+import org.semanticweb.owlapi.model.OWLException;
 import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyChange;
+import org.semanticweb.owlapi.model.OWLOntologyChangeListener;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 
@@ -17,11 +21,11 @@ import de.tudresden.inf.lat.uel.core.processor.OntologyProvider;
 import de.tudresden.inf.lat.uel.plugin.main.UelStarter;
 
 /**
- * This is used to start the UEL system.
+ * This is used to start UEL as a plug-in in Protégé.
  * 
  * @author Julian Mendez
  */
-public class UelProtegeStarter extends UelStarter implements OWLModelManagerListener {
+public class UelProtegeStarter extends UelStarter implements OWLModelManagerListener, OWLOntologyChangeListener {
 
 	private static final class ProtegeOntologyProvider implements OntologyProvider {
 
@@ -66,24 +70,35 @@ public class UelProtegeStarter extends UelStarter implements OWLModelManagerList
 		}
 	}
 
+	/**
+	 * Serial version UID
+	 */
 	static final long serialVersionUID = -8760277761148468455L;
 
 	private final OWLModelManager modelManager;
 
 	/**
-	 * Constructs a new UEL starter.
+	 * Start an instance of UEL for the Protégé plug-in and listen for changes
+	 * from the modelManager.
 	 * 
+	 * @param parent
+	 *            the parent Swing component
 	 * @param modelManager
-	 *            OWL model manager
+	 *            the OWL model manager from Protégé
 	 */
-	public UelProtegeStarter(Container parent, OWLModelManager modelManager) {
+	UelProtegeStarter(Container parent, OWLModelManager modelManager) {
 		super(parent, new ProtegeOntologyProvider(modelManager));
 		this.modelManager = modelManager;
 		modelManager.addListener(this);
+		modelManager.addOntologyChangeListener(this);
 	}
 
+	/**
+	 * Remove this object as a listener for changes from the OWL model manager.
+	 */
 	public void removeListeners() {
 		modelManager.removeListener(this);
+		modelManager.removeOntologyChangeListener(this);
 	}
 
 	@Override
@@ -94,9 +109,19 @@ public class UelProtegeStarter extends UelStarter implements OWLModelManagerList
 
 		EventType type = event.getType();
 		if ((type == EventType.ONTOLOGY_CREATED) || (type == EventType.ONTOLOGY_LOADED)
-				|| (type == EventType.ONTOLOGY_RELOADED)) {
+				|| (type == EventType.ONTOLOGY_RELOADED) || (type == EventType.ENTITY_RENDERER_CHANGED)
+				|| (type == EventType.ENTITY_RENDERING_CHANGED)) {
 			reset();
 		}
+	}
+
+	@Override
+	public void ontologiesChanged(List<? extends OWLOntologyChange> changes) throws OWLException {
+		if (changes == null) {
+			throw new IllegalArgumentException("Null argument");
+		}
+
+		reset();
 	}
 
 }

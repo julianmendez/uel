@@ -18,15 +18,15 @@ public class UnifierView extends UelDialog {
 
 	private static final long serialVersionUID = 7965907233259580732L;
 
-	private JButton buttonFirst = new JButton();
-	private JButton buttonLast = new JButton();
-	private JButton buttonNext = new JButton();
-	private JButton buttonPrevious = new JButton();
-	private JButton buttonSave = new JButton();
-	private JButton buttonShowStatInfo = new JButton();
-	private JButton buttonRefine = new JButton();
-	private JTextArea textUnifier = new JTextArea();
-	private JLabel labelUnifierId = new JLabel();
+	private final JButton buttonFirst = new JButton();
+	private final JButton buttonLast = new JButton();
+	private final JButton buttonNext = new JButton();
+	private final JButton buttonPrevious = new JButton();
+	private final JButton buttonSave = new JButton();
+	private final JButton buttonShowStatInfo = new JButton();
+	private final JButton buttonRefine = new JButton();
+	private final JTextArea textUnifier = new JTextArea();
+	private final JLabel labelUnifierId = new JLabel();
 
 	public UnifierView() {
 		setup("Unifiers");

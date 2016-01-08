@@ -49,16 +49,8 @@ class VarSelectionController {
 	}
 
 	private void init() {
-		view.addMakeConsListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				executeMakeCons();
-			}
-		});
-		view.addMakeVarListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				executeMakeVar();
-			}
-		});
+		view.addMakeConsListener(e -> executeMakeCons());
+		view.addMakeVarListener(e -> executeMakeVar());
 		updateLists();
 	}
 

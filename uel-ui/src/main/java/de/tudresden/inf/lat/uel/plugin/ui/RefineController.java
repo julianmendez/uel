@@ -8,10 +8,13 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import de.tudresden.inf.lat.uel.core.processor.UelModel;
 import de.tudresden.inf.lat.uel.core.type.KRSSRenderer;
@@ -45,16 +48,14 @@ public class RefineController {
 	}
 
 	public String getDissubsumptions() {
-		Set<Definition> dissubsumptions = new HashSet<Definition>();
-		Map<LabelId, List<LabelId>> map = view.getSelectedAtoms();
-
 		// construct (primitive) definitions representing dissubsumptions from
 		// selected atoms
-		for (LabelId var : map.keySet()) {
-			for (LabelId atom : map.get(var)) {
-				dissubsumptions.add(new Definition(var.getId(), Collections.singleton(atom.getId()), true));
-			}
-		}
+		Function<Entry<LabelId, List<LabelId>>, Stream<Definition>> definitionsForEntry = entry -> entry.getValue()
+				.stream()
+				.map(atom -> new Definition(entry.getKey().getId(), Collections.singleton(atom.getId()), true));
+
+		Set<Definition> dissubsumptions = view.getSelectedAtoms().entrySet().stream().flatMap(definitionsForEntry)
+				.collect(Collectors.toSet());
 
 		return model.getRenderer(false).printDefinitions(dissubsumptions, model.getCurrentUnifier().getDefinitions(),
 				true);
