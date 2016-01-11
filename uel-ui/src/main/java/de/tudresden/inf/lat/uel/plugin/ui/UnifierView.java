@@ -14,7 +14,7 @@ import javax.swing.SwingConstants;
  * 
  * @author Julian Mendez
  */
-public class UnifierView extends UelDialog {
+class UnifierView extends UelDialog {
 
 	private static final long serialVersionUID = 7965907233259580732L;
 

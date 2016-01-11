@@ -1,7 +1,6 @@
 package de.tudresden.inf.lat.uel.core.processor;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
@@ -22,6 +21,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
@@ -30,7 +30,6 @@ import org.semanticweb.owlapi.reasoner.Node;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 
 import de.tudresden.inf.lat.jcel.owlapi.main.JcelReasonerFactory;
-import de.tudresden.inf.lat.uel.core.type.KRSSRenderer;
 import de.tudresden.inf.lat.uel.type.impl.Unifier;
 
 @RunWith(value = Parameterized.class)
@@ -65,10 +64,9 @@ public class ProcessorTest {
 		return ontologyManager.getOntologies().iterator().next();
 	}
 
-	private OWLReasoner createReasoner(String ontologyStr) throws OWLOntologyCreationException {
+	private OWLReasoner createReasoner(OWLOntology ontology) {
 		JcelReasonerFactory factory = new JcelReasonerFactory();
-		OWLReasoner reasoner = factory
-				.createNonBufferingReasoner(createOntology(new ByteArrayInputStream(ontologyStr.getBytes())));
+		OWLReasoner reasoner = factory.createNonBufferingReasoner(ontology);
 		reasoner.precomputeInferences();
 		return reasoner;
 	}
@@ -149,23 +147,16 @@ public class ProcessorTest {
 
 		uelModel.initializeUnificationAlgorithm(algorithmName);
 
-		boolean hasUnifiers = true;
-		while (hasUnifiers) {
-			hasUnifiers = uelModel.computeNextUnifier();
+		while (uelModel.computeNextUnifier()) {
 		}
 
 		List<Unifier> unifiers = uelModel.getUnifierList();
-		KRSSRenderer renderer = uelModel.getRenderer(false);
-		String goalStr = renderer.printDefinitions(uelModel.getGoal().getDefinitions(), false);
+		Set<OWLAxiom> goalAxioms = uelModel.getOWLRenderer(null).renderDefinitions(uelModel.getGoal().getDefinitions());
 
 		for (Unifier unifier : unifiers) {
-			String extendedOntology = goalStr + renderer.printDefinitions(unifier.getDefinitions(), true);
-			// String u = renderer.printDefinitions(unifier.getDefinitions(),
-			// false);
-			// System.out.println(u);
-			// System.out.println();
-			// System.out.println("---");
-			// System.out.println(extendedOntology);
+			OWLOntology extendedOntology = ontologyManager.createOntology();
+			ontologyManager.addAxioms(extendedOntology, goalAxioms);
+			ontologyManager.addAxioms(extendedOntology, uelModel.renderUnifier(unifier));
 
 			OWLReasoner reasoner = createReasoner(extendedOntology);
 			Node<OWLClass> node = reasoner.getEquivalentClasses(idClassMap.get(conceptC));

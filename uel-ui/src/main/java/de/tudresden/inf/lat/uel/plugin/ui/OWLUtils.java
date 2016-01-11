@@ -1,61 +1,32 @@
 package de.tudresden.inf.lat.uel.plugin.ui;
 
 import java.io.BufferedWriter;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.Set;
 
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.io.OWLRendererException;
-import org.semanticweb.owlapi.io.StreamDocumentSource;
-import org.semanticweb.owlapi.krss2.parser.KRSS2OWLParser;
 import org.semanticweb.owlapi.krss2.renderer.KRSS2OWLSyntaxRenderer;
+import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
-import org.semanticweb.owlapi.model.OWLOntologyLoaderConfiguration;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.owlxml.renderer.OWLXMLRenderer;
 import org.semanticweb.owlapi.rdf.rdfxml.renderer.RDFXMLRenderer;
 
 /**
- * An object of this class can read OWL ontologies from strings and also write
- * these ontologies as strings.
+ * Utility methods for saving ontologies.
  * 
  * @author Julian Mendez
  */
-public class OntologyRenderer {
+class OWLUtils {
 
 	public static final String EXTENSION_KRSS = ".krss";
 	public static final String EXTENSION_OWL = ".owl";
 	public static final String EXTENSION_RDF = ".rdf";
-
-	public OntologyRenderer() {
-	}
-
-	public static OWLOntology parseOntology(String ontology) {
-		try {
-			OWLOntologyManager ontologyManager = OWLManager.createOWLOntologyManager();
-			ByteArrayInputStream input = new ByteArrayInputStream(ontology.getBytes());
-			return ontologyManager.loadOntologyFromOntologyDocument(input);
-		} catch (OWLOntologyCreationException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	public static OWLOntology parseKRSS(String ontologyString) {
-		try {
-			OWLOntologyManager ontologyManager = OWLManager.createOWLOntologyManager();
-			OWLOntology ontology = ontologyManager.createOntology();
-			KRSS2OWLParser parser = new KRSS2OWLParser();
-			ByteArrayInputStream input = new ByteArrayInputStream(ontologyString.getBytes());
-			parser.parse(new StreamDocumentSource(input), ontology, new OWLOntologyLoaderConfiguration());
-			return ontology;
-		} catch (IOException | OWLOntologyCreationException e) {
-			throw new RuntimeException(e);
-		}
-	}
 
 	public static String renderKRSS(OWLOntology owlOntology) throws OWLRendererException {
 		StringWriter writer = new StringWriter();
@@ -81,19 +52,26 @@ public class OntologyRenderer {
 		return writer.toString();
 	}
 
-	public static void saveToOntologyFile(String ontology, File file) {
-		saveToOntologyFile(parseOntology(ontology), file);
+	public static void saveToOntologyFile(Set<OWLAxiom> axioms, File file) {
+		try {
+			OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
+			OWLOntology ontology = manager.createOntology();
+			manager.addAxioms(ontology, axioms);
+			saveToOntologyFile(ontology, file);
+		} catch (OWLOntologyCreationException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	public static void saveToOntologyFile(OWLOntology owlOntology, File file) {
 		if (file != null) {
 			try {
 				String ontology = "";
-				if (file.getName().endsWith(OntologyRenderer.EXTENSION_RDF)) {
+				if (file.getName().endsWith(OWLUtils.EXTENSION_RDF)) {
 					ontology = renderRDF(owlOntology);
-				} else if (file.getName().endsWith(OntologyRenderer.EXTENSION_OWL)) {
+				} else if (file.getName().endsWith(OWLUtils.EXTENSION_OWL)) {
 					ontology = renderOWL(owlOntology);
-				} else if (file.getName().endsWith(OntologyRenderer.EXTENSION_KRSS)) {
+				} else if (file.getName().endsWith(OWLUtils.EXTENSION_KRSS)) {
 					ontology = renderKRSS(owlOntology);
 				}
 

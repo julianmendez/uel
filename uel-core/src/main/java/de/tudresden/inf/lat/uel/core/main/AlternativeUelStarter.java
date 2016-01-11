@@ -27,7 +27,6 @@ import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 import de.tudresden.inf.lat.uel.core.processor.BasicOntologyProvider;
 import de.tudresden.inf.lat.uel.core.processor.UelModel;
 import de.tudresden.inf.lat.uel.core.processor.UnificationAlgorithmFactory;
-import de.tudresden.inf.lat.uel.core.type.OWLUelClassDefinition;
 import de.tudresden.inf.lat.uel.type.api.AtomManager;
 import de.tudresden.inf.lat.uel.type.api.Goal;
 import de.tudresden.inf.lat.uel.type.api.UnificationAlgorithm;
@@ -150,14 +149,14 @@ public class AlternativeUelStarter {
 		}
 		String algorithmName = algorithmNames.get(algorithmIdx);
 
-		Iterator<Set<OWLUelClassDefinition>> result = starter.modifyOntologyAndSolve(subsumptions, dissubsumptions,
+		Iterator<Set<OWLEquivalentClassesAxiom>> result = starter.modifyOntologyAndSolve(subsumptions, dissubsumptions,
 				variables, algorithmName);
 		int unifierIdx = 1;
 		while (result.hasNext()) {
 			System.out.println("Unifier " + unifierIdx + ":");
-			Set<OWLUelClassDefinition> unifier = result.next();
-			for (OWLUelClassDefinition def : unifier) {
-				System.out.println(def.asOWLEquivalentClassesAxiom().toString());
+			Set<OWLEquivalentClassesAxiom> unifier = result.next();
+			for (OWLEquivalentClassesAxiom def : unifier) {
+				System.out.println(def.toString());
 			}
 			System.out.println();
 			unifierIdx++;
@@ -224,7 +223,7 @@ public class AlternativeUelStarter {
 		}
 	}
 
-	public Iterator<Set<OWLUelClassDefinition>> modifyOntologyAndSolve(OWLOntology positiveProblem,
+	public Iterator<Set<OWLEquivalentClassesAxiom>> modifyOntologyAndSolve(OWLOntology positiveProblem,
 			OWLOntology negativeProblem, Set<OWLClass> variables, String algorithmName) {
 
 		UelModel uelModel = new UelModel(new BasicOntologyProvider(ontologyManager));
@@ -233,7 +232,7 @@ public class AlternativeUelStarter {
 		return modifyOntologyAndSolve(uelModel, variables, algorithmName);
 	}
 
-	public Iterator<Set<OWLUelClassDefinition>> modifyOntologyAndSolve(Set<OWLSubClassOfAxiom> subsumptions,
+	public Iterator<Set<OWLEquivalentClassesAxiom>> modifyOntologyAndSolve(Set<OWLSubClassOfAxiom> subsumptions,
 			Set<OWLEquivalentClassesAxiom> equations, Set<OWLSubClassOfAxiom> dissubsumptions,
 			Set<OWLEquivalentClassesAxiom> disequations, Set<OWLClass> variables, String algorithmName) {
 
@@ -243,7 +242,7 @@ public class AlternativeUelStarter {
 		return modifyOntologyAndSolve(uelModel, variables, algorithmName);
 	}
 
-	private Iterator<Set<OWLUelClassDefinition>> modifyOntologyAndSolve(UelModel uelModel, Set<OWLClass> variables,
+	private Iterator<Set<OWLEquivalentClassesAxiom>> modifyOntologyAndSolve(UelModel uelModel, Set<OWLClass> variables,
 			String algorithmName) {
 
 		uelModel.makeClassesUserVariables(variables);
@@ -269,7 +268,7 @@ public class AlternativeUelStarter {
 		}
 
 		uelModel.initializeUnificationAlgorithm(algorithmName);
-		return new UnifierIterator(uelModel.getUnificationAlgorithm(), uelModel.getTranslator());
+		return new UnifierIterator(uelModel);
 	}
 
 	public List<Entry<String, String>> getStats() {

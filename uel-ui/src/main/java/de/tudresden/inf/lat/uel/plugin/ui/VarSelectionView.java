@@ -15,7 +15,7 @@ import javax.swing.JList;
  * 
  * @author Julian Mendez
  */
-public final class VarSelectionView extends UelDialog {
+class VarSelectionView extends UelDialog {
 
 	private static final long serialVersionUID = 1742164773153032359L;
 

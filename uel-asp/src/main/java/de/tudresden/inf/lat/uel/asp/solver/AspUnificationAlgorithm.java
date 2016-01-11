@@ -1,8 +1,7 @@
 package de.tudresden.inf.lat.uel.asp.solver;
 
 import java.io.IOException;
-import java.util.AbstractMap;
-import java.util.ArrayList;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -66,10 +65,7 @@ public class AspUnificationAlgorithm implements UnificationAlgorithm {
 
 	@Override
 	public List<Entry<String, String>> getInfo() {
-		Entry<String, String> e = new AbstractMap.SimpleEntry<String, String>("ASP encoding", aspInput.getProgram());
-		List<Entry<String, String>> res = new ArrayList<Entry<String, String>>();
-		res.add(e);
-		return res;
+		return Collections.singletonList(new SimpleEntry<String, String>("ASP encoding", aspInput.getProgram()));
 	}
 
 	@Override

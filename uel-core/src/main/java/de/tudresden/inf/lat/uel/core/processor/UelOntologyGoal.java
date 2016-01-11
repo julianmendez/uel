@@ -27,7 +27,7 @@ import de.tudresden.inf.lat.uel.type.api.Subsumption;
  * @author Julian Mendez
  * @author Stefan Borgwardt
  */
-public class UelOntologyGoal implements Goal {
+class UelOntologyGoal implements Goal {
 
 	private final Set<Definition> definitions = new HashSet<Definition>();
 	private final Set<Equation> equations = new HashSet<Equation>();

@@ -6,10 +6,9 @@ import java.awt.Container;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 
 import de.tudresden.inf.lat.uel.core.processor.BasicOntologyProvider;
-import de.tudresden.inf.lat.uel.core.processor.UelModel;
 import de.tudresden.inf.lat.uel.core.processor.OntologyProvider;
+import de.tudresden.inf.lat.uel.core.processor.UelModel;
 import de.tudresden.inf.lat.uel.plugin.ui.UelController;
-import de.tudresden.inf.lat.uel.plugin.ui.UelView;
 
 /**
  * This is used to start the UEL system.
@@ -32,10 +31,8 @@ public class UelStarter {
 			throw new IllegalArgumentException("Null argument.");
 		}
 
-		UelView view = new UelView();
-		parent.add(view, BorderLayout.CENTER);
-		UelModel model = new UelModel(provider);
-		uelController = new UelController(view, model);
+		uelController = new UelController(new UelModel(provider));
+		parent.add(uelController.getView(), BorderLayout.CENTER);
 		reset();
 	}
 

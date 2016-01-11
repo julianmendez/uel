@@ -26,7 +26,7 @@ import de.tudresden.inf.lat.uel.type.api.Definition;
  *
  * @author Stefan Borgwardt
  */
-public class UelOntology {
+class UelOntology {
 
 	private static final String flatteningVariablePrefix = "var";
 	private int flatteningVariableIndex = 0;

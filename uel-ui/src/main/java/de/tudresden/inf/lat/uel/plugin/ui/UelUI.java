@@ -46,7 +46,7 @@ import org.semanticweb.owlapi.model.OWLOntologyID;
  * @author Julian Mendez
  *
  */
-public class UelUI {
+class UelUI {
 
 	static class ComboBoxRenderer extends DefaultListCellRenderer {
 

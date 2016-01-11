@@ -1,8 +1,10 @@
 package de.tudresden.inf.lat.uel.plugin.ui;
 
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.util.Set;
+
+import org.semanticweb.owlapi.model.OWLAxiom;
 
 import de.tudresden.inf.lat.uel.core.processor.UelModel;
 
@@ -11,7 +13,7 @@ import de.tudresden.inf.lat.uel.core.processor.UelModel;
  * 
  * @author Julian Mendez
  */
-public class UnifierController {
+class UnifierController {
 
 	private final UelModel model;
 	private final UnifierView view;
@@ -69,9 +71,8 @@ public class UnifierController {
 			return;
 		}
 
-		// TODO render directly as OWLOntology
-		String unifier = model.printCurrentUnifier(false);
-		OntologyRenderer.saveToOntologyFile(unifier, file);
+		Set<OWLAxiom> unifier = model.renderCurrentUnifier();
+		OWLUtils.saveToOntologyFile(unifier, file);
 	}
 
 	private void executeShowStatInfo() {

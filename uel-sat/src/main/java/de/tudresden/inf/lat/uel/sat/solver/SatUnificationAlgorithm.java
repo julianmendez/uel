@@ -1,7 +1,7 @@
 package de.tudresden.inf.lat.uel.sat.solver;
 
 import java.io.IOException;
-import java.util.AbstractMap;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -9,11 +9,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Logger;
 
 import de.tudresden.inf.lat.uel.sat.literals.Choice;
-import de.tudresden.inf.lat.uel.sat.literals.ChoiceLiteral;
 import de.tudresden.inf.lat.uel.sat.literals.Literal;
 import de.tudresden.inf.lat.uel.sat.literals.OrderLiteral;
 import de.tudresden.inf.lat.uel.sat.literals.SubsumptionLiteral;
@@ -159,7 +159,6 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 		this.goal = goal;
 		this.nonVariableAtoms.addAll(goal.getAtomManager().getConstants());
 		this.nonVariableAtoms.addAll(goal.getAtomManager().getExistentialRestrictions());
-		// TODO exclude top from the used atom ids
 		this.usedAtomIds.addAll(nonVariableAtoms);
 		this.usedAtomIds.addAll(goal.getAtomManager().getVariables());
 		this.onlyMinimalAssignments = useMinimalAssignments;
@@ -175,8 +174,8 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 		}
 	}
 
-	private boolean addEntry(List<Map.Entry<String, String>> list, String key, String value) {
-		return list.add(new AbstractMap.SimpleEntry<String, String>(key, value));
+	private boolean addEntry(List<Entry<String, String>> list, String key, String value) {
+		return list.add(new SimpleEntry<String, String>(key, value));
 	}
 
 	private boolean addToSetOfSubsumers(Integer atomId1, Integer atomId2) {
@@ -399,8 +398,8 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 	}
 
 	@Override
-	public List<Map.Entry<String, String>> getInfo() {
-		List<Map.Entry<String, String>> ret = new ArrayList<Map.Entry<String, String>>();
+	public List<Entry<String, String>> getInfo() {
+		List<Entry<String, String>> ret = new ArrayList<Entry<String, String>>();
 		addEntry(ret, keyName, algorithmName);
 
 		if (this.onlyMinimalAssignments) {

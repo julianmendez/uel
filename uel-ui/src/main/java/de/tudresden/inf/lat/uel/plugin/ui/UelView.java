@@ -20,7 +20,7 @@ import de.tudresden.inf.lat.uel.core.processor.UnificationAlgorithmFactory;
  * 
  * @author Julian Mendez
  */
-public class UelView extends JPanel {
+class UelView extends JPanel {
 
 	private static final long serialVersionUID = 9096602357606632334L;
 

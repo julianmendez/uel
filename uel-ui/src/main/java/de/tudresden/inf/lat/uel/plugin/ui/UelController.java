@@ -1,13 +1,15 @@
 package de.tudresden.inf.lat.uel.plugin.ui;
 
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.semanticweb.owlapi.model.AxiomType;
+import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 
 import de.tudresden.inf.lat.uel.core.processor.UelModel;
 
@@ -24,8 +26,8 @@ public class UelController {
 	private VarSelectionController varSelectionController = null;
 	private final UelView view;
 
-	public UelController(UelView view, UelModel model) {
-		this.view = view;
+	public UelController(UelModel model) {
+		this.view = new UelView();
 		this.model = model;
 		init();
 	}
@@ -38,13 +40,12 @@ public class UelController {
 			view.setSelectedOntologyNeg(negOntology);
 		}
 
-		String dissubsumptions = refineController.getDissubsumptions();
-		OWLOntology add = OntologyRenderer.parseKRSS(dissubsumptions);
+		Set<OWLAxiom> newAxioms = refineController.getDissubsumptions();
 
-		if (add.getAxiomCount() - add.getAxiomCount(AxiomType.SUBCLASS_OF) > 0) {
+		if (!newAxioms.stream().allMatch(axiom -> axiom instanceof OWLSubClassOfAxiom)) {
 			throw new IllegalStateException("Expected dissubsumptions to be encoded as OWLSubClassOfAxioms.");
 		}
-		negOntology.getOWLOntologyManager().addAxioms(negOntology, add.getAxioms());
+		negOntology.getOWLOntologyManager().addAxioms(negOntology, newAxioms);
 	}
 
 	private void executeAcceptVar() {
@@ -85,7 +86,7 @@ public class UelController {
 		}
 
 		addNewDissubsumptions();
-		OntologyRenderer.saveToOntologyFile(view.getSelectedOntologyNeg(), file);
+		OWLUtils.saveToOntologyFile(view.getSelectedOntologyNeg(), file);
 		recomputeUnifiers();
 	}
 
@@ -95,6 +96,10 @@ public class UelController {
 		varSelectionController = new VarSelectionController(model);
 		varSelectionController.addAcceptVarListener(e -> executeAcceptVar());
 		varSelectionController.open();
+	}
+
+	public Component getView() {
+		return view;
 	}
 
 	private void init() {

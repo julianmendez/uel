@@ -31,7 +31,7 @@ import de.tudresden.inf.lat.uel.type.cons.KRSSKeyword;
  * 
  * @author Stefan Borgwardt
  */
-public final class RefineView extends UelDialog {
+class RefineView extends UelDialog {
 
 	private static final long serialVersionUID = 6093665334232206919L;
 
