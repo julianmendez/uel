@@ -11,6 +11,7 @@ import java.util.Set;
  *
  */
 public abstract class Axiom {
+
 	final Set<Integer> left;
 	final Set<Integer> right;
 

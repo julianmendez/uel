@@ -1,12 +1,10 @@
 package de.tudresden.inf.lat.uel.plugin.ui;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Map;
+import java.util.Map.Entry;
 
 import de.tudresden.inf.lat.uel.core.processor.UelModel;
 
@@ -37,7 +35,7 @@ class StatInfoController {
 
 		try {
 			BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-			writer.write(model.printGoal(false));
+			writer.write(model.printGoal());
 			writer.close();
 		} catch (IOException e) {
 			throw new RuntimeException(e);
@@ -55,9 +53,9 @@ class StatInfoController {
 	}
 
 	public void updateView() {
-		view.setGoalText(model.printGoal(true));
+		view.setGoalText(model.printGoal());
 		StringBuffer info = new StringBuffer();
-		for (Map.Entry<String, String> pair : model.getUnificationAlgorithm().getInfo()) {
+		for (Entry<String, String> pair : model.getUnificationAlgorithm().getInfo()) {
 			info.append(pair.getKey());
 			info.append(colon);
 			info.append(pair.getValue());

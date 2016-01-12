@@ -13,6 +13,7 @@ import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
+import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLEntity;
@@ -21,8 +22,8 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 
-import de.tudresden.inf.lat.uel.core.type.KRSSRenderer;
-import de.tudresden.inf.lat.uel.core.type.UnifierTranslator;
+import de.tudresden.inf.lat.uel.core.renderer.OWLRenderer;
+import de.tudresden.inf.lat.uel.core.renderer.StringRenderer;
 import de.tudresden.inf.lat.uel.type.api.AtomManager;
 import de.tudresden.inf.lat.uel.type.api.Definition;
 import de.tudresden.inf.lat.uel.type.api.Goal;
@@ -46,6 +47,14 @@ public class UelModel {
 		} catch (OWLOntologyCreationException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	public static String removeQuotes(String str) {
+		String ret = str;
+		if ((str.startsWith("\"") && str.endsWith("\"")) || (str.startsWith("'") && str.endsWith("'"))) {
+			ret = str.substring(1, str.length() - 1);
+		}
+		return ret;
 	}
 
 	private boolean allUnifiersFound;
@@ -86,13 +95,8 @@ public class UelModel {
 		return false;
 	}
 
-	private boolean isNew(Unifier result) {
-		for (Unifier unifier : unifierList) {
-			if (equalsModuloUserVariables(unifier.getDefinitions(), result.getDefinitions())) {
-				return false;
-			}
-		}
-		return true;
+	public OWLOntology createOntology() {
+		return provider.createOntology();
 	}
 
 	private boolean equalsModuloUserVariables(Set<Definition> defs1, Set<Definition> defs2) {
@@ -106,14 +110,6 @@ public class UelModel {
 			}
 		}
 		return true;
-	}
-
-	public OWLOntology createOntology() {
-		return provider.createOntology();
-	}
-
-	public void initializeUnificationAlgorithm(String name) {
-		algorithm = UnificationAlgorithmFactory.instantiateAlgorithm(name, goal);
 	}
 
 	public Integer getAtomId(String name) {
@@ -131,6 +127,10 @@ public class UelModel {
 		return currentUnifierIndex;
 	}
 
+	public Goal getGoal() {
+		return goal;
+	}
+
 	public List<OWLOntology> getOntologyList() {
 		List<OWLOntology> list = new ArrayList<OWLOntology>();
 		list.add(EMPTY_ONTOLOGY);
@@ -138,8 +138,8 @@ public class UelModel {
 		return list;
 	}
 
-	public KRSSRenderer getRenderer(boolean shortForm) {
-		return new KRSSRenderer(atomManager, shortForm ? shortFormMap : null);
+	public OWLRenderer getOWLRenderer(Set<Definition> background) {
+		return new OWLRenderer(atomManager, background);
 	}
 
 	private String getShortForm(OWLEntity entity, OWLOntology ontology) {
@@ -156,12 +156,16 @@ public class UelModel {
 		return entity.getIRI().getShortForm();
 	}
 
-	public UnifierTranslator getTranslator() {
-		return new UnifierTranslator(atomManager);
+	public StringRenderer getStringRenderer(Set<Definition> background) {
+		return StringRenderer.createInstance(atomManager, shortFormMap, background);
 	}
 
 	public UnificationAlgorithm getUnificationAlgorithm() {
 		return this.algorithm;
+	}
+
+	public List<Unifier> getUnifierList() {
+		return Collections.unmodifiableList(unifierList);
 	}
 
 	public Set<String> getUserVariableNames() {
@@ -172,17 +176,45 @@ public class UelModel {
 		return names;
 	}
 
-	public List<Unifier> getUnifierList() {
-		return Collections.unmodifiableList(unifierList);
+	public void initializeUnificationAlgorithm(String name) {
+		algorithm = UnificationAlgorithmFactory.instantiateAlgorithm(name, goal);
 	}
 
-	public Goal getGoal() {
-		return goal;
+	private boolean isNew(Unifier result) {
+		for (Unifier unifier : unifierList) {
+			if (equalsModuloUserVariables(unifier.getDefinitions(), result.getDefinitions())) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	public void loadOntology(File file) {
 		provider.loadOntology(file);
 		recomputeShortFormMap();
+	}
+
+	public void makeClassesUserVariables(Set<OWLClass> variables) {
+		for (OWLClass var : variables) {
+			atomManager.makeUserVariable(getAtomId(var.toStringID()));
+		}
+	}
+
+	public void makeNamesUserVariables(Set<String> variables) {
+		for (String var : variables) {
+			atomManager.makeUserVariable(getAtomId(var));
+		}
+	}
+
+	public void makeUndefClassesUserVariables(Set<OWLClass> variables) {
+		for (OWLClass var : variables)
+			atomManager.makeUserVariable(getAtomId(var.toStringID() + AtomManager.UNDEF_SUFFIX));
+	}
+
+	public void makeUndefNamesUserVariables(Set<String> variables) {
+		for (String var : variables) {
+			atomManager.makeUserVariable(getAtomId(var + AtomManager.UNDEF_SUFFIX));
+		}
 	}
 
 	public void markUndefAsUserVariables() {
@@ -197,16 +229,20 @@ public class UelModel {
 		}
 	}
 
-	public String printCurrentUnifier(boolean shortForm) {
+	public String printCurrentUnifier() {
 		Unifier unifier = getCurrentUnifier();
 		if (unifier == null) {
 			return "";
 		}
-		return getRenderer(shortForm).printDefinitions(unifier.getDefinitions(), true);
+		return printUnifier(unifier);
 	}
 
-	public String printGoal(boolean shortForm) {
-		return getRenderer(shortForm).printGoal(goal);
+	public String printGoal() {
+		return getStringRenderer(null).renderGoal(goal);
+	}
+
+	public String printUnifier(Unifier unifier) {
+		return getStringRenderer(unifier.getDefinitions()).renderUnifier(unifier);
 	}
 
 	public void recomputeShortFormMap() {
@@ -217,12 +253,20 @@ public class UelModel {
 		}
 	}
 
-	public static String removeQuotes(String str) {
-		String ret = str;
-		if ((str.startsWith("\"") && str.endsWith("\"")) || (str.startsWith("'") && str.endsWith("'"))) {
-			ret = str.substring(1, str.length() - 1);
+	public Set<OWLAxiom> renderCurrentUnifier() {
+		Unifier unifier = getCurrentUnifier();
+		if (unifier == null) {
+			return null;
 		}
-		return ret;
+		return renderUnifier(unifier);
+	}
+
+	public Set<OWLAxiom> renderDefinitions() {
+		return getOWLRenderer(null).renderAxioms(goal.getDefinitions());
+	}
+
+	public Set<OWLAxiom> renderUnifier(Unifier unifier) {
+		return getOWLRenderer(unifier.getDefinitions()).renderUnifier(unifier);
 	}
 
 	public void setCurrentUnifierIndex(int index) {
@@ -233,10 +277,6 @@ public class UelModel {
 		} else {
 			currentUnifierIndex = index;
 		}
-	}
-
-	public void setShortFormMap(Map<String, String> map) {
-		shortFormMap = map;
 	}
 
 	public void setupGoal(Set<OWLOntology> bgOntologies, OWLOntology positiveProblem, OWLOntology negativeProblem,
@@ -255,8 +295,9 @@ public class UelModel {
 		unifierList = new ArrayList<Unifier>();
 		currentUnifierIndex = -1;
 		allUnifiersFound = false;
-		recomputeShortFormMap();
 		atomManager = new AtomManagerImpl();
+
+		recomputeShortFormMap();
 
 		OWLClass top = (owlThingAlias != null) ? owlThingAlias : OWLManager.getOWLDataFactory().getOWLThing();
 		goal = new UelOntologyGoal(atomManager, new UelOntology(atomManager, bgOntologies, top));
@@ -273,29 +314,6 @@ public class UelModel {
 		atomManager.makeDefinitionVariable(topId);
 
 		goal.disposeOntology();
-	}
-
-	public void makeClassesUserVariables(Set<OWLClass> variables) {
-		for (OWLClass var : variables) {
-			atomManager.makeUserVariable(getAtomId(var.toStringID()));
-		}
-	}
-
-	public void makeUndefClassesUserVariables(Set<OWLClass> variables) {
-		for (OWLClass var : variables)
-			atomManager.makeUserVariable(getAtomId(var.toStringID() + AtomManager.UNDEF_SUFFIX));
-	}
-
-	public void makeNamesUserVariables(Set<String> variables) {
-		for (String var : variables) {
-			atomManager.makeUserVariable(getAtomId(var));
-		}
-	}
-
-	public void makeUndefNamesUserVariables(Set<String> variables) {
-		for (String var : variables) {
-			atomManager.makeUserVariable(getAtomId(var + AtomManager.UNDEF_SUFFIX));
-		}
 	}
 
 }

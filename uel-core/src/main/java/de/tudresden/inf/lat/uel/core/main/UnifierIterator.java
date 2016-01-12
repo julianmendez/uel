@@ -3,35 +3,28 @@ package de.tudresden.inf.lat.uel.core.main;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.stream.Collectors;
 
-import de.tudresden.inf.lat.uel.core.type.OWLUelClassDefinition;
-import de.tudresden.inf.lat.uel.core.type.UnifierTranslator;
-import de.tudresden.inf.lat.uel.type.api.AtomManager;
+import org.semanticweb.owlapi.model.OWLAxiom;
+import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
+
+import de.tudresden.inf.lat.uel.core.processor.UelModel;
 import de.tudresden.inf.lat.uel.type.api.UnificationAlgorithm;
 import de.tudresden.inf.lat.uel.type.impl.Unifier;
 
-public class UnifierIterator implements Iterator<Set<OWLUelClassDefinition>> {
+public class UnifierIterator implements Iterator<Set<OWLEquivalentClassesAxiom>> {
 
 	private boolean hasNext = false;
 	private boolean isComputed = false;
-	private UnificationAlgorithm algorithm;
-	private UnifierTranslator translator;
+	private UelModel uelModel;
 	private Unifier unifier;
 
-	public UnifierIterator(UnificationAlgorithm algorithm, UnifierTranslator translator) {
-		this.algorithm = algorithm;
-		this.translator = translator;
-	}
-
-	protected UnificationAlgorithm getAlgorithm() {
-		return this.algorithm;
-	}
-
-	protected AtomManager getAtomManager() {
-		return this.translator.getAtomManager();
+	public UnifierIterator(UelModel uelModel) {
+		this.uelModel = uelModel;
 	}
 
 	private void compute() {
+		UnificationAlgorithm algorithm = uelModel.getUnificationAlgorithm();
 		if (!isComputed) {
 			try {
 				hasNext = algorithm.computeNextUnifier();
@@ -47,6 +40,10 @@ public class UnifierIterator implements Iterator<Set<OWLUelClassDefinition>> {
 		}
 	}
 
+	UelModel getUelModel() {
+		return uelModel;
+	}
+
 	@Override
 	public boolean hasNext() {
 		compute();
@@ -54,7 +51,7 @@ public class UnifierIterator implements Iterator<Set<OWLUelClassDefinition>> {
 	}
 
 	@Override
-	public Set<OWLUelClassDefinition> next() {
+	public Set<OWLEquivalentClassesAxiom> next() {
 		compute();
 		if (!hasNext) {
 			throw new NoSuchElementException();
@@ -62,7 +59,12 @@ public class UnifierIterator implements Iterator<Set<OWLUelClassDefinition>> {
 
 		isComputed = false;
 
-		return translator.createOWLUelClassDefinitions(unifier.getDefinitions());
+		Set<OWLAxiom> axioms = uelModel.renderUnifier(unifier);
+		return axioms.stream().map(axiom -> {
+			if (axiom instanceof OWLEquivalentClassesAxiom)
+				return (OWLEquivalentClassesAxiom) axiom;
+			throw new IllegalStateException("Expected OWLEquivalentClassesAxiom");
+		}).collect(Collectors.toSet());
 	}
 
 	@Override

@@ -5,7 +5,7 @@ package de.tudresden.inf.lat.uel.plugin.ui;
  * 
  * @author Julian Mendez
  */
-public interface Message {
+interface Message {
 
 	String buttonAcceptVar = ">";
 	String buttonFirst = "|<";

@@ -1,7 +1,7 @@
 package de.tudresden.inf.lat.uel.type.api;
 
 import java.util.List;
-import java.util.Map;
+import java.util.Map.Entry;
 
 import de.tudresden.inf.lat.uel.type.impl.Unifier;
 
@@ -37,7 +37,7 @@ public interface UnificationAlgorithm {
 	 * 
 	 * @return information about the last computation
 	 */
-	List<Map.Entry<String, String>> getInfo();
+	List<Entry<String, String>> getInfo();
 
 	/**
 	 * Returns the input to be used to compute the next unifier.

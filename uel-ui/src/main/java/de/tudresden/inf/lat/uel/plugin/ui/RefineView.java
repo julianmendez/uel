@@ -23,7 +23,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
-import de.tudresden.inf.lat.uel.type.cons.KRSSKeyword;
+import de.tudresden.inf.lat.uel.core.renderer.StringRenderer;
 
 /**
  * This dialog allows to select non-variable atoms that should not be included
@@ -31,7 +31,7 @@ import de.tudresden.inf.lat.uel.type.cons.KRSSKeyword;
  * 
  * @author Stefan Borgwardt
  */
-public final class RefineView extends UelDialog {
+class RefineView extends UelDialog {
 
 	private static final long serialVersionUID = 6093665334232206919L;
 
@@ -75,7 +75,8 @@ public final class RefineView extends UelDialog {
 		GridBagConstraints atomsConstraints = new GridBagConstraints();
 
 		if (atoms.isEmpty()) {
-			JLabel label = UelUI.addLabel(selectionPanel, KRSSKeyword.top, Message.tooltipSubsumedByTop);
+			JLabel label = UelUI.addLabel(selectionPanel, StringRenderer.createInstance(null, null, null).renderTop(),
+					Message.tooltipSubsumedByTop);
 			label.setBorder(new EmptyBorder(UelUI.GAP_SIZE, 0, UelUI.GAP_SIZE, UelUI.GAP_SIZE));
 			label.setHorizontalTextPosition(SwingConstants.LEFT);
 			label.setVerticalAlignment(SwingConstants.TOP);

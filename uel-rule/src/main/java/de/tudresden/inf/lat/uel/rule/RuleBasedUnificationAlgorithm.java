@@ -1,6 +1,6 @@
 package de.tudresden.inf.lat.uel.rule;
 
-import java.util.AbstractMap;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -8,7 +8,7 @@ import java.util.Deque;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import de.tudresden.inf.lat.uel.rule.rules.DecompositionRule;
@@ -108,12 +108,12 @@ public class RuleBasedUnificationAlgorithm implements UnificationAlgorithm {
 		return input;
 	}
 
-	private boolean addEntry(List<Map.Entry<String, String>> list, String key, String value) {
-		return list.add(new AbstractMap.SimpleEntry<String, String>(key, value));
+	private boolean addEntry(List<Entry<String, String>> list, String key, String value) {
+		return list.add(new SimpleEntry<String, String>(key, value));
 	}
 
-	public List<Map.Entry<String, String>> getInfo() {
-		List<Map.Entry<String, String>> ret = new ArrayList<Map.Entry<String, String>>();
+	public List<Entry<String, String>> getInfo() {
+		List<Entry<String, String>> ret = new ArrayList<Entry<String, String>>();
 		addEntry(ret, keyName, algorithmName);
 		addEntry(ret, keyInitialSubs, "" + initialSize);
 		addEntry(ret, keyMaxSubs, "" + goal.getMaxSize());

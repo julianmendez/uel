@@ -1,12 +1,12 @@
 package de.tudresden.inf.lat.uel.core.main;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -27,7 +27,6 @@ import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 import de.tudresden.inf.lat.uel.core.processor.BasicOntologyProvider;
 import de.tudresden.inf.lat.uel.core.processor.UelModel;
 import de.tudresden.inf.lat.uel.core.processor.UnificationAlgorithmFactory;
-import de.tudresden.inf.lat.uel.core.type.OWLUelClassDefinition;
 import de.tudresden.inf.lat.uel.type.api.AtomManager;
 import de.tudresden.inf.lat.uel.type.api.Goal;
 import de.tudresden.inf.lat.uel.type.api.UnificationAlgorithm;
@@ -124,11 +123,10 @@ public class AlternativeUelStarter {
 		}
 
 		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
-		OWLDataFactory factory = manager.getOWLDataFactory();
 		AlternativeUelStarter starter = new AlternativeUelStarter(loadOntology(mainFilename, manager));
 		starter.setVerbose(printInfo);
 		if (!owlThingAliasName.isEmpty()) {
-			starter.setOwlThingAlias(factory.getOWLClass(IRI.create(owlThingAliasName)));
+			starter.setOwlThingAlias(OWLManager.getOWLDataFactory().getOWLClass(IRI.create(owlThingAliasName)));
 		}
 
 		OWLOntology subsumptions = loadOntology(subsFilename, manager);
@@ -139,7 +137,7 @@ public class AlternativeUelStarter {
 		if (dissubsumptions == null) {
 			return;
 		}
-		Set<OWLClass> variables = loadVariables(varFilename, factory);
+		Set<OWLClass> variables = loadVariables(varFilename);
 		if (variables == null) {
 			return;
 		}
@@ -150,14 +148,14 @@ public class AlternativeUelStarter {
 		}
 		String algorithmName = algorithmNames.get(algorithmIdx);
 
-		Iterator<Set<OWLUelClassDefinition>> result = starter.modifyOntologyAndSolve(subsumptions, dissubsumptions,
+		Iterator<Set<OWLEquivalentClassesAxiom>> result = starter.modifyOntologyAndSolve(subsumptions, dissubsumptions,
 				variables, algorithmName);
 		int unifierIdx = 1;
 		while (result.hasNext()) {
 			System.out.println("Unifier " + unifierIdx + ":");
-			Set<OWLUelClassDefinition> unifier = result.next();
-			for (OWLUelClassDefinition def : unifier) {
-				System.out.println(def.asOWLEquivalentClassesAxiom().toString());
+			Set<OWLEquivalentClassesAxiom> unifier = result.next();
+			for (OWLEquivalentClassesAxiom def : unifier) {
+				System.out.println(def.toString());
 			}
 			System.out.println();
 			unifierIdx++;
@@ -180,38 +178,35 @@ public class AlternativeUelStarter {
 				"Usage: uel [-s subsumptions.owl] [-d dissubsumptions.owl] [-v variables.txt] [-t owl:Thing_alias] [-a algorithmIndex] [-h] [-i] [ontology.owl]");
 	}
 
-	public static Set<OWLClass> loadVariables(String filename, OWLDataFactory factory) {
-		if (filename.isEmpty()) {
-			return Collections.emptySet();
-		}
+	static Set<OWLClass> loadVariables(String filename) {
 		try {
+			if (filename.isEmpty()) {
+				return Collections.emptySet();
+			}
 
-			BufferedReader input = new BufferedReader(new FileReader(new File(filename)));
+			OWLDataFactory factory = OWLManager.getOWLDataFactory();
 			Set<OWLClass> variables = new HashSet<OWLClass>();
-			String line = "";
-			while (line != null) {
-				line = input.readLine();
-				if ((line != null) && !line.isEmpty()) {
+
+			for (String line : Files.readAllLines(Paths.get(filename))) {
+				if (!line.isEmpty()) {
 					variables.add(factory.getOWLClass(IRI.create(line)));
 				}
 			}
-			input.close();
+
 			return variables;
-		} catch (FileNotFoundException e) {
-			System.err.println("Could not find file '" + filename + "'.");
-			return null;
 		} catch (IOException e) {
-			System.err.println("Unknown I/O error while reading file '" + filename + "'.");
+			System.err.println("Error while reading file '" + filename + "'.");
 			System.err.println(e.getMessage());
 			return null;
 		}
 	}
 
-	public static OWLOntology loadOntology(String filename, OWLOntologyManager manager) {
+	private static OWLOntology loadOntology(String filename, OWLOntologyManager manager) {
 		try {
 			if (filename.isEmpty()) {
 				return manager.createOntology();
 			}
+
 			InputStream input = new FileInputStream(new File(filename));
 			return manager.loadOntologyFromOntologyDocument(input);
 		} catch (FileNotFoundException e) {
@@ -224,7 +219,7 @@ public class AlternativeUelStarter {
 		}
 	}
 
-	public Iterator<Set<OWLUelClassDefinition>> modifyOntologyAndSolve(OWLOntology positiveProblem,
+	public Iterator<Set<OWLEquivalentClassesAxiom>> modifyOntologyAndSolve(OWLOntology positiveProblem,
 			OWLOntology negativeProblem, Set<OWLClass> variables, String algorithmName) {
 
 		UelModel uelModel = new UelModel(new BasicOntologyProvider(ontologyManager));
@@ -233,7 +228,7 @@ public class AlternativeUelStarter {
 		return modifyOntologyAndSolve(uelModel, variables, algorithmName);
 	}
 
-	public Iterator<Set<OWLUelClassDefinition>> modifyOntologyAndSolve(Set<OWLSubClassOfAxiom> subsumptions,
+	public Iterator<Set<OWLEquivalentClassesAxiom>> modifyOntologyAndSolve(Set<OWLSubClassOfAxiom> subsumptions,
 			Set<OWLEquivalentClassesAxiom> equations, Set<OWLSubClassOfAxiom> dissubsumptions,
 			Set<OWLEquivalentClassesAxiom> disequations, Set<OWLClass> variables, String algorithmName) {
 
@@ -243,7 +238,7 @@ public class AlternativeUelStarter {
 		return modifyOntologyAndSolve(uelModel, variables, algorithmName);
 	}
 
-	private Iterator<Set<OWLUelClassDefinition>> modifyOntologyAndSolve(UelModel uelModel, Set<OWLClass> variables,
+	private Iterator<Set<OWLEquivalentClassesAxiom>> modifyOntologyAndSolve(UelModel uelModel, Set<OWLClass> variables,
 			String algorithmName) {
 
 		uelModel.makeClassesUserVariables(variables);
@@ -265,11 +260,11 @@ public class AlternativeUelStarter {
 			System.out.println("Final number of subsumptions: " + goal.getSubsumptions().size());
 			System.out.println("Final number of dissubsumptions: " + goal.getDissubsumptions().size());
 			System.out.println("(Dis-)Unification problem:");
-			System.out.println(uelModel.printGoal(true));
+			System.out.println(uelModel.printGoal());
 		}
 
 		uelModel.initializeUnificationAlgorithm(algorithmName);
-		return new UnifierIterator(uelModel.getUnificationAlgorithm(), uelModel.getTranslator());
+		return new UnifierIterator(uelModel);
 	}
 
 	public List<Entry<String, String>> getStats() {

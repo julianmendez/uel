@@ -1,12 +1,11 @@
 package de.tudresden.inf.lat.uel.plugin.ui;
 
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
 import de.tudresden.inf.lat.uel.core.processor.UelModel;
-import de.tudresden.inf.lat.uel.core.type.KRSSRenderer;
+import de.tudresden.inf.lat.uel.core.renderer.StringRenderer;
 
 /**
  * This is the controller of the panel to select the variables in a given
@@ -60,17 +59,17 @@ class VarSelectionController {
 	}
 
 	private void updateLists() {
-		KRSSRenderer renderer = model.getRenderer(true);
+		StringRenderer renderer = model.getStringRenderer(null);
 
 		List<LabelId> constants = new ArrayList<LabelId>();
 		for (Integer id : model.getGoal().getAtomManager().getConstants()) {
-			constants.add(new LabelId(renderer.getName(id, false), id));
+			constants.add(new LabelId(renderer.renderAtom(id), id));
 		}
 		view.setConstants(constants);
 
 		List<LabelId> variables = new ArrayList<LabelId>();
 		for (Integer id : model.getGoal().getAtomManager().getUserVariables()) {
-			variables.add(new LabelId(renderer.getName(id, false), id));
+			variables.add(new LabelId(renderer.renderAtom(id), id));
 		}
 		view.setVariables(variables);
 	}

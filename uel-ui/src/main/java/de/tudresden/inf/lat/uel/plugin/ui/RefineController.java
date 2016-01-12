@@ -5,7 +5,6 @@ package de.tudresden.inf.lat.uel.plugin.ui;
 
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -16,15 +15,18 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.semanticweb.owlapi.model.OWLAxiom;
+
 import de.tudresden.inf.lat.uel.core.processor.UelModel;
-import de.tudresden.inf.lat.uel.core.type.KRSSRenderer;
+import de.tudresden.inf.lat.uel.core.renderer.StringRenderer;
 import de.tudresden.inf.lat.uel.type.api.Definition;
+import de.tudresden.inf.lat.uel.type.api.Dissubsumption;
 
 /**
  * @author Stefan Borgwardt
  *
  */
-public class RefineController {
+class RefineController {
 
 	private final UelModel model;
 	private final RefineView view;
@@ -47,18 +49,18 @@ public class RefineController {
 		view.dispose();
 	}
 
-	public String getDissubsumptions() {
+	public Set<OWLAxiom> getDissubsumptions() {
 		// construct (primitive) definitions representing dissubsumptions from
 		// selected atoms
-		Function<Entry<LabelId, List<LabelId>>, Stream<Definition>> definitionsForEntry = entry -> entry.getValue()
-				.stream()
-				.map(atom -> new Definition(entry.getKey().getId(), Collections.singleton(atom.getId()), true));
+		Function<Entry<LabelId, List<LabelId>>, Stream<Dissubsumption>> dissubsumptionsForEntry = entry -> entry
+				.getValue().stream().map(atom -> new Dissubsumption(Collections.singleton(entry.getKey().getId()),
+						Collections.singleton(atom.getId())));
 
-		Set<Definition> dissubsumptions = view.getSelectedAtoms().entrySet().stream().flatMap(definitionsForEntry)
-				.collect(Collectors.toSet());
+		Set<Dissubsumption> dissubsumptions = view.getSelectedAtoms().entrySet().stream()
+				.flatMap(dissubsumptionsForEntry).collect(Collectors.toSet());
 
-		return model.getRenderer(false).printDefinitions(dissubsumptions, model.getCurrentUnifier().getDefinitions(),
-				true);
+		// render the definitions as OWLSubClassOfAxioms
+		return model.getOWLRenderer(model.getCurrentUnifier().getDefinitions()).renderAxioms(dissubsumptions);
 	}
 
 	public void open() {
@@ -73,22 +75,15 @@ public class RefineController {
 
 	private void updateView() {
 		Map<LabelId, List<LabelId>> map = new HashMap<LabelId, List<LabelId>>();
-		KRSSRenderer renderer = model.getRenderer(true);
 		Set<Definition> definitions = model.getCurrentUnifier().getDefinitions();
+		StringRenderer renderer = model.getStringRenderer(definitions);
 
 		// convert unifier into map between LabelIds for the view
 		for (Definition definition : definitions) {
 			Integer varId = definition.getDefiniendum();
 			if (model.getGoal().getAtomManager().getUserVariables().contains(varId)) {
-				LabelId var = new LabelId(renderer.getName(varId, false), varId);
-
-				List<LabelId> atoms = new ArrayList<LabelId>();
-				for (Integer atomId : definition.getRight()) {
-					String label = UelModel.removeQuotes(renderer.printAtom(atomId, definitions, true));
-					atoms.add(new LabelId(label, atomId));
-				}
-
-				map.put(var, atoms);
+				map.put(new LabelId(renderer.renderAtom(varId), varId), definition.getRight().stream()
+						.map(atomId -> new LabelId(renderer.renderAtom(atomId), atomId)).collect(Collectors.toList()));
 			}
 		}
 

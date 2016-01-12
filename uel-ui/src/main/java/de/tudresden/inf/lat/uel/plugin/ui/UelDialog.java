@@ -14,7 +14,7 @@ import javax.swing.border.EmptyBorder;
  * @author Stefan Borgwardt
  *
  */
-public abstract class UelDialog extends JDialog {
+abstract class UelDialog extends JDialog {
 
 	private static final long serialVersionUID = -9159093716481990295L;
 
