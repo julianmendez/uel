@@ -59,17 +59,17 @@ class VarSelectionController {
 	}
 
 	private void updateLists() {
-		StringRenderer renderer = model.getStringRenderer(true, null);
+		StringRenderer renderer = model.getStringRenderer(null);
 
 		List<LabelId> constants = new ArrayList<LabelId>();
 		for (Integer id : model.getGoal().getAtomManager().getConstants()) {
-			constants.add(new LabelId(renderer.renderNameWithoutQuotes(id), id));
+			constants.add(new LabelId(renderer.renderAtom(id), id));
 		}
 		view.setConstants(constants);
 
 		List<LabelId> variables = new ArrayList<LabelId>();
 		for (Integer id : model.getGoal().getAtomManager().getUserVariables()) {
-			variables.add(new LabelId(renderer.renderNameWithoutQuotes(id), id));
+			variables.add(new LabelId(renderer.renderAtom(id), id));
 		}
 		view.setVariables(variables);
 	}

@@ -127,7 +127,7 @@ class UelOntology {
 			Integer nameId = toVisit.iterator().next();
 
 			if (!visited.contains(nameId)) {
-				createFlatDefinition(nameId, newDefinitions, toVisit);
+				loadFlatDefinition(nameId, newDefinitions, toVisit);
 				visited.add(nameId);
 				toVisit.remove(nameId);
 			}
@@ -135,7 +135,7 @@ class UelOntology {
 		return conjunction;
 	}
 
-	private void createFlatDefinition(Integer id, Set<Definition> newDefinitions, Set<Integer> toVisit) {
+	private void loadFlatDefinition(Integer id, Set<Definition> newDefinitions, Set<Integer> toVisit) {
 		OWLClass cls = nameMap.get(id);
 		if (cls.equals(top)) {
 			// do not expand definitions beyond top
@@ -165,8 +165,6 @@ class UelOntology {
 
 		Set<Integer> right = flattenClassExpression(expression, newDefinitions, toVisit);
 		atomManager.makeDefinitionVariable(id);
-		// TODO introduce new 'undef' variables for primitive definitions
-		// already here?
 		newDefinitions.add(new Definition(id, right, primitive));
 	}
 

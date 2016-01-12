@@ -12,7 +12,10 @@ import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
 
 import de.tudresden.inf.lat.uel.type.api.AtomManager;
+import de.tudresden.inf.lat.uel.type.api.Axiom;
 import de.tudresden.inf.lat.uel.type.api.Definition;
+import de.tudresden.inf.lat.uel.type.api.Dissubsumption;
+import de.tudresden.inf.lat.uel.type.api.Subsumption;
 
 public class OWLRenderer extends Renderer<OWLClassExpression, Set<OWLAxiom>> {
 
@@ -41,11 +44,13 @@ public class OWLRenderer extends Renderer<OWLClassExpression, Set<OWLAxiom>> {
 	}
 
 	@Override
-	protected Set<OWLAxiom> translateDefinition(Definition definition) {
-		OWLClassExpression definiendum = translateAtom(definition.getDefiniendum());
-		OWLClassExpression definiens = translateConjunction(definition.getRight());
-		OWLAxiom newAxiom = definition.isPrimitive() ? dataFactory.getOWLSubClassOfAxiom(definiendum, definiens)
-				: dataFactory.getOWLEquivalentClassesAxiom(definiendum, definiens);
+	protected Set<OWLAxiom> translateAxiom(Axiom axiom) {
+		OWLClassExpression left = translateConjunction(axiom.getLeft());
+		OWLClassExpression right = translateConjunction(axiom.getRight());
+		boolean subclassof = (axiom instanceof Subsumption) || (axiom instanceof Dissubsumption)
+				|| ((axiom instanceof Definition) && (((Definition) axiom).isPrimitive()));
+		OWLAxiom newAxiom = subclassof ? dataFactory.getOWLSubClassOfAxiom(left, right)
+				: dataFactory.getOWLEquivalentClassesAxiom(left, right);
 		axioms.add(newAxiom);
 		return axioms;
 	}

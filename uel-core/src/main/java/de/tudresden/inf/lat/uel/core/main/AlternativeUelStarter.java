@@ -1,12 +1,12 @@
 package de.tudresden.inf.lat.uel.core.main;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -123,11 +123,10 @@ public class AlternativeUelStarter {
 		}
 
 		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
-		OWLDataFactory factory = manager.getOWLDataFactory();
 		AlternativeUelStarter starter = new AlternativeUelStarter(loadOntology(mainFilename, manager));
 		starter.setVerbose(printInfo);
 		if (!owlThingAliasName.isEmpty()) {
-			starter.setOwlThingAlias(factory.getOWLClass(IRI.create(owlThingAliasName)));
+			starter.setOwlThingAlias(OWLManager.getOWLDataFactory().getOWLClass(IRI.create(owlThingAliasName)));
 		}
 
 		OWLOntology subsumptions = loadOntology(subsFilename, manager);
@@ -138,7 +137,7 @@ public class AlternativeUelStarter {
 		if (dissubsumptions == null) {
 			return;
 		}
-		Set<OWLClass> variables = loadVariables(varFilename, factory);
+		Set<OWLClass> variables = loadVariables(varFilename);
 		if (variables == null) {
 			return;
 		}
@@ -179,38 +178,35 @@ public class AlternativeUelStarter {
 				"Usage: uel [-s subsumptions.owl] [-d dissubsumptions.owl] [-v variables.txt] [-t owl:Thing_alias] [-a algorithmIndex] [-h] [-i] [ontology.owl]");
 	}
 
-	public static Set<OWLClass> loadVariables(String filename, OWLDataFactory factory) {
-		if (filename.isEmpty()) {
-			return Collections.emptySet();
-		}
+	static Set<OWLClass> loadVariables(String filename) {
 		try {
+			if (filename.isEmpty()) {
+				return Collections.emptySet();
+			}
 
-			BufferedReader input = new BufferedReader(new FileReader(new File(filename)));
+			OWLDataFactory factory = OWLManager.getOWLDataFactory();
 			Set<OWLClass> variables = new HashSet<OWLClass>();
-			String line = "";
-			while (line != null) {
-				line = input.readLine();
-				if ((line != null) && !line.isEmpty()) {
+
+			for (String line : Files.readAllLines(Paths.get(filename))) {
+				if (!line.isEmpty()) {
 					variables.add(factory.getOWLClass(IRI.create(line)));
 				}
 			}
-			input.close();
+
 			return variables;
-		} catch (FileNotFoundException e) {
-			System.err.println("Could not find file '" + filename + "'.");
-			return null;
 		} catch (IOException e) {
-			System.err.println("Unknown I/O error while reading file '" + filename + "'.");
+			System.err.println("Error while reading file '" + filename + "'.");
 			System.err.println(e.getMessage());
 			return null;
 		}
 	}
 
-	public static OWLOntology loadOntology(String filename, OWLOntologyManager manager) {
+	private static OWLOntology loadOntology(String filename, OWLOntologyManager manager) {
 		try {
 			if (filename.isEmpty()) {
 				return manager.createOntology();
 			}
+
 			InputStream input = new FileInputStream(new File(filename));
 			return manager.loadOntologyFromOntologyDocument(input);
 		} catch (FileNotFoundException e) {
@@ -264,7 +260,7 @@ public class AlternativeUelStarter {
 			System.out.println("Final number of subsumptions: " + goal.getSubsumptions().size());
 			System.out.println("Final number of dissubsumptions: " + goal.getDissubsumptions().size());
 			System.out.println("(Dis-)Unification problem:");
-			System.out.println(uelModel.printGoal(true));
+			System.out.println(uelModel.printGoal());
 		}
 
 		uelModel.initializeUnificationAlgorithm(algorithmName);

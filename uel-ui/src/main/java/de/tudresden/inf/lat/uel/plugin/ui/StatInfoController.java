@@ -35,7 +35,7 @@ class StatInfoController {
 
 		try {
 			BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-			writer.write(model.printGoal(false));
+			writer.write(model.printGoal());
 			writer.close();
 		} catch (IOException e) {
 			throw new RuntimeException(e);
@@ -53,7 +53,7 @@ class StatInfoController {
 	}
 
 	public void updateView() {
-		view.setGoalText(model.printGoal(true));
+		view.setGoalText(model.printGoal());
 		StringBuffer info = new StringBuffer();
 		for (Entry<String, String> pair : model.getUnificationAlgorithm().getInfo()) {
 			info.append(pair.getKey());

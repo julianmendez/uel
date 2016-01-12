@@ -97,7 +97,7 @@ class UnifierController {
 	private void updateUnifierView() {
 		int index = model.getCurrentUnifierIndex();
 		if (index > -1) {
-			view.setUnifier(model.printCurrentUnifier(true));
+			view.setUnifier(model.printCurrentUnifier());
 			view.setSaveRefineButtons(true);
 		} else {
 			view.setUnifier("[not unifiable]");

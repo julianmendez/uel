@@ -516,7 +516,6 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 	 */
 	private void runStep1(SatInput input) {
 		// encode positive part of the goal
-		// TODO the atoms here could be top! take care of this case!
 		for (Definition d : goal.getDefinitions()) {
 			runStep1(d, input);
 		}
@@ -537,7 +536,9 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 
 	private void runStep1(Definition d, SatInput input) {
 		runStep1(new Subsumption(d.getLeft(), d.getRight()), input);
-		runStep1(new Subsumption(d.getRight(), d.getLeft()), input);
+		if (!d.isPrimitive()) {
+			runStep1(new Subsumption(d.getRight(), d.getLeft()), input);
+		}	
 	}
 
 	private void runStep1(Equation e, SatInput input) {

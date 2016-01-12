@@ -49,6 +49,14 @@ public class UelModel {
 		}
 	}
 
+	public static String removeQuotes(String str) {
+		String ret = str;
+		if ((str.startsWith("\"") && str.endsWith("\"")) || (str.startsWith("'") && str.endsWith("'"))) {
+			ret = str.substring(1, str.length() - 1);
+		}
+		return ret;
+	}
+
 	private boolean allUnifiersFound;
 	private AtomManager atomManager;
 	private int currentUnifierIndex;
@@ -65,7 +73,7 @@ public class UelModel {
 	private void addAllShortForms(OWLOntology ontology, Set<? extends OWLEntity> entities) {
 		for (OWLEntity entity : entities) {
 			String shortForm = getShortForm(entity, ontology);
-			shortFormMap.put(entity.toStringID(), StringRenderer.removeQuotes(shortForm));
+			shortFormMap.put(entity.toStringID(), removeQuotes(shortForm));
 		}
 	}
 
@@ -148,9 +156,8 @@ public class UelModel {
 		return entity.getIRI().getShortForm();
 	}
 
-	// TODO check if the first parameter is still needed
-	public StringRenderer getStringRenderer(boolean shortForm, Set<Definition> background) {
-		return StringRenderer.createInstance(atomManager, shortForm ? shortFormMap : null, background);
+	public StringRenderer getStringRenderer(Set<Definition> background) {
+		return StringRenderer.createInstance(atomManager, shortFormMap, background);
 	}
 
 	public UnificationAlgorithm getUnificationAlgorithm() {
@@ -222,20 +229,20 @@ public class UelModel {
 		}
 	}
 
-	public String printCurrentUnifier(boolean shortForm) {
+	public String printCurrentUnifier() {
 		Unifier unifier = getCurrentUnifier();
 		if (unifier == null) {
 			return "";
 		}
-		return printUnifier(shortForm, unifier);
+		return printUnifier(unifier);
 	}
 
-	public String printGoal(boolean shortForm) {
-		return getStringRenderer(shortForm, null).renderGoal(goal);
+	public String printGoal() {
+		return getStringRenderer(null).renderGoal(goal);
 	}
 
-	public String printUnifier(boolean shortForm, Unifier unifier) {
-		return getStringRenderer(shortForm, unifier.getDefinitions()).renderDefinitions(unifier.getDefinitions());
+	public String printUnifier(Unifier unifier) {
+		return getStringRenderer(unifier.getDefinitions()).renderUnifier(unifier);
 	}
 
 	public void recomputeShortFormMap() {
@@ -254,8 +261,12 @@ public class UelModel {
 		return renderUnifier(unifier);
 	}
 
+	public Set<OWLAxiom> renderDefinitions() {
+		return getOWLRenderer(null).renderAxioms(goal.getDefinitions());
+	}
+
 	public Set<OWLAxiom> renderUnifier(Unifier unifier) {
-		return getOWLRenderer(unifier.getDefinitions()).renderDefinitions(unifier.getDefinitions());
+		return getOWLRenderer(unifier.getDefinitions()).renderUnifier(unifier);
 	}
 
 	public void setCurrentUnifierIndex(int index) {

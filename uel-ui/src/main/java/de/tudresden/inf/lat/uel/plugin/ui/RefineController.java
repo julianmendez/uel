@@ -20,6 +20,7 @@ import org.semanticweb.owlapi.model.OWLAxiom;
 import de.tudresden.inf.lat.uel.core.processor.UelModel;
 import de.tudresden.inf.lat.uel.core.renderer.StringRenderer;
 import de.tudresden.inf.lat.uel.type.api.Definition;
+import de.tudresden.inf.lat.uel.type.api.Dissubsumption;
 
 /**
  * @author Stefan Borgwardt
@@ -51,16 +52,15 @@ class RefineController {
 	public Set<OWLAxiom> getDissubsumptions() {
 		// construct (primitive) definitions representing dissubsumptions from
 		// selected atoms
-		Function<Entry<LabelId, List<LabelId>>, Stream<Definition>> definitionsForEntry = entry -> entry.getValue()
-				.stream()
-				.map(atom -> new Definition(entry.getKey().getId(), Collections.singleton(atom.getId()), true));
+		Function<Entry<LabelId, List<LabelId>>, Stream<Dissubsumption>> dissubsumptionsForEntry = entry -> entry
+				.getValue().stream().map(atom -> new Dissubsumption(Collections.singleton(entry.getKey().getId()),
+						Collections.singleton(atom.getId())));
 
-		Set<Definition> dissubsumptions = view.getSelectedAtoms().entrySet().stream().flatMap(definitionsForEntry)
-				.collect(Collectors.toSet());
+		Set<Dissubsumption> dissubsumptions = view.getSelectedAtoms().entrySet().stream()
+				.flatMap(dissubsumptionsForEntry).collect(Collectors.toSet());
 
 		// render the definitions as OWLSubClassOfAxioms
-		return model.getOWLRenderer(model.getCurrentUnifier().getDefinitions())
-				.renderDefinitions(dissubsumptions);
+		return model.getOWLRenderer(model.getCurrentUnifier().getDefinitions()).renderAxioms(dissubsumptions);
 	}
 
 	public void open() {
@@ -76,16 +76,14 @@ class RefineController {
 	private void updateView() {
 		Map<LabelId, List<LabelId>> map = new HashMap<LabelId, List<LabelId>>();
 		Set<Definition> definitions = model.getCurrentUnifier().getDefinitions();
-		StringRenderer renderer = model.getStringRenderer(true, definitions);
+		StringRenderer renderer = model.getStringRenderer(definitions);
 
 		// convert unifier into map between LabelIds for the view
 		for (Definition definition : definitions) {
 			Integer varId = definition.getDefiniendum();
 			if (model.getGoal().getAtomManager().getUserVariables().contains(varId)) {
-				map.put(new LabelId(renderer.renderNameWithoutQuotes(varId), varId),
-						definition.getRight().stream()
-								.map(atomId -> new LabelId(renderer.renderAtomWithoutQuotes(atomId), atomId))
-								.collect(Collectors.toList()));
+				map.put(new LabelId(renderer.renderAtom(varId), varId), definition.getRight().stream()
+						.map(atomId -> new LabelId(renderer.renderAtom(atomId), atomId)).collect(Collectors.toList()));
 			}
 		}
 

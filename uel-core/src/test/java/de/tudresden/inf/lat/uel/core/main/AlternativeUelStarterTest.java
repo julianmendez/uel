@@ -1,7 +1,6 @@
 package de.tudresden.inf.lat.uel.core.main;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -13,20 +12,14 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.formats.KRSS2DocumentFormat;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
-import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
-import org.semanticweb.owlapi.model.OWLOntologyManager;
-import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 
-import de.tudresden.inf.lat.jcel.owlapi.main.JcelReasoner;
-import de.tudresden.inf.lat.uel.core.processor.UelModel;
+import de.tudresden.inf.lat.jcel.owlapi.main.JcelReasonerFactory;
 import de.tudresden.inf.lat.uel.core.processor.UnificationAlgorithmFactory;
 
 @RunWith(value = Parameterized.class)
@@ -63,42 +56,23 @@ public class AlternativeUelStarterTest {
 		for (int i = 1; i <= maxTest; i++) {
 			try {
 				String baseFilename = apath + prefix + String.format("%02d", i);
-				OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
-				OWLDataFactory factory = manager.getOWLDataFactory();
 
-				OWLOntology mainOntology = AlternativeUelStarter.loadOntology(baseFilename + ontologyFilename, manager);
-				OWLOntology subsumptions = AlternativeUelStarter.loadOntology(baseFilename + subsFilename, manager);
-				OWLOntology dissubsumptions = AlternativeUelStarter.loadOntology(baseFilename + dissubsFilename,
-						manager);
-				Set<OWLClass> variables = AlternativeUelStarter.loadVariables(baseFilename + varFilename, factory);
+				OWLOntology mainOntology = ProcessorTest.loadKRSSOntology(baseFilename + ontologyFilename);
+				OWLOntology subsumptions = ProcessorTest.loadKRSSOntology(baseFilename + subsFilename);
+				OWLOntology dissubsumptions = ProcessorTest.loadKRSSOntology(baseFilename + dissubsFilename);
+				Set<OWLClass> variables = AlternativeUelStarter.loadVariables(baseFilename + varFilename);
 
 				BufferedReader testFile = new BufferedReader(new FileReader(baseFilename + testFilename));
 				Integer numberOfUnifiers = Integer.parseInt(testFile.readLine());
 				testFile.close();
 
 				data.add(new Object[] { mainOntology, subsumptions, dissubsumptions, variables, numberOfUnifiers });
-			} catch (IOException ex) {
+			} catch (OWLOntologyCreationException | IOException ex) {
 				throw new RuntimeException(ex);
 			}
 		}
 
 		return data;
-	}
-
-	private OWLReasoner createReasoner(OWLOntology ontology) throws OWLOntologyCreationException {
-		JcelReasoner reasoner = new JcelReasoner(ontology, false);
-		reasoner.precomputeInferences();
-		return reasoner;
-	}
-
-	String toString(OWLOntology ontology) {
-		StringBuffer sbuf = new StringBuffer();
-
-		for (OWLAxiom axiom : ontology.getAxioms()) {
-			sbuf.append(axiom.toString());
-			sbuf.append("\n");
-		}
-		return sbuf.toString();
 	}
 
 	@Test
@@ -110,48 +84,38 @@ public class AlternativeUelStarterTest {
 		UnifierIterator iterator = (UnifierIterator) starter.modifyOntologyAndSolve(subsumptions, dissubsumptions,
 				variables, UnificationAlgorithmFactory.SAT_BASED_ALGORITHM);
 
-		UelModel uelModel = iterator.getUelModel();
-		// TODO replace by OWLRenderer
-		String krssDefinitions = uelModel.getStringRenderer(false, null)
-				.renderDefinitions(uelModel.getGoal().getDefinitions());
-		System.out.println(krssDefinitions);
-		System.out.println();
-		System.out.println();
+		Set<OWLAxiom> background = iterator.getUelModel().renderDefinitions();
 
-		int actualNumberOfUnifiers = 0;
+		Integer actualNumberOfUnifiers = 0;
 		while (iterator.hasNext()) {
-			Set<OWLEquivalentClassesAxiom> unifier = iterator.next();
 			actualNumberOfUnifiers++;
-			System.out.println();
-			System.out.println("--- " + actualNumberOfUnifiers);
-			for (OWLEquivalentClassesAxiom def : unifier) {
-				System.out.println(def.toString());
-			}
-			System.out.println();
+			Set<OWLEquivalentClassesAxiom> unifier = iterator.next();
+			OWLOntology extendedOntology = ProcessorTest.createOntology(background, unifier);
+			// try {
+			// System.out.println();
+			// System.out.println("---" + actualNumberOfUnifiers);
+			// OWLManager.createOWLOntologyManager().saveOntology(extendedOntology,
+			// new FunctionalSyntaxDocumentFormat(), System.out);
+			// System.out.println();
+			// } catch (OWLOntologyStorageException e) {
+			// e.printStackTrace();
+			// }
 
-			OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
-			OWLOntology auxOntology = manager
-					.loadOntologyFromOntologyDocument(new ByteArrayInputStream(krssDefinitions.getBytes()));
-			for (OWLEquivalentClassesAxiom def : unifier) {
-				manager.addAxiom(auxOntology, def);
-			}
-			try {
-				manager.saveOntology(auxOntology, new KRSS2DocumentFormat(), System.out);
-			} catch (OWLOntologyStorageException e) {
-				e.printStackTrace();
-			}
-
-			OWLReasoner reasoner = createReasoner(auxOntology);
+			OWLReasoner reasoner = new JcelReasonerFactory().createNonBufferingReasoner(extendedOntology);
+			reasoner.precomputeInferences();
 
 			for (OWLAxiom pos : subsumptions.getAxioms()) {
+				// System.out.println(pos + ": " + reasoner.isEntailed(pos));
 				Assert.assertTrue(reasoner.isEntailed(pos));
 			}
 			for (OWLAxiom neg : dissubsumptions.getAxioms()) {
+				// System.out.println(neg + ": " + reasoner.isEntailed(neg));
 				Assert.assertTrue(!reasoner.isEntailed(neg));
 			}
 
+			reasoner.dispose();
 		}
 
-		Assert.assertEquals(numberOfUnifiers, (Integer) actualNumberOfUnifiers);
+		Assert.assertEquals(numberOfUnifiers, actualNumberOfUnifiers);
 	}
 }

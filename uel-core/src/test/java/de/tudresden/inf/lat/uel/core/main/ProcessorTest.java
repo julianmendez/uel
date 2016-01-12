@@ -1,17 +1,15 @@
-package de.tudresden.inf.lat.uel.core.processor;
+package de.tudresden.inf.lat.uel.core.main;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -21,15 +19,20 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.io.StreamDocumentSource;
+import org.semanticweb.owlapi.krss2.parser.KRSS2OWLParser;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
+import org.semanticweb.owlapi.model.OWLOntologyLoaderConfiguration;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.reasoner.Node;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 
 import de.tudresden.inf.lat.jcel.owlapi.main.JcelReasonerFactory;
+import de.tudresden.inf.lat.uel.core.processor.BasicOntologyProvider;
+import de.tudresden.inf.lat.uel.core.processor.UelModel;
 import de.tudresden.inf.lat.uel.type.impl.Unifier;
 
 @RunWith(value = Parameterized.class)
@@ -58,13 +61,25 @@ public class ProcessorTest {
 		this.algorithmName = algorithmName;
 	}
 
-	private OWLOntology createOntology(InputStream input) throws OWLOntologyCreationException {
+	static OWLOntology loadKRSSOntology(String input) throws OWLOntologyCreationException, IOException {
 		OWLOntologyManager ontologyManager = OWLManager.createOWLOntologyManager();
-		ontologyManager.loadOntologyFromOntologyDocument(input);
-		return ontologyManager.getOntologies().iterator().next();
+		OWLOntology ontology = ontologyManager.createOntology();
+		KRSS2OWLParser parser = new KRSS2OWLParser();
+		parser.parse(new StreamDocumentSource(new FileInputStream(input)), ontology,
+				new OWLOntologyLoaderConfiguration());
+		return ontology;
 	}
 
-	private OWLReasoner createReasoner(OWLOntology ontology) {
+	static OWLOntology createOntology(Set<? extends OWLAxiom> background, Set<? extends OWLAxiom> unifier)
+			throws OWLOntologyCreationException {
+		OWLOntologyManager ontologyManager = OWLManager.createOWLOntologyManager();
+		OWLOntology ontology = ontologyManager.createOntology();
+		ontologyManager.addAxioms(ontology, background);
+		ontologyManager.addAxioms(ontology, unifier);
+		return ontology;
+	}
+
+	static OWLReasoner createReasoner(OWLOntology ontology) {
 		JcelReasonerFactory factory = new JcelReasonerFactory();
 		OWLReasoner reasoner = factory.createNonBufferingReasoner(ontology);
 		reasoner.precomputeInferences();
@@ -89,9 +104,7 @@ public class ProcessorTest {
 				while (algorithmName != null) {
 					Integer nbUnifiers = Integer.parseInt(configFile.readLine());
 					if (!algorithmName.contains("ASP")) {
-						if ((i == 8) && algorithmName.equals(UnificationAlgorithmFactory.SAT_BASED_ALGORITHM)) {
-							data.add(new Object[] { ontologyName, varNames, undefVarNames, nbUnifiers, algorithmName });
-						}
+						data.add(new Object[] { ontologyName, varNames, undefVarNames, nbUnifiers, algorithmName });
 					}
 
 					algorithmName = configFile.readLine();
@@ -117,7 +130,7 @@ public class ProcessorTest {
 	@Test
 	public void tryOntology() throws OWLOntologyCreationException, IOException, InterruptedException {
 		Map<String, OWLClass> idClassMap = new HashMap<String, OWLClass>();
-		OWLOntology owlOntology = createOntology(new FileInputStream(ontologyName));
+		OWLOntology owlOntology = loadKRSSOntology(ontologyName);
 		OWLOntologyManager ontologyManager = owlOntology.getOWLOntologyManager();
 		UelModel uelModel = new UelModel(new BasicOntologyProvider(ontologyManager));
 		Set<OWLClass> clsSet = owlOntology.getClassesInSignature();
@@ -150,20 +163,20 @@ public class ProcessorTest {
 		while (uelModel.computeNextUnifier()) {
 		}
 
-		List<Unifier> unifiers = uelModel.getUnifierList();
-		Set<OWLAxiom> goalAxioms = uelModel.getOWLRenderer(null).renderDefinitions(uelModel.getGoal().getDefinitions());
+		// cannot use 'owlOntology' here, as we may have introduced UNDEF
+		// variables
+		Set<OWLAxiom> background = uelModel.renderDefinitions();
 
-		for (Unifier unifier : unifiers) {
-			OWLOntology extendedOntology = ontologyManager.createOntology();
-			ontologyManager.addAxioms(extendedOntology, goalAxioms);
-			ontologyManager.addAxioms(extendedOntology, uelModel.renderUnifier(unifier));
-
+		for (Unifier unifier : uelModel.getUnifierList()) {
+			OWLOntology extendedOntology = createOntology(background, uelModel.renderUnifier(unifier));
 			OWLReasoner reasoner = createReasoner(extendedOntology);
 			Node<OWLClass> node = reasoner.getEquivalentClasses(idClassMap.get(conceptC));
 			OWLClass elem = idClassMap.get(conceptD);
 			Assert.assertTrue(node.contains(elem));
+			reasoner.dispose();
 		}
 
-		Assert.assertEquals(numberOfUnifiers, (Integer) unifiers.size());
+		Assert.assertEquals(numberOfUnifiers, (Integer) uelModel.getUnifierList().size());
 	}
+
 }

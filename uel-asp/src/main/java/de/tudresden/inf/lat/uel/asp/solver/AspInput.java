@@ -8,7 +8,7 @@ import de.tudresden.inf.lat.uel.type.api.Dissubsumption;
 import de.tudresden.inf.lat.uel.type.api.Equation;
 import de.tudresden.inf.lat.uel.type.api.Goal;
 import de.tudresden.inf.lat.uel.type.api.Subsumption;
-import de.tudresden.inf.lat.uel.type.cons.KRSSKeyword;
+import de.tudresden.inf.lat.uel.type.cons.RendererKeywords;
 import de.tudresden.inf.lat.uel.type.impl.ExistentialRestriction;
 
 /**
@@ -62,7 +62,7 @@ public class AspInput {
 			encoding.append("relevant(x");
 			encoding.append(var);
 			encoding.append(").");
-			encoding.append(KRSSKeyword.newLine);
+			encoding.append(RendererKeywords.newLine);
 		}
 		program = encoding.toString();
 	}
@@ -70,20 +70,20 @@ public class AspInput {
 	private void encodeDefinition(StringBuilder encoding, Definition d, int index) {
 		encoding.append("%definition ");
 		encoding.append(index);
-		encoding.append(KRSSKeyword.newLine);
+		encoding.append(RendererKeywords.newLine);
 		// lhs
 		encodePositiveAtom(encoding, d.getDefiniendum(), 0, index);
 		// rhs
 		for (Integer rightId : d.getRight()) {
 			encodePositiveAtom(encoding, rightId, 1, index);
 		}
-		encoding.append(KRSSKeyword.newLine);
+		encoding.append(RendererKeywords.newLine);
 	}
 
 	private void encodeEquation(StringBuilder encoding, Equation e, int index) {
 		encoding.append("%equation ");
 		encoding.append(index);
-		encoding.append(KRSSKeyword.newLine);
+		encoding.append(RendererKeywords.newLine);
 		// lhs
 		for (Integer leftId : e.getLeft()) {
 			encodePositiveAtom(encoding, leftId, 0, index);
@@ -92,13 +92,13 @@ public class AspInput {
 		for (Integer rightId : e.getRight()) {
 			encodePositiveAtom(encoding, rightId, 1, index);
 		}
-		encoding.append(KRSSKeyword.newLine);
+		encoding.append(RendererKeywords.newLine);
 	}
 
 	private void encodeSubsumption(StringBuilder encoding, Subsumption s, int index) {
 		encoding.append("%subsumption ");
 		encoding.append(index);
-		encoding.append(KRSSKeyword.newLine);
+		encoding.append(RendererKeywords.newLine);
 		// lhs
 		for (Integer leftId : s.getLeft()) {
 			encodePositiveAtom(encoding, leftId, 0, index);
@@ -108,13 +108,13 @@ public class AspInput {
 		for (Integer rightId : s.getRight()) {
 			encodePositiveAtom(encoding, rightId, 1, index);
 		}
-		encoding.append(KRSSKeyword.newLine);
+		encoding.append(RendererKeywords.newLine);
 	}
 
 	private void encodeDisequation(StringBuilder encoding, Disequation e, int index) {
 		encoding.append("%disequation ");
 		encoding.append(index);
-		encoding.append(KRSSKeyword.newLine);
+		encoding.append(RendererKeywords.newLine);
 		// lhs
 		for (Integer leftId : e.getLeft()) {
 			encodeNegativeAtom(encoding, leftId, 0, index);
@@ -123,13 +123,13 @@ public class AspInput {
 		for (Integer rightId : e.getRight()) {
 			encodeNegativeAtom(encoding, rightId, 1, index);
 		}
-		encoding.append(KRSSKeyword.newLine);
+		encoding.append(RendererKeywords.newLine);
 	}
 
 	private void encodeDissubsumption(StringBuilder encoding, Dissubsumption s, int index) {
 		encoding.append("%disequation ");
 		encoding.append(index);
-		encoding.append(KRSSKeyword.newLine);
+		encoding.append(RendererKeywords.newLine);
 		// lhs
 		for (Integer leftId : s.getLeft()) {
 			encodeNegativeAtom(encoding, leftId, 0, index);
@@ -138,11 +138,11 @@ public class AspInput {
 		for (Integer rightId : s.getRight()) {
 			encodeNegativeAtom(encoding, rightId, 1, index);
 		}
-		encoding.append(KRSSKeyword.newLine);
+		encoding.append(RendererKeywords.newLine);
 		encoding.append("lefttoright(");
 		encoding.append(index);
 		encoding.append(").");
-		encoding.append(KRSSKeyword.newLine);
+		encoding.append(RendererKeywords.newLine);
 	}
 
 	private void encodePositiveAtom(StringBuilder encoding, Integer atomId, int side, int equationId) {
@@ -153,7 +153,7 @@ public class AspInput {
 		encoding.append(", ");
 		encoding.append(equationId);
 		encoding.append(").");
-		encoding.append(KRSSKeyword.newLine);
+		encoding.append(RendererKeywords.newLine);
 	}
 	
 	private void encodeNegativeAtom(StringBuilder encoding, Integer atomId, int side, int disequationId) {
@@ -164,7 +164,7 @@ public class AspInput {
 		encoding.append(", ");
 		encoding.append(disequationId);
 		encoding.append(").");
-		encoding.append(KRSSKeyword.newLine);
+		encoding.append(RendererKeywords.newLine);
 	}
 
 	private void encodeAtom(StringBuilder encoding, Atom atom) {

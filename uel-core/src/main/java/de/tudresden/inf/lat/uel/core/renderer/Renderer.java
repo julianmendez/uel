@@ -6,7 +6,10 @@ import java.util.Set;
 import org.semanticweb.owlapi.model.IRI;
 
 import de.tudresden.inf.lat.uel.type.api.AtomManager;
+import de.tudresden.inf.lat.uel.type.api.Axiom;
 import de.tudresden.inf.lat.uel.type.api.Definition;
+import de.tudresden.inf.lat.uel.type.api.Goal;
+import de.tudresden.inf.lat.uel.type.impl.Unifier;
 
 abstract class Renderer<ExpressionType, AxiomsType> {
 
@@ -38,10 +41,10 @@ abstract class Renderer<ExpressionType, AxiomsType> {
 	private String getShortForm(String id) {
 		boolean alias = false;
 		String label = id;
+
 		if (id.endsWith(AtomManager.UNDEF_SUFFIX)) {
 			label = id.substring(0, id.length() - AtomManager.UNDEF_SUFFIX.length());
 		}
-
 		String str = shortFormMap.get(label);
 		if (str != null) {
 			alias = true;
@@ -52,7 +55,7 @@ abstract class Renderer<ExpressionType, AxiomsType> {
 		}
 
 		if (alias) {
-			return "\"" + label + "\"";
+			return "<" + label + ">";
 		} else {
 			return IRI.create(label).getShortForm();
 		}
@@ -66,13 +69,25 @@ abstract class Renderer<ExpressionType, AxiomsType> {
 		return finalizeExpression();
 	}
 
-	public AxiomsType renderDefinitions(Set<Definition> definitions) {
+	public AxiomsType renderAxioms(Set<? extends Axiom> axioms) {
 		initialize();
-		for (Definition definition : definitions) {
-			if (!restrictToUserVariables || atomManager.getUserVariables().contains(definition.getDefiniendum())) {
-				translateDefinition(definition);
-			}
-		}
+		translateAxioms(axioms);
+		return finalizeAxioms();
+	}
+
+	public ExpressionType renderConjunction(Set<Integer> atomIds) {
+		initialize();
+		translateConjunction(atomIds);
+		return finalizeExpression();
+	}
+
+	public AxiomsType renderGoal(Goal input) {
+		initialize();
+		translateAxioms(input.getDefinitions());
+		translateAxioms(input.getEquations());
+		translateAxioms(input.getSubsumptions());
+		translateAxioms(input.getDisequations());
+		translateAxioms(input.getDissubsumptions());
 		return finalizeAxioms();
 	}
 
@@ -82,6 +97,22 @@ abstract class Renderer<ExpressionType, AxiomsType> {
 			name = getShortForm(name);
 		}
 		return name;
+	}
+
+	public ExpressionType renderTop() {
+		initialize();
+		translateTop();
+		return finalizeExpression();
+	}
+
+	public AxiomsType renderUnifier(Unifier unifier) {
+		initialize();
+		for (Definition definition : unifier.getDefinitions()) {
+			if (!restrictToUserVariables || atomManager.getUserVariables().contains(definition.getDefiniendum())) {
+				translateAxiom(definition);
+			}
+		}
+		return finalizeAxioms();
 	}
 
 	protected ExpressionType translateAtom(Integer atomId) {
@@ -95,6 +126,16 @@ abstract class Renderer<ExpressionType, AxiomsType> {
 		} else {
 			return translateName(atomId);
 		}
+	}
+
+	protected abstract AxiomsType translateAxiom(Axiom axiom);
+
+	public AxiomsType translateAxioms(Set<? extends Axiom> axioms) {
+		AxiomsType ret = null;
+		for (Axiom axiom : axioms) {
+			ret = translateAxiom(axiom);
+		}
+		return ret;
 	}
 
 	protected ExpressionType translateChild(Integer childId) {
@@ -114,8 +155,6 @@ abstract class Renderer<ExpressionType, AxiomsType> {
 			return translateTrueConjunction(atomIds);
 		}
 	}
-
-	protected abstract AxiomsType translateDefinition(Definition definition);
 
 	protected abstract ExpressionType translateExistentialRestriction(String roleName, Integer childId);
 
