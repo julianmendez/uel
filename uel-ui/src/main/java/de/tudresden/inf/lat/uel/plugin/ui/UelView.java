@@ -19,30 +19,39 @@ import de.tudresden.inf.lat.uel.core.processor.UnificationAlgorithmFactory;
  * This is the main panel of the UEL system.
  * 
  * @author Julian Mendez
+ * @author Stefan Borgwardt
  */
 class UelView extends JPanel {
 
 	private static final long serialVersionUID = 9096602357606632334L;
 
+	@SuppressWarnings("unchecked")
+	private static <T> void resetModelAndRestoreSelection(JComboBox<T> comboBox, T[] data) {
+		T selection = (T) comboBox.getSelectedItem();
+		comboBox.setModel(new DefaultComboBoxModel<T>(data));
+		if (selection != null) {
+			comboBox.setSelectedItem(selection);
+		}
+	}
+
+	// TODO change this back to JComboBox<OWLOntology>, then ComboBoxRenderer
+	// takes care of the rest
+
 	private final JButton buttonOpen = new JButton();
 	private final JButton buttonSelectVariables = new JButton();
+	private final JComboBox<String> listAlgorithm = new JComboBox<String>();
 	private final List<OWLOntology> listOfOntologies = new ArrayList<OWLOntology>();
 	private final JComboBox<String> listOntologyBg00 = new JComboBox<String>();
 	private final JComboBox<String> listOntologyBg01 = new JComboBox<String>();
-	private final JComboBox<String> listOntologyPos = new JComboBox<String>();
 	private final JComboBox<String> listOntologyNeg = new JComboBox<String>();
-	private final JComboBox<String> listAlgorithm = new JComboBox<String>();
 
+	private final JComboBox<String> listOntologyPos = new JComboBox<String>();
+
+	/**
+	 * Construct the main view of UEL.
+	 */
 	public UelView() {
 		addMainPanel(this);
-	}
-
-	public void addOpenListener(ActionListener listener) {
-		buttonOpen.addActionListener(listener);
-	}
-
-	public void addSelectVariablesListener(ActionListener listener) {
-		buttonSelectVariables.addActionListener(listener);
 	}
 
 	private void addMainPanel(Container parent) {
@@ -81,6 +90,27 @@ class UelView extends JPanel {
 		UelUI.setupComboBox(ontologyPanel, listOntologyNeg, Message.tooltipComboBoxOntologyNeg);
 	}
 
+	/**
+	 * Add a listener to the button for opening a new ontology.
+	 * 
+	 * @param listener
+	 *            the listener
+	 */
+	public void addOpenListener(ActionListener listener) {
+		buttonOpen.addActionListener(listener);
+	}
+
+	/**
+	 * Add a listener to the button for starting the unification process by
+	 * selecting the variables.
+	 * 
+	 * @param listener
+	 *            the listener
+	 */
+	public void addSelectVariablesListener(ActionListener listener) {
+		buttonSelectVariables.addActionListener(listener);
+	}
+
 	private void addTopPanel(Container parent) {
 		Container topPanel = UelUI.addButtonPanel(parent);
 
@@ -92,30 +122,6 @@ class UelView extends JPanel {
 		UelUI.setupButton(topPanel, buttonOpen, UelUI.ICON_OPEN, Message.tooltipOpen);
 
 		UelUI.setupButton(topPanel, buttonSelectVariables, UelUI.ICON_FORWARD, Message.tooltipSelectVariables);
-	}
-
-	public OWLOntology getSelectedOntologyBg00() {
-		return listOfOntologies.get(listOntologyBg00.getSelectedIndex());
-	}
-
-	public OWLOntology getSelectedOntologyBg01() {
-		return listOfOntologies.get(listOntologyBg01.getSelectedIndex());
-	}
-
-	public OWLOntology getSelectedOntologyPos() {
-		return listOfOntologies.get(listOntologyPos.getSelectedIndex());
-	}
-
-	public OWLOntology getSelectedOntologyNeg() {
-		return listOfOntologies.get(listOntologyNeg.getSelectedIndex());
-	}
-
-	public void setSelectedOntologyNeg(OWLOntology ontology) {
-		listOntologyNeg.setSelectedIndex(listOfOntologies.indexOf(ontology));
-	}
-
-	public String getSelectedAlgorithm() {
-		return (String) listAlgorithm.getSelectedItem();
 	}
 
 	String getName(OWLOntology ontology) {
@@ -135,6 +141,53 @@ class UelView extends JPanel {
 		return ret;
 	}
 
+	/**
+	 * Return the currently selected unification algorithm.
+	 * 
+	 * @return a string identifier for the selected algorithm
+	 */
+	public String getSelectedAlgorithm() {
+		return (String) listAlgorithm.getSelectedItem();
+	}
+
+	/**
+	 * Return the currently selected 1st background ontology.
+	 * 
+	 * @return the selected OWLOntology object
+	 */
+	public OWLOntology getSelectedOntologyBg00() {
+		return listOfOntologies.get(listOntologyBg00.getSelectedIndex());
+	}
+
+	/**
+	 * Return the currently selected 2nd background ontology.
+	 * 
+	 * @return the selected OWLOntology object
+	 */
+	public OWLOntology getSelectedOntologyBg01() {
+		return listOfOntologies.get(listOntologyBg01.getSelectedIndex());
+	}
+
+	/**
+	 * Return the currently selected ontology containing the negative part of
+	 * the goal.
+	 * 
+	 * @return the selected OWLOntology object
+	 */
+	public OWLOntology getSelectedOntologyNeg() {
+		return listOfOntologies.get(listOntologyNeg.getSelectedIndex());
+	}
+
+	/**
+	 * Return the currently selected ontology containing the positive part of
+	 * the goal.
+	 * 
+	 * @return the selected OWLOntology object
+	 */
+	public OWLOntology getSelectedOntologyPos() {
+		return listOfOntologies.get(listOntologyPos.getSelectedIndex());
+	}
+
 	public void reloadOntologies(List<OWLOntology> list) {
 		this.listOfOntologies.clear();
 		this.listOfOntologies.addAll(list);
@@ -143,15 +196,6 @@ class UelView extends JPanel {
 		resetModelAndRestoreSelection(listOntologyBg01, ontologyNames);
 		resetModelAndRestoreSelection(listOntologyPos, ontologyNames);
 		resetModelAndRestoreSelection(listOntologyNeg, ontologyNames);
-	}
-
-	@SuppressWarnings("unchecked")
-	public static <T> void resetModelAndRestoreSelection(JComboBox<T> comboBox, T[] data) {
-		T selection = (T) comboBox.getSelectedItem();
-		comboBox.setModel(new DefaultComboBoxModel<T>(data));
-		if (selection != null) {
-			comboBox.setSelectedItem(selection);
-		}
 	}
 
 	public void setButtonLoadEnabled(boolean b) {
@@ -170,12 +214,16 @@ class UelView extends JPanel {
 		this.listOntologyBg01.setEnabled(b);
 	}
 
+	public void setComboBoxOntologyNegEnabled(boolean b) {
+		this.listOntologyNeg.setEnabled(b);
+	}
+
 	public void setComboBoxOntologyPosEnabled(boolean b) {
 		this.listOntologyPos.setEnabled(b);
 	}
 
-	public void setComboBoxOntologyNegEnabled(boolean b) {
-		this.listOntologyNeg.setEnabled(b);
+	public void setSelectedOntologyNeg(OWLOntology ontology) {
+		listOntologyNeg.setSelectedIndex(listOfOntologies.indexOf(ontology));
 	}
 
 }

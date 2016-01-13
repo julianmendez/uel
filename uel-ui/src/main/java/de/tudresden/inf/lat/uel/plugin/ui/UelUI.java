@@ -48,6 +48,12 @@ import org.semanticweb.owlapi.model.OWLOntologyID;
  */
 class UelUI {
 
+	/**
+	 * This renderer for UEL's combo boxes makes some layout adjustments and
+	 * takes care of rendering the names of OWLOntologies.
+	 * 
+	 * @author Stefan Borgwardt
+	 */
 	static class ComboBoxRenderer extends DefaultListCellRenderer {
 
 		private static final long serialVersionUID = -2411864526023749022L;
@@ -63,7 +69,7 @@ class UelUI {
 				if (id.isAnonymous()) {
 					this.setText(id.toString());
 				} else {
-					this.setText(id.getOntologyIRI().toString());
+					this.setText(id.getOntologyIRI().get().toString());
 				}
 			}
 
@@ -143,6 +149,8 @@ class UelUI {
 	public static final Icon ICON_STEP_BACK = createIcon(PATH_STEP_BACK);
 	public static final Icon ICON_STEP_FORWARD = createIcon(PATH_STEP_FORWARD);
 
+	static File previousFile = null;
+
 	static Container addButtonPanel(Container parent) {
 		JPanel panel = new JPanel();
 		setupContainer(parent, panel);
@@ -181,6 +189,15 @@ class UelUI {
 		return list;
 	}
 
+	static JScrollPane addScrollableTextArea(Container parent, JTextArea textArea, String tooltipText,
+			Dimension preferredSize) {
+		textArea.setWrapStyleWord(true);
+		textArea.setLineWrap(true);
+		textArea.setEditable(false);
+		setBorder(textArea);
+		return addScrollPane(parent, textArea, tooltipText, preferredSize);
+	}
+
 	static JScrollPane addScrollPane(Container parent, Component child, String tooltipText, Dimension preferredSize) {
 		if (!tooltipText.equals("")) {
 			((JComponent) child).setToolTipText(tooltipText);
@@ -194,15 +211,6 @@ class UelUI {
 		scrollPane.setBorder(new EmptyBorder(0, 0, 0, 0));
 		parent.add(scrollPane);
 		return scrollPane;
-	}
-
-	static JScrollPane addScrollableTextArea(Container parent, JTextArea textArea, String tooltipText,
-			Dimension preferredSize) {
-		textArea.setWrapStyleWord(true);
-		textArea.setLineWrap(true);
-		textArea.setEditable(false);
-		setBorder(textArea);
-		return addScrollPane(parent, textArea, tooltipText, preferredSize);
 	}
 
 	static void addStrut(Container parent) {
@@ -296,14 +304,19 @@ class UelUI {
 		setupComponent(parent, comboBox);
 	}
 
+	static void setupComponent(Container parent, JComponent comp) {
+		setupComponent(comp);
+		parent.add(comp);
+	}
+
 	static void setupComponent(JComponent comp) {
 		comp.setAlignmentX(Component.LEFT_ALIGNMENT);
 		comp.setAlignmentY(Component.TOP_ALIGNMENT);
-//		comp.setBorder(new LineBorder(Color.BLACK));
+		// comp.setBorder(new LineBorder(Color.BLACK));
 	}
 
-	static void setupComponent(Container parent, JComponent comp) {
-		setupComponent(comp);
+	static void setupContainer(Container parent, JComponent comp) {
+		setupContainer(comp);
 		parent.add(comp);
 	}
 
@@ -311,12 +324,7 @@ class UelUI {
 		comp.setAlignmentX(Component.CENTER_ALIGNMENT);
 		comp.setAlignmentY(Component.TOP_ALIGNMENT);
 		comp.setMinimumSize(new Dimension(0, 0));
-//		comp.setBorder(new LineBorder(Color.BLACK));
-	}
-
-	static void setupContainer(Container parent, JComponent comp) {
-		setupContainer(comp);
-		parent.add(comp);
+		// comp.setBorder(new LineBorder(Color.BLACK));
 	}
 
 	static void setupLabel(Container parent, JLabel label, String tooltipText, Dimension preferredSize) {
@@ -344,8 +352,10 @@ class UelUI {
 
 	static File showOpenFileDialog(Component parent) {
 		JFileChooser fileChooser = new JFileChooser();
+		fileChooser.setCurrentDirectory(previousFile);
 		if (fileChooser.showOpenDialog(parent) == JFileChooser.APPROVE_OPTION) {
-			return fileChooser.getSelectedFile();
+			previousFile = fileChooser.getSelectedFile();
+			return previousFile;
 		} else {
 			return null;
 		}
@@ -353,8 +363,10 @@ class UelUI {
 
 	static File showSaveFileDialog(Component parent) {
 		JFileChooser fileChooser = new JFileChooser();
+		fileChooser.setCurrentDirectory(previousFile);
 		if (fileChooser.showSaveDialog(parent) == JFileChooser.APPROVE_OPTION) {
-			return fileChooser.getSelectedFile();
+			previousFile = fileChooser.getSelectedFile();
+			return previousFile;
 		} else {
 			return null;
 		}
