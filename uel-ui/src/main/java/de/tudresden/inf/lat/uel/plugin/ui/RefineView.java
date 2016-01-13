@@ -85,9 +85,7 @@ class RefineView extends UelDialog {
 			JList<LabelId> list = UelUI.addList(selectionPanel, atoms, Message.tooltipRefineAtoms);
 			content.put(var, list);
 			comp = list;
-			if (rowCount > 0) {
-				atomsConstraints.insets = new Insets(UelUI.GAP_SIZE, 0, 0, 0);
-			}
+			atomsConstraints.insets = new Insets(0, 0, UelUI.GAP_SIZE, 0);
 		}
 
 		atomsConstraints.gridx = 1;
