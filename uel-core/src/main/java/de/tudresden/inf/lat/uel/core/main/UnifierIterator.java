@@ -23,6 +23,10 @@ public class UnifierIterator implements Iterator<Set<OWLEquivalentClassesAxiom>>
 		this.uelModel = uelModel;
 	}
 
+	public void cleanup() {
+		uelModel.getUnificationAlgorithm().cleanup();
+	}
+
 	private void compute() {
 		UnificationAlgorithm algorithm = uelModel.getUnificationAlgorithm();
 		if (!isComputed) {
