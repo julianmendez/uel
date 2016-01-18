@@ -36,13 +36,12 @@ public class XMLFlattener {
 	private static final String tabSepStr = "\t";
 	private static final String textStr = "#text";
 
-	public static final void main(String[] args)
-			throws ParserConfigurationException, SAXException, IOException {
+	public static final void main(String[] args) throws ParserConfigurationException, SAXException, IOException {
 		if (args.length == 2) {
 			(new XMLFlattener()).run(new File(args[0]), new File(args[1]));
 		} else {
-			System.out
-					.println("two parameters are required:  \n(1) input file name, RDF/OWL file  \n(2) output file name, a tab-separated file");
+			System.out.println(
+					"two parameters are required:  \n(1) input file name, RDF/OWL file  \n(2) output file name, a tab-separated file");
 		}
 	}
 
@@ -58,8 +57,7 @@ public class XMLFlattener {
 		Node ret = null;
 		if (n > 0) {
 			Node mainNode = mainNodeList.item(0);
-			for (int k = 0; mainNode.getNodeType() != Node.ELEMENT_NODE
-					&& k < n; k++) {
+			for (int k = 0; mainNode.getNodeType() != Node.ELEMENT_NODE && k < n; k++) {
 				mainNode = mainNodeList.item(k);
 			}
 			if (mainNode.getNodeType() == Node.ELEMENT_NODE) {
@@ -69,8 +67,7 @@ public class XMLFlattener {
 		return ret;
 	}
 
-	private String getNodeName(String prefix, Node node,
-			Map<String, String> nodeInfo) {
+	private String getNodeName(String prefix, Node node, Map<String, String> nodeInfo) {
 		String ret = node.getNodeName();
 		if (ret.equals(textStr)) {
 			ret = node.getParentNode().getNodeName();
@@ -100,8 +97,7 @@ public class XMLFlattener {
 		return ret;
 	}
 
-	private void processDocument(Set<String> keySet, Document doc, Writer writer)
-			throws IOException {
+	private void processDocument(Set<String> keySet, Document doc, Writer writer) throws IOException {
 		Node mainNode = getMainNode(doc);
 		if (mainNode != null) {
 			NodeList nodeList = mainNode.getChildNodes();
@@ -113,8 +109,7 @@ public class XMLFlattener {
 		}
 	}
 
-	private void processNode(String prefix, Node node,
-			Map<String, String> nodeInfo) {
+	private void processNode(String prefix, Node node, Map<String, String> nodeInfo) {
 
 		String name = getNodeName(prefix, node, nodeInfo);
 		String value = node.getNodeValue();
@@ -140,16 +135,14 @@ public class XMLFlattener {
 		}
 	}
 
-	private void renderHeader(Set<String> keySet, Writer writer)
-			throws IOException {
+	private void renderHeader(Set<String> keySet, Writer writer) throws IOException {
 		for (String key : keySet) {
 			writer.write(key.replace(tabSepStr, spaceSepStr) + tabSepStr);
 		}
 		writer.write(newLineSepStr);
 	}
 
-	private void renderRecord(Set<String> keySet, Map<String, String> nodeInfo,
-			Writer writer) throws IOException {
+	private void renderRecord(Set<String> keySet, Map<String, String> nodeInfo, Writer writer) throws IOException {
 		StringBuffer sbuf = new StringBuffer();
 		for (String key : keySet) {
 			String value = nodeInfo.get(key);
@@ -167,10 +160,8 @@ public class XMLFlattener {
 		}
 	}
 
-	public void run(File input, File output)
-			throws ParserConfigurationException, SAXException, IOException {
-		DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory
-				.newInstance();
+	public void run(File input, File output) throws ParserConfigurationException, SAXException, IOException {
+		DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
 		Document document = docBuilder.parse(input);
 		document.getDocumentElement().normalize();

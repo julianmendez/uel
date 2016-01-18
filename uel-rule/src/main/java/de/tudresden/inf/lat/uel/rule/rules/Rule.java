@@ -44,8 +44,7 @@ public abstract class Rule {
 	 * @return a rule application describing the arguments needed to apply this
 	 *         rule or 'null' if there are no more ways to apply this rule
 	 */
-	public abstract Application getNextApplication(FlatSubsumption sub, Assignment assign,
-			Application previous);
+	public abstract Application getNextApplication(FlatSubsumption sub, Assignment assign, Application previous);
 
 	/**
 	 * Applies this rule to the given subsumption using the arguments stored in
@@ -60,8 +59,7 @@ public abstract class Rule {
 	 * @param application
 	 * @return the result of the application
 	 */
-	public abstract Result apply(FlatSubsumption sub, Assignment assign,
-			Application application);
+	public abstract Result apply(FlatSubsumption sub, Assignment assign, Application application);
 
 	/**
 	 * A shortcut that can be used to identify the type of this rule in a string

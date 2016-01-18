@@ -36,8 +36,7 @@ public class MiniSatSolver implements Solver {
 
 	private void runMiniSat(File satinput, File satoutput) throws IOException {
 		try {
-			ProcessBuilder pb = new ProcessBuilder(minisatCommand,
-					satinput.toString(), satoutput.toString());
+			ProcessBuilder pb = new ProcessBuilder(minisatCommand, satinput.toString(), satoutput.toString());
 			Process p = pb.start();
 			p.waitFor();
 			p.destroy();
@@ -62,15 +61,13 @@ public class MiniSatSolver implements Solver {
 
 		runMiniSat(satinput, satoutput);
 
-		BufferedReader satoutputReader = new BufferedReader(new FileReader(
-				satoutput));
+		BufferedReader satoutputReader = new BufferedReader(new FileReader(satoutput));
 		String line = satoutputReader.readLine();
 		boolean satisfiable = false;
 		Set<Integer> clause = new HashSet<Integer>();
 		if (line.trim().equals(Solver.SAT)) {
 			satisfiable = true;
-			StringTokenizer stok = new StringTokenizer(
-					satoutputReader.readLine());
+			StringTokenizer stok = new StringTokenizer(satoutputReader.readLine());
 			while (stok.hasMoreTokens()) {
 				clause.add(Integer.parseInt(stok.nextToken()));
 			}

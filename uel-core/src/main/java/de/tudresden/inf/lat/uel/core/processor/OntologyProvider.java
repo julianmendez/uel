@@ -16,7 +16,7 @@ import org.semanticweb.owlapi.model.OWLOntology;
 public interface OntologyProvider {
 
 	OWLOntology createOntology();
-	
+
 	void loadOntology(File file);
 
 	Set<OWLOntology> getOntologies();

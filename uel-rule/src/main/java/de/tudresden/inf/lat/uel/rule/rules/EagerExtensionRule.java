@@ -42,11 +42,9 @@ public final class EagerExtensionRule extends EagerRule {
 	}
 
 	@Override
-	public Result apply(FlatSubsumption sub, Assignment assign,
-			Rule.Application application) {
+	public Result apply(FlatSubsumption sub, Assignment assign, Rule.Application application) {
 		if (!(application instanceof Application)) {
-			throw new IllegalArgumentException(
-					"Expected rule application of type EagerExtensionRule.Application.");
+			throw new IllegalArgumentException("Expected rule application of type EagerExtensionRule.Application.");
 		}
 		Application appl = (Application) application;
 		if (assign.makesCyclic(appl.var, sub.getHead())) {

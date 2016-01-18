@@ -10,11 +10,11 @@ package de.tudresden.inf.lat.uel.sat.literals;
 public class ChoiceLiteral implements Literal {
 
 	private final int index;
-	
+
 	public ChoiceLiteral(int index) {
 		this.index = index;
 	}
-	
+
 	@Override
 	public Integer getFirst() {
 		return null;
@@ -29,12 +29,12 @@ public class ChoiceLiteral implements Literal {
 	public boolean isSubsumption() {
 		return false;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return index;
 	}
-	
+
 	@Override
 	public boolean equals(Object o) {
 		boolean ret = (this == o);

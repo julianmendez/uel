@@ -22,8 +22,7 @@ public final class EagerGroundSolvingRule extends EagerRule {
 
 	@Override
 	public Result apply(FlatSubsumption sub, Assignment assign, Application application) {
-		return new Result(sub, application, sub.getBody().contains(
-				sub.getHead()));
+		return new Result(sub, application, sub.getBody().contains(sub.getHead()));
 	}
 
 	@Override

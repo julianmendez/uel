@@ -14,7 +14,7 @@ public class Unifier {
 	public Set<Definition> getDefinitions() {
 		return definitions;
 	}
-	
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) {
@@ -25,7 +25,7 @@ public class Unifier {
 		}
 		return definitions.equals(((Unifier) o).definitions);
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return definitions.hashCode();

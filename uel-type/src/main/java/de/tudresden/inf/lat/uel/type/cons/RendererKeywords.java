@@ -43,7 +43,7 @@ public interface RendererKeywords {
 	 * the string 'top'
 	 */
 	String krssTop = "top";
-	
+
 	/**
 	 * the string 'owl:Thing'
 	 */

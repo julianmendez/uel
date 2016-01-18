@@ -30,7 +30,7 @@ public class KRSSRenderer extends StringRenderer {
 		sb.append(RendererKeywords.krssTop);
 		return "";
 	}
-	
+
 	@Override
 	protected String translateTrueConjunction(Set<Integer> atomIds) {
 		sb.append(RendererKeywords.open);

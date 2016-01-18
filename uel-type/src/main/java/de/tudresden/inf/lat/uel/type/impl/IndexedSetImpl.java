@@ -46,15 +46,13 @@ public class IndexedSetImpl<T> implements IndexedSet<T> {
 		if (this.map.containsKey(element)) {
 			Integer oldIndex = this.map.get(element);
 			if (!oldIndex.equals(index)) {
-				throw new IllegalArgumentException("Element '" + element
-						+ "' has already index " + oldIndex + " but new index "
-						+ index + " was given.");
+				throw new IllegalArgumentException("Element '" + element + "' has already index " + oldIndex
+						+ " but new index " + index + " was given.");
 			}
 		} else if (this.invMap.containsKey(index)) {
 			T oldElement = this.invMap.get(index);
 			if (!oldElement.equals(element)) {
-				throw new IllegalArgumentException("Index " + index
-						+ " has been used for element '" + oldElement
+				throw new IllegalArgumentException("Index " + index + " has been used for element '" + oldElement
 						+ "' but new element '" + element + "' was given.");
 			}
 		} else {

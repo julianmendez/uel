@@ -538,7 +538,7 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 		runStep1(new Subsumption(d.getLeft(), d.getRight()), input);
 		if (!d.isPrimitive()) {
 			runStep1(new Subsumption(d.getRight(), d.getLeft()), input);
-		}	
+		}
 	}
 
 	private void runStep1(Equation e, SatInput input) {

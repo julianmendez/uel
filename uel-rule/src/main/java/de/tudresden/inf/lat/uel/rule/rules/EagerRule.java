@@ -13,8 +13,8 @@ import de.tudresden.inf.lat.uel.rule.FlatSubsumption;
 public abstract class EagerRule extends Rule {
 
 	@Override
-	public final Rule.Application getNextApplication(FlatSubsumption sub,
-			Assignment assign, Rule.Application previous) {
+	public final Rule.Application getNextApplication(FlatSubsumption sub, Assignment assign,
+			Rule.Application previous) {
 		return null;
 	}
 

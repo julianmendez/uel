@@ -24,15 +24,12 @@ public final class ExtensionRule extends Rule {
 	}
 
 	@Override
-	public Application getNextApplication(FlatSubsumption sub, Assignment assign,
-			Rule.Application previous) {
+	public Application getNextApplication(FlatSubsumption sub, Assignment assign, Rule.Application previous) {
 		if (!(previous instanceof Application)) {
-			throw new IllegalArgumentException(
-					"Expected rule application of type ExtensionRule.Application.");
+			throw new IllegalArgumentException("Expected rule application of type ExtensionRule.Application.");
 		}
 		Application appl = (Application) previous;
-		for (int i = sub.getBody().indexOf(appl.at) + 1; i < sub.getBody()
-				.size(); i++) {
+		for (int i = sub.getBody().indexOf(appl.at) + 1; i < sub.getBody().size(); i++) {
 			if (sub.getBody().get(i).isVariable()) {
 				appl.at = sub.getBody().get(i);
 				return appl;
@@ -42,11 +39,9 @@ public final class ExtensionRule extends Rule {
 	}
 
 	@Override
-	public Result apply(FlatSubsumption sub, Assignment assign,
-			Rule.Application application) {
+	public Result apply(FlatSubsumption sub, Assignment assign, Rule.Application application) {
 		if (!(application instanceof Application)) {
-			throw new IllegalArgumentException(
-					"Expected rule application of type ExtensionRule.Application.");
+			throw new IllegalArgumentException("Expected rule application of type ExtensionRule.Application.");
 		}
 		Application appl = (Application) application;
 		if (assign.makesCyclic(appl.at, sub.getHead())) {

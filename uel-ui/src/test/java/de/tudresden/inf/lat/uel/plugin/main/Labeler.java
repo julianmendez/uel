@@ -38,19 +38,16 @@ public class Labeler {
 
 	public static void main(String[] args) throws IOException {
 		if (args.length == 3) {
-			(new Labeler()).run(new File(args[0]), new File(args[1]), new File(
-					args[2]));
+			(new Labeler()).run(new File(args[0]), new File(args[1]), new File(args[2]));
 		} else {
-			System.out
-					.println("Parameters: <input owl file>  <name map file> <output owl file>");
+			System.out.println("Parameters: <input owl file>  <name map file> <output owl file>");
 		}
 	}
 
 	public Labeler() {
 	}
 
-	private String processTag(String line, Map<String, String> map,
-			String header, String footer) {
+	private String processTag(String line, Map<String, String> map, String header, String footer) {
 		String ret = line;
 		int leftMarker = line.indexOf(header);
 		if (leftMarker != -1) {
@@ -67,8 +64,8 @@ public class Labeler {
 				String value = map.get(key);
 				if (value != null) {
 					int endMarker = rightMarker + quotes.length();
-					ret = line.substring(0, endMarker) + rdfsLabelLeft + value
-							+ rdfsLabelRight + line.substring(endMarker);
+					ret = line.substring(0, endMarker) + rdfsLabelLeft + value + rdfsLabelRight
+							+ line.substring(endMarker);
 				}
 			}
 		}
@@ -96,8 +93,7 @@ public class Labeler {
 		return ret;
 	}
 
-	public void run(File inputFile, File mapFile, File outputFile)
-			throws IOException {
+	public void run(File inputFile, File mapFile, File outputFile) throws IOException {
 		Map<String, String> nameMap = readMap(mapFile);
 		BufferedWriter writer = new BufferedWriter(new FileWriter(outputFile));
 		BufferedReader reader = new BufferedReader(new FileReader(inputFile));
@@ -106,8 +102,7 @@ public class Labeler {
 			line = reader.readLine();
 			if (line != null) {
 				line = processTag(line, nameMap, classRdfAbout, classEnd);
-				line = processTag(line, nameMap, objectPropertyRdfAbout,
-						objectPropertyEnd);
+				line = processTag(line, nameMap, objectPropertyRdfAbout, objectPropertyEnd);
 				writer.write(line + "\n");
 			}
 		}

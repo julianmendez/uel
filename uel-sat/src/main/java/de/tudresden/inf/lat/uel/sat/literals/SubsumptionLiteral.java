@@ -37,8 +37,7 @@ public class SubsumptionLiteral implements Literal {
 		boolean ret = (this == o);
 		if (!ret && o instanceof SubsumptionLiteral) {
 			SubsumptionLiteral other = (SubsumptionLiteral) o;
-			ret = this.first.equals(other.first)
-					&& this.second.equals(other.second);
+			ret = this.first.equals(other.first) && this.second.equals(other.second);
 		}
 		return ret;
 	}

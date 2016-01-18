@@ -37,8 +37,7 @@ public class OrderLiteral implements Literal {
 		boolean ret = (this == o);
 		if (!ret && o instanceof OrderLiteral) {
 			OrderLiteral other = (OrderLiteral) o;
-			ret = this.first.equals(other.first)
-					&& this.second.equals(other.second);
+			ret = this.first.equals(other.first) && this.second.equals(other.second);
 		}
 		return ret;
 	}

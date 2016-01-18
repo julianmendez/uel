@@ -81,8 +81,7 @@ public class Sat4jMaxSatSolver implements Solver {
 		solver = new WeightedMaxSatDecorator(SolverFactory.newDefault());
 		nbVars = input.getLastId();
 		solver.newVar(nbVars);
-		solver.addLiteralsToMinimize(new VecInt(SatInput.toArray(input
-				.getMinimizeLiterals())));
+		solver.addLiteralsToMinimize(new VecInt(SatInput.toArray(input.getMinimizeLiterals())));
 		for (Set<Integer> clause : input.getClauses()) {
 			try {
 				solver.addHardClause(new VecInt(SatInput.toArray(clause)));

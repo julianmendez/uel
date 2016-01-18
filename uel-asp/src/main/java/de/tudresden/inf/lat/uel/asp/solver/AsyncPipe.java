@@ -30,8 +30,7 @@ public class AsyncPipe extends Thread {
 		String line;
 
 		try {
-			while (!Thread.currentThread().isInterrupted()
-					&& ((line = reader.readLine()) != null)) {
+			while (!Thread.currentThread().isInterrupted() && ((line = reader.readLine()) != null)) {
 				// System.out.println(line);
 				writer.write(line);
 				writer.newLine();

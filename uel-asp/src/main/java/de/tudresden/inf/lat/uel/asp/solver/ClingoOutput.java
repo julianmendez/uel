@@ -88,13 +88,10 @@ public class ClingoOutput implements AspOutput {
 		addEntry(stats, "CPU time (s)", time.get("CPU").asText());
 	}
 
-	private void extendAssignment(Map<Integer, Set<Integer>> assignment,
-			String subsumption) throws IOException {
+	private void extendAssignment(Map<Integer, Set<Integer>> assignment, String subsumption) throws IOException {
 		int parenthesisIndex = subsumption.indexOf(')');
-		Integer varId = Integer.parseInt(subsumption.substring(13,
-				parenthesisIndex));
-		Atom nonVarAtom = parseAtom(subsumption.substring(parenthesisIndex + 2,
-				subsumption.length() - 1));
+		Integer varId = Integer.parseInt(subsumption.substring(13, parenthesisIndex));
+		Atom nonVarAtom = parseAtom(subsumption.substring(parenthesisIndex + 2, subsumption.length() - 1));
 		Integer atomId = atomManager.getIndex(nonVarAtom);
 
 		Set<Integer> subsumers = assignment.get(varId);
@@ -109,28 +106,23 @@ public class ClingoOutput implements AspOutput {
 		switch (encoding.charAt(0)) {
 		case 'e':
 			int commaIndex = encoding.indexOf(',');
-			Integer roleId = Integer
-					.parseInt(encoding.substring(8, commaIndex));
-			ConceptName conceptName = (ConceptName) parseAtom(encoding
-					.substring(commaIndex + 1, encoding.length() - 1));
+			Integer roleId = Integer.parseInt(encoding.substring(8, commaIndex));
+			ConceptName conceptName = (ConceptName) parseAtom(
+					encoding.substring(commaIndex + 1, encoding.length() - 1));
 			return new ExistentialRestriction(roleId, conceptName);
 		case 'c':
-			Integer atomId = Integer.parseInt(encoding.substring(7,
-					encoding.length() - 1));
+			Integer atomId = Integer.parseInt(encoding.substring(7, encoding.length() - 1));
 			return atomManager.getAtom(atomId);
 		case 'v':
-			atomId = Integer.parseInt(encoding.substring(5,
-					encoding.length() - 1));
+			atomId = Integer.parseInt(encoding.substring(5, encoding.length() - 1));
 			return atomManager.getAtom(atomId);
 		default:
 			throw new IOException("Invalid atom encoding.");
 		}
 	}
 
-	private boolean addEntry(List<Map.Entry<String, String>> list, String key,
-			String value) {
-		return list
-				.add(new AbstractMap.SimpleEntry<String, String>(key, value));
+	private boolean addEntry(List<Map.Entry<String, String>> list, String key, String value) {
+		return list.add(new AbstractMap.SimpleEntry<String, String>(key, value));
 	}
 
 	public List<Entry<String, String>> getStats() {

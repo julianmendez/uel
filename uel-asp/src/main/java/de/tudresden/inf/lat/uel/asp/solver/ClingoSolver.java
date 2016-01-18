@@ -108,12 +108,10 @@ public class ClingoSolver implements AspSolver {
 
 			// successful if there was no exception (lsb=0) and either a model
 			// was found (10) or the search space was exhausted (20)
-			if (((clingoReturnCode & 1) == 1)
-					|| (((clingoReturnCode & 10) == 0) && ((clingoReturnCode & 20) == 0))) {
+			if (((clingoReturnCode & 1) == 1) || (((clingoReturnCode & 10) == 0) && ((clingoReturnCode & 20) == 0))) {
 				ByteArrayOutputStream error = new ByteArrayOutputStream();
 				syncPipe(pClingo.getErrorStream(), error);
-				throw new IOException("clingo error (return code "
-						+ clingoReturnCode + "):\n" + error.toString());
+				throw new IOException("clingo error (return code " + clingoReturnCode + "):\n" + error.toString());
 			}
 			pClingo.destroy();
 
@@ -131,8 +129,7 @@ public class ClingoSolver implements AspSolver {
 		}
 	}
 
-	private void syncPipe(InputStream input, OutputStream output)
-			throws InterruptedException, IOException {
+	private void syncPipe(InputStream input, OutputStream output) throws InterruptedException, IOException {
 		AsyncPipe pipe = new AsyncPipe(input, output);
 		pipe.start();
 		pipe.join();
@@ -150,10 +147,9 @@ public class ClingoSolver implements AspSolver {
 		}
 	}
 
-	private void appendResource(String resourceName, StringBuilder output)
-			throws IOException {
-		BufferedReader reader = new BufferedReader(new InputStreamReader(
-				AspUnificationAlgorithm.class.getResourceAsStream(resourceName)));
+	private void appendResource(String resourceName, StringBuilder output) throws IOException {
+		BufferedReader reader = new BufferedReader(
+				new InputStreamReader(AspUnificationAlgorithm.class.getResourceAsStream(resourceName)));
 		String line = null;
 		while ((line = reader.readLine()) != null) {
 			output.append(line);

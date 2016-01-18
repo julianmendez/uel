@@ -51,10 +51,10 @@ public interface AtomManager {
 	void makeFlatteningVariable(Integer atomId);
 
 	void makeUserVariable(Integer atomId);
-	
+
 	String printConceptName(Integer atomId);
 
 	String printRoleName(Integer atomId);
-	
+
 	int size();
 }

@@ -3,4 +3,3 @@
  * algorithm.
  */
 package de.tudresden.inf.lat.uel.sat.solver;
-

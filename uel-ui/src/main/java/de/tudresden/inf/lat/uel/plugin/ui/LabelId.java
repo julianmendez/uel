@@ -51,8 +51,7 @@ class LabelId implements Comparable<LabelId> {
 		boolean ret = (this == o);
 		if (!ret && o instanceof LabelId) {
 			LabelId other = (LabelId) o;
-			ret = getLabel().equals(other.getLabel())
-					&& getId().equals(other.getId());
+			ret = getLabel().equals(other.getLabel()) && getId().equals(other.getId());
 		}
 
 		return ret;

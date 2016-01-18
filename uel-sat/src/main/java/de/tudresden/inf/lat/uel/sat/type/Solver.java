@@ -76,6 +76,5 @@ public interface Solver {
 	 * @throws InterruptedException
 	 *             if the process is interrupted
 	 */
-	SatOutput update(Set<Integer> clause) throws IOException,
-			InterruptedException;
+	SatOutput update(Set<Integer> clause) throws IOException, InterruptedException;
 }

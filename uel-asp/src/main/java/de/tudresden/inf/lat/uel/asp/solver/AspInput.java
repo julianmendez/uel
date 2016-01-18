@@ -155,7 +155,7 @@ public class AspInput {
 		encoding.append(").");
 		encoding.append(RendererKeywords.newLine);
 	}
-	
+
 	private void encodeNegativeAtom(StringBuilder encoding, Integer atomId, int side, int disequationId) {
 		encoding.append("diseqhasatom(");
 		encodeAtom(encoding, goal.getAtomManager().getAtom(atomId));

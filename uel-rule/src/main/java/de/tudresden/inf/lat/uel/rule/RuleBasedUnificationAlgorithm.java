@@ -231,7 +231,8 @@ public class RuleBasedUnificationAlgorithm implements UnificationAlgorithm {
 		return null;
 	}
 
-	private Result applyEagerRules(Collection<FlatSubsumption> subs, List<EagerRule> rules, Assignment currentAssignment) {
+	private Result applyEagerRules(Collection<FlatSubsumption> subs, List<EagerRule> rules,
+			Assignment currentAssignment) {
 		Result res = new Result(null, null);
 		for (FlatSubsumption sub : subs) {
 			if (!sub.isSolved()) {
