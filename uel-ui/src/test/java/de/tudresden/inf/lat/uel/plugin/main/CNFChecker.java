@@ -170,6 +170,8 @@ public class CNFChecker {
 	 *            name of the unification algorithm (either 'SAT' or 'Rule')
 	 * @throws IOException
 	 *             if the input is invalid
+	 * @throws InterruptedException
+	 *             if the execution is interrupted
 	 */
 	public static void main(String[] args) throws IOException, InterruptedException {
 		if (args.length == 1) {
@@ -195,6 +197,8 @@ public class CNFChecker {
 	 * 
 	 * @param algorithmName
 	 *            the string identifier of the algorithm
+	 * @throws InterruptedException
+	 *             if the execution is interrupted
 	 */
 	public void runAlgorithm(String algorithmName) throws InterruptedException {
 		UnificationAlgorithm algorithm = UnificationAlgorithmFactory.instantiateAlgorithm(algorithmName, goal);

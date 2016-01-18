@@ -28,6 +28,7 @@ public class Assignment {
 	 * Create a copy of another assignment.
 	 * 
 	 * @param other
+	 *            the other assignment
 	 */
 	Assignment(Assignment other) {
 		addAll(other);

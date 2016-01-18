@@ -57,6 +57,7 @@ public abstract class Rule {
 	 * @param assign
 	 *            the current assignment
 	 * @param application
+	 *            application
 	 * @return the result of the application
 	 */
 	public abstract Result apply(FlatSubsumption sub, Assignment assign, Application application);
