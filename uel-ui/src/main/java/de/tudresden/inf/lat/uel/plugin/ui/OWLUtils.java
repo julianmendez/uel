@@ -21,14 +21,24 @@ import org.semanticweb.owlapi.rdf.rdfxml.renderer.RDFXMLRenderer;
  * Utility methods for saving ontologies.
  * 
  * @author Julian Mendez
+ * @author Stefan Borgwardt
  */
 class OWLUtils {
 
-	public static final String EXTENSION_KRSS = ".krss";
-	public static final String EXTENSION_OWL = ".owl";
-	public static final String EXTENSION_RDF = ".rdf";
+	private static final String EXTENSION_KRSS = ".krss";
+	private static final String EXTENSION_OWL = ".owl";
+	private static final String EXTENSION_RDF = ".rdf";
 
-	public static String renderKRSS(OWLOntology owlOntology) throws OWLRendererException {
+	/**
+	 * Render the given ontology as a string in KRSS2 format.
+	 * 
+	 * @param owlOntology
+	 *            the input ontology
+	 * @return the KRRS2 representation of the input ontology
+	 * @throws OWLRendererException
+	 *             if an error occurred during rendering
+	 */
+	private static String renderKRSS(OWLOntology owlOntology) throws OWLRendererException {
 		StringWriter writer = new StringWriter();
 		KRSS2OWLSyntaxRenderer renderer = new KRSS2OWLSyntaxRenderer();
 		renderer.render(owlOntology, writer);
@@ -36,7 +46,16 @@ class OWLUtils {
 		return writer.toString();
 	}
 
-	public static String renderOWL(OWLOntology owlOntology) throws OWLRendererException {
+	/**
+	 * Render the given ontology as a string in OWL XML format.
+	 * 
+	 * @param owlOntology
+	 *            the input ontology
+	 * @return the OWL XML representation of the input ontology
+	 * @throws OWLRendererException
+	 *             if an error occurred during rendering
+	 */
+	private static String renderOWL(OWLOntology owlOntology) throws OWLRendererException {
 		StringWriter writer = new StringWriter();
 		OWLXMLRenderer renderer = new OWLXMLRenderer();
 		renderer.render(owlOntology, writer);
@@ -44,7 +63,16 @@ class OWLUtils {
 		return writer.toString();
 	}
 
-	public static String renderRDF(OWLOntology owlOntology) throws IOException {
+	/**
+	 * Render the given ontology as a string in RDF XML format.
+	 * 
+	 * @param owlOntology
+	 *            the input ontology
+	 * @return the RDF XML representation of the input ontology
+	 * @throws IOException
+	 *             if an error occurred during rendering
+	 */
+	private static String renderRDF(OWLOntology owlOntology) throws IOException {
 		StringWriter writer = new StringWriter();
 		RDFXMLRenderer renderer = new RDFXMLRenderer(owlOntology, writer);
 		renderer.render();
@@ -52,6 +80,14 @@ class OWLUtils {
 		return writer.toString();
 	}
 
+	/**
+	 * Saves a set of axioms to an OWL ontology file.
+	 * 
+	 * @param axioms
+	 *            a set of OWLAxioms
+	 * @param file
+	 *            the output destination
+	 */
 	public static void saveToOntologyFile(Set<OWLAxiom> axioms, File file) {
 		try {
 			OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
@@ -63,6 +99,14 @@ class OWLUtils {
 		}
 	}
 
+	/**
+	 * Saves an OWL ontology to a file.
+	 * 
+	 * @param owlOntology
+	 *            an ontology
+	 * @param file
+	 *            the output destination
+	 */
 	public static void saveToOntologyFile(OWLOntology owlOntology, File file) {
 		if (file != null) {
 			try {

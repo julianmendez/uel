@@ -23,32 +23,59 @@ import de.tudresden.inf.lat.uel.type.api.Definition;
 import de.tudresden.inf.lat.uel.type.api.Dissubsumption;
 
 /**
+ * An instance of this class controls the behavior of the 'Refine unifier' view.
+ * 
  * @author Stefan Borgwardt
- *
  */
 class RefineController {
 
 	private final UelModel model;
 	private final RefineView view;
 
+	/**
+	 * Constructs a new Refine controller using the given model.
+	 * 
+	 * @param model
+	 *            the UEL model
+	 */
 	public RefineController(UelModel model) {
 		this.view = new RefineView();
 		this.model = model;
 	}
 
+	/**
+	 * Adds a listener to the button for recomputing the unifiers.
+	 * 
+	 * @param listener
+	 *            the listener
+	 */
 	public void addRecomputeListener(ActionListener listener) {
 		view.addRecomputeListener(listener);
 	}
 
+	/**
+	 * Adds a listener to the button for saving the current and new
+	 * dissubsumptions and recomputing the unifiers.
+	 * 
+	 * @param listener
+	 *            the listener
+	 */
 	public void addSaveListener(ActionListener listener) {
 		view.addSaveListener(listener);
 	}
 
+	/**
+	 * Closes the Refine view.
+	 */
 	public void close() {
 		view.setVisible(false);
 		view.dispose();
 	}
 
+	/**
+	 * Returns the currently selected dissubsumptions, rendered as OWLSubClassOfAxioms.
+	 * @return the OWL representation of the new dissubsumptions
+	 */
 	public Set<OWLAxiom> getDissubsumptions() {
 		// construct (primitive) definitions representing dissubsumptions from
 		// selected atoms
@@ -63,12 +90,19 @@ class RefineController {
 		return model.getOWLRenderer(model.getCurrentUnifier().getDefinitions()).renderAxioms(dissubsumptions);
 	}
 
+	/**
+	 * Opens the Refine view.
+	 */
 	public void open() {
 		updateView();
 		view.pack();
 		view.setVisible(true);
 	}
 
+	/**
+	 * Shows a dialog window for saving a file.
+	 * @return the selected file, possibly null
+	 */
 	public File showSaveFileDialog() {
 		return UelUI.showSaveFileDialog(view);
 	}

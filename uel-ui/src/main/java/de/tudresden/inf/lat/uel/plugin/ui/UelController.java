@@ -17,6 +17,7 @@ import de.tudresden.inf.lat.uel.core.processor.UelModel;
  * This class is a controller for the main panel of the UEL system.
  * 
  * @author Julian Mendez
+ * @author Stefan Borgwardt
  */
 public class UelController {
 
@@ -26,6 +27,12 @@ public class UelController {
 	private VarSelectionController varSelectionController = null;
 	private final UelView view;
 
+	/**
+	 * Constructs a new UEL controller using the specified model.
+	 * 
+	 * @param model
+	 *            the UEL model
+	 */
 	public UelController(UelModel model) {
 		this.view = new UelView();
 		this.model = model;
@@ -91,13 +98,18 @@ public class UelController {
 	}
 
 	private void executeSelectVariables() {
-		setupModel();
+		setupGoal();
 
 		varSelectionController = new VarSelectionController(model);
 		varSelectionController.addAcceptVarListener(e -> executeAcceptVar());
 		varSelectionController.open();
 	}
 
+	/**
+	 * Returns the UEL view controlled by this instance.
+	 * 
+	 * @return the view component
+	 */
 	public Component getView() {
 		return view;
 	}
@@ -119,7 +131,7 @@ public class UelController {
 		// store previously selected variables
 		Set<String> userVariables = model.getUserVariableNames();
 
-		setupModel();
+		setupGoal();
 
 		// restore user variables
 		model.makeNamesUserVariables(userVariables);
@@ -127,11 +139,19 @@ public class UelController {
 		setupComputation();
 	}
 
+	/**
+	 * Updates internal indices with the list of currently loaded ontologies and
+	 * refreshes the view accordingly.
+	 */
 	public void reload() {
 		model.recomputeShortFormMap();
 		updateView();
 	}
 
+	/**
+	 * Uses the UEL model to initialize the selected unification algorithm and
+	 * opens the 'Unifier' view.
+	 */
 	public void setupComputation() {
 		model.initializeUnificationAlgorithm(view.getSelectedAlgorithm());
 
@@ -140,13 +160,20 @@ public class UelController {
 		unifierController.open();
 	}
 
-	public void setupModel() {
+	/**
+	 * Uses the UEL model to initialize the goal for the unification algorithm
+	 * with the currently selected ontologies.
+	 */
+	public void setupGoal() {
 		Set<OWLOntology> bgOntologies = new HashSet<OWLOntology>();
 		bgOntologies.add(view.getSelectedOntologyBg00());
 		bgOntologies.add(view.getSelectedOntologyBg01());
 		model.setupGoal(bgOntologies, view.getSelectedOntologyPos(), view.getSelectedOntologyNeg(), null);
 	}
 
+	/**
+	 * Updates the UEL view with the current set of loaded ontologies.
+	 */
 	public void updateView() {
 		view.reloadOntologies(model.getOntologyList());
 	}

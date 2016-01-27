@@ -2,7 +2,6 @@ package de.tudresden.inf.lat.uel.plugin.ui;
 
 import java.awt.Container;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.DefaultComboBoxModel;
@@ -11,7 +10,6 @@ import javax.swing.JComboBox;
 import javax.swing.JPanel;
 
 import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLOntologyID;
 
 import de.tudresden.inf.lat.uel.core.processor.UnificationAlgorithmFactory;
 
@@ -25,27 +23,21 @@ class UelView extends JPanel {
 
 	private static final long serialVersionUID = 9096602357606632334L;
 
-	@SuppressWarnings("unchecked")
 	private static <T> void resetModelAndRestoreSelection(JComboBox<T> comboBox, T[] data) {
-		T selection = (T) comboBox.getSelectedItem();
+		Object selection = comboBox.getSelectedItem();
 		comboBox.setModel(new DefaultComboBoxModel<T>(data));
 		if (selection != null) {
 			comboBox.setSelectedItem(selection);
 		}
 	}
 
-	// TODO change this back to JComboBox<OWLOntology>, then ComboBoxRenderer
-	// takes care of the rest
-
 	private final JButton buttonOpen = new JButton();
 	private final JButton buttonSelectVariables = new JButton();
 	private final JComboBox<String> listAlgorithm = new JComboBox<String>();
-	private final List<OWLOntology> listOfOntologies = new ArrayList<OWLOntology>();
-	private final JComboBox<String> listOntologyBg00 = new JComboBox<String>();
-	private final JComboBox<String> listOntologyBg01 = new JComboBox<String>();
-	private final JComboBox<String> listOntologyNeg = new JComboBox<String>();
-
-	private final JComboBox<String> listOntologyPos = new JComboBox<String>();
+	private final JComboBox<OWLOntology> listOntologyBg00 = new JComboBox<OWLOntology>();
+	private final JComboBox<OWLOntology> listOntologyBg01 = new JComboBox<OWLOntology>();
+	private final JComboBox<OWLOntology> listOntologyNeg = new JComboBox<OWLOntology>();
+	private final JComboBox<OWLOntology> listOntologyPos = new JComboBox<OWLOntology>();
 
 	/**
 	 * Construct the main view of UEL.
@@ -124,23 +116,6 @@ class UelView extends JPanel {
 		UelUI.setupButton(topPanel, buttonSelectVariables, UelUI.ICON_FORWARD, Message.tooltipSelectVariables);
 	}
 
-	String getName(OWLOntology ontology) {
-		OWLOntologyID id = ontology.getOntologyID();
-		if (id.getOntologyIRI().isPresent()) {
-			return id.getOntologyIRI().get().toString();
-		} else {
-			return id.toString();
-		}
-	}
-
-	String[] getNames(List<OWLOntology> list) {
-		String[] ret = new String[list.size()];
-		for (int i = 0; i < list.size(); i++) {
-			ret[i] = getName(list.get(i));
-		}
-		return ret;
-	}
-
 	/**
 	 * Return the currently selected unification algorithm.
 	 * 
@@ -156,7 +131,7 @@ class UelView extends JPanel {
 	 * @return the selected OWLOntology object
 	 */
 	public OWLOntology getSelectedOntologyBg00() {
-		return listOfOntologies.get(listOntologyBg00.getSelectedIndex());
+		return (OWLOntology) listOntologyBg00.getSelectedItem();
 	}
 
 	/**
@@ -165,7 +140,7 @@ class UelView extends JPanel {
 	 * @return the selected OWLOntology object
 	 */
 	public OWLOntology getSelectedOntologyBg01() {
-		return listOfOntologies.get(listOntologyBg01.getSelectedIndex());
+		return (OWLOntology) listOntologyBg01.getSelectedItem();
 	}
 
 	/**
@@ -175,7 +150,7 @@ class UelView extends JPanel {
 	 * @return the selected OWLOntology object
 	 */
 	public OWLOntology getSelectedOntologyNeg() {
-		return listOfOntologies.get(listOntologyNeg.getSelectedIndex());
+		return (OWLOntology) listOntologyNeg.getSelectedItem();
 	}
 
 	/**
@@ -185,45 +160,100 @@ class UelView extends JPanel {
 	 * @return the selected OWLOntology object
 	 */
 	public OWLOntology getSelectedOntologyPos() {
-		return listOfOntologies.get(listOntologyPos.getSelectedIndex());
+		return (OWLOntology) listOntologyPos.getSelectedItem();
 	}
 
+	/**
+	 * Refresh the list of ontologies shown for selection. This method restores
+	 * the previously selected ontologies in the combo boxes, if they are still
+	 * present in the new list.
+	 * 
+	 * @param list
+	 *            the new list of ontologies
+	 */
 	public void reloadOntologies(List<OWLOntology> list) {
-		this.listOfOntologies.clear();
-		this.listOfOntologies.addAll(list);
-		String[] ontologyNames = getNames(this.listOfOntologies);
-		resetModelAndRestoreSelection(listOntologyBg00, ontologyNames);
-		resetModelAndRestoreSelection(listOntologyBg01, ontologyNames);
-		resetModelAndRestoreSelection(listOntologyPos, ontologyNames);
-		resetModelAndRestoreSelection(listOntologyNeg, ontologyNames);
+		OWLOntology[] ontologies = list.toArray(new OWLOntology[list.size()]);
+		resetModelAndRestoreSelection(listOntologyBg00, ontologies);
+		resetModelAndRestoreSelection(listOntologyBg01, ontologies);
+		resetModelAndRestoreSelection(listOntologyPos, ontologies);
+		resetModelAndRestoreSelection(listOntologyNeg, ontologies);
 	}
 
+	/**
+	 * Sets the 'enabled' state of the button that allows to open a new
+	 * ontology.
+	 * 
+	 * @param b
+	 *            the new state
+	 */
 	public void setButtonLoadEnabled(boolean b) {
 		this.buttonOpen.setEnabled(b);
 	}
 
+	/**
+	 * Sets the 'enabled' state of the button that allows to start the variable
+	 * selection process.
+	 * 
+	 * @param b
+	 *            the new state
+	 */
 	public void setButtonSelectVariablesEnabled(boolean b) {
 		this.buttonSelectVariables.setEnabled(b);
 	}
 
+	/**
+	 * Sets the 'enabled' state of the combo box for selecting the first
+	 * background ontology.
+	 * 
+	 * @param b
+	 *            the new state
+	 */
 	public void setComboBoxOntologyBg00Enabled(boolean b) {
 		this.listOntologyBg00.setEnabled(b);
 	}
 
+	/**
+	 * Sets the 'enabled' state of the combo box for selecting the second
+	 * background ontology.
+	 * 
+	 * @param b
+	 *            the new state
+	 */
 	public void setComboBoxOntologyBg01Enabled(boolean b) {
 		this.listOntologyBg01.setEnabled(b);
 	}
 
+	/**
+	 * Sets the 'enabled' state of the combo box for selecting the negative goal
+	 * ontology.
+	 * 
+	 * @param b
+	 *            the new state
+	 */
 	public void setComboBoxOntologyNegEnabled(boolean b) {
 		this.listOntologyNeg.setEnabled(b);
 	}
 
+	/**
+	 * Sets the 'enabled' state of the combo box for selecting the positive goal
+	 * ontology.
+	 * 
+	 * @param b
+	 *            the new state
+	 */
 	public void setComboBoxOntologyPosEnabled(boolean b) {
 		this.listOntologyPos.setEnabled(b);
 	}
 
+	/**
+	 * Sets the currently selected negative goal ontology, if this ontology is
+	 * present in the list used in the last call of 'reloadOntologies'.
+	 * 
+	 * @param ontology
+	 *            the ontology that is to be selected
+	 */
 	public void setSelectedOntologyNeg(OWLOntology ontology) {
-		listOntologyNeg.setSelectedIndex(listOfOntologies.indexOf(ontology));
+		listOntologyNeg.setSelectedItem(ontology);
 	}
 
 }

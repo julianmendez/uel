@@ -36,9 +36,13 @@ import de.tudresden.inf.lat.uel.type.impl.Unifier;
  * unification algorithm.
  * 
  * @author Julian Mendez
+ * @author Stefan Borgwardt
  */
 public class UelModel {
 
+	/**
+	 * A special 'empty' ontology used in the selection combo boxes.
+	 */
 	public static final OWLOntology EMPTY_ONTOLOGY = createEmptyOntology();
 
 	private static OWLOntology createEmptyOntology() {
@@ -49,6 +53,13 @@ public class UelModel {
 		}
 	}
 
+	/**
+	 * Removes single or double quotes around the given string.
+	 * 
+	 * @param str
+	 *            the input string, possibly with quotes
+	 * @return the input string, with quotes removed
+	 */
 	public static String removeQuotes(String str) {
 		String ret = str;
 		if ((str.startsWith("\"") && str.endsWith("\"")) || (str.startsWith("'") && str.endsWith("'"))) {
@@ -66,6 +77,13 @@ public class UelModel {
 	private UnificationAlgorithm algorithm;
 	private List<Unifier> unifierList;
 
+	/**
+	 * Constructs a new UEL model.
+	 * 
+	 * @param provider
+	 *            the OntologyProvider that should be used to load ontologies
+	 *            and short forms
+	 */
 	public UelModel(OntologyProvider provider) {
 		this.provider = provider;
 	}
@@ -77,10 +95,27 @@ public class UelModel {
 		}
 	}
 
+	/**
+	 * Indicates whether the unification algorithm has finished its search for
+	 * unifiers.
+	 * 
+	 * @return 'true' iff the unification algorithm does not compute any more
+	 *         unifiers
+	 */
 	public boolean allUnifiersFound() {
 		return allUnifiersFound;
 	}
 
+	/**
+	 * Uses the unification algorithm to obtain the next unifier. This method
+	 * iterates as long as the unification algorithm returns unifiers that are
+	 * already in the unifier list.
+	 * 
+	 * @return 'true' if a new unifier was found
+	 * @throws InterruptedException
+	 *             if the computation in this thread was interrupted from
+	 *             outside
+	 */
 	public boolean computeNextUnifier() throws InterruptedException {
 		if (!allUnifiersFound) {
 			while (algorithm.computeNextUnifier()) {
@@ -95,6 +130,11 @@ public class UelModel {
 		return false;
 	}
 
+	/**
+	 * Creates a new anonymous ontology.
+	 * 
+	 * @return the new ontology
+	 */
 	public OWLOntology createOntology() {
 		return provider.createOntology();
 	}
@@ -112,10 +152,23 @@ public class UelModel {
 		return true;
 	}
 
+	/**
+	 * Translates a given concept name to an atom id. This method adds the
+	 * corresponding atom to the atom manager if it was not present before.
+	 * 
+	 * @param name
+	 *            the concept name
+	 * @return the id of the atom representing 'name'
+	 */
 	public Integer getAtomId(String name) {
 		return atomManager.createConceptName(name);
 	}
 
+	/**
+	 * Return the currently selected unifier.
+	 * 
+	 * @return the current unifier
+	 */
 	public Unifier getCurrentUnifier() {
 		if (unifierList.size() == 0) {
 			return null;
@@ -123,14 +176,30 @@ public class UelModel {
 		return unifierList.get(currentUnifierIndex);
 	}
 
+	/**
+	 * Return the index of the currently selected unifier.
+	 * 
+	 * @return the current unifier index
+	 */
 	public int getCurrentUnifierIndex() {
 		return currentUnifierIndex;
 	}
 
+	/**
+	 * Return the goal used for the unification algorithm.
+	 * 
+	 * @return the goal
+	 */
 	public Goal getGoal() {
 		return goal;
 	}
 
+	/**
+	 * Return the list of currently loaded ontologies, including a special
+	 * 'empty' ontology.
+	 * 
+	 * @return the list of loaded ontologies
+	 */
 	public List<OWLOntology> getOntologyList() {
 		List<OWLOntology> list = new ArrayList<OWLOntology>();
 		list.add(EMPTY_ONTOLOGY);
@@ -138,6 +207,13 @@ public class UelModel {
 		return list;
 	}
 
+	/**
+	 * Construct a renderer for output of unifiers etc. as OWL API objects.
+	 * 
+	 * @param background
+	 *            the background definitions used for formatting unifiers
+	 * @return a new OWLRenderer object
+	 */
 	public OWLRenderer getOWLRenderer(Set<Definition> background) {
 		return new OWLRenderer(atomManager, background);
 	}
@@ -156,18 +232,42 @@ public class UelModel {
 		return entity.getIRI().getShortForm();
 	}
 
+	/**
+	 * Construct a renderer for output of unifiers etc. as strings. The actual
+	 * format is specified in the method 'StringRenderer.createInstance'.
+	 * 
+	 * @param background
+	 *            the background definitions used for formatting unifiers
+	 * @return a new StringRenderer object
+	 */
 	public StringRenderer getStringRenderer(Set<Definition> background) {
 		return StringRenderer.createInstance(atomManager, shortFormMap, background);
 	}
 
+	/**
+	 * Returns the current unification algorithm, if it has already been
+	 * initialized.
+	 * 
+	 * @return the current unification algorithm, or 'null'
+	 */
 	public UnificationAlgorithm getUnificationAlgorithm() {
-		return this.algorithm;
+		return algorithm;
 	}
 
+	/**
+	 * Returns the list of all unifiers that have already been computed.
+	 * 
+	 * @return the current list of unifiers
+	 */
 	public List<Unifier> getUnifierList() {
 		return Collections.unmodifiableList(unifierList);
 	}
 
+	/**
+	 * Returns the names of all concept names marked as user variables.
+	 * 
+	 * @return the current set of user variable names
+	 */
 	public Set<String> getUserVariableNames() {
 		Set<String> names = new HashSet<String>();
 		for (Integer varId : atomManager.getUserVariables()) {
@@ -176,6 +276,13 @@ public class UelModel {
 		return names;
 	}
 
+	/**
+	 * Initializes the unification algorithm with the current goal.
+	 * 
+	 * @param name
+	 *            The string identifier of the unification algorithm, as defined
+	 *            by 'UnificationAlgorithmFactory'
+	 */
 	public void initializeUnificationAlgorithm(String name) {
 		algorithm = UnificationAlgorithmFactory.instantiateAlgorithm(name, goal);
 	}
@@ -189,34 +296,68 @@ public class UelModel {
 		return true;
 	}
 
+	/**
+	 * Loads an ontology from a file and adds it to the set of currently loaded
+	 * ontologies.
+	 * 
+	 * @param file
+	 *            the input file
+	 */
 	public void loadOntology(File file) {
 		provider.loadOntology(file);
 		recomputeShortFormMap();
 	}
 
+	/**
+	 * Marks a given set of variables as user variables.
+	 * 
+	 * @param variables
+	 *            a set of variables given as instances of OWLClass
+	 */
 	public void makeClassesUserVariables(Set<OWLClass> variables) {
 		for (OWLClass var : variables) {
 			atomManager.makeUserVariable(getAtomId(var.toStringID()));
 		}
 	}
 
+	/**
+	 * Marks a given set of variables as user variables.
+	 * 
+	 * @param variables
+	 *            a set of variable names
+	 */
 	public void makeNamesUserVariables(Set<String> variables) {
 		for (String var : variables) {
 			atomManager.makeUserVariable(getAtomId(var));
 		}
 	}
 
+	/**
+	 * Marks the 'undef' versions of a given set of variables as user variables.
+	 * 
+	 * @param variables
+	 *            a set of variables given as instances of OWLClass
+	 */
 	public void makeUndefClassesUserVariables(Set<OWLClass> variables) {
 		for (OWLClass var : variables)
 			atomManager.makeUserVariable(getAtomId(var.toStringID() + AtomManager.UNDEF_SUFFIX));
 	}
 
+	/**
+	 * Marks the 'undef' versions of a given set of variables as user variables.
+	 * 
+	 * @param variables
+	 *            a set of variable names
+	 */
 	public void makeUndefNamesUserVariables(Set<String> variables) {
 		for (String var : variables) {
 			atomManager.makeUserVariable(getAtomId(var + AtomManager.UNDEF_SUFFIX));
 		}
 	}
 
+	/**
+	 * Marks all 'undef' variables as user variables.
+	 */
 	public void markUndefAsUserVariables() {
 		// mark all "_UNDEF" variables as user variables
 		// copy the list of constants since we need to modify it
@@ -229,6 +370,11 @@ public class UelModel {
 		}
 	}
 
+	/**
+	 * Prints the current unifier using the default StringRenderer.
+	 * 
+	 * @return a string representation of the current unifier
+	 */
 	public String printCurrentUnifier() {
 		Unifier unifier = getCurrentUnifier();
 		if (unifier == null) {
@@ -237,14 +383,30 @@ public class UelModel {
 		return printUnifier(unifier);
 	}
 
+	/**
+	 * Prints the goal using the default StringRenderer.
+	 * 
+	 * @return a string representation of the unification goal
+	 */
 	public String printGoal() {
 		return getStringRenderer(null).renderGoal(goal);
 	}
 
+	/**
+	 * Prints the given unifier using the default StringRenderer.
+	 * 
+	 * @param unifier
+	 *            a unifier
+	 * @return a string representation of the unifier
+	 */
 	public String printUnifier(Unifier unifier) {
 		return getStringRenderer(unifier.getDefinitions()).renderUnifier(unifier);
 	}
 
+	/**
+	 * Updates the mapping from long to short string representations for all
+	 * OWLEntities in the currently loaded ontologies.
+	 */
 	public void recomputeShortFormMap() {
 		shortFormMap = new HashMap<String, String>();
 		for (OWLOntology ontology : provider.getOntologies()) {
@@ -253,6 +415,11 @@ public class UelModel {
 		}
 	}
 
+	/**
+	 * Renders the current unifier as a set of OWLAxioms.
+	 * 
+	 * @return the OWL representation of the current unifier
+	 */
 	public Set<OWLAxiom> renderCurrentUnifier() {
 		Unifier unifier = getCurrentUnifier();
 		if (unifier == null) {
@@ -261,14 +428,32 @@ public class UelModel {
 		return renderUnifier(unifier);
 	}
 
+	/**
+	 * Renders the background definitions as a set of OWLAxioms.
+	 * 
+	 * @return the OWL representation of the background definitions
+	 */
 	public Set<OWLAxiom> renderDefinitions() {
 		return getOWLRenderer(null).renderAxioms(goal.getDefinitions());
 	}
 
+	/**
+	 * Renders the given unifier as a set of OWLAxioms.
+	 * 
+	 * @param unifier
+	 *            a unifier
+	 * @return the OWL representation of the unifier
+	 */
 	public Set<OWLAxiom> renderUnifier(Unifier unifier) {
 		return getOWLRenderer(unifier.getDefinitions()).renderUnifier(unifier);
 	}
 
+	/**
+	 * Sets the index of the currently selected unifier in the unifier list.
+	 * 
+	 * @param index
+	 *            the new index
+	 */
 	public void setCurrentUnifierIndex(int index) {
 		if (index < 0) {
 			currentUnifierIndex = -1;
@@ -279,6 +464,18 @@ public class UelModel {
 		}
 	}
 
+	/**
+	 * Initializes the unification goal with the given ontologies.
+	 * 
+	 * @param bgOntologies
+	 *            a set of background ontologies with definitions
+	 * @param positiveProblem
+	 *            the positive part of the unification problem
+	 * @param negativeProblem
+	 *            the negative part of the unification problem
+	 * @param owlThingAlias
+	 *            (optional) an alias for owl:Thing, e.g., 'SNOMED CT Concept'
+	 */
 	public void setupGoal(Set<OWLOntology> bgOntologies, OWLOntology positiveProblem, OWLOntology negativeProblem,
 			OWLClass owlThingAlias) {
 		setupGoal(bgOntologies, positiveProblem.getAxioms(AxiomType.SUBCLASS_OF),
@@ -287,6 +484,22 @@ public class UelModel {
 				negativeProblem.getAxioms(AxiomType.EQUIVALENT_CLASSES), owlThingAlias);
 	}
 
+	/**
+	 * Initializes the unification goal with the given ontologies and axioms.
+	 * 
+	 * @param bgOntologies
+	 *            a set of background ontologies with definitions
+	 * @param subsumptions
+	 *            the goal subsumptions, as OWLSubClassOfAxioms
+	 * @param equations
+	 *            the goal equations, as binary OWLEquivalentClassesAxioms
+	 * @param dissubsumptions
+	 *            the goal dissubsumptions, as OWLSubClassOfAxioms
+	 * @param disequations
+	 *            the goal disequations, as binary OWLEquivalentClassesAxioms
+	 * @param owlThingAlias
+	 *            (optional) an alias for owl:Thing, e.g., 'SNOMED CT Concept'
+	 */
 	public void setupGoal(Set<OWLOntology> bgOntologies, Set<OWLSubClassOfAxiom> subsumptions,
 			Set<OWLEquivalentClassesAxiom> equations, Set<OWLSubClassOfAxiom> dissubsumptions,
 			Set<OWLEquivalentClassesAxiom> disequations, OWLClass owlThingAlias) {
