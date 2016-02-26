@@ -215,7 +215,11 @@ class UelOntology {
 		while (!currentClass.equals(t)) {
 			previousClass = currentClass;
 			currentClass = null;
+			System.out.println(previousClass);
 			OWLClassExpression def = loadDefinition(previousClass);
+			if (def == null) {
+				def = loadPrimitiveDefinition(previousClass);
+			}
 			for (OWLClassExpression expr : def.asConjunctSet()) {
 				if (!expr.isAnonymous()) {
 					currentClass = expr.asOWLClass();
