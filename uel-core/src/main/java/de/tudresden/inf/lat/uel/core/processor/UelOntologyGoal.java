@@ -1,6 +1,7 @@
 package de.tudresden.inf.lat.uel.core.processor;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -154,6 +155,8 @@ class UelOntologyGoal implements Goal {
 	private Definition processPrimitiveDefinition(Definition def) {
 		Integer defId = def.getDefiniendum();
 		Integer undefId = atomManager.createUndefConceptName(defId);
+		subsumptions.add(new Subsumption(Collections.singleton(undefId),
+				Collections.singleton(ontology.getClassification(defId))));
 		Set<Integer> newRightIds = new HashSet<Integer>(def.getRight());
 		newRightIds.add(undefId);
 		return new Definition(defId, newRightIds, false);

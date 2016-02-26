@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
@@ -16,6 +17,7 @@ import org.semanticweb.owlapi.model.OWLObjectSomeValuesFrom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 
+import de.tudresden.inf.lat.uel.core.renderer.OWLRenderer;
 import de.tudresden.inf.lat.uel.type.api.AtomManager;
 import de.tudresden.inf.lat.uel.type.api.Definition;
 
@@ -202,5 +204,24 @@ class UelOntology {
 			return OWLManager.getOWLDataFactory().getOWLObjectIntersectionOf(allDefinitions);
 		}
 		return allDefinitions.iterator().next();
+	}
+
+	public Integer getClassification(Integer atomId) {
+		// extract the atom representing the top-level SNOMED CT hierarchy
+		// 'defId' is contained in
+		OWLClass currentClass = new OWLRenderer(atomManager, null).renderAtom(atomId).asOWLClass();
+		OWLClass previousClass = null;
+		OWLClass t = OWLManager.getOWLDataFactory().getOWLClass(IRI.create("http://www.ihtsdo.org/SCT_138875005"));
+		while (!currentClass.equals(t)) {
+			previousClass = currentClass;
+			currentClass = null;
+			OWLClassExpression def = loadDefinition(previousClass);
+			for (OWLClassExpression expr : def.asConjunctSet()) {
+				if (!expr.isAnonymous()) {
+					currentClass = expr.asOWLClass();
+				}
+			}
+		}
+		return atomManager.createConceptName(previousClass.toStringID());
 	}
 }
