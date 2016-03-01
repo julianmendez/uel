@@ -155,8 +155,10 @@ class UelOntologyGoal implements Goal {
 	private Definition processPrimitiveDefinition(Definition def) {
 		Integer defId = def.getDefiniendum();
 		Integer undefId = atomManager.createUndefConceptName(defId);
-		subsumptions.add(new Subsumption(Collections.singleton(undefId),
-				Collections.singleton(ontology.getClassification(defId))));
+		Integer classId = ontology.getClassification(defId);
+		if (!classId.equals(defId)) {
+			subsumptions.add(new Subsumption(Collections.singleton(undefId), Collections.singleton(classId)));
+		}
 		Set<Integer> newRightIds = new HashSet<Integer>(def.getRight());
 		newRightIds.add(undefId);
 		return new Definition(defId, newRightIds, false);
