@@ -48,6 +48,7 @@ public class AspInput {
 		}
 		for (Subsumption s : goal.getSubsumptions()) {
 			encodeSubsumption(encoding, s, i);
+			i++;
 		}
 		i = 1;
 		for (Disequation e : goal.getDisequations()) {

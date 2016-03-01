@@ -9,7 +9,6 @@ import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
 
 import de.tudresden.inf.lat.uel.core.processor.UelModel;
-import de.tudresden.inf.lat.uel.type.api.UnificationAlgorithm;
 import de.tudresden.inf.lat.uel.type.impl.Unifier;
 
 public class UnifierIterator implements Iterator<Set<OWLEquivalentClassesAxiom>> {
@@ -28,17 +27,17 @@ public class UnifierIterator implements Iterator<Set<OWLEquivalentClassesAxiom>>
 	}
 
 	private void compute() {
-		UnificationAlgorithm algorithm = uelModel.getUnificationAlgorithm();
 		if (!isComputed) {
 			try {
-				hasNext = algorithm.computeNextUnifier();
+				hasNext = uelModel.computeNextUnifier();
 			} catch (InterruptedException ex) {
 				Thread.currentThread().interrupt();
-				algorithm.cleanup();
+				cleanup();
 				hasNext = false;
 			}
 			if (hasNext) {
-				unifier = algorithm.getUnifier();
+				uelModel.setCurrentUnifierIndex(uelModel.getCurrentUnifierIndex() + 1);
+				unifier = uelModel.getCurrentUnifier();
 			}
 			isComputed = true;
 		}
