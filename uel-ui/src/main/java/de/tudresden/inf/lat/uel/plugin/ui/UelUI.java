@@ -1,13 +1,11 @@
 package de.tudresden.inf.lat.uel.plugin.ui;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
+import java.awt.FlowLayout;
 import java.awt.Image;
-import java.awt.LayoutManager;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -16,7 +14,6 @@ import java.util.Vector;
 
 import javax.imageio.ImageIO;
 import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.Icon;
@@ -24,14 +21,12 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.WindowConstants;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
@@ -151,88 +146,8 @@ class UelUI {
 
 	static File previousFile = null;
 
-	static Container addButtonPanel(Container parent) {
-		JPanel panel = new JPanel();
-		setupContainer(parent, panel);
-		return panel;
-	}
-
-	static void addGlue(Container parent) {
-		LayoutManager layout = parent.getLayout();
-		if ((layout instanceof BoxLayout) && (((BoxLayout) layout).getAxis() == BoxLayout.Y_AXIS)) {
-			parent.add(Box.createVerticalGlue());
-		} else {
-			parent.add(Box.createHorizontalGlue());
-		}
-	}
-
-	static Container addHorizontalPanel(Container parent) {
-		Box box = Box.createHorizontalBox();
-		setupContainer(parent, box);
-		return box;
-	}
-
-	static JLabel addLabel(Container parent, String text) {
-		return addLabel(parent, text, "");
-	}
-
-	static JLabel addLabel(Container parent, String text, String tooltipText) {
-		JLabel label = new JLabel(text);
-		setupLabel(parent, label, tooltipText, null);
-		return label;
-	}
-
-	static <T> JList<T> addList(Container parent, List<T> data, String tooltipText) {
-		JList<T> list = new JList<T>(new Vector<T>(data));
-		setupList(list, tooltipText);
-		parent.add(list);
-		return list;
-	}
-
-	static JScrollPane addScrollableTextArea(Container parent, JTextArea textArea, String tooltipText,
-			Dimension preferredSize) {
-		textArea.setWrapStyleWord(true);
-		textArea.setLineWrap(true);
-		textArea.setEditable(false);
-		setBorder(textArea);
-		return addScrollPane(parent, textArea, tooltipText, preferredSize);
-	}
-
-	static JScrollPane addScrollPane(Container parent, Component child, String tooltipText, Dimension preferredSize) {
-		if (!tooltipText.equals("")) {
-			((JComponent) child).setToolTipText(tooltipText);
-		}
-		JScrollPane scrollPane = new JScrollPane(child);
-		if (preferredSize != null) {
-			scrollPane.setPreferredSize(preferredSize);
-		}
-		scrollPane.setOpaque(false);
-		scrollPane.getViewport().setOpaque(false);
-		scrollPane.setBorder(new EmptyBorder(0, 0, 0, 0));
-		parent.add(scrollPane);
-		return scrollPane;
-	}
-
-	static void addStrut(Container parent) {
-		LayoutManager layout = parent.getLayout();
-		if ((layout instanceof BoxLayout) && (((BoxLayout) layout).getAxis() == BoxLayout.Y_AXIS)) {
-			parent.add(Box.createVerticalStrut(GAP_SIZE));
-		} else {
-			parent.add(Box.createHorizontalStrut(GAP_SIZE));
-		}
-	}
-
-	static Container addVerticalPanel(Container parent) {
-		Container box = createVerticalPanel();
-		parent.add(box);
-		return box;
-	}
-
-	static Container createGridPanel(int rows, int columns) {
-		JPanel panel = new JPanel();
-		panel.setLayout(new GridLayout(rows, columns, 0, GAP_SIZE));
-		setupContainer(panel);
-		return panel;
+	static JComponent createButtonPanel() {
+		return new JPanel(new FlowLayout(FlowLayout.CENTER, UelUI.GAP_SIZE, 0));
 	}
 
 	/**
@@ -270,10 +185,41 @@ class UelUI {
 		}
 	}
 
-	static Container createVerticalPanel() {
-		Box box = Box.createVerticalBox();
-		setupContainer(box);
-		return box;
+	static JLabel createLabel(String text, String toolTipText) {
+		return setupLabel(new JLabel(text), toolTipText);
+	}
+
+	static <T> JList<T> createList(List<T> data, String toolTipText) {
+		return setupList(new JList<T>(new Vector<T>(data)), toolTipText);
+	}
+
+	static JScrollPane createScrollableTextArea(JTextArea textArea, String toolTipText) {
+		textArea.setWrapStyleWord(true);
+		textArea.setLineWrap(true);
+		textArea.setEditable(false);
+		textArea.setToolTipText(toolTipText);
+		setBorder(textArea);
+		return createScrollPane(textArea);
+	}
+
+	static JScrollPane createScrollPane(Component child) {
+		JScrollPane scrollPane = new JScrollPane(child);
+		scrollPane.setOpaque(false);
+		scrollPane.getViewport().setOpaque(false);
+		scrollPane.setBorder(new EmptyBorder(0, 0, 0, 0));
+		return scrollPane;
+	}
+
+	static Component createStrut() {
+		return Box.createHorizontalStrut(GAP_SIZE);
+	}
+
+	static JComponent createVerticalPanel() {
+		return new JPanel(new BorderLayout(0, UelUI.GAP_SIZE));
+	}
+
+	static void mark(JComponent comp) {
+		comp.setBorder(new LineBorder(Color.RED));
 	}
 
 	static void setBorder(JComponent comp) {
@@ -290,64 +236,30 @@ class UelUI {
 		comp.setBorder(new EmptyBorder(GAP_SIZE, GAP_SIZE, GAP_SIZE, GAP_SIZE));
 	}
 
-	static void setupButton(Container parent, JButton button, Icon icon, String toolTipText) {
+	static JButton setupButton(JButton button, Icon icon, String toolTipText) {
 		button.setIcon(icon);
 		button.setToolTipText(toolTipText);
 		setBorder(button);
-		parent.add(button);
+		return button;
 	}
 
-	static <E> void setupComboBox(Container parent, JComboBox<E> comboBox, String tooltipText) {
+	static <E> JComboBox<E> setupComboBox(JComboBox<E> comboBox, String toolTipText) {
 		comboBox.setRenderer(new ComboBoxRenderer());
-		comboBox.setToolTipText(tooltipText);
+		comboBox.setToolTipText(toolTipText);
 		comboBox.setEditable(false);
-		setupComponent(parent, comboBox);
+		return comboBox;
 	}
 
-	static void setupComponent(Container parent, JComponent comp) {
-		setupComponent(comp);
-		parent.add(comp);
+	static JLabel setupLabel(JLabel label, String toolTipText) {
+		label.setToolTipText(toolTipText);
+		return label;
 	}
 
-	static void setupComponent(JComponent comp) {
-		comp.setAlignmentX(Component.LEFT_ALIGNMENT);
-		comp.setAlignmentY(Component.TOP_ALIGNMENT);
-		// comp.setBorder(new LineBorder(Color.BLACK));
-	}
-
-	static void setupContainer(Container parent, JComponent comp) {
-		setupContainer(comp);
-		parent.add(comp);
-	}
-
-	static void setupContainer(JComponent comp) {
-		comp.setAlignmentX(Component.CENTER_ALIGNMENT);
-		comp.setAlignmentY(Component.TOP_ALIGNMENT);
-		comp.setMinimumSize(new Dimension(0, 0));
-		// comp.setBorder(new LineBorder(Color.BLACK));
-	}
-
-	static void setupLabel(Container parent, JLabel label, String tooltipText, Dimension preferredSize) {
-		label.setToolTipText(tooltipText);
-		if (preferredSize != null) {
-			label.setPreferredSize(preferredSize);
-		}
-		setupComponent(parent, label);
-	}
-
-	static <T> void setupList(JList<T> list, String tooltipText) {
-		list.setToolTipText(tooltipText);
+	static <E> JList<E> setupList(JList<E> list, String toolTipText) {
+		list.setToolTipText(toolTipText);
 		list.setSelectionModel(new ToggleListSelectionModel());
 		setBorder(list);
-		setupComponent(list);
-	}
-
-	static void setupWindow(JDialog window) {
-		window.setLocation(200, 200);
-		window.setSize(new Dimension(800, 600));
-		window.setMinimumSize(new Dimension(200, 200));
-		window.setLayout(new GridBagLayout());
-		window.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+		return list;
 	}
 
 	static File showOpenFileDialog(Component parent) {

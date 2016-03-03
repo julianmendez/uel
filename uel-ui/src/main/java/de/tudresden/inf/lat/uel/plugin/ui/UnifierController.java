@@ -1,5 +1,6 @@
 package de.tudresden.inf.lat.uel.plugin.ui;
 
+import java.awt.Component;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.Set;
@@ -18,8 +19,8 @@ class UnifierController {
 	private final UelModel model;
 	private final UnifierView view;
 
-	public UnifierController(UelModel model) {
-		this.view = new UnifierView();
+	public UnifierController(UnifierView view, UelModel model) {
+		this.view = view;
 		this.model = model;
 		init();
 	}
@@ -29,8 +30,7 @@ class UnifierController {
 	}
 
 	public void close() {
-		view.setVisible(false);
-		view.dispose();
+		view.close();
 	}
 
 	private void executeFirst() {
@@ -76,7 +76,11 @@ class UnifierController {
 	}
 
 	private void executeShowStatInfo() {
-		new StatInfoController(model).open();
+		new StatInfoController(new StatInfoView(view), model).open();
+	}
+
+	Component getView() {
+		return view;
 	}
 
 	private void init() {
@@ -90,8 +94,7 @@ class UnifierController {
 
 	public void open() {
 		view.initializeButtons();
-		view.pack();
-		view.setVisible(true);
+		view.open();
 	}
 
 	private void updateUnifierView() {

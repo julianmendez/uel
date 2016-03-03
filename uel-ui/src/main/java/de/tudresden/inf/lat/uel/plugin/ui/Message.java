@@ -21,6 +21,8 @@ interface Message {
 	String buttonSelectVariables = ">";
 	String buttonShowStatInfo = "Stat";
 	String textRefineExplanation = "Select the atoms that should not subsume the respective variable:";
+	String textConstants = "Constants:";
+	String textVariables = "Variables:";
 	String titleError = "Error";
 	String textOntologyBg00 = "First background ontology:";
 	String textOntologyBg01 = "Second background ontology:";

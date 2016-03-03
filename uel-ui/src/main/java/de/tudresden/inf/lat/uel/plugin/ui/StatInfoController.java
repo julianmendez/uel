@@ -21,8 +21,8 @@ class StatInfoController {
 	private final UelModel model;
 	private final StatInfoView view;
 
-	public StatInfoController(UelModel model) {
-		this.view = new StatInfoView();
+	public StatInfoController(StatInfoView view, UelModel model) {
+		this.view = view;
 		this.model = model;
 		init();
 	}
@@ -48,8 +48,7 @@ class StatInfoController {
 
 	public void open() {
 		updateView();
-		view.pack();
-		view.setVisible(true);
+		view.open();
 	}
 
 	public void updateView() {

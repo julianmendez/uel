@@ -21,7 +21,8 @@ public class UelStandalone {
 		frame.getContentPane().setLayout(new BorderLayout());
 		new UelStarter(frame.getContentPane());
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		frame.setSize(new Dimension(1024, 400));
+		frame.setSize(new Dimension(640, 480));
+		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
 	}
 

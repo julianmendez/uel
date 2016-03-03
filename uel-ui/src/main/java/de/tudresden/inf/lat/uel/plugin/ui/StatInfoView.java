@@ -1,10 +1,11 @@
 package de.tudresden.inf.lat.uel.plugin.ui;
 
-import java.awt.Container;
-import java.awt.Dimension;
+import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JTextArea;
 
 /**
@@ -20,29 +21,33 @@ class StatInfoView extends UelDialog {
 	private final JTextArea textGoal = new JTextArea();
 	private final JTextArea textInfo = new JTextArea();
 
-	public StatInfoView() {
-		setup("Additional information");
+	public StatInfoView(Component parent) {
+		setup(parent, "Additional information");
 	}
 
 	public void addSaveListener(ActionListener listener) {
 		saveButton.addActionListener(listener);
 	}
 
+	private JComponent createButtonPanel() {
+		JComponent buttonPanel = UelUI.createButtonPanel();
+
+		buttonPanel.add(UelUI.setupButton(saveButton, UelUI.ICON_SAVE, Message.tooltipSaveGoal));
+
+		return buttonPanel;
+	}
+
 	@Override
-	protected void addMainPanel(Container parent) {
-		Container mainPanel = UelUI.addVerticalPanel(parent);
+	protected JComponent createMainPanel() {
+		JComponent mainPanel = UelUI.createVerticalPanel();
 
-		Container buttonPanel = UelUI.addButtonPanel(mainPanel);
+		mainPanel.add(createButtonPanel(), BorderLayout.NORTH);
 
-		UelUI.setupButton(buttonPanel, saveButton, UelUI.ICON_SAVE, Message.tooltipSaveGoal);
+		mainPanel.add(UelUI.createScrollableTextArea(textGoal, Message.tooltipGoal), BorderLayout.CENTER);
 
-		UelUI.addStrut(mainPanel);
+		mainPanel.add(UelUI.createScrollableTextArea(textInfo, Message.tooltipTextInfo), BorderLayout.SOUTH);
 
-		UelUI.addScrollableTextArea(mainPanel, textGoal, Message.tooltipGoal, new Dimension(640, 240));
-
-		UelUI.addStrut(mainPanel);
-
-		UelUI.addScrollableTextArea(mainPanel, textInfo, Message.tooltipTextInfo, new Dimension(640, 120));
+		return mainPanel;
 	}
 
 	public void setGoalText(String text) {

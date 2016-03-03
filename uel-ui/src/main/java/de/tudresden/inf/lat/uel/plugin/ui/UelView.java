@@ -1,13 +1,19 @@
 package de.tudresden.inf.lat.uel.plugin.ui;
 
+import java.awt.BorderLayout;
 import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.awt.event.ActionListener;
 import java.util.List;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
 
 import org.semanticweb.owlapi.model.OWLOntology;
 
@@ -43,43 +49,37 @@ class UelView extends JPanel {
 	 * Construct the main view of UEL.
 	 */
 	public UelView() {
-		addMainPanel(this);
+		setBorder(new EmptyBorder(10, 10, 10, 10));
+		setLayout(new BorderLayout(0, UelUI.GAP_SIZE));
+
+		add(createTopPanel(), BorderLayout.NORTH);
+
+		JPanel auxPanel = new JPanel();
+		add(auxPanel, BorderLayout.CENTER);
+
+		auxPanel.add(createOntologyPanel());
 	}
 
-	private void addMainPanel(Container parent) {
-		Container mainPanel = UelUI.addVerticalPanel(parent);
+	private Container createOntologyPanel() {
+		Container ontologyPanel = new JPanel(new GridLayout(0, 1));
 
-		addTopPanel(mainPanel);
+		ontologyPanel.add(new JLabel(Message.textOntologyBg00));
 
-		UelUI.addStrut(mainPanel);
+		ontologyPanel.add(UelUI.setupComboBox(listOntologyBg00, Message.tooltipComboBoxOntologyBg00));
 
-		addOntologyPanel(mainPanel);
-	}
+		ontologyPanel.add(new JLabel(Message.textOntologyBg01));
 
-	private void addOntologyPanel(Container parent) {
-		Container ontologyPanel = UelUI.addVerticalPanel(parent);
+		ontologyPanel.add(UelUI.setupComboBox(listOntologyBg01, Message.tooltipComboBoxOntologyBg01));
 
-		UelUI.addLabel(ontologyPanel, Message.textOntologyBg00);
+		ontologyPanel.add(new JLabel(Message.textOntologyPos));
 
-		UelUI.setupComboBox(ontologyPanel, listOntologyBg00, Message.tooltipComboBoxOntologyBg00);
+		ontologyPanel.add(UelUI.setupComboBox(listOntologyPos, Message.tooltipComboBoxOntologyPos));
 
-		UelUI.addStrut(ontologyPanel);
+		ontologyPanel.add(new JLabel(Message.textOntologyNeg));
 
-		UelUI.addLabel(ontologyPanel, Message.textOntologyBg01);
+		ontologyPanel.add(UelUI.setupComboBox(listOntologyNeg, Message.tooltipComboBoxOntologyNeg));
 
-		UelUI.setupComboBox(ontologyPanel, listOntologyBg01, Message.tooltipComboBoxOntologyBg01);
-
-		UelUI.addStrut(ontologyPanel);
-
-		UelUI.addLabel(ontologyPanel, Message.textOntologyPos);
-
-		UelUI.setupComboBox(ontologyPanel, listOntologyPos, Message.tooltipComboBoxOntologyPos);
-
-		UelUI.addStrut(ontologyPanel);
-
-		UelUI.addLabel(ontologyPanel, Message.textOntologyNeg);
-
-		UelUI.setupComboBox(ontologyPanel, listOntologyNeg, Message.tooltipComboBoxOntologyNeg);
+		return ontologyPanel;
 	}
 
 	/**
@@ -103,17 +103,19 @@ class UelView extends JPanel {
 		buttonSelectVariables.addActionListener(listener);
 	}
 
-	private void addTopPanel(Container parent) {
-		Container topPanel = UelUI.addButtonPanel(parent);
+	private JComponent createTopPanel() {
+		JComponent topPanel = UelUI.createButtonPanel();
 
-		UelUI.setupComboBox(topPanel, listAlgorithm, Message.tooltipSelectAlgorithm);
+		topPanel.add(UelUI.setupComboBox(listAlgorithm, Message.tooltipSelectAlgorithm));
 		for (String algorithmName : UnificationAlgorithmFactory.getAlgorithmNames()) {
 			listAlgorithm.addItem(algorithmName);
 		}
 
-		UelUI.setupButton(topPanel, buttonOpen, UelUI.ICON_OPEN, Message.tooltipOpen);
+		topPanel.add(UelUI.setupButton(buttonOpen, UelUI.ICON_OPEN, Message.tooltipOpen));
 
-		UelUI.setupButton(topPanel, buttonSelectVariables, UelUI.ICON_FORWARD, Message.tooltipSelectVariables);
+		topPanel.add(UelUI.setupButton(buttonSelectVariables, UelUI.ICON_FORWARD, Message.tooltipSelectVariables));
+
+		return topPanel;
 	}
 
 	/**
