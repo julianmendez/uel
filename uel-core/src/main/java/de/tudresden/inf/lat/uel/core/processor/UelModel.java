@@ -512,21 +512,32 @@ public class UelModel {
 
 		recomputeShortFormMap();
 
-		OWLClass top = (owlThingAlias != null) ? owlThingAlias : OWLManager.getOWLDataFactory().getOWLThing();
-		goal = new UelOntologyGoal(atomManager, new UelOntology(atomManager, bgOntologies, top));
+		OWLClass owlThing = (owlThingAlias != null) ? owlThingAlias : getOwlThing(bgOntologies);
+		goal = new UelOntologyGoal(atomManager, new UelOntology(atomManager, bgOntologies, owlThing));
 
 		goal.addPositiveAxioms(subsumptions);
 		goal.addPositiveAxioms(equations);
 		goal.addNegativeAxioms(dissubsumptions);
 		goal.addNegativeAxioms(disequations);
 
-		// define top as the empty conjunction
+		// define owl:Thing as the empty conjunction
 		OWLDataFactory factory = OWLManager.getOWLDataFactory();
-		goal.addEquation(factory.getOWLEquivalentClassesAxiom(top, factory.getOWLObjectIntersectionOf()));
-		Integer topId = atomManager.createConceptName(top.toStringID());
-		atomManager.makeDefinitionVariable(topId);
+		goal.addEquation(factory.getOWLEquivalentClassesAxiom(owlThing, factory.getOWLObjectIntersectionOf()));
+		Integer owlThingId = atomManager.createConceptName(owlThing.toStringID());
+		atomManager.makeDefinitionVariable(owlThingId);
+
+		// extract types from background ontologies
+		goal.extractTypes();
 
 		goal.disposeOntology();
 	}
 
+	private OWLClass getOwlThing(Set<OWLOntology> bgOntologies) {
+		IRI SNOMEDCTCONCEPT = IRI.create("http://www.ihtsdo.org/SCT_138875005");
+		if (bgOntologies.stream().anyMatch(o -> o.containsClassInSignature(SNOMEDCTCONCEPT))) {
+			return OWLManager.getOWLDataFactory().getOWLClass(SNOMEDCTCONCEPT);
+		} else {
+			return OWLManager.getOWLDataFactory().getOWLThing();
+		}
+	}
 }

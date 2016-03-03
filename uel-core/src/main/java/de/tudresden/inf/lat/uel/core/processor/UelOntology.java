@@ -12,6 +12,8 @@ import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
 import org.semanticweb.owlapi.model.OWLObjectIntersectionOf;
+import org.semanticweb.owlapi.model.OWLObjectProperty;
+import org.semanticweb.owlapi.model.OWLObjectPropertyDomainAxiom;
 import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
 import org.semanticweb.owlapi.model.OWLObjectSomeValuesFrom;
 import org.semanticweb.owlapi.model.OWLOntology;
@@ -207,12 +209,11 @@ class UelOntology {
 	}
 
 	public Integer getClassification(Integer atomId) {
-		// extract the atom representing the top-level SNOMED CT hierarchy
-		// 'defId' is contained in
+		// extract the atom representing the top-level hierarchy that 'defId' is
+		// contained in
 		OWLClass currentClass = new OWLRenderer(atomManager, null).renderAtom(atomId).asOWLClass();
 		OWLClass previousClass = null;
-		OWLClass t = OWLManager.getOWLDataFactory().getOWLClass(IRI.create("http://www.ihtsdo.org/SCT_138875005"));
-		while (!currentClass.equals(t)) {
+		while (!currentClass.equals(top)) {
 			previousClass = currentClass;
 			currentClass = null;
 			OWLClassExpression def = loadDefinition(previousClass);
@@ -226,5 +227,29 @@ class UelOntology {
 			}
 		}
 		return atomManager.createConceptName(previousClass.toStringID());
+	}
+
+	public Set<OWLClass> getDomain(Integer roleId) {
+		IRI roleIRI = IRI.create(atomManager.getRoleName(roleId));
+		OWLObjectProperty property = OWLManager.getOWLDataFactory().getOWLObjectProperty(roleIRI);
+		Set<OWLClassExpression> possibleDomains = new HashSet<OWLClassExpression>();
+
+		for (OWLOntology ontology : ontologies) {
+			for (OWLObjectPropertyDomainAxiom domainAxiom : ontology.getObjectPropertyDomainAxioms(property)) {
+				possibleDomains.add(domainAxiom.getDomain());
+			}
+		}
+		if (possibleDomains.size() < 1) {
+			return null;
+		}
+		if (possibleDomains.size() > 1) {
+			throw new RuntimeException("Multiple candidate domains found for property: " + property);
+		}
+		return possibleDomains.iterator().next();
+	}
+
+	public Set<OWLClass> getRange(Integer roleId) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

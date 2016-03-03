@@ -1,5 +1,6 @@
 package de.tudresden.inf.lat.uel.type.api;
 
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -51,6 +52,14 @@ public interface Goal {
 	 * @return the set of user variables
 	 */
 	Set<Dissubsumption> getDissubsumptions();
+
+	Set<Integer> getTypes();
+
+	Set<Integer> getDisjointTypes();
+
+	Map<Integer, Set<Integer>> getDomains();
+
+	Map<Integer, Set<Integer>> getRanges();
 
 	boolean hasNegativePart();
 

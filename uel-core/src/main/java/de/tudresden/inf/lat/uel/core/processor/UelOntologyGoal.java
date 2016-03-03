@@ -2,12 +2,16 @@ package de.tudresden.inf.lat.uel.core.processor;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.OWLAxiom;
+import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
@@ -35,6 +39,10 @@ class UelOntologyGoal implements Goal {
 	private final Set<Disequation> disequations = new HashSet<Disequation>();
 	private final Set<Subsumption> subsumptions = new HashSet<Subsumption>();
 	private final Set<Dissubsumption> dissubsumptions = new HashSet<Dissubsumption>();
+	private final Set<Integer> types = new HashSet<Integer>();
+	private final Set<Integer> topLevelTypes = new HashSet<Integer>();
+	private final Map<Integer, Set<Integer>> domains = new HashMap<Integer, Set<Integer>>();
+	private final Map<Integer, Set<Integer>> ranges = new HashMap<Integer, Set<Integer>>();
 	private final AtomManager atomManager;
 	private UelOntology ontology;
 
@@ -111,6 +119,29 @@ class UelOntologyGoal implements Goal {
 		ontology = null;
 	}
 
+	public void extractTypes() {
+		// extract all types from domain/range restrictions of used role names
+		for (Integer roleId : atomManager.getRoleIds()) {
+			Set<Integer> domain = processClasses(ontology.getDomain(roleId));
+			Set<Integer> range = processClasses(ontology.getRange(roleId));
+
+			domains.put(roleId, domain);
+			ranges.put(roleId, range);
+
+			types.addAll(domain);
+			types.addAll(range);
+		}
+
+		// extract all used top-level concept names
+		topLevelTypes.addAll(atomManager.getConstants().stream().filter(id -> id == ontology.getClassification(id))
+				.collect(Collectors.toList()));
+		types.addAll(topLevelTypes);
+	}
+
+	private boolean isTopLevel(Integer conceptNameId) {
+		return ontology.getClassification(conceptNameId) == conceptNameId;
+	}
+
 	@Override
 	public AtomManager getAtomManager() {
 		return atomManager;
@@ -141,6 +172,16 @@ class UelOntologyGoal implements Goal {
 		return dissubsumptions;
 	}
 
+	public Set<Integer> processClasses(Set<OWLClass> classes) {
+		Set<Definition> newDefinitions = new HashSet<Definition>();
+		Set<Integer> classIds = new HashSet<Integer>();
+		for (OWLClass newClass : classes) {
+			classIds.addAll(ontology.processClassExpression(newClass, newDefinitions));
+		}
+		processDefinitions(newDefinitions);
+		return classIds;
+	}
+
 	private void processDefinitions(Set<Definition> newDefinitions) {
 		for (Definition newDefinition : newDefinitions) {
 			// only full definitions are allowed
@@ -155,10 +196,14 @@ class UelOntologyGoal implements Goal {
 	private Definition processPrimitiveDefinition(Definition def) {
 		Integer defId = def.getDefiniendum();
 		Integer undefId = atomManager.createUndefConceptName(defId);
+
+		// add type restriction for new UNDEF concept name
 		Integer classId = ontology.getClassification(defId);
 		if (!classId.equals(defId)) {
 			subsumptions.add(new Subsumption(Collections.singleton(undefId), Collections.singleton(classId)));
 		}
+
+		// create full definition
 		Set<Integer> newRightIds = new HashSet<Integer>(def.getRight());
 		newRightIds.add(undefId);
 		return new Definition(defId, newRightIds, false);
