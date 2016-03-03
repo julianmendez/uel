@@ -18,8 +18,8 @@ class VarSelectionController {
 	private final UelModel model;
 	private final VarSelectionView view;
 
-	public VarSelectionController(UelModel model) {
-		this.view = new VarSelectionView();
+	public VarSelectionController(VarSelectionView view, UelModel model) {
+		this.view = view;
 		this.model = model;
 		init();
 	}
@@ -29,8 +29,7 @@ class VarSelectionController {
 	}
 
 	public void close() {
-		view.setVisible(false);
-		view.dispose();
+		view.close();
 	}
 
 	private void executeMakeCons() {
@@ -54,8 +53,7 @@ class VarSelectionController {
 	}
 
 	public void open() {
-		view.pack();
-		view.setVisible(true);
+		view.open();
 	}
 
 	private void updateLists() {

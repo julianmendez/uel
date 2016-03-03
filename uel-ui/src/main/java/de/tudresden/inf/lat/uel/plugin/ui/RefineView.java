@@ -3,9 +3,9 @@
  */
 package de.tudresden.inf.lat.uel.plugin.ui;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -17,6 +17,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -44,75 +45,77 @@ class RefineView extends UelDialog {
 	/**
 	 * Construct a new unifier refinement view.
 	 */
-	public RefineView() {
-		setup("Refine unifier");
+	public RefineView(Component parent) {
+		setup(parent, "Refine unifier");
 	}
 
-	private void addButtonPanel(Container parent) {
-		Container buttonPanel = UelUI.addButtonPanel(parent);
+	private Container createButtonPanel() {
+		Container buttonPanel = UelUI.createButtonPanel();
 
-		UelUI.setupButton(buttonPanel, buttonRecompute, UelUI.ICON_FORWARD, Message.tooltipRecompute);
+		buttonPanel.add(UelUI.setupButton(buttonRecompute, UelUI.ICON_FORWARD, Message.tooltipRecompute));
 
-		UelUI.setupButton(buttonPanel, buttonSave, UelUI.ICON_SAVE, Message.tooltipSaveDissub);
+		buttonPanel.add(UelUI.setupButton(buttonSave, UelUI.ICON_SAVE, Message.tooltipSaveDissub));
+
+		return buttonPanel;
 	}
 
 	private void addLabel(int rowCount, LabelId var) {
-		JLabel varLabel = UelUI.addLabel(selectionPanel, var.getLabel() + " ⋢", Message.tooltipVariableName);
-		UelUI.setMargin(varLabel);
+		JLabel varLabel = UelUI.createLabel(var.getLabel() + " ⋢", Message.tooltipVariableName);
+		varLabel.setBorder(new EmptyBorder(UelUI.GAP_SIZE, UelUI.GAP_SIZE, UelUI.GAP_SIZE, UelUI.GAP_SIZE));
 		varLabel.setHorizontalTextPosition(SwingConstants.RIGHT);
 		varLabel.setVerticalAlignment(SwingConstants.TOP);
+
 		GridBagConstraints varConstraints = new GridBagConstraints();
 		varConstraints.gridx = 0;
 		varConstraints.gridy = rowCount;
 		varConstraints.weightx = 0.1;
 		varConstraints.weighty = 0;
 		varConstraints.anchor = GridBagConstraints.FIRST_LINE_END;
-		layout.setConstraints(varLabel, varConstraints);
+
+		selectionPanel.add(varLabel, varConstraints);
 	}
 
 	private void addList(int rowCount, LabelId var, List<LabelId> atoms) {
-		Component comp;
 		GridBagConstraints atomsConstraints = new GridBagConstraints();
-
-		if (atoms.isEmpty()) {
-			JLabel label = UelUI.addLabel(selectionPanel, StringRenderer.createInstance(null, null, null).renderTop(),
-					Message.tooltipSubsumedByTop);
-			label.setBorder(new EmptyBorder(UelUI.GAP_SIZE, 0, UelUI.GAP_SIZE, UelUI.GAP_SIZE));
-			label.setHorizontalTextPosition(SwingConstants.LEFT);
-			label.setVerticalAlignment(SwingConstants.TOP);
-			comp = label;
-		} else {
-			JList<LabelId> list = UelUI.addList(selectionPanel, atoms, Message.tooltipRefineAtoms);
-			content.put(var, list);
-			comp = list;
-			atomsConstraints.insets = new Insets(0, 0, UelUI.GAP_SIZE, 0);
-		}
-
 		atomsConstraints.gridx = 1;
 		atomsConstraints.gridy = rowCount;
 		atomsConstraints.weightx = 0.5;
 		atomsConstraints.weighty = 0;
 		atomsConstraints.fill = GridBagConstraints.HORIZONTAL;
 		atomsConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
-		layout.setConstraints(comp, atomsConstraints);
+
+		Component comp;
+		if (atoms.isEmpty()) {
+			JLabel label = UelUI.createLabel(StringRenderer.createInstance(null, null, null).renderTop(),
+					Message.tooltipSubsumedByTop);
+			label.setBorder(new EmptyBorder(UelUI.GAP_SIZE, 0, UelUI.GAP_SIZE, UelUI.GAP_SIZE));
+			label.setHorizontalTextPosition(SwingConstants.LEFT);
+			label.setVerticalAlignment(SwingConstants.TOP);
+			comp = label;
+		} else {
+			JList<LabelId> list = UelUI.createList(atoms, Message.tooltipRefineAtoms);
+			content.put(var, list);
+			comp = list;
+			atomsConstraints.insets = new Insets(0, 0, UelUI.GAP_SIZE, 0);
+		}
+
+		selectionPanel.add(comp, atomsConstraints);
 	}
 
 	@Override
-	protected void addMainPanel(Container parent) {
-		Container mainPanel = UelUI.addVerticalPanel(parent);
+	protected JComponent createMainPanel() {
+		JComponent mainPanel = UelUI.createVerticalPanel();
 
-		addButtonPanel(mainPanel);
+		mainPanel.add(createButtonPanel(), BorderLayout.NORTH);
 
-		UelUI.addStrut(mainPanel);
+		Container auxPanel = UelUI.createVerticalPanel();
+		mainPanel.add(auxPanel, BorderLayout.CENTER);
 
-		Container auxPanel = UelUI.addVerticalPanel(mainPanel);
-		UelUI.addLabel(auxPanel, Message.textRefineExplanation);
+		auxPanel.add(new JLabel(Message.textRefineExplanation), BorderLayout.NORTH);
 
-		UelUI.addStrut(auxPanel);
-		UelUI.addStrut(auxPanel);
+		auxPanel.add(UelUI.createScrollPane(selectionPanel), BorderLayout.CENTER);
 
-		UelUI.setupContainer(selectionPanel);
-		UelUI.addScrollPane(mainPanel, selectionPanel, "", new Dimension(640, 480));
+		return mainPanel;
 	}
 
 	/**

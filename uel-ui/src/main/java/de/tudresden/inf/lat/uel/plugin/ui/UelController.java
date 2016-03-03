@@ -80,7 +80,7 @@ public class UelController {
 			return;
 		}
 
-		refineController = new RefineController(model);
+		refineController = new RefineController(new RefineView(unifierController.getView()), model);
 		refineController.addSaveListener(e -> executeSaveDissubsumptions());
 		refineController.addRecomputeListener(e -> executeRecompute());
 		refineController.open();
@@ -100,7 +100,7 @@ public class UelController {
 	private void executeSelectVariables() {
 		setupGoal();
 
-		varSelectionController = new VarSelectionController(model);
+		varSelectionController = new VarSelectionController(new VarSelectionView(view), model);
 		varSelectionController.addAcceptVarListener(e -> executeAcceptVar());
 		varSelectionController.open();
 	}
@@ -155,7 +155,7 @@ public class UelController {
 	public void setupComputation() {
 		model.initializeUnificationAlgorithm(view.getSelectedAlgorithm());
 
-		unifierController = new UnifierController(model);
+		unifierController = new UnifierController(new UnifierView(view), model);
 		unifierController.addRefineListener(e -> executeRefine());
 		unifierController.open();
 	}

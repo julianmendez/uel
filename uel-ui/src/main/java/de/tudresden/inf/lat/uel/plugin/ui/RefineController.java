@@ -3,6 +3,7 @@
  */
 package de.tudresden.inf.lat.uel.plugin.ui;
 
+import java.awt.Component;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.Collections;
@@ -38,8 +39,8 @@ class RefineController {
 	 * @param model
 	 *            the UEL model
 	 */
-	public RefineController(UelModel model) {
-		this.view = new RefineView();
+	public RefineController(RefineView view, UelModel model) {
+		this.view = view;
 		this.model = model;
 	}
 
@@ -68,12 +69,13 @@ class RefineController {
 	 * Closes the Refine view.
 	 */
 	public void close() {
-		view.setVisible(false);
-		view.dispose();
+		view.close();
 	}
 
 	/**
-	 * Returns the currently selected dissubsumptions, rendered as OWLSubClassOfAxioms.
+	 * Returns the currently selected dissubsumptions, rendered as
+	 * OWLSubClassOfAxioms.
+	 * 
 	 * @return the OWL representation of the new dissubsumptions
 	 */
 	public Set<OWLAxiom> getDissubsumptions() {
@@ -95,12 +97,12 @@ class RefineController {
 	 */
 	public void open() {
 		updateView();
-		view.pack();
-		view.setVisible(true);
+		view.open();
 	}
 
 	/**
 	 * Shows a dialog window for saving a file.
+	 * 
 	 * @return the selected file, possibly null
 	 */
 	public File showSaveFileDialog() {

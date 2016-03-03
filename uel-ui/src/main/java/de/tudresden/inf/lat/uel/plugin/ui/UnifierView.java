@@ -1,10 +1,11 @@
 package de.tudresden.inf.lat.uel.plugin.ui;
 
-import java.awt.Container;
-import java.awt.Dimension;
+import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
@@ -28,8 +29,8 @@ class UnifierView extends UelDialog {
 	private final JTextArea textUnifier = new JTextArea();
 	private final JLabel labelUnifierId = new JLabel();
 
-	public UnifierView() {
-		setup("Unifiers");
+	public UnifierView(Component parent) {
+		setup(parent, "Unifiers");
 	}
 
 	public void addFirstListener(ActionListener listener) {
@@ -61,45 +62,48 @@ class UnifierView extends UelDialog {
 	}
 
 	@Override
-	protected void addMainPanel(Container parent) {
-		Container mainPanel = UelUI.addVerticalPanel(parent);
+	protected JComponent createMainPanel() {
+		JComponent mainPanel = UelUI.createVerticalPanel();
 
-		addNavigateButtons(mainPanel);
+		mainPanel.add(createNavigateButtons(), BorderLayout.NORTH);
 
-		UelUI.addStrut(mainPanel);
+		mainPanel.add(UelUI.createScrollableTextArea(textUnifier, Message.tooltipUnifier), BorderLayout.CENTER);
 
-		UelUI.addScrollableTextArea(mainPanel, textUnifier, Message.tooltipUnifier, new Dimension(640, 480));
+		mainPanel.add(createUnifierButtons(), BorderLayout.SOUTH);
 
-		UelUI.addStrut(mainPanel);
-
-		addUnifierButtons(mainPanel);
+		return mainPanel;
 	}
 
-	private void addUnifierButtons(Container parent) {
-		Container unifierButtons = UelUI.addButtonPanel(parent);
+	private JComponent createUnifierButtons() {
+		JComponent unifierButtons = UelUI.createButtonPanel();
 
-		UelUI.setupButton(unifierButtons, buttonSave, UelUI.ICON_SAVE, Message.tooltipSave);
+		unifierButtons.add(UelUI.setupButton(buttonSave, UelUI.ICON_SAVE, Message.tooltipSave));
 
-		UelUI.setupButton(unifierButtons, buttonRefine, UelUI.ICON_REFINE, Message.tooltipRefine);
+		unifierButtons.add(UelUI.setupButton(buttonRefine, UelUI.ICON_REFINE, Message.tooltipRefine));
+
+		return unifierButtons;
 	}
 
-	private void addNavigateButtons(Container parent) {
-		Container navigateButtons = UelUI.addButtonPanel(parent);
+	private JComponent createNavigateButtons() {
+		JComponent navigateButtons = UelUI.createButtonPanel();
 
-		UelUI.setupButton(navigateButtons, buttonFirst, UelUI.ICON_REWIND, Message.tooltipFirst);
+		navigateButtons.add(UelUI.setupButton(buttonFirst, UelUI.ICON_REWIND, Message.tooltipFirst));
 
-		UelUI.setupButton(navigateButtons, buttonPrevious, UelUI.ICON_BACK, Message.tooltipPrevious);
+		navigateButtons.add(UelUI.setupButton(buttonPrevious, UelUI.ICON_BACK, Message.tooltipPrevious));
 
-		UelUI.setupLabel(navigateButtons, labelUnifierId, Message.tooltipUnifierId, new Dimension(40, 20));
+		labelUnifierId.setToolTipText(Message.tooltipUnifierId);
 		labelUnifierId.setHorizontalAlignment(SwingConstants.CENTER);
+		navigateButtons.add(labelUnifierId);
 
-		UelUI.setupButton(navigateButtons, buttonNext, UelUI.ICON_FORWARD, Message.tooltipNext);
+		navigateButtons.add(UelUI.setupButton(buttonNext, UelUI.ICON_FORWARD, Message.tooltipNext));
 
-		UelUI.setupButton(navigateButtons, buttonLast, UelUI.ICON_FAST_FORWARD, Message.tooltipLast);
+		navigateButtons.add(UelUI.setupButton(buttonLast, UelUI.ICON_FAST_FORWARD, Message.tooltipLast));
 
-		UelUI.addStrut(navigateButtons);
+		navigateButtons.add(UelUI.createStrut());
 
-		UelUI.setupButton(navigateButtons, buttonShowStatInfo, UelUI.ICON_STATISTICS, Message.tooltipShowStatInfo);
+		navigateButtons.add(UelUI.setupButton(buttonShowStatInfo, UelUI.ICON_STATISTICS, Message.tooltipShowStatInfo));
+
+		return navigateButtons;
 	}
 
 	public void setUnifier(String text) {
