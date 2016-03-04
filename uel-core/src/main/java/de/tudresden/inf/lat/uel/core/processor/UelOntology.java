@@ -15,9 +15,7 @@ import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLObjectIntersectionOf;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
-import org.semanticweb.owlapi.model.OWLObjectPropertyDomainAxiom;
 import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
-import org.semanticweb.owlapi.model.OWLObjectPropertyRangeAxiom;
 import org.semanticweb.owlapi.model.OWLObjectSomeValuesFrom;
 import org.semanticweb.owlapi.model.OWLOntology;
 
@@ -38,11 +36,8 @@ class UelOntology {
 
 	private static final String flatteningVariablePrefix = "var";
 
-	private static Function<OWLClassExpression, Set<OWLClass>> getNamedDisjuncts = e -> {
-		System.out.println(e);
-		return e.asDisjunctSet().stream().filter(expr -> !expr.isAnonymous()).map(expr -> expr.asOWLClass())
-				.collect(Collectors.toSet());
-	};
+	private static Function<OWLClassExpression, Set<OWLClass>> getNamedDisjuncts = e -> e.asDisjunctSet().stream()
+			.filter(expr -> !expr.isAnonymous()).map(expr -> expr.asOWLClass()).collect(Collectors.toSet());
 
 	private static <R> Function<Set<OWLClassExpression>, R> exception(String message) {
 		return e -> {
@@ -197,9 +192,7 @@ class UelOntology {
 	}
 
 	private Stream<OWLClassExpression> getDomain(OWLOntology ont, OWLObjectProperty prop) {
-		Set<OWLObjectPropertyDomainAxiom> s = ont.getObjectPropertyDomainAxioms(prop);
-		System.out.println("#opda: " + s.size());
-		return s.stream().map(ax -> ax.getDomain());
+		return ont.getObjectPropertyDomainAxioms(prop).stream().map(ax -> ax.getDomain());
 	}
 
 	private OWLClassExpression getPrimitiveDefinition(OWLClass cls) {
@@ -217,9 +210,7 @@ class UelOntology {
 	}
 
 	private Stream<OWLClassExpression> getRange(OWLOntology ont, OWLObjectProperty prop) {
-		Set<OWLObjectPropertyRangeAxiom> s = ont.getObjectPropertyRangeAxioms(prop);
-		System.out.println("#opra: " + s.size());
-		return s.stream().map(ax -> ax.getRange());
+		return ont.getObjectPropertyRangeAxioms(prop).stream().map(ax -> ax.getRange());
 	}
 
 	private void loadFlatDefinition(Integer id, Set<Definition> newDefinitions, Set<Integer> toVisit) {
@@ -273,7 +264,6 @@ class UelOntology {
 
 	private OWLObjectProperty toOWLObjectProperty(Integer roleId) {
 		IRI roleIRI = IRI.create(atomManager.getRoleName(roleId));
-		System.out.println(roleIRI.toString());
 		return OWLManager.getOWLDataFactory().getOWLObjectProperty(roleIRI);
 	}
 

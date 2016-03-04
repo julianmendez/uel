@@ -127,7 +127,6 @@ class UelOntologyGoal implements Goal {
 		while (!remainingRoleIds.isEmpty()) {
 			for (Integer roleId : remainingRoleIds) {
 				processedRoleIds.add(roleId);
-				System.out.println(roleId);
 
 				Set<OWLClass> domainClasses = ontology.getDomain(roleId);
 				if (domainClasses != null) {
