@@ -88,6 +88,15 @@ abstract class Renderer<ExpressionType, AxiomsType> {
 		translateAxioms(input.getSubsumptions());
 		translateAxioms(input.getDisequations());
 		translateAxioms(input.getDissubsumptions());
+		translateAtomList("Types", input.getTypes());
+		translateAtomList("Disjoint types", input.getDisjointTypes());
+		for (Integer roleId : input.getDomains().keySet()) {
+			translateAtomList("Domain of " + renderRole(roleId), input.getDomains().get(roleId));
+		}
+		for (Integer roleId : input.getRanges().keySet()) {
+			translateAtomList("Range of " + renderRole(roleId), input.getRanges().get(roleId));
+		}
+		translateRoleList("Transparent roles", input.getTransparentRoles());
 		return finalizeAxioms();
 	}
 
@@ -97,6 +106,14 @@ abstract class Renderer<ExpressionType, AxiomsType> {
 			name = getShortForm(name);
 		}
 		return name;
+	}
+
+	public String renderRole(Integer roleId) {
+		String roleName = atomManager.getRoleName(roleId);
+		if (shortFormMap != null) {
+			roleName = getShortForm(roleName);
+		}
+		return roleName;
 	}
 
 	public ExpressionType renderTop() {
@@ -118,15 +135,14 @@ abstract class Renderer<ExpressionType, AxiomsType> {
 	protected ExpressionType translateAtom(Integer atomId) {
 		if (atomManager.getExistentialRestrictions().contains(atomId)) {
 			Integer childId = atomManager.getChild(atomId);
-			String roleName = atomManager.printRoleName(atomId);
-			if (shortFormMap != null) {
-				roleName = getShortForm(roleName);
-			}
+			String roleName = renderRole(atomManager.getExistentialRestriction(atomId).getRoleId());
 			return translateExistentialRestriction(roleName, childId);
 		} else {
 			return translateName(atomId);
 		}
 	}
+
+	protected abstract ExpressionType translateAtomList(String description, Set<Integer> atomIds);
 
 	protected abstract AxiomsType translateAxiom(Axiom axiom);
 
@@ -159,6 +175,8 @@ abstract class Renderer<ExpressionType, AxiomsType> {
 	protected abstract ExpressionType translateExistentialRestriction(String roleName, Integer childId);
 
 	protected abstract ExpressionType translateName(Integer atomId);
+
+	protected abstract ExpressionType translateRoleList(String description, Set<Integer> roleIds);
 
 	protected abstract ExpressionType translateTop();
 

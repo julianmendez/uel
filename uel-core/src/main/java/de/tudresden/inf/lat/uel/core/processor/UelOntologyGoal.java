@@ -34,33 +34,34 @@ import de.tudresden.inf.lat.uel.type.api.Subsumption;
  */
 class UelOntologyGoal implements Goal {
 
-	private final Set<Definition> definitions = new HashSet<Definition>();
-	private final Set<Equation> equations = new HashSet<Equation>();
-	private final Set<Disequation> disequations = new HashSet<Disequation>();
-	private final Set<Subsumption> subsumptions = new HashSet<Subsumption>();
-	private final Set<Dissubsumption> dissubsumptions = new HashSet<Dissubsumption>();
-	private final Set<Integer> types = new HashSet<Integer>();
-	private final Set<Integer> topLevelTypes = new HashSet<Integer>();
-	private final Map<Integer, Set<Integer>> domains = new HashMap<Integer, Set<Integer>>();
-	private final Map<Integer, Set<Integer>> ranges = new HashMap<Integer, Set<Integer>>();
 	private final AtomManager atomManager;
+	private final Set<Definition> definitions = new HashSet<Definition>();
+	private final Set<Disequation> disequations = new HashSet<Disequation>();
+	private final Set<Dissubsumption> dissubsumptions = new HashSet<Dissubsumption>();
+	private final Map<Integer, Set<Integer>> domains = new HashMap<Integer, Set<Integer>>();
+	private final Set<Equation> equations = new HashSet<Equation>();
 	private UelOntology ontology;
+	private final Map<Integer, Set<Integer>> ranges = new HashMap<Integer, Set<Integer>>();
+	private final Set<Subsumption> subsumptions = new HashSet<Subsumption>();
+	private final Set<Integer> transparentRoles = new HashSet<Integer>();
+	private final Set<Integer> topLevelTypes = new HashSet<Integer>();
+	private final Set<Integer> types = new HashSet<Integer>();
 
 	public UelOntologyGoal(AtomManager manager, UelOntology ontology) {
 		this.atomManager = manager;
 		this.ontology = ontology;
 	}
 
-	public void addPositiveAxioms(Set<? extends OWLAxiom> axioms) {
-		for (OWLAxiom axiom : axioms) {
-			if (axiom.isOfType(AxiomType.EQUIVALENT_CLASSES)) {
-				addEquation((OWLEquivalentClassesAxiom) axiom);
-			} else if (axiom.isOfType(AxiomType.SUBCLASS_OF)) {
-				addSubsumption((OWLSubClassOfAxiom) axiom);
-			} else {
-				throw new RuntimeException("Unsupported axiom type: " + axiom);
-			}
-		}
+	public void addDisequation(OWLEquivalentClassesAxiom axiom) {
+		disequations.add(createAxiom(Disequation.class, axiom));
+	}
+
+	public void addDissubsumption(OWLSubClassOfAxiom axiom) {
+		dissubsumptions.add(createAxiom(Dissubsumption.class, axiom));
+	}
+
+	public void addEquation(OWLEquivalentClassesAxiom axiom) {
+		equations.add(createAxiom(Equation.class, axiom));
 	}
 
 	public void addNegativeAxioms(Set<? extends OWLAxiom> axioms) {
@@ -75,29 +76,20 @@ class UelOntologyGoal implements Goal {
 		}
 	}
 
-	public void addEquation(OWLEquivalentClassesAxiom axiom) {
-		equations.add(createAxiom(Equation.class, axiom));
-	}
-
-	public void addDisequation(OWLEquivalentClassesAxiom axiom) {
-		disequations.add(createAxiom(Disequation.class, axiom));
+	public void addPositiveAxioms(Set<? extends OWLAxiom> axioms) {
+		for (OWLAxiom axiom : axioms) {
+			if (axiom.isOfType(AxiomType.EQUIVALENT_CLASSES)) {
+				addEquation((OWLEquivalentClassesAxiom) axiom);
+			} else if (axiom.isOfType(AxiomType.SUBCLASS_OF)) {
+				addSubsumption((OWLSubClassOfAxiom) axiom);
+			} else {
+				throw new RuntimeException("Unsupported axiom type: " + axiom);
+			}
+		}
 	}
 
 	public void addSubsumption(OWLSubClassOfAxiom axiom) {
 		subsumptions.add(createAxiom(Subsumption.class, axiom));
-	}
-
-	public void addDissubsumption(OWLSubClassOfAxiom axiom) {
-		dissubsumptions.add(createAxiom(Dissubsumption.class, axiom));
-	}
-
-	private <T extends Axiom> T createAxiom(Class<T> type, OWLEquivalentClassesAxiom axiom) {
-		Iterator<OWLClassExpression> it = axiom.getClassExpressions().iterator();
-		return createAxiom(type, it.next(), it.next());
-	}
-
-	private <T extends Axiom> T createAxiom(Class<T> type, OWLSubClassOfAxiom axiom) {
-		return createAxiom(type, axiom.getSubClass(), axiom.getSuperClass());
 	}
 
 	private <T extends Axiom> T createAxiom(Class<T> type, OWLClassExpression left, OWLClassExpression right) {
@@ -115,31 +107,57 @@ class UelOntologyGoal implements Goal {
 		return newAxiom;
 	}
 
+	private <T extends Axiom> T createAxiom(Class<T> type, OWLEquivalentClassesAxiom axiom) {
+		Iterator<OWLClassExpression> it = axiom.getClassExpressions().iterator();
+		return createAxiom(type, it.next(), it.next());
+	}
+
+	private <T extends Axiom> T createAxiom(Class<T> type, OWLSubClassOfAxiom axiom) {
+		return createAxiom(type, axiom.getSubClass(), axiom.getSuperClass());
+	}
+
 	public void disposeOntology() {
 		ontology = null;
 	}
 
 	public void extractTypes() {
 		// extract all types from domain/range restrictions of used role names
-		for (Integer roleId : atomManager.getRoleIds()) {
-			Set<Integer> domain = processClasses(ontology.getDomain(roleId));
-			Set<Integer> range = processClasses(ontology.getRange(roleId));
+		Set<Integer> processedRoleIds = new HashSet<Integer>();
+		Set<Integer> remainingRoleIds = new HashSet<Integer>(atomManager.getRoleIds());
+		while (!remainingRoleIds.isEmpty()) {
+			for (Integer roleId : remainingRoleIds) {
+				processedRoleIds.add(roleId);
+				System.out.println(roleId);
 
-			domains.put(roleId, domain);
-			ranges.put(roleId, range);
+				Set<OWLClass> domainClasses = ontology.getDomain(roleId);
+				if (domainClasses != null) {
+					Set<Integer> domain = processClasses(domainClasses);
+					domains.put(roleId, domain);
+					types.addAll(domain);
+				}
 
-			types.addAll(domain);
-			types.addAll(range);
+				Set<OWLClass> rangeClasses = ontology.getRange(roleId);
+				if (rangeClasses != null) {
+					Set<Integer> range = processClasses(rangeClasses);
+					ranges.put(roleId, range);
+					types.addAll(range);
+				}
+			}
+			remainingRoleIds = new HashSet<Integer>(atomManager.getRoleIds());
+			remainingRoleIds.removeAll(processedRoleIds);
 		}
 
 		// extract all used top-level concept names
 		topLevelTypes.addAll(atomManager.getConstants().stream().filter(id -> id == ontology.getClassification(id))
 				.collect(Collectors.toList()));
 		types.addAll(topLevelTypes);
-	}
 
-	private boolean isTopLevel(Integer conceptNameId) {
-		return ontology.getClassification(conceptNameId) == conceptNameId;
+		// fill set of transparent roles
+		Integer roleGroupId = atomManager.getRoleId("http://www.ihtsdo.org/RoleGroup");
+		if ((roleGroupId != null) && (roleGroupId >= 0)) {
+			transparentRoles.add(roleGroupId);
+		}
+
 	}
 
 	@Override
@@ -153,13 +171,33 @@ class UelOntologyGoal implements Goal {
 	}
 
 	@Override
+	public Set<Disequation> getDisequations() {
+		return disequations;
+	}
+
+	@Override
+	public Set<Integer> getDisjointTypes() {
+		return topLevelTypes;
+	}
+
+	@Override
+	public Set<Dissubsumption> getDissubsumptions() {
+		return dissubsumptions;
+	}
+
+	@Override
+	public Map<Integer, Set<Integer>> getDomains() {
+		return domains;
+	}
+
+	@Override
 	public Set<Equation> getEquations() {
 		return equations;
 	}
 
 	@Override
-	public Set<Disequation> getDisequations() {
-		return disequations;
+	public Map<Integer, Set<Integer>> getRanges() {
+		return ranges;
 	}
 
 	@Override
@@ -168,11 +206,20 @@ class UelOntologyGoal implements Goal {
 	}
 
 	@Override
-	public Set<Dissubsumption> getDissubsumptions() {
-		return dissubsumptions;
+	public Set<Integer> getTransparentRoles() {
+		return transparentRoles;
 	}
 
-	public Set<Integer> processClasses(Set<OWLClass> classes) {
+	@Override
+	public Set<Integer> getTypes() {
+		return types;
+	}
+
+	public boolean hasNegativePart() {
+		return !disequations.isEmpty() || !dissubsumptions.isEmpty();
+	}
+
+	private Set<Integer> processClasses(Set<OWLClass> classes) {
 		Set<Definition> newDefinitions = new HashSet<Definition>();
 		Set<Integer> classIds = new HashSet<Integer>();
 		for (OWLClass newClass : classes) {
@@ -207,9 +254,5 @@ class UelOntologyGoal implements Goal {
 		Set<Integer> newRightIds = new HashSet<Integer>(def.getRight());
 		newRightIds.add(undefId);
 		return new Definition(defId, newRightIds, false);
-	}
-
-	public boolean hasNegativePart() {
-		return !disequations.isEmpty() || !dissubsumptions.isEmpty();
 	}
 }

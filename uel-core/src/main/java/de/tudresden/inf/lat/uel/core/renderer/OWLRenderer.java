@@ -44,6 +44,11 @@ public class OWLRenderer extends Renderer<OWLClassExpression, Set<OWLAxiom>> {
 	}
 
 	@Override
+	protected OWLClassExpression translateAtomList(String description, Set<Integer> atomIds) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
 	protected Set<OWLAxiom> translateAxiom(Axiom axiom) {
 		OWLClassExpression left = translateConjunction(axiom.getLeft());
 		OWLClassExpression right = translateConjunction(axiom.getRight());
@@ -67,6 +72,11 @@ public class OWLRenderer extends Renderer<OWLClassExpression, Set<OWLAxiom>> {
 	protected OWLClassExpression translateName(Integer atomId) {
 		expr = dataFactory.getOWLClass(IRI.create(renderName(atomId)));
 		return expr;
+	}
+
+	@Override
+	protected OWLClassExpression translateRoleList(String description, Set<Integer> roleIds) {
+		throw new UnsupportedOperationException();
 	}
 
 	@Override

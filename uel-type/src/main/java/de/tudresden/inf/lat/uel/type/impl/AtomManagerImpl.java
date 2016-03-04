@@ -105,6 +105,11 @@ public class AtomManagerImpl implements AtomManager {
 	}
 
 	@Override
+	public Integer getRoleId(String roleName) {
+		return roleNames.getIndex(roleName);
+	}
+
+	@Override
 	public Set<Integer> getRoleIds() {
 		return Collections.unmodifiableSet(roleNames.getIndices());
 	}

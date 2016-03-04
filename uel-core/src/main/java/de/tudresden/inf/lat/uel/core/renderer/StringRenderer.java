@@ -21,6 +21,22 @@ public abstract class StringRenderer extends Renderer<String, String> {
 	}
 
 	@Override
+	protected String translateAtomList(String description, Set<Integer> atomIds) {
+		sb.append(description);
+		sb.append(": ");
+
+		for (Integer atomId : atomIds) {
+			translateAtom(atomId);
+			sb.append(", ");
+		}
+
+		sb.setLength(sb.length() - 2);
+		sb.append(System.lineSeparator());
+		sb.append(System.lineSeparator());
+		return "";
+	}
+
+	@Override
 	protected String finalizeAxioms() {
 		return sb.toString();
 	}
@@ -43,6 +59,22 @@ public abstract class StringRenderer extends Renderer<String, String> {
 		sb.append(axiom.getConnective());
 		sb.append(" ");
 		translateConjunction(axiom.getRight());
+		sb.append(System.lineSeparator());
+		sb.append(System.lineSeparator());
+		return "";
+	}
+
+	@Override
+	protected String translateRoleList(String description, Set<Integer> roleIds) {
+		sb.append(description);
+		sb.append(": ");
+
+		for (Integer roleId : roleIds) {
+			sb.append(renderRole(roleId));
+			sb.append(", ");
+		}
+
+		sb.setLength(sb.length() - 2);
 		sb.append(System.lineSeparator());
 		sb.append(System.lineSeparator());
 		return "";

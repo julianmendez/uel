@@ -61,6 +61,8 @@ public interface Goal {
 
 	Map<Integer, Set<Integer>> getRanges();
 
+	Set<Integer> getTransparentRoles();
+
 	boolean hasNegativePart();
 
 }

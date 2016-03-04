@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
@@ -158,6 +159,31 @@ public class CNFChecker {
 			@Override
 			public boolean hasNegativePart() {
 				return false;
+			}
+
+			@Override
+			public Set<Integer> getTypes() {
+				return Collections.emptySet();
+			}
+
+			@Override
+			public Set<Integer> getDisjointTypes() {
+				return Collections.emptySet();
+			}
+
+			@Override
+			public Map<Integer, Set<Integer>> getDomains() {
+				return Collections.emptyMap();
+			}
+
+			@Override
+			public Map<Integer, Set<Integer>> getRanges() {
+				return Collections.emptyMap();
+			}
+
+			@Override
+			public Set<Integer> getTransparentRoles() {
+				return Collections.emptySet();
 			}
 		};
 	}
