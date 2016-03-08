@@ -88,15 +88,21 @@ abstract class Renderer<ExpressionType, AxiomsType> {
 		translateAxioms(input.getSubsumptions());
 		translateAxioms(input.getDisequations());
 		translateAxioms(input.getDissubsumptions());
-		translateAtomList("Types", input.getTypes());
-		translateAtomList("Disjoint types", input.getDisjointTypes());
+		if (!input.getTypes().isEmpty()) {
+			translateAtomList("Types", input.getTypes());
+		}
+		if (!input.getDisjointTypes().isEmpty()) {
+			translateAtomList("Disjoint types", input.getDisjointTypes());
+		}
 		for (Integer roleId : input.getDomains().keySet()) {
 			translateAtomList("Domain of " + renderRole(roleId), input.getDomains().get(roleId));
 		}
 		for (Integer roleId : input.getRanges().keySet()) {
 			translateAtomList("Range of " + renderRole(roleId), input.getRanges().get(roleId));
 		}
-		translateRoleList("Transparent roles", input.getTransparentRoles());
+		if (!input.getTransparentRoles().isEmpty()) {
+			translateRoleList("Transparent roles", input.getTransparentRoles());
+		}
 		return finalizeAxioms();
 	}
 

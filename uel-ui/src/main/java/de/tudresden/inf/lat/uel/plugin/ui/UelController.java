@@ -168,7 +168,8 @@ public class UelController {
 		Set<OWLOntology> bgOntologies = new HashSet<OWLOntology>();
 		bgOntologies.add(view.getSelectedOntologyBg00());
 		bgOntologies.add(view.getSelectedOntologyBg01());
-		model.setupGoal(bgOntologies, view.getSelectedOntologyPos(), view.getSelectedOntologyNeg(), null);
+		model.setupGoal(bgOntologies, view.getSelectedOntologyPos(), view.getSelectedOntologyNeg(), null,
+				view.getSnomedMode());
 	}
 
 	/**

@@ -518,7 +518,7 @@ public class UelModel {
 
 		recomputeShortFormMap();
 
-		OWLClass owlThing = (owlThingAlias != null) ? owlThingAlias : OWLManager.getOWLDataFactory().getOWLThing();
+		OWLClass owlThing = getOWLThing(owlThingAlias, snomedMode);
 		goal = new UelOntologyGoal(atomManager, new UelOntology(atomManager, bgOntologies, owlThing), snomedMode);
 
 		goal.addPositiveAxioms(subsumptions);
@@ -526,7 +526,7 @@ public class UelModel {
 		goal.addNegativeAxioms(dissubsumptions);
 		goal.addNegativeAxioms(disequations);
 
-		// define owl:Thing as the empty conjunction
+		// define 'owlThing' as the empty conjunction
 		OWLDataFactory factory = OWLManager.getOWLDataFactory();
 		goal.addEquation(factory.getOWLEquivalentClassesAxiom(owlThing, factory.getOWLObjectIntersectionOf()));
 		Integer owlThingId = atomManager.createConceptName(owlThing.toStringID());
@@ -538,5 +538,16 @@ public class UelModel {
 		}
 
 		goal.disposeOntology();
+	}
+
+	private OWLClass getOWLThing(OWLClass owlThingAlias, boolean snomedMode) {
+		if (owlThingAlias != null)
+			return owlThingAlias;
+		else if (snomedMode)
+			// 'SNOMED CT Concept'
+			return OWLManager.getOWLDataFactory().getOWLClass(IRI.create("http://www.ihtsdo.org/SCT_138875005"));
+		else
+			// owl:Thing
+			return OWLManager.getOWLDataFactory().getOWLThing();
 	}
 }

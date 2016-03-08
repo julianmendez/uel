@@ -19,6 +19,7 @@ import javax.swing.DefaultListSelectionModel;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
@@ -241,6 +242,12 @@ class UelUI {
 		button.setToolTipText(toolTipText);
 		setBorder(button);
 		return button;
+	}
+
+	static JCheckBox setupCheckBox(JCheckBox checkBox, String text) {
+		checkBox.setSelected(false);
+		checkBox.setText(text);
+		return checkBox;
 	}
 
 	static <E> JComboBox<E> setupComboBox(JComboBox<E> comboBox, String toolTipText) {

@@ -74,8 +74,6 @@ public class AlternativeUelStarter {
 
 	public void setSnomedMode(boolean snomedMode) {
 		this.snomedMode = snomedMode;
-		this.owlThingAlias = OWLManager.getOWLDataFactory()
-				.getOWLClass(IRI.create("http://www.ihtsdo.org/SCT_138875005"));
 	}
 
 	public static void main(String[] args) {

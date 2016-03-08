@@ -2,13 +2,13 @@ package de.tudresden.inf.lat.uel.plugin.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
-import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionListener;
 import java.util.List;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -44,6 +44,7 @@ class UelView extends JPanel {
 	private final JComboBox<OWLOntology> listOntologyBg01 = new JComboBox<OWLOntology>();
 	private final JComboBox<OWLOntology> listOntologyNeg = new JComboBox<OWLOntology>();
 	private final JComboBox<OWLOntology> listOntologyPos = new JComboBox<OWLOntology>();
+	private final JCheckBox checkSnomedMode = new JCheckBox();
 
 	/**
 	 * Construct the main view of UEL.
@@ -70,6 +71,8 @@ class UelView extends JPanel {
 		ontologyPanel.add(new JLabel(Message.textOntologyBg01));
 
 		ontologyPanel.add(UelUI.setupComboBox(listOntologyBg01, Message.tooltipComboBoxOntologyBg01));
+
+		ontologyPanel.add(UelUI.setupCheckBox(checkSnomedMode, Message.textSnomedMode));
 
 		ontologyPanel.add(new JLabel(Message.textOntologyPos));
 
@@ -163,6 +166,15 @@ class UelView extends JPanel {
 	 */
 	public OWLOntology getSelectedOntologyPos() {
 		return (OWLOntology) listOntologyPos.getSelectedItem();
+	}
+
+	/**
+	 * Return the state of the "SNOMED mode" checkbox.
+	 * 
+	 * @return 'true' iff SNOMED mode should be enabled
+	 */
+	public boolean getSnomedMode() {
+		return checkSnomedMode.isSelected();
 	}
 
 	/**
