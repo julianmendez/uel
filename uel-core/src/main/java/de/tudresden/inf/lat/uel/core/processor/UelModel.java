@@ -358,7 +358,7 @@ public class UelModel {
 	/**
 	 * Marks all 'undef' variables as user variables.
 	 */
-	public void markUndefAsUserVariables() {
+	public void makeAllUndefClassesUserVariables() {
 		// mark all "_UNDEF" variables as user variables
 		// copy the list of constants since we need to modify it
 		Set<Integer> constants = new HashSet<Integer>(atomManager.getConstants());
@@ -475,13 +475,16 @@ public class UelModel {
 	 *            the negative part of the unification problem
 	 * @param owlThingAlias
 	 *            (optional) an alias for owl:Thing, e.g., 'SNOMED CT Concept'
+	 * @param snomedMode
+	 *            indicates if "SNOMED mode" should be activated, loading
+	 *            additional type information
 	 */
 	public void setupGoal(Set<OWLOntology> bgOntologies, OWLOntology positiveProblem, OWLOntology negativeProblem,
-			OWLClass owlThingAlias) {
+			OWLClass owlThingAlias, boolean snomedMode) {
 		setupGoal(bgOntologies, positiveProblem.getAxioms(AxiomType.SUBCLASS_OF),
 				positiveProblem.getAxioms(AxiomType.EQUIVALENT_CLASSES),
 				negativeProblem.getAxioms(AxiomType.SUBCLASS_OF),
-				negativeProblem.getAxioms(AxiomType.EQUIVALENT_CLASSES), owlThingAlias);
+				negativeProblem.getAxioms(AxiomType.EQUIVALENT_CLASSES), owlThingAlias, snomedMode);
 	}
 
 	/**
@@ -499,10 +502,13 @@ public class UelModel {
 	 *            the goal disequations, as binary OWLEquivalentClassesAxioms
 	 * @param owlThingAlias
 	 *            (optional) an alias for owl:Thing, e.g., 'SNOMED CT Concept'
+	 * @param snomedMode
+	 *            indicates if "SNOMED mode" should be activated, loading
+	 *            additional type information
 	 */
 	public void setupGoal(Set<OWLOntology> bgOntologies, Set<OWLSubClassOfAxiom> subsumptions,
 			Set<OWLEquivalentClassesAxiom> equations, Set<OWLSubClassOfAxiom> dissubsumptions,
-			Set<OWLEquivalentClassesAxiom> disequations, OWLClass owlThingAlias) {
+			Set<OWLEquivalentClassesAxiom> disequations, OWLClass owlThingAlias, boolean snomedMode) {
 
 		algorithm = null;
 		unifierList = new ArrayList<Unifier>();
@@ -512,8 +518,8 @@ public class UelModel {
 
 		recomputeShortFormMap();
 
-		OWLClass owlThing = (owlThingAlias != null) ? owlThingAlias : getOwlThing(bgOntologies);
-		goal = new UelOntologyGoal(atomManager, new UelOntology(atomManager, bgOntologies, owlThing));
+		OWLClass owlThing = (owlThingAlias != null) ? owlThingAlias : OWLManager.getOWLDataFactory().getOWLThing();
+		goal = new UelOntologyGoal(atomManager, new UelOntology(atomManager, bgOntologies, owlThing), snomedMode);
 
 		goal.addPositiveAxioms(subsumptions);
 		goal.addPositiveAxioms(equations);
@@ -527,17 +533,10 @@ public class UelModel {
 		atomManager.makeDefinitionVariable(owlThingId);
 
 		// extract types from background ontologies
-		goal.extractTypes();
+		if (snomedMode) {
+			goal.extractTypes();
+		}
 
 		goal.disposeOntology();
-	}
-
-	private OWLClass getOwlThing(Set<OWLOntology> bgOntologies) {
-		IRI SNOMEDCTCONCEPT = IRI.create("http://www.ihtsdo.org/SCT_138875005");
-		if (bgOntologies.stream().anyMatch(o -> o.containsClassInSignature(SNOMEDCTCONCEPT))) {
-			return OWLManager.getOWLDataFactory().getOWLClass(SNOMEDCTCONCEPT);
-		} else {
-			return OWLManager.getOWLDataFactory().getOWLThing();
-		}
 	}
 }

@@ -1,10 +1,12 @@
 package de.tudresden.inf.lat.uel.core.main;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Collections;
@@ -37,6 +39,7 @@ public class AlternativeUelStarter {
 	private OWLOntologyManager ontologyManager;
 	private UnificationAlgorithm uelProcessor;
 	private boolean verbose = false;
+	private boolean snomedMode = false;
 	private OWLClass owlThingAlias = null;
 	private boolean markUndefAsVariables = true;
 
@@ -69,6 +72,12 @@ public class AlternativeUelStarter {
 		this.markUndefAsVariables = markUndefAsVariables;
 	}
 
+	public void setSnomedMode(boolean snomedMode) {
+		this.snomedMode = snomedMode;
+		this.owlThingAlias = OWLManager.getOWLDataFactory()
+				.getOWLClass(IRI.create("http://www.ihtsdo.org/SCT_138875005"));
+	}
+
 	public static void main(String[] args) {
 		int argIdx = 0;
 		String mainFilename = "";
@@ -77,6 +86,7 @@ public class AlternativeUelStarter {
 		String varFilename = "";
 		String owlThingAliasName = "";
 		boolean printInfo = false;
+		boolean snomedMode = false;
 		int algorithmIdx = 0;
 		while (argIdx < args.length) {
 			if ((args[argIdx].length() == 2) && (args[argIdx].charAt(0) == '-')) {
@@ -112,6 +122,9 @@ public class AlternativeUelStarter {
 				case 'i':
 					printInfo = true;
 					break;
+				case 's':
+					snomedMode = true;
+					break;
 				default:
 					mainFilename = args[argIdx];
 					break;
@@ -125,6 +138,7 @@ public class AlternativeUelStarter {
 		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
 		AlternativeUelStarter starter = new AlternativeUelStarter(loadOntology(mainFilename, manager));
 		starter.setVerbose(printInfo);
+		starter.setSnomedMode(snomedMode);
 		if (!owlThingAliasName.isEmpty()) {
 			starter.setOwlThingAlias(OWLManager.getOWLDataFactory().getOWLClass(IRI.create(owlThingAliasName)));
 		}
@@ -174,8 +188,18 @@ public class AlternativeUelStarter {
 	}
 
 	private static void printSyntax() {
-		System.out.println(
-				"Usage: uel [-p positive.owl] [-n negative.owl] [-v variables.txt] [-t owl:Thing_alias] [-a algorithmIndex] [-h] [-i] [background_ontology.owl]");
+		try {
+			BufferedReader reader = new BufferedReader(
+					new InputStreamReader(AlternativeUelStarter.class.getResourceAsStream("/help")));
+			String line = null;
+			while ((line = reader.readLine()) != null) {
+				System.out.println(line);
+			}
+			System.out.flush();
+			reader.close();
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		}
 	}
 
 	static Set<OWLClass> loadVariables(String filename) {
@@ -223,7 +247,7 @@ public class AlternativeUelStarter {
 			OWLOntology negativeProblem, Set<OWLClass> variables, String algorithmName) {
 
 		UelModel uelModel = new UelModel(new BasicOntologyProvider(ontologyManager));
-		uelModel.setupGoal(ontologies, positiveProblem, negativeProblem, owlThingAlias);
+		uelModel.setupGoal(ontologies, positiveProblem, negativeProblem, owlThingAlias, snomedMode);
 
 		return modifyOntologyAndSolve(uelModel, variables, algorithmName);
 	}
@@ -233,7 +257,8 @@ public class AlternativeUelStarter {
 			Set<OWLEquivalentClassesAxiom> disequations, Set<OWLClass> variables, String algorithmName) {
 
 		UelModel uelModel = new UelModel(new BasicOntologyProvider(ontologyManager));
-		uelModel.setupGoal(ontologies, subsumptions, equations, dissubsumptions, disequations, owlThingAlias);
+		uelModel.setupGoal(ontologies, subsumptions, equations, dissubsumptions, disequations, owlThingAlias,
+				snomedMode);
 
 		return modifyOntologyAndSolve(uelModel, variables, algorithmName);
 	}
@@ -244,7 +269,7 @@ public class AlternativeUelStarter {
 		uelModel.makeClassesUserVariables(variables);
 
 		if (markUndefAsVariables) {
-			uelModel.markUndefAsUserVariables();
+			uelModel.makeAllUndefClassesUserVariables();
 		}
 
 		if (verbose) {

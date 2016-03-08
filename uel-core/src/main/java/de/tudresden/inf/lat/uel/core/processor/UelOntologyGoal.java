@@ -41,15 +41,17 @@ class UelOntologyGoal implements Goal {
 	private final Map<Integer, Set<Integer>> domains = new HashMap<Integer, Set<Integer>>();
 	private final Set<Equation> equations = new HashSet<Equation>();
 	private UelOntology ontology;
+	private final boolean snomedMode;
 	private final Map<Integer, Set<Integer>> ranges = new HashMap<Integer, Set<Integer>>();
 	private final Set<Subsumption> subsumptions = new HashSet<Subsumption>();
 	private final Set<Integer> transparentRoles = new HashSet<Integer>();
 	private final Set<Integer> topLevelTypes = new HashSet<Integer>();
 	private final Set<Integer> types = new HashSet<Integer>();
 
-	public UelOntologyGoal(AtomManager manager, UelOntology ontology) {
+	public UelOntologyGoal(AtomManager manager, UelOntology ontology, boolean snomedMode) {
 		this.atomManager = manager;
 		this.ontology = ontology;
+		this.snomedMode = snomedMode;
 	}
 
 	public void addDisequation(OWLEquivalentClassesAxiom axiom) {
@@ -243,10 +245,12 @@ class UelOntologyGoal implements Goal {
 		Integer defId = def.getDefiniendum();
 		Integer undefId = atomManager.createUndefConceptName(defId);
 
-		// add type restriction for new UNDEF concept name
-		Integer classId = ontology.getClassification(defId);
-		if (!classId.equals(defId)) {
-			subsumptions.add(new Subsumption(Collections.singleton(undefId), Collections.singleton(classId)));
+		if (snomedMode) {
+			// add type restriction for new UNDEF concept name
+			Integer classId = ontology.getClassification(defId);
+			if (!classId.equals(defId)) {
+				subsumptions.add(new Subsumption(Collections.singleton(undefId), Collections.singleton(classId)));
+			}
 		}
 
 		// create full definition
