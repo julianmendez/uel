@@ -12,4 +12,6 @@ public interface AspSolver {
 
 	AspOutput solve(AspInput input) throws IOException;
 
+	void cleanup();
+
 }

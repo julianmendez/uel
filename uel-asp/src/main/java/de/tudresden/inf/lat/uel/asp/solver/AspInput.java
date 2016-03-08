@@ -1,7 +1,10 @@
 package de.tudresden.inf.lat.uel.asp.solver;
 
+import java.util.Set;
+
 import de.tudresden.inf.lat.uel.type.api.Atom;
 import de.tudresden.inf.lat.uel.type.api.AtomManager;
+import de.tudresden.inf.lat.uel.type.api.Axiom;
 import de.tudresden.inf.lat.uel.type.api.Definition;
 import de.tudresden.inf.lat.uel.type.api.Disequation;
 import de.tudresden.inf.lat.uel.type.api.Dissubsumption;
@@ -39,24 +42,23 @@ public class AspInput {
 		StringBuilder encoding = new StringBuilder();
 		int i = 1;
 		for (Definition d : goal.getDefinitions()) {
-			encodeDefinition(encoding, d, i);
+			encodeAxiom(encoding, d, i, "definition", "eq");
 			i++;
 		}
 		for (Equation e : goal.getEquations()) {
-			encodeEquation(encoding, e, i);
+			encodeAxiom(encoding, e, i, "equation", "eq");
 			i++;
 		}
 		for (Subsumption s : goal.getSubsumptions()) {
 			encodeSubsumption(encoding, s, i);
 			i++;
 		}
-		i = 1;
 		for (Disequation e : goal.getDisequations()) {
-			encodeDisequation(encoding, e, i);
+			encodeAxiom(encoding, e, i, "disequation", "diseq");
 			i++;
 		}
 		for (Dissubsumption s : goal.getDissubsumptions()) {
-			encodeDissubsumption(encoding, s, i);
+			encodeAxiom(encoding, s, i, "dissubsumption", "dissubs");
 			i++;
 		}
 		for (Integer var : goal.getAtomManager().getUserVariables()) {
@@ -68,102 +70,57 @@ public class AspInput {
 		program = encoding.toString();
 	}
 
-	private void encodeDefinition(StringBuilder encoding, Definition d, int index) {
-		encoding.append("%definition ");
+	private void encodeAxiom(StringBuilder encoding, Axiom d, int index, String comment, String predicate) {
+		encoding.append("%");
+		encoding.append(comment);
+		encoding.append(" ");
 		encoding.append(index);
 		encoding.append(RendererKeywords.newLine);
-		// lhs
-		encodePositiveAtom(encoding, d.getDefiniendum(), 0, index);
-		// rhs
-		for (Integer rightId : d.getRight()) {
-			encodePositiveAtom(encoding, rightId, 1, index);
-		}
-		encoding.append(RendererKeywords.newLine);
-	}
 
-	private void encodeEquation(StringBuilder encoding, Equation e, int index) {
-		encoding.append("%equation ");
+		encoding.append(predicate);
+		encoding.append("(");
 		encoding.append(index);
+		encoding.append(").");
 		encoding.append(RendererKeywords.newLine);
-		// lhs
-		for (Integer leftId : e.getLeft()) {
-			encodePositiveAtom(encoding, leftId, 0, index);
-		}
-		// rhs
-		for (Integer rightId : e.getRight()) {
-			encodePositiveAtom(encoding, rightId, 1, index);
-		}
+
+		encodeAtoms(encoding, d, index);
 		encoding.append(RendererKeywords.newLine);
 	}
 
 	private void encodeSubsumption(StringBuilder encoding, Subsumption s, int index) {
+		// TODO more direct ASP encoding for subsumptions
 		encoding.append("%subsumption ");
 		encoding.append(index);
 		encoding.append(RendererKeywords.newLine);
-		// lhs
-		for (Integer leftId : s.getLeft()) {
-			encodePositiveAtom(encoding, leftId, 0, index);
-			encodePositiveAtom(encoding, leftId, 1, index);
-		}
-		// rhs
-		for (Integer rightId : s.getRight()) {
-			encodePositiveAtom(encoding, rightId, 1, index);
-		}
-		encoding.append(RendererKeywords.newLine);
-	}
 
-	private void encodeDisequation(StringBuilder encoding, Disequation e, int index) {
-		encoding.append("%disequation ");
-		encoding.append(index);
-		encoding.append(RendererKeywords.newLine);
-		// lhs
-		for (Integer leftId : e.getLeft()) {
-			encodeNegativeAtom(encoding, leftId, 0, index);
-		}
-		// rhs
-		for (Integer rightId : e.getRight()) {
-			encodeNegativeAtom(encoding, rightId, 1, index);
-		}
-		encoding.append(RendererKeywords.newLine);
-	}
-
-	private void encodeDissubsumption(StringBuilder encoding, Dissubsumption s, int index) {
-		encoding.append("%disequation ");
-		encoding.append(index);
-		encoding.append(RendererKeywords.newLine);
-		// lhs
-		for (Integer leftId : s.getLeft()) {
-			encodeNegativeAtom(encoding, leftId, 0, index);
-		}
-		// rhs
-		for (Integer rightId : s.getRight()) {
-			encodeNegativeAtom(encoding, rightId, 1, index);
-		}
-		encoding.append(RendererKeywords.newLine);
-		encoding.append("lefttoright(");
+		encoding.append("eq(");
 		encoding.append(index);
 		encoding.append(").");
 		encoding.append(RendererKeywords.newLine);
+
+		encodeAtoms(encoding, s, index);
+		encodeAtoms(encoding, s.getLeft(), 1, index);
+		encoding.append(RendererKeywords.newLine);
 	}
 
-	private void encodePositiveAtom(StringBuilder encoding, Integer atomId, int side, int equationId) {
-		encoding.append("eqhasatom(");
+	private void encodeAtoms(StringBuilder encoding, Axiom axiom, int index) {
+		encodeAtoms(encoding, axiom.getLeft(), 0, index);
+		encodeAtoms(encoding, axiom.getRight(), 1, index);
+	}
+
+	private void encodeAtoms(StringBuilder encoding, Set<Integer> atomIds, int side, int index) {
+		for (Integer atomId : atomIds) {
+			encodeAtom(encoding, atomId, side, index);
+		}
+	}
+
+	private void encodeAtom(StringBuilder encoding, Integer atomId, int side, int equationId) {
+		encoding.append("hasatom(");
 		encodeAtom(encoding, goal.getAtomManager().getAtom(atomId));
 		encoding.append(", ");
 		encoding.append(side);
 		encoding.append(", ");
 		encoding.append(equationId);
-		encoding.append(").");
-		encoding.append(RendererKeywords.newLine);
-	}
-
-	private void encodeNegativeAtom(StringBuilder encoding, Integer atomId, int side, int disequationId) {
-		encoding.append("diseqhasatom(");
-		encodeAtom(encoding, goal.getAtomManager().getAtom(atomId));
-		encoding.append(", ");
-		encoding.append(side);
-		encoding.append(", ");
-		encoding.append(disequationId);
 		encoding.append(").");
 		encoding.append(RendererKeywords.newLine);
 	}
