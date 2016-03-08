@@ -146,8 +146,8 @@ public class ProcessorTest {
 		uelModel.setupGoal(Collections.singleton(owlOntology), positiveProblem, negativeProblem, null);
 
 		Set<OWLClass> variables = new HashSet<OWLClass>();
-		variables.add(idClassMap.get(conceptC));
-		variables.add(idClassMap.get(conceptD));
+		// variables.add(idClassMap.get(conceptC));
+		// variables.add(idClassMap.get(conceptD));
 		for (String var : varNames) {
 			variables.add(idClassMap.get(var));
 		}
@@ -168,6 +168,13 @@ public class ProcessorTest {
 		Set<OWLAxiom> background = uelModel.renderDefinitions();
 
 		for (Unifier unifier : uelModel.getUnifierList()) {
+			// for (OWLAxiom ax : uelModel.renderUnifier(unifier)) {
+			// System.out.println(ax);
+			// }
+			// System.out.println();
+			// System.out.println();
+			// System.out.println();
+			// System.out.println();
 			OWLOntology extendedOntology = createOntology(background, uelModel.renderUnifier(unifier));
 			OWLReasoner reasoner = createReasoner(extendedOntology);
 			Node<OWLClass> node = reasoner.getEquivalentClasses(idClassMap.get(conceptC));

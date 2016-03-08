@@ -5,8 +5,8 @@
 % ASP encoding based on the SAT encoding in 
 % F. Baader and B. Morawska: SAT Encoding of Unification in EL
 
-atom(A) :- eqhasatom(A,_,_).
-atom(A) :- eqhasatom(exists(_,A),_,_).
+atom(A) :- hasatom(A,_,_).
+atom(A) :- hasatom(exists(_,A),_,_).
 nonvaratom(X) :- atom(X), X!=var(V):atom(var(V)).
 
 
@@ -25,15 +25,13 @@ subs(X,Z) :- subs(X,Y), subs(Y,Z).
 :- subs(X,Y), triviallyfalse(X,Y).
 
 
-1 { subs(Y,X):eqhasatom(Y,|P-1|,E),not triviallyfalse(Y,X) } :- eqhasatom(X,P,E), nonvaratom(X).
+1 { subs(Y,X):hasatom(Y,1-P,E),not triviallyfalse(Y,X) } :- hasatom(X,P,E), nonvaratom(X), eq(E).
 
-{ subs(X,C) } :- nonvaratom(C), eqhasatom(X,P,E), not eqhasatom(C,PX,E):eqhasatom(C,PX,E), X=var(V),
-                 not triviallyfalse(X,C).
+{ subs(X,C) } :- nonvaratom(C), hasatom(X,P,E), eq(E), X=var(V),
+                 not hasatom(C,PX,E):hasatom(C,PX,E).
 
-{ subs(X,C) } :- atom(X), nonvaratom(C), not triviallyfalse(X,C), X!=Y:eqhasatom(Y,P,E).
-
-1 { subs(Y,C):eqhasatom(Y,|P-1|,E),not triviallyfalse(Y,C) } :- subs(X,C), eqhasatom(X,P,E),
-                  X=var(V), nonvaratom(C), not eqhasatom(C,PX,E):eqhasatom(C,PX,E).
+1 { subs(Y,C):hasatom(Y,1-P,E),not triviallyfalse(Y,C) } :- subs(X,C), hasatom(X,P,E), eq(E),
+                  X=var(V), nonvaratom(C), not hasatom(C,PX,E):hasatom(C,PX,E).
 
 
 greater(X,Y) :- subs(var(X),exists(R,var(Y))).

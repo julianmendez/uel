@@ -28,7 +28,7 @@ public class ClingoSolver implements AspSolver {
 	private static String CLINGO_COMMAND = "clingo";
 	// TODO: multi-threading?
 	private static String COMMON_ARGUMENTS = "--project --outf=2"; // --enum-mode=domRec";
-	private static String HEURISTIC_ARGUMENTS = "--dom-mod=5,16 --heu=Domain";
+	private static String HEURISTIC_ARGUMENTS = "--enum-mode=domRec --dom-mod=5,16 --heu=Domain";
 
 	private boolean hasNegativePart;
 	private boolean types;
@@ -46,7 +46,12 @@ public class ClingoSolver implements AspSolver {
 		} catch (IOException ex) {
 			throw new RuntimeException(ex);
 		}
-		// System.out.println(minimize);
+	}
+
+	@Override
+	public void cleanup() {
+		// TODO: implement asynchronous execution of clingo and stop the solver
+		// here if it is currently running
 	}
 
 	private List<String> getClingoArguments() {
@@ -58,7 +63,6 @@ public class ClingoSolver implements AspSolver {
 		if (minimize) {
 			arguments.addAll(Arrays.asList(HEURISTIC_ARGUMENTS.split(" ")));
 		}
-		// System.out.println(arguments.toString());
 		return arguments;
 	}
 
@@ -75,7 +79,6 @@ public class ClingoSolver implements AspSolver {
 		appendResource(FINAL_PROGRAM, programBuilder);
 		programBuilder.append(input.getProgram());
 		this.program = programBuilder.toString();
-		// System.out.println(program);
 		return new ClingoOutput(this, input.getAtomManager());
 	}
 

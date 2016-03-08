@@ -72,8 +72,8 @@ public class AlternativeUelStarter {
 	public static void main(String[] args) {
 		int argIdx = 0;
 		String mainFilename = "";
-		String subsFilename = "";
-		String dissubsFilename = "";
+		String posFilename = "";
+		String negFilename = "";
 		String varFilename = "";
 		String owlThingAliasName = "";
 		boolean printInfo = false;
@@ -81,13 +81,13 @@ public class AlternativeUelStarter {
 		while (argIdx < args.length) {
 			if ((args[argIdx].length() == 2) && (args[argIdx].charAt(0) == '-')) {
 				switch (args[argIdx].charAt(1)) {
-				case 's':
+				case 'p':
 					argIdx++;
-					subsFilename = args[argIdx];
+					posFilename = args[argIdx];
 					break;
-				case 'd':
+				case 'n':
 					argIdx++;
-					dissubsFilename = args[argIdx];
+					negFilename = args[argIdx];
 					break;
 				case 'v':
 					argIdx++;
@@ -129,12 +129,12 @@ public class AlternativeUelStarter {
 			starter.setOwlThingAlias(OWLManager.getOWLDataFactory().getOWLClass(IRI.create(owlThingAliasName)));
 		}
 
-		OWLOntology subsumptions = loadOntology(subsFilename, manager);
-		if (subsumptions == null) {
+		OWLOntology posOntology = loadOntology(posFilename, manager);
+		if (posOntology == null) {
 			return;
 		}
-		OWLOntology dissubsumptions = loadOntology(dissubsFilename, manager);
-		if (dissubsumptions == null) {
+		OWLOntology negOntology = loadOntology(negFilename, manager);
+		if (negOntology == null) {
 			return;
 		}
 		Set<OWLClass> variables = loadVariables(varFilename);
@@ -148,7 +148,7 @@ public class AlternativeUelStarter {
 		}
 		String algorithmName = algorithmNames.get(algorithmIdx);
 
-		Iterator<Set<OWLEquivalentClassesAxiom>> result = starter.modifyOntologyAndSolve(subsumptions, dissubsumptions,
+		Iterator<Set<OWLEquivalentClassesAxiom>> result = starter.modifyOntologyAndSolve(posOntology, negOntology,
 				variables, algorithmName);
 		int unifierIdx = 1;
 		while (result.hasNext()) {
@@ -175,7 +175,7 @@ public class AlternativeUelStarter {
 
 	private static void printSyntax() {
 		System.out.println(
-				"Usage: uel [-s subsumptions.owl] [-d dissubsumptions.owl] [-v variables.txt] [-t owl:Thing_alias] [-a algorithmIndex] [-h] [-i] [ontology.owl]");
+				"Usage: uel [-p positive.owl] [-n negative.owl] [-v variables.txt] [-t owl:Thing_alias] [-a algorithmIndex] [-h] [-i] [background_ontology.owl]");
 	}
 
 	static Set<OWLClass> loadVariables(String filename) {
