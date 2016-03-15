@@ -27,7 +27,7 @@ import de.tudresden.inf.lat.uel.plugin.main.UelStarter;
  */
 public class UelProtegeStarter extends UelStarter implements OWLModelManagerListener, OWLOntologyChangeListener {
 
-	private static final class ProtegeOntologyProvider implements OntologyProvider {
+	private static final class ProtegeOntologyProvider extends OntologyProvider {
 
 		private final OWLModelManager modelManager;
 
@@ -57,11 +57,6 @@ public class UelProtegeStarter extends UelStarter implements OWLModelManagerList
 		@Override
 		public Set<OWLOntology> getOntologies() {
 			return modelManager.getOntologies();
-		}
-
-		@Override
-		public boolean providesShortForms() {
-			return true;
 		}
 
 		@Override

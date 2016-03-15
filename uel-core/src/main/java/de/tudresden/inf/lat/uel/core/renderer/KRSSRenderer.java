@@ -1,16 +1,16 @@
 package de.tudresden.inf.lat.uel.core.renderer;
 
-import java.util.Map;
 import java.util.Set;
 
+import de.tudresden.inf.lat.uel.core.processor.ShortFormProvider;
 import de.tudresden.inf.lat.uel.type.api.AtomManager;
 import de.tudresden.inf.lat.uel.type.api.Definition;
 import de.tudresden.inf.lat.uel.type.cons.RendererKeywords;
 
 public class KRSSRenderer extends StringRenderer {
 
-	protected KRSSRenderer(AtomManager atomManager, Map<String, String> shortFormMap, Set<Definition> background) {
-		super(atomManager, shortFormMap, background);
+	protected KRSSRenderer(AtomManager atomManager, ShortFormProvider provider, Set<Definition> background) {
+		super(atomManager, provider, background);
 	}
 
 	@Override

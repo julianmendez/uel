@@ -6,16 +6,19 @@ package de.tudresden.inf.lat.uel.core.processor;
 import java.io.File;
 import java.util.Set;
 
+import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.model.OWLAnnotation;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.search.EntitySearcher;
 
 /**
  * @author Stefan Borgwardt
  *
  */
-public class BasicOntologyProvider implements OntologyProvider {
+public class BasicOntologyProvider extends OntologyProvider {
 
 	private OWLOntologyManager manager;
 
@@ -47,12 +50,12 @@ public class BasicOntologyProvider implements OntologyProvider {
 	}
 
 	@Override
-	public boolean providesShortForms() {
-		return false;
-	}
-
-	@Override
 	public String getShortForm(OWLEntity entity) {
-		throw new UnsupportedOperationException();
+		for (OWLAnnotation annotation : EntitySearcher.getAnnotations(entity, manager.getOntologies(),
+				OWLManager.getOWLDataFactory().getRDFSLabel())) {
+			return annotation.getValue().toString();
+		}
+
+		return null;
 	}
 }
