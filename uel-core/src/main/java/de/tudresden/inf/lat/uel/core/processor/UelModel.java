@@ -3,20 +3,16 @@ package de.tudresden.inf.lat.uel.core.processor;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.IRI;
-import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLDataFactory;
-import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
@@ -53,26 +49,10 @@ public class UelModel {
 		}
 	}
 
-	/**
-	 * Removes single or double quotes around the given string.
-	 * 
-	 * @param str
-	 *            the input string, possibly with quotes
-	 * @return the input string, with quotes removed
-	 */
-	public static String removeQuotes(String str) {
-		String ret = str;
-		if ((str.startsWith("\"") && str.endsWith("\"")) || (str.startsWith("'") && str.endsWith("'"))) {
-			ret = str.substring(1, str.length() - 1);
-		}
-		return ret;
-	}
-
 	private boolean allUnifiersFound;
 	private AtomManager atomManager;
 	private int currentUnifierIndex;
 	private UelOntologyGoal goal;
-	private Map<String, String> shortFormMap;
 	private OntologyProvider provider;
 	private UnificationAlgorithm algorithm;
 	private List<Unifier> unifierList;
@@ -88,13 +68,6 @@ public class UelModel {
 		this.provider = provider;
 	}
 
-	private void addAllShortForms(OWLOntology ontology, Set<? extends OWLEntity> entities) {
-		for (OWLEntity entity : entities) {
-			String shortForm = getShortForm(entity, ontology);
-			shortFormMap.put(entity.toStringID(), removeQuotes(shortForm));
-		}
-	}
-
 	/**
 	 * Indicates whether the unification algorithm has finished its search for
 	 * unifiers.
@@ -104,6 +77,18 @@ public class UelModel {
 	 */
 	public boolean allUnifiersFound() {
 		return allUnifiersFound;
+	}
+
+	private void cacheShortForms() {
+		for (Integer atomId : atomManager.getConstants()) {
+			provider.getShortForm(atomManager.printConceptName(atomId));
+		}
+		for (Integer atomId : atomManager.getVariables()) {
+			provider.getShortForm(atomManager.printConceptName(atomId));
+		}
+		for (Integer roleId : atomManager.getRoleIds()) {
+			provider.getShortForm(atomManager.getRoleName(roleId));
+		}
 	}
 
 	/**
@@ -218,20 +203,6 @@ public class UelModel {
 		return new OWLRenderer(atomManager, background);
 	}
 
-	private String getShortForm(OWLEntity entity, OWLOntology ontology) {
-		if (provider.providesShortForms()) {
-			return provider.getShortForm(entity);
-		}
-
-		for (OWLAnnotationAssertionAxiom annotation : ontology.getAnnotationAssertionAxioms(entity.getIRI())) {
-			if (annotation.getProperty().equals(OWLManager.getOWLDataFactory().getRDFSLabel())) {
-				return annotation.getValue().toString();
-			}
-		}
-
-		return entity.getIRI().getShortForm();
-	}
-
 	/**
 	 * Construct a renderer for output of unifiers etc. as strings. The actual
 	 * format is specified in the method 'StringRenderer.createInstance'.
@@ -241,7 +212,7 @@ public class UelModel {
 	 * @return a new StringRenderer object
 	 */
 	public StringRenderer getStringRenderer(Set<Definition> background) {
-		return StringRenderer.createInstance(atomManager, shortFormMap, background);
+		return StringRenderer.createInstance(atomManager, provider, background);
 	}
 
 	/**
@@ -305,7 +276,6 @@ public class UelModel {
 	 */
 	public void loadOntology(File file) {
 		provider.loadOntology(file);
-		recomputeShortFormMap();
 	}
 
 	/**
@@ -404,18 +374,6 @@ public class UelModel {
 	}
 
 	/**
-	 * Updates the mapping from long to short string representations for all
-	 * OWLEntities in the currently loaded ontologies.
-	 */
-	public void recomputeShortFormMap() {
-		shortFormMap = new HashMap<String, String>();
-		for (OWLOntology ontology : provider.getOntologies()) {
-			addAllShortForms(ontology, ontology.getClassesInSignature());
-			addAllShortForms(ontology, ontology.getObjectPropertiesInSignature());
-		}
-	}
-
-	/**
 	 * Renders the current unifier as a set of OWLAxioms.
 	 * 
 	 * @return the OWL representation of the current unifier
@@ -446,6 +404,13 @@ public class UelModel {
 	 */
 	public Set<OWLAxiom> renderUnifier(Unifier unifier) {
 		return getOWLRenderer(unifier.getDefinitions()).renderUnifier(unifier);
+	}
+
+	/**
+	 * Resets the internal cache of the short form provider.
+	 */
+	public void resetShortFormCache() {
+		provider.resetCache();
 	}
 
 	/**
@@ -516,7 +481,7 @@ public class UelModel {
 		allUnifiersFound = false;
 		atomManager = new AtomManagerImpl();
 
-		recomputeShortFormMap();
+		resetShortFormCache();
 
 		OWLClass owlThing = getOWLThing(owlThingAlias, snomedMode);
 		goal = new UelOntologyGoal(atomManager, new UelOntology(atomManager, bgOntologies, owlThing), snomedMode);
@@ -538,6 +503,7 @@ public class UelModel {
 		}
 
 		goal.disposeOntology();
+		cacheShortForms();
 	}
 
 	private OWLClass getOWLThing(OWLClass owlThingAlias, boolean snomedMode) {

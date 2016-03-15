@@ -1,10 +1,8 @@
 package de.tudresden.inf.lat.uel.core.renderer;
 
-import java.util.Map;
 import java.util.Set;
 
-import org.semanticweb.owlapi.model.IRI;
-
+import de.tudresden.inf.lat.uel.core.processor.ShortFormProvider;
 import de.tudresden.inf.lat.uel.type.api.AtomManager;
 import de.tudresden.inf.lat.uel.type.api.Axiom;
 import de.tudresden.inf.lat.uel.type.api.Definition;
@@ -14,13 +12,13 @@ import de.tudresden.inf.lat.uel.type.impl.Unifier;
 abstract class Renderer<ExpressionType, AxiomsType> {
 
 	private final AtomManager atomManager;
-	private final Map<String, String> shortFormMap;
+	private final ShortFormProvider provider;
 	private final Set<Definition> background;
 	private final boolean restrictToUserVariables;
 
-	protected Renderer(AtomManager atomManager, Map<String, String> shortFormMap, Set<Definition> background) {
+	protected Renderer(AtomManager atomManager, ShortFormProvider provider, Set<Definition> background) {
 		this.atomManager = atomManager;
-		this.shortFormMap = shortFormMap;
+		this.provider = provider;
 		this.background = background;
 		this.restrictToUserVariables = (background != null);
 	}
@@ -39,26 +37,23 @@ abstract class Renderer<ExpressionType, AxiomsType> {
 	}
 
 	private String getShortForm(String id) {
-		boolean alias = false;
-		String label = id;
+		if (provider == null) {
+			return id;
+		}
 
+		String label = id;
 		if (id.endsWith(AtomManager.UNDEF_SUFFIX)) {
 			label = id.substring(0, id.length() - AtomManager.UNDEF_SUFFIX.length());
 		}
-		String str = shortFormMap.get(label);
+		String str = provider.getShortForm(label);
 		if (str != null) {
-			alias = true;
 			label = str;
 		}
 		if (id.endsWith(AtomManager.UNDEF_SUFFIX)) {
 			label += AtomManager.UNDEF_SUFFIX;
 		}
 
-		if (alias) {
-			return "<" + label + ">";
-		} else {
-			return IRI.create(label).getShortForm();
-		}
+		return "<" + label + ">";
 	}
 
 	protected abstract void initialize();
@@ -107,19 +102,11 @@ abstract class Renderer<ExpressionType, AxiomsType> {
 	}
 
 	public String renderName(Integer atomId) {
-		String name = atomManager.printConceptName(atomId);
-		if (shortFormMap != null) {
-			name = getShortForm(name);
-		}
-		return name;
+		return getShortForm(atomManager.printConceptName(atomId));
 	}
 
 	public String renderRole(Integer roleId) {
-		String roleName = atomManager.getRoleName(roleId);
-		if (shortFormMap != null) {
-			roleName = getShortForm(roleName);
-		}
-		return roleName;
+		return getShortForm(atomManager.getRoleName(roleId));
 	}
 
 	public ExpressionType renderTop() {

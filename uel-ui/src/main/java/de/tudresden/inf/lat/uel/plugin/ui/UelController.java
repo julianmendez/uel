@@ -144,7 +144,7 @@ public class UelController {
 	 * refreshes the view accordingly.
 	 */
 	public void reload() {
-		model.recomputeShortFormMap();
+		model.resetShortFormCache();
 		updateView();
 	}
 

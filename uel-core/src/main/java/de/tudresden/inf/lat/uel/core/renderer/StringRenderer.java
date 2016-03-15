@@ -1,23 +1,23 @@
 package de.tudresden.inf.lat.uel.core.renderer;
 
-import java.util.Map;
 import java.util.Set;
 
+import de.tudresden.inf.lat.uel.core.processor.ShortFormProvider;
 import de.tudresden.inf.lat.uel.type.api.AtomManager;
 import de.tudresden.inf.lat.uel.type.api.Axiom;
 import de.tudresden.inf.lat.uel.type.api.Definition;
 
 public abstract class StringRenderer extends Renderer<String, String> {
 
-	public static StringRenderer createInstance(AtomManager atomManager, Map<String, String> shortFormMap,
+	public static StringRenderer createInstance(AtomManager atomManager, ShortFormProvider provider,
 			Set<Definition> background) {
-		return new ManchesterRenderer(atomManager, shortFormMap, background);
+		return new ManchesterRenderer(atomManager, provider, background);
 	}
 
 	protected StringBuilder sb;
 
-	protected StringRenderer(AtomManager atomManager, Map<String, String> shortFormMap, Set<Definition> background) {
-		super(atomManager, shortFormMap, background);
+	protected StringRenderer(AtomManager atomManager, ShortFormProvider provider, Set<Definition> background) {
+		super(atomManager, provider, background);
 	}
 
 	@Override
