@@ -445,11 +445,12 @@ public class UelModel {
 	 *            additional type information
 	 */
 	public void setupGoal(Set<OWLOntology> bgOntologies, OWLOntology positiveProblem, OWLOntology negativeProblem,
-			OWLClass owlThingAlias, boolean snomedMode) {
+			OWLClass owlThingAlias, boolean snomedMode, boolean resetShortFormCache) {
 		setupGoal(bgOntologies, positiveProblem.getAxioms(AxiomType.SUBCLASS_OF),
 				positiveProblem.getAxioms(AxiomType.EQUIVALENT_CLASSES),
 				negativeProblem.getAxioms(AxiomType.SUBCLASS_OF),
-				negativeProblem.getAxioms(AxiomType.EQUIVALENT_CLASSES), owlThingAlias, snomedMode);
+				negativeProblem.getAxioms(AxiomType.EQUIVALENT_CLASSES), owlThingAlias, snomedMode,
+				resetShortFormCache);
 	}
 
 	/**
@@ -473,7 +474,8 @@ public class UelModel {
 	 */
 	public void setupGoal(Set<OWLOntology> bgOntologies, Set<OWLSubClassOfAxiom> subsumptions,
 			Set<OWLEquivalentClassesAxiom> equations, Set<OWLSubClassOfAxiom> dissubsumptions,
-			Set<OWLEquivalentClassesAxiom> disequations, OWLClass owlThingAlias, boolean snomedMode) {
+			Set<OWLEquivalentClassesAxiom> disequations, OWLClass owlThingAlias, boolean snomedMode,
+			boolean resetShortFormCache) {
 
 		algorithm = null;
 		unifierList = new ArrayList<Unifier>();
@@ -481,7 +483,9 @@ public class UelModel {
 		allUnifiersFound = false;
 		atomManager = new AtomManagerImpl();
 
-		resetShortFormCache();
+		if (resetShortFormCache) {
+			resetShortFormCache();
+		}
 
 		OWLClass owlThing = getOWLThing(owlThingAlias, snomedMode);
 		goal = new UelOntologyGoal(atomManager, new UelOntology(atomManager, bgOntologies, owlThing), snomedMode);
@@ -503,7 +507,9 @@ public class UelModel {
 		}
 
 		goal.disposeOntology();
-		cacheShortForms();
+		if (resetShortFormCache) {
+			cacheShortForms();
+		}
 	}
 
 	private OWLClass getOWLThing(OWLClass owlThingAlias, boolean snomedMode) {

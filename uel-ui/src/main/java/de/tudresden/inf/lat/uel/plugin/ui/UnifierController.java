@@ -29,6 +29,10 @@ class UnifierController {
 		view.addRefineListener(listener);
 	}
 
+	public void addUndoRefineListener(ActionListener listener) {
+		view.addUndoRefineListener(listener);
+	}
+
 	public void close() {
 		view.close();
 	}
@@ -97,25 +101,29 @@ class UnifierController {
 		view.open();
 	}
 
+	public void setUndoRefineButtonEnabled(boolean state) {
+		view.setUndoRefineButtonEnabled(state);
+	}
+
 	private void updateUnifierView() {
 		int index = model.getCurrentUnifierIndex();
 		if (index > -1) {
 			view.setUnifier(model.printCurrentUnifier());
-			view.setSaveRefineButtons(true);
+			view.setSaveRefineButtonsEnabled(true);
 		} else {
 			view.setUnifier("[not unifiable]");
-			view.setSaveRefineButtons(false);
+			view.setSaveRefineButtonsEnabled(false);
 		}
 		view.setUnifierId(" " + (index + 1) + " ");
 		if (index == 0) {
-			view.setFirstPreviousButtons(false);
+			view.setFirstPreviousButtonsEnabled(false);
 		} else {
-			view.setFirstPreviousButtons(true);
+			view.setFirstPreviousButtonsEnabled(true);
 		}
 		if (model.allUnifiersFound() && index >= model.getUnifierList().size() - 1) {
-			view.setNextLastButtons(false);
+			view.setNextLastButtonsEnabled(false);
 		} else {
-			view.setNextLastButtons(true);
+			view.setNextLastButtonsEnabled(true);
 		}
 	}
 

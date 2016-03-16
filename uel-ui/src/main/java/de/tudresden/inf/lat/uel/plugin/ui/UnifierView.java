@@ -26,6 +26,7 @@ class UnifierView extends UelDialog {
 	private final JButton buttonSave = new JButton();
 	private final JButton buttonShowStatInfo = new JButton();
 	private final JButton buttonRefine = new JButton();
+	private final JButton buttonUndoRefine = new JButton();
 	private final JTextArea textUnifier = new JTextArea();
 	private final JLabel labelUnifierId = new JLabel();
 
@@ -61,6 +62,10 @@ class UnifierView extends UelDialog {
 		buttonRefine.addActionListener(listener);
 	}
 
+	public void addUndoRefineListener(ActionListener listener) {
+		buttonUndoRefine.addActionListener(listener);
+	}
+
 	@Override
 	protected JComponent createMainPanel() {
 		JComponent mainPanel = UelUI.createVerticalPanel();
@@ -80,6 +85,8 @@ class UnifierView extends UelDialog {
 		unifierButtons.add(UelUI.setupButton(buttonSave, UelUI.ICON_SAVE, Message.tooltipSave));
 
 		unifierButtons.add(UelUI.setupButton(buttonRefine, UelUI.ICON_REFINE, Message.tooltipRefine));
+
+		unifierButtons.add(UelUI.setupButton(buttonUndoRefine, UelUI.ICON_UNDO, Message.tooltipUndoRefine));
 
 		return unifierButtons;
 	}
@@ -124,19 +131,23 @@ class UnifierView extends UelDialog {
 		buttonShowStatInfo.setEnabled(true);
 	}
 
-	public void setFirstPreviousButtons(boolean state) {
+	public void setFirstPreviousButtonsEnabled(boolean state) {
 		buttonFirst.setEnabled(state);
 		buttonPrevious.setEnabled(state);
 	}
 
-	public void setNextLastButtons(boolean state) {
+	public void setNextLastButtonsEnabled(boolean state) {
 		buttonNext.setEnabled(state);
 		buttonLast.setEnabled(state);
 	}
 
-	public void setSaveRefineButtons(boolean state) {
+	public void setSaveRefineButtonsEnabled(boolean state) {
 		buttonSave.setEnabled(state);
 		buttonRefine.setEnabled(state);
+	}
+
+	public void setUndoRefineButtonEnabled(boolean state) {
+		buttonUndoRefine.setEnabled(state);
 	}
 
 }

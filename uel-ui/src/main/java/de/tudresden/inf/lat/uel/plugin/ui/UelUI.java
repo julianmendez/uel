@@ -133,6 +133,7 @@ class UelUI {
 	public static final String PATH_STATISTICS = "icons/statistics.png";
 	public static final String PATH_STEP_BACK = "icons/stepback.png";
 	public static final String PATH_STEP_FORWARD = "icons/stepforward.png";
+	public static final String PATH_UNDO = "icons/undo.png";
 
 	public static final Icon ICON_BACK = createIcon(PATH_BACK);
 	public static final Icon ICON_FAST_FORWARD = createIcon(PATH_FAST_FORWARD);
@@ -144,6 +145,7 @@ class UelUI {
 	public static final Icon ICON_STATISTICS = createIcon(PATH_STATISTICS);
 	public static final Icon ICON_STEP_BACK = createIcon(PATH_STEP_BACK);
 	public static final Icon ICON_STEP_FORWARD = createIcon(PATH_STEP_FORWARD);
+	public static final Icon ICON_UNDO = createIcon(PATH_UNDO);
 
 	static File previousFile = null;
 
@@ -190,8 +192,8 @@ class UelUI {
 		return setupLabel(new JLabel(text), toolTipText);
 	}
 
-	static <T> JList<T> createList(List<T> data, String toolTipText) {
-		return setupList(new JList<T>(new Vector<T>(data)), toolTipText);
+	static <T> JList<T> createList(List<T> data, String toolTipText, boolean border) {
+		return setupList(new JList<T>(new Vector<T>(data)), toolTipText, border);
 	}
 
 	static JScrollPane createScrollableTextArea(JTextArea textArea, String toolTipText) {
@@ -199,15 +201,17 @@ class UelUI {
 		textArea.setLineWrap(true);
 		textArea.setEditable(false);
 		textArea.setToolTipText(toolTipText);
-		setBorder(textArea);
-		return createScrollPane(textArea);
+		setMargin(textArea);
+		return createScrollPane(textArea, true);
 	}
 
-	static JScrollPane createScrollPane(Component child) {
+	static JScrollPane createScrollPane(JComponent child, boolean border) {
 		JScrollPane scrollPane = new JScrollPane(child);
 		scrollPane.setOpaque(false);
 		scrollPane.getViewport().setOpaque(false);
-		scrollPane.setBorder(new EmptyBorder(0, 0, 0, 0));
+		if (border) {
+			setBorder(scrollPane, false);
+		}
 		return scrollPane;
 	}
 
@@ -223,24 +227,32 @@ class UelUI {
 		comp.setBorder(new LineBorder(Color.RED));
 	}
 
-	static void setBorder(JComponent comp) {
+	static void scrollTop(JComponent comp) {
+		((JScrollPane) comp.getParent().getParent()).getVerticalScrollBar().setValue(0);
+	}
+
+	static void setBorder(JComponent comp, boolean insideMargin) {
 		boolean button = comp instanceof JButton;
 		Border line = new LineBorder(new Color(150, 150, 150));
-		int vertical = button ? 0 : GAP_SIZE - 1;
-		int horizontal = GAP_SIZE - 1;
-		Border margin = new EmptyBorder(vertical, horizontal, vertical, horizontal);
-		Border compound = new CompoundBorder(line, margin);
-		comp.setBorder(compound);
+		if (insideMargin) {
+			int vertical = button ? 0 : GAP_SIZE - 1;
+			int horizontal = GAP_SIZE - 1;
+			Border margin = new EmptyBorder(vertical, horizontal, vertical, horizontal);
+			Border compound = new CompoundBorder(line, margin);
+			comp.setBorder(compound);
+		} else {
+			comp.setBorder(line);
+		}
 	}
 
 	static void setMargin(JComponent comp) {
-		comp.setBorder(new EmptyBorder(GAP_SIZE, GAP_SIZE, GAP_SIZE, GAP_SIZE));
+		comp.setBorder(new EmptyBorder(GAP_SIZE - 1, GAP_SIZE - 1, GAP_SIZE - 1, GAP_SIZE - 1));
 	}
 
 	static JButton setupButton(JButton button, Icon icon, String toolTipText) {
 		button.setIcon(icon);
 		button.setToolTipText(toolTipText);
-		setBorder(button);
+		setBorder(button, true);
 		return button;
 	}
 
@@ -262,10 +274,14 @@ class UelUI {
 		return label;
 	}
 
-	static <E> JList<E> setupList(JList<E> list, String toolTipText) {
+	static <E> JList<E> setupList(JList<E> list, String toolTipText, boolean border) {
 		list.setToolTipText(toolTipText);
 		list.setSelectionModel(new ToggleListSelectionModel());
-		setBorder(list);
+		if (border) {
+			setBorder(list, true);
+		} else {
+			setMargin(list);
+		}
 		return list;
 	}
 

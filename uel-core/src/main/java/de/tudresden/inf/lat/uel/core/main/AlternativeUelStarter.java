@@ -245,7 +245,7 @@ public class AlternativeUelStarter {
 			OWLOntology negativeProblem, Set<OWLClass> variables, String algorithmName) {
 
 		UelModel uelModel = new UelModel(new BasicOntologyProvider(ontologyManager));
-		uelModel.setupGoal(ontologies, positiveProblem, negativeProblem, owlThingAlias, snomedMode);
+		uelModel.setupGoal(ontologies, positiveProblem, negativeProblem, owlThingAlias, snomedMode, true);
 
 		return modifyOntologyAndSolve(uelModel, variables, algorithmName);
 	}
@@ -256,7 +256,7 @@ public class AlternativeUelStarter {
 
 		UelModel uelModel = new UelModel(new BasicOntologyProvider(ontologyManager));
 		uelModel.setupGoal(ontologies, subsumptions, equations, dissubsumptions, disequations, owlThingAlias,
-				snomedMode);
+				snomedMode, true);
 
 		return modifyOntologyAndSolve(uelModel, variables, algorithmName);
 	}

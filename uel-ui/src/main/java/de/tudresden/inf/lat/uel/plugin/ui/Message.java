@@ -55,6 +55,7 @@ interface Message {
 	String tooltipShowStatInfo = "shows additional information about the computation";
 	String tooltipSubsumedByTop = "no subsumers";
 	String tooltipTextInfo = "statistical information about the unification algorithm";
+	String tooltipUndoRefine = "undo last refinement operation";
 	String tooltipUnifier = "unifier";
 	String tooltipUnifierId = "unifier id";
 	String tooltipVariableName = "subsumed variable";

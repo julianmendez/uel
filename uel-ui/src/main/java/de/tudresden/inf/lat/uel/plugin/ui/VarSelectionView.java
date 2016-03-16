@@ -81,7 +81,7 @@ class VarSelectionView extends UelDialog {
 
 		leftPanel.add(new JLabel(Message.textConstants), BorderLayout.NORTH);
 
-		leftPanel.add(UelUI.createScrollPane(UelUI.setupList(listConstants, Message.tooltipConstants)),
+		leftPanel.add(UelUI.createScrollPane(UelUI.setupList(listConstants, Message.tooltipConstants, false), true),
 				BorderLayout.CENTER);
 
 		JComponent rightPanel = UelUI.createVerticalPanel();
@@ -89,7 +89,7 @@ class VarSelectionView extends UelDialog {
 
 		rightPanel.add(new JLabel(Message.textVariables), BorderLayout.NORTH);
 
-		rightPanel.add(UelUI.createScrollPane(UelUI.setupList(listVariables, Message.tooltipVariables)),
+		rightPanel.add(UelUI.createScrollPane(UelUI.setupList(listVariables, Message.tooltipVariables, false), true),
 				BorderLayout.CENTER);
 
 		return varSelectionPanel;

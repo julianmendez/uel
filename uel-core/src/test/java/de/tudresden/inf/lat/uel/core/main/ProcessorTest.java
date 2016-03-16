@@ -143,7 +143,7 @@ public class ProcessorTest {
 				.getOWLEquivalentClassesAxiom(idClassMap.get(conceptC), idClassMap.get(conceptD)));
 		OWLOntology negativeProblem = ontologyManager.createOntology();
 
-		uelModel.setupGoal(Collections.singleton(owlOntology), positiveProblem, negativeProblem, null, false);
+		uelModel.setupGoal(Collections.singleton(owlOntology), positiveProblem, negativeProblem, null, false, true);
 
 		Set<OWLClass> variables = new HashSet<OWLClass>();
 		// variables.add(idClassMap.get(conceptC));
