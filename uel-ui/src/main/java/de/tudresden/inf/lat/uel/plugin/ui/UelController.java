@@ -60,9 +60,7 @@ public class UelController {
 			}
 			negOntology.getOWLOntologyManager().addAxiom(negOntology, axiom);
 		}
-		System.out.println("Pushing " + newAxioms);
 		undoStack.push(newAxioms);
-		System.out.println("Stack size: " + undoStack.size());
 	}
 
 	private void executeAcceptVar() {
@@ -190,7 +188,6 @@ public class UelController {
 		unifierController = new UnifierController(new UnifierView(view), model);
 		unifierController.addRefineListener(e -> executeRefine());
 		unifierController.addUndoRefineListener(e -> executeUndoRefine());
-		System.out.println("Stack is " + (undoStack.isEmpty() ? "empty." : "not empty."));
 		unifierController.setUndoRefineButtonEnabled(!undoStack.isEmpty());
 		unifierController.open();
 	}
