@@ -223,7 +223,7 @@ public class AlternativeUelStarter {
 		}
 	}
 
-	private static OWLOntology loadOntology(String filename, OWLOntologyManager manager) {
+	public static OWLOntology loadOntology(String filename, OWLOntologyManager manager) {
 		try {
 			if (filename.isEmpty()) {
 				return manager.createOntology();

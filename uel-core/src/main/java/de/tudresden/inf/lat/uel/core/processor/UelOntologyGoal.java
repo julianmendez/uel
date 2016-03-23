@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -16,6 +17,7 @@ import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 
+import de.tudresden.inf.lat.uel.core.renderer.StringRenderer;
 import de.tudresden.inf.lat.uel.type.api.AtomManager;
 import de.tudresden.inf.lat.uel.type.api.Axiom;
 import de.tudresden.inf.lat.uel.type.api.Definition;
@@ -36,22 +38,25 @@ class UelOntologyGoal implements Goal {
 
 	private final AtomManager atomManager;
 	private final Set<Definition> definitions = new HashSet<Definition>();
+	private final Map<Integer, Integer> directSupertype = new HashMap<Integer, Integer>();
 	private final Set<Disequation> disequations = new HashSet<Disequation>();
 	private final Set<Dissubsumption> dissubsumptions = new HashSet<Dissubsumption>();
 	private final Map<Integer, Set<Integer>> domains = new HashMap<Integer, Set<Integer>>();
 	private final Set<Equation> equations = new HashSet<Equation>();
 	private UelOntology ontology;
-	private final boolean snomedMode;
 	private final Map<Integer, Set<Integer>> ranges = new HashMap<Integer, Set<Integer>>();
+	private final StringRenderer renderer;
+	private final boolean snomedMode;
 	private final Set<Subsumption> subsumptions = new HashSet<Subsumption>();
 	private final Set<Integer> transparentRoles = new HashSet<Integer>();
-	private final Set<Integer> topLevelTypes = new HashSet<Integer>();
+
 	private final Set<Integer> types = new HashSet<Integer>();
 
-	public UelOntologyGoal(AtomManager manager, UelOntology ontology, boolean snomedMode) {
+	public UelOntologyGoal(AtomManager manager, UelOntology ontology, boolean snomedMode, ShortFormProvider provider) {
 		this.atomManager = manager;
 		this.ontology = ontology;
 		this.snomedMode = snomedMode;
+		this.renderer = StringRenderer.createInstance(atomManager, provider, null);
 	}
 
 	public void addDisequation(OWLEquivalentClassesAxiom axiom) {
@@ -122,6 +127,10 @@ class UelOntologyGoal implements Goal {
 		ontology = null;
 	}
 
+	/**
+	 * Extract (SNOMED) type information from domain and range restrictions and
+	 * the concept definitions.
+	 */
 	public void extractTypes() {
 		// extract all types from domain/range restrictions of used role names
 		Set<Integer> processedRoleIds = new HashSet<Integer>();
@@ -148,10 +157,24 @@ class UelOntologyGoal implements Goal {
 			remainingRoleIds.removeAll(processedRoleIds);
 		}
 
-		// extract all used top-level concept names
-		topLevelTypes.addAll(atomManager.getConstants().stream().filter(id -> id == ontology.getClassification(id))
-				.collect(Collectors.toList()));
-		types.addAll(topLevelTypes);
+		// extract all used top-level concept names from the background
+		// ontology, i.e., skip those that only occur in the goal or are UNDEF
+		// names
+		atomManager.getConstants().stream().map(ontology::getClassification).filter(Optional::isPresent)
+				.map(Optional::get).forEach(types::add);
+
+		// extract type hierarchy
+		for (Integer type : types) {
+			// traverse the class hierarchy and try to find another type
+			Optional<Integer> supertype = Optional.of(type);
+			do {
+				supertype = ontology.getDirectSuperclass(supertype.get());
+			} while (supertype.isPresent() && !types.contains(supertype.get()));
+
+			if (supertype.isPresent()) {
+				directSupertype.put(type, supertype.get());
+			}
+		}
 
 		// fill set of transparent roles
 		Integer roleGroupId = atomManager.getRoleId("http://www.ihtsdo.org/RoleGroup");
@@ -172,13 +195,13 @@ class UelOntologyGoal implements Goal {
 	}
 
 	@Override
-	public Set<Disequation> getDisequations() {
-		return disequations;
+	public Integer getDirectSupertype(Integer type) {
+		return directSupertype.get(type);
 	}
 
 	@Override
-	public Set<Integer> getDisjointTypes() {
-		return topLevelTypes;
+	public Set<Disequation> getDisequations() {
+		return disequations;
 	}
 
 	@Override
@@ -247,7 +270,7 @@ class UelOntologyGoal implements Goal {
 
 		if (snomedMode) {
 			// add type restriction for new UNDEF concept name
-			Integer classId = ontology.getClassification(defId);
+			Integer classId = ontology.getClassification(defId).get();
 			if (!classId.equals(defId)) {
 				subsumptions.add(new Subsumption(Collections.singleton(undefId), Collections.singleton(classId)));
 			}

@@ -1,5 +1,6 @@
 package de.tudresden.inf.lat.uel.core.renderer;
 
+import java.util.Collections;
 import java.util.Set;
 
 import de.tudresden.inf.lat.uel.core.processor.ShortFormProvider;
@@ -86,8 +87,11 @@ abstract class Renderer<ExpressionType, AxiomsType> {
 		if (!input.getTypes().isEmpty()) {
 			translateAtomList("Types", input.getTypes());
 		}
-		if (!input.getDisjointTypes().isEmpty()) {
-			translateAtomList("Disjoint types", input.getDisjointTypes());
+		for (Integer type : input.getTypes()) {
+			Integer supertype = input.getDirectSupertype(type);
+			if (supertype != null) {
+				translateAtomList("Direct supertype of " + renderName(type), Collections.singleton(supertype));
+			}
 		}
 		for (Integer roleId : input.getDomains().keySet()) {
 			translateAtomList("Domain of " + renderRole(roleId), input.getDomains().get(roleId));

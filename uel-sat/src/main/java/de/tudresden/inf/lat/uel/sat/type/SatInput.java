@@ -76,6 +76,17 @@ public class SatInput {
 	}
 
 	/**
+	 * Adds a new unit clause.
+	 * 
+	 * @param literal
+	 *            the only literal of the unit clause
+	 * @return a value indicating whether the SatInput was changed
+	 */
+	public boolean add(Integer literal) {
+		return add(Collections.singleton(literal));
+	}
+
+	/**
 	 * Adds a new non-empty clause.
 	 * 
 	 * @param clause

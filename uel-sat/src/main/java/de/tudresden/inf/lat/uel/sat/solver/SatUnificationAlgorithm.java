@@ -3,6 +3,7 @@ package de.tudresden.inf.lat.uel.sat.solver;
 import java.io.IOException;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -12,11 +13,13 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import de.tudresden.inf.lat.uel.sat.literals.Choice;
 import de.tudresden.inf.lat.uel.sat.literals.Literal;
 import de.tudresden.inf.lat.uel.sat.literals.OrderLiteral;
 import de.tudresden.inf.lat.uel.sat.literals.SubsumptionLiteral;
+import de.tudresden.inf.lat.uel.sat.literals.SubtypeLiteral;
 import de.tudresden.inf.lat.uel.sat.type.SatInput;
 import de.tudresden.inf.lat.uel.sat.type.SatOutput;
 import de.tudresden.inf.lat.uel.sat.type.Solver;
@@ -148,6 +151,7 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 	private final Set<Integer> trueLiterals = new HashSet<Integer>();
 	private final Set<Integer> nonVariableAtoms = new HashSet<Integer>();
 	private final Set<Integer> usedAtomIds = new HashSet<Integer>();
+	private final Set<Integer> conceptNames = new HashSet<Integer>();
 	private final Goal goal;
 	private Set<Integer> update = new HashSet<Integer>();
 
@@ -157,10 +161,12 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 		}
 
 		this.goal = goal;
-		this.nonVariableAtoms.addAll(goal.getAtomManager().getConstants());
-		this.nonVariableAtoms.addAll(goal.getAtomManager().getExistentialRestrictions());
+		this.nonVariableAtoms.addAll(getConstants());
+		this.nonVariableAtoms.addAll(getExistentialRestrictions());
 		this.usedAtomIds.addAll(nonVariableAtoms);
-		this.usedAtomIds.addAll(goal.getAtomManager().getVariables());
+		this.usedAtomIds.addAll(getVariables());
+		this.conceptNames.addAll(getConstants());
+		this.conceptNames.addAll(getVariables());
 		this.onlyMinimalAssignments = useMinimalAssignments;
 		setLiterals();
 	}
@@ -168,7 +174,7 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 	private void addClausesForDisunification(SatInput input) throws InterruptedException {
 		for (Integer atomId : getUsedAtomIds()) {
 			for (Integer varId : getVariables()) {
-				runStep1DissubsumptionVariable(Collections.singleton(getSubsumptionLiteral(atomId, varId)),
+				runStep1DissubsumptionVariable(Collections.singleton(subsumption(atomId, varId)),
 						Collections.singleton(atomId), varId, input);
 			}
 		}
@@ -185,6 +191,90 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 			subsumers.put(atomId1, ret);
 		}
 		return ret.add(atomId2);
+	}
+
+	private void addTypeRestrictions(SatInput input) {
+		// a - all types have themselves as types
+		for (Integer type : goal.getTypes()) {
+			input.add(subtype(type, type));
+		}
+
+		// b - every other concept name must also have a type
+		for (Integer conceptNameId : getConceptNames()) {
+			if (!goal.getTypes().contains(conceptNameId)) {
+				input.add(
+						goal.getTypes().stream().map(type -> subtype(conceptNameId, type)).collect(Collectors.toSet()));
+			}
+		}
+
+		// c - types are inherited by subconcepts
+		for (Integer conceptNameId1 : getConceptNames()) {
+			for (Integer conceptNameId2 : getConceptNames()) {
+				for (Integer type : goal.getTypes()) {
+					Set<Integer> clause = new HashSet<Integer>();
+					clause.add(neg(subsumption(conceptNameId1, conceptNameId2)));
+					clause.add(neg(subtype(conceptNameId2, type)));
+					clause.add(subtype(conceptNameId1, type));
+					input.add(clause);
+				}
+			}
+		}
+
+		// d - no concept name can have disjoint types
+		for (Integer type1 : goal.getTypes()) {
+			for (Integer type2 : goal.getTypes()) {
+				if (goal.areDisjoint(type1, type2)) {
+					for (Integer conceptNameId : getConceptNames()) {
+						Set<Integer> clause = new HashSet<Integer>();
+						clause.add(neg(subtype(conceptNameId, type1)));
+						clause.add(neg(subtype(conceptNameId, type2)));
+						input.add(clause);
+					}
+				}
+			}
+		}
+
+		// domain restrictions
+		for (Integer varId : getVariables()) {
+			for (Integer eatomId : getExistentialRestrictions()) {
+				Integer roleId = goal.getAtomManager().getExistentialRestriction(eatomId).getRoleId();
+				Set<Integer> domain = goal.getDomains().get(roleId);
+				if (domain != null) {
+					Set<Integer> clause = domain.stream().map(type -> subtype(varId, type)).collect(Collectors.toSet());
+					clause.add(neg(subsumption(varId, eatomId)));
+					input.add(clause);
+				}
+			}
+		}
+
+		// range restrictions
+		for (Integer eatomId : getExistentialRestrictions()) {
+			Integer roleId = goal.getAtomManager().getExistentialRestriction(eatomId).getRoleId();
+			Integer childId = goal.getAtomManager().getChild(eatomId);
+			Set<Integer> range = goal.getRanges().get(roleId);
+			if (range != null) {
+				input.add(range.stream().map(type -> subtype(childId, type)).collect(Collectors.toSet()));
+			}
+		}
+
+		for (Integer roleId : goal.getTransparentRoles()) {
+			for (Integer eatomId : getExistentialRestrictions()) {
+				if (goal.getAtomManager().getExistentialRestriction(eatomId).getRoleId().equals(roleId)) {
+					Integer childId = goal.getAtomManager().getChild(eatomId);
+					for (Integer varId : getVariables()) {
+						Integer dissubsumptionLiteral = neg(subsumption(varId, eatomId));
+						for (Integer type : goal.getTypes()) {
+							Integer varTypeLiteral = subtype(varId, type);
+							Integer childTypeLiteral = subtype(childId, type);
+							input.add(new HashSet<Integer>(
+									Arrays.asList(dissubsumptionLiteral, neg(varTypeLiteral), childTypeLiteral)));
+							input.add(new HashSet<Integer>(
+									Arrays.asList(dissubsumptionLiteral, neg(childTypeLiteral), varTypeLiteral)));
+						}
+					}
+				}
+			}
+		}
 	}
 
 	@Override
@@ -356,11 +446,17 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 			addClausesForDisunification(ret);
 		}
 
+		if (!goal.getTypes().isEmpty()) {
+			// encode type restrictions
+			logger.finer("encoding type restrictions ...");
+			addTypeRestrictions(ret);
+		}
+
 		if (this.onlyMinimalAssignments) {
 			logger.finer("adding literals to be minimized ...");
 			for (Integer varId : getUserVariables()) {
 				for (Integer atomId : getNonVariableAtoms()) {
-					ret.addMinimizeLiteral(getSubsumptionLiteral(varId, atomId));
+					ret.addMinimizeLiteral(subsumption(varId, atomId));
 				}
 			}
 		}
@@ -377,12 +473,16 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 	private void createUpdate() {
 		for (Integer firstAtomId : getUserVariables()) {
 			for (Integer secondAtomId : getNonVariableAtoms()) {
-				Integer literalId = getSubsumptionLiteral(firstAtomId, secondAtomId);
+				Integer literalId = subsumption(firstAtomId, secondAtomId);
 				if (!this.onlyMinimalAssignments || getLiteralValue(literalId)) {
 					update.add(getLiteralValue(literalId) ? (-1) * literalId : literalId);
 				}
 			}
 		}
+	}
+
+	private Set<Integer> getConceptNames() {
+		return conceptNames;
 	}
 
 	private Set<Integer> getConstants() {
@@ -429,16 +529,21 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 		return this.trueLiterals.contains(literalId);
 	}
 
-	private Integer getMinusOrderLiteral(Integer atomId1, Integer atomId2) {
-		return (-1) * getOrderLiteral(atomId1, atomId2);
+	private Integer neg(Integer literalId) {
+		return (-1) * literalId;
 	}
 
-	private Integer getSubsumptionLiteral(Integer atomId1, Integer atomId2) {
+	private Integer subtype(Integer atomId, Integer type) {
+		Literal literal = new SubtypeLiteral(atomId, type);
+		return literalManager.addAndGetIndex(literal);
+	}
+
+	private Integer subsumption(Integer atomId1, Integer atomId2) {
 		Literal literal = new SubsumptionLiteral(atomId1, atomId2);
 		return literalManager.addAndGetIndex(literal);
 	}
 
-	private Integer getOrderLiteral(Integer atomId1, Integer atomId2) {
+	private Integer order(Integer atomId1, Integer atomId2) {
 		Literal literal = new OrderLiteral(atomId1, atomId2);
 		return this.literalManager.addAndGetIndex(literal);
 	}
@@ -450,10 +555,6 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 			subsumers.put(atomId, list);
 		}
 		return list;
-	}
-
-	private Integer getMinusSubsumptionLiteral(Integer atomId1, Integer atomId2) {
-		return (-1) * getSubsumptionLiteral(atomId1, atomId2);
 	}
 
 	@Override
@@ -561,9 +662,9 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 		for (Integer atomId : getNonVariableAtoms()) {
 			if (!leftIds.contains(atomId)) {
 				Set<Integer> clause = new HashSet<Integer>();
-				clause.add(getMinusSubsumptionLiteral(rightId, atomId));
+				clause.add(neg(subsumption(rightId, atomId)));
 				for (Integer leftId : leftIds) {
-					clause.add(getSubsumptionLiteral(leftId, atomId));
+					clause.add(subsumption(leftId, atomId));
 				}
 				input.add(clause);
 			}
@@ -571,11 +672,7 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 	}
 
 	private void runStep1SubsumptionNonVariableAtom(Set<Integer> leftIds, Integer rightId, SatInput input) {
-		Set<Integer> clause = new HashSet<Integer>();
-		for (Integer leftId : leftIds) {
-			clause.add(getSubsumptionLiteral(leftId, rightId));
-		}
-		input.add(clause);
+		input.add(leftIds.stream().map(leftId -> subsumption(leftId, rightId)).collect(Collectors.toSet()));
 	}
 
 	private void runStep1(Disequation e, SatInput input) {
@@ -629,7 +726,7 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 			// Under the current choice, 'rightId' is subsumed by 'atomId'
 			// ...
 			Set<Integer> clause = new HashSet<Integer>(currentChoiceLiterals);
-			clause.add(getSubsumptionLiteral(rightId, atomId));
+			clause.add(subsumption(rightId, atomId));
 			input.add(clause);
 
 			// ... and 'atomId' does not subsume any of the 'leftIds'.
@@ -646,7 +743,7 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 		Set<Integer> clause;
 		for (Integer leftId : leftIds) {
 			clause = new HashSet<Integer>(choiceLiterals);
-			clause.add(getMinusSubsumptionLiteral(leftId, rightId));
+			clause.add(neg(subsumption(leftId, rightId)));
 			input.add(clause);
 		}
 	}
@@ -659,17 +756,13 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 
 			for (Integer atomId2 : getConstants()) {
 				if (!atomId1.equals(atomId2)) {
-					Set<Integer> clause = new HashSet<Integer>();
-					clause.add(getMinusSubsumptionLiteral(atomId1, atomId2));
-					input.add(clause);
+					input.add(neg(subsumption(atomId1, atomId2)));
 				}
 			}
 
 			if (goal.hasNegativePart()) {
 				// positive clause needed for soundness of disunification
-				Set<Integer> clause = new HashSet<Integer>();
-				clause.add(getSubsumptionLiteral(atomId1, atomId1));
-				input.add(clause);
+				input.add(subsumption(atomId1, atomId1));
 			}
 
 		}
@@ -680,20 +773,10 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 	 */
 	private void runStep2_4(SatInput input) {
 		for (Integer atomId1 : getConstants()) {
-
 			for (Integer atomId2 : getExistentialRestrictions()) {
-				{
-					Set<Integer> clause = new HashSet<Integer>();
-					clause.add(getMinusSubsumptionLiteral(atomId1, atomId2));
-					input.add(clause);
-				}
-
-				Set<Integer> clause = new HashSet<Integer>();
-				clause.add(getMinusSubsumptionLiteral(atomId2, atomId1));
-				input.add(clause);
-
+				input.add(neg(subsumption(atomId1, atomId2)));
+				input.add(neg(subsumption(atomId2, atomId1)));
 			}
-
 		}
 	}
 
@@ -714,9 +797,9 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 
 						if (!atomId1.equals(atomId3) && !atomId2.equals(atomId3)) {
 							Set<Integer> clause = new HashSet<Integer>();
-							clause.add(getMinusSubsumptionLiteral(atomId1, atomId2));
-							clause.add(getMinusSubsumptionLiteral(atomId2, atomId3));
-							clause.add(getSubsumptionLiteral(atomId1, atomId3));
+							clause.add(neg(subsumption(atomId1, atomId2)));
+							clause.add(neg(subsumption(atomId2, atomId3)));
+							clause.add(subsumption(atomId1, atomId3));
 							input.add(clause);
 						}
 					}
@@ -736,9 +819,7 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 	 */
 	private void runStep3_1_r(SatInput input) {
 		for (Integer atomId1 : getVariables()) {
-			Set<Integer> clause = new HashSet<Integer>();
-			clause.add(getMinusOrderLiteral(atomId1, atomId1));
-			input.add(clause);
+			input.add(neg(order(atomId1, atomId1)));
 		}
 	}
 
@@ -757,9 +838,9 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 					if (!atomId1.equals(atomId2) && !atomId2.equals(atomId3)) {
 
 						Set<Integer> clause = new HashSet<Integer>();
-						clause.add(getMinusOrderLiteral(atomId1, atomId2));
-						clause.add(getMinusOrderLiteral(atomId2, atomId3));
-						clause.add(getOrderLiteral(atomId1, atomId3));
+						clause.add(neg(order(atomId1, atomId2)));
+						clause.add(neg(order(atomId2, atomId3)));
+						clause.add(order(atomId1, atomId3));
 						input.add(clause);
 					}
 
@@ -785,8 +866,8 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 			if (getVariables().contains(childId)) {
 				for (Integer atomId2 : getVariables()) {
 					Set<Integer> clause = new HashSet<Integer>();
-					clause.add(getOrderLiteral(atomId2, childId));
-					clause.add(getMinusSubsumptionLiteral(atomId2, atomId1));
+					clause.add(order(atomId2, childId));
+					clause.add(neg(subsumption(atomId2, atomId1)));
 					input.add(clause);
 				}
 			}
@@ -813,9 +894,7 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 					 */
 
 					if (!role1.equals(role2)) {
-						Set<Integer> clause = new HashSet<Integer>();
-						clause.add(getMinusSubsumptionLiteral(atomId1, atomId2));
-						input.add(clause);
+						input.add(neg(subsumption(atomId1, atomId2)));
 
 						/*
 						 * if the roles are equal, then clause in Step 2.3
@@ -827,8 +906,8 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 
 						if (!child1.equals(child2)) {
 							Set<Integer> clause = new HashSet<Integer>();
-							clause.add(getSubsumptionLiteral(child1, child2));
-							clause.add(getMinusSubsumptionLiteral(atomId1, atomId2));
+							clause.add(subsumption(child1, child2));
+							clause.add(neg(subsumption(atomId1, atomId2)));
 							input.add(clause);
 						}
 
@@ -836,8 +915,8 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 							// converse clause needed for soundness of
 							// disunification
 							Set<Integer> clause = new HashSet<Integer>();
-							clause.add(getSubsumptionLiteral(atomId1, atomId2));
-							clause.add(getMinusSubsumptionLiteral(child1, child2));
+							clause.add(subsumption(atomId1, atomId2));
+							clause.add(neg(subsumption(child1, child2)));
 							input.add(clause);
 						}
 
@@ -850,9 +929,7 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 			if (goal.hasNegativePart()) {
 				// converse clause (as above) for trival subsumption
 				// between an existential restriction and itself
-				Set<Integer> clause = new HashSet<Integer>();
-				clause.add(getSubsumptionLiteral(atomId1, atomId1));
-				input.add(clause);
+				input.add(subsumption(atomId1, atomId1));
 			}
 
 		}
@@ -871,7 +948,7 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 
 		for (Integer atomId1 : getUsedAtomIds()) {
 			for (Integer atomId2 : getUsedAtomIds()) {
-				getSubsumptionLiteral(atomId1, atomId2);
+				subsumption(atomId1, atomId2);
 			}
 		}
 
@@ -882,7 +959,7 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 
 		for (Integer atomId1 : getVariables()) {
 			for (Integer atomId2 : getVariables()) {
-				getOrderLiteral(atomId1, atomId2);
+				order(atomId1, atomId2);
 			}
 		}
 	}
@@ -893,9 +970,9 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 		}
 
 		if (value) {
-			this.trueLiterals.add(literalId);
+			trueLiterals.add(literalId);
 		} else {
-			this.trueLiterals.remove(literalId);
+			trueLiterals.remove(literalId);
 		}
 	}
 

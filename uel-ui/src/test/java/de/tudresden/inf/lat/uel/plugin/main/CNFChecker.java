@@ -167,8 +167,8 @@ public class CNFChecker {
 			}
 
 			@Override
-			public Set<Integer> getDisjointTypes() {
-				return Collections.emptySet();
+			public Integer getDirectSupertype(Integer type) {
+				return null;
 			}
 
 			@Override

@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -39,6 +40,8 @@ class UelOntology {
 	private static Function<OWLClassExpression, Set<OWLClass>> getNamedDisjuncts = e -> e.asDisjunctSet().stream()
 			.filter(expr -> !expr.isAnonymous()).map(expr -> expr.asOWLClass()).collect(Collectors.toSet());
 
+	private static final Function<IRI, OWLClass> iriToClass = iri -> OWLManager.getOWLDataFactory().getOWLClass(iri);
+
 	private static <R> Function<Set<OWLClassExpression>, R> exception(String message) {
 		return e -> {
 			throw new RuntimeException(message);
@@ -56,6 +59,20 @@ class UelOntology {
 		this.atomManager = atomManager;
 		this.ontologies = ontologies;
 		this.top = top;
+	}
+
+	private Optional<IRI> checkUsedIRI(Integer conceptNameId) {
+		// check if the given concept name can have a classification at all (in
+		// the background ontologies)
+		IRI iri = IRI.create(atomManager.printConceptName(conceptNameId));
+		if (!ontologies.stream().anyMatch(ont -> ont.containsClassInSignature(iri))) {
+			return Optional.empty();
+		}
+		return Optional.of(iri);
+	}
+
+	private Integer classToId(OWLClass cls) {
+		return atomManager.createConceptName(cls.toStringID());
 	}
 
 	private Integer createFreshFlatteningDefinition(Set<Integer> atomIds, Set<Definition> newDefinitions) {
@@ -85,7 +102,7 @@ class UelOntology {
 	}
 
 	private Set<Integer> flattenClass(OWLClass cls, Set<Integer> newNames) {
-		Integer atomId = atomManager.createConceptName(cls.toStringID());
+		Integer atomId = classToId(cls);
 		if (!visited.contains(atomId)) {
 			// only consider new concept names that have not yet been processed
 			newNames.add(atomId);
@@ -130,7 +147,7 @@ class UelOntology {
 
 		if (fillerIds.size() == 0) {
 			// the empty conjunction is top
-			fillerId = atomManager.createConceptName(top.toStringID());
+			fillerId = classToId(top);
 		} else if (fillerIds.size() == 1) {
 			fillerId = fillerIds.iterator().next();
 		}
@@ -146,34 +163,16 @@ class UelOntology {
 		return Collections.singleton(atomId);
 	}
 
-	public Integer getClassification(Integer conceptNameId) {
-		// check if the given concept name can have a classification at all (in
-		// the background ontologies)
-		IRI iri = IRI.create(atomManager.printConceptName(conceptNameId));
-		if (!ontologies.stream().anyMatch(ont -> ont.containsClassInSignature(iri))) {
-			return null;
-		}
-
-		// extract the atom representing the top-level hierarchy that 'iri' is
-		// contained in
-		OWLClass currentClass = OWLManager.getOWLDataFactory().getOWLClass(iri);
-		OWLClass previousClass = null;
-		while ((currentClass != null) && !currentClass.equals(top)) {
+	public Optional<Integer> getClassification(Integer conceptNameId) {
+		Optional<OWLClass> currentClass = checkUsedIRI(conceptNameId).map(iriToClass);
+		// extract the atom representing the top-level hierarchy that
+		// 'currentClass' is contained in
+		Optional<OWLClass> previousClass = Optional.empty();
+		while (currentClass.isPresent()) {
 			previousClass = currentClass;
-			currentClass = null;
-			OWLClassExpression def = getDefinition(previousClass);
-			if (def == null) {
-				def = getPrimitiveDefinition(previousClass);
-			}
-			if (def != null) {
-				for (OWLClassExpression expr : def.asConjunctSet()) {
-					if (!expr.isAnonymous()) {
-						currentClass = expr.asOWLClass();
-					}
-				}
-			}
+			currentClass = getDirectSuperclass(previousClass.get());
 		}
-		return atomManager.createConceptName(previousClass.toStringID());
+		return previousClass.map(this::classToId);
 	}
 
 	private OWLClassExpression getDefinition(OWLClass cls) {
@@ -183,6 +182,30 @@ class UelOntology {
 
 	private Stream<OWLClassExpression> getDefinition(OWLOntology ont, OWLClass cls) {
 		return ont.getEquivalentClassesAxioms(cls).stream().flatMap(ax -> ax.getClassExpressionsMinus(cls).stream());
+	}
+
+	public Optional<Integer> getDirectSuperclass(Integer conceptNameId) {
+		return checkUsedIRI(conceptNameId).map(iriToClass).flatMap(this::getDirectSuperclass).map(this::classToId);
+	}
+
+	private Optional<OWLClass> getDirectSuperclass(OWLClass cls) {
+		OWLClassExpression def = getDefinition(cls);
+		if (def == null) {
+			def = getPrimitiveDefinition(cls);
+		}
+
+		Optional<OWLClass> superclass = Optional.empty();
+		if (def != null) {
+			for (OWLClassExpression expr : def.asConjunctSet()) {
+				if (!expr.isAnonymous()) {
+					superclass = Optional.of(expr.asOWLClass());
+				}
+			}
+		}
+		if (superclass.equals(top)) {
+			superclass = Optional.empty();
+		}
+		return superclass;
 	}
 
 	public Set<OWLClass> getDomain(Integer roleId) {
