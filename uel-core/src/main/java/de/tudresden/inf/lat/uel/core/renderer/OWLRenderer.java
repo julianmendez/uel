@@ -45,7 +45,7 @@ public class OWLRenderer extends Renderer<OWLClassExpression, Set<OWLAxiom>> {
 
 	@Override
 	protected OWLClassExpression translateAtomList(String description, Set<Integer> atomIds) {
-		throw new UnsupportedOperationException();
+		return translateConjunction(atomIds);
 	}
 
 	@Override

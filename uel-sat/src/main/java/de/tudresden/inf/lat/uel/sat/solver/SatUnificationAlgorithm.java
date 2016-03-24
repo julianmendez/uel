@@ -3,7 +3,6 @@ package de.tudresden.inf.lat.uel.sat.solver;
 import java.io.IOException;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -221,10 +220,21 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 		}
 
 		// d - no concept name can have disjoint types
-		for (Integer type1 : goal.getTypes()) {
-			for (Integer type2 : goal.getTypes()) {
+		// TODO: we only need this for disjoint siblings!
+		int n = 0;
+		List<Integer> types = new ArrayList<Integer>(goal.getTypes());
+		a: for (int i = 0; i < types.size(); i++) {
+			for (int j = i + 1; j < types.size(); j++) {
+				Integer type1 = types.get(i);
+				Integer type2 = types.get(j);
 				if (goal.areDisjoint(type1, type2)) {
+					System.out.println("Disjoint: " + goal.getAtomManager().printConceptName(type1) + ", "
+							+ goal.getAtomManager().printConceptName(type2));
 					for (Integer conceptNameId : getConceptNames()) {
+						n++;
+						// if (n > 1000) {
+						// break a;
+						// }
 						Set<Integer> clause = new HashSet<Integer>();
 						clause.add(neg(subtype(conceptNameId, type1)));
 						clause.add(neg(subtype(conceptNameId, type2)));
@@ -233,48 +243,77 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 				}
 			}
 		}
+		// for (Integer type1 : goal.getTypes()) {
+		// for (Integer type2 : goal.getTypes()) {
+		// if (goal.areDisjoint(type1, type2)) {
+		// System.out.println("Disjoint: " +
+		// goal.getAtomManager().printConceptName(type1) + ", "
+		// + goal.getAtomManager().printConceptName(type2));
+		// for (Integer conceptNameId : getConceptNames()) {
+		// n++;
+		// // if (n > 1000) {
+		// // break a;
+		// // }
+		// Set<Integer> clause = new HashSet<Integer>();
+		// clause.add(neg(subtype(conceptNameId, type1)));
+		// clause.add(neg(subtype(conceptNameId, type2)));
+		// input.add(clause);
+		// }
+		// }
+		// }
+		// }
+		System.out.println("Type disjointness clauses: " + n);
 
 		// domain restrictions
-		for (Integer varId : getVariables()) {
-			for (Integer eatomId : getExistentialRestrictions()) {
-				Integer roleId = goal.getAtomManager().getExistentialRestriction(eatomId).getRoleId();
-				Set<Integer> domain = goal.getDomains().get(roleId);
-				if (domain != null) {
-					Set<Integer> clause = domain.stream().map(type -> subtype(varId, type)).collect(Collectors.toSet());
-					clause.add(neg(subsumption(varId, eatomId)));
-					input.add(clause);
-				}
-			}
-		}
+		// for (Integer varId : getVariables()) {
+		// for (Integer eatomId : getExistentialRestrictions()) {
+		// Integer roleId =
+		// goal.getAtomManager().getExistentialRestriction(eatomId).getRoleId();
+		// Set<Integer> domain = goal.getDomains().get(roleId);
+		// if (domain != null) {
+		// Set<Integer> clause = domain.stream().map(type -> subtype(varId,
+		// type)).collect(Collectors.toSet());
+		// clause.add(neg(subsumption(varId, eatomId)));
+		// input.add(clause);
+		// }
+		// }
+		// }
 
 		// range restrictions
-		for (Integer eatomId : getExistentialRestrictions()) {
-			Integer roleId = goal.getAtomManager().getExistentialRestriction(eatomId).getRoleId();
-			Integer childId = goal.getAtomManager().getChild(eatomId);
-			Set<Integer> range = goal.getRanges().get(roleId);
-			if (range != null) {
-				input.add(range.stream().map(type -> subtype(childId, type)).collect(Collectors.toSet()));
-			}
-		}
+		// for (Integer eatomId : getExistentialRestrictions()) {
+		// Integer roleId =
+		// goal.getAtomManager().getExistentialRestriction(eatomId).getRoleId();
+		// Integer childId = goal.getAtomManager().getChild(eatomId);
+		// Set<Integer> range = goal.getRanges().get(roleId);
+		// if (range != null) {
+		// input.add(range.stream().map(type -> subtype(childId,
+		// type)).collect(Collectors.toSet()));
+		// }
+		// }
 
-		for (Integer roleId : goal.getTransparentRoles()) {
-			for (Integer eatomId : getExistentialRestrictions()) {
-				if (goal.getAtomManager().getExistentialRestriction(eatomId).getRoleId().equals(roleId)) {
-					Integer childId = goal.getAtomManager().getChild(eatomId);
-					for (Integer varId : getVariables()) {
-						Integer dissubsumptionLiteral = neg(subsumption(varId, eatomId));
-						for (Integer type : goal.getTypes()) {
-							Integer varTypeLiteral = subtype(varId, type);
-							Integer childTypeLiteral = subtype(childId, type);
-							input.add(new HashSet<Integer>(
-									Arrays.asList(dissubsumptionLiteral, neg(varTypeLiteral), childTypeLiteral)));
-							input.add(new HashSet<Integer>(
-									Arrays.asList(dissubsumptionLiteral, neg(childTypeLiteral), varTypeLiteral)));
-						}
-					}
-				}
-			}
-		}
+		// transparent roles
+		// for (Integer roleId : goal.getTransparentRoles()) {
+		// for (Integer eatomId : getExistentialRestrictions()) {
+		// if
+		// (goal.getAtomManager().getExistentialRestriction(eatomId).getRoleId().equals(roleId))
+		// {
+		// Integer childId = goal.getAtomManager().getChild(eatomId);
+		// for (Integer varId : getVariables()) {
+		// Integer dissubsumptionLiteral = neg(subsumption(varId, eatomId));
+		// for (Integer type : goal.getTypes()) {
+		// Integer varTypeLiteral = subtype(varId, type);
+		// Integer childTypeLiteral = subtype(childId, type);
+		// input.add(new HashSet<Integer>(
+		// Arrays.asList(dissubsumptionLiteral, neg(varTypeLiteral),
+		// childTypeLiteral)));
+		// input.add(new HashSet<Integer>(
+		// Arrays.asList(dissubsumptionLiteral, neg(childTypeLiteral),
+		// varTypeLiteral)));
+		// }
+		// }
+		// }
+		// }
+		// }
 	}
 
 	@Override
@@ -348,7 +387,7 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 
 		reset();
 		if (unifiable) {
-			this.result = new Unifier(toDefinitions(satoutput.getOutput()));
+			this.result = toUnifier(satoutput.getOutput());
 		} else {
 			// release resources used by the solver after all unifiers have been
 			// computed
@@ -988,7 +1027,7 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 				value = false;
 			}
 			Literal literal = literalManager.get(literalId);
-			if (literal.isSubsumption()) {
+			if (literal.isSubsumption() || (literal instanceof SubtypeLiteral)) {
 				setLiteralValue(literalId, value);
 			}
 		}
@@ -1002,12 +1041,34 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 	 *            SAT solver output
 	 * @return a new unifier.
 	 */
-	public Set<Definition> toDefinitions(Set<Integer> val) {
+	public Unifier toUnifier(Set<Integer> val) {
 		setValuesForLiterals(val);
 		updateTBox();
 		createUpdate();
-		Set<Definition> ret = getUpdatedDefinitions();
-		return ret;
+		Set<Definition> def = getUpdatedDefinitions();
+		Map<Integer, Integer> typ = getTypeAssignment();
+		return new Unifier(def, typ);
+	}
+
+	private Map<Integer, Integer> getTypeAssignment() {
+		Map<Integer, Integer> typeAssignment = new HashMap<Integer, Integer>();
+		for (Integer i : literalManager.getIndices()) {
+			Literal l = literalManager.get(i);
+			if (l instanceof SubtypeLiteral) {
+				if (getLiteralValue(i)) {
+					Integer atomId = l.getFirst();
+					Integer type = l.getSecond();
+					Integer oldType = typeAssignment.get(atomId);
+					if (oldType != null) {
+						if (goal.subtypeOrEquals(oldType, type)) {
+							type = oldType;
+						}
+					}
+					typeAssignment.put(atomId, type);
+				}
+			}
+		}
+		return typeAssignment;
 	}
 
 	private void updateTBox() {

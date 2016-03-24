@@ -84,6 +84,8 @@ abstract class Renderer<ExpressionType, AxiomsType> {
 		translateAxioms(input.getSubsumptions());
 		translateAxioms(input.getDisequations());
 		translateAxioms(input.getDissubsumptions());
+		translateAtomList("Variables", input.getAtomManager().getVariables());
+		translateAtomList("Constants", input.getAtomManager().getConstants());
 		if (!input.getTypes().isEmpty()) {
 			translateAtomList("Types", input.getTypes());
 		}
@@ -123,7 +125,16 @@ abstract class Renderer<ExpressionType, AxiomsType> {
 		initialize();
 		for (Definition definition : unifier.getDefinitions()) {
 			if (!restrictToUserVariables || atomManager.getUserVariables().contains(definition.getDefiniendum())) {
-				translateAxiom(definition);
+				if (!definition.getRight().isEmpty()) {
+					// print only non-empty substitutions
+					translateAxiom(definition);
+				}
+			}
+		}
+		if (unifier.getTypeAssignment() != null) {
+			for (Integer atomId : unifier.getTypeAssignment().keySet()) {
+				translateAtomList("Has type " + renderName(unifier.getTypeAssignment().get(atomId)),
+						Collections.singleton(atomId));
 			}
 		}
 		return finalizeAxioms();

@@ -57,9 +57,9 @@ public interface Goal {
 
 	Integer getDirectSupertype(Integer type);
 
-	default boolean isSubtypeOf(Integer type1, Integer type2) {
+	default boolean subtypeOrEquals(Integer type1, Integer type2) {
 		while (type1 != null) {
-			if (type1 == type2) {
+			if (type1.equals(type2)) {
 				return true;
 			}
 			type1 = getDirectSupertype(type1);
@@ -68,7 +68,7 @@ public interface Goal {
 	}
 
 	default boolean areDisjoint(Integer type1, Integer type2) {
-		return !isSubtypeOf(type1, type2) && !isSubtypeOf(type2, type1);
+		return !subtypeOrEquals(type1, type2) && !subtypeOrEquals(type2, type1);
 	}
 
 	Map<Integer, Set<Integer>> getDomains();
