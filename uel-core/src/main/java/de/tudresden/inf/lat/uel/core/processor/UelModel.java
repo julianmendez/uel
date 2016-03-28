@@ -489,7 +489,7 @@ public class UelModel {
 		}
 
 		OWLClass owlThing = getOWLThing(owlThingAlias, snomedMode);
-		goal = new UelOntologyGoal(atomManager, new UelOntology(atomManager, bgOntologies, owlThing), snomedMode, provider);
+		goal = new UelOntologyGoal(atomManager, new UelOntology(atomManager, bgOntologies, owlThing), snomedMode);
 
 		goal.addPositiveAxioms(subsumptions);
 		goal.addPositiveAxioms(equations);

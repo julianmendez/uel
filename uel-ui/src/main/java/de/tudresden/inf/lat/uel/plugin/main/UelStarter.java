@@ -3,8 +3,6 @@ package de.tudresden.inf.lat.uel.plugin.main;
 import java.awt.BorderLayout;
 import java.awt.Container;
 
-import javax.swing.border.EmptyBorder;
-
 import org.semanticweb.owlapi.apibinding.OWLManager;
 
 import de.tudresden.inf.lat.uel.core.processor.BasicOntologyProvider;

@@ -8,7 +8,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.OWLAxiom;
@@ -17,7 +16,6 @@ import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 
-import de.tudresden.inf.lat.uel.core.renderer.StringRenderer;
 import de.tudresden.inf.lat.uel.type.api.AtomManager;
 import de.tudresden.inf.lat.uel.type.api.Axiom;
 import de.tudresden.inf.lat.uel.type.api.Definition;
@@ -45,18 +43,18 @@ class UelOntologyGoal implements Goal {
 	private final Set<Equation> equations = new HashSet<Equation>();
 	private UelOntology ontology;
 	private final Map<Integer, Set<Integer>> ranges = new HashMap<Integer, Set<Integer>>();
-	private final StringRenderer renderer;
+//	private final StringRenderer renderer;
 	private final boolean snomedMode;
 	private final Set<Subsumption> subsumptions = new HashSet<Subsumption>();
 	private final Set<Integer> transparentRoles = new HashSet<Integer>();
 
 	private final Set<Integer> types = new HashSet<Integer>();
 
-	public UelOntologyGoal(AtomManager manager, UelOntology ontology, boolean snomedMode, ShortFormProvider provider) {
+	public UelOntologyGoal(AtomManager manager, UelOntology ontology, boolean snomedMode) {
 		this.atomManager = manager;
 		this.ontology = ontology;
 		this.snomedMode = snomedMode;
-		this.renderer = StringRenderer.createInstance(atomManager, provider, null);
+//		this.renderer = StringRenderer.createInstance(atomManager, provider, null);
 	}
 
 	public void addDisequation(OWLEquivalentClassesAxiom axiom) {

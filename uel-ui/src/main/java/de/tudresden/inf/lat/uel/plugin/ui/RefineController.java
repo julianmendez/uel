@@ -3,7 +3,6 @@
  */
 package de.tudresden.inf.lat.uel.plugin.ui;
 
-import java.awt.Component;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.Collections;

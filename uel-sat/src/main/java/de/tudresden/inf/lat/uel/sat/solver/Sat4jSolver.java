@@ -49,6 +49,8 @@ public class Sat4jSolver implements Solver {
 			for (Integer e : problem.model()) {
 				model.add(e);
 			}
+		} else {
+			// TODO: unsat proof?
 		}
 
 		return new SatOutput(satisfiable, model);
