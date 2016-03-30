@@ -7,14 +7,14 @@ import de.tudresden.inf.lat.uel.type.api.Definition;
 
 public class Unifier {
 	private final Set<Definition> definitions;
-	private final Map<Integer, Integer> typeAssignment;
+	private final Map<Integer, Set<Integer>> typeAssignment;
 
 	public Unifier(Set<Definition> definitions) {
 		this.definitions = definitions;
 		this.typeAssignment = null;
 	}
 
-	public Unifier(Set<Definition> definitions, Map<Integer, Integer> typeAssignment) {
+	public Unifier(Set<Definition> definitions, Map<Integer, Set<Integer>> typeAssignment) {
 		this.definitions = definitions;
 		this.typeAssignment = typeAssignment;
 	}
@@ -23,7 +23,7 @@ public class Unifier {
 		return definitions;
 	}
 
-	public Map<Integer, Integer> getTypeAssignment() {
+	public Map<Integer, Set<Integer>> getTypeAssignment() {
 		return typeAssignment;
 	}
 

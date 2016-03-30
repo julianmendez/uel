@@ -31,8 +31,8 @@ public abstract class StringRenderer extends Renderer<String, String> {
 		}
 
 		sb.setLength(sb.length() - 2);
-		sb.append(System.lineSeparator());
-		sb.append(System.lineSeparator());
+		newLine();
+		newLine();
 		return "";
 	}
 
@@ -53,14 +53,19 @@ public abstract class StringRenderer extends Renderer<String, String> {
 	}
 
 	@Override
+	protected void newLine() {
+		sb.append(System.lineSeparator());
+	}
+
+	@Override
 	protected String translateAxiom(Axiom axiom) {
 		translateConjunction(axiom.getLeft());
 		sb.append(" ");
 		sb.append(axiom.getConnective());
 		sb.append(" ");
 		translateConjunction(axiom.getRight());
-		sb.append(System.lineSeparator());
-		sb.append(System.lineSeparator());
+		newLine();
+		newLine();
 		return "";
 	}
 
@@ -75,8 +80,8 @@ public abstract class StringRenderer extends Renderer<String, String> {
 		}
 
 		sb.setLength(sb.length() - 2);
-		sb.append(System.lineSeparator());
-		sb.append(System.lineSeparator());
+		newLine();
+		newLine();
 		return "";
 	}
 

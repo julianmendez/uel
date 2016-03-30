@@ -164,7 +164,7 @@ public class UelController {
 		setupGoal(false);
 
 		// restore user variables
-		model.makeNamesUserVariables(userVariables);
+		model.makeNamesVariables(userVariables.stream(), true);
 
 		setupComputation();
 	}

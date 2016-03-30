@@ -59,6 +59,8 @@ abstract class Renderer<ExpressionType, AxiomsType> {
 
 	protected abstract void initialize();
 
+	protected abstract void newLine();
+
 	public ExpressionType renderAtom(Integer atomId) {
 		initialize();
 		translateAtom(atomId);
@@ -84,23 +86,30 @@ abstract class Renderer<ExpressionType, AxiomsType> {
 		translateAxioms(input.getSubsumptions());
 		translateAxioms(input.getDisequations());
 		translateAxioms(input.getDissubsumptions());
+		newLine();
 		translateAtomList("Variables", input.getAtomManager().getVariables());
+		translateAtomList("User variables", input.getAtomManager().getUserVariables());
 		translateAtomList("Constants", input.getAtomManager().getConstants());
+		newLine();
 		if (!input.getTypes().isEmpty()) {
 			translateAtomList("Types", input.getTypes());
 		}
+		newLine();
 		for (Integer type : input.getTypes()) {
 			Integer supertype = input.getDirectSupertype(type);
 			if (supertype != null) {
 				translateAtomList("Direct supertype of " + renderName(type), Collections.singleton(supertype));
 			}
 		}
+		newLine();
 		for (Integer roleId : input.getDomains().keySet()) {
 			translateAtomList("Domain of " + renderRole(roleId), input.getDomains().get(roleId));
 		}
+		newLine();
 		for (Integer roleId : input.getRanges().keySet()) {
 			translateAtomList("Range of " + renderRole(roleId), input.getRanges().get(roleId));
 		}
+		newLine();
 		if (!input.getTransparentRoles().isEmpty()) {
 			translateRoleList("Transparent roles", input.getTransparentRoles());
 		}
@@ -133,8 +142,7 @@ abstract class Renderer<ExpressionType, AxiomsType> {
 		}
 		if (unifier.getTypeAssignment() != null) {
 			for (Integer atomId : unifier.getTypeAssignment().keySet()) {
-				translateAtomList("Has type " + renderName(unifier.getTypeAssignment().get(atomId)),
-						Collections.singleton(atomId));
+				translateAtomList("Types of " + renderName(atomId), unifier.getTypeAssignment().get(atomId));
 			}
 		}
 		return finalizeAxioms();

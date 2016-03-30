@@ -35,45 +35,45 @@ import de.tudresden.inf.lat.uel.type.api.UnificationAlgorithm;
 
 public class AlternativeUelStarter {
 
-	private Set<OWLOntology> ontologies;
-	private OWLOntologyManager ontologyManager;
-	private UnificationAlgorithm uelProcessor;
-	private boolean verbose = false;
-	private boolean snomedMode = false;
-	private OWLClass owlThingAlias = null;
-	private boolean markUndefAsVariables = true;
+	public static OWLOntology loadOntology(String filename, OWLOntologyManager manager) {
+		try {
+			if (filename.isEmpty()) {
+				return manager.createOntology();
+			}
 
-	public AlternativeUelStarter(OWLOntology ontology) {
-		if (ontology == null) {
-			throw new IllegalArgumentException("Null argument.");
+			InputStream input = new FileInputStream(new File(filename));
+			return manager.loadOntologyFromOntologyDocument(input);
+		} catch (FileNotFoundException e) {
+			System.err.println("Could not find file '" + filename + "'.");
+			return null;
+		} catch (OWLOntologyCreationException e) {
+			System.err.println("Could not create ontology from file '" + filename + "'.");
+			System.err.println(e.getMessage());
+			return null;
 		}
-		this.ontologyManager = ontology.getOWLOntologyManager();
-		this.ontologies = new HashSet<OWLOntology>();
-		this.ontologies.add(ontology);
 	}
 
-	public AlternativeUelStarter(OWLOntologyManager ontologyManager, Set<OWLOntology> ontologies) {
-		if (ontologies == null) {
-			throw new IllegalArgumentException("Null argument.");
+	static Set<OWLClass> loadVariables(String filename) {
+		try {
+			if (filename.isEmpty()) {
+				return Collections.emptySet();
+			}
+
+			OWLDataFactory factory = OWLManager.getOWLDataFactory();
+			Set<OWLClass> variables = new HashSet<OWLClass>();
+
+			for (String line : Files.readAllLines(Paths.get(filename))) {
+				if (!line.isEmpty()) {
+					variables.add(factory.getOWLClass(IRI.create(line)));
+				}
+			}
+
+			return variables;
+		} catch (IOException e) {
+			System.err.println("Error while reading file '" + filename + "'.");
+			System.err.println(e.getMessage());
+			return null;
 		}
-		this.ontologyManager = ontologyManager;
-		this.ontologies = ontologies;
-	}
-
-	public void setVerbose(boolean verbose) {
-		this.verbose = verbose;
-	}
-
-	public void setOwlThingAlias(OWLClass owlThingAlias) {
-		this.owlThingAlias = owlThingAlias;
-	}
-
-	public void markUndefAsVariables(boolean markUndefAsVariables) {
-		this.markUndefAsVariables = markUndefAsVariables;
-	}
-
-	public void setSnomedMode(boolean snomedMode) {
-		this.snomedMode = snomedMode;
 	}
 
 	public static void main(String[] args) {
@@ -200,45 +200,44 @@ public class AlternativeUelStarter {
 		}
 	}
 
-	static Set<OWLClass> loadVariables(String filename) {
-		try {
-			if (filename.isEmpty()) {
-				return Collections.emptySet();
-			}
+	private Set<OWLOntology> ontologies;
+	private OWLOntologyManager ontologyManager;
+	private UnificationAlgorithm uelProcessor;
+	private boolean verbose = false;
+	private boolean snomedMode = false;
+	private OWLClass owlThingAlias = null;
+	private boolean markUndefAsVariables = true;
+	private boolean markUndefAsAuxVariables = false;
 
-			OWLDataFactory factory = OWLManager.getOWLDataFactory();
-			Set<OWLClass> variables = new HashSet<OWLClass>();
-
-			for (String line : Files.readAllLines(Paths.get(filename))) {
-				if (!line.isEmpty()) {
-					variables.add(factory.getOWLClass(IRI.create(line)));
-				}
-			}
-
-			return variables;
-		} catch (IOException e) {
-			System.err.println("Error while reading file '" + filename + "'.");
-			System.err.println(e.getMessage());
-			return null;
+	public AlternativeUelStarter(OWLOntology ontology) {
+		if (ontology == null) {
+			throw new IllegalArgumentException("Null argument.");
 		}
+		this.ontologyManager = ontology.getOWLOntologyManager();
+		this.ontologies = new HashSet<OWLOntology>();
+		this.ontologies.add(ontology);
 	}
 
-	public static OWLOntology loadOntology(String filename, OWLOntologyManager manager) {
-		try {
-			if (filename.isEmpty()) {
-				return manager.createOntology();
-			}
-
-			InputStream input = new FileInputStream(new File(filename));
-			return manager.loadOntologyFromOntologyDocument(input);
-		} catch (FileNotFoundException e) {
-			System.err.println("Could not find file '" + filename + "'.");
-			return null;
-		} catch (OWLOntologyCreationException e) {
-			System.err.println("Could not create ontology from file '" + filename + "'.");
-			System.err.println(e.getMessage());
-			return null;
+	public AlternativeUelStarter(OWLOntologyManager ontologyManager, Set<OWLOntology> ontologies) {
+		if (ontologies == null) {
+			throw new IllegalArgumentException("Null argument.");
 		}
+		this.ontologyManager = ontologyManager;
+		this.ontologies = ontologies;
+	}
+
+	public List<Entry<String, String>> getStats() {
+		return uelProcessor.getInfo();
+	}
+
+	public void markUndefAsAuxVariables(boolean markUndefAsAuxVariables) {
+		this.markUndefAsAuxVariables = markUndefAsAuxVariables;
+		this.markUndefAsVariables = false;
+	}
+
+	public void markUndefAsVariables(boolean markUndefAsVariables) {
+		this.markUndefAsVariables = markUndefAsVariables;
+		this.markUndefAsAuxVariables = false;
 	}
 
 	public Iterator<Set<OWLEquivalentClassesAxiom>> modifyOntologyAndSolve(OWLOntology positiveProblem,
@@ -264,10 +263,14 @@ public class AlternativeUelStarter {
 	private Iterator<Set<OWLEquivalentClassesAxiom>> modifyOntologyAndSolve(UelModel uelModel, Set<OWLClass> variables,
 			String algorithmName) {
 
-		uelModel.makeClassesUserVariables(variables);
+		uelModel.makeClassesVariables(variables.stream(), false, true);
 
 		if (markUndefAsVariables) {
-			uelModel.makeAllUndefClassesUserVariables();
+			uelModel.makeAllUndefClassesVariables(true);
+		}
+
+		if (markUndefAsAuxVariables) {
+			uelModel.makeAllUndefClassesVariables(false);
 		}
 
 		if (verbose) {
@@ -290,8 +293,16 @@ public class AlternativeUelStarter {
 		return new UnifierIterator(uelModel);
 	}
 
-	public List<Entry<String, String>> getStats() {
-		return uelProcessor.getInfo();
+	public void setOwlThingAlias(OWLClass owlThingAlias) {
+		this.owlThingAlias = owlThingAlias;
+	}
+
+	public void setSnomedMode(boolean snomedMode) {
+		this.snomedMode = snomedMode;
+	}
+
+	public void setVerbose(boolean verbose) {
+		this.verbose = verbose;
 	}
 
 }

@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.AxiomType;
@@ -204,6 +205,17 @@ public class UelModel {
 		return new OWLRenderer(atomManager, background);
 	}
 
+	private OWLClass getOWLThing(OWLClass owlThingAlias, boolean snomedMode) {
+		if (owlThingAlias != null)
+			return owlThingAlias;
+		else if (snomedMode)
+			// 'SNOMED CT Concept'
+			return OWLManager.getOWLDataFactory().getOWLClass(IRI.create("http://www.ihtsdo.org/SCT_138875005"));
+		else
+			// owl:Thing
+			return OWLManager.getOWLDataFactory().getOWLThing();
+	}
+
 	/**
 	 * Construct a renderer for output of unifiers etc. as strings. The actual
 	 * format is specified in the method 'StringRenderer.createInstance'.
@@ -280,65 +292,44 @@ public class UelModel {
 	}
 
 	/**
-	 * Marks a given set of variables as user variables.
+	 * Marks all 'undef' variables as (user) variables.
 	 * 
-	 * @param variables
-	 *            a set of variables given as instances of OWLClass
+	 * @param userVariables
+	 *            a flag indicating whether to create user variables or
+	 *            definition variables
 	 */
-	public void makeClassesUserVariables(Set<OWLClass> variables) {
-		for (OWLClass var : variables) {
-			atomManager.makeUserVariable(getAtomId(var.toStringID()));
-		}
-	}
-
-	/**
-	 * Marks a given set of variables as user variables.
-	 * 
-	 * @param variables
-	 *            a set of variable names
-	 */
-	public void makeNamesUserVariables(Set<String> variables) {
-		for (String var : variables) {
-			atomManager.makeUserVariable(getAtomId(var));
-		}
-	}
-
-	/**
-	 * Marks the 'undef' versions of a given set of variables as user variables.
-	 * 
-	 * @param variables
-	 *            a set of variables given as instances of OWLClass
-	 */
-	public void makeUndefClassesUserVariables(Set<OWLClass> variables) {
-		for (OWLClass var : variables)
-			atomManager.makeUserVariable(getAtomId(var.toStringID() + AtomManager.UNDEF_SUFFIX));
-	}
-
-	/**
-	 * Marks the 'undef' versions of a given set of variables as user variables.
-	 * 
-	 * @param variables
-	 *            a set of variable names
-	 */
-	public void makeUndefNamesUserVariables(Set<String> variables) {
-		for (String var : variables) {
-			atomManager.makeUserVariable(getAtomId(var + AtomManager.UNDEF_SUFFIX));
-		}
-	}
-
-	/**
-	 * Marks all 'undef' variables as user variables.
-	 */
-	public void makeAllUndefClassesUserVariables() {
-		// mark all "_UNDEF" variables as user variables
-		// copy the list of constants since we need to modify it
+	public void makeAllUndefClassesVariables(boolean userVariables) {
+		// first copy the list of constants since we need to modify it
 		Set<Integer> constants = new HashSet<Integer>(atomManager.getConstants());
-		for (Integer atomId : constants) {
-			String name = atomManager.printConceptName(atomId);
-			if (name.endsWith(AtomManager.UNDEF_SUFFIX)) {
-				atomManager.makeUserVariable(atomId);
-			}
-		}
+		makeIdsVariables(
+				constants.stream().filter(id -> atomManager.printConceptName(id).endsWith(AtomManager.UNDEF_SUFFIX)),
+				userVariables);
+	}
+
+	/**
+	 * Marks a given set of variables as user variables.
+	 * 
+	 * @param variables
+	 *            a set of variables given as instances of OWLClass
+	 * @param addUndefSuffix
+	 *            a flag indicating whether to add an _UNDEF suffix to the given
+	 *            classes
+	 * @param userVariables
+	 *            a flag indicating whether to create user variables or
+	 *            definition variables
+	 */
+	public void makeClassesVariables(Stream<OWLClass> variables, boolean addUndefSuffix, boolean userVariables) {
+		makeNamesVariables(variables
+				.map(addUndefSuffix ? (cls -> cls.toStringID() + AtomManager.UNDEF_SUFFIX) : (cls -> cls.toStringID())),
+				userVariables);
+	}
+
+	private void makeIdsVariables(Stream<Integer> variables, boolean userVariables) {
+		variables.forEach(userVariables ? atomManager::makeUserVariable : atomManager::makeDefinitionVariable);
+	}
+
+	public void makeNamesVariables(Stream<String> variables, boolean userVariables) {
+		makeIdsVariables(variables.map(this::getAtomId), userVariables);
 	}
 
 	/**
@@ -489,7 +480,7 @@ public class UelModel {
 		}
 
 		OWLClass owlThing = getOWLThing(owlThingAlias, snomedMode);
-		goal = new UelOntologyGoal(atomManager, new UelOntology(atomManager, bgOntologies, owlThing), snomedMode);
+		goal = new UelOntologyGoal(atomManager, new UelOntology(atomManager, bgOntologies, owlThing));
 
 		goal.addPositiveAxioms(subsumptions);
 		goal.addPositiveAxioms(equations);
@@ -511,16 +502,5 @@ public class UelModel {
 		if (resetShortFormCache) {
 			cacheShortForms();
 		}
-	}
-
-	private OWLClass getOWLThing(OWLClass owlThingAlias, boolean snomedMode) {
-		if (owlThingAlias != null)
-			return owlThingAlias;
-		else if (snomedMode)
-			// 'SNOMED CT Concept'
-			return OWLManager.getOWLDataFactory().getOWLClass(IRI.create("http://www.ihtsdo.org/SCT_138875005"));
-		else
-			// owl:Thing
-			return OWLManager.getOWLDataFactory().getOWLThing();
 	}
 }

@@ -147,7 +147,7 @@ class UelOntology {
 
 		if (fillerIds.size() == 0) {
 			// the empty conjunction is top
-			fillerId = classToId(top);
+			fillerId = getTop();
 		} else if (fillerIds.size() == 1) {
 			fillerId = fillerIds.iterator().next();
 		}
@@ -202,9 +202,6 @@ class UelOntology {
 				}
 			}
 		}
-		if (superclass.equals(top)) {
-			superclass = Optional.empty();
-		}
 		return superclass;
 	}
 
@@ -234,6 +231,10 @@ class UelOntology {
 
 	private Stream<OWLClassExpression> getRange(OWLOntology ont, OWLObjectProperty prop) {
 		return ont.getObjectPropertyRangeAxioms(prop).stream().map(ax -> ax.getRange());
+	}
+
+	public Integer getTop() {
+		return classToId(top);
 	}
 
 	private void loadFlatDefinition(Integer id, Set<Definition> newDefinitions, Set<Integer> toVisit) {

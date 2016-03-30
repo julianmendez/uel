@@ -71,6 +71,10 @@ public interface Goal {
 		return !subtypeOrEquals(type1, type2) && !subtypeOrEquals(type2, type1);
 	}
 
+	default boolean areDisjointSiblings(Integer type1, Integer type2) {
+		return areDisjoint(type1, type2) && (getDirectSupertype(type1).equals(getDirectSupertype(type2)));
+	}
+
 	Map<Integer, Set<Integer>> getDomains();
 
 	Map<Integer, Set<Integer>> getRanges();

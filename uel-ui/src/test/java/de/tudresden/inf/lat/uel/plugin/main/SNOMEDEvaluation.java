@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Scanner;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.IRI;
@@ -32,6 +33,10 @@ public class SNOMEDEvaluation {
 	private static final String POS_PATH = WORK_DIR + "Projects/uel-snomed-pos2.owl";
 	private static final String NEG_PATH = WORK_DIR + "Projects/uel-snomed-neg2.owl";
 
+	private static OWLClass var(String name) {
+		return OWLManager.getOWLDataFactory().getOWLClass(IRI.create("http://www.ihtsdo.org/" + name));
+	}
+
 	public static void main(String[] args) {
 		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
 		OWLOntology snomed = AlternativeUelStarter.loadOntology(SNOMED_PATH, manager);
@@ -39,18 +44,16 @@ public class SNOMEDEvaluation {
 		AlternativeUelStarter starter = new AlternativeUelStarter(manager,
 				new HashSet<OWLOntology>(Arrays.asList(snomed, snomedRestrictions)));
 		starter.setVerbose(true);
-		starter.markUndefAsVariables(true);
+		starter.markUndefAsAuxVariables(true);
 		starter.setSnomedMode(true);
 
 		OWLOntology pos = AlternativeUelStarter.loadOntology(POS_PATH, manager);
 		OWLOntology neg = AlternativeUelStarter.loadOntology(NEG_PATH, manager);
-//		OWLOntology neg = UelModel.EMPTY_ONTOLOGY;
-		Set<OWLClass> vars = new HashSet<OWLClass>();
-		vars.add(OWLManager.getOWLDataFactory().getOWLClass(IRI.create("http://www.ihtsdo.org/X")));
-		vars.add(OWLManager.getOWLDataFactory().getOWLClass(IRI.create("http://www.ihtsdo.org/Y")));
-		vars.add(OWLManager.getOWLDataFactory().getOWLClass(IRI.create("http://www.ihtsdo.org/Z")));
-		vars.add(OWLManager.getOWLDataFactory().getOWLClass(IRI.create("http://www.ihtsdo.org/W")));
-		Iterator<Set<OWLEquivalentClassesAxiom>> iterator = starter.modifyOntologyAndSolve(pos, neg, vars,
+		// OWLOntology neg = UelModel.EMPTY_ONTOLOGY;
+		// String[] varNames = { "X" };
+		String[] varNames = { "X", "Y", "Z", "W" };
+		Iterator<Set<OWLEquivalentClassesAxiom>> iterator = starter.modifyOntologyAndSolve(pos, neg,
+				Arrays.asList(varNames).stream().map(SNOMEDEvaluation::var).collect(Collectors.toSet()),
 				UnificationAlgorithmFactory.SAT_BASED_ALGORITHM);
 
 		System.out.println("Press RETURN to start computing unifiers.");
@@ -75,6 +78,7 @@ public class SNOMEDEvaluation {
 					// System.out);
 
 					System.out.println();
+
 					System.out.flush();
 				} else {
 					System.out.println("No more unifiers.");

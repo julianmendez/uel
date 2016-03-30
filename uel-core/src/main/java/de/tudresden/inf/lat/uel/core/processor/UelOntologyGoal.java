@@ -1,7 +1,6 @@
 package de.tudresden.inf.lat.uel.core.processor;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -43,18 +42,19 @@ class UelOntologyGoal implements Goal {
 	private final Set<Equation> equations = new HashSet<Equation>();
 	private UelOntology ontology;
 	private final Map<Integer, Set<Integer>> ranges = new HashMap<Integer, Set<Integer>>();
-//	private final StringRenderer renderer;
-	private final boolean snomedMode;
+	// private final StringRenderer renderer;
+//	private final boolean snomedMode;
 	private final Set<Subsumption> subsumptions = new HashSet<Subsumption>();
 	private final Set<Integer> transparentRoles = new HashSet<Integer>();
 
 	private final Set<Integer> types = new HashSet<Integer>();
 
-	public UelOntologyGoal(AtomManager manager, UelOntology ontology, boolean snomedMode) {
+	public UelOntologyGoal(AtomManager manager, UelOntology ontology) {
 		this.atomManager = manager;
 		this.ontology = ontology;
-		this.snomedMode = snomedMode;
-//		this.renderer = StringRenderer.createInstance(atomManager, provider, null);
+//		this.snomedMode = snomedMode;
+		// this.renderer = StringRenderer.createInstance(atomManager, provider,
+		// null);
 	}
 
 	public void addDisequation(OWLEquivalentClassesAxiom axiom) {
@@ -162,6 +162,7 @@ class UelOntologyGoal implements Goal {
 				.map(Optional::get).forEach(types::add);
 
 		// extract type hierarchy
+		Integer topId = ontology.getTop();
 		for (Integer type : types) {
 			// traverse the class hierarchy and try to find another type
 			Optional<Integer> supertype = Optional.of(type);
@@ -171,8 +172,11 @@ class UelOntologyGoal implements Goal {
 
 			if (supertype.isPresent()) {
 				directSupertype.put(type, supertype.get());
+			} else {
+				directSupertype.put(type, topId);
 			}
 		}
+		types.add(topId);
 
 		// fill set of transparent roles
 		Integer roleGroupId = atomManager.getRoleId("http://www.ihtsdo.org/RoleGroup");
@@ -266,13 +270,16 @@ class UelOntologyGoal implements Goal {
 		Integer defId = def.getDefiniendum();
 		Integer undefId = atomManager.createUndefConceptName(defId);
 
-		if (snomedMode) {
-			// add type restriction for new UNDEF concept name
-			Integer classId = ontology.getClassification(defId).get();
-			if (!classId.equals(defId)) {
-				subsumptions.add(new Subsumption(Collections.singleton(undefId), Collections.singleton(classId)));
-			}
-		}
+		// the following is not necessary anymore if we transfer types also via
+		// goal subsumptions!
+		// if (snomedMode) {
+		// // add type restriction for new UNDEF concept name
+		// Integer classId = ontology.getClassification(defId).get();
+		// if (!classId.equals(defId)) {
+		// subsumptions.add(new Subsumption(Collections.singleton(undefId),
+		// Collections.singleton(classId)));
+		// }
+		// }
 
 		// create full definition
 		Set<Integer> newRightIds = new HashSet<Integer>(def.getRight());

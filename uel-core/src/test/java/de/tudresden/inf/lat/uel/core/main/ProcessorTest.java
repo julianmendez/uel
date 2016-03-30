@@ -129,12 +129,12 @@ public class ProcessorTest {
 
 	@Test
 	public void tryOntology() throws OWLOntologyCreationException, IOException, InterruptedException {
-		Map<String, OWLClass> idClassMap = new HashMap<String, OWLClass>();
 		OWLOntology owlOntology = loadKRSSOntology(ontologyName);
 		OWLOntologyManager ontologyManager = owlOntology.getOWLOntologyManager();
 		UelModel uelModel = new UelModel(new BasicOntologyProvider(ontologyManager));
-		Set<OWLClass> clsSet = owlOntology.getClassesInSignature();
-		for (OWLClass cls : clsSet) {
+
+		Map<String, OWLClass> idClassMap = new HashMap<String, OWLClass>();
+		for (OWLClass cls : owlOntology.getClassesInSignature()) {
 			idClassMap.put(cls.getIRI().getShortForm(), cls);
 		}
 
@@ -142,22 +142,9 @@ public class ProcessorTest {
 		ontologyManager.addAxiom(positiveProblem, ontologyManager.getOWLDataFactory()
 				.getOWLEquivalentClassesAxiom(idClassMap.get(conceptC), idClassMap.get(conceptD)));
 		OWLOntology negativeProblem = ontologyManager.createOntology();
-
 		uelModel.setupGoal(Collections.singleton(owlOntology), positiveProblem, negativeProblem, null, false, true);
-
-		Set<OWLClass> variables = new HashSet<OWLClass>();
-		// variables.add(idClassMap.get(conceptC));
-		// variables.add(idClassMap.get(conceptD));
-		for (String var : varNames) {
-			variables.add(idClassMap.get(var));
-		}
-		uelModel.makeClassesUserVariables(variables);
-		variables.clear();
-		for (String var : undefVarNames) {
-			variables.add(idClassMap.get(var));
-		}
-		uelModel.makeUndefClassesUserVariables(variables);
-
+		uelModel.makeClassesVariables(varNames.stream().map(idClassMap::get), false, true);
+		uelModel.makeClassesVariables(undefVarNames.stream().map(idClassMap::get), true, true);
 		uelModel.initializeUnificationAlgorithm(algorithmName);
 
 		while (uelModel.computeNextUnifier()) {
