@@ -135,11 +135,13 @@ abstract class Renderer<ExpressionType, AxiomsType> {
 		for (Definition definition : unifier.getDefinitions()) {
 			if (!restrictToUserVariables || atomManager.getUserVariables().contains(definition.getDefiniendum())) {
 				if (!definition.getRight().isEmpty()) {
-					// print only non-empty substitutions
+					// TODO for debugging only: print only non-empty
+					// substitutions
 					translateAxiom(definition);
 				}
 			}
 		}
+		// TODO for debugging only
 		if (unifier.getTypeAssignment() != null) {
 			for (Integer atomId : unifier.getTypeAssignment().keySet()) {
 				translateAtomList("Types of " + renderName(atomId), unifier.getTypeAssignment().get(atomId));

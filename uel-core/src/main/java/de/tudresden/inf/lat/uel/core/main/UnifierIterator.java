@@ -43,7 +43,7 @@ public class UnifierIterator implements Iterator<Set<OWLEquivalentClassesAxiom>>
 		}
 	}
 
-	UelModel getUelModel() {
+	public UelModel getUelModel() {
 		return uelModel;
 	}
 

@@ -193,7 +193,7 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 	}
 
 	private void addTypeRestrictions(SatInput input) {
-		// TODO experimental - minimize subtype literals
+		// experimental - minimize subtype literals
 		for (Integer conceptNameId : getConceptNames()) {
 			for (Integer type : goal.getTypes()) {
 				input.addMinimizeLiteral(subtype(conceptNameId, type));
@@ -239,19 +239,18 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 		}
 
 		// d - no concept name can have disjoint types
-		// List<Integer> types = new ArrayList<Integer>(goal.getTypes());
-		// for (int i = 0; i < types.size(); i++) {
-		// for (int j = i + 1; j < types.size(); j++) {
-		// Integer type1 = types.get(i);
-		// Integer type2 = types.get(j);
-		// if (goal.areDisjointSiblings(type1, type2)) {
-		// for (Integer conceptNameId : getConceptNames()) {
-		// input.add(negativeClause(subtype(conceptNameId, type1),
-		// subtype(conceptNameId, type2)));
-		// }
-		// }
-		// }
-		// }
+		List<Integer> types = new ArrayList<Integer>(goal.getTypes());
+		for (int i = 0; i < types.size(); i++) {
+			for (int j = i + 1; j < types.size(); j++) {
+				Integer type1 = types.get(i);
+				Integer type2 = types.get(j);
+				if (goal.areDisjoint(type1, type2)) {
+					for (Integer conceptNameId : getConceptNames()) {
+						input.add(negativeClause(subtype(conceptNameId, type1), subtype(conceptNameId, type2)));
+					}
+				}
+			}
+		}
 
 		// domain restrictions
 		for (Integer varId : getVariables()) {
@@ -503,7 +502,8 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 	}
 
 	private void createUpdate() {
-		for (Integer firstAtomId : getUserVariables()) {
+		// for (Integer firstAtomId : getUserVariables()) {
+		for (Integer firstAtomId : getVariables()) {
 			for (Integer secondAtomId : getNonVariableAtoms()) {
 				Integer literalId = subsumption(firstAtomId, secondAtomId);
 				if (!this.onlyMinimalAssignments || getLiteralValue(literalId)) {

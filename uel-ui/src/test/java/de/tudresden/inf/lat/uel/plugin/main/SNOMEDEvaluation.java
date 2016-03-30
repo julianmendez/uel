@@ -5,19 +5,24 @@ package de.tudresden.inf.lat.uel.plugin.main;
 
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.junit.Assert;
 import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.reasoner.OWLReasoner;
 
+import de.tudresden.inf.lat.jcel.owlapi.main.JcelReasonerFactory;
 import de.tudresden.inf.lat.uel.core.main.AlternativeUelStarter;
+import de.tudresden.inf.lat.uel.core.main.UnifierIterator;
 import de.tudresden.inf.lat.uel.core.processor.UnificationAlgorithmFactory;
 
 /**
@@ -26,8 +31,8 @@ import de.tudresden.inf.lat.uel.core.processor.UnificationAlgorithmFactory;
  */
 public class SNOMEDEvaluation {
 
-	private static final String WORK_DIR = "C:\\Users\\Stefan\\Work\\";
-	// private static final String WORK_DIR = "/Users/stefborg/Documents/";
+	// private static final String WORK_DIR = "C:\\Users\\Stefan\\Work\\";
+	private static final String WORK_DIR = "/Users/stefborg/Documents/";
 	private static final String SNOMED_PATH = WORK_DIR + "Ontologies/snomed-english-rdf.owl";
 	private static final String SNOMED_RESTR_PATH = WORK_DIR + "Ontologies/snomed-restrictions.owl";
 	private static final String POS_PATH = WORK_DIR + "Projects/uel-snomed-pos2.owl";
@@ -44,7 +49,8 @@ public class SNOMEDEvaluation {
 		AlternativeUelStarter starter = new AlternativeUelStarter(manager,
 				new HashSet<OWLOntology>(Arrays.asList(snomed, snomedRestrictions)));
 		starter.setVerbose(true);
-		starter.markUndefAsAuxVariables(true);
+		starter.markUndefAsVariables(false);
+		starter.markUndefAsAuxVariables(false);
 		starter.setSnomedMode(true);
 
 		OWLOntology pos = AlternativeUelStarter.loadOntology(POS_PATH, manager);
@@ -52,21 +58,31 @@ public class SNOMEDEvaluation {
 		// OWLOntology neg = UelModel.EMPTY_ONTOLOGY;
 		// String[] varNames = { "X" };
 		String[] varNames = { "X", "Y", "Z", "W" };
-		Iterator<Set<OWLEquivalentClassesAxiom>> iterator = starter.modifyOntologyAndSolve(pos, neg,
+		UnifierIterator iterator = (UnifierIterator) starter.modifyOntologyAndSolve(pos, neg,
 				Arrays.asList(varNames).stream().map(SNOMEDEvaluation::var).collect(Collectors.toSet()),
-				UnificationAlgorithmFactory.SAT_BASED_ALGORITHM);
+				UnificationAlgorithmFactory.SAT_BASED_ALGORITHM_MINIMAL);
 
 		System.out.println("Press RETURN to start computing unifiers.");
+
+		Set<OWLAxiom> background = iterator.getUelModel().renderDefinitions();
 
 		try {
 			Scanner in = new Scanner(System.in);
 			int i = 0;
-			while (in.hasNextLine()) {
-				in.nextLine();
+			boolean skip = false;
+
+			while (skip || in.hasNextLine()) {
+				if (!skip) {
+					if (in.nextLine().equals("a")) {
+						skip = true;
+					}
+				}
 				i++;
 				System.out.println();
 				System.out.println("--- " + i);
 				if (iterator.hasNext()) {
+
+					// TODO compute unifiers modulo equivalence
 
 					Set<OWLEquivalentClassesAxiom> unifier = iterator.next();
 					// OWLOntologyManager ontologyManager =
@@ -76,6 +92,24 @@ public class SNOMEDEvaluation {
 					// OWLManager.createOWLOntologyManager().saveOntology(ontology,
 					// new FunctionalSyntaxDocumentFormat(),
 					// System.out);
+					OWLOntologyManager ontologyManager = OWLManager.createOWLOntologyManager();
+					OWLOntology extendedOntology = ontologyManager.createOntology();
+					ontologyManager.addAxioms(extendedOntology, background);
+					ontologyManager.addAxioms(extendedOntology, unifier);
+
+					OWLReasoner reasoner = new JcelReasonerFactory().createNonBufferingReasoner(extendedOntology);
+					reasoner.precomputeInferences();
+
+					for (OWLAxiom a : pos.getAxioms(AxiomType.SUBCLASS_OF)) {
+						System.out.println(a + ": " + reasoner.isEntailed(a));
+						Assert.assertTrue(reasoner.isEntailed(a));
+					}
+					for (OWLAxiom a : neg.getAxioms(AxiomType.SUBCLASS_OF)) {
+						System.out.println(a + ": " + reasoner.isEntailed(a));
+						Assert.assertTrue(!reasoner.isEntailed(a));
+					}
+
+					reasoner.dispose();
 
 					System.out.println();
 
