@@ -328,7 +328,7 @@ public class UelModel {
 	/**
 	 * Marks all 'undef' variables as user variables.
 	 */
-	public void markUndefAsUserVariables() {
+	public void makeAllUndefClassesUserVariables() {
 		// mark all "_UNDEF" variables as user variables
 		// copy the list of constants since we need to modify it
 		Set<Integer> constants = new HashSet<Integer>(atomManager.getConstants());
@@ -442,11 +442,12 @@ public class UelModel {
 	 *            (optional) an alias for owl:Thing, e.g., 'SNOMED CT Concept'
 	 */
 	public void setupGoal(Set<OWLOntology> bgOntologies, OWLOntology positiveProblem, OWLOntology negativeProblem,
-			OWLClass owlThingAlias) {
+			OWLClass owlThingAlias, boolean resetShortFormCache) {
 		setupGoal(bgOntologies, positiveProblem.getAxioms(AxiomType.SUBCLASS_OF),
 				positiveProblem.getAxioms(AxiomType.EQUIVALENT_CLASSES),
 				negativeProblem.getAxioms(AxiomType.SUBCLASS_OF),
-				negativeProblem.getAxioms(AxiomType.EQUIVALENT_CLASSES), owlThingAlias);
+				negativeProblem.getAxioms(AxiomType.EQUIVALENT_CLASSES), owlThingAlias,
+				resetShortFormCache);
 	}
 
 	/**
@@ -467,7 +468,8 @@ public class UelModel {
 	 */
 	public void setupGoal(Set<OWLOntology> bgOntologies, Set<OWLSubClassOfAxiom> subsumptions,
 			Set<OWLEquivalentClassesAxiom> equations, Set<OWLSubClassOfAxiom> dissubsumptions,
-			Set<OWLEquivalentClassesAxiom> disequations, OWLClass owlThingAlias) {
+			Set<OWLEquivalentClassesAxiom> disequations, OWLClass owlThingAlias,
+			boolean resetShortFormCache) {
 
 		algorithm = null;
 		unifierList = new ArrayList<Unifier>();
@@ -475,7 +477,9 @@ public class UelModel {
 		allUnifiersFound = false;
 		atomManager = new AtomManagerImpl();
 
-		resetShortFormCache();
+		if (resetShortFormCache) {
+			resetShortFormCache();
+		}
 
 		OWLClass top = (owlThingAlias != null) ? owlThingAlias : OWLManager.getOWLDataFactory().getOWLThing();
 		goal = new UelOntologyGoal(atomManager, new UelOntology(atomManager, bgOntologies, top));
@@ -492,7 +496,9 @@ public class UelModel {
 		atomManager.makeDefinitionVariable(topId);
 
 		goal.disposeOntology();
-		cacheShortForms();
+		if (resetShortFormCache) {
+			cacheShortForms();
+		}
 	}
 
 }

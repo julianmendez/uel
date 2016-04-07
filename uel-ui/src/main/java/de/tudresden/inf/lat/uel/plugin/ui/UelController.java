@@ -6,6 +6,7 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.Stack;
 
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
@@ -26,6 +27,7 @@ public class UelController {
 	private UnifierController unifierController = null;
 	private VarSelectionController varSelectionController = null;
 	private final UelView view;
+	private Stack<Set<OWLAxiom>> undoStack = new Stack<Set<OWLAxiom>>();
 
 	/**
 	 * Constructs a new UEL controller using the specified model.
@@ -49,10 +51,18 @@ public class UelController {
 
 		Set<OWLAxiom> newAxioms = refineController.getDissubsumptions();
 
-		if (!newAxioms.stream().allMatch(axiom -> axiom instanceof OWLSubClassOfAxiom)) {
-			throw new IllegalStateException("Expected dissubsumptions to be encoded as OWLSubClassOfAxioms.");
+		for (OWLAxiom axiom : newAxioms) {
+			if (!(axiom instanceof OWLSubClassOfAxiom)) {
+				throw new IllegalStateException("Expected new dissubsumptions to be encoded as OWLSubClassOfAxioms.");
+			}
+			if (negOntology.containsAxiom(axiom)) {
+				throw new IllegalStateException("The negative goal already contains the following axiom: " + axiom);
+			}
+			negOntology.getOWLOntologyManager().addAxiom(negOntology, axiom);
 		}
-		negOntology.getOWLOntologyManager().addAxioms(negOntology, newAxioms);
+		System.out.println("Pushing " + newAxioms);
+		undoStack.push(newAxioms);
+		System.out.println("Stack size: " + undoStack.size());
 	}
 
 	private void executeAcceptVar() {
@@ -70,8 +80,21 @@ public class UelController {
 		updateView();
 	}
 
-	private void executeRecompute() {
+	private void executeRecompute(boolean save) {
+		File file = null;
+		if (save) {
+			file = refineController.showSaveFileDialog();
+			if (file == null) {
+				return;
+			}
+		}
+
 		addNewDissubsumptions();
+
+		if (save) {
+			OWLUtils.saveToOntologyFile(view.getSelectedOntologyNeg(), file);
+		}
+
 		recomputeUnifiers();
 	}
 
@@ -81,28 +104,35 @@ public class UelController {
 		}
 
 		refineController = new RefineController(new RefineView(unifierController.getView()), model);
-		refineController.addSaveListener(e -> executeSaveDissubsumptions());
-		refineController.addRecomputeListener(e -> executeRecompute());
+		refineController.addSaveListener(e -> executeRecompute(true));
+		refineController.addRecomputeListener(e -> executeRecompute(false));
 		refineController.open();
 	}
 
-	private void executeSaveDissubsumptions() {
-		File file = refineController.showSaveFileDialog();
-		if (file == null) {
-			return;
-		}
-
-		addNewDissubsumptions();
-		OWLUtils.saveToOntologyFile(view.getSelectedOntologyNeg(), file);
-		recomputeUnifiers();
-	}
-
 	private void executeSelectVariables() {
-		setupGoal();
+		undoStack.clear();
+		setupGoal(true);
 
 		varSelectionController = new VarSelectionController(new VarSelectionView(view), model);
 		varSelectionController.addAcceptVarListener(e -> executeAcceptVar());
 		varSelectionController.open();
+	}
+
+	private void executeUndoRefine() {
+		if (undoStack.isEmpty()) {
+			throw new IllegalStateException("Expected the undo stack to be non-empty.");
+		}
+
+		Set<OWLAxiom> lastDiff = undoStack.pop();
+		OWLOntology negOntology = view.getSelectedOntologyNeg();
+		for (OWLAxiom axiom : lastDiff) {
+			if (!negOntology.containsAxiom(axiom)) {
+				throw new IllegalStateException("Expected the negative goal to contain the following axiom: " + axiom);
+			}
+			negOntology.getOWLOntologyManager().removeAxiom(negOntology, axiom);
+		}
+
+		recomputeUnifiers();
 	}
 
 	/**
@@ -125,13 +155,15 @@ public class UelController {
 	}
 
 	private void recomputeUnifiers() {
-		refineController.close();
+		if (refineController != null) {
+			refineController.close();
+		}
 		unifierController.close();
 
 		// store previously selected variables
 		Set<String> userVariables = model.getUserVariableNames();
 
-		setupGoal();
+		setupGoal(false);
 
 		// restore user variables
 		model.makeNamesUserVariables(userVariables);
@@ -157,6 +189,9 @@ public class UelController {
 
 		unifierController = new UnifierController(new UnifierView(view), model);
 		unifierController.addRefineListener(e -> executeRefine());
+		unifierController.addUndoRefineListener(e -> executeUndoRefine());
+		System.out.println("Stack is " + (undoStack.isEmpty() ? "empty." : "not empty."));
+		unifierController.setUndoRefineButtonEnabled(!undoStack.isEmpty());
 		unifierController.open();
 	}
 
@@ -164,11 +199,12 @@ public class UelController {
 	 * Uses the UEL model to initialize the goal for the unification algorithm
 	 * with the currently selected ontologies.
 	 */
-	public void setupGoal() {
+	public void setupGoal(boolean resetShortFormCache) {
 		Set<OWLOntology> bgOntologies = new HashSet<OWLOntology>();
 		bgOntologies.add(view.getSelectedOntologyBg00());
 		bgOntologies.add(view.getSelectedOntologyBg01());
-		model.setupGoal(bgOntologies, view.getSelectedOntologyPos(), view.getSelectedOntologyNeg(), null);
+		model.setupGoal(bgOntologies, view.getSelectedOntologyPos(), view.getSelectedOntologyNeg(), null,
+				resetShortFormCache);
 	}
 
 	/**

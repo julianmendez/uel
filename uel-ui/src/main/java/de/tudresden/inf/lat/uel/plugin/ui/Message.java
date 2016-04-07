@@ -20,14 +20,15 @@ interface Message {
 	String buttonSaveGoal = "Save";
 	String buttonSelectVariables = ">";
 	String buttonShowStatInfo = "Stat";
-	String textRefineExplanation = "Select the atoms that should not subsume the respective variable:";
 	String textConstants = "Constants:";
-	String textVariables = "Variables:";
 	String titleError = "Error";
 	String textOntologyBg00 = "First background ontology:";
 	String textOntologyBg01 = "Second background ontology:";
 	String textOntologyPos = "Goal subsumptions and equations:";
 	String textOntologyNeg = "Goal dissubsumptions and disequations:";
+	String textRefineExplanation = "Select the atoms that should not subsume the respective variable:";
+	String textSnomedMode = "Load SNOMED type information";
+	String textVariables = "Variables:";
 	String tooltipAcceptVar = "use the selected entities as variables";
 	String tooltipComboBoxOntologyBg00 = "select first background ontology";
 	String tooltipComboBoxOntologyBg01 = "select second background ontology";
@@ -54,6 +55,7 @@ interface Message {
 	String tooltipShowStatInfo = "shows additional information about the computation";
 	String tooltipSubsumedByTop = "no subsumers";
 	String tooltipTextInfo = "statistical information about the unification algorithm";
+	String tooltipUndoRefine = "undo last refinement operation";
 	String tooltipUnifier = "unifier";
 	String tooltipUnifierId = "unifier id";
 	String tooltipVariableName = "subsumed variable";

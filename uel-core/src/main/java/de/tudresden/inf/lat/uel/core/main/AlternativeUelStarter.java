@@ -1,10 +1,12 @@
 package de.tudresden.inf.lat.uel.core.main;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Collections;
@@ -174,8 +176,18 @@ public class AlternativeUelStarter {
 	}
 
 	private static void printSyntax() {
-		System.out.println(
-				"Usage: uel [-p positive.owl] [-n negative.owl] [-v variables.txt] [-t owl:Thing_alias] [-a algorithmIndex] [-h] [-i] [background_ontology.owl]");
+		try {
+			BufferedReader reader = new BufferedReader(
+					new InputStreamReader(AlternativeUelStarter.class.getResourceAsStream("/help")));
+			String line = null;
+			while ((line = reader.readLine()) != null) {
+				System.out.println(line);
+			}
+			System.out.flush();
+			reader.close();
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		}
 	}
 
 	static Set<OWLClass> loadVariables(String filename) {
@@ -223,7 +235,7 @@ public class AlternativeUelStarter {
 			OWLOntology negativeProblem, Set<OWLClass> variables, String algorithmName) {
 
 		UelModel uelModel = new UelModel(new BasicOntologyProvider(ontologyManager));
-		uelModel.setupGoal(ontologies, positiveProblem, negativeProblem, owlThingAlias);
+		uelModel.setupGoal(ontologies, positiveProblem, negativeProblem, owlThingAlias, true);
 
 		return modifyOntologyAndSolve(uelModel, variables, algorithmName);
 	}
@@ -233,7 +245,8 @@ public class AlternativeUelStarter {
 			Set<OWLEquivalentClassesAxiom> disequations, Set<OWLClass> variables, String algorithmName) {
 
 		UelModel uelModel = new UelModel(new BasicOntologyProvider(ontologyManager));
-		uelModel.setupGoal(ontologies, subsumptions, equations, dissubsumptions, disequations, owlThingAlias);
+		uelModel.setupGoal(ontologies, subsumptions, equations, dissubsumptions, disequations, owlThingAlias,
+				true);
 
 		return modifyOntologyAndSolve(uelModel, variables, algorithmName);
 	}
@@ -244,7 +257,7 @@ public class AlternativeUelStarter {
 		uelModel.makeClassesUserVariables(variables);
 
 		if (markUndefAsVariables) {
-			uelModel.markUndefAsUserVariables();
+			uelModel.makeAllUndefClassesUserVariables();
 		}
 
 		if (verbose) {

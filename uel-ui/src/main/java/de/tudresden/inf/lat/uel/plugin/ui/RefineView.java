@@ -39,8 +39,7 @@ class RefineView extends UelDialog {
 	private final JButton buttonRecompute = new JButton();
 	private final JButton buttonSave = new JButton();
 	private Map<LabelId, JList<LabelId>> content = null;
-	private final GridBagLayout layout = new GridBagLayout();
-	private final JPanel selectionPanel = new JPanel(layout);
+	private final JPanel selectionPanel = new JPanel(new GridBagLayout());
 
 	/**
 	 * Construct a new unifier refinement view.
@@ -93,7 +92,7 @@ class RefineView extends UelDialog {
 			label.setVerticalAlignment(SwingConstants.TOP);
 			comp = label;
 		} else {
-			JList<LabelId> list = UelUI.createList(atoms, Message.tooltipRefineAtoms);
+			JList<LabelId> list = UelUI.createList(atoms, Message.tooltipRefineAtoms, true);
 			content.put(var, list);
 			comp = list;
 			atomsConstraints.insets = new Insets(0, 0, UelUI.GAP_SIZE, 0);
@@ -113,7 +112,8 @@ class RefineView extends UelDialog {
 
 		auxPanel.add(new JLabel(Message.textRefineExplanation), BorderLayout.NORTH);
 
-		auxPanel.add(UelUI.createScrollPane(selectionPanel), BorderLayout.CENTER);
+		UelUI.setMargin(selectionPanel);
+		auxPanel.add(UelUI.createScrollPane(selectionPanel, false), BorderLayout.CENTER);
 
 		return mainPanel;
 	}

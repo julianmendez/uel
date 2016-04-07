@@ -1,0 +1,20 @@
+uel [options] background_ontology.owl
+================================================================================
+Options:
+  -p file    Path to an ontology file containing the positive part of the goal
+             (equations, subsumptions)
+  -n file    Path to an ontology file containing the negative part of the goal
+             (disequations, dissubsumptions)
+  -v file    Path to a text file containing the IRIs identifying the variables
+  -t class   IRI identifying an alias for owl:Thing
+  -a i       Index of the unification algorithm that is to be used (default = 0)
+                0 - SAT-based algorithm
+                1 - SAT-based algorithm (minimal assignments)
+                2 - Rule-based algorithm
+                3 - ASP-based algorithm
+                4 - ASP-based algorithm (minimal assignments)
+             The latter two options are only available if 'clingo' is installed.
+  -h         Prints this help message
+  -i         Prints additional information about the unfication process
+
+More about UEL: http://julianmendez.github.io/uel/

@@ -158,6 +158,7 @@ public class ClingoSolver implements AspSolver {
 			output.append(line);
 			output.append(System.lineSeparator());
 		}
+		reader.close();
 	}
 
 }
