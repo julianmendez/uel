@@ -147,6 +147,8 @@ public class ProcessorTest {
 		uelModel.makeClassesVariables(undefVarNames.stream().map(idClassMap::get), true, true);
 		uelModel.initializeUnificationAlgorithm(algorithmName);
 
+		// System.out.println(uelModel.getStringRenderer(null).renderGoal(uelModel.getGoal()));
+
 		while (uelModel.computeNextUnifier()) {
 		}
 
@@ -163,6 +165,12 @@ public class ProcessorTest {
 			// System.out.println();
 			// System.out.println();
 			OWLOntology extendedOntology = createOntology(background, uelModel.renderUnifier(unifier));
+			// try {
+			// extendedOntology.saveOntology(new
+			// FunctionalSyntaxDocumentFormat(), System.out);
+			// } catch (Exception e) {
+			// e.printStackTrace();
+			// }
 			OWLReasoner reasoner = createReasoner(extendedOntology);
 			Node<OWLClass> node = reasoner.getEquivalentClasses(idClassMap.get(conceptC));
 			OWLClass elem = idClassMap.get(conceptD);

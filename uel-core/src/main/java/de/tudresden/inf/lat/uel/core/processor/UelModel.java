@@ -108,7 +108,7 @@ public class UelModel {
 				Unifier result = algorithm.getUnifier();
 				if (isNew(result)) {
 					unifierList.add(result);
-					System.out.println(getStringRenderer(null).renderUnifier(result));
+					// System.out.println(getStringRenderer(null).renderUnifier(result));
 					// System.out.println(printUnifier(result));
 					return true;
 				}
