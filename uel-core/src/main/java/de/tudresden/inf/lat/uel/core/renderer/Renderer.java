@@ -134,11 +134,7 @@ abstract class Renderer<ExpressionType, AxiomsType> {
 		initialize();
 		for (Definition definition : unifier.getDefinitions()) {
 			if (!restrictToUserVariables || atomManager.getUserVariables().contains(definition.getDefiniendum())) {
-				if (!definition.getRight().isEmpty()) {
-					// TODO for debugging only: print only non-empty
-					// substitutions
-					translateAxiom(definition);
-				}
+				translateAxiom(definition);
 			}
 		}
 		// TODO for debugging only
