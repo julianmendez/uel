@@ -113,10 +113,7 @@ abstract class Renderer<ExpressionType, AxiomsType> {
 	protected ExpressionType translateAtom(Integer atomId) {
 		if (atomManager.getExistentialRestrictions().contains(atomId)) {
 			Integer childId = atomManager.getChild(atomId);
-			String roleName = atomManager.printRoleName(atomId);
-			if (shortFormMap != null) {
-				roleName = getShortForm(roleName);
-			}
+			String roleName = renderRole(atomManager.getExistentialRestriction(atomId).getRoleId());
 			return translateExistentialRestriction(roleName, childId);
 		} else {
 			return translateName(atomId);

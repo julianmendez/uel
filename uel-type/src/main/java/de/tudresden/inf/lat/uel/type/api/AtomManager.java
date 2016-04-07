@@ -56,5 +56,7 @@ public interface AtomManager {
 
 	String printRoleName(Integer atomId);
 
+	String getRoleName(Integer roleId);
+
 	int size();
 }
