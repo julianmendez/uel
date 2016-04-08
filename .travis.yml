@@ -10,8 +10,8 @@ jdk:
   - oraclejdk8
 
 before_install:
- - "echo $JAVA_OPTS"
- - "export JAVA_OPTS=-Xmx2G"
+ - echo ${JAVA_OPTS}
+ - export JAVA_OPTS=-Xmx8G
 
 install:
   - mvn install -DskipTests=true -Dmaven.javadoc.skip=false -B -V
