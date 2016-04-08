@@ -9,13 +9,11 @@ language: java
 jdk:
   - oraclejdk8
 
-before_install:
- - echo ${JAVA_OPTS}
- - export JAVA_OPTS=-Xmx8G
- - echo ${JAVA_OPTS}
-
 install:
   - mvn install -DskipTests=true -Dmaven.javadoc.skip=false -B -V
+
+before_script:
+ - export JAVA_OPTS=-Xmx8G
 
 after_success:
   - mvn clean cobertura:cobertura coveralls:report
