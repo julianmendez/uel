@@ -103,7 +103,7 @@ public class ProcessorTest {
 	public static Collection<Object[]> data() {
 		Collection<Object[]> data = new ArrayList<Object[]>();
 
-		System.out.println("Preparing tests ...");
+		System.out.println("Preparing tests.");
 		for (int i = 1; i <= maxTest; i++) {
 			try {
 
