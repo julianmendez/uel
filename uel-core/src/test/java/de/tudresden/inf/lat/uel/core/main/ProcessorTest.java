@@ -59,6 +59,7 @@ public class ProcessorTest {
 		this.undefVarNames = undefVarNames;
 		this.numberOfUnifiers = numberOfUnifiers;
 		this.algorithmName = algorithmName;
+		System.out.println("Testing " + ontologyName + " with " + algorithmName + " ...");
 	}
 
 	static OWLOntology loadKRSSOntology(String input) throws OWLOntologyCreationException, IOException {
@@ -90,6 +91,7 @@ public class ProcessorTest {
 	public static Collection<Object[]> data() {
 		Collection<Object[]> data = new ArrayList<Object[]>();
 
+		System.out.println("Preparing tests ...");
 		for (int i = 1; i <= maxTest; i++) {
 			try {
 
@@ -115,6 +117,7 @@ public class ProcessorTest {
 				throw new RuntimeException(ex);
 			}
 		}
+		System.out.println("Tests are prepared.");
 
 		return data;
 	}
