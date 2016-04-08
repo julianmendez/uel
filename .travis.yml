@@ -15,6 +15,9 @@ install:
 before_script:
  - export JAVA_OPTS=-Xmx8G
 
+script:
+ - mvn test -B -DargLine="-Xmx8G"
+
 after_success:
   - mvn clean cobertura:cobertura coveralls:report
 
