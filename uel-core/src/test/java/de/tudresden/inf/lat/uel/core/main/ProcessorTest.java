@@ -52,6 +52,18 @@ public class ProcessorTest {
 	private Integer numberOfUnifiers;
 	private String algorithmName;
 
+	String getMemoryUsage() {
+		long totalMemory = Runtime.getRuntime().totalMemory() / 0x100000;
+		long freeMemory = Runtime.getRuntime().freeMemory() / 0x100000;
+		StringBuffer sbuf = new StringBuffer();
+		sbuf.append("([X]:");
+		sbuf.append("" + (totalMemory - freeMemory));
+		sbuf.append(" MB, [ ]:");
+		sbuf.append("" + freeMemory);
+		sbuf.append(" MB)");
+		return sbuf.toString();
+	}
+
 	public ProcessorTest(String ontologyName, Set<String> varNames, Set<String> undefVarNames, Integer numberOfUnifiers,
 			String algorithmName) {
 		this.ontologyName = ontologyName;
@@ -59,7 +71,7 @@ public class ProcessorTest {
 		this.undefVarNames = undefVarNames;
 		this.numberOfUnifiers = numberOfUnifiers;
 		this.algorithmName = algorithmName;
-		System.out.println("Testing " + ontologyName + " with " + algorithmName + " ...");
+		System.out.println("Testing " + ontologyName + " with " + algorithmName + " " + getMemoryUsage() + ".");
 	}
 
 	static OWLOntology loadKRSSOntology(String input) throws OWLOntologyCreationException, IOException {
@@ -187,6 +199,7 @@ public class ProcessorTest {
 		}
 
 		Assert.assertEquals(numberOfUnifiers, (Integer) uelModel.getUnifierList().size());
+		System.out.println("Test OK " + getMemoryUsage() + ".");
 	}
 
 }
