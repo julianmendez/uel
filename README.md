@@ -14,7 +14,7 @@
 <dependency>
   <groupId>de.tu-dresden.inf.lat.uel</groupId>
   <artifactId>uel-ui</artifactId>
-  <version>1.3.1</version>
+  <version>1.4.0</version>
 </dependency>
 ```
 
