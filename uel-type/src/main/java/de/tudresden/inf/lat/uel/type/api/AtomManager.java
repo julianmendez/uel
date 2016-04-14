@@ -15,12 +15,16 @@ import de.tudresden.inf.lat.uel.type.impl.ExistentialRestriction;
 public interface AtomManager {
 
 	String UNDEF_SUFFIX = "_UNDEF";
+	
+	String ROLEGROUP_SUFFIX = "_ROLEGROUP";
 
 	Integer createConceptName(String conceptName);
 
 	Integer createExistentialRestriction(String roleName, Integer child);
 
 	Integer createUndefConceptName(Integer originId);
+	
+	Integer createRoleGroupConceptName(Integer originid);
 
 	Atom getAtom(Integer atomId);
 

@@ -299,6 +299,10 @@ public class AlternativeUelStarter {
 
 	public void setSnomedMode(boolean snomedMode) {
 		this.snomedMode = snomedMode;
+		if (snomedMode) {
+			this.markUndefAsVariables = false;
+			this.markUndefAsAuxVariables = false;
+		}
 	}
 
 	public void setVerbose(boolean verbose) {

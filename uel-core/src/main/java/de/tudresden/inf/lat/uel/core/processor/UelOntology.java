@@ -168,7 +168,7 @@ class UelOntology {
 		// extract the atom representing the top-level hierarchy that
 		// 'currentClass' is contained in
 		Optional<OWLClass> previousClass = Optional.empty();
-		while (currentClass.isPresent()) {
+		while (currentClass.isPresent() && !currentClass.get().equals(top)) {
 			previousClass = currentClass;
 			currentClass = getDirectSuperclass(previousClass.get());
 		}
@@ -189,6 +189,10 @@ class UelOntology {
 	}
 
 	private Optional<OWLClass> getDirectSuperclass(OWLClass cls) {
+		if (cls.equals(top)) {
+			return Optional.empty();
+		}
+
 		OWLClassExpression def = getDefinition(cls);
 		if (def == null) {
 			def = getPrimitiveDefinition(cls);
@@ -220,7 +224,7 @@ class UelOntology {
 	}
 
 	private Stream<OWLClassExpression> getPrimitiveDefinition(OWLOntology ont, OWLClass cls) {
-		return ont.getSubClassAxiomsForSubClass(cls).stream().map(ax -> ax.getSuperClass()).filter(c -> !c.equals(top));
+		return ont.getSubClassAxiomsForSubClass(cls).stream().map(ax -> ax.getSuperClass());
 	}
 
 	public Set<OWLClass> getRange(Integer roleId) {

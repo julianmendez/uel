@@ -1,5 +1,6 @@
 package de.tudresden.inf.lat.uel.type.api;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
@@ -23,39 +24,53 @@ public interface Goal {
 	 * 
 	 * @return the set of definitions
 	 */
-	Set<Definition> getDefinitions();
+	default Set<Definition> getDefinitions() {
+		return Collections.emptySet();
+	}
 
 	/**
 	 * Returns the set of flattened goal equations.
 	 * 
 	 * @return the set of goal equations
 	 */
-	Set<Equation> getEquations();
+	default Set<Equation> getEquations() {
+		return Collections.emptySet();
+	}
 
 	/**
 	 * Returns the set of flattened and small goal disequations.
 	 * 
 	 * @return the set of goal disequations
 	 */
-	Set<Disequation> getDisequations();
+	default Set<Disequation> getDisequations() {
+		return Collections.emptySet();
+	}
 
 	/**
 	 * Returns the set of all flattened equations (definitions and goal).
 	 * 
 	 * @return the set of equations
 	 */
-	Set<Subsumption> getSubsumptions();
+	default Set<Subsumption> getSubsumptions() {
+		return Collections.emptySet();
+	}
 
 	/**
 	 * Returns the set of user variables.
 	 * 
 	 * @return the set of user variables
 	 */
-	Set<Dissubsumption> getDissubsumptions();
+	default Set<Dissubsumption> getDissubsumptions() {
+		return Collections.emptySet();
+	}
 
-	Set<Integer> getTypes();
+	default Set<Integer> getTypes() {
+		return Collections.emptySet();
+	}
 
-	Integer getDirectSupertype(Integer type);
+	default Integer getDirectSupertype(Integer type) {
+		return null;
+	}
 
 	default boolean subtypeOrEquals(Integer type1, Integer type2) {
 		while (type1 != null) {
@@ -75,12 +90,20 @@ public interface Goal {
 		return areDisjoint(type1, type2) && (getDirectSupertype(type1).equals(getDirectSupertype(type2)));
 	}
 
-	Map<Integer, Set<Integer>> getDomains();
+	default Map<Integer, Set<Integer>> getDomains() {
+		return Collections.emptyMap();
+	}
 
-	Map<Integer, Set<Integer>> getRanges();
+	default Map<Integer, Set<Integer>> getRanges() {
+		return Collections.emptyMap();
+	}
 
-	Set<Integer> getTransparentRoles();
+	default Map<Integer, Integer> getRoleGroupTypes() {
+		return Collections.emptyMap();
+	}
 
-	boolean hasNegativePart();
+	default boolean hasNegativePart() {
+		return false;
+	}
 
 }

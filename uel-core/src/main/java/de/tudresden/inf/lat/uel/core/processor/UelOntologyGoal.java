@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.OWLAxiom;
@@ -42,19 +43,20 @@ class UelOntologyGoal implements Goal {
 	private final Set<Equation> equations = new HashSet<Equation>();
 	private UelOntology ontology;
 	private final Map<Integer, Set<Integer>> ranges = new HashMap<Integer, Set<Integer>>();
-	// private final StringRenderer renderer;
-//	private final boolean snomedMode;
+	private final Map<Integer, Integer> roleGroupTypes = new HashMap<Integer, Integer>();
 	private final Set<Subsumption> subsumptions = new HashSet<Subsumption>();
-	private final Set<Integer> transparentRoles = new HashSet<Integer>();
 
 	private final Set<Integer> types = new HashSet<Integer>();
 
 	public UelOntologyGoal(AtomManager manager, UelOntology ontology) {
 		this.atomManager = manager;
 		this.ontology = ontology;
-//		this.snomedMode = snomedMode;
-		// this.renderer = StringRenderer.createInstance(atomManager, provider,
-		// null);
+	}
+
+	public void addDefinition(OWLClass definiendum, OWLClassExpression definiens) {
+		Definition newDefinition = createAxiom(Definition.class, definiendum, definiens);
+		definitions.add(newDefinition);
+		atomManager.makeDefinitionVariable(newDefinition.getDefiniendum());
 	}
 
 	public void addDisequation(OWLEquivalentClassesAxiom axiom) {
@@ -130,6 +132,57 @@ class UelOntologyGoal implements Goal {
 	 * the concept definitions.
 	 */
 	public void extractTypes() {
+		extractDomainsAndRanges();
+		extractTopLevelTypes();
+		extractTypeHierarchy();
+		introduceRoleGroupTypes();
+	}
+
+	private void introduceRoleGroupTypes() {
+		// copy type hierarchy
+		for (Integer type : types) {
+			roleGroupTypes.put(type, atomManager.createRoleGroupConceptName(type));
+		}
+		for (Integer type : types) {
+			Integer supertype = directSupertype.get(type);
+			if (supertype != null) {
+				directSupertype.put(roleGroupTypes.get(type), roleGroupTypes.get(supertype));
+			}
+		}
+		types.addAll(roleGroupTypes.values());
+
+		// change the domains of all roles to corresponding 'role group types'
+		for (Integer type : domains.keySet()) {
+			Set<Integer> domain = domains.get(type);
+			domains.put(type, domain.stream().map(t -> roleGroupTypes.get(t)).collect(Collectors.toSet()));
+		}
+	}
+
+	private void extractTypeHierarchy() {
+		// extract type hierarchy
+		Integer topId = ontology.getTop();
+		types.add(topId);
+		for (Integer type : types) {
+			// traverse the class hierarchy and try to find another type
+			Optional<Integer> supertype = Optional.of(type);
+			do {
+				supertype = ontology.getDirectSuperclass(supertype.get());
+			} while (supertype.isPresent() && !types.contains(supertype.get()));
+
+			if (supertype.isPresent()) {
+				directSupertype.put(type, supertype.get());
+			}
+		}
+	}
+
+	private void extractTopLevelTypes() {
+		// extract all used top-level concept names from the background
+		// ontology; skip those that only occur in the goal or are UNDEF names
+		atomManager.getVariables().stream().map(ontology::getClassification).filter(Optional::isPresent)
+				.map(Optional::get).forEach(types::add);
+	}
+
+	private void extractDomainsAndRanges() {
 		// extract all types from domain/range restrictions of used role names
 		Set<Integer> processedRoleIds = new HashSet<Integer>();
 		Set<Integer> remainingRoleIds = new HashSet<Integer>(atomManager.getRoleIds());
@@ -154,36 +207,6 @@ class UelOntologyGoal implements Goal {
 			remainingRoleIds = new HashSet<Integer>(atomManager.getRoleIds());
 			remainingRoleIds.removeAll(processedRoleIds);
 		}
-
-		// extract all used top-level concept names from the background
-		// ontology, i.e., skip those that only occur in the goal or are UNDEF
-		// names
-		atomManager.getConstants().stream().map(ontology::getClassification).filter(Optional::isPresent)
-				.map(Optional::get).forEach(types::add);
-
-		// extract type hierarchy
-		Integer topId = ontology.getTop();
-		for (Integer type : types) {
-			// traverse the class hierarchy and try to find another type
-			Optional<Integer> supertype = Optional.of(type);
-			do {
-				supertype = ontology.getDirectSuperclass(supertype.get());
-			} while (supertype.isPresent() && !types.contains(supertype.get()));
-
-			if (supertype.isPresent()) {
-				directSupertype.put(type, supertype.get());
-			} else {
-				directSupertype.put(type, topId);
-			}
-		}
-		types.add(topId);
-
-		// fill set of transparent roles
-		Integer roleGroupId = atomManager.getRoleId("http://www.ihtsdo.org/RoleGroup");
-		if ((roleGroupId != null) && (roleGroupId >= 0)) {
-			transparentRoles.add(roleGroupId);
-		}
-
 	}
 
 	@Override
@@ -227,13 +250,13 @@ class UelOntologyGoal implements Goal {
 	}
 
 	@Override
-	public Set<Subsumption> getSubsumptions() {
-		return subsumptions;
+	public Map<Integer, Integer> getRoleGroupTypes() {
+		return roleGroupTypes;
 	}
 
 	@Override
-	public Set<Integer> getTransparentRoles() {
-		return transparentRoles;
+	public Set<Subsumption> getSubsumptions() {
+		return subsumptions;
 	}
 
 	@Override
@@ -269,17 +292,6 @@ class UelOntologyGoal implements Goal {
 	private Definition processPrimitiveDefinition(Definition def) {
 		Integer defId = def.getDefiniendum();
 		Integer undefId = atomManager.createUndefConceptName(defId);
-
-		// the following is not necessary anymore if we transfer types also via
-		// goal subsumptions!
-		// if (snomedMode) {
-		// // add type restriction for new UNDEF concept name
-		// Integer classId = ontology.getClassification(defId).get();
-		// if (!classId.equals(defId)) {
-		// subsumptions.add(new Subsumption(Collections.singleton(undefId),
-		// Collections.singleton(classId)));
-		// }
-		// }
 
 		// create full definition
 		Set<Integer> newRightIds = new HashSet<Integer>(def.getRight());

@@ -46,12 +46,18 @@ abstract class Renderer<ExpressionType, AxiomsType> {
 		if (id.endsWith(AtomManager.UNDEF_SUFFIX)) {
 			label = id.substring(0, id.length() - AtomManager.UNDEF_SUFFIX.length());
 		}
+		if (id.endsWith(AtomManager.ROLEGROUP_SUFFIX)) {
+			label = id.substring(0, id.length() - AtomManager.ROLEGROUP_SUFFIX.length());
+		}
 		String str = provider.getShortForm(label);
 		if (str != null) {
 			label = str;
 		}
 		if (id.endsWith(AtomManager.UNDEF_SUFFIX)) {
 			label += AtomManager.UNDEF_SUFFIX;
+		}
+		if (id.endsWith(AtomManager.ROLEGROUP_SUFFIX)) {
+			label += AtomManager.ROLEGROUP_SUFFIX;
 		}
 
 		return "<" + label + ">";
@@ -109,10 +115,6 @@ abstract class Renderer<ExpressionType, AxiomsType> {
 		for (Integer roleId : input.getRanges().keySet()) {
 			translateAtomList("Range of " + renderRole(roleId), input.getRanges().get(roleId));
 		}
-		newLine();
-		if (!input.getTransparentRoles().isEmpty()) {
-			translateRoleList("Transparent roles", input.getTransparentRoles());
-		}
 		return finalizeAxioms();
 	}
 
@@ -130,17 +132,18 @@ abstract class Renderer<ExpressionType, AxiomsType> {
 		return finalizeExpression();
 	}
 
-	public AxiomsType renderUnifier(Unifier unifier) {
+	public AxiomsType renderUnifier(Unifier unifier, boolean typeInfo) {
 		initialize();
 		for (Definition definition : unifier.getDefinitions()) {
 			if (!restrictToUserVariables || atomManager.getUserVariables().contains(definition.getDefiniendum())) {
 				translateAxiom(definition);
 			}
 		}
-		// TODO for debugging only
-		if (unifier.getTypeAssignment() != null) {
-			for (Integer atomId : unifier.getTypeAssignment().keySet()) {
-				translateAtomList("Types of " + renderName(atomId), unifier.getTypeAssignment().get(atomId));
+		if (typeInfo) {
+			if (unifier.getTypeAssignment() != null) {
+				for (Integer atomId : unifier.getTypeAssignment().keySet()) {
+					translateAtomList("Types of " + renderName(atomId), unifier.getTypeAssignment().get(atomId));
+				}
 			}
 		}
 		return finalizeAxioms();

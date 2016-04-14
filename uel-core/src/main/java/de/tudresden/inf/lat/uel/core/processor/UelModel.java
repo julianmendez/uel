@@ -13,7 +13,6 @@ import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
-import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
@@ -363,7 +362,7 @@ public class UelModel {
 	 * @return a string representation of the unifier
 	 */
 	public String printUnifier(Unifier unifier) {
-		return getStringRenderer(unifier.getDefinitions()).renderUnifier(unifier);
+		return getStringRenderer(unifier.getDefinitions()).renderUnifier(unifier, false);
 	}
 
 	/**
@@ -396,7 +395,7 @@ public class UelModel {
 	 * @return the OWL representation of the unifier
 	 */
 	public Set<OWLAxiom> renderUnifier(Unifier unifier) {
-		return getOWLRenderer(unifier.getDefinitions()).renderUnifier(unifier);
+		return getOWLRenderer(unifier.getDefinitions()).renderUnifier(unifier, false);
 	}
 
 	/**
@@ -419,6 +418,22 @@ public class UelModel {
 			currentUnifierIndex = unifierList.size() - 1;
 		} else {
 			currentUnifierIndex = index;
+		}
+	}
+
+	private void setUndefVariablesFromTypes() {
+		Set<Integer> constants = new HashSet<Integer>(atomManager.getConstants());
+		for (Integer conceptNameId : constants) {
+			String conceptName = atomManager.printConceptName(conceptNameId);
+			if (conceptName.endsWith(AtomManager.UNDEF_SUFFIX)) {
+				String origName = conceptName.substring(0, conceptName.length() - AtomManager.UNDEF_SUFFIX.length());
+				Integer origId = atomManager.createConceptName(origName);
+				if (!goal.getTypes().contains(origId)) {
+					// all UNDEF names belonging to types are constants, all
+					// others are variables
+					atomManager.makeUserVariable(conceptNameId);
+				}
+			}
 		}
 	}
 
@@ -489,14 +504,12 @@ public class UelModel {
 		goal.addNegativeAxioms(disequations);
 
 		// define 'owlThing' as the empty conjunction
-		OWLDataFactory factory = OWLManager.getOWLDataFactory();
-		goal.addEquation(factory.getOWLEquivalentClassesAxiom(owlThing, factory.getOWLObjectIntersectionOf()));
-		Integer owlThingId = atomManager.createConceptName(owlThing.toStringID());
-		atomManager.makeDefinitionVariable(owlThingId);
+		goal.addDefinition(owlThing, OWLManager.getOWLDataFactory().getOWLObjectIntersectionOf());
 
 		// extract types from background ontologies
 		if (snomedMode) {
 			goal.extractTypes();
+			setUndefVariablesFromTypes();
 		}
 
 		goal.disposeOntology();

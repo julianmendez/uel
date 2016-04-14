@@ -47,7 +47,18 @@ public class AtomManagerImpl implements AtomManager {
 
 	@Override
 	public Integer createUndefConceptName(Integer originId) {
-		String newName = conceptNames.get(getConceptName(originId).getConceptNameId()) + UNDEF_SUFFIX;
+		return createAppendedName(originId, UNDEF_SUFFIX);
+	}
+
+	@Override
+	public Integer createRoleGroupConceptName(Integer originId) {
+		Integer newId = createAppendedName(originId, ROLEGROUP_SUFFIX);
+		constants.remove(newId);
+		return newId;
+	}
+
+	private Integer createAppendedName(Integer originId, String suffix) {
+		String newName = conceptNames.get(getConceptName(originId).getConceptNameId()) + suffix;
 		return createConceptName(newName);
 	}
 

@@ -132,58 +132,8 @@ public class CNFChecker {
 			}
 
 			@Override
-			public Set<Definition> getDefinitions() {
-				return Collections.emptySet();
-			}
-
-			@Override
 			public Set<Equation> getEquations() {
 				return equations;
-			}
-
-			@Override
-			public Set<Disequation> getDisequations() {
-				return Collections.emptySet();
-			}
-
-			@Override
-			public Set<Subsumption> getSubsumptions() {
-				return Collections.emptySet();
-			}
-
-			@Override
-			public Set<Dissubsumption> getDissubsumptions() {
-				return Collections.emptySet();
-			}
-
-			@Override
-			public boolean hasNegativePart() {
-				return false;
-			}
-
-			@Override
-			public Set<Integer> getTypes() {
-				return Collections.emptySet();
-			}
-
-			@Override
-			public Integer getDirectSupertype(Integer type) {
-				return null;
-			}
-
-			@Override
-			public Map<Integer, Set<Integer>> getDomains() {
-				return Collections.emptyMap();
-			}
-
-			@Override
-			public Map<Integer, Set<Integer>> getRanges() {
-				return Collections.emptyMap();
-			}
-
-			@Override
-			public Set<Integer> getTransparentRoles() {
-				return Collections.emptySet();
 			}
 		};
 	}

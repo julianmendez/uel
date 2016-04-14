@@ -23,6 +23,7 @@ import de.tudresden.inf.lat.uel.sat.literals.SubtypeLiteral;
 import de.tudresden.inf.lat.uel.sat.type.SatInput;
 import de.tudresden.inf.lat.uel.sat.type.SatOutput;
 import de.tudresden.inf.lat.uel.sat.type.Solver;
+import de.tudresden.inf.lat.uel.type.api.Atom;
 import de.tudresden.inf.lat.uel.type.api.AtomManager;
 import de.tudresden.inf.lat.uel.type.api.Definition;
 import de.tudresden.inf.lat.uel.type.api.Disequation;
@@ -32,6 +33,7 @@ import de.tudresden.inf.lat.uel.type.api.Goal;
 import de.tudresden.inf.lat.uel.type.api.IndexedSet;
 import de.tudresden.inf.lat.uel.type.api.Subsumption;
 import de.tudresden.inf.lat.uel.type.api.UnificationAlgorithm;
+import de.tudresden.inf.lat.uel.type.impl.ExistentialRestriction;
 import de.tudresden.inf.lat.uel.type.impl.IndexedSetImpl;
 import de.tudresden.inf.lat.uel.type.impl.Unifier;
 
@@ -194,11 +196,11 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 
 	private void addTypeRestrictions(SatInput input) {
 		// experimental - minimize subtype literals
-		for (Integer conceptNameId : getConceptNames()) {
-			for (Integer type : goal.getTypes()) {
-				input.addMinimizeLiteral(subtype(conceptNameId, type));
-			}
-		}
+		// for (Integer conceptNameId : getConceptNames()) {
+		// for (Integer type : goal.getTypes()) {
+		// input.addMinimizeLiteral(subtype(conceptNameId, type));
+		// }
+		// }
 
 		// a - all types have themselves as types
 		for (Integer type : goal.getTypes()) {
@@ -238,7 +240,7 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 			}
 		}
 
-		// d - no concept name can have disjoint types
+		// // d - no concept name can have disjoint types
 		List<Integer> types = new ArrayList<Integer>(goal.getTypes());
 		for (int i = 0; i < types.size(); i++) {
 			for (int j = i + 1; j < types.size(); j++) {
@@ -274,22 +276,42 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 			}
 		}
 
-		// transparent roles
+		// 'RoleGroup' translates between 'normal types' and 'role group types'
+		Integer roleGroupId = goal.getAtomManager().getRoleId("http://www.ihtsdo.org/RoleGroup");
 		for (Integer eatomId : getExistentialRestrictions()) {
-			Integer roleId = goal.getAtomManager().getExistentialRestriction(eatomId).getRoleId();
-			if (goal.getTransparentRoles().contains(roleId)) {
+			if (goal.getAtomManager().getExistentialRestriction(eatomId).getRoleId().equals(roleGroupId)) {
 				Integer childId = goal.getAtomManager().getChild(eatomId);
 				for (Integer varId : getVariables()) {
 					Integer subsumptionLiteral = subsumption(varId, eatomId);
-					for (Integer type : goal.getTypes()) {
+					for (Integer type : goal.getRoleGroupTypes().keySet()) {
+						Integer roleGroupType = goal.getRoleGroupTypes().get(type);
 						Integer varTypeLiteral = subtype(varId, type);
-						Integer childTypeLiteral = subtype(childId, type);
-						input.add(implication(childTypeLiteral, varTypeLiteral, subsumptionLiteral));
-						input.add(implication(varTypeLiteral, childTypeLiteral, subsumptionLiteral));
+						Integer childRoleGroupTypeLiteral = subtype(childId, roleGroupType);
+						input.add(implication(childRoleGroupTypeLiteral, varTypeLiteral, subsumptionLiteral));
+						input.add(implication(varTypeLiteral, childRoleGroupTypeLiteral, subsumptionLiteral));
 					}
 				}
 			}
 		}
+		// OLD: transparent roles
+		// for (Integer eatomId : getExistentialRestrictions()) {
+		// Integer roleId =
+		// goal.getAtomManager().getExistentialRestriction(eatomId).getRoleId();
+		// if (goal.getTransparentRoles().contains(roleId)) {
+		// Integer childId = goal.getAtomManager().getChild(eatomId);
+		// for (Integer varId : getVariables()) {
+		// Integer subsumptionLiteral = subsumption(varId, eatomId);
+		// for (Integer type : goal.getTypes()) {
+		// Integer varTypeLiteral = subtype(varId, type);
+		// Integer childTypeLiteral = subtype(childId, type);
+		// input.add(implication(childTypeLiteral, varTypeLiteral,
+		// subsumptionLiteral));
+		// input.add(implication(varTypeLiteral, childTypeLiteral,
+		// subsumptionLiteral));
+		// }
+		// }
+		// }
+		// }
 	}
 
 	private Set<Integer> negativeClause(Integer... body) {
@@ -323,7 +345,7 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 				if (this.onlyMinimalAssignments) {
 					this.solver = new Sat4jMaxSatSolver();
 				} else {
-					this.solver = new Sat4jMaxSatSolver();
+					this.solver = new Sat4jSolver();
 				}
 				SatInput satInput = computeSatInput();
 				//// DEBUG
@@ -1044,8 +1066,36 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 						}
 					}
 
+					// } else {
+					// Integer atomId1 = this.literalManager.get(i).getFirst();
+					// Integer atomId2 = this.literalManager.get(i).getSecond();
+					// if (getUsedAtomIds().contains(atomId1)) {
+					// if (getVariables().contains(atomId2)) {
+					// System.out.println(printAtom(atomId1) + " dissubsumes " +
+					// printAtom(atomId2));
+					// }
+					// }
 				}
 			}
+		}
+
+		Integer x = goal.getAtomManager().createConceptName("http://www.ihtsdo.org/X");
+		Integer u = goal.getAtomManager().createConceptName("http://www.ihtsdo.org/SCT_307126008");
+		for (Integer atom : getNonVariableAtoms()) {
+			if (getLiteralValue(subsumption(x, atom)) && !getLiteralValue(subsumption(u, atom))) {
+				System.out.println("Difference: " + printAtom(atom));
+			}
+		}
+	}
+
+	private String printAtom(Integer atomId) {
+		Atom a = goal.getAtomManager().getAtom(atomId);
+		if (a instanceof ExistentialRestriction) {
+			String roleName = goal.getAtomManager().printRoleName(atomId);
+			String child = goal.getAtomManager().printConceptName(goal.getAtomManager().getChild(atomId));
+			return "(" + roleName + " some " + child + ")";
+		} else {
+			return goal.getAtomManager().printConceptName(atomId);
 		}
 	}
 
