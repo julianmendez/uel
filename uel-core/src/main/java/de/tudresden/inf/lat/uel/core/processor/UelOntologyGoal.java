@@ -141,7 +141,12 @@ class UelOntologyGoal implements Goal {
 	private void introduceRoleGroupTypes() {
 		// copy type hierarchy
 		for (Integer type : types) {
-			roleGroupTypes.put(type, atomManager.createRoleGroupConceptName(type));
+			if (type.equals(ontology.getTop())) {
+				// keep the top concept as the unique most general type
+				roleGroupTypes.put(type, type);
+			} else {
+				roleGroupTypes.put(type, atomManager.createRoleGroupConceptName(type));
+			}
 		}
 		for (Integer type : types) {
 			Integer supertype = directSupertype.get(type);
@@ -149,9 +154,12 @@ class UelOntologyGoal implements Goal {
 				directSupertype.put(roleGroupTypes.get(type), roleGroupTypes.get(supertype));
 			}
 		}
+
+		// finally add all newly created types to the collection
 		types.addAll(roleGroupTypes.values());
 
-		// change the domains of all roles to corresponding 'role group types'
+		// change the domains of all roles to the corresponding 'role group
+		// types'
 		for (Integer type : domains.keySet()) {
 			Set<Integer> domain = domains.get(type);
 			domains.put(type, domain.stream().map(t -> roleGroupTypes.get(t)).collect(Collectors.toSet()));
@@ -159,9 +167,11 @@ class UelOntologyGoal implements Goal {
 	}
 
 	private void extractTypeHierarchy() {
-		// extract type hierarchy
+		// designate the top concept as the most general type
 		Integer topId = ontology.getTop();
 		types.add(topId);
+
+		// extract type hierarchy
 		for (Integer type : types) {
 			// traverse the class hierarchy and try to find another type
 			Optional<Integer> supertype = Optional.of(type);

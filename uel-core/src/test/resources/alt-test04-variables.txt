@@ -1,2 +1,4 @@
 x#C
 x#D
+x#Head_injury_UNDEF
+x#Severe_injury_UNDEF

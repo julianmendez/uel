@@ -5,18 +5,13 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
 import de.tudresden.inf.lat.uel.core.processor.UnificationAlgorithmFactory;
 import de.tudresden.inf.lat.uel.type.api.AtomManager;
-import de.tudresden.inf.lat.uel.type.api.Definition;
-import de.tudresden.inf.lat.uel.type.api.Disequation;
-import de.tudresden.inf.lat.uel.type.api.Dissubsumption;
 import de.tudresden.inf.lat.uel.type.api.Equation;
 import de.tudresden.inf.lat.uel.type.api.Goal;
-import de.tudresden.inf.lat.uel.type.api.Subsumption;
 import de.tudresden.inf.lat.uel.type.api.UnificationAlgorithm;
 import de.tudresden.inf.lat.uel.type.impl.AtomManagerImpl;
 

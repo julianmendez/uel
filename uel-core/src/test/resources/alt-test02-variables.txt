@@ -1,1 +1,7 @@
 x#X
+x#B_UNDEF
+x#C_UNDEF
+x#D_UNDEF
+x#E_UNDEF
+x#F_UNDEF
+x#G_UNDEF

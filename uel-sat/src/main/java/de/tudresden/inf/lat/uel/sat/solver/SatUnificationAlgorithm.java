@@ -196,14 +196,14 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 
 	private void addTypeRestrictions(SatInput input) {
 		// experimental - minimize subtype literals
-		// for (Integer conceptNameId : getConceptNames()) {
-		// for (Integer type : goal.getTypes()) {
-		// input.addMinimizeLiteral(subtype(conceptNameId, type));
-		// }
-		// }
+		for (Integer conceptNameId : getConceptNames()) {
+			for (Integer type : goal.getTypes()) {
+				input.addMinimizeLiteral(subtype(conceptNameId, type));
+			}
+		}
 
 		// a - all types have themselves as types
-		for (Integer type : goal.getTypes()) {
+		for (Integer type : goal.getRoleGroupTypes().keySet()) {
 			input.add(subtype(type, type));
 		}
 
@@ -1079,13 +1079,16 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 			}
 		}
 
-		Integer x = goal.getAtomManager().createConceptName("http://www.ihtsdo.org/X");
-		Integer u = goal.getAtomManager().createConceptName("http://www.ihtsdo.org/SCT_307126008");
-		for (Integer atom : getNonVariableAtoms()) {
-			if (getLiteralValue(subsumption(x, atom)) && !getLiteralValue(subsumption(u, atom))) {
-				System.out.println("Difference: " + printAtom(atom));
-			}
-		}
+		// Integer x =
+		// goal.getAtomManager().createConceptName("http://www.ihtsdo.org/X");
+		// Integer u =
+		// goal.getAtomManager().createConceptName("http://www.ihtsdo.org/SCT_307126008");
+		// for (Integer atom : getNonVariableAtoms()) {
+		// if (getLiteralValue(subsumption(x, atom)) &&
+		// !getLiteralValue(subsumption(u, atom))) {
+		// System.out.println("Difference: " + printAtom(atom));
+		// }
+		// }
 	}
 
 	private String printAtom(Integer atomId) {

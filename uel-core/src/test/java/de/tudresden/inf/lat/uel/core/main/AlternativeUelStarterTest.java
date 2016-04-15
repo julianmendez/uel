@@ -79,7 +79,8 @@ public class AlternativeUelStarterTest {
 	public void tryOntology() throws OWLOntologyCreationException, IOException {
 
 		AlternativeUelStarter starter = new AlternativeUelStarter(mainOntology);
-		// starter.setVerbose(true);
+		starter.markUndefAsVariables(false);
+		starter.setVerbose(true);
 
 		UnifierIterator iterator = (UnifierIterator) starter.modifyOntologyAndSolve(subsumptions, dissubsumptions,
 				variables, UnificationAlgorithmFactory.SAT_BASED_ALGORITHM);
