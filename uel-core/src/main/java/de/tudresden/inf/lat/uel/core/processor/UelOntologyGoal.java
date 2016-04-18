@@ -128,12 +128,31 @@ class UelOntologyGoal implements Goal {
 	}
 
 	public Set<Integer> extractSiblings() {
-		Set<Integer> siblingUndefIds = new HashSet<Integer>();
-		Set<Integer> leaves = new HashSet<Integer>();
-		// TODO find all leaves (ids that are not used in other defs)
-		// TODO pull in all siblings of leaves from ontology, as usual
-		// TODO put all UNDEF variables created for the siblings' definitions
-		// (only the "most specific" ones) into 'siblingUndefIds'
+		// find all parents of leaves (ids that are not used in other defs)
+		Set<Integer> parents = atomManager.getDefinitionVariables().stream().filter(this::isLeaf).map(this::getParent)
+				.filter(Optional::isPresent).map(Optional::get).collect(Collectors.toSet());
+
+		// pull in all siblings of leaves from ontology
+		Set<OWLClass> siblings = parents.stream().flatMap(id -> ontology.getOtherChildren(id).stream())
+				.collect(Collectors.toSet());
+		Set<Integer> siblingIds = processClasses(siblings);
+
+		// return all UNDEF variables created for the siblings' definitions
+		// (only the "most specific" ones)
+		return siblingIds.stream().flatMap(id -> getTopLevelUndefIds(id).stream()).collect(Collectors.toSet());
+	}
+	
+	private Set<Integer> getTopLevelUndefIds(Integer atomId) {
+		// TODO extract most specific UNDEF names used in the definition of 'atomId'
+	}
+
+	private boolean isLeaf(Integer atomId) {
+		return !definitions.stream().anyMatch(d -> d.getRight().contains(atomId));
+	}
+
+	private Optional<Integer> getParent(Integer atomId) {
+		return definitions.stream().filter(d -> d.getDefiniendum().equals(atomId)).flatMap(d -> d.getRight().stream())
+				.filter(id -> atomManager.getVariables().contains(id)).findFirst();
 	}
 
 	/**

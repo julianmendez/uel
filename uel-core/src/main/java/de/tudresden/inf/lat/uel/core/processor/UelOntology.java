@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -14,11 +15,15 @@ import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
+import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
 import org.semanticweb.owlapi.model.OWLObjectIntersectionOf;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
 import org.semanticweb.owlapi.model.OWLObjectSomeValuesFrom;
 import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
+import org.semanticweb.owlapi.model.parameters.Imports;
+import org.semanticweb.owlapi.model.parameters.Navigation;
 
 import de.tudresden.inf.lat.uel.type.api.AtomManager;
 import de.tudresden.inf.lat.uel.type.api.Definition;
@@ -62,8 +67,7 @@ class UelOntology {
 	}
 
 	private Optional<IRI> checkUsedIRI(Integer conceptNameId) {
-		// check if the given concept name can have a classification at all (in
-		// the background ontologies)
+		// check if the given concept name occurs in the background ontologies
 		IRI iri = IRI.create(atomManager.printConceptName(conceptNameId));
 		if (!ontologies.stream().anyMatch(ont -> ont.containsClassInSignature(iri))) {
 			return Optional.empty();
@@ -89,11 +93,11 @@ class UelOntology {
 		return varId;
 	}
 
-	private <R> R extractInformation(Function<OWLOntology, Stream<OWLClassExpression>> extractor,
-			Function<Set<OWLClassExpression>, R> ifMultiple, Function<OWLClassExpression, R> ifSingleton) {
-		Set<OWLClassExpression> expr = ontologies.stream().flatMap(extractor).collect(Collectors.toSet());
+	private <R, S> R extractInformation(Function<OWLOntology, Stream<S>> extractor, Function<Set<S>, R> ifMultiple,
+			Function<S, R> ifSingleton, Supplier<R> ifEmpty) {
+		Set<S> expr = ontologies.stream().flatMap(extractor).collect(Collectors.toSet());
 		if (expr.size() < 1) {
-			return null;
+			return ifEmpty.get();
 		}
 		if (expr.size() > 1) {
 			return ifMultiple.apply(expr);
@@ -177,7 +181,7 @@ class UelOntology {
 
 	private OWLClassExpression getDefinition(OWLClass cls) {
 		return extractInformation(ont -> getDefinition(ont, cls),
-				exception("Multiple candidate definitions found for class: " + cls), Function.identity());
+				exception("Multiple candidate definitions found for class: " + cls), Function.identity(), null);
 	}
 
 	private Stream<OWLClassExpression> getDefinition(OWLOntology ont, OWLClass cls) {
@@ -212,15 +216,38 @@ class UelOntology {
 	public Set<OWLClass> getDomain(Integer roleId) {
 		OWLObjectProperty prop = toOWLObjectProperty(roleId);
 		return extractInformation(ont -> getDomain(ont, prop),
-				exception("Multiple candidate domains found for property: " + prop), getNamedDisjuncts);
+				exception("Multiple candidate domains found for property: " + prop), getNamedDisjuncts, null);
 	}
 
 	private Stream<OWLClassExpression> getDomain(OWLOntology ont, OWLObjectProperty prop) {
 		return ont.getObjectPropertyDomainAxioms(prop).stream().map(ax -> ax.getDomain());
 	}
 
+	public Set<OWLClass> getOtherChildren(Integer parentId) {
+		Optional<OWLClass> parentClass = checkUsedIRI(parentId).map(iriToClass);
+		if (!parentClass.isPresent()) {
+			return Collections.emptySet();
+		}
+
+		return extractInformation(ont -> getOtherChildren(ont, parentClass.get()), Function.identity(),
+				Collections::<OWLClass> singleton, Collections::emptySet);
+	}
+
+	private Stream<OWLClass> getOtherChildren(OWLOntology ont, OWLClass cls) {
+		Stream<OWLClass> subClasses1 = ont
+				.getAxioms(OWLEquivalentClassesAxiom.class, cls, Imports.EXCLUDED, Navigation.IN_SUPER_POSITION)
+				.stream().filter(ax -> !ax.getClassExpressions().contains(cls))
+				.map(ax -> ax.getNamedClasses().iterator().next());
+		Stream<OWLClass> subClasses2 = ont
+				.getAxioms(OWLSubClassOfAxiom.class, cls, Imports.EXCLUDED, Navigation.IN_SUPER_POSITION).stream()
+				.filter(ax -> !ax.getSubClass().equals(cls)).map(ax -> ax.getSubClass()).filter(expr -> !expr.isAnonymous())
+				.map(expr -> expr.asOWLClass());
+		return Stream.concat(subClasses1, subClasses2).filter(c -> !nameMap.containsValue(c));
+	}
+
 	private OWLClassExpression getPrimitiveDefinition(OWLClass cls) {
-		return extractInformation(ont -> getPrimitiveDefinition(ont, cls), constructIntersection, Function.identity());
+		return extractInformation(ont -> getPrimitiveDefinition(ont, cls), constructIntersection, Function.identity(),
+				null);
 	}
 
 	private Stream<OWLClassExpression> getPrimitiveDefinition(OWLOntology ont, OWLClass cls) {
@@ -230,7 +257,7 @@ class UelOntology {
 	public Set<OWLClass> getRange(Integer roleId) {
 		OWLObjectProperty prop = toOWLObjectProperty(roleId);
 		return extractInformation(ont -> getRange(ont, prop),
-				exception("Multiple candidate ranges found for property: " + prop), getNamedDisjuncts);
+				exception("Multiple candidate ranges found for property: " + prop), getNamedDisjuncts, null);
 	}
 
 	private Stream<OWLClassExpression> getRange(OWLOntology ont, OWLObjectProperty prop) {
