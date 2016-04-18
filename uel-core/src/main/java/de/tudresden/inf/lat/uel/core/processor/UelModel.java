@@ -421,17 +421,17 @@ public class UelModel {
 		}
 	}
 
-	private void setUndefVariablesFromTypes() {
+	private void setUndefVariablesFromTypes(Set<Integer> siblingUndefIds) {
 		Set<Integer> constants = new HashSet<Integer>(atomManager.getConstants());
-		for (Integer conceptNameId : constants) {
-			String conceptName = atomManager.printConceptName(conceptNameId);
-			if (conceptName.endsWith(AtomManager.UNDEF_SUFFIX)) {
-				String origName = conceptName.substring(0, conceptName.length() - AtomManager.UNDEF_SUFFIX.length());
+		for (Integer undefId : constants) {
+			String undefName = atomManager.printConceptName(undefId);
+			if (undefName.endsWith(AtomManager.UNDEF_SUFFIX)) {
+				String origName = undefName.substring(0, undefName.length() - AtomManager.UNDEF_SUFFIX.length());
 				Integer origId = atomManager.createConceptName(origName);
-				if (!goal.getTypes().contains(origId)) {
+				if (!goal.getTypes().contains(origId) && !siblingUndefIds.contains(undefId)) {
 					// all UNDEF names belonging to types are constants, all
 					// others are variables
-					atomManager.makeUserVariable(conceptNameId);
+					atomManager.makeUserVariable(undefId);
 				}
 			}
 		}
@@ -508,8 +508,9 @@ public class UelModel {
 
 		// extract types from background ontologies
 		if (snomedMode) {
+			Set<Integer> siblingUndefIds = goal.extractSiblings();
 			goal.extractTypes();
-			setUndefVariablesFromTypes();
+			setUndefVariablesFromTypes(siblingUndefIds);
 		}
 
 		goal.disposeOntology();

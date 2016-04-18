@@ -1061,7 +1061,9 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 					Integer atomId1 = this.literalManager.get(i).getFirst();
 					Integer atomId2 = this.literalManager.get(i).getSecond();
 					if (getVariables().contains(atomId1)) {
-						if (getNonVariableAtoms().contains(atomId2)) {
+						// if (getNonVariableAtoms().contains(atomId2)) {
+						if (!getUserVariables().contains(atomId2)
+								&& !goal.getAtomManager().getFlatteningVariables().contains(atomId2)) {
 							addToSetOfSubsumers(atomId1, atomId2);
 						}
 					}

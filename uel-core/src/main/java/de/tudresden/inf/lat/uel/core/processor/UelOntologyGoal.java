@@ -127,6 +127,15 @@ class UelOntologyGoal implements Goal {
 		ontology = null;
 	}
 
+	public Set<Integer> extractSiblings() {
+		Set<Integer> siblingUndefIds = new HashSet<Integer>();
+		Set<Integer> leaves = new HashSet<Integer>();
+		// TODO find all leaves (ids that are not used in other defs)
+		// TODO pull in all siblings of leaves from ontology, as usual
+		// TODO put all UNDEF variables created for the siblings' definitions
+		// (only the "most specific" ones) into 'siblingUndefIds'
+	}
+
 	/**
 	 * Extract (SNOMED) type information from domain and range restrictions and
 	 * the concept definitions.
