@@ -73,6 +73,12 @@ abstract class Renderer<ExpressionType, AxiomsType> {
 		return finalizeExpression();
 	}
 
+	public ExpressionType renderAtomList(String description, Set<Integer> atomIds) {
+		initialize();
+		translateAtomList(description, atomIds);
+		return finalizeExpression();
+	}
+
 	public AxiomsType renderAxioms(Set<? extends Axiom> axioms) {
 		initialize();
 		translateAxioms(axioms);

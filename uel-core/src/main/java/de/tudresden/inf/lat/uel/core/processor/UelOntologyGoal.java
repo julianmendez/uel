@@ -1,12 +1,15 @@
 package de.tudresden.inf.lat.uel.core.processor;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.semanticweb.owlapi.model.AxiomType;
@@ -16,6 +19,7 @@ import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 
+import de.tudresden.inf.lat.uel.core.renderer.StringRenderer;
 import de.tudresden.inf.lat.uel.type.api.AtomManager;
 import de.tudresden.inf.lat.uel.type.api.Axiom;
 import de.tudresden.inf.lat.uel.type.api.Definition;
@@ -35,7 +39,7 @@ import de.tudresden.inf.lat.uel.type.api.Subsumption;
 class UelOntologyGoal implements Goal {
 
 	private final AtomManager atomManager;
-	private final Set<Definition> definitions = new HashSet<Definition>();
+	private final Map<Integer, Definition> definitions = new HashMap<Integer, Definition>();
 	private final Map<Integer, Integer> directSupertype = new HashMap<Integer, Integer>();
 	private final Set<Disequation> disequations = new HashSet<Disequation>();
 	private final Set<Dissubsumption> dissubsumptions = new HashSet<Dissubsumption>();
@@ -55,8 +59,12 @@ class UelOntologyGoal implements Goal {
 
 	public void addDefinition(OWLClass definiendum, OWLClassExpression definiens) {
 		Definition newDefinition = createAxiom(Definition.class, definiendum, definiens);
-		definitions.add(newDefinition);
+		addDefinition(newDefinition);
 		atomManager.makeDefinitionVariable(newDefinition.getDefiniendum());
+	}
+
+	private void addDefinition(Definition definition) {
+		definitions.put(definition.getDefiniendum(), definition);
 	}
 
 	public void addDisequation(OWLEquivalentClassesAxiom axiom) {
@@ -127,32 +135,58 @@ class UelOntologyGoal implements Goal {
 		ontology = null;
 	}
 
-	public Set<Integer> extractSiblings() {
+	public Set<Integer> extractSiblings(StringRenderer renderer) {
 		// find all parents of leaves (ids that are not used in other defs)
-		Set<Integer> parents = atomManager.getDefinitionVariables().stream().filter(this::isLeaf).map(this::getParent)
-				.filter(Optional::isPresent).map(Optional::get).collect(Collectors.toSet());
+		Set<Integer> parentIds = mapSet(atomManager.getDefinitionVariables(), this::isLeaf, this::getParent);
+		System.out.println(renderer.renderAtomList("Parents", parentIds));
 
 		// pull in all siblings of leaves from ontology
-		Set<OWLClass> siblings = parents.stream().flatMap(id -> ontology.getOtherChildren(id).stream())
-				.collect(Collectors.toSet());
+		Set<OWLClass> siblings = collectSets(parentIds, id -> true, ontology::getOtherChildren);
 		Set<Integer> siblingIds = processClasses(siblings);
+		System.out.println(renderer.renderAtomList("Siblings", siblingIds));
 
 		// return all UNDEF variables created for the siblings' definitions
 		// (only the "most specific" ones)
-		return siblingIds.stream().flatMap(id -> getTopLevelUndefIds(id).stream()).collect(Collectors.toSet());
+		return collectSets(siblingIds, id -> true, this::getTopLevelUndefIds);
 	}
-	
+
 	private Set<Integer> getTopLevelUndefIds(Integer atomId) {
-		// TODO extract most specific UNDEF names used in the definition of 'atomId'
+		// extract most specific UNDEF names used in the definition of 'atomId'
+		Definition def = definitions.get(atomId);
+		if (def == null) {
+			return Collections.emptySet();
+		}
+
+		if (def.isPrimitive()) {
+			// TODO does not work! all definitions are full definitions now!
+			Integer undefId = atomManager.createUndefConceptName(atomId);
+			return Collections.singleton(undefId);
+		} else {
+			return collectSets(def.getRight(), id -> atomManager.getExistentialRestrictions().contains(id),
+					id -> getTopLevelUndefIds(atomManager.getChild(id)));
+		}
+	}
+
+	private <S, T> Set<T> collectSets(Set<S> input, Predicate<S> filter, Function<S, Set<T>> mapper) {
+		return input.stream().filter(filter).map(mapper).flatMap(Set::stream).collect(Collectors.toSet());
+	}
+
+	private <S, T> Set<T> mapSet(Set<S> input, Function<S, T> mapper) {
+		return input.stream().map(mapper).collect(Collectors.toSet());
+	}
+
+	private <S, T> Set<T> mapSet(Set<S> input, Predicate<S> filter, Function<S, Optional<T>> mapper) {
+		return input.stream().filter(filter).map(mapper).filter(Optional::isPresent).map(Optional::get)
+				.collect(Collectors.toSet());
 	}
 
 	private boolean isLeaf(Integer atomId) {
-		return !definitions.stream().anyMatch(d -> d.getRight().contains(atomId));
+		return !definitions.values().stream().anyMatch(d -> d.getRight().contains(atomId));
 	}
 
 	private Optional<Integer> getParent(Integer atomId) {
-		return definitions.stream().filter(d -> d.getDefiniendum().equals(atomId)).flatMap(d -> d.getRight().stream())
-				.filter(id -> atomManager.getVariables().contains(id)).findFirst();
+		return definitions.get(atomId).getRight().stream().filter(id -> atomManager.getVariables().contains(id))
+				.findFirst();
 	}
 
 	/**
@@ -190,7 +224,7 @@ class UelOntologyGoal implements Goal {
 		// types'
 		for (Integer type : domains.keySet()) {
 			Set<Integer> domain = domains.get(type);
-			domains.put(type, domain.stream().map(t -> roleGroupTypes.get(t)).collect(Collectors.toSet()));
+			domains.put(type, mapSet(domain, roleGroupTypes::get));
 		}
 	}
 
@@ -254,7 +288,7 @@ class UelOntologyGoal implements Goal {
 
 	@Override
 	public Set<Definition> getDefinitions() {
-		return definitions;
+		return new HashSet<Definition>(definitions.values());
 	}
 
 	@Override
@@ -320,9 +354,9 @@ class UelOntologyGoal implements Goal {
 		for (Definition newDefinition : newDefinitions) {
 			// only full definitions are allowed
 			if (newDefinition.isPrimitive()) {
-				definitions.add(processPrimitiveDefinition(newDefinition));
+				addDefinition(processPrimitiveDefinition(newDefinition));
 			} else {
-				definitions.add(newDefinition);
+				addDefinition(newDefinition);
 			}
 		}
 	}

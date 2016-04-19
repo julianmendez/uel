@@ -181,7 +181,7 @@ class UelOntology {
 
 	private OWLClassExpression getDefinition(OWLClass cls) {
 		return extractInformation(ont -> getDefinition(ont, cls),
-				exception("Multiple candidate definitions found for class: " + cls), Function.identity(), null);
+				exception("Multiple candidate definitions found for class: " + cls), Function.identity(), () -> null);
 	}
 
 	private Stream<OWLClassExpression> getDefinition(OWLOntology ont, OWLClass cls) {
@@ -216,7 +216,7 @@ class UelOntology {
 	public Set<OWLClass> getDomain(Integer roleId) {
 		OWLObjectProperty prop = toOWLObjectProperty(roleId);
 		return extractInformation(ont -> getDomain(ont, prop),
-				exception("Multiple candidate domains found for property: " + prop), getNamedDisjuncts, null);
+				exception("Multiple candidate domains found for property: " + prop), getNamedDisjuncts, () -> null);
 	}
 
 	private Stream<OWLClassExpression> getDomain(OWLOntology ont, OWLObjectProperty prop) {
@@ -240,14 +240,14 @@ class UelOntology {
 				.map(ax -> ax.getNamedClasses().iterator().next());
 		Stream<OWLClass> subClasses2 = ont
 				.getAxioms(OWLSubClassOfAxiom.class, cls, Imports.EXCLUDED, Navigation.IN_SUPER_POSITION).stream()
-				.filter(ax -> !ax.getSubClass().equals(cls)).map(ax -> ax.getSubClass()).filter(expr -> !expr.isAnonymous())
-				.map(expr -> expr.asOWLClass());
+				.filter(ax -> !ax.getSubClass().equals(cls)).map(ax -> ax.getSubClass())
+				.filter(expr -> !expr.isAnonymous()).map(expr -> expr.asOWLClass());
 		return Stream.concat(subClasses1, subClasses2).filter(c -> !nameMap.containsValue(c));
 	}
 
 	private OWLClassExpression getPrimitiveDefinition(OWLClass cls) {
 		return extractInformation(ont -> getPrimitiveDefinition(ont, cls), constructIntersection, Function.identity(),
-				null);
+				() -> null);
 	}
 
 	private Stream<OWLClassExpression> getPrimitiveDefinition(OWLOntology ont, OWLClass cls) {
@@ -257,7 +257,7 @@ class UelOntology {
 	public Set<OWLClass> getRange(Integer roleId) {
 		OWLObjectProperty prop = toOWLObjectProperty(roleId);
 		return extractInformation(ont -> getRange(ont, prop),
-				exception("Multiple candidate ranges found for property: " + prop), getNamedDisjuncts, null);
+				exception("Multiple candidate ranges found for property: " + prop), getNamedDisjuncts, () -> null);
 	}
 
 	private Stream<OWLClassExpression> getRange(OWLOntology ont, OWLObjectProperty prop) {

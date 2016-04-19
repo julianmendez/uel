@@ -429,8 +429,8 @@ public class UelModel {
 				String origName = undefName.substring(0, undefName.length() - AtomManager.UNDEF_SUFFIX.length());
 				Integer origId = atomManager.createConceptName(origName);
 				if (!goal.getTypes().contains(origId) && !siblingUndefIds.contains(undefId)) {
-					// all UNDEF names belonging to types are constants, all
-					// others are variables
+					// all UNDEF names belonging to types or siblings are
+					// constants, all others are variables
 					atomManager.makeUserVariable(undefId);
 				}
 			}
@@ -508,9 +508,12 @@ public class UelModel {
 
 		// extract types from background ontologies
 		if (snomedMode) {
-			Set<Integer> siblingUndefIds = goal.extractSiblings();
+			Set<Integer> siblingUndefIds = goal.extractSiblings(getStringRenderer(null));
+			System.out.println(getStringRenderer(null).renderAtomList("Sibling defining UNDEFs:", siblingUndefIds));
 			goal.extractTypes();
 			setUndefVariablesFromTypes(siblingUndefIds);
+			// TODO introduce new "blank" existential restrictions with fresh
+			// variables, one for each role name
 		}
 
 		goal.disposeOntology();

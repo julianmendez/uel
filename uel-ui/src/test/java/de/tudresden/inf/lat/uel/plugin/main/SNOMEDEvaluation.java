@@ -32,11 +32,11 @@ import de.tudresden.inf.lat.uel.core.processor.UnificationAlgorithmFactory;
  */
 public class SNOMEDEvaluation {
 
-	private static final String WORK_DIR = "C:\\Users\\Stefan\\Work\\";
-	// private static final String WORK_DIR = "/Users/stefborg/Documents/";
+	// private static final String WORK_DIR = "C:\\Users\\Stefan\\Work\\";
+	private static final String WORK_DIR = "/Users/stefborg/Documents/";
 	private static final String SNOMED_PATH = WORK_DIR + "Ontologies/snomed-english-rdf.owl";
 	private static final String SNOMED_RESTR_PATH = WORK_DIR + "Ontologies/snomed-restrictions.owl";
-	private static final String POS_PATH = WORK_DIR + "Projects/uel-snomed/uel-snomed-pos2-const.owl";
+	private static final String POS_PATH = WORK_DIR + "Projects/uel-snomed/uel-snomed-pos3.owl";
 	private static final String NEG_PATH = WORK_DIR + "Projects/uel-snomed/uel-snomed-neg2.owl";
 
 	private static OWLClass var(String name) {
