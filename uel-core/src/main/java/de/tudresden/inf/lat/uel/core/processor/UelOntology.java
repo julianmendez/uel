@@ -59,6 +59,7 @@ class UelOntology {
 	private final Set<OWLOntology> ontologies;
 	private final OWLClass top;
 	private final Set<Integer> visited = new HashSet<Integer>();
+	private final Map<Set<Integer>, Integer> flatteningInvMap = new HashMap<Set<Integer>, Integer>();
 
 	public UelOntology(AtomManager atomManager, Set<OWLOntology> ontologies, OWLClass top) {
 		this.atomManager = atomManager;
@@ -79,9 +80,13 @@ class UelOntology {
 		return atomManager.createConceptName(cls.toStringID());
 	}
 
-	private Integer createFreshFlatteningDefinition(Set<Integer> atomIds, Set<Definition> newDefinitions) {
-		Integer varId = createFreshFlatteningVariable();
-		newDefinitions.add(new Definition(varId, atomIds, false));
+	private Integer createOrReuseFlatteningDefinition(Set<Integer> atomIds, Set<Definition> newDefinitions) {
+		Integer varId = flatteningInvMap.get(atomIds);
+		if (varId == null) {
+			varId = createFreshFlatteningVariable();
+			flatteningInvMap.put(atomIds, varId);
+			newDefinitions.add(new Definition(varId, atomIds, false));
+		}
 		return varId;
 	}
 
@@ -158,9 +163,9 @@ class UelOntology {
 
 		if ((fillerId == null) || !atomManager.getAtom(fillerId).isConceptName()) {
 			// if we have more than one atom id in 'fillerIds' or the only atom
-			// id is not a concept name, then we need to introduce a new
-			// definition in order to obtain a flat atom
-			fillerId = createFreshFlatteningDefinition(fillerIds, newDefinitions);
+			// id is not a concept name, then we need a separate definition in
+			// order to obtain a flat atom
+			fillerId = createOrReuseFlatteningDefinition(fillerIds, newDefinitions);
 		}
 
 		Integer atomId = atomManager.createExistentialRestriction(roleName, fillerId);
@@ -235,13 +240,29 @@ class UelOntology {
 
 	private Stream<OWLClass> getOtherChildren(OWLOntology ont, OWLClass cls) {
 		Stream<OWLClass> subClasses1 = ont
+				// Get all OWLEquivalentClassesAxioms that mention 'cls', ...
 				.getAxioms(OWLEquivalentClassesAxiom.class, cls, Imports.EXCLUDED, Navigation.IN_SUPER_POSITION)
+				// ... do not directly mention 'cls', ...
 				.stream().filter(ax -> !ax.getClassExpressions().contains(cls))
+				// ... but contain 'cls' as a conjunct in one of the equivalent
+				// expressions.
+				.filter(ax -> ax.getClassExpressions().stream().anyMatch(expr -> expr.asConjunctSet().contains(cls)))
+				// Then get the concept name that this axiom defines.
 				.map(ax -> ax.getNamedClasses().iterator().next());
+
 		Stream<OWLClass> subClasses2 = ont
+				// Get all OWLSubClassOfAxioms that mention 'cls', ...
 				.getAxioms(OWLSubClassOfAxiom.class, cls, Imports.EXCLUDED, Navigation.IN_SUPER_POSITION).stream()
-				.filter(ax -> !ax.getSubClass().equals(cls)).map(ax -> ax.getSubClass())
-				.filter(expr -> !expr.isAnonymous()).map(expr -> expr.asOWLClass());
+				// ... are not a primitive defintion of 'cls', ...
+				.filter(ax -> !ax.getSubClass().equals(cls))
+				// ... but contain 'cls' as a conjunct of the superclass
+				// expression.
+				.filter(ax -> ax.getSuperClass().asConjunctSet().contains(cls))
+				// Then get the concept name that this axiom defines.
+				.map(ax -> ax.getSubClass()).filter(expr -> !expr.isAnonymous()).map(expr -> expr.asOWLClass());
+
+		// Finally, filter both sets for concept names that have not yet been
+		// processed.
 		return Stream.concat(subClasses1, subClasses2).filter(c -> !nameMap.containsValue(c));
 	}
 

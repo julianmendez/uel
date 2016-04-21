@@ -9,14 +9,11 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
-import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
-import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 
 import de.tudresden.inf.lat.uel.core.renderer.OWLRenderer;
 import de.tudresden.inf.lat.uel.core.renderer.StringRenderer;
@@ -107,7 +104,8 @@ public class UelModel {
 				Unifier result = algorithm.getUnifier();
 				if (isNew(result)) {
 					unifierList.add(result);
-					// System.out.println(getStringRenderer(null).renderUnifier(result));
+					// System.out.println(getStringRenderer(null).renderUnifier(result,
+					// true, true));
 					// System.out.println(printUnifier(result));
 					return true;
 				}
@@ -118,12 +116,20 @@ public class UelModel {
 	}
 
 	/**
-	 * Creates a new anonymous ontology.
+	 * Creates a new anonymous ontology containing all axioms of the given one.
 	 * 
+	 * @param original
+	 *            the original ontology
 	 * @return the new ontology
 	 */
-	public OWLOntology createOntology() {
-		return provider.createOntology();
+	public OWLOntology createOntology(OWLOntology original) {
+		try {
+			OWLOntology newOntology = OWLManager.createOWLOntologyManager().createOntology();
+			newOntology.getOWLOntologyManager().addAxioms(newOntology, original.getAxioms());
+			return newOntology;
+		} catch (OWLOntologyCreationException ex) {
+			throw new RuntimeException(ex);
+		}
 	}
 
 	private boolean equalsModuloUserVariables(Set<Definition> defs1, Set<Definition> defs2) {
@@ -268,6 +274,9 @@ public class UelModel {
 	 *            by 'UnificationAlgorithmFactory'
 	 */
 	public void initializeUnificationAlgorithm(String name) {
+		unifierList = new ArrayList<Unifier>();
+		currentUnifierIndex = -1;
+		allUnifiersFound = false;
 		algorithm = UnificationAlgorithmFactory.instantiateAlgorithm(name, goal);
 	}
 
@@ -292,7 +301,7 @@ public class UelModel {
 	}
 
 	/**
-	 * Marks all 'undef' variables as (user) variables.
+	 * Marks all 'undef' variables as variables.
 	 * 
 	 * @param userVariables
 	 *            a flag indicating whether to create user variables or
@@ -307,7 +316,7 @@ public class UelModel {
 	}
 
 	/**
-	 * Marks a given set of variables as user variables.
+	 * Marks a given set of classes as variables.
 	 * 
 	 * @param variables
 	 *            a set of variables given as instances of OWLClass
@@ -315,8 +324,8 @@ public class UelModel {
 	 *            a flag indicating whether to add an _UNDEF suffix to the given
 	 *            classes
 	 * @param userVariables
-	 *            a flag indicating whether to create user variables or
-	 *            definition variables
+	 *            a flag indicating whether to create user variables ('true') or
+	 *            definition variables ('false')
 	 */
 	public void makeClassesVariables(Stream<OWLClass> variables, boolean addUndefSuffix, boolean userVariables) {
 		makeNamesVariables(variables
@@ -328,6 +337,15 @@ public class UelModel {
 		variables.forEach(userVariables ? atomManager::makeUserVariable : atomManager::makeDefinitionVariable);
 	}
 
+	/**
+	 * Marks the given concept names as variables.
+	 * 
+	 * @param variables
+	 *            a stream of concept names
+	 * @param userVariables
+	 *            indicates whether the concept names should be user variables
+	 *            ('true') or definition variables ('false')
+	 */
 	public void makeNamesVariables(Stream<String> variables, boolean userVariables) {
 		makeIdsVariables(variables.map(this::getAtomId), userVariables);
 	}
@@ -362,7 +380,7 @@ public class UelModel {
 	 * @return a string representation of the unifier
 	 */
 	public String printUnifier(Unifier unifier) {
-		return getStringRenderer(unifier.getDefinitions()).renderUnifier(unifier, false);
+		return getStringRenderer(unifier.getDefinitions()).renderUnifier(unifier, true, false);
 	}
 
 	/**
@@ -395,7 +413,7 @@ public class UelModel {
 	 * @return the OWL representation of the unifier
 	 */
 	public Set<OWLAxiom> renderUnifier(Unifier unifier) {
-		return getOWLRenderer(unifier.getDefinitions()).renderUnifier(unifier, false);
+		return getOWLRenderer(unifier.getDefinitions()).renderUnifier(unifier, true, false);
 	}
 
 	/**
@@ -446,49 +464,21 @@ public class UelModel {
 	 *            the positive part of the unification problem
 	 * @param negativeProblem
 	 *            the negative part of the unification problem
+	 * @param constraintOntology
+	 *            additional negative constraints to be added after all
+	 *            pre-processing
 	 * @param owlThingAlias
 	 *            (optional) an alias for owl:Thing, e.g., 'SNOMED CT Concept'
 	 * @param snomedMode
-	 *            indicates if "SNOMED mode" should be activated, loading
+	 *            indicates whether "SNOMED mode" should be activated, loading
 	 *            additional type information
+	 * @param resetShortFormCache
+	 *            indicates whether the cached short forms should be reloaded
+	 *            from the OntologyProvider
 	 */
 	public void setupGoal(Set<OWLOntology> bgOntologies, OWLOntology positiveProblem, OWLOntology negativeProblem,
-			OWLClass owlThingAlias, boolean snomedMode, boolean resetShortFormCache) {
-		setupGoal(bgOntologies, positiveProblem.getAxioms(AxiomType.SUBCLASS_OF),
-				positiveProblem.getAxioms(AxiomType.EQUIVALENT_CLASSES),
-				negativeProblem.getAxioms(AxiomType.SUBCLASS_OF),
-				negativeProblem.getAxioms(AxiomType.EQUIVALENT_CLASSES), owlThingAlias, snomedMode,
-				resetShortFormCache);
-	}
+			OWLOntology constraintOntology, OWLClass owlThingAlias, boolean snomedMode, boolean resetShortFormCache) {
 
-	/**
-	 * Initializes the unification goal with the given ontologies and axioms.
-	 * 
-	 * @param bgOntologies
-	 *            a set of background ontologies with definitions
-	 * @param subsumptions
-	 *            the goal subsumptions, as OWLSubClassOfAxioms
-	 * @param equations
-	 *            the goal equations, as binary OWLEquivalentClassesAxioms
-	 * @param dissubsumptions
-	 *            the goal dissubsumptions, as OWLSubClassOfAxioms
-	 * @param disequations
-	 *            the goal disequations, as binary OWLEquivalentClassesAxioms
-	 * @param owlThingAlias
-	 *            (optional) an alias for owl:Thing, e.g., 'SNOMED CT Concept'
-	 * @param snomedMode
-	 *            indicates if "SNOMED mode" should be activated, loading
-	 *            additional type information
-	 */
-	public void setupGoal(Set<OWLOntology> bgOntologies, Set<OWLSubClassOfAxiom> subsumptions,
-			Set<OWLEquivalentClassesAxiom> equations, Set<OWLSubClassOfAxiom> dissubsumptions,
-			Set<OWLEquivalentClassesAxiom> disequations, OWLClass owlThingAlias, boolean snomedMode,
-			boolean resetShortFormCache) {
-
-		algorithm = null;
-		unifierList = new ArrayList<Unifier>();
-		currentUnifierIndex = -1;
-		allUnifiersFound = false;
 		atomManager = new AtomManagerImpl();
 
 		if (resetShortFormCache) {
@@ -498,10 +488,8 @@ public class UelModel {
 		OWLClass owlThing = getOWLThing(owlThingAlias, snomedMode);
 		goal = new UelOntologyGoal(atomManager, new UelOntology(atomManager, bgOntologies, owlThing));
 
-		goal.addPositiveAxioms(subsumptions);
-		goal.addPositiveAxioms(equations);
-		goal.addNegativeAxioms(dissubsumptions);
-		goal.addNegativeAxioms(disequations);
+		goal.addPositiveAxioms(positiveProblem.getAxioms());
+		goal.addNegativeAxioms(negativeProblem.getAxioms());
 
 		// define 'owlThing' as the empty conjunction
 		goal.addDefinition(owlThing, OWLManager.getOWLDataFactory().getOWLObjectIntersectionOf());
@@ -509,11 +497,14 @@ public class UelModel {
 		// extract types from background ontologies
 		if (snomedMode) {
 			Set<Integer> siblingUndefIds = goal.extractSiblings(getStringRenderer(null));
-			System.out.println(getStringRenderer(null).renderAtomList("Sibling defining UNDEFs:", siblingUndefIds));
+			System.out.println(getStringRenderer(null).renderAtomList("Sibling defining UNDEFs", siblingUndefIds));
 			goal.extractTypes();
 			setUndefVariablesFromTypes(siblingUndefIds);
-			// TODO introduce new "blank" existential restrictions with fresh
-			// variables, one for each role name
+			goal.introduceBlankExistentialRestrictions();
+		}
+
+		if (constraintOntology != null) {
+			goal.addNegativeAxioms(constraintOntology.getAxioms());
 		}
 
 		goal.disposeOntology();

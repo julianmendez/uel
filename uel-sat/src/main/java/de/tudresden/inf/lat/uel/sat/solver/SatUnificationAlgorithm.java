@@ -1081,6 +1081,25 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 			}
 		}
 
+		// minimize assignment
+		for (Integer varId : getVariables()) {
+			Integer removed;
+			do {
+				removed = null;
+				a: for (Integer atomId1 : getSetOfSubsumers(varId)) {
+					for (Integer atomId2 : getSetOfSubsumers(varId)) {
+						if (!atomId1.equals(atomId2) && getLiteralValue(subsumption(atomId1, atomId2))) {
+							removed = atomId2;
+							break a;
+						}
+					}
+				}
+				if (removed != null) {
+					subsumers.get(varId).remove(removed);
+				}
+			} while (removed != null);
+		}
+
 		// Integer x =
 		// goal.getAtomManager().createConceptName("http://www.ihtsdo.org/X");
 		// Integer u =

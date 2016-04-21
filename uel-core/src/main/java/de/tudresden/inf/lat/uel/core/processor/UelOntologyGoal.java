@@ -52,11 +52,30 @@ class UelOntologyGoal implements Goal {
 
 	private final Set<Integer> types = new HashSet<Integer>();
 
+	/**
+	 * Construct a new goal for UEL.
+	 * 
+	 * @param manager
+	 *            the global AtomManager to be used for storage and indexing of
+	 *            all 'local' flat atoms
+	 * @param ontology
+	 *            the background ontology
+	 */
 	public UelOntologyGoal(AtomManager manager, UelOntology ontology) {
 		this.atomManager = manager;
 		this.ontology = ontology;
 	}
 
+	/**
+	 * Add a new definition to the goal. Actually, this is considered to be part
+	 * of the background ontology. If you want to add a definition to the goal,
+	 * use 'addEquation' instead.
+	 * 
+	 * @param definiendum
+	 *            the class to be defined
+	 * @param definiens
+	 *            the definition of the class
+	 */
 	public void addDefinition(OWLClass definiendum, OWLClassExpression definiens) {
 		Definition newDefinition = createAxiom(Definition.class, definiendum, definiens);
 		addDefinition(newDefinition);
@@ -67,18 +86,44 @@ class UelOntologyGoal implements Goal {
 		definitions.put(definition.getDefiniendum(), definition);
 	}
 
+	/**
+	 * Add a new disequation to the goal.
+	 * 
+	 * @param axiom
+	 *            the disequation encoded as an OWLEquivalentClassesAxiom
+	 */
 	public void addDisequation(OWLEquivalentClassesAxiom axiom) {
 		disequations.add(createAxiom(Disequation.class, axiom));
 	}
 
+	/**
+	 * Add a new dissubsumption to the goal.
+	 * 
+	 * @param axiom
+	 *            the dissubsumption encoded as an OWLSubClassOfAxiom
+	 */
 	public void addDissubsumption(OWLSubClassOfAxiom axiom) {
 		dissubsumptions.add(createAxiom(Dissubsumption.class, axiom));
 	}
 
+	/**
+	 * Add a new equation to the goal.
+	 * 
+	 * @param axiom
+	 *            the equation encoded as an OWLEquivalentClassesAxiom
+	 */
 	public void addEquation(OWLEquivalentClassesAxiom axiom) {
 		equations.add(createAxiom(Equation.class, axiom));
 	}
 
+	/**
+	 * Add a set of negative goal axioms.
+	 * 
+	 * @param axioms
+	 *            the goal axioms encoded as either OWLSubClassOfAxioms (for
+	 *            dissubsumptions) or OWLEquivalentClassesAxioms (for
+	 *            disequations)
+	 */
 	public void addNegativeAxioms(Set<? extends OWLAxiom> axioms) {
 		for (OWLAxiom axiom : axioms) {
 			if (axiom.isOfType(AxiomType.EQUIVALENT_CLASSES)) {
@@ -86,11 +131,18 @@ class UelOntologyGoal implements Goal {
 			} else if (axiom.isOfType(AxiomType.SUBCLASS_OF)) {
 				addDissubsumption((OWLSubClassOfAxiom) axiom);
 			} else {
-				throw new RuntimeException("Unsupported axiom type: " + axiom);
+				// ignore all other axioms
 			}
 		}
 	}
 
+	/**
+	 * Add a set of positive goal axioms.
+	 * 
+	 * @param axioms
+	 *            the goal axioms encoded as either OWLSubClassOfAxioms (for
+	 *            subsumptions) or OWLEquivalentClassesAxioms (for equations)
+	 */
 	public void addPositiveAxioms(Set<? extends OWLAxiom> axioms) {
 		for (OWLAxiom axiom : axioms) {
 			if (axiom.isOfType(AxiomType.EQUIVALENT_CLASSES)) {
@@ -98,11 +150,17 @@ class UelOntologyGoal implements Goal {
 			} else if (axiom.isOfType(AxiomType.SUBCLASS_OF)) {
 				addSubsumption((OWLSubClassOfAxiom) axiom);
 			} else {
-				throw new RuntimeException("Unsupported axiom type: " + axiom);
+				// ignore all other axioms
 			}
 		}
 	}
 
+	/**
+	 * Add a new subsumption to the goal.
+	 * 
+	 * @param axiom
+	 *            the subsumption encoded as an OWLSubClassOfAxiom
+	 */
 	public void addSubsumption(OWLSubClassOfAxiom axiom) {
 		subsumptions.add(createAxiom(Subsumption.class, axiom));
 	}
@@ -131,13 +189,31 @@ class UelOntologyGoal implements Goal {
 		return createAxiom(type, axiom.getSubClass(), axiom.getSuperClass());
 	}
 
+	/**
+	 * Remove the reference to the background ontology once it is no longer
+	 * used.
+	 */
 	public void disposeOntology() {
 		ontology = null;
 	}
 
+	/**
+	 * Extract 'sibling' classes for all defined classes that are not otherwise
+	 * used (in other definitions), and do not occur directly in the
+	 * user-specified goal.
+	 * 
+	 * @param renderer
+	 *            (DEBUG) a string renderer for showing the extracted siblings
+	 *            and their common parents
+	 * @return he set of IDs of the UNDEF variables introduced to directly
+	 *         define the siblings (i.e., not the ones belonging to their
+	 *         superclasses)
+	 */
 	public Set<Integer> extractSiblings(StringRenderer renderer) {
-		// find all parents of leaves (ids that are not used in other defs)
-		Set<Integer> parentIds = mapSet(atomManager.getDefinitionVariables(), this::isLeaf, this::getParent);
+		// find all parents of leaves (ids that are not used in other defs) that
+		// do not occur in the goal
+		Set<Integer> parentIds = mapSet(atomManager.getDefinitionVariables(), id -> isLeaf(id) && notInGoal(id),
+				this::getParent);
 		System.out.println(renderer.renderAtomList("Parents", parentIds));
 
 		// pull in all siblings of leaves from ontology
@@ -150,6 +226,16 @@ class UelOntologyGoal implements Goal {
 		return collectSets(siblingIds, id -> true, this::getTopLevelUndefIds);
 	}
 
+	private boolean notInGoal(Integer atomId) {
+		return notInAxioms(equations, atomId) && notInAxioms(subsumptions, atomId) && notInAxioms(disequations, atomId)
+				&& notInAxioms(dissubsumptions, atomId);
+	}
+
+	private boolean notInAxioms(Set<? extends Axiom> axioms, Integer atomId) {
+		return axioms.stream()
+				.allMatch(axiom -> !axiom.getLeft().contains(atomId) && !axiom.getRight().contains(atomId));
+	}
+
 	private Set<Integer> getTopLevelUndefIds(Integer atomId) {
 		// extract most specific UNDEF names used in the definition of 'atomId'
 		Definition def = definitions.get(atomId);
@@ -157,14 +243,24 @@ class UelOntologyGoal implements Goal {
 			return Collections.emptySet();
 		}
 
-		if (def.isPrimitive()) {
-			// TODO does not work! all definitions are full definitions now!
-			Integer undefId = atomManager.createUndefConceptName(atomId);
+		Integer undefId = getUndefIdFromPrimitiveDefinition(def);
+		if (undefId != null) {
 			return Collections.singleton(undefId);
 		} else {
 			return collectSets(def.getRight(), id -> atomManager.getExistentialRestrictions().contains(id),
 					id -> getTopLevelUndefIds(atomManager.getChild(id)));
 		}
+	}
+
+	private Integer getUndefIdFromPrimitiveDefinition(Definition definition) {
+		for (Integer atomId : definition.getRight()) {
+			if (atomManager.getConstants().contains(atomId)) {
+				if (atomManager.printConceptName(atomId).endsWith(AtomManager.UNDEF_SUFFIX)) {
+					return atomId;
+				}
+			}
+		}
+		return null;
 	}
 
 	private <S, T> Set<T> collectSets(Set<S> input, Predicate<S> filter, Function<S, Set<T>> mapper) {
@@ -369,5 +465,17 @@ class UelOntologyGoal implements Goal {
 		Set<Integer> newRightIds = new HashSet<Integer>(def.getRight());
 		newRightIds.add(undefId);
 		return new Definition(defId, newRightIds, false);
+	}
+
+	/**
+	 * Introduce 'blank' existential restrictions, one for each used role name,
+	 * to be used in local solutions.
+	 */
+	public void introduceBlankExistentialRestrictions() {
+		for (Integer roleId : atomManager.getRoleIds()) {
+			String roleName = atomManager.getRoleName(roleId);
+			Integer fillerId = atomManager.createConceptName(roleName + "_VAR");
+			atomManager.createExistentialRestriction(roleName, fillerId);
+		}
 	}
 }

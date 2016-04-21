@@ -157,7 +157,8 @@ public class ProcessorTest {
 		ontologyManager.addAxiom(positiveProblem, ontologyManager.getOWLDataFactory()
 				.getOWLEquivalentClassesAxiom(idClassMap.get(conceptC), idClassMap.get(conceptD)));
 		OWLOntology negativeProblem = ontologyManager.createOntology();
-		uelModel.setupGoal(Collections.singleton(owlOntology), positiveProblem, negativeProblem, null, false, true);
+		uelModel.setupGoal(Collections.singleton(owlOntology), positiveProblem, negativeProblem, null, null, false,
+				true);
 		uelModel.makeClassesVariables(varNames.stream().map(idClassMap::get), false, true);
 		uelModel.makeClassesVariables(undefVarNames.stream().map(idClassMap::get), true, true);
 		uelModel.initializeUnificationAlgorithm(algorithmName);

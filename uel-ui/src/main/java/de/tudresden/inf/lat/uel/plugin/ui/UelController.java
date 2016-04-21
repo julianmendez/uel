@@ -8,9 +8,9 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.Stack;
 
-import org.semanticweb.owlapi.model.OWLAxiom;
+import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
+import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 
 import de.tudresden.inf.lat.uel.core.processor.UelModel;
 
@@ -27,7 +27,7 @@ public class UelController {
 	private UnifierController unifierController = null;
 	private VarSelectionController varSelectionController = null;
 	private final UelView view;
-	private Stack<Set<OWLAxiom>> undoStack = new Stack<Set<OWLAxiom>>();
+	private Stack<OWLOntology> constraintOntologies = new Stack<OWLOntology>();
 
 	/**
 	 * Constructs a new UEL controller using the specified model.
@@ -42,25 +42,20 @@ public class UelController {
 	}
 
 	private void addNewDissubsumptions() {
-		OWLOntology negOntology = view.getSelectedOntologyNeg();
-		if (negOntology.equals(UelModel.EMPTY_ONTOLOGY)) {
-			negOntology = model.createOntology();
-			updateView();
-			view.setSelectedOntologyNeg(negOntology);
+		OWLOntology newConstraints;
+		try {
+			newConstraints = OWLManager.createOWLOntologyManager().createOntology();
+		} catch (OWLOntologyCreationException ex) {
+			throw new RuntimeException(ex);
 		}
 
-		Set<OWLAxiom> newAxioms = refineController.getDissubsumptions();
-
-		for (OWLAxiom axiom : newAxioms) {
-			if (!(axiom instanceof OWLSubClassOfAxiom)) {
-				throw new IllegalStateException("Expected new dissubsumptions to be encoded as OWLSubClassOfAxioms.");
-			}
-			if (negOntology.containsAxiom(axiom)) {
-				throw new IllegalStateException("The negative goal already contains the following axiom: " + axiom);
-			}
-			negOntology.getOWLOntologyManager().addAxiom(negOntology, axiom);
+		if (!constraintOntologies.isEmpty()) {
+			newConstraints.getOWLOntologyManager().addAxioms(newConstraints, constraintOntologies.peek().getAxioms());
 		}
-		undoStack.push(newAxioms);
+
+		newConstraints.getOWLOntologyManager().addAxioms(newConstraints, refineController.getDissubsumptions());
+
+		constraintOntologies.push(newConstraints);
 	}
 
 	private void executeAcceptVar() {
@@ -108,7 +103,7 @@ public class UelController {
 	}
 
 	private void executeSelectVariables() {
-		undoStack.clear();
+		constraintOntologies.clear();
 		setupGoal(true);
 
 		varSelectionController = new VarSelectionController(new VarSelectionView(view), model);
@@ -117,19 +112,7 @@ public class UelController {
 	}
 
 	private void executeUndoRefine() {
-		if (undoStack.isEmpty()) {
-			throw new IllegalStateException("Expected the undo stack to be non-empty.");
-		}
-
-		Set<OWLAxiom> lastDiff = undoStack.pop();
-		OWLOntology negOntology = view.getSelectedOntologyNeg();
-		for (OWLAxiom axiom : lastDiff) {
-			if (!negOntology.containsAxiom(axiom)) {
-				throw new IllegalStateException("Expected the negative goal to contain the following axiom: " + axiom);
-			}
-			negOntology.getOWLOntologyManager().removeAxiom(negOntology, axiom);
-		}
-
+		constraintOntologies.pop();
 		recomputeUnifiers();
 	}
 
@@ -188,7 +171,7 @@ public class UelController {
 		unifierController = new UnifierController(new UnifierView(view), model);
 		unifierController.addRefineListener(e -> executeRefine());
 		unifierController.addUndoRefineListener(e -> executeUndoRefine());
-		unifierController.setUndoRefineButtonEnabled(!undoStack.isEmpty());
+		unifierController.setUndoRefineButtonEnabled(!constraintOntologies.empty());
 		unifierController.open();
 	}
 
@@ -200,8 +183,9 @@ public class UelController {
 		Set<OWLOntology> bgOntologies = new HashSet<OWLOntology>();
 		bgOntologies.add(view.getSelectedOntologyBg00());
 		bgOntologies.add(view.getSelectedOntologyBg01());
-		model.setupGoal(bgOntologies, view.getSelectedOntologyPos(), view.getSelectedOntologyNeg(), null,
-				view.getSnomedMode(), resetShortFormCache);
+		OWLOntology constraintOntology = constraintOntologies.empty() ? null : constraintOntologies.peek();
+		model.setupGoal(bgOntologies, view.getSelectedOntologyPos(), view.getSelectedOntologyNeg(), constraintOntology,
+				null, view.getSnomedMode(), resetShortFormCache);
 	}
 
 	/**

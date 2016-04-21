@@ -138,11 +138,13 @@ abstract class Renderer<ExpressionType, AxiomsType> {
 		return finalizeExpression();
 	}
 
-	public AxiomsType renderUnifier(Unifier unifier, boolean typeInfo) {
+	public AxiomsType renderUnifier(Unifier unifier, boolean identity, boolean typeInfo) {
 		initialize();
 		for (Definition definition : unifier.getDefinitions()) {
 			if (!restrictToUserVariables || atomManager.getUserVariables().contains(definition.getDefiniendum())) {
-				translateAxiom(definition);
+				if (!identity || !definition.getRight().equals(Collections.singleton(definition.getDefiniendum()))) {
+					translateAxiom(definition);
+				}
 			}
 		}
 		if (typeInfo) {

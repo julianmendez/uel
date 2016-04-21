@@ -24,7 +24,6 @@ import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
-import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 
 import de.tudresden.inf.lat.uel.core.processor.BasicOntologyProvider;
 import de.tudresden.inf.lat.uel.core.processor.UelModel;
@@ -244,18 +243,7 @@ public class AlternativeUelStarter {
 			OWLOntology negativeProblem, Set<OWLClass> variables, String algorithmName) {
 
 		UelModel uelModel = new UelModel(new BasicOntologyProvider(ontologyManager));
-		uelModel.setupGoal(ontologies, positiveProblem, negativeProblem, owlThingAlias, snomedMode, true);
-
-		return modifyOntologyAndSolve(uelModel, variables, algorithmName);
-	}
-
-	public Iterator<Set<OWLEquivalentClassesAxiom>> modifyOntologyAndSolve(Set<OWLSubClassOfAxiom> subsumptions,
-			Set<OWLEquivalentClassesAxiom> equations, Set<OWLSubClassOfAxiom> dissubsumptions,
-			Set<OWLEquivalentClassesAxiom> disequations, Set<OWLClass> variables, String algorithmName) {
-
-		UelModel uelModel = new UelModel(new BasicOntologyProvider(ontologyManager));
-		uelModel.setupGoal(ontologies, subsumptions, equations, dissubsumptions, disequations, owlThingAlias,
-				snomedMode, true);
+		uelModel.setupGoal(ontologies, positiveProblem, negativeProblem, null, owlThingAlias, snomedMode, true);
 
 		return modifyOntologyAndSolve(uelModel, variables, algorithmName);
 	}

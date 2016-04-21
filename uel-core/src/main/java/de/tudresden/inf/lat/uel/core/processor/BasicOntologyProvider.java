@@ -36,9 +36,9 @@ public class BasicOntologyProvider extends OntologyProvider {
 	}
 
 	@Override
-	public void loadOntology(File file) {
+	public OWLOntology loadOntology(File file) {
 		try {
-			manager.loadOntologyFromOntologyDocument(file);
+			return manager.loadOntologyFromOntologyDocument(file);
 		} catch (OWLOntologyCreationException ex) {
 			throw new RuntimeException(ex);
 		}

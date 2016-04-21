@@ -84,9 +84,10 @@ public class SNOMEDEvaluation {
 				System.out.println("--- " + i);
 				if (iterator.hasNext()) {
 
-					// TODO compute unifiers modulo equivalence
+					// TODO compute unifiers modulo equivalence?
 
-					System.out.println(model.getStringRenderer(null).renderUnifier(model.getCurrentUnifier(), true));
+					System.out.println(
+							model.getStringRenderer(null).renderUnifier(model.getCurrentUnifier(), false, true));
 
 					Set<OWLEquivalentClassesAxiom> unifier = iterator.next();
 					OWLOntologyManager ontologyManager = OWLManager.createOWLOntologyManager();

@@ -20,32 +20,65 @@ abstract class UelDialog extends JDialog {
 
 	private static final long serialVersionUID = -9159093716481990295L;
 
+	private static Dimension size = null;
+
 	private Component parent;
 
+	/**
+	 * Constructs a new dialog with standard behavior for UEL.
+	 */
 	public UelDialog() {
 		super((Frame) null, true);
 	}
 
+	/**
+	 * Close and dispose of the dialog.
+	 */
 	public void close() {
+		size = getSize();
 		setVisible(false);
 		dispose();
 	}
 
+	/**
+	 * Constructs the main panel of this UelDialog.
+	 * 
+	 * @return a JComponent constituting the main panel
+	 */
 	protected abstract JComponent createMainPanel();
 
 	@Override
 	public Dimension getPreferredSize() {
-		return new Dimension(640, 480);
+		if (size != null) {
+			return size;
+		} else {
+			return new Dimension(640, 480);
+		}
 	}
 
+	/**
+	 * Open this dialog, centered on the position of the parent view.
+	 */
 	public void open() {
 		pack();
 		setLocationRelativeTo(parent);
 		setVisible(true);
 	}
 
+	/**
+	 * Set up the dialog. This method should be called in the constructor of an
+	 * implementing class.
+	 * 
+	 * @param parent
+	 *            the parent view
+	 * @param title
+	 *            the window title
+	 */
 	protected void setup(Component parent, String title) {
 		this.parent = parent;
+		if (parent instanceof UelDialog) {
+			size = parent.getSize();
+		}
 		setResizable(true);
 		setTitle(title);
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);

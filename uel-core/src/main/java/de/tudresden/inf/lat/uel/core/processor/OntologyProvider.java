@@ -66,7 +66,7 @@ public abstract class OntologyProvider implements ShortFormProvider {
 		return shortForm;
 	}
 
-	public abstract void loadOntology(File file);
+	public abstract OWLOntology loadOntology(File file);
 
 	@Override
 	public void resetCache() {

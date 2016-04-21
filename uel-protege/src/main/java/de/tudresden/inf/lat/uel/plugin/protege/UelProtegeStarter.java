@@ -3,13 +3,11 @@ package de.tudresden.inf.lat.uel.plugin.protege;
 import java.awt.Container;
 import java.io.File;
 import java.util.List;
-import java.util.Set;
 
 import org.protege.editor.owl.model.OWLModelManager;
 import org.protege.editor.owl.model.event.EventType;
 import org.protege.editor.owl.model.event.OWLModelManagerChangeEvent;
 import org.protege.editor.owl.model.event.OWLModelManagerListener;
-import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLException;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyChange;
@@ -17,7 +15,7 @@ import org.semanticweb.owlapi.model.OWLOntologyChangeListener;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 
-import de.tudresden.inf.lat.uel.core.processor.OntologyProvider;
+import de.tudresden.inf.lat.uel.core.processor.BasicOntologyProvider;
 import de.tudresden.inf.lat.uel.plugin.main.UelStarter;
 
 /**
@@ -27,41 +25,31 @@ import de.tudresden.inf.lat.uel.plugin.main.UelStarter;
  */
 public class UelProtegeStarter extends UelStarter implements OWLModelManagerListener, OWLOntologyChangeListener {
 
-	private static final class ProtegeOntologyProvider extends OntologyProvider {
+	private static final class ProtegeOntologyProvider extends BasicOntologyProvider {
 
 		private final OWLModelManager modelManager;
 
 		private ProtegeOntologyProvider(OWLModelManager modelManager) {
+			super(modelManager.getOWLOntologyManager());
 			this.modelManager = modelManager;
 		}
 
 		@Override
 		public OWLOntology createOntology() {
 			try {
-				return modelManager.createNewOntology(new OWLOntologyID(), null);
+				OWLOntology activeOntology = modelManager.getActiveOntology();
+				OWLOntology newOntology = modelManager.createNewOntology(new OWLOntologyID(), null);
+				modelManager.setActiveOntology(activeOntology);
+				return newOntology;
 			} catch (OWLOntologyCreationException ex) {
 				throw new RuntimeException(ex);
 			}
 		}
 
 		@Override
-		public void loadOntology(File file) {
-			try {
-				OWLOntology ontology = modelManager.getOWLOntologyManager().loadOntologyFromOntologyDocument(file);
-				modelManager.setActiveOntology(ontology);
-			} catch (OWLOntologyCreationException ex) {
-				throw new RuntimeException(ex);
-			}
-		}
-
-		@Override
-		public Set<OWLOntology> getOntologies() {
-			return modelManager.getOntologies();
-		}
-
-		@Override
-		public String getShortForm(OWLEntity entity) {
-			return modelManager.getOWLEntityRenderer().getShortForm(entity);
+		public OWLOntology loadOntology(File file) {
+			modelManager.setActiveOntology(super.loadOntology(file));
+			return modelManager.getActiveOntology();
 		}
 	}
 

@@ -259,15 +259,4 @@ class UelView extends JPanel {
 		this.listOntologyPos.setEnabled(b);
 	}
 
-	/**
-	 * Sets the currently selected negative goal ontology, if this ontology is
-	 * present in the list used in the last call of 'reloadOntologies'.
-	 * 
-	 * @param ontology
-	 *            the ontology that is to be selected
-	 */
-	public void setSelectedOntologyNeg(OWLOntology ontology) {
-		listOntologyNeg.setSelectedItem(ontology);
-	}
-
 }
