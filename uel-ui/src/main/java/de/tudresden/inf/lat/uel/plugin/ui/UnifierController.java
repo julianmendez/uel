@@ -3,9 +3,6 @@ package de.tudresden.inf.lat.uel.plugin.ui;
 import java.awt.Component;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.util.Set;
-
-import org.semanticweb.owlapi.model.OWLAxiom;
 
 import de.tudresden.inf.lat.uel.core.processor.UelModel;
 
@@ -75,8 +72,11 @@ class UnifierController {
 			return;
 		}
 
-		Set<OWLAxiom> unifier = model.renderCurrentUnifier();
-		OWLUtils.saveToOntologyFile(unifier, file);
+		if (FileUtils.isTextFile(file)) {
+			FileUtils.saveToFile(file, model.printCurrentUnifier());
+		} else {
+			FileUtils.saveToFile(file, model.renderCurrentUnifier());
+		}
 	}
 
 	private void executeShowStatInfo() {

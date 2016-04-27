@@ -47,7 +47,7 @@ public class SNOMEDEvaluation {
 		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
 		OWLOntology snomed = AlternativeUelStarter.loadOntology(SNOMED_PATH, manager);
 		OWLOntology snomedRestrictions = AlternativeUelStarter.loadOntology(SNOMED_RESTR_PATH, manager);
-		AlternativeUelStarter starter = new AlternativeUelStarter(manager,
+		AlternativeUelStarter starter = new AlternativeUelStarter(
 				new HashSet<OWLOntology>(Arrays.asList(snomed, snomedRestrictions)));
 		starter.setVerbose(true);
 		// starter.markUndefAsVariables(false);

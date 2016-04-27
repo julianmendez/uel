@@ -2,11 +2,13 @@ package de.tudresden.inf.lat.uel.core.renderer;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAxiom;
+import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
@@ -17,12 +19,25 @@ import de.tudresden.inf.lat.uel.type.api.Definition;
 import de.tudresden.inf.lat.uel.type.api.Dissubsumption;
 import de.tudresden.inf.lat.uel.type.api.Subsumption;
 
-public class OWLRenderer extends Renderer<OWLClassExpression, Set<OWLAxiom>> {
+/**
+ * This class can render UEL objects as OWL objects.
+ * 
+ * @author Stefan Borgwardt
+ */
+public class OWLRenderer extends Renderer<OWLClassExpression, OWLObjectProperty, Set<OWLAxiom>> {
 
-	private final OWLDataFactory dataFactory = OWLManager.getOWLDataFactory();
 	private Set<OWLAxiom> axioms;
+	private final OWLDataFactory dataFactory = OWLManager.getOWLDataFactory();
 	private OWLClassExpression expr;
 
+	/**
+	 * Construct a new OWL renderer.
+	 * 
+	 * @param atomManager
+	 *            the atom manager
+	 * @param background
+	 *            (optional) a set of background definitions
+	 */
 	public OWLRenderer(AtomManager atomManager, Set<Definition> background) {
 		super(atomManager, null, background);
 	}
@@ -65,9 +80,21 @@ public class OWLRenderer extends Renderer<OWLClassExpression, Set<OWLAxiom>> {
 	}
 
 	@Override
-	protected OWLClassExpression translateExistentialRestriction(String roleName, Integer childId) {
-		OWLClassExpression child = translateChild(childId);
-		OWLObjectProperty property = dataFactory.getOWLObjectProperty(IRI.create(roleName));
+	protected Set<OWLAxiom> translateAxiom(OWLAxiom axiom, boolean positive) {
+		axioms.add(axiom);
+		return axioms;
+	}
+
+	@Override
+	protected OWLClassExpression translateClass(OWLClass cls) {
+		return cls;
+	}
+
+	@Override
+	protected <T, S> OWLClassExpression translateExistentialRestriction(T role, S filler,
+			Function<T, OWLObjectProperty> roleRenderer, Function<S, OWLClassExpression> fillerRenderer) {
+		OWLObjectProperty property = roleRenderer.apply(role);
+		OWLClassExpression child = fillerRenderer.apply(filler);
 		expr = dataFactory.getOWLObjectSomeValuesFrom(property, child);
 		return expr;
 	}
@@ -76,6 +103,16 @@ public class OWLRenderer extends Renderer<OWLClassExpression, Set<OWLAxiom>> {
 	protected OWLClassExpression translateName(Integer atomId) {
 		expr = dataFactory.getOWLClass(IRI.create(renderName(atomId)));
 		return expr;
+	}
+
+	@Override
+	protected OWLObjectProperty translateObjectProperty(OWLObjectProperty prop) {
+		return prop;
+	}
+
+	@Override
+	protected OWLObjectProperty translateRole(Integer roleId) {
+		return dataFactory.getOWLObjectProperty(IRI.create(renderRole(roleId)));
 	}
 
 	@Override
@@ -90,11 +127,11 @@ public class OWLRenderer extends Renderer<OWLClassExpression, Set<OWLAxiom>> {
 	}
 
 	@Override
-	protected OWLClassExpression translateTrueConjunction(Set<Integer> atomIds) {
-		Set<OWLClassExpression> classExpressions = atomIds.stream().map(atomId -> translateAtom(atomId))
+	protected <T> OWLClassExpression translateTrueConjunction(Set<T> conjuncts,
+			Function<T, OWLClassExpression> conjunctTranslator) {
+		Set<OWLClassExpression> classExpressions = conjuncts.stream().map(conjunctTranslator)
 				.collect(Collectors.toSet());
 		expr = dataFactory.getOWLObjectIntersectionOf(classExpressions);
 		return expr;
 	}
-
 }

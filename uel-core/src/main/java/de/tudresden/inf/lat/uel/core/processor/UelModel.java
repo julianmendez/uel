@@ -104,8 +104,7 @@ public class UelModel {
 				Unifier result = algorithm.getUnifier();
 				if (isNew(result)) {
 					unifierList.add(result);
-					// System.out.println(getStringRenderer(null).renderUnifier(result,
-					// true, true));
+					System.out.println(getStringRenderer(null).renderUnifier(result, true, true));
 					// System.out.println(printUnifier(result));
 					return true;
 				}
@@ -488,8 +487,12 @@ public class UelModel {
 		OWLClass owlThing = getOWLThing(owlThingAlias, snomedMode);
 		goal = new UelOntologyGoal(atomManager, new UelOntology(atomManager, bgOntologies, owlThing));
 
-		goal.addPositiveAxioms(positiveProblem.getAxioms());
-		goal.addNegativeAxioms(negativeProblem.getAxioms());
+		if (positiveProblem != null) {
+			goal.addPositiveAxioms(positiveProblem.getAxioms());
+		}
+		if (negativeProblem != null) {
+			goal.addNegativeAxioms(negativeProblem.getAxioms());
+		}
 
 		// define 'owlThing' as the empty conjunction
 		goal.addDefinition(owlThing, OWLManager.getOWLDataFactory().getOWLObjectIntersectionOf());

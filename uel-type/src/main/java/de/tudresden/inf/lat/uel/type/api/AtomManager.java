@@ -25,6 +25,12 @@ public interface AtomManager {
 	String ROLEGROUP_SUFFIX = "_ROLEGROUP";
 
 	/**
+	 * A string used to designate 'fresh' variables introduced as filles for
+	 * existential restrictions with certain role names.
+	 */
+	String VAR_SUFFIX = "_VAR";
+
+	/**
 	 * Create a new concept name with the given string representation and add it
 	 * to the index. If the concept name already exists, this method simply
 	 * returns the existing identifier.
@@ -235,4 +241,14 @@ public interface AtomManager {
 	 * @return the number of atoms
 	 */
 	int size();
+
+	/**
+	 * Create a new existential restriction using the given role and a 'fresh'
+	 * variable as a filler.
+	 * 
+	 * @param roleId
+	 *            the role id
+	 * @return the atom id of the new existential restriction
+	 */
+	public Integer createBlankExistentialRestriction(Integer roleId);
 }

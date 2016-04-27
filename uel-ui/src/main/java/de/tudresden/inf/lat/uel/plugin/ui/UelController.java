@@ -1,16 +1,13 @@
 package de.tudresden.inf.lat.uel.plugin.ui;
 
 import java.awt.Component;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Stack;
 
-import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 
 import de.tudresden.inf.lat.uel.core.processor.UelModel;
 
@@ -22,12 +19,12 @@ import de.tudresden.inf.lat.uel.core.processor.UelModel;
  */
 public class UelController {
 
+	private Stack<OWLOntology> constraints = new Stack<OWLOntology>();
 	private final UelModel model;
 	private RefineController refineController = null;
 	private UnifierController unifierController = null;
 	private VarSelectionController varSelectionController = null;
 	private final UelView view;
-	private Stack<OWLOntology> constraintOntologies = new Stack<OWLOntology>();
 
 	/**
 	 * Constructs a new UEL controller using the specified model.
@@ -41,21 +38,18 @@ public class UelController {
 		init();
 	}
 
-	private void addNewDissubsumptions() {
-		OWLOntology newConstraints;
-		try {
-			newConstraints = OWLManager.createOWLOntologyManager().createOntology();
-		} catch (OWLOntologyCreationException ex) {
-			throw new RuntimeException(ex);
+	private boolean addNewDissubsumptions() {
+		Set<OWLAxiom> newDissubsumptions = refineController.getDissubsumptions();
+		if (newDissubsumptions.isEmpty()) {
+			return false;
 		}
 
-		if (!constraintOntologies.isEmpty()) {
-			newConstraints.getOWLOntologyManager().addAxioms(newConstraints, constraintOntologies.peek().getAxioms());
+		if (!constraints.isEmpty()) {
+			newDissubsumptions.addAll(constraints.peek().getAxioms());
 		}
 
-		newConstraints.getOWLOntologyManager().addAxioms(newConstraints, refineController.getDissubsumptions());
-
-		constraintOntologies.push(newConstraints);
+		constraints.push(FileUtils.toOWLOntology(newDissubsumptions));
+		return true;
 	}
 
 	private void executeAcceptVar() {
@@ -73,6 +67,14 @@ public class UelController {
 		updateView();
 	}
 
+	/**
+	 * Recompute the unifiers w.r.t. old and new dissubsumptions created by the
+	 * user.
+	 * 
+	 * @param save
+	 *            indicates whether the current constraints should be saved into
+	 *            an ontology file
+	 */
 	private void executeRecompute(boolean save) {
 		File file = null;
 		if (save) {
@@ -82,13 +84,26 @@ public class UelController {
 			}
 		}
 
-		addNewDissubsumptions();
+		boolean changed = addNewDissubsumptions();
 
-		if (save) {
-			OWLUtils.saveToOntologyFile(view.getSelectedOntologyNeg(), file);
+		if (save && !constraints.isEmpty()) {
+			if (FileUtils.isTextFile(file)) {
+				FileUtils.saveToFile(file,
+						model.getStringRenderer(null).renderAxioms(constraints.peek().getAxioms(), false));
+			} else {
+				FileUtils.saveToFile(file, constraints.peek());
+			}
 		}
 
-		recomputeUnifiers();
+		if (changed) {
+			// if new dissubsumptions were created, restart the (dis)unification
+			// process
+			recomputeUnifiers();
+		} else {
+			// otherwise, only close the refinement view and continue computing
+			// unifiers
+			refineController.close();
+		}
 	}
 
 	private void executeRefine() {
@@ -103,7 +118,7 @@ public class UelController {
 	}
 
 	private void executeSelectVariables() {
-		constraintOntologies.clear();
+		constraints.clear();
 		setupGoal(true);
 
 		varSelectionController = new VarSelectionController(new VarSelectionView(view), model);
@@ -112,7 +127,7 @@ public class UelController {
 	}
 
 	private void executeUndoRefine() {
-		constraintOntologies.pop();
+		constraints.pop();
 		recomputeUnifiers();
 	}
 
@@ -126,11 +141,7 @@ public class UelController {
 	}
 
 	private void init() {
-		view.addOpenListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				executeOpen();
-			}
-		});
+		view.addOpenListener(e -> executeOpen());
 		view.addSelectVariablesListener(e -> executeSelectVariables());
 		updateView();
 	}
@@ -171,19 +182,23 @@ public class UelController {
 		unifierController = new UnifierController(new UnifierView(view), model);
 		unifierController.addRefineListener(e -> executeRefine());
 		unifierController.addUndoRefineListener(e -> executeUndoRefine());
-		unifierController.setUndoRefineButtonEnabled(!constraintOntologies.empty());
+		unifierController.setUndoRefineButtonEnabled(!constraints.empty());
 		unifierController.open();
 	}
 
 	/**
 	 * Uses the UEL model to initialize the goal for the unification algorithm
 	 * with the currently selected ontologies.
+	 * 
+	 * @param resetShortFormCache
+	 *            indicates whether the cache of used short forms should be
+	 *            reset in order to refresh the presentation
 	 */
 	public void setupGoal(boolean resetShortFormCache) {
 		Set<OWLOntology> bgOntologies = new HashSet<OWLOntology>();
 		bgOntologies.add(view.getSelectedOntologyBg00());
 		bgOntologies.add(view.getSelectedOntologyBg01());
-		OWLOntology constraintOntology = constraintOntologies.empty() ? null : constraintOntologies.peek();
+		OWLOntology constraintOntology = constraints.empty() ? null : constraints.peek();
 		model.setupGoal(bgOntologies, view.getSelectedOntologyPos(), view.getSelectedOntologyNeg(), constraintOntology,
 				null, view.getSnomedMode(), resetShortFormCache);
 	}

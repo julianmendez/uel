@@ -15,13 +15,19 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.search.EntitySearcher;
 
 /**
+ * This class provides the basic functionality for managing ontologies and
+ * extracting entity labels that is exposed by an OWLOntologyManager.
+ * 
  * @author Stefan Borgwardt
- *
  */
 public class BasicOntologyProvider extends OntologyProvider {
 
 	private OWLOntologyManager manager;
 
+	/**
+	 * Construct a new ontology provider based on an OWL ontology manager.
+	 * @param manager the OWL ontology manager
+	 */
 	public BasicOntologyProvider(OWLOntologyManager manager) {
 		this.manager = manager;
 	}

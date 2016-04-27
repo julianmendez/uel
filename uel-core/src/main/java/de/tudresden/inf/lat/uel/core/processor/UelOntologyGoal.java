@@ -36,7 +36,7 @@ import de.tudresden.inf.lat.uel.type.api.Subsumption;
  * @author Julian Mendez
  * @author Stefan Borgwardt
  */
-class UelOntologyGoal implements Goal {
+public class UelOntologyGoal implements Goal {
 
 	private final AtomManager atomManager;
 	private final Map<Integer, Definition> definitions = new HashMap<Integer, Definition>();
@@ -473,9 +473,7 @@ class UelOntologyGoal implements Goal {
 	 */
 	public void introduceBlankExistentialRestrictions() {
 		for (Integer roleId : atomManager.getRoleIds()) {
-			String roleName = atomManager.getRoleName(roleId);
-			Integer fillerId = atomManager.createConceptName(roleName + "_VAR");
-			atomManager.createExistentialRestriction(roleName, fillerId);
+			atomManager.createBlankExistentialRestriction(roleId);
 		}
 	}
 }

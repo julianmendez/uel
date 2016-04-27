@@ -32,8 +32,22 @@ import de.tudresden.inf.lat.uel.type.api.AtomManager;
 import de.tudresden.inf.lat.uel.type.api.Goal;
 import de.tudresden.inf.lat.uel.type.api.UnificationAlgorithm;
 
+/**
+ * This class provides an acces point to UEL without the user interface.
+ * 
+ * @author Stefan Borgwardt
+ */
 public class AlternativeUelStarter {
 
+	/**
+	 * Convenience method for loading an OWL ontology from a file.
+	 * 
+	 * @param filename
+	 *            the path to the ontology file
+	 * @param manager
+	 *            a pre-existing OWL ontology manager
+	 * @return the created OWL ontology, or 'null' if the loading failed
+	 */
 	public static OWLOntology loadOntology(String filename, OWLOntologyManager manager) {
 		try {
 			if (filename.isEmpty()) {
@@ -52,6 +66,13 @@ public class AlternativeUelStarter {
 		}
 	}
 
+	/**
+	 * Convenience method for loading a list of OWL class IRIs from a text file.
+	 * 
+	 * @param filename
+	 *            the path to the file
+	 * @return the set of OWL classes, or 'null' if the loading failed
+	 */
 	static Set<OWLClass> loadVariables(String filename) {
 		try {
 			if (filename.isEmpty()) {
@@ -75,6 +96,13 @@ public class AlternativeUelStarter {
 		}
 	}
 
+	/**
+	 * Command line interface for UEL. For more information, see the '-h'
+	 * option.
+	 * 
+	 * @param args
+	 *            the command line arguments
+	 */
 	public static void main(String[] args) {
 		int argIdx = 0;
 		String mainFilename = "";
@@ -200,7 +228,6 @@ public class AlternativeUelStarter {
 	}
 
 	private Set<OWLOntology> ontologies;
-	private OWLOntologyManager ontologyManager;
 	private UnificationAlgorithm uelProcessor;
 	private boolean verbose = false;
 	private boolean snomedMode = false;
@@ -208,41 +235,99 @@ public class AlternativeUelStarter {
 	private boolean markUndefAsVariables = true;
 	private boolean markUndefAsAuxVariables = false;
 
+	/**
+	 * Construct a new starter for UEL.
+	 * 
+	 * @param ontology
+	 *            the background ontology
+	 */
 	public AlternativeUelStarter(OWLOntology ontology) {
 		if (ontology == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
-		this.ontologyManager = ontology.getOWLOntologyManager();
 		this.ontologies = new HashSet<OWLOntology>();
 		this.ontologies.add(ontology);
 	}
 
-	public AlternativeUelStarter(OWLOntologyManager ontologyManager, Set<OWLOntology> ontologies) {
+	/**
+	 * Construct a new starter for UEL
+	 * 
+	 * @param ontologies
+	 *            the set of background ontologies
+	 */
+	public AlternativeUelStarter(Set<OWLOntology> ontologies) {
 		if (ontologies == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
-		this.ontologyManager = ontologyManager;
 		this.ontologies = ontologies;
 	}
 
+	/**
+	 * Retrieve additional information about the unification process.
+	 * 
+	 * @return a list of string entries, labeled by strings
+	 */
 	public List<Entry<String, String>> getStats() {
 		return uelProcessor.getInfo();
 	}
 
+	/**
+	 * Mark all UNDEF classes as auxiliary variables (they are not shown in the
+	 * unifiers).
+	 * 
+	 * @param markUndefAsAuxVariables
+	 *            indicates whether UNDEF classes should be marked as auxiliary
+	 *            variables, defaults to 'false'
+	 */
 	public void markUndefAsAuxVariables(boolean markUndefAsAuxVariables) {
 		this.markUndefAsAuxVariables = markUndefAsAuxVariables;
 		this.markUndefAsVariables = false;
 	}
 
+	/**
+	 * Mark all UNDEF classes as user variables (these are shown in the
+	 * unifiers).
+	 * 
+	 * @param markUndefAsVariables
+	 *            indicates whether UNDEF classes should be marked as user
+	 *            variables, defaults to 'true'
+	 */
 	public void markUndefAsVariables(boolean markUndefAsVariables) {
 		this.markUndefAsVariables = markUndefAsVariables;
 		this.markUndefAsAuxVariables = false;
 	}
 
+	/**
+	 * Start the unification process.
+	 * 
+	 * @param positiveProblem
+	 *            the positive part of the unification problem
+	 * @param negativeProblem
+	 *            the negative part of the unification problem
+	 * @param variables
+	 *            the set of user variables
+	 * @param algorithmName
+	 *            the name of the unification algorithm to be used (see
+	 *            UnificationAlgorithmFactory)
+	 * @return an iterator yielding all produced unifiers (as sets of
+	 *         OWLEquivalentClassesAxioms describing the definitions of the user
+	 *         variables)
+	 */
 	public Iterator<Set<OWLEquivalentClassesAxiom>> modifyOntologyAndSolve(OWLOntology positiveProblem,
 			OWLOntology negativeProblem, Set<OWLClass> variables, String algorithmName) {
 
-		UelModel uelModel = new UelModel(new BasicOntologyProvider(ontologyManager));
+		OWLOntologyManager manager;
+		if (ontologies.size() > 0) {
+			manager = ontologies.iterator().next().getOWLOntologyManager();
+		} else if (positiveProblem != null) {
+			manager = positiveProblem.getOWLOntologyManager();
+		} else if (negativeProblem != null) {
+			manager = negativeProblem.getOWLOntologyManager();
+		} else {
+			manager = OWLManager.createOWLOntologyManager();
+		}
+
+		UelModel uelModel = new UelModel(new BasicOntologyProvider(manager));
 		uelModel.setupGoal(ontologies, positiveProblem, negativeProblem, null, owlThingAlias, snomedMode, true);
 
 		return modifyOntologyAndSolve(uelModel, variables, algorithmName);
@@ -281,10 +366,25 @@ public class AlternativeUelStarter {
 		return new UnifierIterator(uelModel);
 	}
 
+	/**
+	 * Set an alias for 'owl:Thing', e.g., 'SNOMED CT Concept'. The background
+	 * ontology is not expanded above this class.
+	 * 
+	 * @param owlThingAlias
+	 *            the OWL class serving as owl:Thing
+	 */
 	public void setOwlThingAlias(OWLClass owlThingAlias) {
 		this.owlThingAlias = owlThingAlias;
 	}
 
+	/**
+	 * EXPERIMENTAL. Enable 'SNOMED mode', which extracts additional information
+	 * about the type hierarchy from the background ontology and makes some
+	 * other modifications to the unfication process.
+	 * 
+	 * @param snomedMode
+	 *            indicates whether 'SNOMED mode' should be activated
+	 */
 	public void setSnomedMode(boolean snomedMode) {
 		this.snomedMode = snomedMode;
 		if (snomedMode) {
@@ -293,6 +393,13 @@ public class AlternativeUelStarter {
 		}
 	}
 
+	/**
+	 * Switch debug output.
+	 * 
+	 * @param verbose
+	 *            indicates whether additional information about the unification
+	 *            process should be shown.
+	 */
 	public void setVerbose(boolean verbose) {
 		this.verbose = verbose;
 	}

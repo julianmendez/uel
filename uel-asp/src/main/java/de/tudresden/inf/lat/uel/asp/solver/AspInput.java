@@ -11,7 +11,6 @@ import de.tudresden.inf.lat.uel.type.api.Dissubsumption;
 import de.tudresden.inf.lat.uel.type.api.Equation;
 import de.tudresden.inf.lat.uel.type.api.Goal;
 import de.tudresden.inf.lat.uel.type.api.Subsumption;
-import de.tudresden.inf.lat.uel.type.cons.RendererKeywords;
 import de.tudresden.inf.lat.uel.type.impl.ExistentialRestriction;
 
 /**
@@ -65,7 +64,7 @@ public class AspInput {
 			encoding.append("relevant(x");
 			encoding.append(var);
 			encoding.append(").");
-			encoding.append(RendererKeywords.newLine);
+			encoding.append(System.lineSeparator());
 		}
 		program = encoding.toString();
 	}
@@ -75,32 +74,32 @@ public class AspInput {
 		encoding.append(comment);
 		encoding.append(" ");
 		encoding.append(index);
-		encoding.append(RendererKeywords.newLine);
+		encoding.append(System.lineSeparator());
 
 		encoding.append(predicate);
 		encoding.append("(");
 		encoding.append(index);
 		encoding.append(").");
-		encoding.append(RendererKeywords.newLine);
+		encoding.append(System.lineSeparator());
 
 		encodeAtoms(encoding, d, index);
-		encoding.append(RendererKeywords.newLine);
+		encoding.append(System.lineSeparator());
 	}
 
 	private void encodeSubsumption(StringBuilder encoding, Subsumption s, int index) {
 		// TODO more direct ASP encoding for subsumptions
 		encoding.append("%subsumption ");
 		encoding.append(index);
-		encoding.append(RendererKeywords.newLine);
+		encoding.append(System.lineSeparator());
 
 		encoding.append("eq(");
 		encoding.append(index);
 		encoding.append(").");
-		encoding.append(RendererKeywords.newLine);
+		encoding.append(System.lineSeparator());
 
 		encodeAtoms(encoding, s, index);
 		encodeAtoms(encoding, s.getLeft(), 1, index);
-		encoding.append(RendererKeywords.newLine);
+		encoding.append(System.lineSeparator());
 	}
 
 	private void encodeAtoms(StringBuilder encoding, Axiom axiom, int index) {
@@ -122,7 +121,7 @@ public class AspInput {
 		encoding.append(", ");
 		encoding.append(equationId);
 		encoding.append(").");
-		encoding.append(RendererKeywords.newLine);
+		encoding.append(System.lineSeparator());
 	}
 
 	private void encodeAtom(StringBuilder encoding, Atom atom) {

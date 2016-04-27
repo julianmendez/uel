@@ -29,7 +29,7 @@ public class Definition extends Axiom {
 
 	@Override
 	public String getConnective() {
-		return primitive ? "⊑" : "≡";
+		return primitive ? Subsumption.CONNECTIVE : Equation.CONNECTIVE;
 	}
 
 	public Integer getDefiniendum() {

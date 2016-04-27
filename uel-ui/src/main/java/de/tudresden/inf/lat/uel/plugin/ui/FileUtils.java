@@ -23,11 +23,23 @@ import org.semanticweb.owlapi.rdf.rdfxml.renderer.RDFXMLRenderer;
  * @author Julian Mendez
  * @author Stefan Borgwardt
  */
-class OWLUtils {
+class FileUtils {
 
 	private static final String EXTENSION_KRSS = ".krss";
 	private static final String EXTENSION_OWL = ".owl";
 	private static final String EXTENSION_RDF = ".rdf";
+	private static final String EXTENSION_TXT = ".txt";
+
+	/**
+	 * Test whether a file has the extension of a text file.
+	 * 
+	 * @param file
+	 *            the file description
+	 * @return true iff the file has the extension '.txt'
+	 */
+	public static boolean isTextFile(File file) {
+		return file.getName().endsWith(EXTENSION_TXT);
+	}
 
 	/**
 	 * Render the given ontology as a string in KRSS2 format.
@@ -83,17 +95,29 @@ class OWLUtils {
 	/**
 	 * Saves a set of axioms to an OWL ontology file.
 	 * 
-	 * @param axioms
-	 *            a set of OWLAxioms
 	 * @param file
 	 *            the output destination
+	 * @param axioms
+	 *            a set of OWLAxioms
 	 */
-	public static void saveToOntologyFile(Set<OWLAxiom> axioms, File file) {
+	public static void saveToFile(File file, Set<OWLAxiom> axioms) {
+		OWLOntology ontology = toOWLOntology(axioms);
+		saveToFile(file, ontology);
+	}
+
+	/**
+	 * Converts a set of OWLAxioms to an OWLOntology.
+	 * 
+	 * @param axioms
+	 *            the input axioms
+	 * @return a new ontology containing the axioms
+	 */
+	public static OWLOntology toOWLOntology(Set<OWLAxiom> axioms) {
 		try {
 			OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
 			OWLOntology ontology = manager.createOntology();
 			manager.addAxioms(ontology, axioms);
-			saveToOntologyFile(ontology, file);
+			return ontology;
 		} catch (OWLOntologyCreationException e) {
 			throw new RuntimeException(e);
 		}
@@ -102,30 +126,45 @@ class OWLUtils {
 	/**
 	 * Saves an OWL ontology to a file.
 	 * 
-	 * @param owlOntology
-	 *            an ontology
 	 * @param file
 	 *            the output destination
+	 * @param owlOntology
+	 *            an ontology
 	 */
-	public static void saveToOntologyFile(OWLOntology owlOntology, File file) {
-		if (file != null) {
-			try {
-				String ontology = "";
-				if (file.getName().endsWith(OWLUtils.EXTENSION_RDF)) {
-					ontology = renderRDF(owlOntology);
-				} else if (file.getName().endsWith(OWLUtils.EXTENSION_OWL)) {
-					ontology = renderOWL(owlOntology);
-				} else if (file.getName().endsWith(OWLUtils.EXTENSION_KRSS)) {
-					ontology = renderKRSS(owlOntology);
-				}
-
-				BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-				writer.write(ontology);
-				writer.flush();
-				writer.close();
-			} catch (OWLRendererException | IOException e) {
-				throw new RuntimeException(e);
+	public static void saveToFile(File file, OWLOntology owlOntology) {
+		try {
+			String ontology = "";
+			if (file.getName().endsWith(EXTENSION_RDF)) {
+				ontology = renderRDF(owlOntology);
+			} else if (file.getName().endsWith(EXTENSION_OWL)) {
+				ontology = renderOWL(owlOntology);
+			} else if (file.getName().endsWith(EXTENSION_KRSS)) {
+				ontology = renderKRSS(owlOntology);
+			} else {
+				throw new RuntimeException("Unexpected file extension: " + file.getName());
 			}
+			saveToFile(file, ontology);
+		} catch (OWLRendererException | IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	/**
+	 * Saves a string to a file.
+	 * 
+	 * @param file
+	 *            the output destination
+	 * @param content
+	 *            the file content
+	 */
+	public static void saveToFile(File file, String content) {
+		try {
+			BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+			writer.write(content);
+			writer.flush();
+			writer.close();
+		} catch (IOException e) {
+			throw new RuntimeException(e);
 		}
 	}
 

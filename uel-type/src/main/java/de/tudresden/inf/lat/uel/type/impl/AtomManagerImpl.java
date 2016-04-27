@@ -194,4 +194,13 @@ public class AtomManagerImpl implements AtomManager {
 	public int size() {
 		return atoms.size();
 	}
+
+	@Override
+	public Integer createBlankExistentialRestriction(Integer roleId) {
+		String roleName = getRoleName(roleId);
+		Integer fillerId = createConceptName(roleName + VAR_SUFFIX);
+		makeUserVariable(fillerId);
+		return createExistentialRestriction(roleName, fillerId);
+	}
+
 }

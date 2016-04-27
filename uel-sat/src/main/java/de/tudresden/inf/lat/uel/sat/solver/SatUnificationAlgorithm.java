@@ -1081,7 +1081,7 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 			}
 		}
 
-		// minimize assignment
+		// minimize assignment - may change the number of distinct unifiers!
 		for (Integer varId : getVariables()) {
 			Integer removed;
 			do {

@@ -22,6 +22,12 @@ import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import de.tudresden.inf.lat.jcel.owlapi.main.JcelReasonerFactory;
 import de.tudresden.inf.lat.uel.core.processor.UnificationAlgorithmFactory;
 
+/**
+ * Test class for 'AlternativeUelStarter'.
+ * 
+ * @author Stefan Borgwardt
+ *
+ */
 @RunWith(value = Parameterized.class)
 public class AlternativeUelStarterTest {
 
@@ -40,6 +46,21 @@ public class AlternativeUelStarterTest {
 	private Set<OWLClass> variables;
 	private Integer numberOfUnifiers;
 
+	/**
+	 * Construct a new test object with the given input. Input is constructed in
+	 * the method 'data'.
+	 * 
+	 * @param mainOntology
+	 *            the background ontology
+	 * @param subsumptions
+	 *            the positive goal ontology
+	 * @param dissubsumptions
+	 *            the negative goal ontology
+	 * @param variables
+	 *            the set of user variables
+	 * @param numberOfUnifiers
+	 *            the expected number of unifiers
+	 */
 	public AlternativeUelStarterTest(OWLOntology mainOntology, OWLOntology subsumptions, OWLOntology dissubsumptions,
 			Set<OWLClass> variables, Integer numberOfUnifiers) {
 		this.mainOntology = mainOntology;
@@ -49,6 +70,11 @@ public class AlternativeUelStarterTest {
 		this.numberOfUnifiers = numberOfUnifiers;
 	}
 
+	/**
+	 * Construct all inputs for this test.
+	 * 
+	 * @return a Collection of parameter combinations, as required by JUnit
+	 */
 	@Parameters(name = "{index}")
 	public static Collection<Object[]> data() {
 		Collection<Object[]> data = new ArrayList<Object[]>();
@@ -75,8 +101,15 @@ public class AlternativeUelStarterTest {
 		return data;
 	}
 
+	/**
+	 * Run a single test.
+	 * 
+	 * @throws OWLOntologyCreationException
+	 *             indicates that the ontology for verifying the results could
+	 *             not be created
+	 */
 	@Test
-	public void tryOntology() throws OWLOntologyCreationException, IOException {
+	public void tryOntology() throws OWLOntologyCreationException {
 
 		AlternativeUelStarter starter = new AlternativeUelStarter(mainOntology);
 		starter.markUndefAsVariables(false);
@@ -106,11 +139,11 @@ public class AlternativeUelStarterTest {
 			reasoner.precomputeInferences();
 
 			for (OWLAxiom pos : subsumptions.getAxioms()) {
-				 System.out.println(pos + ": " + reasoner.isEntailed(pos));
+				System.out.println(pos + ": " + reasoner.isEntailed(pos));
 				Assert.assertTrue(reasoner.isEntailed(pos));
 			}
 			for (OWLAxiom neg : dissubsumptions.getAxioms()) {
-				 System.out.println(neg + ": " + reasoner.isEntailed(neg));
+				System.out.println(neg + ": " + reasoner.isEntailed(neg));
 				Assert.assertTrue(!reasoner.isEntailed(neg));
 			}
 
