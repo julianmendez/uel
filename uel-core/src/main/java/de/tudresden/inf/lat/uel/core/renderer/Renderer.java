@@ -1,7 +1,9 @@
 package de.tudresden.inf.lat.uel.core.renderer;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.function.Function;
 
 import org.semanticweb.owlapi.model.OWLAxiom;
@@ -20,7 +22,24 @@ import de.tudresden.inf.lat.uel.type.api.Goal;
 import de.tudresden.inf.lat.uel.type.impl.Unifier;
 
 /**
- * Base class for all rendering purposes of UEL objects.
+ * Base class for all rendering purposes of UEL objects. Subclasses can
+ * implement the rendering using one of two modes (or a combination of both).
+ * The 'render...' methods are used to obtained renderings of the given objects,
+ * by first calling 'initialize()', then the corresponding 'translate...'
+ * method, and finally a 'finalize...' method, depending on the type of object
+ * (concept term, role, or axioms). The 'translate...' methods recursively call
+ * other necessary 'translate...' methods (for sub-objects). These methods can
+ * either directly return the rendering, to be used as arguments in constructors
+ * for more complex renderings, or simply update an internal variable, for
+ * sequential renderings. In the latter case, only the 'finalize...' methods
+ * constructs the final rendering.
+ * 
+ * For example, the instances of 'StringRenderer' update an internal
+ * 'StringBuilder', which only yields the final string representation via a call
+ * to 'finalize...'. In contrast, the 'OWLRenderer' needs the final renderings
+ * of sub-objects in order to compute more complex renderings (e.g., the
+ * renderings of a filler and a role are needed to obtain an existential
+ * restriction (OWLObjectSomeValuesFrom)).
  * 
  * @author Stefan Borgwardt
  *
@@ -66,6 +85,20 @@ abstract class Renderer<ExpressionType, RoleType, AxiomsType> {
 			}
 		}
 		return label;
+	}
+
+	private int compareDefinitions(Definition d1, Definition d2) {
+		// compare definitions according to the lexicographic order of the
+		// (IRIs or short forms of the) defined concept names
+		return compareNames(d1.getDefiniendum(), d2.getDefiniendum());
+	}
+
+	private int compareNames(Integer id1, Integer id2) {
+		return renderName(id1).compareTo(renderName(id2));
+	}
+
+	private int compareRoles(Integer r1, Integer r2) {
+		return renderRole(r1).compareTo(renderRole(r2));
 	}
 
 	/**
@@ -174,6 +207,13 @@ abstract class Renderer<ExpressionType, RoleType, AxiomsType> {
 		return finalizeAxioms();
 	}
 
+	/**
+	 * Render the given OWL entity.
+	 * 
+	 * @param entity
+	 *            the entity
+	 * @return the rendered entity
+	 */
 	public String renderEntity(OWLEntity entity) {
 		return getShortForm(entity.toStringID());
 	}
@@ -183,37 +223,41 @@ abstract class Renderer<ExpressionType, RoleType, AxiomsType> {
 	 * 
 	 * @param input
 	 *            a 'Goal' object representing the unification problem
+	 * @param sorted
+	 *            indicates whether the definitions and various lists should be
+	 *            sorted
 	 * @return the rendered problem, with axioms, variables, etc.
 	 */
-	public AxiomsType renderGoal(Goal input) {
+	public AxiomsType renderGoal(Goal input, boolean sorted) {
 		initialize();
-		translateAxioms(input.getDefinitions());
+		translateAxioms(sortDefinitions(input.getDefinitions(), sorted));
 		translateAxioms(input.getEquations());
 		translateAxioms(input.getSubsumptions());
 		translateAxioms(input.getDisequations());
 		translateAxioms(input.getDissubsumptions());
 		newLine();
-		translateAtomList("Variables", input.getAtomManager().getVariables());
-		translateAtomList("User variables", input.getAtomManager().getUserVariables());
-		translateAtomList("Constants", input.getAtomManager().getConstants());
+		translateAtomList("Variables", sortNames(input.getAtomManager().getVariables(), sorted));
+		translateAtomList("User variables", sortNames(input.getAtomManager().getUserVariables(), sorted));
+		translateAtomList("Constants", sortNames(input.getAtomManager().getConstants(), sorted));
 		newLine();
-		if (!input.getTypes().isEmpty()) {
-			translateAtomList("Types", input.getTypes());
+		Set<Integer> types = sortNames(input.getTypes(), sorted);
+		if (!types.isEmpty()) {
+			translateAtomList("Types", types);
 		}
 		newLine();
-		for (Integer type : input.getTypes()) {
+		for (Integer type : types) {
 			Integer supertype = input.getDirectSupertype(type);
 			if (supertype != null) {
 				translateAtomList("Direct supertype of " + renderName(type), Collections.singleton(supertype));
 			}
 		}
 		newLine();
-		for (Integer roleId : input.getDomains().keySet()) {
-			translateAtomList("Domain of " + renderRole(roleId), input.getDomains().get(roleId));
+		for (Integer roleId : sortRoles(input.getDomains().keySet(), sorted)) {
+			translateAtomList("Domain of " + renderRole(roleId), sortNames(input.getDomains().get(roleId), sorted));
 		}
 		newLine();
-		for (Integer roleId : input.getRanges().keySet()) {
-			translateAtomList("Range of " + renderRole(roleId), input.getRanges().get(roleId));
+		for (Integer roleId : sortRoles(input.getRanges().keySet(), sorted)) {
+			translateAtomList("Range of " + renderRole(roleId), sortNames(input.getRanges().get(roleId), sorted));
 		}
 		return finalizeAxioms();
 	}
@@ -261,25 +305,57 @@ abstract class Renderer<ExpressionType, RoleType, AxiomsType> {
 	 *            indicates whether identity assignments should be rendered
 	 * @param typeInfo
 	 *            indicates whether type information should be rendered
+	 * @param sorted
+	 *            indicates whether the definitions in the output should be
+	 *            sorted by the label of the variable
 	 * @return the rendered unifier
 	 */
-	public AxiomsType renderUnifier(Unifier unifier, boolean identity, boolean typeInfo) {
+	public AxiomsType renderUnifier(Unifier unifier, boolean identity, boolean typeInfo, boolean sorted) {
 		initialize();
-		for (Definition definition : unifier.getDefinitions()) {
+
+		Set<Definition> definitions = sortDefinitions(unifier.getDefinitions(), sorted);
+
+		for (Definition definition : definitions) {
 			if (!restrictToUserVariables || atomManager.getUserVariables().contains(definition.getDefiniendum())) {
 				if (!identity || !definition.getRight().equals(Collections.singleton(definition.getDefiniendum()))) {
 					translateAxiom(definition);
 				}
 			}
 		}
+
 		if (typeInfo) {
+			// optional: print type information used to obtain the unifier; this
+			// is only meaningful in 'SNOMED mode'
 			if (unifier.getTypeAssignment() != null) {
 				for (Integer atomId : unifier.getTypeAssignment().keySet()) {
 					translateAtomList("Types of " + renderName(atomId), unifier.getTypeAssignment().get(atomId));
 				}
 			}
 		}
+
 		return finalizeAxioms();
+	}
+
+	private <T> Set<T> sort(Set<T> set, Comparator<T> comparator, boolean sorted) {
+		if (sorted) {
+			Set<T> sortedSet = new TreeSet<T>(comparator);
+			sortedSet.addAll(set);
+			return sortedSet;
+		} else {
+			return set;
+		}
+	}
+
+	private Set<Definition> sortDefinitions(Set<Definition> definitions, boolean sorted) {
+		return sort(definitions, this::compareDefinitions, sorted);
+	}
+
+	private Set<Integer> sortNames(Set<Integer> atomIds, boolean sorted) {
+		return sort(atomIds, this::compareNames, sorted);
+	}
+
+	private Set<Integer> sortRoles(Set<Integer> roleIds, boolean sorted) {
+		return sort(roleIds, this::compareRoles, sorted);
 	}
 
 	private String stripSuffixes(String id) {
@@ -329,6 +405,16 @@ abstract class Renderer<ExpressionType, RoleType, AxiomsType> {
 	 */
 	protected abstract AxiomsType translateAxiom(Axiom axiom);
 
+	/**
+	 * Add an OWL axiom to the rendering under construction.
+	 * 
+	 * @param axiom
+	 *            the axiom
+	 * @param positive
+	 *            indicates whether the axiom should be rendered as a positive
+	 *            axiom or a negative axiom
+	 * @return the rendered axiom (for recursive translations)
+	 */
 	protected abstract AxiomsType translateAxiom(OWLAxiom axiom, boolean positive);
 
 	/**
@@ -346,6 +432,16 @@ abstract class Renderer<ExpressionType, RoleType, AxiomsType> {
 		return ret;
 	}
 
+	/**
+	 * Add the given OWL axioms to the rendering under construction.
+	 * 
+	 * @param axioms
+	 *            a set of axioms
+	 * @param positive
+	 *            indicates whether the axioms should be rendered as positive
+	 *            axioms or negative axioms
+	 * @return the rendered axioms (for recursive translations)
+	 */
 	protected AxiomsType translateAxioms(Set<OWLAxiom> axioms, boolean positive) {
 		AxiomsType ret = null;
 		for (OWLAxiom axiom : axioms) {
@@ -370,8 +466,22 @@ abstract class Renderer<ExpressionType, RoleType, AxiomsType> {
 		}
 	}
 
+	/**
+	 * Add an OWL class to the rendering under construction.
+	 * 
+	 * @param cls
+	 *            the class
+	 * @return the rendered class (for recursive translation)
+	 */
 	protected abstract ExpressionType translateClass(OWLClass cls);
 
+	/**
+	 * Add an OWL class expression to the rendering under construction.
+	 * 
+	 * @param expression
+	 *            the class expression
+	 * @return the rendered class expression (for recursive translation)
+	 */
 	protected ExpressionType translateClassExpression(OWLClassExpression expression) {
 		if (expression instanceof OWLClass) {
 			return translateClass((OWLClass) expression);
@@ -388,6 +498,14 @@ abstract class Renderer<ExpressionType, RoleType, AxiomsType> {
 		throw new RuntimeException("Unsupported class expression: " + expression);
 	}
 
+	/**
+	 * Add a conjunction to the rendering under construction. To render the
+	 * individual atoms, the method 'translateAtom' is used.
+	 * 
+	 * @param conjuncts
+	 *            a set of conjuncts
+	 * @return the rendered conjunction (for recursive translation)
+	 */
 	protected ExpressionType translateConjunction(Set<Integer> conjuncts) {
 		return translateConjunction(conjuncts, this::translateAtom);
 	}
@@ -414,19 +532,85 @@ abstract class Renderer<ExpressionType, RoleType, AxiomsType> {
 		}
 	}
 
+	/**
+	 * Add an existential restriction to the rendering under construction.
+	 * 
+	 * @param<T> the
+	 *               type of a role, e.g. a role id or an OWLObjectProperty
+	 * @param<S> the
+	 *               type of the filler, e.g. a concept name id or an
+	 *               OWLClassExpression
+	 * 
+	 * @param role
+	 *            the role
+	 * @param filler
+	 *            the filler
+	 * @param roleTranslator
+	 *            a translation function for roles
+	 * @param fillerTranslator
+	 *            a translation function for fillers
+	 * @return the rendered existential restriction (for recursive translation)
+	 */
 	protected abstract <T, S> ExpressionType translateExistentialRestriction(T role, S filler,
 			Function<T, RoleType> roleTranslator, Function<S, ExpressionType> fillerTranslator);
 
+	/**
+	 * Add a concept name to the rendering under construction.
+	 * 
+	 * @param atomId
+	 *            the atom id of the concept name
+	 * @return the rendered concepr name (for recursive translation)
+	 */
 	protected abstract ExpressionType translateName(Integer atomId);
 
+	/**
+	 * Add an OWL object property to the rendering under construction.
+	 * 
+	 * @param prop
+	 *            the object property
+	 * @return the rendered object property (for recursive translation)
+	 */
 	protected abstract RoleType translateObjectProperty(OWLObjectProperty prop);
 
+	/**
+	 * Add a role to the rendering under construction.
+	 * 
+	 * @param roleId
+	 *            the role id
+	 * @return the rendered role (for recursive translation)
+	 */
 	protected abstract RoleType translateRole(Integer roleId);
 
+	/**
+	 * Add a list of roles to the rendering under construction.
+	 * 
+	 * @param description
+	 *            a description of the list
+	 * @param roleIds
+	 *            a set of role ids
+	 * @return the rendered role list (for recursive translation)
+	 */
 	protected abstract ExpressionType translateRoleList(String description, Set<Integer> roleIds);
 
+	/**
+	 * Add the top concept to the rendering under construction.
+	 * 
+	 * @return the rendering of top
+	 */
 	protected abstract ExpressionType translateTop();
 
+	/**
+	 * Add a 'proper' conjunction between at least two conjuncts to the
+	 * rendering under construction.
+	 * @param<T> the
+	 *               type of the conjuncts
+	 * 
+	 * @param conjuncts
+	 *            a set of conjuncts
+	 * @param conjunctTranslator
+	 *            a translation function for individual conjuncts
+	 * @return the rendered conjunction (for recursive translation)
+	 */
 	protected abstract <T> ExpressionType translateTrueConjunction(Set<T> conjuncts,
 			Function<T, ExpressionType> conjunctTranslator);
 

@@ -20,7 +20,10 @@ import de.tudresden.inf.lat.uel.type.api.Dissubsumption;
 import de.tudresden.inf.lat.uel.type.api.Subsumption;
 
 /**
- * This class can render UEL objects as OWL objects.
+ * This class can render UEL objects as OWL objects. The output cannot
+ * distinguish between positive axioms (subsumptions, equations) and negative
+ * axioms (dissubsumptions, disequations). This distinction has to be made
+ * separately, e.g., by saving the output in two different files.
  * 
  * @author Stefan Borgwardt
  */

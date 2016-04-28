@@ -104,7 +104,8 @@ public class UelModel {
 				Unifier result = algorithm.getUnifier();
 				if (isNew(result)) {
 					unifierList.add(result);
-					System.out.println(getStringRenderer(null).renderUnifier(result, true, true));
+					// System.out.println(getStringRenderer(null).renderUnifier(result,
+					// true, true, true));
 					// System.out.println(printUnifier(result));
 					return true;
 				}
@@ -368,7 +369,7 @@ public class UelModel {
 	 * @return a string representation of the unification goal
 	 */
 	public String printGoal() {
-		return getStringRenderer(null).renderGoal(goal);
+		return getStringRenderer(null).renderGoal(goal, true);
 	}
 
 	/**
@@ -379,7 +380,7 @@ public class UelModel {
 	 * @return a string representation of the unifier
 	 */
 	public String printUnifier(Unifier unifier) {
-		return getStringRenderer(unifier.getDefinitions()).renderUnifier(unifier, true, false);
+		return getStringRenderer(unifier.getDefinitions()).renderUnifier(unifier, true, false, true);
 	}
 
 	/**
@@ -412,7 +413,7 @@ public class UelModel {
 	 * @return the OWL representation of the unifier
 	 */
 	public Set<OWLAxiom> renderUnifier(Unifier unifier) {
-		return getOWLRenderer(unifier.getDefinitions()).renderUnifier(unifier, true, false);
+		return getOWLRenderer(unifier.getDefinitions()).renderUnifier(unifier, true, false, false);
 	}
 
 	/**
@@ -499,10 +500,10 @@ public class UelModel {
 
 		// extract types from background ontologies
 		if (snomedMode) {
-			Set<Integer> siblingUndefIds = goal.extractSiblings(getStringRenderer(null));
-			System.out.println(getStringRenderer(null).renderAtomList("Sibling defining UNDEFs", siblingUndefIds));
+			Set<Integer> siblingUndefIds = goal.extractSiblings();
 			goal.extractTypes();
 			setUndefVariablesFromTypes(siblingUndefIds);
+			goal.introduceDissubsumptionsForUndefVariables();
 			goal.introduceBlankExistentialRestrictions();
 		}
 

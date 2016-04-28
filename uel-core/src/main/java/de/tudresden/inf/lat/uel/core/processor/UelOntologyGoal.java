@@ -19,7 +19,6 @@ import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 
-import de.tudresden.inf.lat.uel.core.renderer.StringRenderer;
 import de.tudresden.inf.lat.uel.type.api.AtomManager;
 import de.tudresden.inf.lat.uel.type.api.Axiom;
 import de.tudresden.inf.lat.uel.type.api.Definition;
@@ -202,24 +201,19 @@ public class UelOntologyGoal implements Goal {
 	 * used (in other definitions), and do not occur directly in the
 	 * user-specified goal.
 	 * 
-	 * @param renderer
-	 *            (DEBUG) a string renderer for showing the extracted siblings
-	 *            and their common parents
 	 * @return he set of IDs of the UNDEF variables introduced to directly
 	 *         define the siblings (i.e., not the ones belonging to their
 	 *         superclasses)
 	 */
-	public Set<Integer> extractSiblings(StringRenderer renderer) {
+	public Set<Integer> extractSiblings() {
 		// find all parents of leaves (ids that are not used in other defs) that
 		// do not occur in the goal
 		Set<Integer> parentIds = mapSet(atomManager.getDefinitionVariables(), id -> isLeaf(id) && notInGoal(id),
 				this::getParent);
-		System.out.println(renderer.renderAtomList("Parents", parentIds));
 
 		// pull in all siblings of leaves from ontology
 		Set<OWLClass> siblings = collectSets(parentIds, id -> true, ontology::getOtherChildren);
 		Set<Integer> siblingIds = processClasses(siblings);
-		System.out.println(renderer.renderAtomList("Siblings", siblingIds));
 
 		// return all UNDEF variables created for the siblings' definitions
 		// (only the "most specific" ones)
@@ -475,5 +469,22 @@ public class UelOntologyGoal implements Goal {
 		for (Integer roleId : atomManager.getRoleIds()) {
 			atomManager.createBlankExistentialRestriction(roleId);
 		}
+	}
+
+	/**
+	 * Introduce new dissubsumptions forcing UNDEF variables to be
+	 * non-equivalent to their non-UNDEF counterparts.
+	 */
+	public void introduceDissubsumptionsForUndefVariables() {
+		for (Integer undefVarId : atomManager.getUserVariables()) {
+			String undefName = atomManager.printConceptName(undefVarId);
+			if (undefName.endsWith(AtomManager.UNDEF_SUFFIX)) {
+				String origName = undefName.substring(0, undefName.length() - AtomManager.UNDEF_SUFFIX.length());
+				Integer origId = atomManager.createConceptName(origName);
+				dissubsumptions
+						.add(new Dissubsumption(Collections.singleton(undefVarId), Collections.singleton(origId)));
+			}
+		}
+
 	}
 }

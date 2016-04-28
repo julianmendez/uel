@@ -61,6 +61,16 @@ class UelOntology {
 	private final Set<Integer> visited = new HashSet<Integer>();
 	private final Map<Set<Integer>, Integer> flatteningInvMap = new HashMap<Set<Integer>, Integer>();
 
+	/**
+	 * Construct a new UEL ontology
+	 * 
+	 * @param atomManager
+	 *            the atom manager
+	 * @param ontologies
+	 *            the background ontologies
+	 * @param top
+	 *            the top concept (or an alias)
+	 */
 	public UelOntology(AtomManager atomManager, Set<OWLOntology> ontologies, OWLClass top) {
 		this.atomManager = atomManager;
 		this.ontologies = ontologies;
@@ -172,6 +182,16 @@ class UelOntology {
 		return Collections.singleton(atomId);
 	}
 
+	/**
+	 * Retrieve the top-level concept name (below top) above the given concept
+	 * name in the subsumption hierarchy. This only applies to concept names
+	 * that appear in the background ontologies.
+	 * 
+	 * @param conceptNameId
+	 *            the atom id of the concept name
+	 * @return an Optional object containing the atom id of the top-level
+	 *         concept name, if it exists, and an empty Optional otherwise
+	 */
 	public Optional<Integer> getClassification(Integer conceptNameId) {
 		Optional<OWLClass> currentClass = checkUsedIRI(conceptNameId).map(iriToClass);
 		// extract the atom representing the top-level hierarchy that
@@ -193,6 +213,15 @@ class UelOntology {
 		return ont.getEquivalentClassesAxioms(cls).stream().flatMap(ax -> ax.getClassExpressionsMinus(cls).stream());
 	}
 
+	/**
+	 * Retrieve the direct superclass (possibly top) of a given concept name
+	 * from the background ontologies.
+	 * 
+	 * @param conceptNameId
+	 *            the atom id of the concept name
+	 * @return an Optional object containing the atom id of the direct
+	 *         superclass, if it exists, and an empty Optional otherwise
+	 */
 	public Optional<Integer> getDirectSuperclass(Integer conceptNameId) {
 		return checkUsedIRI(conceptNameId).map(iriToClass).flatMap(this::getDirectSuperclass).map(this::classToId);
 	}
@@ -218,6 +247,14 @@ class UelOntology {
 		return superclass;
 	}
 
+	/**
+	 * Retrieve the domain of a given role from the background ontologies.
+	 * 
+	 * @param roleId
+	 *            the role id
+	 * @return a set containing all named disjuncts of the domain restriction
+	 *         for the role, or 'null' if the role has no domain restriction
+	 */
 	public Set<OWLClass> getDomain(Integer roleId) {
 		OWLObjectProperty prop = toOWLObjectProperty(roleId);
 		return extractInformation(ont -> getDomain(ont, prop),
@@ -228,6 +265,14 @@ class UelOntology {
 		return ont.getObjectPropertyDomainAxioms(prop).stream().map(ax -> ax.getDomain());
 	}
 
+	/**
+	 * Retrieve all direct subclasses of the given concept name from the
+	 * background ontologies, but only those that have not yet been processed.
+	 * 
+	 * @param parentId
+	 *            the atom id of the concept name
+	 * @return the set of all new children
+	 */
 	public Set<OWLClass> getOtherChildren(Integer parentId) {
 		Optional<OWLClass> parentClass = checkUsedIRI(parentId).map(iriToClass);
 		if (!parentClass.isPresent()) {
@@ -275,6 +320,14 @@ class UelOntology {
 		return ont.getSubClassAxiomsForSubClass(cls).stream().map(ax -> ax.getSuperClass());
 	}
 
+	/**
+	 * Retrieve the range of a given role from the background ontologies.
+	 * 
+	 * @param roleId
+	 *            the role id
+	 * @return a set containing all named disjuncts of the range restriction for
+	 *         the role, or 'null' if the role has no range restriction
+	 */
 	public Set<OWLClass> getRange(Integer roleId) {
 		OWLObjectProperty prop = toOWLObjectProperty(roleId);
 		return extractInformation(ont -> getRange(ont, prop),
@@ -285,6 +338,11 @@ class UelOntology {
 		return ont.getObjectPropertyRangeAxioms(prop).stream().map(ax -> ax.getRange());
 	}
 
+	/**
+	 * Retrieve the atom id of the top concept.
+	 * 
+	 * @return top id
+	 */
 	public Integer getTop() {
 		return classToId(top);
 	}
@@ -322,6 +380,17 @@ class UelOntology {
 		newDefinitions.add(new Definition(id, right, primitive));
 	}
 
+	/**
+	 * Recursively translate an OWL class expression into UEL's atom ids and
+	 * definitions.
+	 * 
+	 * @param expression
+	 *            the input expression
+	 * @param newDefinitions
+	 *            a set of new definitions produced by this method
+	 * @return the UEL representation of the input expression, as a set
+	 *         (conjunction) of atom ids
+	 */
 	public Set<Integer> processClassExpression(OWLClassExpression expression, Set<Definition> newDefinitions) {
 		Set<Integer> toVisit = new HashSet<Integer>();
 		Set<Integer> conjunction = flattenClassExpression(expression, newDefinitions, toVisit);

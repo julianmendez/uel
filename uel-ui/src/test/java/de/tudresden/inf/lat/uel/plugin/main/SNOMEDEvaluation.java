@@ -36,13 +36,19 @@ public class SNOMEDEvaluation {
 	private static final String WORK_DIR = "/Users/stefborg/Documents/";
 	private static final String SNOMED_PATH = WORK_DIR + "Ontologies/snomed-english-rdf.owl";
 	private static final String SNOMED_RESTR_PATH = WORK_DIR + "Ontologies/snomed-restrictions.owl";
-	private static final String POS_PATH = WORK_DIR + "Projects/uel-snomed/uel-snomed-pos3.owl";
-	private static final String NEG_PATH = WORK_DIR + "Projects/uel-snomed/uel-snomed-neg2.owl";
+	private static final String POS_PATH = WORK_DIR + "Projects/uel-snomed/uel-snomed-pos.owl";
+	private static final String NEG_PATH = WORK_DIR + "Projects/uel-snomed/uel-snomed-neg.owl";
 
 	private static OWLClass var(String name) {
 		return OWLManager.getOWLDataFactory().getOWLClass(IRI.create("http://www.ihtsdo.org/" + name));
 	}
 
+	/**
+	 * Entry point for tests.
+	 * 
+	 * @param args
+	 *            arguments (ignored)
+	 */
 	public static void main(String[] args) {
 		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
 		OWLOntology snomed = AlternativeUelStarter.loadOntology(SNOMED_PATH, manager);
@@ -58,7 +64,7 @@ public class SNOMEDEvaluation {
 		OWLOntology neg = AlternativeUelStarter.loadOntology(NEG_PATH, manager);
 		// OWLOntology neg = UelModel.EMPTY_ONTOLOGY;
 		// String[] varNames = { "X" };
-		String[] varNames = { "X", "Y", "Z", "W" };
+		String[] varNames = { "X" };
 		UnifierIterator iterator = (UnifierIterator) starter.modifyOntologyAndSolve(pos, neg,
 				Arrays.asList(varNames).stream().map(SNOMEDEvaluation::var).collect(Collectors.toSet()),
 				UnificationAlgorithmFactory.SAT_BASED_ALGORITHM);
@@ -87,7 +93,7 @@ public class SNOMEDEvaluation {
 					// TODO compute unifiers modulo equivalence?
 
 					System.out.println(
-							model.getStringRenderer(null).renderUnifier(model.getCurrentUnifier(), false, true));
+							model.getStringRenderer(null).renderUnifier(model.getCurrentUnifier(), false, true, true));
 
 					Set<OWLEquivalentClassesAxiom> unifier = iterator.next();
 					OWLOntologyManager ontologyManager = OWLManager.createOWLOntologyManager();

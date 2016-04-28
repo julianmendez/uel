@@ -16,20 +16,43 @@ class UnifierController {
 	private final UelModel model;
 	private final UnifierView view;
 
+	/**
+	 * Set up a new Unifier controller.
+	 * 
+	 * @param view
+	 *            the Unifier view
+	 * @param model
+	 *            the UEL model
+	 */
 	public UnifierController(UnifierView view, UelModel model) {
 		this.view = view;
 		this.model = model;
 		init();
 	}
 
+	/**
+	 * Register an action listener for the 'refine' button.
+	 * 
+	 * @param listener
+	 *            the listener
+	 */
 	public void addRefineListener(ActionListener listener) {
 		view.addRefineListener(listener);
 	}
 
+	/**
+	 * Register an action listener for the 'undo' button.
+	 * 
+	 * @param listener
+	 *            the listener
+	 */
 	public void addUndoRefineListener(ActionListener listener) {
 		view.addUndoRefineListener(listener);
 	}
 
+	/**
+	 * Close the view.
+	 */
 	public void close() {
 		view.close();
 	}
@@ -83,6 +106,11 @@ class UnifierController {
 		new StatInfoController(new StatInfoView(view), model).open();
 	}
 
+	/**
+	 * Access the unifier view Component.
+	 * 
+	 * @return the view
+	 */
 	Component getView() {
 		return view;
 	}
@@ -96,11 +124,20 @@ class UnifierController {
 		view.addShowStatInfoListener(e -> executeShowStatInfo());
 	}
 
+	/**
+	 * Initialize the unifier view and open it.
+	 */
 	public void open() {
 		view.initializeButtons();
 		view.open();
 	}
 
+	/**
+	 * Sets the state of the 'undo' button.
+	 * 
+	 * @param state
+	 *            indicates whether the button should be enabled
+	 */
 	public void setUndoRefineButtonEnabled(boolean state) {
 		view.setUndoRefineButtonEnabled(state);
 	}

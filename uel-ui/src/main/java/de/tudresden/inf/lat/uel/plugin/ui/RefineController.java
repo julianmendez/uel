@@ -6,11 +6,11 @@ package de.tudresden.inf.lat.uel.plugin.ui;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -35,6 +35,8 @@ class RefineController {
 	/**
 	 * Constructs a new Refine controller using the given model.
 	 * 
+	 * @param view
+	 *            the Refine view
 	 * @param model
 	 *            the UEL model
 	 */
@@ -109,7 +111,7 @@ class RefineController {
 	}
 
 	private void updateView() {
-		Map<LabelId, List<LabelId>> map = new HashMap<LabelId, List<LabelId>>();
+		Map<LabelId, List<LabelId>> map = new TreeMap<LabelId, List<LabelId>>();
 		Set<Definition> definitions = model.getCurrentUnifier().getDefinitions();
 		StringRenderer renderer = model.getStringRenderer(definitions);
 

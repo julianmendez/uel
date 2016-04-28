@@ -2,6 +2,7 @@ package de.tudresden.inf.lat.uel.plugin.ui;
 
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import de.tudresden.inf.lat.uel.core.processor.UelModel;
@@ -63,12 +64,14 @@ class VarSelectionController {
 		for (Integer id : model.getGoal().getAtomManager().getConstants()) {
 			constants.add(new LabelId(renderer.renderAtom(id), id));
 		}
+		Collections.sort(constants);
 		view.setConstants(constants);
 
 		List<LabelId> variables = new ArrayList<LabelId>();
 		for (Integer id : model.getGoal().getAtomManager().getUserVariables()) {
 			variables.add(new LabelId(renderer.renderAtom(id), id));
 		}
+		Collections.sort(variables);
 		view.setVariables(variables);
 	}
 

@@ -23,7 +23,6 @@ import de.tudresden.inf.lat.uel.sat.literals.SubtypeLiteral;
 import de.tudresden.inf.lat.uel.sat.type.SatInput;
 import de.tudresden.inf.lat.uel.sat.type.SatOutput;
 import de.tudresden.inf.lat.uel.sat.type.Solver;
-import de.tudresden.inf.lat.uel.type.api.Atom;
 import de.tudresden.inf.lat.uel.type.api.AtomManager;
 import de.tudresden.inf.lat.uel.type.api.Definition;
 import de.tudresden.inf.lat.uel.type.api.Disequation;
@@ -33,7 +32,6 @@ import de.tudresden.inf.lat.uel.type.api.Goal;
 import de.tudresden.inf.lat.uel.type.api.IndexedSet;
 import de.tudresden.inf.lat.uel.type.api.Subsumption;
 import de.tudresden.inf.lat.uel.type.api.UnificationAlgorithm;
-import de.tudresden.inf.lat.uel.type.impl.ExistentialRestriction;
 import de.tudresden.inf.lat.uel.type.impl.IndexedSetImpl;
 import de.tudresden.inf.lat.uel.type.impl.Unifier;
 
@@ -157,6 +155,15 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 	private final Goal goal;
 	private Set<Integer> update = new HashSet<Integer>();
 
+	/**
+	 * Initialize an instance of the SAT-based unification algorithm.
+	 * 
+	 * @param goal
+	 *            the unification problem
+	 * @param useMinimalAssignments
+	 *            indicates whether only unifiers based on minimal assignments
+	 *            should be returned
+	 */
 	public SatUnificationAlgorithm(Goal goal, boolean useMinimalAssignments) {
 		if (goal == null) {
 			throw new IllegalArgumentException("Null argument.");
@@ -759,6 +766,12 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 
 	private void runStep1Dissubsumption(Set<Integer> choiceLiterals, Set<Integer> leftIds, Integer rightId,
 			SatInput input) {
+		if(leftIds.size() ==0) {
+			return;
+		}
+		if (leftIds.size() == 1) {
+			// TODO assert single dissubsumption, the rest will be handled by 'addClausesForDisunification'
+		}
 		if (getVariables().contains(rightId))
 			runStep1DissubsumptionVariable(choiceLiterals, leftIds, rightId, input);
 		else {
@@ -1112,15 +1125,16 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 		// }
 	}
 
-	private String printAtom(Integer atomId) {
-		Atom a = goal.getAtomManager().getAtom(atomId);
-		if (a instanceof ExistentialRestriction) {
-			String roleName = goal.getAtomManager().printRoleName(atomId);
-			String child = goal.getAtomManager().printConceptName(goal.getAtomManager().getChild(atomId));
-			return "(" + roleName + " some " + child + ")";
-		} else {
-			return goal.getAtomManager().printConceptName(atomId);
-		}
-	}
+	// private String printAtom(Integer atomId) {
+	// Atom a = goal.getAtomManager().getAtom(atomId);
+	// if (a instanceof ExistentialRestriction) {
+	// String roleName = goal.getAtomManager().printRoleName(atomId);
+	// String child =
+	// goal.getAtomManager().printConceptName(goal.getAtomManager().getChild(atomId));
+	// return "(" + roleName + " some " + child + ")";
+	// } else {
+	// return goal.getAtomManager().printConceptName(atomId);
+	// }
+	// }
 
 }
