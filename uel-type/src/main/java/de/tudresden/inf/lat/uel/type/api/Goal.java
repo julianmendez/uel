@@ -29,6 +29,17 @@ public interface Goal {
 	}
 
 	/**
+	 * Returns a specific definition.
+	 * 
+	 * @param varId
+	 *            The id of the variable that is defined.
+	 * @return the definition of 'varId', if it exists, and 'null' otherwise
+	 */
+	default Definition getDefinition(Integer varId) {
+		return null;
+	}
+
+	/**
 	 * Returns the set of flattened goal equations.
 	 * 
 	 * @return the set of goal equations

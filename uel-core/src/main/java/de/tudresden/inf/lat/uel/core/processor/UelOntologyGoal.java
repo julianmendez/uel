@@ -382,6 +382,11 @@ public class UelOntologyGoal implements Goal {
 	}
 
 	@Override
+	public Definition getDefinition(Integer varId) {
+		return definitions.get(varId);
+	}
+
+	@Override
 	public Integer getDirectSupertype(Integer type) {
 		return directSupertype.get(type);
 	}
@@ -476,15 +481,16 @@ public class UelOntologyGoal implements Goal {
 	 * non-equivalent to their non-UNDEF counterparts.
 	 */
 	public void introduceDissubsumptionsForUndefVariables() {
-		for (Integer undefVarId : atomManager.getUserVariables()) {
-			String undefName = atomManager.printConceptName(undefVarId);
-			if (undefName.endsWith(AtomManager.UNDEF_SUFFIX)) {
-				String origName = undefName.substring(0, undefName.length() - AtomManager.UNDEF_SUFFIX.length());
-				Integer origId = atomManager.createConceptName(origName);
-				dissubsumptions
-						.add(new Dissubsumption(Collections.singleton(undefVarId), Collections.singleton(origId)));
-			}
-		}
-
+		// for (Integer undefVarId : atomManager.getUserVariables()) {
+		// String undefName = atomManager.printConceptName(undefVarId);
+		// if (undefName.endsWith(AtomManager.UNDEF_SUFFIX)) {
+		// String origName = undefName.substring(0, undefName.length() -
+		// AtomManager.UNDEF_SUFFIX.length());
+		// Integer origId = atomManager.createConceptName(origName);
+		// dissubsumptions
+		// .add(new Dissubsumption(Collections.singleton(undefVarId),
+		// Collections.singleton(origId)));
+		// }
+		// }
 	}
 }

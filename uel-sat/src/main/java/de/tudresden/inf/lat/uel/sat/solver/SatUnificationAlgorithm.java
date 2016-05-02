@@ -182,6 +182,7 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 	private void addClausesForDisunification(SatInput input) throws InterruptedException {
 		for (Integer atomId : getUsedAtomIds()) {
 			for (Integer varId : getVariables()) {
+				// TODO negate choice literals?
 				runStep1DissubsumptionVariable(Collections.singleton(subsumption(atomId, varId)),
 						Collections.singleton(atomId), varId, input);
 			}
@@ -330,9 +331,7 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 	}
 
 	private Set<Integer> implication(Set<Integer> head, Integer... body) {
-		for (Integer bodyLiteral : body) {
-			head.add(neg(bodyLiteral));
-		}
+		Arrays.stream(body).forEach(l -> head.add(neg(l)));
 		return head;
 	}
 
@@ -766,13 +765,13 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 
 	private void runStep1Dissubsumption(Set<Integer> choiceLiterals, Set<Integer> leftIds, Integer rightId,
 			SatInput input) {
-		if(leftIds.size() ==0) {
-			return;
-		}
 		if (leftIds.size() == 1) {
-			// TODO assert single dissubsumption, the rest will be handled by 'addClausesForDisunification'
-		}
-		if (getVariables().contains(rightId))
+			// assert single dissubsumption, the rest will be handled by
+			// 'addClausesForDisunification'
+			Set<Integer> clause = new HashSet<Integer>(choiceLiterals);
+			clause.add(neg(subsumption(leftIds.iterator().next(), rightId)));
+			input.add(clause);
+		} else if (getVariables().contains(rightId))
 			runStep1DissubsumptionVariable(choiceLiterals, leftIds, rightId, input);
 		else {
 			// 'rightId' is a non-variable atom --> it should not subsume any of
@@ -1074,9 +1073,11 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 					Integer atomId1 = this.literalManager.get(i).getFirst();
 					Integer atomId2 = this.literalManager.get(i).getSecond();
 					if (getVariables().contains(atomId1)) {
-						// if (getNonVariableAtoms().contains(atomId2)) {
-						if (!getUserVariables().contains(atomId2)
-								&& !goal.getAtomManager().getFlatteningVariables().contains(atomId2)) {
+						if (getNonVariableAtoms().contains(atomId2)) {
+							// if (!getUserVariables().contains(atomId2)
+							// &&
+							// !goal.getAtomManager().getFlatteningVariables().contains(atomId2))
+							// {
 							addToSetOfSubsumers(atomId1, atomId2);
 						}
 					}
@@ -1094,24 +1095,64 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 			}
 		}
 
-		// minimize assignment - may change the number of distinct unifiers!
-		for (Integer varId : getVariables()) {
-			Integer removed;
+		for (Integer varId : getUserVariables()) {
+			boolean changed;
 			do {
-				removed = null;
+				// exhaustively replace definitions by the defined variables
+				do {
+					changed = false;
+					for (Definition def : goal.getDefinitions()) {
+						if (!def.getRight().isEmpty()) {
+							if (getSetOfSubsumers(varId).containsAll(def.getRight())) {
+								// System.out.println("Applied definition of: "
+								// +
+								// goal.getAtomManager().printConceptName(def.getDefiniendum()));
+								Set<Integer> subs = subsumers.get(varId);
+								subs.removeAll(def.getRight());
+								subs.add(def.getDefiniendum());
+								changed = true;
+							}
+						}
+					}
+				} while (changed);
+
+				// remove superclasses if subclasses are also present
+				Integer removed = null;
 				a: for (Integer atomId1 : getSetOfSubsumers(varId)) {
 					for (Integer atomId2 : getSetOfSubsumers(varId)) {
-						if (!atomId1.equals(atomId2) && getLiteralValue(subsumption(atomId1, atomId2))) {
+						Definition def = goal.getDefinition(atomId1);
+						if ((def != null) && def.getRight().contains(atomId2)) {
 							removed = atomId2;
 							break a;
 						}
 					}
 				}
 				if (removed != null) {
+					changed = true;
 					subsumers.get(varId).remove(removed);
 				}
-			} while (removed != null);
+			} while (changed);
 		}
+
+		// minimize assignment - may change the number of distinct unifiers!
+		// for (Integer varId : getVariables()) {
+		// Integer removed;
+		// do {
+		// removed = null;
+		// a: for (Integer atomId1 : getSetOfSubsumers(varId)) {
+		// for (Integer atomId2 : getSetOfSubsumers(varId)) {
+		// if (!atomId1.equals(atomId2) && getLiteralValue(subsumption(atomId1,
+		// atomId2))) {
+		// removed = atomId2;
+		// break a;
+		// }
+		// }
+		// }
+		// if (removed != null) {
+		// subsumers.get(varId).remove(removed);
+		// }
+		// } while (removed != null);
+		// }
 
 		// Integer x =
 		// goal.getAtomManager().createConceptName("http://www.ihtsdo.org/X");

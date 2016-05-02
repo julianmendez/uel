@@ -58,6 +58,7 @@ public class Choice {
 
 	public void ruleOutOtherChoices(SatInput input) {
 		for (int j = numberOfChoices; j < Math.pow(2, log); j++) {
+			// TODO negate choice literals?
 			input.add(addChoiceLiterals(Collections.<Integer> emptySet(), j));
 		}
 	}
