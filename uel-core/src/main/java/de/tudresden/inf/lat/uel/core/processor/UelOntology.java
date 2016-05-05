@@ -204,6 +204,25 @@ class UelOntology {
 		return previousClass.map(this::classToId);
 	}
 
+	public boolean isSubclass(Integer subId, Integer superId) {
+		Optional<OWLClass> subclass = checkUsedIRI(subId).map(iriToClass);
+		Optional<OWLClass> superclass = checkUsedIRI(superId).map(iriToClass);
+		if (!(subclass.isPresent() && superclass.isPresent())) {
+			return false;
+		}
+		if (subclass.equals(superclass)) {
+			return true;
+		}
+
+		while (subclass.isPresent() && !subclass.get().equals(top)) {
+			subclass = getDirectSuperclass(subclass.get());
+			if (subclass.equals(superclass)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	private OWLClassExpression getDefinition(OWLClass cls) {
 		return extractInformation(ont -> getDefinition(ont, cls),
 				exception("Multiple candidate definitions found for class: " + cls), Function.identity(), () -> null);

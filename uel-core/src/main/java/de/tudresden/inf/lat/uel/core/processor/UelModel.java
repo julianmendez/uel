@@ -440,17 +440,12 @@ public class UelModel {
 	}
 
 	private void setUndefVariablesFromTypes(Set<Integer> siblingUndefIds) {
-		Set<Integer> constants = new HashSet<Integer>(atomManager.getConstants());
-		for (Integer undefId : constants) {
-			String undefName = atomManager.printConceptName(undefId);
-			if (undefName.endsWith(AtomManager.UNDEF_SUFFIX)) {
-				String origName = undefName.substring(0, undefName.length() - AtomManager.UNDEF_SUFFIX.length());
-				Integer origId = atomManager.createConceptName(origName);
-				if (!goal.getTypes().contains(origId) && !siblingUndefIds.contains(undefId)) {
-					// all UNDEF names belonging to types or siblings are
-					// constants, all others are variables
-					atomManager.makeUserVariable(undefId);
-				}
+		for (Integer undefId : atomManager.getUndefNames()) {
+			Integer origId = atomManager.removeUndef(undefId);
+			if (!goal.getTypes().contains(origId) && !siblingUndefIds.contains(undefId)) {
+				// all UNDEF names belonging to types or siblings are
+				// constants, all others are variables
+				atomManager.makeUserVariable(undefId);
 			}
 		}
 	}

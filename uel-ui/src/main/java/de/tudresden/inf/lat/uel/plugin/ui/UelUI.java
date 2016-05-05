@@ -32,6 +32,7 @@ import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
+import javax.swing.text.DefaultCaret;
 
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyID;
@@ -201,6 +202,7 @@ class UelUI {
 		textArea.setLineWrap(true);
 		textArea.setEditable(false);
 		textArea.setToolTipText(toolTipText);
+		((DefaultCaret) textArea.getCaret()).setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
 		setMargin(textArea);
 		return createScrollPane(textArea, true);
 	}

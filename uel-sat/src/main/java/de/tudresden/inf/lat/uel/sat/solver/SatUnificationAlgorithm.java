@@ -23,7 +23,6 @@ import de.tudresden.inf.lat.uel.sat.literals.SubtypeLiteral;
 import de.tudresden.inf.lat.uel.sat.type.SatInput;
 import de.tudresden.inf.lat.uel.sat.type.SatOutput;
 import de.tudresden.inf.lat.uel.sat.type.Solver;
-import de.tudresden.inf.lat.uel.type.api.AtomManager;
 import de.tudresden.inf.lat.uel.type.api.Definition;
 import de.tudresden.inf.lat.uel.type.api.Disequation;
 import de.tudresden.inf.lat.uel.type.api.Dissubsumption;
@@ -234,17 +233,13 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 		}
 
 		// c' - types are inherited by/from UNDEF concept names
-		for (Integer undefId : getConceptNames()) {
-			String undefName = goal.getAtomManager().printConceptName(undefId);
-			if (undefName.endsWith(AtomManager.UNDEF_SUFFIX)) {
-				String name = undefName.substring(0, undefName.length() - AtomManager.UNDEF_SUFFIX.length());
-				Integer id = goal.getAtomManager().createConceptName(name);
-				for (Integer type : goal.getTypes()) {
-					Integer typeLiteral = subtype(id, type);
-					Integer undefTypeLiteral = subtype(undefId, type);
-					input.add(implication(undefTypeLiteral, typeLiteral));
-					input.add(implication(typeLiteral, undefTypeLiteral));
-				}
+		for (Integer undefId : goal.getAtomManager().getUndefNames()) {
+			Integer origId = goal.getAtomManager().removeUndef(undefId);
+			for (Integer type : goal.getTypes()) {
+				Integer origTypeLiteral = subtype(origId, type);
+				Integer undefTypeLiteral = subtype(undefId, type);
+				input.add(implication(undefTypeLiteral, origTypeLiteral));
+				input.add(implication(origTypeLiteral, undefTypeLiteral));
 			}
 		}
 

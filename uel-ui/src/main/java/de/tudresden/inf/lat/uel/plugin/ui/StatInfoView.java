@@ -52,12 +52,10 @@ class StatInfoView extends UelDialog {
 
 	public void setGoalText(String text) {
 		textGoal.setText(text);
-		UelUI.scrollTop(textGoal);
 	}
 
 	public void setInfoText(String text) {
 		textInfo.setText(text);
-		UelUI.scrollTop(textInfo);
 	}
 
 }

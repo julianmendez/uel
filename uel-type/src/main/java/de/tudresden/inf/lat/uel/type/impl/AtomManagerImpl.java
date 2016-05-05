@@ -19,10 +19,24 @@ public class AtomManagerImpl implements AtomManager {
 	private final Set<Integer> definitionVariables = new HashSet<Integer>();
 	private final Set<Integer> flatteningVariables = new HashSet<Integer>();
 	private final IndexedSet<String> roleNames = new IndexedSetImpl<String>();
+	private final Set<Integer> undefs = new HashSet<Integer>();
 	private final Set<Integer> userVariables = new HashSet<Integer>();
 	private final Set<Integer> variables = new HashSet<Integer>();
 
 	public AtomManagerImpl() {
+	}
+
+	private Integer createAppendedName(Integer originId, String suffix) {
+		String newName = conceptNames.get(getConceptName(originId).getConceptNameId()) + suffix;
+		return createConceptName(newName);
+	}
+
+	@Override
+	public Integer createBlankExistentialRestriction(Integer roleId) {
+		String roleName = getRoleName(roleId);
+		Integer fillerId = createConceptName(roleName + VAR_SUFFIX);
+		makeUserVariable(fillerId);
+		return createExistentialRestriction(roleName, fillerId);
 	}
 
 	@Override
@@ -46,20 +60,17 @@ public class AtomManagerImpl implements AtomManager {
 	}
 
 	@Override
-	public Integer createUndefConceptName(Integer originId) {
-		return createAppendedName(originId, UNDEF_SUFFIX);
-	}
-
-	@Override
 	public Integer createRoleGroupConceptName(Integer originId) {
 		Integer newId = createAppendedName(originId, ROLEGROUP_SUFFIX);
 		constants.remove(newId);
 		return newId;
 	}
 
-	private Integer createAppendedName(Integer originId, String suffix) {
-		String newName = conceptNames.get(getConceptName(originId).getConceptNameId()) + suffix;
-		return createConceptName(newName);
+	@Override
+	public Integer createUndefConceptName(Integer originId) {
+		Integer undefId = createAppendedName(originId, UNDEF_SUFFIX);
+		undefs.add(undefId);
+		return undefId;
 	}
 
 	@Override
@@ -131,6 +142,11 @@ public class AtomManagerImpl implements AtomManager {
 	}
 
 	@Override
+	public Set<Integer> getUndefNames() {
+		return Collections.unmodifiableSet(undefs);
+	}
+
+	@Override
 	public Set<Integer> getUserVariables() {
 		return Collections.unmodifiableSet(userVariables);
 	}
@@ -191,16 +207,17 @@ public class AtomManagerImpl implements AtomManager {
 	}
 
 	@Override
-	public int size() {
-		return atoms.size();
+	public Integer removeUndef(Integer undefId) {
+		String undefName = printConceptName(undefId);
+		if (!undefName.endsWith(UNDEF_SUFFIX)) {
+			throw new IllegalArgumentException("Argument does not represent an UNDEF concept name.");
+		}
+		String origName = undefName.substring(0, undefName.length() - UNDEF_SUFFIX.length());
+		return createConceptName(origName);
 	}
 
 	@Override
-	public Integer createBlankExistentialRestriction(Integer roleId) {
-		String roleName = getRoleName(roleId);
-		Integer fillerId = createConceptName(roleName + VAR_SUFFIX);
-		makeUserVariable(fillerId);
-		return createExistentialRestriction(roleName, fillerId);
+	public int size() {
+		return atoms.size();
 	}
-
 }

@@ -477,20 +477,25 @@ public class UelOntologyGoal implements Goal {
 	}
 
 	/**
-	 * Introduce new dissubsumptions forcing UNDEF variables to be
-	 * non-equivalent to their non-UNDEF counterparts.
+	 * Introduce new dissubsumptions restricting the subsumptions between UNDEF
+	 * variables.
 	 */
 	public void introduceDissubsumptionsForUndefVariables() {
-		// for (Integer undefVarId : atomManager.getUserVariables()) {
-		// String undefName = atomManager.printConceptName(undefVarId);
-		// if (undefName.endsWith(AtomManager.UNDEF_SUFFIX)) {
-		// String origName = undefName.substring(0, undefName.length() -
-		// AtomManager.UNDEF_SUFFIX.length());
-		// Integer origId = atomManager.createConceptName(origName);
-		// dissubsumptions
-		// .add(new Dissubsumption(Collections.singleton(undefVarId),
-		// Collections.singleton(origId)));
-		// }
-		// }
+		for (Integer undefId1 : atomManager.getUndefNames()) {
+			if (atomManager.getUserVariables().contains(undefId1)) {
+				for (Integer undefId2 : atomManager.getUndefNames()) {
+					if (atomManager.getConstants().contains(undefId2)) {
+						Integer origId1 = atomManager.removeUndef(undefId1);
+						Integer origId2 = atomManager.removeUndef(undefId2);
+						if (ontology.getClassification(origId1).equals(ontology.getClassification(origId2))) {
+							if (!ontology.isSubclass(origId1, origId2)) {
+								dissubsumptions.add(new Dissubsumption(Collections.singleton(undefId1),
+										Collections.singleton(undefId2)));
+							}
+						}
+					}
+				}
+			}
+		}
 	}
 }

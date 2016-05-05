@@ -31,6 +31,16 @@ public interface AtomManager {
 	String VAR_SUFFIX = "_VAR";
 
 	/**
+	 * Create a new existential restriction using the given role and a 'fresh'
+	 * variable as a filler.
+	 * 
+	 * @param roleId
+	 *            the role id
+	 * @return the atom id of the new existential restriction
+	 */
+	Integer createBlankExistentialRestriction(Integer roleId);
+
+	/**
 	 * Create a new concept name with the given string representation and add it
 	 * to the index. If the concept name already exists, this method simply
 	 * returns the existing identifier.
@@ -54,15 +64,6 @@ public interface AtomManager {
 	Integer createExistentialRestriction(String roleName, Integer child);
 
 	/**
-	 * Create a new 'undef' concept name from an existing concept name id.
-	 * 
-	 * @param originId
-	 *            the original id
-	 * @return the 'undef' id
-	 */
-	Integer createUndefConceptName(Integer originId);
-
-	/**
 	 * Create a new 'role group' type from an existing type id. 'Role group' ids
 	 * are not added to the sets of constants or variables.
 	 * 
@@ -71,6 +72,15 @@ public interface AtomManager {
 	 * @return the 'role group' id
 	 */
 	Integer createRoleGroupConceptName(Integer originid);
+
+	/**
+	 * Create a new 'undef' concept name from an existing concept name id.
+	 * 
+	 * @param originId
+	 *            the original id
+	 * @return the 'undef' id
+	 */
+	Integer createUndefConceptName(Integer originId);
 
 	/**
 	 * Retrieve a certain atom.
@@ -146,6 +156,38 @@ public interface AtomManager {
 	Integer getIndex(Atom atom);
 
 	/**
+	 * Retrieve the role id of a certain role name.
+	 * 
+	 * @param roleName
+	 *            the string representation of the role name
+	 * @return the associated role id
+	 */
+	Integer getRoleId(String roleName);
+
+	/**
+	 * Obtain the set of all role ids (different from atom ids).
+	 * 
+	 * @return all integer ids of roles
+	 */
+	Set<Integer> getRoleIds();
+
+	/**
+	 * Retrieve the string reprentation of a role id.
+	 * 
+	 * @param roleId
+	 *            the role id
+	 * @return the string representation of the id
+	 */
+	String getRoleName(Integer roleId);
+
+	/**
+	 * Obtain the set of all UNDEF concept names, both variables and constants.
+	 * 
+	 * @return the set of atom ids identifying the UNDEF concept names
+	 */
+	Set<Integer> getUndefNames();
+
+	/**
 	 * Obtain the set of all user variables.
 	 * 
 	 * @return the concept name ids
@@ -211,29 +253,14 @@ public interface AtomManager {
 	String printRoleName(Integer atomId);
 
 	/**
-	 * Obtain the set of all role ids (different from atom ids).
+	 * Retrieve the original concept name associated to a given UNDEF concept
+	 * name.
 	 * 
-	 * @return all integer ids of roles
+	 * @param undefId
+	 *            the atom id of the UNDEF concept name
+	 * @return the atom id of the original concept name
 	 */
-	Set<Integer> getRoleIds();
-
-	/**
-	 * Retrieve the string reprentation of a role id.
-	 * 
-	 * @param roleId
-	 *            the role id
-	 * @return the string representation of the id
-	 */
-	String getRoleName(Integer roleId);
-
-	/**
-	 * Retrieve the role id of a certain role name.
-	 * 
-	 * @param roleName
-	 *            the string representation of the role name
-	 * @return the associated role id
-	 */
-	Integer getRoleId(String roleName);
+	Integer removeUndef(Integer undefId);
 
 	/**
 	 * Return the number of atoms used.
@@ -241,14 +268,4 @@ public interface AtomManager {
 	 * @return the number of atoms
 	 */
 	int size();
-
-	/**
-	 * Create a new existential restriction using the given role and a 'fresh'
-	 * variable as a filler.
-	 * 
-	 * @param roleId
-	 *            the role id
-	 * @return the atom id of the new existential restriction
-	 */
-	public Integer createBlankExistentialRestriction(Integer roleId);
 }
