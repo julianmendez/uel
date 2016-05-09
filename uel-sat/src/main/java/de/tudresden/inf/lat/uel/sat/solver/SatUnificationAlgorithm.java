@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -23,6 +24,7 @@ import de.tudresden.inf.lat.uel.sat.literals.SubtypeLiteral;
 import de.tudresden.inf.lat.uel.sat.type.SatInput;
 import de.tudresden.inf.lat.uel.sat.type.SatOutput;
 import de.tudresden.inf.lat.uel.sat.type.Solver;
+import de.tudresden.inf.lat.uel.type.api.Atom;
 import de.tudresden.inf.lat.uel.type.api.Definition;
 import de.tudresden.inf.lat.uel.type.api.Disequation;
 import de.tudresden.inf.lat.uel.type.api.Dissubsumption;
@@ -31,6 +33,7 @@ import de.tudresden.inf.lat.uel.type.api.Goal;
 import de.tudresden.inf.lat.uel.type.api.IndexedSet;
 import de.tudresden.inf.lat.uel.type.api.Subsumption;
 import de.tudresden.inf.lat.uel.type.api.UnificationAlgorithm;
+import de.tudresden.inf.lat.uel.type.impl.ExistentialRestriction;
 import de.tudresden.inf.lat.uel.type.impl.IndexedSetImpl;
 import de.tudresden.inf.lat.uel.type.impl.Unifier;
 
@@ -1068,13 +1071,13 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 					Integer atomId1 = this.literalManager.get(i).getFirst();
 					Integer atomId2 = this.literalManager.get(i).getSecond();
 					if (getVariables().contains(atomId1)) {
-						if (getNonVariableAtoms().contains(atomId2)) {
-							// if (!getUserVariables().contains(atomId2)
-							// &&
-							// !goal.getAtomManager().getFlatteningVariables().contains(atomId2))
-							// {
-							addToSetOfSubsumers(atomId1, atomId2);
-						}
+						// if (getNonVariableAtoms().contains(atomId2)) {
+						// if (!getUserVariables().contains(atomId2)
+						// &&
+						// !goal.getAtomManager().getFlatteningVariables().contains(atomId2))
+						// {
+						addToSetOfSubsumers(atomId1, atomId2);
+						// }
 					}
 
 					// } else {
@@ -1091,86 +1094,113 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 		}
 
 		for (Integer varId : getUserVariables()) {
-			boolean changed;
-			do {
-				// exhaustively replace definitions by the defined variables
-				do {
-					changed = false;
-					for (Definition def : goal.getDefinitions()) {
-						if (!def.getRight().isEmpty()) {
-							if (getSetOfSubsumers(varId).containsAll(def.getRight())) {
-								// System.out.println("Applied definition of: "
-								// +
-								// goal.getAtomManager().printConceptName(def.getDefiniendum()));
-								Set<Integer> subs = subsumers.get(varId);
-								subs.removeAll(def.getRight());
-								subs.add(def.getDefiniendum());
-								changed = true;
-							}
-						}
-					}
-				} while (changed);
+			// getSetOfSubsumers(varId).remove(varId);
+			System.out.println("*** Minimizing substitution set of " + printAtom(varId));
+			System.out.println("Original substitution set: " + printAtoms(getSetOfSubsumers(varId)));
 
-				// remove superclasses if subclasses are also present
-				Integer removed = null;
-				a: for (Integer atomId1 : getSetOfSubsumers(varId)) {
-					for (Integer atomId2 : getSetOfSubsumers(varId)) {
-						Definition def = goal.getDefinition(atomId1);
-						if ((def != null) && def.getRight().contains(atomId2)) {
-							removed = atomId2;
-							break a;
-						}
+			// replace UNDEF names by originals
+			for (Integer undefId : goal.getAtomManager().getUndefNames()) {
+				if (subsumers.get(varId).contains(undefId)) {
+					subsumers.get(varId).remove(undefId);
+					subsumers.get(varId).add(goal.getAtomManager().removeUndef(undefId));
+				}
+			}
+			System.out.println("Substitution set without UNDEF names: " + printAtoms(getSetOfSubsumers(varId)));
+
+			// boolean changed;
+			// // exhaustively replace definitions by the defined variables
+			// do {
+			// changed = false;
+			// for (Definition def : goal.getDefinitions()) {
+			// // if (!def.getDefiniendum().equals(varId)) {
+			// if (getSetOfSubsumers(varId).containsAll(def.getRight())) {
+			// if (subsumers.get(varId).add(def.getDefiniendum())) {
+			// changed = true;
+			// System.out.println("Applying definition: " +
+			// printAtom(def.getDefiniendum()) + " "
+			// + Equation.CONNECTIVE + " " + printAtoms(def.getRight()));
+			// System.out.println("Current substitution set: " +
+			// printAtoms(getSetOfSubsumers(varId)));
+			// System.out.println();
+			// }
+			// }
+			// // }
+			// }
+			// } while (changed);
+
+			// remove superclasses if subclasses are also present
+			Set<Integer> toRemove = new HashSet<Integer>();
+			for (Integer atomId1 : getSetOfSubsumers(varId)) {
+				for (Integer atomId2 : getSetOfSubsumers(varId)) {
+					if (isSubClass(atomId1, atomId2)) {
+						System.out.println("Removing superclass " + printAtom(atomId2) + " of " + printAtom(atomId1));
+						toRemove.add(atomId2);
 					}
 				}
-				if (removed != null) {
-					changed = true;
-					subsumers.get(varId).remove(removed);
-				}
-			} while (changed);
+			}
+			subsumers.get(varId).removeAll(toRemove);
+
+			// remove also the variable itself
+			subsumers.get(varId).remove(varId);
+
+			System.out.println("Final substitution set: " + printAtoms(getSetOfSubsumers(varId)));
+			System.out.println();
+			System.out.println();
+			System.out.println();
 		}
-
-		// minimize assignment - may change the number of distinct unifiers!
-		// for (Integer varId : getVariables()) {
-		// Integer removed;
-		// do {
-		// removed = null;
-		// a: for (Integer atomId1 : getSetOfSubsumers(varId)) {
-		// for (Integer atomId2 : getSetOfSubsumers(varId)) {
-		// if (!atomId1.equals(atomId2) && getLiteralValue(subsumption(atomId1,
-		// atomId2))) {
-		// removed = atomId2;
-		// break a;
-		// }
-		// }
-		// }
-		// if (removed != null) {
-		// subsumers.get(varId).remove(removed);
-		// }
-		// } while (removed != null);
-		// }
-
-		// Integer x =
-		// goal.getAtomManager().createConceptName("http://www.ihtsdo.org/X");
-		// Integer u =
-		// goal.getAtomManager().createConceptName("http://www.ihtsdo.org/SCT_307126008");
-		// for (Integer atom : getNonVariableAtoms()) {
-		// if (getLiteralValue(subsumption(x, atom)) &&
-		// !getLiteralValue(subsumption(u, atom))) {
-		// System.out.println("Difference: " + printAtom(atom));
-		// }
-		// }
 	}
 
-	// private String printAtom(Integer atomId) {
-	// Atom a = goal.getAtomManager().getAtom(atomId);
-	// if (a instanceof ExistentialRestriction) {
-	// String roleName = goal.getAtomManager().printRoleName(atomId);
-	// String child =
-	// goal.getAtomManager().printConceptName(goal.getAtomManager().getChild(atomId));
-	// return "(" + roleName + " some " + child + ")";
-	// } else {
-	// return goal.getAtomManager().printConceptName(atomId);
-	// }
-	// }
+	private boolean isSubClass(Integer atomId1, Integer atomId2) {
+		Definition def = goal.getDefinition(atomId2);
+		if ((def != null) && def.getRight().isEmpty()) {
+			return true;
+		}
+
+		def = goal.getDefinition(atomId1);
+		if (def == null) {
+			return false;
+		}
+		if (def.getRight().contains(atomId2)) {
+			return true;
+		}
+
+		for (Integer atomId : def.getRight()) {
+			if (isSubClass(atomId, atomId2)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	private Function<String, String> shortFormMap = Function.identity();
+
+	public void setShortFormMap(Function<String, String> map) {
+		shortFormMap = map;
+	}
+
+	private String printAtom(Integer atomId) {
+		Atom a = goal.getAtomManager().getAtom(atomId);
+		if (a instanceof ExistentialRestriction) {
+			String roleName = shortFormMap.apply(goal.getAtomManager().printRoleName(atomId));
+			String child = shortFormMap
+					.apply(goal.getAtomManager().printConceptName(goal.getAtomManager().getChild(atomId)));
+			return "(" + roleName + " some " + child + ")";
+		} else {
+			return shortFormMap.apply(goal.getAtomManager().printConceptName(atomId));
+		}
+	}
+
+	private String printAtoms(Set<Integer> atomIds) {
+		StringBuilder sb = new StringBuilder();
+		for (Integer atomId : atomIds) {
+			sb.append(printAtom(atomId));
+			sb.append(", ");
+		}
+		if (sb.length() > 0) {
+			sb.setLength(sb.length() - 2);
+		}
+		return sb.toString();
+	}
 
 }

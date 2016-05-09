@@ -3,7 +3,6 @@ package de.tudresden.inf.lat.uel.core.renderer;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.IRI;
@@ -43,6 +42,15 @@ public class OWLRenderer extends Renderer<OWLClassExpression, OWLObjectProperty,
 	 */
 	public OWLRenderer(AtomManager atomManager, Set<Definition> background) {
 		super(atomManager, null, background);
+	}
+
+	@Override
+	protected void appendExpression(OWLClassExpression expr) {
+	}
+
+	@Override
+	protected Renderer<OWLClassExpression, OWLObjectProperty, Set<OWLAxiom>> clone() {
+		return new OWLRenderer(atomManager, background);
 	}
 
 	@Override
@@ -130,11 +138,8 @@ public class OWLRenderer extends Renderer<OWLClassExpression, OWLObjectProperty,
 	}
 
 	@Override
-	protected <T> OWLClassExpression translateTrueConjunction(Set<T> conjuncts,
-			Function<T, OWLClassExpression> conjunctTranslator) {
-		Set<OWLClassExpression> classExpressions = conjuncts.stream().map(conjunctTranslator)
-				.collect(Collectors.toSet());
-		expr = dataFactory.getOWLObjectIntersectionOf(classExpressions);
+	protected OWLClassExpression translateTrueConjunction(Set<OWLClassExpression> conjuncts) {
+		expr = dataFactory.getOWLObjectIntersectionOf(conjuncts);
 		return expr;
 	}
 }

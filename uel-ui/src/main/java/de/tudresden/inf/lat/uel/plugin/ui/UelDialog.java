@@ -6,6 +6,7 @@ package de.tudresden.inf.lat.uel.plugin.ui;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Frame;
+import java.awt.Point;
 
 import javax.swing.JComponent;
 import javax.swing.JDialog;
@@ -20,6 +21,7 @@ abstract class UelDialog extends JDialog {
 
 	private static final long serialVersionUID = -9159093716481990295L;
 
+	private static Point location = null;
 	private static Dimension size = null;
 
 	private Component parent;
@@ -36,6 +38,7 @@ abstract class UelDialog extends JDialog {
 	 */
 	public void close() {
 		size = getSize();
+		location = getLocation();
 		setVisible(false);
 		dispose();
 	}
@@ -61,7 +64,11 @@ abstract class UelDialog extends JDialog {
 	 */
 	public void open() {
 		pack();
-		setLocationRelativeTo(parent);
+		if (location != null) {
+			setLocation(location);
+		} else {
+			setLocationRelativeTo(parent);
+		}
 		setVisible(true);
 	}
 
@@ -78,6 +85,7 @@ abstract class UelDialog extends JDialog {
 		this.parent = parent;
 		if (parent instanceof UelDialog) {
 			size = parent.getSize();
+			location = parent.getLocation();
 		}
 		setResizable(true);
 		setTitle(title);

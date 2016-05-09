@@ -65,6 +65,11 @@ public abstract class StringRenderer extends Renderer<String, String, String> {
 	}
 
 	@Override
+	protected void appendExpression(String string) {
+		sb.append(string);
+	}
+
+	@Override
 	protected String finalizeAxioms() {
 		return sb.toString();
 	}
@@ -96,7 +101,7 @@ public abstract class StringRenderer extends Renderer<String, String, String> {
 	protected String translateAtomList(String description, Set<Integer> atomIds) {
 		sb.append(description);
 		sb.append(RendererKeywords.colon);
-		translateSet(atomIds, this::translateAtom, RendererKeywords.comma);
+		translateSet(atomIds, id -> translateAtom(id, false), RendererKeywords.comma);
 		newLine();
 		newLine();
 		return "";
@@ -198,5 +203,20 @@ public abstract class StringRenderer extends Renderer<String, String, String> {
 			sb.append(separator);
 		}
 		sb.setLength(sb.length() - separator.length());
+	}
+
+	/**
+	 * Add a set of strings to the rendering under construction.
+	 * 
+	 * @param set
+	 *            the set of strings to be added
+	 * @param separator
+	 *            the string for separating consecutive elements
+	 */
+	protected void appendSet(Set<String> set, String separator) {
+		translateSet(set, str -> {
+			sb.append(str);
+			return str;
+		} , separator);
 	}
 }

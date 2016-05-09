@@ -62,14 +62,14 @@ class VarSelectionController {
 
 		List<LabelId> constants = new ArrayList<LabelId>();
 		for (Integer id : model.getGoal().getAtomManager().getConstants()) {
-			constants.add(new LabelId(renderer.renderAtom(id), id));
+			constants.add(new LabelId(renderer.renderAtom(id, false), id));
 		}
 		Collections.sort(constants);
 		view.setConstants(constants);
 
 		List<LabelId> variables = new ArrayList<LabelId>();
 		for (Integer id : model.getGoal().getAtomManager().getUserVariables()) {
-			variables.add(new LabelId(renderer.renderAtom(id), id));
+			variables.add(new LabelId(renderer.renderAtom(id, false), id));
 		}
 		Collections.sort(variables);
 		view.setVariables(variables);

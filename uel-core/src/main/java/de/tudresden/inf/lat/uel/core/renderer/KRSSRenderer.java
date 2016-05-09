@@ -31,6 +31,11 @@ public class KRSSRenderer extends StringRenderer {
 	}
 
 	@Override
+	protected Renderer<String, String, String> clone() {
+		return new KRSSRenderer(atomManager, provider, background);
+	}
+
+	@Override
 	protected <T, S> String translateExistentialRestriction(T role, S filler, Function<T, String> roleTranslator,
 			Function<S, String> fillerTranslator) {
 		sb.append(RendererKeywords.open);
@@ -50,11 +55,11 @@ public class KRSSRenderer extends StringRenderer {
 	}
 
 	@Override
-	protected <T> String translateTrueConjunction(Set<T> conjuncts, Function<T, String> conjunctTranslator) {
+	protected String translateTrueConjunction(Set<String> conjuncts) {
 		sb.append(RendererKeywords.open);
 		sb.append(RendererKeywords.and);
 		sb.append(RendererKeywords.space);
-		translateSet(conjuncts, conjunctTranslator, RendererKeywords.space);
+		appendSet(conjuncts, RendererKeywords.space);
 		sb.append(RendererKeywords.close);
 		return "";
 	}

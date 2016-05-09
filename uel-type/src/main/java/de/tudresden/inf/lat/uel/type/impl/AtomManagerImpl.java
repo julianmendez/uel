@@ -10,6 +10,12 @@ import de.tudresden.inf.lat.uel.type.api.Atom;
 import de.tudresden.inf.lat.uel.type.api.AtomManager;
 import de.tudresden.inf.lat.uel.type.api.IndexedSet;
 
+/**
+ * The canonical implementation of an atom manager for UEL.
+ * 
+ * @author Stefan Borgwardt
+ *
+ */
 public class AtomManagerImpl implements AtomManager {
 
 	private final IndexedSet<Atom> atoms = new IndexedSetImpl<Atom>();
@@ -23,6 +29,9 @@ public class AtomManagerImpl implements AtomManager {
 	private final Set<Integer> userVariables = new HashSet<Integer>();
 	private final Set<Integer> variables = new HashSet<Integer>();
 
+	/**
+	 * Initialize a new atom manager with empty indices.
+	 */
 	public AtomManagerImpl() {
 	}
 
@@ -35,7 +44,7 @@ public class AtomManagerImpl implements AtomManager {
 	public Integer createBlankExistentialRestriction(Integer roleId) {
 		String roleName = getRoleName(roleId);
 		Integer fillerId = createConceptName(roleName + VAR_SUFFIX);
-		makeUserVariable(fillerId);
+		makeFlatteningVariable(fillerId);
 		return createExistentialRestriction(roleName, fillerId);
 	}
 

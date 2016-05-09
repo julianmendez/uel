@@ -31,6 +31,11 @@ public class ManchesterRenderer extends StringRenderer {
 	}
 
 	@Override
+	protected Renderer<String, String, String> clone() {
+		return new ManchesterRenderer(atomManager, provider, background);
+	}
+
+	@Override
 	protected <T, S> String translateExistentialRestriction(T role, S filler, Function<T, String> roleTranslator,
 			Function<S, String> fillerTranslator) {
 		sb.append(RendererKeywords.open);
@@ -50,10 +55,9 @@ public class ManchesterRenderer extends StringRenderer {
 	}
 
 	@Override
-	protected <T> String translateTrueConjunction(Set<T> conjuncts, Function<T, String> conjunctTranslator) {
+	protected String translateTrueConjunction(Set<String> conjuncts) {
 		sb.append(RendererKeywords.open);
-		translateSet(conjuncts, conjunctTranslator,
-				RendererKeywords.space + RendererKeywords.and + RendererKeywords.space);
+		appendSet(conjuncts, RendererKeywords.space + RendererKeywords.and + RendererKeywords.space);
 		sb.append(RendererKeywords.close);
 		return "";
 	}

@@ -84,7 +84,7 @@ class RefineController {
 		// selected atoms
 		Function<Entry<LabelId, List<LabelId>>, Stream<Dissubsumption>> dissubsumptionsForEntry = entry -> entry
 				.getValue().stream().map(atom -> new Dissubsumption(Collections.singleton(entry.getKey().getId()),
-						Collections.singleton(atom.getId())));
+						Collections.singleton(model.replaceByUndefId(atom.getId()))));
 
 		Set<Dissubsumption> dissubsumptions = view.getSelectedAtoms().entrySet().stream()
 				.flatMap(dissubsumptionsForEntry).collect(Collectors.toSet());
@@ -119,8 +119,10 @@ class RefineController {
 		for (Definition definition : definitions) {
 			Integer varId = definition.getDefiniendum();
 			if (model.getGoal().getAtomManager().getUserVariables().contains(varId)) {
-				map.put(new LabelId(renderer.renderAtom(varId), varId), definition.getRight().stream()
-						.map(atomId -> new LabelId(renderer.renderAtom(atomId), atomId)).collect(Collectors.toList()));
+				map.put(new LabelId(renderer.renderAtom(varId, false), varId),
+						definition.getRight().stream()
+								.map(atomId -> new LabelId(renderer.renderAtom(atomId, true), atomId))
+								.collect(Collectors.toList()));
 			}
 		}
 

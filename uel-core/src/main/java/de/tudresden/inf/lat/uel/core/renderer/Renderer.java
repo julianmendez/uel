@@ -5,6 +5,7 @@ import java.util.Comparator;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
@@ -55,9 +56,22 @@ abstract class Renderer<ExpressionType, RoleType, AxiomsType> {
 	private static final String[] suffixes = new String[] { AtomManager.UNDEF_SUFFIX, AtomManager.ROLEGROUP_SUFFIX,
 			AtomManager.VAR_SUFFIX };
 
-	private final AtomManager atomManager;
-	private final Set<Definition> background;
-	private final ShortFormProvider provider;
+	/**
+	 * The atom manager providing the atom indices.
+	 */
+	protected final AtomManager atomManager;
+
+	/**
+	 * (Optional) A set of background definition for simplifying the output.
+	 */
+	protected final Set<Definition> background;
+
+	/**
+	 * The short form provider for entities rendered by the atom manager
+	 * (concept and role names).
+	 */
+	protected final ShortFormProvider provider;
+
 	private final boolean restrictToUserVariables;
 
 	/**
@@ -86,6 +100,10 @@ abstract class Renderer<ExpressionType, RoleType, AxiomsType> {
 		}
 		return label;
 	}
+
+	protected abstract void appendExpression(ExpressionType expr);
+
+	protected abstract Renderer<ExpressionType, RoleType, AxiomsType> clone();
 
 	private int compareDefinitions(Definition d1, Definition d2) {
 		// compare definitions according to the lexicographic order of the
@@ -124,7 +142,14 @@ abstract class Renderer<ExpressionType, RoleType, AxiomsType> {
 		throw new IllegalArgumentException("Atom has no definition.");
 	}
 
-	private String getShortForm(String id) {
+	/**
+	 * Get the short form of the given identifier.
+	 * 
+	 * @param id
+	 *            a string representating of an entity, e.g. an IRI
+	 * @return the short form of 'id'
+	 */
+	public String getShortForm(String id) {
 		if (provider == null) {
 			return id;
 		}
@@ -151,15 +176,18 @@ abstract class Renderer<ExpressionType, RoleType, AxiomsType> {
 	protected abstract void newLine();
 
 	/**
-	 * Add the given atom to the rendering.
+	 * Render the given atom.
 	 * 
 	 * @param atomId
 	 *            the atom id
+	 * @param expand
+	 *            indicates whether the atom should be expanded if it is a
+	 *            flattening variable
 	 * @return the rendered atom
 	 */
-	public ExpressionType renderAtom(Integer atomId) {
+	public ExpressionType renderAtom(Integer atomId, boolean expand) {
 		initialize();
-		translateAtom(atomId);
+		translateAtom(atomId, expand);
 		return finalizeExpression();
 	}
 
@@ -205,6 +233,19 @@ abstract class Renderer<ExpressionType, RoleType, AxiomsType> {
 		initialize();
 		translateAxioms(axioms, positive);
 		return finalizeAxioms();
+	}
+
+	/**
+	 * Render the given OWL class expression.
+	 * 
+	 * @param expression
+	 *            the class expression
+	 * @return the rendered class expression
+	 */
+	public ExpressionType renderClassExpression(OWLClassExpression expression) {
+		initialize();
+		translateClassExpression(expression);
+		return finalizeExpression();
 	}
 
 	/**
@@ -373,15 +414,22 @@ abstract class Renderer<ExpressionType, RoleType, AxiomsType> {
 	 * 
 	 * @param atomId
 	 *            the atom id
+	 * @param expand
+	 *            indicates whether the atom should be expanded if it is a
+	 *            flattening variable
 	 * @return the rendered atom (for recursive translations)
 	 */
-	protected ExpressionType translateAtom(Integer atomId) {
+	protected ExpressionType translateAtom(Integer atomId, boolean expand) {
 		if (atomManager.getExistentialRestrictions().contains(atomId)) {
 			Integer childId = atomManager.getChild(atomId);
 			Integer roleId = atomManager.getExistentialRestriction(atomId).getRoleId();
 			return translateExistentialRestriction(roleId, childId, this::translateRole, this::translateChild);
 		} else {
-			return translateName(atomId);
+			if (expand) {
+				return translateChild(atomId);
+			} else {
+				return translateName(atomId);
+			}
 		}
 	}
 
@@ -488,7 +536,7 @@ abstract class Renderer<ExpressionType, RoleType, AxiomsType> {
 		}
 		if (expression instanceof OWLObjectIntersectionOf) {
 			return translateConjunction(((OWLObjectIntersectionOf) expression).getOperands(),
-					this::translateClassExpression);
+					clone()::renderClassExpression);
 		}
 		if (expression instanceof OWLObjectSomeValuesFrom) {
 			OWLObjectSomeValuesFrom someValuesFrom = ((OWLObjectSomeValuesFrom) expression);
@@ -507,7 +555,8 @@ abstract class Renderer<ExpressionType, RoleType, AxiomsType> {
 	 * @return the rendered conjunction (for recursive translation)
 	 */
 	protected ExpressionType translateConjunction(Set<Integer> conjuncts) {
-		return translateConjunction(conjuncts, this::translateAtom);
+		Renderer<ExpressionType, RoleType, AxiomsType> clone = clone();
+		return translateConjunction(conjuncts, t -> clone.renderAtom(t, true));
 	}
 
 	/**
@@ -523,12 +572,16 @@ abstract class Renderer<ExpressionType, RoleType, AxiomsType> {
 	 */
 	protected <T> ExpressionType translateConjunction(Set<T> conjuncts,
 			Function<T, ExpressionType> conjunctTranslator) {
-		if (conjuncts.isEmpty()) {
+		Set<ExpressionType> translatedConjuncts = conjuncts.stream().map(conjunctTranslator)
+				.collect(Collectors.toSet());
+		if (translatedConjuncts.isEmpty()) {
 			return translateTop();
-		} else if (conjuncts.size() == 1) {
-			return conjunctTranslator.apply(conjuncts.iterator().next());
+		} else if (translatedConjuncts.size() == 1) {
+			ExpressionType expr = translatedConjuncts.iterator().next();
+			appendExpression(expr);
+			return expr;
 		} else {
-			return translateTrueConjunction(conjuncts, conjunctTranslator);
+			return translateTrueConjunction(translatedConjuncts);
 		}
 	}
 
@@ -602,16 +655,11 @@ abstract class Renderer<ExpressionType, RoleType, AxiomsType> {
 	/**
 	 * Add a 'proper' conjunction between at least two conjuncts to the
 	 * rendering under construction.
-	 * @param<T> the
-	 *               type of the conjuncts
 	 * 
 	 * @param conjuncts
-	 *            a set of conjuncts
-	 * @param conjunctTranslator
-	 *            a translation function for individual conjuncts
+	 *            a set of (already rendered) conjuncts
 	 * @return the rendered conjunction (for recursive translation)
 	 */
-	protected abstract <T> ExpressionType translateTrueConjunction(Set<T> conjuncts,
-			Function<T, ExpressionType> conjunctTranslator);
+	protected abstract ExpressionType translateTrueConjunction(Set<ExpressionType> conjuncts);
 
 }

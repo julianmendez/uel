@@ -25,6 +25,7 @@ import de.tudresden.inf.lat.uel.core.main.AlternativeUelStarter;
 import de.tudresden.inf.lat.uel.core.main.UnifierIterator;
 import de.tudresden.inf.lat.uel.core.processor.UelModel;
 import de.tudresden.inf.lat.uel.core.processor.UnificationAlgorithmFactory;
+import de.tudresden.inf.lat.uel.sat.solver.SatUnificationAlgorithm;
 
 /**
  * @author Stefan Borgwardt
@@ -32,8 +33,8 @@ import de.tudresden.inf.lat.uel.core.processor.UnificationAlgorithmFactory;
  */
 public class SNOMEDEvaluation {
 
-	private static final String WORK_DIR = "C:\\Users\\Stefan\\Work\\";
-	// private static final String WORK_DIR = "/Users/stefborg/Documents/";
+	// private static final String WORK_DIR = "C:\\Users\\Stefan\\Work\\";
+	private static final String WORK_DIR = "/Users/stefborg/Documents/";
 	private static final String SNOMED_PATH = WORK_DIR + "Ontologies/snomed-english-rdf.owl";
 	private static final String SNOMED_RESTR_PATH = WORK_DIR + "Ontologies/snomed-restrictions.owl";
 	private static final String POS_PATH = WORK_DIR + "Projects/uel-snomed/uel-snomed-pos.owl";
@@ -67,7 +68,7 @@ public class SNOMEDEvaluation {
 		String[] varNames = { "X" };
 		UnifierIterator iterator = (UnifierIterator) starter.modifyOntologyAndSolve(pos, neg,
 				Arrays.asList(varNames).stream().map(SNOMEDEvaluation::var).collect(Collectors.toSet()),
-				UnificationAlgorithmFactory.SAT_BASED_ALGORITHM);
+				UnificationAlgorithmFactory.SAT_BASED_ALGORITHM_MINIMAL);
 
 		System.out.println("Press RETURN to start computing unifiers.");
 

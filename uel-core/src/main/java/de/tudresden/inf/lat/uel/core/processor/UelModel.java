@@ -17,6 +17,7 @@ import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 
 import de.tudresden.inf.lat.uel.core.renderer.OWLRenderer;
 import de.tudresden.inf.lat.uel.core.renderer.StringRenderer;
+import de.tudresden.inf.lat.uel.sat.solver.SatUnificationAlgorithm;
 import de.tudresden.inf.lat.uel.type.api.AtomManager;
 import de.tudresden.inf.lat.uel.type.api.Definition;
 import de.tudresden.inf.lat.uel.type.api.Goal;
@@ -278,6 +279,11 @@ public class UelModel {
 		currentUnifierIndex = -1;
 		allUnifiersFound = false;
 		algorithm = UnificationAlgorithmFactory.instantiateAlgorithm(name, goal);
+
+		// TODO for debugging
+		if (algorithm instanceof SatUnificationAlgorithm) {
+			((SatUnificationAlgorithm) algorithm).setShortFormMap(getStringRenderer(null)::getShortForm);
+		}
 	}
 
 	private boolean isNew(Unifier result) {
@@ -414,6 +420,27 @@ public class UelModel {
 	 */
 	public Set<OWLAxiom> renderUnifier(Unifier unifier) {
 		return getOWLRenderer(unifier.getDefinitions()).renderUnifier(unifier, true, false, false);
+	}
+
+	/**
+	 * Replace the given atom by its UNDEF version, if it exists; otherwise,
+	 * return the input.
+	 * 
+	 * @param atomId
+	 *            the id of the atom
+	 * @return the atom, possibly replaced by its UNDEF version
+	 */
+	public Integer replaceByUndefId(Integer atomId) {
+		if (atomManager.getDefinitionVariables().contains(atomId)) {
+			for (Integer undefId : goal.getDefinition(atomId).getRight()) {
+				if (atomManager.getAtom(undefId).isConceptName()) {
+					if (atomManager.printConceptName(undefId).endsWith(AtomManager.UNDEF_SUFFIX)) {
+						return undefId;
+					}
+				}
+			}
+		}
+		return atomId;
 	}
 
 	/**

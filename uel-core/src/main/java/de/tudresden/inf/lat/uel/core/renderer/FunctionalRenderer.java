@@ -31,6 +31,11 @@ public class FunctionalRenderer extends StringRenderer {
 	}
 
 	@Override
+	protected Renderer<String, String, String> clone() {
+		return new FunctionalRenderer(atomManager, provider, background);
+	}
+
+	@Override
 	protected <T, S> String translateExistentialRestriction(T role, S filler, Function<T, String> roleTranslator,
 			Function<S, String> fillerTranslator) {
 		sb.append(RendererKeywords.objectSomeValuesFrom);
@@ -49,10 +54,10 @@ public class FunctionalRenderer extends StringRenderer {
 	}
 
 	@Override
-	protected <T> String translateTrueConjunction(Set<T> conjuncts, Function<T, String> conjunctTranslator) {
+	protected String translateTrueConjunction(Set<String> conjuncts) {
 		sb.append(RendererKeywords.objectIntersectionOf);
 		sb.append(RendererKeywords.open);
-		translateSet(conjuncts, conjunctTranslator, RendererKeywords.space);
+		appendSet(conjuncts, RendererKeywords.space);
 		sb.append(RendererKeywords.close);
 		return "";
 	}
