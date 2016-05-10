@@ -21,6 +21,7 @@ import de.tudresden.inf.lat.uel.core.processor.UelModel;
 import de.tudresden.inf.lat.uel.core.renderer.StringRenderer;
 import de.tudresden.inf.lat.uel.type.api.Definition;
 import de.tudresden.inf.lat.uel.type.api.Dissubsumption;
+import de.tudresden.inf.lat.uel.type.impl.DefinitionSet;
 
 /**
  * An instance of this class controls the behavior of the 'Refine unifier' view.
@@ -112,7 +113,7 @@ class RefineController {
 
 	private void updateView() {
 		Map<LabelId, List<LabelId>> map = new TreeMap<LabelId, List<LabelId>>();
-		Set<Definition> definitions = model.getCurrentUnifier().getDefinitions();
+		DefinitionSet definitions = model.getCurrentUnifier().getDefinitions();
 		StringRenderer renderer = model.getStringRenderer(definitions);
 
 		// convert unifier into map between LabelIds for the view

@@ -4,6 +4,7 @@
 package de.tudresden.inf.lat.uel.type.api;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 public class Definition extends Axiom {
@@ -20,6 +21,11 @@ public class Definition extends Axiom {
 	public Definition(Integer left, Set<Integer> right, boolean primitive) {
 		super(Collections.singleton(left), right);
 		this.primitive = primitive;
+	}
+
+	public Definition(Definition orig) {
+		super(Collections.singleton(orig.getDefiniendum()), new HashSet<Integer>(orig.getRight()));
+		this.primitive = orig.primitive;
 	}
 
 	@Override

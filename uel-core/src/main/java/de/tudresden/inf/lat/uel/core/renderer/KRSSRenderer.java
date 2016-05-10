@@ -1,11 +1,11 @@
 package de.tudresden.inf.lat.uel.core.renderer;
 
-import java.util.Set;
+import java.util.Collection;
 import java.util.function.Function;
 
 import de.tudresden.inf.lat.uel.core.processor.ShortFormProvider;
 import de.tudresden.inf.lat.uel.type.api.AtomManager;
-import de.tudresden.inf.lat.uel.type.api.Definition;
+import de.tudresden.inf.lat.uel.type.impl.DefinitionSet;
 
 /**
  * Class for rendering UEL objects in KRSS 2 syntax.
@@ -26,13 +26,8 @@ public class KRSSRenderer extends StringRenderer {
 	 *            (optional) a set of background definitions used for
 	 *            abbreviating expressions
 	 */
-	protected KRSSRenderer(AtomManager atomManager, ShortFormProvider provider, Set<Definition> background) {
+	protected KRSSRenderer(AtomManager atomManager, ShortFormProvider provider, DefinitionSet background) {
 		super(atomManager, provider, background);
-	}
-
-	@Override
-	protected Renderer<String, String, String> clone() {
-		return new KRSSRenderer(atomManager, provider, background);
 	}
 
 	@Override
@@ -55,11 +50,11 @@ public class KRSSRenderer extends StringRenderer {
 	}
 
 	@Override
-	protected String translateTrueConjunction(Set<String> conjuncts) {
+	protected <T> String translateTrueConjunction(Collection<T> conjuncts, Function<T, String> conjunctTranslator) {
 		sb.append(RendererKeywords.open);
 		sb.append(RendererKeywords.and);
 		sb.append(RendererKeywords.space);
-		appendSet(conjuncts, RendererKeywords.space);
+		translateCollection(conjuncts, conjunctTranslator, RendererKeywords.space);
 		sb.append(RendererKeywords.close);
 		return "";
 	}

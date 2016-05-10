@@ -1,6 +1,6 @@
 package de.tudresden.inf.lat.uel.core.renderer;
 
-import java.util.Set;
+import java.util.Collection;
 import java.util.function.Function;
 
 import org.semanticweb.owlapi.model.OWLAxiom;
@@ -13,11 +13,11 @@ import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 import de.tudresden.inf.lat.uel.core.processor.ShortFormProvider;
 import de.tudresden.inf.lat.uel.type.api.AtomManager;
 import de.tudresden.inf.lat.uel.type.api.Axiom;
-import de.tudresden.inf.lat.uel.type.api.Definition;
 import de.tudresden.inf.lat.uel.type.api.Disequation;
 import de.tudresden.inf.lat.uel.type.api.Dissubsumption;
 import de.tudresden.inf.lat.uel.type.api.Equation;
 import de.tudresden.inf.lat.uel.type.api.Subsumption;
+import de.tudresden.inf.lat.uel.type.impl.DefinitionSet;
 
 /**
  * Base class for all String renderers for UEL objects. Subclasses implement
@@ -40,7 +40,7 @@ public abstract class StringRenderer extends Renderer<String, String, String> {
 	 * @return the new string renderer
 	 */
 	public static StringRenderer createInstance(AtomManager atomManager, ShortFormProvider provider,
-			Set<Definition> background) {
+			DefinitionSet background) {
 		return new ManchesterRenderer(atomManager, provider, background);
 	}
 
@@ -60,13 +60,8 @@ public abstract class StringRenderer extends Renderer<String, String, String> {
 	 *            (optional) a set of background definitions used for
 	 *            abbreviating expressions
 	 */
-	protected StringRenderer(AtomManager atomManager, ShortFormProvider provider, Set<Definition> background) {
+	protected StringRenderer(AtomManager atomManager, ShortFormProvider provider, DefinitionSet background) {
 		super(atomManager, provider, background);
-	}
-
-	@Override
-	protected void appendExpression(String string) {
-		sb.append(string);
 	}
 
 	@Override
@@ -98,10 +93,10 @@ public abstract class StringRenderer extends Renderer<String, String, String> {
 	}
 
 	@Override
-	protected String translateAtomList(String description, Set<Integer> atomIds) {
+	protected String translateAtomList(String description, Collection<Integer> atomIds) {
 		sb.append(description);
 		sb.append(RendererKeywords.colon);
-		translateSet(atomIds, id -> translateAtom(id, false), RendererKeywords.comma);
+		translateCollection(atomIds, id -> translateAtom(id, false), RendererKeywords.comma);
 		newLine();
 		newLine();
 		return "";
@@ -176,10 +171,10 @@ public abstract class StringRenderer extends Renderer<String, String, String> {
 	}
 
 	@Override
-	protected String translateRoleList(String description, Set<Integer> roleIds) {
+	protected String translateRoleList(String description, Collection<Integer> roleIds) {
 		sb.append(description);
 		sb.append(RendererKeywords.colon);
-		translateSet(roleIds, this::translateRole, RendererKeywords.comma);
+		translateCollection(roleIds, this::translateRole, RendererKeywords.comma);
 		newLine();
 		newLine();
 		return "";
@@ -197,26 +192,11 @@ public abstract class StringRenderer extends Renderer<String, String, String> {
 	 * @param separator
 	 *            the string for separating consecutive elements
 	 */
-	protected <T> void translateSet(Set<T> set, Function<T, String> elementTranslator, String separator) {
+	protected <T> void translateCollection(Collection<T> set, Function<T, String> elementTranslator, String separator) {
 		for (T element : set) {
 			elementTranslator.apply(element);
 			sb.append(separator);
 		}
 		sb.setLength(sb.length() - separator.length());
-	}
-
-	/**
-	 * Add a set of strings to the rendering under construction.
-	 * 
-	 * @param set
-	 *            the set of strings to be added
-	 * @param separator
-	 *            the string for separating consecutive elements
-	 */
-	protected void appendSet(Set<String> set, String separator) {
-		translateSet(set, str -> {
-			sb.append(str);
-			return str;
-		} , separator);
 	}
 }

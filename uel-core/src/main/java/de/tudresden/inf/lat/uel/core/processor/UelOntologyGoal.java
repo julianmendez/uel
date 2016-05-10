@@ -27,6 +27,7 @@ import de.tudresden.inf.lat.uel.type.api.Dissubsumption;
 import de.tudresden.inf.lat.uel.type.api.Equation;
 import de.tudresden.inf.lat.uel.type.api.Goal;
 import de.tudresden.inf.lat.uel.type.api.Subsumption;
+import de.tudresden.inf.lat.uel.type.impl.DefinitionSet;
 
 /**
  * This class is a goal of unification.
@@ -38,7 +39,7 @@ import de.tudresden.inf.lat.uel.type.api.Subsumption;
 public class UelOntologyGoal implements Goal {
 
 	private final AtomManager atomManager;
-	private final Map<Integer, Definition> definitions = new HashMap<Integer, Definition>();
+	private final DefinitionSet definitions = new DefinitionSet();
 	private final Map<Integer, Integer> directSupertype = new HashMap<Integer, Integer>();
 	private final Set<Disequation> disequations = new HashSet<Disequation>();
 	private final Set<Dissubsumption> dissubsumptions = new HashSet<Dissubsumption>();
@@ -82,7 +83,7 @@ public class UelOntologyGoal implements Goal {
 	}
 
 	private void addDefinition(Definition definition) {
-		definitions.put(definition.getDefiniendum(), definition);
+		definitions.add(definition);
 	}
 
 	/**
@@ -232,7 +233,7 @@ public class UelOntologyGoal implements Goal {
 
 	private Set<Integer> getTopLevelUndefIds(Integer atomId) {
 		// extract most specific UNDEF names used in the definition of 'atomId'
-		Definition def = definitions.get(atomId);
+		Definition def = definitions.getDefinition(atomId);
 		if (def == null) {
 			return Collections.emptySet();
 		}
@@ -275,7 +276,7 @@ public class UelOntologyGoal implements Goal {
 	}
 
 	private Optional<Integer> getParent(Integer atomId) {
-		return definitions.get(atomId).getRight().stream().filter(id -> atomManager.getVariables().contains(id))
+		return definitions.getDefiniens(atomId).stream().filter(id -> atomManager.getVariables().contains(id))
 				.findFirst();
 	}
 
@@ -377,13 +378,18 @@ public class UelOntologyGoal implements Goal {
 	}
 
 	@Override
-	public Set<Definition> getDefinitions() {
-		return new HashSet<Definition>(definitions.values());
+	public DefinitionSet getDefinitions() {
+		return definitions;
 	}
 
 	@Override
 	public Definition getDefinition(Integer varId) {
-		return definitions.get(varId);
+		return definitions.getDefinition(varId);
+	}
+
+	@Override
+	public Set<Integer> getDefiniens(Integer varId) {
+		return definitions.getDefiniens(varId);
 	}
 
 	@Override

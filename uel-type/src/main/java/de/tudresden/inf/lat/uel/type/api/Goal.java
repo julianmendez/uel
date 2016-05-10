@@ -4,6 +4,8 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
+import de.tudresden.inf.lat.uel.type.impl.DefinitionSet;
+
 /**
  * An object implementing this interface is an input for the UEL system.
  * 
@@ -24,8 +26,8 @@ public interface Goal {
 	 * 
 	 * @return the set of definitions
 	 */
-	default Set<Definition> getDefinitions() {
-		return Collections.emptySet();
+	default DefinitionSet getDefinitions() {
+		return new DefinitionSet();
 	}
 
 	/**
@@ -36,6 +38,10 @@ public interface Goal {
 	 * @return the definition of 'varId', if it exists, and 'null' otherwise
 	 */
 	default Definition getDefinition(Integer varId) {
+		return null;
+	}
+
+	default Set<Integer> getDefiniens(Integer varId) {
 		return null;
 	}
 

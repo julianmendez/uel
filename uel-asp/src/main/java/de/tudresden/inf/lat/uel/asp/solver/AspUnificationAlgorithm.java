@@ -3,7 +3,6 @@ package de.tudresden.inf.lat.uel.asp.solver;
 import java.io.IOException;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -12,6 +11,7 @@ import java.util.Set;
 import de.tudresden.inf.lat.uel.type.api.Definition;
 import de.tudresden.inf.lat.uel.type.api.Goal;
 import de.tudresden.inf.lat.uel.type.api.UnificationAlgorithm;
+import de.tudresden.inf.lat.uel.type.impl.DefinitionSet;
 import de.tudresden.inf.lat.uel.type.impl.Unifier;
 
 public class AspUnificationAlgorithm implements UnificationAlgorithm {
@@ -90,7 +90,7 @@ public class AspUnificationAlgorithm implements UnificationAlgorithm {
 	}
 
 	private Unifier toUnifier(Map<Integer, Set<Integer>> assignment) {
-		Set<Definition> definitions = new HashSet<Definition>();
+		DefinitionSet definitions = new DefinitionSet(goal.getAtomManager().getVariables().size());
 		for (Integer varId : goal.getAtomManager().getVariables()) {
 			Set<Integer> body = assignment.get(varId);
 			if (body == null) {

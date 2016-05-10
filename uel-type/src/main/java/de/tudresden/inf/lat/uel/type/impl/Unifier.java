@@ -3,23 +3,21 @@ package de.tudresden.inf.lat.uel.type.impl;
 import java.util.Map;
 import java.util.Set;
 
-import de.tudresden.inf.lat.uel.type.api.Definition;
-
 public class Unifier {
-	private final Set<Definition> definitions;
+	private final DefinitionSet definitions;
 	private final Map<Integer, Set<Integer>> typeAssignment;
 
-	public Unifier(Set<Definition> definitions) {
+	public Unifier(DefinitionSet definitions) {
 		this.definitions = definitions;
 		this.typeAssignment = null;
 	}
 
-	public Unifier(Set<Definition> definitions, Map<Integer, Set<Integer>> typeAssignment) {
+	public Unifier(DefinitionSet definitions, Map<Integer, Set<Integer>> typeAssignment) {
 		this.definitions = definitions;
 		this.typeAssignment = typeAssignment;
 	}
 
-	public Set<Definition> getDefinitions() {
+	public DefinitionSet getDefinitions() {
 		return definitions;
 	}
 

@@ -1,8 +1,10 @@
 package de.tudresden.inf.lat.uel.core.renderer;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.IRI;
@@ -17,6 +19,7 @@ import de.tudresden.inf.lat.uel.type.api.Axiom;
 import de.tudresden.inf.lat.uel.type.api.Definition;
 import de.tudresden.inf.lat.uel.type.api.Dissubsumption;
 import de.tudresden.inf.lat.uel.type.api.Subsumption;
+import de.tudresden.inf.lat.uel.type.impl.DefinitionSet;
 
 /**
  * This class can render UEL objects as OWL objects. The output cannot
@@ -40,17 +43,8 @@ public class OWLRenderer extends Renderer<OWLClassExpression, OWLObjectProperty,
 	 * @param background
 	 *            (optional) a set of background definitions
 	 */
-	public OWLRenderer(AtomManager atomManager, Set<Definition> background) {
+	public OWLRenderer(AtomManager atomManager, DefinitionSet background) {
 		super(atomManager, null, background);
-	}
-
-	@Override
-	protected void appendExpression(OWLClassExpression expr) {
-	}
-
-	@Override
-	protected Renderer<OWLClassExpression, OWLObjectProperty, Set<OWLAxiom>> clone() {
-		return new OWLRenderer(atomManager, background);
 	}
 
 	@Override
@@ -74,7 +68,7 @@ public class OWLRenderer extends Renderer<OWLClassExpression, OWLObjectProperty,
 	}
 
 	@Override
-	protected OWLClassExpression translateAtomList(String description, Set<Integer> atomIds) {
+	protected OWLClassExpression translateAtomList(String description, Collection<Integer> atomIds) {
 		return translateConjunction(atomIds);
 	}
 
@@ -127,7 +121,7 @@ public class OWLRenderer extends Renderer<OWLClassExpression, OWLObjectProperty,
 	}
 
 	@Override
-	protected OWLClassExpression translateRoleList(String description, Set<Integer> roleIds) {
+	protected OWLClassExpression translateRoleList(String description, Collection<Integer> roleIds) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -138,8 +132,11 @@ public class OWLRenderer extends Renderer<OWLClassExpression, OWLObjectProperty,
 	}
 
 	@Override
-	protected OWLClassExpression translateTrueConjunction(Set<OWLClassExpression> conjuncts) {
-		expr = dataFactory.getOWLObjectIntersectionOf(conjuncts);
+	protected <T> OWLClassExpression translateTrueConjunction(Collection<T> conjuncts,
+			Function<T, OWLClassExpression> conjunctTranslator) {
+		Set<OWLClassExpression> classExpressions = conjuncts.stream().map(conjunctTranslator)
+				.collect(Collectors.toSet());
+		expr = dataFactory.getOWLObjectIntersectionOf(classExpressions);
 		return expr;
 	}
 }

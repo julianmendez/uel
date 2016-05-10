@@ -1,11 +1,11 @@
 package de.tudresden.inf.lat.uel.core.renderer;
 
-import java.util.Set;
+import java.util.Collection;
 import java.util.function.Function;
 
 import de.tudresden.inf.lat.uel.core.processor.ShortFormProvider;
 import de.tudresden.inf.lat.uel.type.api.AtomManager;
-import de.tudresden.inf.lat.uel.type.api.Definition;
+import de.tudresden.inf.lat.uel.type.impl.DefinitionSet;
 
 /**
  * Class for rendering UEL objects in Functional syntax.
@@ -26,13 +26,8 @@ public class FunctionalRenderer extends StringRenderer {
 	 *            (optional) a set of background definitions used for
 	 *            abbreviating expressions
 	 */
-	protected FunctionalRenderer(AtomManager atomManager, ShortFormProvider provider, Set<Definition> background) {
+	protected FunctionalRenderer(AtomManager atomManager, ShortFormProvider provider, DefinitionSet background) {
 		super(atomManager, provider, background);
-	}
-
-	@Override
-	protected Renderer<String, String, String> clone() {
-		return new FunctionalRenderer(atomManager, provider, background);
 	}
 
 	@Override
@@ -54,10 +49,10 @@ public class FunctionalRenderer extends StringRenderer {
 	}
 
 	@Override
-	protected String translateTrueConjunction(Set<String> conjuncts) {
+	protected <T> String translateTrueConjunction(Collection<T> conjuncts, Function<T, String> conjunctTranslator) {
 		sb.append(RendererKeywords.objectIntersectionOf);
 		sb.append(RendererKeywords.open);
-		appendSet(conjuncts, RendererKeywords.space);
+		translateCollection(conjuncts, conjunctTranslator, RendererKeywords.space);
 		sb.append(RendererKeywords.close);
 		return "";
 	}

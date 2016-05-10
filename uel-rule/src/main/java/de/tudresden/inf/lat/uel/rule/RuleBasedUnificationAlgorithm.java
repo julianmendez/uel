@@ -26,6 +26,7 @@ import de.tudresden.inf.lat.uel.type.api.AtomManager;
 import de.tudresden.inf.lat.uel.type.api.Definition;
 import de.tudresden.inf.lat.uel.type.api.Goal;
 import de.tudresden.inf.lat.uel.type.api.UnificationAlgorithm;
+import de.tudresden.inf.lat.uel.type.impl.DefinitionSet;
 import de.tudresden.inf.lat.uel.type.impl.Unifier;
 
 /**
@@ -183,7 +184,7 @@ public class RuleBasedUnificationAlgorithm implements UnificationAlgorithm {
 	public Unifier getUnifier() {
 		// convert current assignment to a set of definitions
 		AtomManager atomManager = input.getAtomManager();
-		Set<Definition> definitions = new HashSet<Definition>();
+		DefinitionSet definitions = new DefinitionSet(atomManager.getVariables().size());
 		for (Integer varId : atomManager.getVariables()) {
 			Set<Integer> body = new HashSet<Integer>();
 			for (Atom subsumer : assignment.getSubsumers(atomManager.getAtom(varId))) {
