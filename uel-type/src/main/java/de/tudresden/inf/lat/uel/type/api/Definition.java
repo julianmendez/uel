@@ -42,6 +42,10 @@ public class Definition extends Axiom {
 		return left.iterator().next();
 	}
 
+	public Set<Integer> getDefiniens() {
+		return right;
+	}
+
 	public boolean isPrimitive() {
 		return primitive;
 	}

@@ -25,7 +25,6 @@ import de.tudresden.inf.lat.uel.core.main.AlternativeUelStarter;
 import de.tudresden.inf.lat.uel.core.main.UnifierIterator;
 import de.tudresden.inf.lat.uel.core.processor.UelModel;
 import de.tudresden.inf.lat.uel.core.processor.UnificationAlgorithmFactory;
-import de.tudresden.inf.lat.uel.sat.solver.SatUnificationAlgorithm;
 
 /**
  * @author Stefan Borgwardt
@@ -68,27 +67,35 @@ public class SNOMEDEvaluation {
 		String[] varNames = { "X" };
 		UnifierIterator iterator = (UnifierIterator) starter.modifyOntologyAndSolve(pos, neg,
 				Arrays.asList(varNames).stream().map(SNOMEDEvaluation::var).collect(Collectors.toSet()),
-				UnificationAlgorithmFactory.SAT_BASED_ALGORITHM_MINIMAL);
-
-		System.out.println("Press RETURN to start computing unifiers.");
+				UnificationAlgorithmFactory.SAT_BASED_ALGORITHM);
 
 		Set<OWLAxiom> background = iterator.getUelModel().renderDefinitions();
 		UelModel model = iterator.getUelModel();
 
+		System.out.println("Unifiers:");
+
 		try {
 			Scanner in = new Scanner(System.in);
 			int i = 0;
-			boolean skip = false;
+			boolean skip = true;
 
+			if (!skip) {
+				System.out.println("Press RETURN to start computing the next unifier (input 'a' for all unifiers) ...");
+			}
 			while (skip || in.hasNextLine()) {
 				if (!skip) {
 					if (in.nextLine().equals("a")) {
 						skip = true;
 					}
 				}
+				if (i == 0) {
+					skip = false;
+				}
+
 				i++;
 				System.out.println();
 				System.out.println("--- " + i);
+
 				if (iterator.hasNext()) {
 
 					// TODO compute unifiers modulo equivalence?

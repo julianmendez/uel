@@ -48,7 +48,7 @@ public class DefinitionSet extends HashMap<Integer, Definition> implements Itera
 	public Set<Integer> getDefiniens(Integer atomId) {
 		Definition def = super.get(atomId);
 		if (def != null) {
-			return def.getRight();
+			return def.getDefiniens();
 		} else {
 			return null;
 		}

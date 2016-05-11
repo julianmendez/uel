@@ -51,7 +51,7 @@ import de.tudresden.inf.lat.uel.type.impl.Unifier;
  * @param <AxiomsType>
  *            the type of a rendered set of axioms
  */
-abstract class Renderer<ExpressionType, RoleType, AxiomsType> {
+public abstract class Renderer<ExpressionType, RoleType, AxiomsType> {
 
 	private static final String[] suffixes = new String[] { AtomManager.UNDEF_SUFFIX, AtomManager.ROLEGROUP_SUFFIX,
 			AtomManager.VAR_SUFFIX };
@@ -327,7 +327,7 @@ abstract class Renderer<ExpressionType, RoleType, AxiomsType> {
 			// optional: print type information used to obtain the unifier; this
 			// is only meaningful in 'SNOMED mode'
 			if (unifier.getTypeAssignment() != null) {
-				for (Integer atomId : unifier.getTypeAssignment().keySet()) {
+				for (Integer atomId : sortNames(unifier.getTypeAssignment().keySet(), sorted)) {
 					translateAtomList("Types of " + renderName(atomId), unifier.getTypeAssignment().get(atomId));
 				}
 			}

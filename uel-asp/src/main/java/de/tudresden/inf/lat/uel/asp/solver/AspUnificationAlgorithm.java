@@ -96,7 +96,7 @@ public class AspUnificationAlgorithm implements UnificationAlgorithm {
 			if (body == null) {
 				body = Collections.emptySet();
 			}
-			definitions.add(new Definition(varId, body, false));
+			definitions.add(new Definition(varId, Collections.unmodifiableSet(body), false));
 		}
 		return new Unifier(definitions);
 	}

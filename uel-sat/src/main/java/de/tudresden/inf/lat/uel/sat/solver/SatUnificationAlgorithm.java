@@ -628,7 +628,8 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 	private DefinitionSet getUpdatedDefinitions() {
 		DefinitionSet definitions = new DefinitionSet(getVariables().size());
 		for (Integer leftPartId : getVariables()) {
-			definitions.add(new Definition(leftPartId, new HashSet<Integer>(getSetOfSubsumers(leftPartId)), false));
+			definitions.add(new Definition(leftPartId,
+					Collections.unmodifiableSet(new HashSet<Integer>(getSetOfSubsumers(leftPartId))), false));
 		}
 		return definitions;
 	}
@@ -1073,8 +1074,8 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 					Integer atomId2 = this.literalManager.get(i).getSecond();
 					// if (getVariables().contains(atomId1) &&
 					// !atomId1.equals(atomId2)) {
-					// if (getNonVariableAtoms().contains(atomId2)) {
-					if (!getUserVariables().contains(atomId2)) {
+					if (getNonVariableAtoms().contains(atomId2)) {
+						// if (!getUserVariables().contains(atomId2)) {
 						addToSetOfSubsumers(atomId1, atomId2);
 					}
 				}

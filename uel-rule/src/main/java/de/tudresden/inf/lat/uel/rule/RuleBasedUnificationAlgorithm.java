@@ -4,6 +4,7 @@ import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Deque;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -190,7 +191,7 @@ public class RuleBasedUnificationAlgorithm implements UnificationAlgorithm {
 			for (Atom subsumer : assignment.getSubsumers(atomManager.getAtom(varId))) {
 				body.add(atomManager.getIndex(subsumer));
 			}
-			definitions.add(new Definition(varId, body, false));
+			definitions.add(new Definition(varId, Collections.unmodifiableSet(body), false));
 		}
 		return new Unifier(definitions);
 	}

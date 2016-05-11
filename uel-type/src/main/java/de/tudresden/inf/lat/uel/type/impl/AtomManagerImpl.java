@@ -44,7 +44,7 @@ public class AtomManagerImpl implements AtomManager {
 	public Integer createBlankExistentialRestriction(Integer roleId) {
 		String roleName = getRoleName(roleId);
 		Integer fillerId = createConceptName(roleName + VAR_SUFFIX);
-		makeFlatteningVariable(fillerId);
+		makeUserVariable(fillerId);
 		return createExistentialRestriction(roleName, fillerId);
 	}
 

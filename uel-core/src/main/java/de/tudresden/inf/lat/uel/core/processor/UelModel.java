@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.semanticweb.owlapi.apibinding.OWLManager;
@@ -55,6 +54,7 @@ public class UelModel {
 	private OntologyProvider provider;
 	private UnificationAlgorithm algorithm;
 	private List<Unifier> unifierList;
+	private UnifierPostprocessor postprocessor;
 
 	/**
 	 * Constructs a new UEL model.
@@ -104,7 +104,7 @@ public class UelModel {
 		if (!allUnifiersFound) {
 			while (algorithm.computeNextUnifier()) {
 				Unifier result = algorithm.getUnifier();
-				result = minimizeUnifier(result);
+				result = postprocessor.minimizeUnifier(result);
 				if (isNew(result)) {
 					unifierList.add(result);
 					// System.out.println(getStringRenderer(null).renderUnifier(result,
@@ -115,225 +115,6 @@ public class UelModel {
 			}
 		}
 		allUnifiersFound = true;
-		return false;
-	}
-
-	private void replaceUndefNames(DefinitionSet defs) {
-		// replace UNDEF names by originals
-		for (Integer varId : atomManager.getUserVariables()) {
-			Set<Integer> definiens = defs.getDefiniens(varId);
-			for (Integer undefId : atomManager.getUndefNames()) {
-				if (definiens.contains(undefId)) {
-					definiens.remove(undefId);
-					definiens.add(goal.getAtomManager().removeUndef(undefId));
-				}
-			}
-		}
-	}
-
-	private Unifier minimizeUnifier(Unifier unifier) {
-		// copy the unifier
-		DefinitionSet defs = new DefinitionSet();
-		for (Definition def : unifier.getDefinitions()) {
-			defs.add(new Definition(def));
-		}
-
-		replaceUndefNames(defs);
-
-		StringRenderer renderer = getStringRenderer(null);
-
-		for (Integer varId : atomManager.getUserVariables()) {
-			System.out.println("*** Minimizing substitution set of " + renderer.renderAtom(varId, false));
-			System.out.println(renderer.renderAtomList("Original substitution set", defs.getDefiniens(varId)));
-
-			// remove superclasses if subclasses are also present
-			Set<Integer> minimalAtoms = new HashSet<Integer>();
-			for (Integer atomId : defs.getDefiniens(varId)) {
-				List<Integer> replaceAtoms = new ArrayList<Integer>();
-				for (Integer minimalId : minimalAtoms) {
-					if (isStrictlySmaller(atomId, minimalId, unifier.getDefinitions())) {
-						replaceAtoms.add(minimalId);
-						System.out.println("Atom " + renderer.renderAtom(minimalId, true) + " subsumes "
-								+ renderer.renderAtom(atomId, true));
-					}
-				}
-				if (minimalAtoms.isEmpty() || !replaceAtoms.isEmpty()) {
-					minimalAtoms.removeAll(replaceAtoms);
-					minimalAtoms.add(atomId);
-					System.out.println("New minimal atom: " + renderer.renderAtom(atomId, true));
-				}
-			}
-			defs.getDefiniens(varId).retainAll(minimalAtoms);
-
-			System.out.println(renderer.renderAtomList("Final substitution set", defs.getDefiniens(varId)));
-			System.out.println();
-			System.out.println();
-			System.out.println();
-		}
-
-		return new Unifier(defs, unifier.getTypeAssignment());
-	}
-
-	private boolean isStrictlySmaller(Integer atomId1, Integer atomId2, DefinitionSet unifier) {
-		if (!isSubsumed(atomId1, atomId2, unifier)) {
-			// atomId1 is not even smaller equal to atomId2
-			return false;
-		}
-		if (!isSubsumed(atomId2, atomId1, unifier)) {
-			// atomId1 is smaller equal to atomId2, but not vice versa
-			return true;
-		}
-
-		// atomId2 and atomId2 are equivalent
-		int size1 = getStructuralSize(atomId1, unifier);
-		int size2 = getStructuralSize(atomId2, unifier);
-		if (size1 < size2) {
-			// the structure of atomId1 is smaller than that of atomId2
-			return true;
-		}
-		if (size2 < size1) {
-			// atomId2 is smaller
-			return false;
-		}
-
-		// structural size is the same; finally compare actual size
-		size1 = getFullSize(atomId1, unifier);
-		size2 = getFullSize(atomId2, unifier);
-		return size1 < size2;
-	}
-
-	private int getStructuralSize(Integer atomId, DefinitionSet unifier) {
-		if (atomManager.getFlatteningVariables().contains(atomId)) {
-			Definition def = goal.getDefinition(atomId);
-			Set<Integer> expanded;
-			if (def != null) {
-				expanded = def.getRight();
-			} else {
-				expanded = unifier.getDefiniens(atomId);
-			}
-			return sum(expanded, id -> getStructuralSize(id, unifier));
-		} else if (atomManager.getExistentialRestrictions().contains(atomId)) {
-			return 2 + getStructuralSize(atomManager.getChild(atomId), unifier);
-		} else {
-			return 1;
-		}
-	}
-
-	private int getFullSize(Integer atomId, DefinitionSet unifier) {
-		if (atomManager.getFlatteningVariables().contains(atomId)) {
-			Definition def = goal.getDefinition(atomId);
-			Set<Integer> expanded;
-			if (def != null) {
-				expanded = def.getRight();
-			} else {
-				expanded = unifier.getDefiniens(atomId);
-			}
-			return sum(expanded, id -> getFullSize(id, unifier));
-		} else if (atomManager.getExistentialRestrictions().contains(atomId)) {
-			return atomManager.getExistentialRestriction(atomId).getRoleId()
-					+ 100 * getFullSize(atomManager.getChild(atomId), unifier);
-		} else {
-			return atomId;
-		}
-	}
-
-	private <T> int sum(Set<T> set, Function<T, Integer> map) {
-		return set.stream().map(map).reduce(0, Integer::sum);
-	}
-
-	private Set<Integer> expand(Integer atomId, DefinitionSet unifier) {
-		Set<Integer> processed = new HashSet<Integer>();
-		Set<Integer> toVisit = new HashSet<Integer>();
-		toVisit.add(atomId);
-
-		StringRenderer renderer = getStringRenderer(null);
-
-		while (!toVisit.isEmpty()) {
-			atomId = toVisit.iterator().next();
-			toVisit.remove(atomId);
-			processed.add(atomId);
-
-			// consider the expansion of 'atomId' minus the atoms that have
-			// already been processed
-			System.out.print("Expanding " + renderer.renderAtom(atomId, false) + " ... ");
-			Set<Integer> exp = expandOneStep(atomId, unifier);
-			System.out.println(renderer.renderAtomList("to", exp));
-			toVisit.addAll(exp);
-			toVisit.removeAll(processed);
-		}
-		return processed;
-	}
-
-	private Set<Integer> expandOneStep(Integer atomId, DefinitionSet unifier) {
-		if (atomManager.getConstants().contains(atomId) || atomManager.getExistentialRestrictions().contains(atomId)) {
-			// non-variable atoms cannot be expanded
-			return Collections.singleton(atomId);
-		} else if (atomManager.getUserVariables().contains(atomId)) {
-			if (atomManager.getUndefNames().contains(atomId)) {
-				// UNDEF variables are not expanded
-				return Collections.singleton(atomId);
-			} else {
-				// all other user variables are expanded using their original
-				// definitions
-				return unifier.getDefiniens(atomId);
-			}
-		} else {
-			// 'atomId' must be a definition or flattening variable
-			Definition def = goal.getDefinition(atomId);
-			if (def != null) {
-				return def.getRight();
-			} else {
-				return unifier.getDefiniens(atomId);
-			}
-		}
-	}
-
-	private boolean isSubsumed(Integer leftId, Integer rightId, DefinitionSet unifier) {
-		StringRenderer renderer = getStringRenderer(null);
-		System.out.println("Checking subsumption between " + renderer.renderAtom(leftId, false) + " and "
-				+ renderer.renderAtom(rightId, false));
-		Set<Integer> leftAtoms = expand(leftId, unifier);
-		Set<Integer> rightAtoms = expand(rightId, unifier);
-		System.out.println(renderer.renderAtomList("Left expansion", leftAtoms));
-		System.out.println(renderer.renderAtomList("Right expansion", rightAtoms));
-
-		for (Integer atomId : rightAtoms) {
-			if (!isSubsumed(leftAtoms, atomId, unifier)) {
-				System.out.println(renderer.renderAtom(leftId, false) + " is not subsumed by "
-						+ renderer.renderAtom(rightId, false));
-				return false;
-			}
-		}
-
-		System.out
-				.println(renderer.renderAtom(leftId, false) + " is subsumed by " + renderer.renderAtom(rightId, false));
-		return true;
-	}
-
-	private boolean isSubsumed(Set<Integer> leftIds, Integer rightId, DefinitionSet unifier) {
-		if (leftIds.contains(rightId)) {
-			return true;
-		}
-		if (!atomManager.getExistentialRestrictions().contains(rightId)) {
-			// every constant must occur also on the left-hand side
-			return false;
-		}
-
-		Integer roleId = atomManager.getExistentialRestriction(rightId).getRoleId();
-		Integer childId = atomManager.getChild(rightId);
-		for (Integer leftId : leftIds) {
-			if (atomManager.getExistentialRestrictions().contains(leftId)) {
-				if (atomManager.getExistentialRestriction(leftId).getRoleId().equals(roleId)) {
-					if (isSubsumed(atomManager.getChild(leftId), childId, unifier)) {
-						// a matching existential restriction was found on the
-						// left-hand side
-						return true;
-					}
-				}
-			}
-		}
-
-		// the existential restriction is not matched on the left-hand side
 		return false;
 	}
 
@@ -500,6 +281,7 @@ public class UelModel {
 		currentUnifierIndex = -1;
 		allUnifiersFound = false;
 		algorithm = UnificationAlgorithmFactory.instantiateAlgorithm(name, goal);
+		postprocessor = new UnifierPostprocessor(atomManager, goal, getStringRenderer(null));
 	}
 
 	private boolean isNew(Unifier result) {

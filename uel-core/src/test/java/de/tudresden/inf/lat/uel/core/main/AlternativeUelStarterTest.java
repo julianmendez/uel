@@ -139,11 +139,11 @@ public class AlternativeUelStarterTest {
 			reasoner.precomputeInferences();
 
 			for (OWLAxiom pos : subsumptions.getAxioms()) {
-				System.out.println(pos + ": " + reasoner.isEntailed(pos));
+				// System.out.println(pos + ": " + reasoner.isEntailed(pos));
 				Assert.assertTrue(reasoner.isEntailed(pos));
 			}
 			for (OWLAxiom neg : dissubsumptions.getAxioms()) {
-				System.out.println(neg + ": " + reasoner.isEntailed(neg));
+				// System.out.println(neg + ": " + reasoner.isEntailed(neg));
 				Assert.assertTrue(!reasoner.isEntailed(neg));
 			}
 
