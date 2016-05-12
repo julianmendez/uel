@@ -15,7 +15,9 @@ import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
+import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
@@ -39,8 +41,12 @@ public class SNOMEDEvaluation {
 	private static final String POS_PATH = WORK_DIR + "Projects/uel-snomed/uel-snomed-pos.owl";
 	private static final String NEG_PATH = WORK_DIR + "Projects/uel-snomed/uel-snomed-neg.owl";
 
-	private static OWLClass var(String name) {
+	private static OWLClass cls(String name) {
 		return OWLManager.getOWLDataFactory().getOWLClass(IRI.create("http://www.ihtsdo.org/" + name));
+	}
+
+	private static OWLObjectProperty prp(String name) {
+		return OWLManager.getOWLDataFactory().getOWLObjectProperty(IRI.create("http://www.ihtsdo.org/" + name));
 	}
 
 	/**
@@ -56,7 +62,7 @@ public class SNOMEDEvaluation {
 		AlternativeUelStarter starter = new AlternativeUelStarter(
 				new HashSet<OWLOntology>(Arrays.asList(snomed, snomedRestrictions)));
 		starter.setVerbose(true);
-		// starter.markUndefAsVariables(false);
+		starter.markUndefAsVariables(false);
 		// starter.markUndefAsAuxVariables(true);
 		starter.setSnomedMode(true);
 
@@ -66,11 +72,20 @@ public class SNOMEDEvaluation {
 		// String[] varNames = { "X" };
 		String[] varNames = { "X" };
 		UnifierIterator iterator = (UnifierIterator) starter.modifyOntologyAndSolve(pos, neg,
-				Arrays.asList(varNames).stream().map(SNOMEDEvaluation::var).collect(Collectors.toSet()),
+				Arrays.asList(varNames).stream().map(SNOMEDEvaluation::cls).collect(Collectors.toSet()),
 				UnificationAlgorithmFactory.SAT_BASED_ALGORITHM);
 
 		Set<OWLAxiom> background = iterator.getUelModel().renderDefinitions();
 		UelModel model = iterator.getUelModel();
+
+		OWLDataFactory fac = manager.getOWLDataFactory();
+		OWLAxiom goalAxiom = fac
+				.getOWLEquivalentClassesAxiom(cls("X"),
+						fac.getOWLObjectIntersectionOf(cls("SCT_106133000"), cls("SCT_365781004"),
+								fac.getOWLObjectSomeValuesFrom(prp("RoleGroup"),
+										fac.getOWLObjectIntersectionOf(fac.getOWLObjectSomeValuesFrom(
+												prp("SCT_363713009"), cls("SCT_371157007")),
+										fac.getOWLObjectSomeValuesFrom(prp("SCT_363714003"), cls("SCT_307124006"))))));
 
 		System.out.println("Unifiers:");
 
@@ -88,9 +103,9 @@ public class SNOMEDEvaluation {
 						skip = true;
 					}
 				}
-				if (i == 0) {
-					skip = false;
-				}
+				// if (i == 0) {
+				// skip = false;
+				// }
 
 				i++;
 				System.out.println();
@@ -121,6 +136,12 @@ public class SNOMEDEvaluation {
 					for (OWLAxiom a : neg.getAxioms(AxiomType.SUBCLASS_OF)) {
 						System.out.println(a + " (neg): " + reasoner.isEntailed(a));
 						// Assert.assertTrue(!reasoner.isEntailed(a));
+					}
+
+					System.out.println(goalAxiom + " (goal): " + reasoner.isEntailed(goalAxiom));
+					if (reasoner.isEntailed(goalAxiom)) {
+						System.out.println("Success! " + i);
+						break;
 					}
 
 					reasoner.dispose();

@@ -23,9 +23,9 @@ import de.tudresden.inf.lat.uel.type.impl.Unifier;
  */
 public class UnifierPostprocessor {
 
-	AtomManager atomManager;
-	Goal goal;
-	StringRenderer renderer;
+	private AtomManager atomManager;
+	private Goal goal;
+	private StringRenderer renderer;
 
 	public UnifierPostprocessor(AtomManager atomManager, Goal goal, StringRenderer renderer) {
 		this.atomManager = atomManager;
