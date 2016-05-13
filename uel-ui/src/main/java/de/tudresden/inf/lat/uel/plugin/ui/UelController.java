@@ -200,7 +200,7 @@ public class UelController {
 		bgOntologies.add(view.getSelectedOntologyBg01());
 		OWLOntology constraintOntology = constraints.empty() ? null : constraints.peek();
 		model.setupGoal(bgOntologies, view.getSelectedOntologyPos(), view.getSelectedOntologyNeg(), constraintOntology,
-				null, view.getSnomedMode(), resetShortFormCache);
+				null, view.getSnomedMode(), resetShortFormCache, view.getExpandPrimitiveDefinitions());
 	}
 
 	/**

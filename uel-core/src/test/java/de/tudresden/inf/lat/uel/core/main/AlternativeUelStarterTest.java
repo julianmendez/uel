@@ -115,8 +115,8 @@ public class AlternativeUelStarterTest {
 		starter.markUndefAsVariables(false);
 		starter.setVerbose(true);
 
-		UnifierIterator iterator = (UnifierIterator) starter.modifyOntologyAndSolve(subsumptions, dissubsumptions,
-				variables, UnificationAlgorithmFactory.SAT_BASED_ALGORITHM);
+		UnifierIterator iterator = (UnifierIterator) starter.modifyOntologyAndSolve(subsumptions, dissubsumptions, null,
+				variables, UnificationAlgorithmFactory.SAT_BASED_ALGORITHM, true);
 
 		Set<OWLAxiom> background = iterator.getUelModel().renderDefinitions();
 

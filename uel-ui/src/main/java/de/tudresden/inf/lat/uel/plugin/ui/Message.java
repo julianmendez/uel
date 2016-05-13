@@ -22,6 +22,7 @@ interface Message {
 	String buttonShowStatInfo = "Stat";
 	String textConstants = "Constants:";
 	String titleError = "Error";
+	String textExpandPrimitiveDefinitions = "Expand primitive definitions";
 	String textOntologyBg00 = "First background ontology:";
 	String textOntologyBg01 = "Second background ontology:";
 	String textOntologyPos = "Goal subsumptions and equations:";

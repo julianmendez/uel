@@ -14,6 +14,8 @@ import org.semanticweb.owlapi.model.OWLObjectIntersectionOf;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLObjectSomeValuesFrom;
 
+import com.google.common.collect.Sets;
+
 import de.tudresden.inf.lat.uel.core.processor.ShortFormProvider;
 import de.tudresden.inf.lat.uel.type.api.AtomManager;
 import de.tudresden.inf.lat.uel.type.api.Axiom;
@@ -260,6 +262,14 @@ public abstract class Renderer<ExpressionType, RoleType, AxiomsType> {
 		newLine();
 		for (Integer roleId : sortRoles(input.getRanges().keySet(), sorted)) {
 			translateAtomList("Range of " + renderRole(roleId), sortNames(input.getRanges().get(roleId), sorted));
+		}
+		newLine();
+		for (Integer conceptNameId : sortNames(
+				Sets.union(input.getAtomManager().getVariables(), input.getAtomManager().getConstants()), sorted)) {
+			if (input.getTypeAssignment().containsKey(conceptNameId)) {
+				translateAtomList("Type of " + renderName(conceptNameId),
+						Collections.singleton(input.getTypeAssignment().get(conceptNameId)));
+			}
 		}
 		return finalizeAxioms();
 	}

@@ -45,6 +45,7 @@ class UelView extends JPanel {
 	private final JComboBox<OWLOntology> listOntologyNeg = new JComboBox<OWLOntology>();
 	private final JComboBox<OWLOntology> listOntologyPos = new JComboBox<OWLOntology>();
 	private final JCheckBox checkSnomedMode = new JCheckBox();
+	private final JCheckBox checkExpandPrimitiveDefinitions = new JCheckBox();
 
 	/**
 	 * Construct the main view of UEL.
@@ -72,7 +73,9 @@ class UelView extends JPanel {
 
 		ontologyPanel.add(UelUI.setupComboBox(listOntologyBg01, Message.tooltipComboBoxOntologyBg01));
 
-		ontologyPanel.add(UelUI.setupCheckBox(checkSnomedMode, Message.textSnomedMode));
+		ontologyPanel.add(UelUI.setupCheckBox(checkSnomedMode, false, Message.textSnomedMode));
+
+		ontologyPanel.add(UelUI.setupCheckBox(checkExpandPrimitiveDefinitions, true, Message.textExpandPrimitiveDefinitions));
 
 		ontologyPanel.add(new JLabel(Message.textOntologyPos));
 
@@ -119,6 +122,10 @@ class UelView extends JPanel {
 		topPanel.add(UelUI.setupButton(buttonSelectVariables, UelUI.ICON_FORWARD, Message.tooltipSelectVariables));
 
 		return topPanel;
+	}
+	
+	public boolean getExpandPrimitiveDefinitions() {
+		return checkExpandPrimitiveDefinitions.isSelected();
 	}
 
 	/**

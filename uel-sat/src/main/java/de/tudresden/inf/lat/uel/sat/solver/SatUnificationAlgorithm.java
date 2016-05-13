@@ -221,8 +221,14 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 		// b - every other concept name must also have a type
 		for (Integer conceptNameId : getConceptNames()) {
 			if (!goal.getTypes().contains(conceptNameId)) {
-				input.add(
-						goal.getTypes().stream().map(type -> subtype(conceptNameId, type)).collect(Collectors.toSet()));
+				if (goal.getTypeAssignment().containsKey(conceptNameId)) {
+					// if there is a direct type hint in the goal, use it ...
+					input.add(subtype(conceptNameId, goal.getTypeAssignment().get(conceptNameId)));
+				} else {
+					// otherwise only assert that there must exist a type
+					input.add(goal.getTypes().stream().map(type -> subtype(conceptNameId, type))
+							.collect(Collectors.toSet()));
+				}
 			}
 		}
 

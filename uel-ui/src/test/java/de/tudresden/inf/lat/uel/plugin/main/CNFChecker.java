@@ -68,12 +68,12 @@ public class CNFChecker {
 		int numVariables = Integer.parseInt(line[2]);
 		int numClauses = Integer.parseInt(line[3]);
 
-		Integer uId = atomManager.createConceptName("U");
+		Integer uId = atomManager.createConceptName("U", false);
 		atomManager.makeDefinitionVariable(uId);
-		Integer vId = atomManager.createConceptName("V");
+		Integer vId = atomManager.createConceptName("V", false);
 		atomManager.makeDefinitionVariable(vId);
-		Integer aId = atomManager.createConceptName("A");
-		Integer bId = atomManager.createConceptName("B");
+		Integer aId = atomManager.createConceptName("A", false);
+		Integer bId = atomManager.createConceptName("B", false);
 		Integer raId = atomManager.createExistentialRestriction("r", aId);
 		Integer rbId = atomManager.createExistentialRestriction("r", bId);
 
@@ -81,9 +81,9 @@ public class CNFChecker {
 		// B - false)
 		equations.add(new Equation(Collections.singleton(uId), set(raId, rbId)));
 		for (int var = 1; var <= numVariables; var++) {
-			Integer xId = atomManager.createConceptName("X" + var);
+			Integer xId = atomManager.createConceptName("X" + var, false);
 			atomManager.makeUserVariable(xId);
-			Integer xnId = atomManager.createConceptName("Xn" + var);
+			Integer xnId = atomManager.createConceptName("Xn" + var, false);
 			atomManager.makeUserVariable(xnId);
 			Integer rxId = atomManager.createExistentialRestriction("r", xId);
 			Integer rxnId = atomManager.createExistentialRestriction("r", xnId);
@@ -107,8 +107,8 @@ public class CNFChecker {
 					reader.close();
 					throw new IOException("Input file is not in DIMACS CNF format!");
 				}
-				Integer atomId = (literal > 0) ? atomManager.createConceptName("X" + literal)
-						: atomManager.createConceptName("Xn" + (-literal));
+				Integer atomId = (literal > 0) ? atomManager.createConceptName("X" + literal, false)
+						: atomManager.createConceptName("Xn" + (-literal), false);
 				atomManager.makeDefinitionVariable(atomId);
 				literals.add(atomId);
 			}

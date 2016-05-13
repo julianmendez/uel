@@ -10,7 +10,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.formats.FunctionalSyntaxDocumentFormat;
 import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAxiom;
@@ -40,6 +39,7 @@ public class SNOMEDEvaluation {
 	private static final String SNOMED_RESTR_PATH = WORK_DIR + "Ontologies/snomed-restrictions.owl";
 	private static final String POS_PATH = WORK_DIR + "Projects/uel-snomed/uel-snomed-pos.owl";
 	private static final String NEG_PATH = WORK_DIR + "Projects/uel-snomed/uel-snomed-neg.owl";
+	private static final String CONSTRAINTS_PATH = WORK_DIR + "Projects/uel-snomed/constraints_const.owl";
 
 	private static OWLClass cls(String name) {
 		return OWLManager.getOWLDataFactory().getOWLClass(IRI.create("http://www.ihtsdo.org/" + name));
@@ -68,12 +68,13 @@ public class SNOMEDEvaluation {
 
 		OWLOntology pos = AlternativeUelStarter.loadOntology(POS_PATH, manager);
 		OWLOntology neg = AlternativeUelStarter.loadOntology(NEG_PATH, manager);
+		OWLOntology constraints = AlternativeUelStarter.loadOntology(CONSTRAINTS_PATH, manager);
 		// OWLOntology neg = UelModel.EMPTY_ONTOLOGY;
 		// String[] varNames = { "X" };
 		String[] varNames = { "X" };
-		UnifierIterator iterator = (UnifierIterator) starter.modifyOntologyAndSolve(pos, neg,
+		UnifierIterator iterator = (UnifierIterator) starter.modifyOntologyAndSolve(pos, neg, null,
 				Arrays.asList(varNames).stream().map(SNOMEDEvaluation::cls).collect(Collectors.toSet()),
-				UnificationAlgorithmFactory.SAT_BASED_ALGORITHM);
+				UnificationAlgorithmFactory.SAT_BASED_ALGORITHM_MINIMAL, false);
 
 		Set<OWLAxiom> background = iterator.getUelModel().renderDefinitions();
 		UelModel model = iterator.getUelModel();
@@ -124,7 +125,8 @@ public class SNOMEDEvaluation {
 					ontologyManager.addAxioms(extendedOntology, background);
 					ontologyManager.addAxioms(extendedOntology, unifier);
 
-					ontologyManager.saveOntology(extendedOntology, new FunctionalSyntaxDocumentFormat(), System.out);
+					// ontologyManager.saveOntology(extendedOntology, new
+					// FunctionalSyntaxDocumentFormat(), System.out);
 
 					OWLReasoner reasoner = new JcelReasonerFactory().createNonBufferingReasoner(extendedOntology);
 					reasoner.precomputeInferences();
@@ -141,7 +143,7 @@ public class SNOMEDEvaluation {
 					System.out.println(goalAxiom + " (goal): " + reasoner.isEntailed(goalAxiom));
 					if (reasoner.isEntailed(goalAxiom)) {
 						System.out.println("Success! " + i);
-						break;
+						// break;
 					}
 
 					reasoner.dispose();

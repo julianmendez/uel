@@ -18,7 +18,6 @@ import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import de.tudresden.inf.lat.uel.core.renderer.OWLRenderer;
 import de.tudresden.inf.lat.uel.core.renderer.StringRenderer;
 import de.tudresden.inf.lat.uel.type.api.AtomManager;
-import de.tudresden.inf.lat.uel.type.api.Definition;
 import de.tudresden.inf.lat.uel.type.api.Goal;
 import de.tudresden.inf.lat.uel.type.api.UnificationAlgorithm;
 import de.tudresden.inf.lat.uel.type.impl.AtomManagerImpl;
@@ -47,14 +46,14 @@ public class UelModel {
 		}
 	}
 
+	private UnificationAlgorithm algorithm;
 	private boolean allUnifiersFound;
 	private AtomManager atomManager;
 	private int currentUnifierIndex;
 	private UelOntologyGoal goal;
-	private OntologyProvider provider;
-	private UnificationAlgorithm algorithm;
-	private List<Unifier> unifierList;
 	private UnifierPostprocessor postprocessor;
+	private OntologyProvider provider;
+	private List<Unifier> unifierList;
 
 	/**
 	 * Constructs a new UEL model.
@@ -103,9 +102,13 @@ public class UelModel {
 	public boolean computeNextUnifier() throws InterruptedException {
 		if (!allUnifiersFound) {
 			while (algorithm.computeNextUnifier()) {
+				System.out.print(".");
 				Unifier result = algorithm.getUnifier();
 				result = postprocessor.minimizeUnifier(result);
-				if (isNew(result)) {
+
+				if (!isNew(result)) {
+					continue;
+				} else {
 					unifierList.add(result);
 					// System.out.println(getStringRenderer(null).renderUnifier(result,
 					// true, true, true));
@@ -135,19 +138,6 @@ public class UelModel {
 		}
 	}
 
-	private boolean equalsModuloUserVariables(DefinitionSet defs1, DefinitionSet defs2) {
-		// since both unifiers must define all variables, it suffices to check
-		// one inclusion
-		for (Definition def1 : defs1) {
-			if (atomManager.getUserVariables().contains(def1.getDefiniendum())) {
-				if (!defs2.contains(def1)) {
-					return false;
-				}
-			}
-		}
-		return true;
-	}
-
 	/**
 	 * Translates a given concept name to an atom id. This method adds the
 	 * corresponding atom to the atom manager if it was not present before.
@@ -157,7 +147,7 @@ public class UelModel {
 	 * @return the id of the atom representing 'name'
 	 */
 	public Integer getAtomId(String name) {
-		return atomManager.createConceptName(name);
+		return atomManager.createConceptName(name, false);
 	}
 
 	/**
@@ -284,9 +274,9 @@ public class UelModel {
 		postprocessor = new UnifierPostprocessor(atomManager, goal, getStringRenderer(null));
 	}
 
-	private boolean isNew(Unifier result) {
-		for (Unifier unifier : unifierList) {
-			if (equalsModuloUserVariables(unifier.getDefinitions(), result.getDefinitions())) {
+	private boolean isNew(Unifier newUnifier) {
+		for (Unifier oldUnifier : unifierList) {
+			if (postprocessor.areEquivalent(oldUnifier, newUnifier)) {
 				return false;
 			}
 		}
@@ -496,9 +486,11 @@ public class UelModel {
 	 * @param resetShortFormCache
 	 *            indicates whether the cached short forms should be reloaded
 	 *            from the OntologyProvider
+	 * @param expandPrimitiveDefinitions
 	 */
 	public void setupGoal(Set<OWLOntology> bgOntologies, OWLOntology positiveProblem, OWLOntology negativeProblem,
-			OWLOntology constraintOntology, OWLClass owlThingAlias, boolean snomedMode, boolean resetShortFormCache) {
+			OWLOntology constraintOntology, OWLClass owlThingAlias, boolean snomedMode, boolean resetShortFormCache,
+			boolean expandPrimitiveDefinitions) {
 
 		atomManager = new AtomManagerImpl();
 
@@ -507,7 +499,8 @@ public class UelModel {
 		}
 
 		OWLClass owlThing = getOWLThing(owlThingAlias, snomedMode);
-		goal = new UelOntologyGoal(atomManager, new UelOntology(atomManager, bgOntologies, owlThing));
+		goal = new UelOntologyGoal(atomManager,
+				new UelOntology(atomManager, bgOntologies, owlThing, expandPrimitiveDefinitions));
 
 		if (positiveProblem != null) {
 			goal.addPositiveAxioms(positiveProblem.getAxioms());
@@ -521,7 +514,7 @@ public class UelModel {
 
 		// extract types from background ontologies
 		if (snomedMode) {
-			Set<Integer> siblingUndefIds = goal.extractSiblings();
+			Set<Integer> siblingUndefIds = goal.extractSiblings(getStringRenderer(null));
 			goal.extractTypes();
 			setUndefVariablesFromTypes(siblingUndefIds);
 			goal.introduceDissubsumptionsForUndefVariables();

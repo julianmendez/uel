@@ -258,8 +258,8 @@ class UelUI {
 		return button;
 	}
 
-	static JCheckBox setupCheckBox(JCheckBox checkBox, String text) {
-		checkBox.setSelected(false);
+	static JCheckBox setupCheckBox(JCheckBox checkBox, boolean selected, String text) {
+		checkBox.setSelected(selected);
 		checkBox.setText(text);
 		return checkBox;
 	}

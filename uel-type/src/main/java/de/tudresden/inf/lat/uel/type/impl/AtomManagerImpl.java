@@ -35,24 +35,24 @@ public class AtomManagerImpl implements AtomManager {
 	public AtomManagerImpl() {
 	}
 
-	private Integer createAppendedName(Integer originId, String suffix) {
+	private Integer createAppendedName(Integer originId, String suffix, boolean onlyTypes) {
 		String newName = conceptNames.get(getConceptName(originId).getConceptNameId()) + suffix;
-		return createConceptName(newName);
+		return createConceptName(newName, onlyTypes);
 	}
 
 	@Override
 	public Integer createBlankExistentialRestriction(Integer roleId) {
 		String roleName = getRoleName(roleId);
-		Integer fillerId = createConceptName(roleName + VAR_SUFFIX);
+		Integer fillerId = createConceptName(roleName + VAR_SUFFIX, false);
 		makeUserVariable(fillerId);
 		return createExistentialRestriction(roleName, fillerId);
 	}
 
 	@Override
-	public Integer createConceptName(String conceptName) {
+	public Integer createConceptName(String conceptName, boolean onlyTypes) {
 		Integer conceptNameId = conceptNames.addAndGetIndex(conceptName);
 		Integer atomId = atoms.addAndGetIndex(new ConceptName(conceptNameId));
-		if (!variables.contains(atomId)) {
+		if (!variables.contains(atomId) && !onlyTypes) {
 			// if the concept name had already been created earlier and marked
 			// as a variable, then do not mark it as a constant
 			constants.add(atomId);
@@ -70,14 +70,13 @@ public class AtomManagerImpl implements AtomManager {
 
 	@Override
 	public Integer createRoleGroupConceptName(Integer originId) {
-		Integer newId = createAppendedName(originId, ROLEGROUP_SUFFIX);
-		constants.remove(newId);
+		Integer newId = createAppendedName(originId, ROLEGROUP_SUFFIX, true);
 		return newId;
 	}
 
 	@Override
 	public Integer createUndefConceptName(Integer originId) {
-		Integer undefId = createAppendedName(originId, UNDEF_SUFFIX);
+		Integer undefId = createAppendedName(originId, UNDEF_SUFFIX, false);
 		undefs.add(undefId);
 		return undefId;
 	}
@@ -222,7 +221,7 @@ public class AtomManagerImpl implements AtomManager {
 			throw new IllegalArgumentException("Argument does not represent an UNDEF concept name.");
 		}
 		String origName = undefName.substring(0, undefName.length() - UNDEF_SUFFIX.length());
-		return createConceptName(origName);
+		return createConceptName(origName, false);
 	}
 
 	@Override

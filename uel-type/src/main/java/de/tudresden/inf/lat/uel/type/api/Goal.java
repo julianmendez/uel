@@ -123,4 +123,8 @@ public interface Goal {
 		return false;
 	}
 
+	default Map<Integer, Integer> getTypeAssignment() {
+		return Collections.emptyMap();
+	}
+
 }

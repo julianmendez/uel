@@ -11,6 +11,12 @@ import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
 import de.tudresden.inf.lat.uel.core.processor.UelModel;
 import de.tudresden.inf.lat.uel.type.impl.Unifier;
 
+/**
+ * An iterator for unifiers, in the form of sets of OWLEquivalentClassesAxioms.
+ * 
+ * @author Stefan Borgwardt
+ *
+ */
 public class UnifierIterator implements Iterator<Set<OWLEquivalentClassesAxiom>> {
 
 	private boolean hasNext = false;
@@ -18,10 +24,19 @@ public class UnifierIterator implements Iterator<Set<OWLEquivalentClassesAxiom>>
 	private UelModel uelModel;
 	private Unifier unifier;
 
+	/**
+	 * Initialize a new iterator based on a UEL model.
+	 * 
+	 * @param uelModel
+	 *            the UEL model.
+	 */
 	public UnifierIterator(UelModel uelModel) {
 		this.uelModel = uelModel;
 	}
 
+	/**
+	 * Clean up the resources used by UEL once they are no longer needed.
+	 */
 	public void cleanup() {
 		uelModel.getUnificationAlgorithm().cleanup();
 	}
@@ -43,6 +58,11 @@ public class UnifierIterator implements Iterator<Set<OWLEquivalentClassesAxiom>>
 		}
 	}
 
+	/**
+	 * Obtain the UEL model that coordinates the unification process.
+	 * 
+	 * @return the UEL model
+	 */
 	public UelModel getUelModel() {
 		return uelModel;
 	}

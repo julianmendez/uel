@@ -47,9 +47,10 @@ public interface AtomManager {
 	 * 
 	 * @param conceptName
 	 *            the string representation of the concept name (OWLClass)
+	 * @param onlyTypes 
 	 * @return the integer id of the concept name
 	 */
-	Integer createConceptName(String conceptName);
+	Integer createConceptName(String conceptName, boolean onlyTypes);
 
 	/**
 	 * Create a new existential restriction from the given role name and child

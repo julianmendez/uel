@@ -187,8 +187,9 @@ public class AlternativeUelStarter {
 		}
 		String algorithmName = algorithmNames.get(algorithmIdx);
 
-		Iterator<Set<OWLEquivalentClassesAxiom>> result = starter.modifyOntologyAndSolve(posOntology, negOntology,
-				variables, algorithmName);
+		// TODO add options
+		Iterator<Set<OWLEquivalentClassesAxiom>> result = starter.modifyOntologyAndSolve(posOntology, negOntology, null,
+				variables, algorithmName, true);
 		int unifierIdx = 1;
 		while (result.hasNext()) {
 			System.out.println("Unifier " + unifierIdx + ":");
@@ -304,17 +305,22 @@ public class AlternativeUelStarter {
 	 *            the positive part of the unification problem
 	 * @param negativeProblem
 	 *            the negative part of the unification problem
+	 * @param constraints
+	 *            additional constraints to be loaded after all processing
+	 *            finished (only relevant in SNOMED mode)
 	 * @param variables
 	 *            the set of user variables
 	 * @param algorithmName
 	 *            the name of the unification algorithm to be used (see
 	 *            UnificationAlgorithmFactory)
+	 * @param expandPrimitiveDefinitions
 	 * @return an iterator yielding all produced unifiers (as sets of
 	 *         OWLEquivalentClassesAxioms describing the definitions of the user
 	 *         variables)
 	 */
 	public Iterator<Set<OWLEquivalentClassesAxiom>> modifyOntologyAndSolve(OWLOntology positiveProblem,
-			OWLOntology negativeProblem, Set<OWLClass> variables, String algorithmName) {
+			OWLOntology negativeProblem, OWLOntology constraints, Set<OWLClass> variables, String algorithmName,
+			boolean expandPrimitiveDefinitions) {
 
 		OWLOntologyManager manager;
 		if (ontologies.size() > 0) {
@@ -323,12 +329,15 @@ public class AlternativeUelStarter {
 			manager = positiveProblem.getOWLOntologyManager();
 		} else if (negativeProblem != null) {
 			manager = negativeProblem.getOWLOntologyManager();
+		} else if (constraints != null) {
+			manager = constraints.getOWLOntologyManager();
 		} else {
 			manager = OWLManager.createOWLOntologyManager();
 		}
 
 		UelModel uelModel = new UelModel(new BasicOntologyProvider(manager));
-		uelModel.setupGoal(ontologies, positiveProblem, negativeProblem, null, owlThingAlias, snomedMode, true);
+		uelModel.setupGoal(ontologies, positiveProblem, negativeProblem, constraints, owlThingAlias, snomedMode, true,
+				expandPrimitiveDefinitions);
 
 		return modifyOntologyAndSolve(uelModel, variables, algorithmName);
 	}

@@ -19,6 +19,9 @@ import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 
+import com.google.common.collect.Sets;
+
+import de.tudresden.inf.lat.uel.core.renderer.StringRenderer;
 import de.tudresden.inf.lat.uel.type.api.AtomManager;
 import de.tudresden.inf.lat.uel.type.api.Axiom;
 import de.tudresden.inf.lat.uel.type.api.Definition;
@@ -49,7 +52,7 @@ public class UelOntologyGoal implements Goal {
 	private final Map<Integer, Set<Integer>> ranges = new HashMap<Integer, Set<Integer>>();
 	private final Map<Integer, Integer> roleGroupTypes = new HashMap<Integer, Integer>();
 	private final Set<Subsumption> subsumptions = new HashSet<Subsumption>();
-
+	private final Map<Integer, Integer> typeAssignment = new HashMap<Integer, Integer>();
 	private final Set<Integer> types = new HashSet<Integer>();
 
 	/**
@@ -66,6 +69,10 @@ public class UelOntologyGoal implements Goal {
 		this.ontology = ontology;
 	}
 
+	private void addDefinition(Definition definition) {
+		definitions.add(definition);
+	}
+
 	/**
 	 * Add a new definition to the goal. Actually, this is considered to be part
 	 * of the background ontology. If you want to add a definition to the goal,
@@ -80,10 +87,6 @@ public class UelOntologyGoal implements Goal {
 		Definition newDefinition = createAxiom(Definition.class, definiendum, definiens);
 		addDefinition(newDefinition);
 		atomManager.makeDefinitionVariable(newDefinition.getDefiniendum());
-	}
-
-	private void addDefinition(Definition definition) {
-		definitions.add(definition);
 	}
 
 	/**
@@ -165,10 +168,18 @@ public class UelOntologyGoal implements Goal {
 		subsumptions.add(createAxiom(Subsumption.class, axiom));
 	}
 
+	private <S, T> Set<T> collectSets(Set<S> input, Function<S, Set<T>> mapper) {
+		return input.stream().map(mapper).flatMap(Set::stream).collect(Collectors.toSet());
+	}
+
+	private <S, T> Set<T> collectSets(Set<S> input, Predicate<S> filter, Function<S, Set<T>> mapper) {
+		return input.stream().filter(filter).map(mapper).flatMap(Set::stream).collect(Collectors.toSet());
+	}
+
 	private <T extends Axiom> T createAxiom(Class<T> type, OWLClassExpression left, OWLClassExpression right) {
 		Set<Definition> newDefinitions = new HashSet<Definition>();
-		Set<Integer> leftIds = ontology.processClassExpression(left, newDefinitions);
-		Set<Integer> rightIds = ontology.processClassExpression(right, newDefinitions);
+		Set<Integer> leftIds = ontology.processClassExpression(left, newDefinitions, false);
+		Set<Integer> rightIds = ontology.processClassExpression(right, newDefinitions, false);
 		T newAxiom;
 		try {
 			newAxiom = type.getConstructor(Set.class, Set.class).newInstance(leftIds, rightIds);
@@ -197,87 +208,97 @@ public class UelOntologyGoal implements Goal {
 		ontology = null;
 	}
 
+	private void extractDomainsAndRanges() {
+		// extract all types from domain/range restrictions of used role names
+		Set<Integer> processedRoleIds = new HashSet<Integer>();
+		Set<Integer> remainingRoleIds = new HashSet<Integer>(atomManager.getRoleIds());
+		while (!remainingRoleIds.isEmpty()) {
+			for (Integer roleId : remainingRoleIds) {
+				processedRoleIds.add(roleId);
+
+				Set<OWLClass> domainClasses = ontology.getDomain(roleId);
+				if (domainClasses != null) {
+					Set<Integer> domain = processClasses(domainClasses, true);
+					domains.put(roleId, domain);
+					types.addAll(domain);
+				}
+
+				Set<OWLClass> rangeClasses = ontology.getRange(roleId);
+				if (rangeClasses != null) {
+					Set<Integer> range = processClasses(rangeClasses, true);
+					ranges.put(roleId, range);
+					types.addAll(range);
+				}
+			}
+			remainingRoleIds = new HashSet<Integer>(atomManager.getRoleIds());
+			remainingRoleIds.removeAll(processedRoleIds);
+		}
+	}
+
 	/**
 	 * Extract 'sibling' classes for all defined classes that are not otherwise
 	 * used (in other definitions), and do not occur directly in the
 	 * user-specified goal.
 	 * 
+	 * @param renderer
+	 *            for debugging
 	 * @return he set of IDs of the UNDEF variables introduced to directly
 	 *         define the siblings (i.e., not the ones belonging to their
 	 *         superclasses)
 	 */
-	public Set<Integer> extractSiblings() {
+	public Set<Integer> extractSiblings(StringRenderer renderer) {
 		// find all parents of leaves (ids that are not used in other defs) that
 		// do not occur in the goal
-		Set<Integer> parentIds = mapSet(atomManager.getDefinitionVariables(), id -> isLeaf(id) && notInGoal(id),
-				this::getParent);
+		Set<Integer> leafIds = filterSet(Sets.union(atomManager.getDefinitionVariables(), atomManager.getConstants()),
+				id -> !types.contains(id) && isLeaf(id) && notInGoal(id));
+		System.out.println(renderer.renderAtomList("Leaves", leafIds));
 
 		// pull in all siblings of leaves from ontology
-		Set<OWLClass> siblings = collectSets(parentIds, id -> true, ontology::getOtherChildren);
-		Set<Integer> siblingIds = processClasses(siblings);
+		Set<OWLClass> siblings = collectSets(leafIds, id -> true, ontology::getSiblings);
+		Set<Integer> siblingIds = processClasses(siblings, false);
+		System.out.println(renderer.renderAtomList("Siblings", siblingIds));
 
 		// return all UNDEF variables created for the siblings' definitions
 		// (only the "most specific" ones)
 		return collectSets(siblingIds, id -> true, this::getTopLevelUndefIds);
 	}
 
-	private boolean notInGoal(Integer atomId) {
-		return notInAxioms(equations, atomId) && notInAxioms(subsumptions, atomId) && notInAxioms(disequations, atomId)
-				&& notInAxioms(dissubsumptions, atomId);
+	private void extractTopLevelTypes() {
+		// extract all used top-level concept names from the background
+		// ontology; skip those that only occur in the goal or are UNDEF names
+		new HashSet<Integer>(Sets.union(atomManager.getVariables(), atomManager.getConstants())).stream()
+				.map(ontology::getClassification).filter(Optional::isPresent).map(Optional::get).forEach(types::add);
 	}
 
-	private boolean notInAxioms(Set<? extends Axiom> axioms, Integer atomId) {
-		return axioms.stream()
-				.allMatch(axiom -> !axiom.getLeft().contains(atomId) && !axiom.getRight().contains(atomId));
-	}
+	private void extractTypeHierarchy() {
+		// designate the top concept as the most general type
+		types.add(ontology.getTop(true));
 
-	private Set<Integer> getTopLevelUndefIds(Integer atomId) {
-		// extract most specific UNDEF names used in the definition of 'atomId'
-		Definition def = definitions.getDefinition(atomId);
-		if (def == null) {
-			return Collections.emptySet();
-		}
-
-		Integer undefId = getUndefIdFromPrimitiveDefinition(def);
-		if (undefId != null) {
-			return Collections.singleton(undefId);
-		} else {
-			return collectSets(def.getRight(), id -> atomManager.getExistentialRestrictions().contains(id),
-					id -> getTopLevelUndefIds(atomManager.getChild(id)));
+		// extract type hierarchy
+		for (Integer type : types) {
+			// traverse the class hierarchy and try to find another type
+			Set<Integer> supertypes = ontology.getMostSpecificSuperclasses(type, types);
+			if (supertypes.size() > 1) {
+				throw new RuntimeException("A type can only have one direct supertype.");
+			}
+			if (supertypes.size() == 1) {
+				directSupertype.put(type, supertypes.iterator().next());
+			}
 		}
 	}
 
-	private Integer getUndefIdFromPrimitiveDefinition(Definition definition) {
-		for (Integer atomId : definition.getRight()) {
-			if (atomManager.getConstants().contains(atomId)) {
-				if (atomManager.printConceptName(atomId).endsWith(AtomManager.UNDEF_SUFFIX)) {
-					return atomId;
+	private void extractTypeAssignment() {
+		for (Integer conceptNameId : Sets.union(atomManager.getConstants(), atomManager.getVariables())) {
+			if (!types.contains(conceptNameId)) {
+				Set<Integer> supertypes = ontology.getMostSpecificSuperclasses(conceptNameId, types);
+				if (supertypes.size() > 1) {
+					throw new RuntimeException("A concept name cannot belong to different types.");
+				}
+				if (supertypes.size() == 1) {
+					typeAssignment.put(conceptNameId, supertypes.iterator().next());
 				}
 			}
 		}
-		return null;
-	}
-
-	private <S, T> Set<T> collectSets(Set<S> input, Predicate<S> filter, Function<S, Set<T>> mapper) {
-		return input.stream().filter(filter).map(mapper).flatMap(Set::stream).collect(Collectors.toSet());
-	}
-
-	private <S, T> Set<T> mapSet(Set<S> input, Function<S, T> mapper) {
-		return input.stream().map(mapper).collect(Collectors.toSet());
-	}
-
-	private <S, T> Set<T> mapSet(Set<S> input, Predicate<S> filter, Function<S, Optional<T>> mapper) {
-		return input.stream().filter(filter).map(mapper).filter(Optional::isPresent).map(Optional::get)
-				.collect(Collectors.toSet());
-	}
-
-	private boolean isLeaf(Integer atomId) {
-		return !definitions.values().stream().anyMatch(d -> d.getRight().contains(atomId));
-	}
-
-	private Optional<Integer> getParent(Integer atomId) {
-		return definitions.getDefiniens(atomId).stream().filter(id -> atomManager.getVariables().contains(id))
-				.findFirst();
 	}
 
 	/**
@@ -289,87 +310,11 @@ public class UelOntologyGoal implements Goal {
 		extractTopLevelTypes();
 		extractTypeHierarchy();
 		introduceRoleGroupTypes();
+		extractTypeAssignment();
 	}
 
-	private void introduceRoleGroupTypes() {
-		// copy type hierarchy
-		for (Integer type : types) {
-			if (type.equals(ontology.getTop())) {
-				// keep the top concept as the unique most general type
-				roleGroupTypes.put(type, type);
-			} else {
-				roleGroupTypes.put(type, atomManager.createRoleGroupConceptName(type));
-			}
-		}
-		for (Integer type : types) {
-			Integer supertype = directSupertype.get(type);
-			if (supertype != null) {
-				directSupertype.put(roleGroupTypes.get(type), roleGroupTypes.get(supertype));
-			}
-		}
-
-		// finally add all newly created types to the collection
-		types.addAll(roleGroupTypes.values());
-
-		// change the domains of all roles to the corresponding 'role group
-		// types'
-		for (Integer type : domains.keySet()) {
-			Set<Integer> domain = domains.get(type);
-			domains.put(type, mapSet(domain, roleGroupTypes::get));
-		}
-	}
-
-	private void extractTypeHierarchy() {
-		// designate the top concept as the most general type
-		Integer topId = ontology.getTop();
-		types.add(topId);
-
-		// extract type hierarchy
-		for (Integer type : types) {
-			// traverse the class hierarchy and try to find another type
-			Optional<Integer> supertype = Optional.of(type);
-			do {
-				supertype = ontology.getDirectSuperclass(supertype.get());
-			} while (supertype.isPresent() && !types.contains(supertype.get()));
-
-			if (supertype.isPresent()) {
-				directSupertype.put(type, supertype.get());
-			}
-		}
-	}
-
-	private void extractTopLevelTypes() {
-		// extract all used top-level concept names from the background
-		// ontology; skip those that only occur in the goal or are UNDEF names
-		atomManager.getVariables().stream().map(ontology::getClassification).filter(Optional::isPresent)
-				.map(Optional::get).forEach(types::add);
-	}
-
-	private void extractDomainsAndRanges() {
-		// extract all types from domain/range restrictions of used role names
-		Set<Integer> processedRoleIds = new HashSet<Integer>();
-		Set<Integer> remainingRoleIds = new HashSet<Integer>(atomManager.getRoleIds());
-		while (!remainingRoleIds.isEmpty()) {
-			for (Integer roleId : remainingRoleIds) {
-				processedRoleIds.add(roleId);
-
-				Set<OWLClass> domainClasses = ontology.getDomain(roleId);
-				if (domainClasses != null) {
-					Set<Integer> domain = processClasses(domainClasses);
-					domains.put(roleId, domain);
-					types.addAll(domain);
-				}
-
-				Set<OWLClass> rangeClasses = ontology.getRange(roleId);
-				if (rangeClasses != null) {
-					Set<Integer> range = processClasses(rangeClasses);
-					ranges.put(roleId, range);
-					types.addAll(range);
-				}
-			}
-			remainingRoleIds = new HashSet<Integer>(atomManager.getRoleIds());
-			remainingRoleIds.removeAll(processedRoleIds);
-		}
+	private <S> Set<S> filterSet(Set<S> input, Predicate<S> filter) {
+		return input.stream().filter(filter).collect(Collectors.toSet());
 	}
 
 	@Override
@@ -378,8 +323,8 @@ public class UelOntologyGoal implements Goal {
 	}
 
 	@Override
-	public DefinitionSet getDefinitions() {
-		return definitions;
+	public Set<Integer> getDefiniens(Integer varId) {
+		return definitions.getDefiniens(varId);
 	}
 
 	@Override
@@ -388,8 +333,8 @@ public class UelOntologyGoal implements Goal {
 	}
 
 	@Override
-	public Set<Integer> getDefiniens(Integer varId) {
-		return definitions.getDefiniens(varId);
+	public DefinitionSet getDefinitions() {
+		return definitions;
 	}
 
 	@Override
@@ -432,44 +377,45 @@ public class UelOntologyGoal implements Goal {
 		return subsumptions;
 	}
 
+	private Set<Integer> getTopLevelUndefIds(Integer atomId) {
+		// extract most specific UNDEF names used in the definition of 'atomId'
+		Definition def = definitions.getDefinition(atomId);
+		if (def == null) {
+			return Collections.emptySet();
+		}
+
+		Integer undefId = getUndefIdFromPrimitiveDefinition(def);
+		if (undefId != null) {
+			return Collections.singleton(undefId);
+		} else {
+			return collectSets(def.getRight(), id -> atomManager.getExistentialRestrictions().contains(id),
+					id -> getTopLevelUndefIds(atomManager.getChild(id)));
+		}
+	}
+
+	@Override
+	public Map<Integer, Integer> getTypeAssignment() {
+		return typeAssignment;
+	}
+
 	@Override
 	public Set<Integer> getTypes() {
 		return types;
 	}
 
-	public boolean hasNegativePart() {
-		return !disequations.isEmpty() || !dissubsumptions.isEmpty();
-	}
-
-	private Set<Integer> processClasses(Set<OWLClass> classes) {
-		Set<Definition> newDefinitions = new HashSet<Definition>();
-		Set<Integer> classIds = new HashSet<Integer>();
-		for (OWLClass newClass : classes) {
-			classIds.addAll(ontology.processClassExpression(newClass, newDefinitions));
-		}
-		processDefinitions(newDefinitions);
-		return classIds;
-	}
-
-	private void processDefinitions(Set<Definition> newDefinitions) {
-		for (Definition newDefinition : newDefinitions) {
-			// only full definitions are allowed
-			if (newDefinition.isPrimitive()) {
-				addDefinition(processPrimitiveDefinition(newDefinition));
-			} else {
-				addDefinition(newDefinition);
+	private Integer getUndefIdFromPrimitiveDefinition(Definition definition) {
+		for (Integer atomId : definition.getRight()) {
+			if (atomManager.getConstants().contains(atomId)) {
+				if (atomManager.printConceptName(atomId).endsWith(AtomManager.UNDEF_SUFFIX)) {
+					return atomId;
+				}
 			}
 		}
+		return null;
 	}
 
-	private Definition processPrimitiveDefinition(Definition def) {
-		Integer defId = def.getDefiniendum();
-		Integer undefId = atomManager.createUndefConceptName(defId);
-
-		// create full definition
-		Set<Integer> newRightIds = new HashSet<Integer>(def.getRight());
-		newRightIds.add(undefId);
-		return new Definition(defId, newRightIds, false);
+	public boolean hasNegativePart() {
+		return !disequations.isEmpty() || !dissubsumptions.isEmpty();
 	}
 
 	/**
@@ -503,5 +449,87 @@ public class UelOntologyGoal implements Goal {
 				}
 			}
 		}
+	}
+
+	private void introduceRoleGroupTypes() {
+		// copy type hierarchy
+		for (Integer type : types) {
+			if (type.equals(ontology.getTop(true))) {
+				// keep the top concept as the unique most general type
+				roleGroupTypes.put(type, type);
+			} else {
+				roleGroupTypes.put(type, atomManager.createRoleGroupConceptName(type));
+			}
+		}
+		for (Integer type : types) {
+			Integer supertype = directSupertype.get(type);
+			if (supertype != null) {
+				directSupertype.put(roleGroupTypes.get(type), roleGroupTypes.get(supertype));
+			}
+		}
+
+		// finally add all newly created types to the collection
+		types.addAll(roleGroupTypes.values());
+
+		// change the domains of all roles to the corresponding 'role group
+		// types'
+		for (Integer type : domains.keySet()) {
+			Set<Integer> domain = domains.get(type);
+			domains.put(type, mapSet(domain, roleGroupTypes::get));
+		}
+	}
+
+	private boolean isLeaf(Integer atomId) {
+		return !definitions.values().stream().anyMatch(d -> d.getRight().contains(atomId));
+	}
+
+	private <S, T> Set<T> mapSet(Set<S> input, Function<S, T> mapper) {
+		return input.stream().map(mapper).collect(Collectors.toSet());
+	}
+
+	private <S, T> Set<T> mapSet(Set<S> input, Predicate<S> filter, Function<S, Optional<T>> mapper) {
+		return input.stream().filter(filter).map(mapper).filter(Optional::isPresent).map(Optional::get)
+				.collect(Collectors.toSet());
+	}
+
+	private boolean notInAxioms(Set<? extends Axiom> axioms, Integer atomId) {
+		return axioms.stream()
+				.allMatch(axiom -> !axiom.getLeft().contains(atomId) && !axiom.getRight().contains(atomId));
+	}
+
+	private boolean notInGoal(Integer atomId) {
+		return notInAxioms(equations, atomId) && notInAxioms(subsumptions, atomId) && notInAxioms(disequations, atomId)
+				&& notInAxioms(dissubsumptions, atomId);
+	}
+
+	private Set<Integer> processClasses(Set<OWLClass> classes, boolean onlyTypes) {
+		Set<Definition> newDefinitions = new HashSet<Definition>();
+		Set<Integer> classIds = new HashSet<Integer>();
+		for (OWLClass newClass : classes) {
+			classIds.addAll(ontology.processClassExpression(newClass, newDefinitions, onlyTypes));
+		}
+		processDefinitions(newDefinitions);
+		return classIds;
+	}
+
+	private void processDefinitions(Set<Definition> newDefinitions) {
+		for (Definition newDefinition : newDefinitions) {
+			// only full definitions are allowed
+			if (newDefinition.isPrimitive()) {
+				addDefinition(processPrimitiveDefinition(newDefinition));
+			} else {
+				addDefinition(newDefinition);
+			}
+		}
+	}
+
+	private Definition processPrimitiveDefinition(Definition def) {
+		Integer defId = def.getDefiniendum();
+		Integer undefId = atomManager.createUndefConceptName(defId);
+
+		// create full definition
+		Set<Integer> newRightIds = new HashSet<Integer>(def.getRight());
+		newRightIds.add(undefId);
+		return new Definition(defId, newRightIds, false);
 	}
 }
