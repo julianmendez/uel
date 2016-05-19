@@ -113,6 +113,7 @@ public class UnifierPostprocessor {
 		expanded.addAll(atomIds);
 		toVisit.addAll(atomIds);
 
+		// expand definitions and substitutions "forward"
 		while (!toVisit.isEmpty()) {
 			Integer atomId = toVisit.iterator().next();
 			expanded.remove(atomId);
@@ -132,26 +133,20 @@ public class UnifierPostprocessor {
 	}
 
 	private Set<Integer> expandOneStep(Integer atomId, DefinitionSet defs) {
-		if (atomManager.getConstants().contains(atomId) || atomManager.getExistentialRestrictions().contains(atomId)) {
-			// non-variable atoms cannot be expanded
+		if (atomManager.getConstants().contains(atomId) || atomManager.getExistentialRestrictions().contains(atomId)
+				|| atomManager.getUndefNames().contains(atomId)) {
+			// non-variable atoms and UNDEF names are not expanded
 			return Collections.singleton(atomId);
-		} else if (atomManager.getUserVariables().contains(atomId)) {
-			if (atomManager.getUndefNames().contains(atomId)) {
-				// UNDEF variables are not expanded
-				return Collections.singleton(atomId);
-			} else {
-				// all other user variables are expanded using their original
-				// definitions
-				return defs.getDefiniens(atomId);
-			}
+		}
+
+		// 'atomId' must be a (non-UNDEF) variable
+		Set<Integer> definiens = goal.getDefiniens(atomId);
+		if (definiens != null) {
+			// if there exists a background definition, use that one
+			return definiens;
 		} else {
-			// 'atomId' must be a definition or flattening variable
-			Definition def = goal.getDefinition(atomId);
-			if (def != null) {
-				return def.getRight();
-			} else {
-				return defs.getDefiniens(atomId);
-			}
+			// all other variables are expanded using their substitutions
+			return defs.getDefiniens(atomId);
 		}
 	}
 
@@ -166,8 +161,7 @@ public class UnifierPostprocessor {
 			}
 			return sum(expanded, id -> getFullSize(id, defs));
 		} else if (atomManager.getExistentialRestrictions().contains(atomId)) {
-			return atomManager.getExistentialRestriction(atomId).getRoleId()
-					+ 100 * getFullSize(atomManager.getChild(atomId), defs);
+			return atomManager.getRoleId(atomId) + 100 * getFullSize(atomManager.getChild(atomId), defs);
 		} else {
 			return atomId;
 		}
@@ -200,11 +194,11 @@ public class UnifierPostprocessor {
 			return leftIds.contains(rightId);
 		}
 
-		Integer roleId = atomManager.getExistentialRestriction(rightId).getRoleId();
+		Integer roleId = atomManager.getRoleId(rightId);
 		Integer childId = atomManager.getChild(rightId);
 		for (Integer leftId : leftIds) {
 			if (atomManager.getExistentialRestrictions().contains(leftId)) {
-				if (atomManager.getExistentialRestriction(leftId).getRoleId().equals(roleId)) {
+				if (atomManager.getRoleId(leftId).equals(roleId)) {
 					if (isSubsumed(atomManager.getChild(leftId), leftDefs, childId, rightDefs)) {
 						// a matching existential restriction was found on the
 						// left-hand side
@@ -233,7 +227,7 @@ public class UnifierPostprocessor {
 	}
 
 	/**
-	 * Minimize a given unifier, resulting in a new unifier.
+	 * Minimize a given unifier, resulting in an equivalent unifier.
 	 * 
 	 * @param unifier
 	 *            the original unifier
@@ -246,7 +240,10 @@ public class UnifierPostprocessor {
 			defs.add(new Definition(def));
 		}
 
-		replaceUndefNames(defs);
+		// saturate all substitutions of user variables by exhaustively applying
+		// all background definitions "backward"
+		saturateWithDefinitions(defs);
+//		System.out.println(renderer.renderUnifier(new Unifier(defs), false, false, true));
 
 		for (Integer varId : atomManager.getVariables()) {
 			if (atomManager.getDefinitionVariables().contains(varId)) {
@@ -299,17 +296,26 @@ public class UnifierPostprocessor {
 		}
 
 		return new Unifier(defs, unifier.getTypeAssignment());
-
 	}
 
-	private void replaceUndefNames(DefinitionSet defs) {
-		// replace UNDEF names by originals
+	private void saturateWithDefinitions(DefinitionSet defs) {
 		for (Integer varId : atomManager.getUserVariables()) {
-			Set<Integer> definiens = defs.getDefiniens(varId);
-			for (Integer undefId : atomManager.getUndefNames()) {
-				if (definiens.contains(undefId)) {
-					definiens.remove(undefId);
-					definiens.add(goal.getAtomManager().removeUndef(undefId));
+			saturateWithDefinitions(defs.getDefiniens(varId));
+		}
+	}
+
+	private void saturateWithDefinitions(Set<Integer> atomIds) {
+		boolean changed = true;
+
+		while (changed) {
+			changed = false;
+
+			for (Integer varId : atomManager.getDefinitionVariables()) {
+				if (!atomIds.contains(varId)) {
+					if (atomIds.containsAll(goal.getDefiniens(varId))) {
+						atomIds.add(varId);
+						changed = true;
+					}
 				}
 			}
 		}

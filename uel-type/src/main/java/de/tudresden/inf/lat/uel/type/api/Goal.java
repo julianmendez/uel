@@ -127,4 +127,12 @@ public interface Goal {
 		return Collections.emptyMap();
 	}
 
+	default boolean enforceUniqueExistentialRestrictions() {
+		return false;
+	}
+
+	default boolean areCompatible(Integer atomId1, Integer atomId2) {
+		return true;
+	}
+
 }

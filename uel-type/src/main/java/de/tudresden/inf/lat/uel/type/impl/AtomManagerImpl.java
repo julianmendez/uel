@@ -24,6 +24,7 @@ public class AtomManagerImpl implements AtomManager {
 	private final Set<Integer> constants = new HashSet<Integer>();
 	private final Set<Integer> definitionVariables = new HashSet<Integer>();
 	private final Set<Integer> flatteningVariables = new HashSet<Integer>();
+	private final Map<Integer, Integer> roleIdMap = new HashMap<Integer, Integer>();
 	private final IndexedSet<String> roleNames = new IndexedSetImpl<String>();
 	private final Set<Integer> undefs = new HashSet<Integer>();
 	private final Set<Integer> userVariables = new HashSet<Integer>();
@@ -65,6 +66,7 @@ public class AtomManagerImpl implements AtomManager {
 		Integer roleId = roleNames.addAndGetIndex(roleName);
 		Integer atomId = atoms.addAndGetIndex(new ExistentialRestriction(roleId, getConceptName(childId)));
 		childMap.put(atomId, childId);
+		roleIdMap.put(atomId, roleId);
 		return atomId;
 	}
 
@@ -140,6 +142,11 @@ public class AtomManagerImpl implements AtomManager {
 	}
 
 	@Override
+	public Integer getRoleId(Integer atomId) {
+		return roleIdMap.get(atomId);
+	}
+
+	@Override
 	public Set<Integer> getRoleIds() {
 		return Collections.unmodifiableSet(roleNames.getIndices());
 	}
@@ -211,7 +218,7 @@ public class AtomManagerImpl implements AtomManager {
 
 	@Override
 	public String printRoleName(Integer atomId) {
-		return roleNames.get(getExistentialRestriction(atomId).getRoleId());
+		return roleNames.get(roleIdMap.get(atomId));
 	}
 
 	@Override

@@ -391,7 +391,7 @@ public abstract class Renderer<ExpressionType, RoleType, AxiomsType> {
 	protected ExpressionType translateAtom(Integer atomId, boolean expand) {
 		if (atomManager.getExistentialRestrictions().contains(atomId)) {
 			Integer childId = atomManager.getChild(atomId);
-			Integer roleId = atomManager.getExistentialRestriction(atomId).getRoleId();
+			Integer roleId = atomManager.getRoleId(atomId);
 			return translateExistentialRestriction(roleId, childId, this::translateRole, t -> translateAtom(t, expand));
 		} else {
 			if (expand && restrictToUserVariables && atomManager.getFlatteningVariables().contains(atomId)) {

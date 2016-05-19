@@ -25,6 +25,7 @@ import de.tudresden.inf.lat.uel.sat.type.SatInput;
 import de.tudresden.inf.lat.uel.sat.type.SatOutput;
 import de.tudresden.inf.lat.uel.sat.type.Solver;
 import de.tudresden.inf.lat.uel.type.api.Atom;
+import de.tudresden.inf.lat.uel.type.api.AtomManager;
 import de.tudresden.inf.lat.uel.type.api.Definition;
 import de.tudresden.inf.lat.uel.type.api.Disequation;
 import de.tudresden.inf.lat.uel.type.api.Dissubsumption;
@@ -253,7 +254,7 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 			}
 		}
 
-		// // d - no concept name can have disjoint types
+		// d - no concept name can have disjoint types
 		List<Integer> types = new ArrayList<Integer>(goal.getTypes());
 		for (int i = 0; i < types.size(); i++) {
 			for (int j = i + 1; j < types.size(); j++) {
@@ -270,7 +271,7 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 		// domain restrictions
 		for (Integer varId : getVariables()) {
 			for (Integer eatomId : getExistentialRestrictions()) {
-				Integer roleId = goal.getAtomManager().getExistentialRestriction(eatomId).getRoleId();
+				Integer roleId = goal.getAtomManager().getRoleId(eatomId);
 				Set<Integer> domain = goal.getDomains().get(roleId);
 				if (domain != null) {
 					Set<Integer> head = domain.stream().map(type -> subtype(varId, type)).collect(Collectors.toSet());
@@ -281,7 +282,7 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 
 		// range restrictions
 		for (Integer eatomId : getExistentialRestrictions()) {
-			Integer roleId = goal.getAtomManager().getExistentialRestriction(eatomId).getRoleId();
+			Integer roleId = goal.getAtomManager().getRoleId(eatomId);
 			Integer childId = goal.getAtomManager().getChild(eatomId);
 			Set<Integer> range = goal.getRanges().get(roleId);
 			if (range != null) {
@@ -292,7 +293,7 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 		// 'RoleGroup' translates between 'normal types' and 'role group types'
 		Integer roleGroupId = goal.getAtomManager().getRoleId("http://www.ihtsdo.org/RoleGroup");
 		for (Integer eatomId : getExistentialRestrictions()) {
-			if (goal.getAtomManager().getExistentialRestriction(eatomId).getRoleId().equals(roleGroupId)) {
+			if (goal.getAtomManager().getRoleId(eatomId).equals(roleGroupId)) {
 				Integer childId = goal.getAtomManager().getChild(eatomId);
 				for (Integer varId : getVariables()) {
 					Integer subsumptionLiteral = subsumption(varId, eatomId);
@@ -516,6 +517,9 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 			addTypeRestrictions(ret);
 		}
 
+		logger.finer("enforcing unique existential restrictions ...");
+		enforceUniqueExistentialRestrictions(ret);
+
 		if (this.onlyMinimalAssignments) {
 			logger.finer("adding literals to be minimized ...");
 			for (Integer varId : getUserVariables()) {
@@ -544,6 +548,89 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 				}
 			}
 		}
+	}
+
+	private void enforceUniqueExistentialRestrictions(SatInput input) {
+
+		for (Integer eatomId1 : getExistentialRestrictions()) {
+			for (Integer eatomId2 : getExistentialRestrictions()) {
+				if (!eatomId1.equals(eatomId2)) {
+					if (goal.getAtomManager().getRoleId(eatomId1).equals(goal.getAtomManager().getRoleId(eatomId2))) {
+						Integer child1 = goal.getAtomManager().getChild(eatomId1);
+						Integer child2 = goal.getAtomManager().getChild(eatomId2);
+						if (!goal.areCompatible(child1, child2)) {
+							// System.out
+							// .println("Not compatible: " + printAtom(eatomId1)
+							// + " and " + printAtom(eatomId2));
+							for (Integer varId : getVariables()) {
+								input.add(negativeClause(subsumption(varId, eatomId1), subsumption(varId, eatomId2)));
+							}
+						} else {
+							// even if compatible, they need to be related via
+							// subsumption if possible
+							if (getVariables().contains(child1) || getVariables().contains(child2)) {
+								System.out.println(
+										"Possibly compatible: " + printAtom(eatomId1) + " and " + printAtom(eatomId2));
+								// TODO: why are Action and Evaluation-action not compatible??
+								// for (Integer varId : getVariables()) {
+								// Set<Integer> head = new HashSet<Integer>(
+								// Arrays.asList(subsumption(child1, child2),
+								// subsumption(child2, child1)));
+								// input.add(implication(head,
+								// subsumption(varId, eatomId1),
+								// subsumption(varId, eatomId2)));
+								// }
+							}
+						}
+					}
+				}
+			}
+		}
+
+		for (Integer atomId1 : goal.getAtomManager().getConstants()) {
+			for (Integer atomId2 : goal.getAtomManager().getConstants()) {
+				if (!goal.areCompatible(atomId1, atomId2)) {
+					// System.out.println("Not compatible: " +
+					// printAtom(atomId1) + " and " + printAtom(atomId2));
+					for (Integer varId : getVariables()) {
+						input.add(negativeClause(subsumption(varId, atomId1), subsumption(varId, atomId2)));
+					}
+				}
+			}
+		}
+	}
+
+	private Set<Integer> getSuperclasses(Integer varId) {
+		Set<Integer> allSuperclasses = new HashSet<Integer>();
+		allSuperclasses.add(varId);
+		Set<Integer> directSuperclasses = goal.getDefiniens(varId);
+		if (directSuperclasses != null) {
+			for (Integer id : directSuperclasses) {
+				allSuperclasses.addAll(getSuperclasses(id));
+			}
+		}
+		return allSuperclasses;
+	}
+
+	private boolean areCompatible(Set<Set<Integer>> ideals, Integer atomId1, Integer atomId2) {
+		if (goal.getAtomManager().printConceptName(atomId1).endsWith(AtomManager.UNDEF_SUFFIX)) {
+			atomId1 = goal.getAtomManager().removeUndef(atomId1);
+		}
+		if (goal.getAtomManager().printConceptName(atomId2).endsWith(AtomManager.UNDEF_SUFFIX)) {
+			atomId2 = goal.getAtomManager().removeUndef(atomId2);
+		}
+
+		if (atomId1.equals(atomId2)) {
+			return true;
+		}
+
+		for (Set<Integer> ideal : ideals) {
+			if (ideal.contains(atomId1) && ideal.contains(atomId2)) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	private Set<Integer> getConceptNames() {
@@ -777,9 +864,9 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 			Set<Integer> clause = new HashSet<Integer>(choiceLiterals);
 			clause.add(neg(subsumption(leftIds.iterator().next(), rightId)));
 			input.add(clause);
-		} else if (getVariables().contains(rightId))
+		} else if (getVariables().contains(rightId)) {
 			runStep1DissubsumptionVariable(choiceLiterals, leftIds, rightId, input);
-		else {
+		} else {
 			// 'rightId' is a non-variable atom --> it should not subsume any of
 			// the leftIds
 			runStep1DissubsumptionNonVariableAtom(choiceLiterals, leftIds, rightId, input);
@@ -950,8 +1037,8 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 					 * if roles are not equal, then Step 2.2
 					 */
 
-					Integer role1 = goal.getAtomManager().getExistentialRestriction(atomId1).getRoleId();
-					Integer role2 = goal.getAtomManager().getExistentialRestriction(atomId2).getRoleId();
+					Integer role1 = goal.getAtomManager().getRoleId(atomId1);
+					Integer role2 = goal.getAtomManager().getRoleId(atomId2);
 					if (!role1.equals(role2)) {
 						input.add(neg(atomSubsumption));
 

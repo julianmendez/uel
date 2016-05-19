@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
@@ -24,6 +25,8 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 import org.semanticweb.owlapi.model.parameters.Imports;
 import org.semanticweb.owlapi.model.parameters.Navigation;
+
+import com.google.common.collect.Sets;
 
 import de.tudresden.inf.lat.uel.type.api.AtomManager;
 import de.tudresden.inf.lat.uel.type.api.Definition;
@@ -240,15 +243,28 @@ class UelOntology {
 		return ont.getEquivalentClassesAxioms(cls).stream().flatMap(ax -> ax.getClassExpressionsMinus(cls).stream());
 	}
 
-	/**
-	 * Retrieve the direct superclass (possibly top) of a given concept name
-	 * from the background ontologies.
-	 * 
-	 * @param conceptNameId
-	 *            the atom id of the concept name
-	 * @return an Optional object containing the atom id of the direct
-	 *         superclass, if it exists, and an empty Optional otherwise
-	 */
+	public Set<Integer> getKnownSuperclasses(Integer atomId) {
+		Optional<OWLClass> cls = checkUsedClass(atomId);
+		if (!cls.isPresent()) {
+			return Collections.singleton(atomId);
+		}
+
+		Set<Integer> ret = new HashSet<Integer>();
+		ret.add(atomId);
+		Set<OWLClass> superclasses = new HashSet<OWLClass>();
+		superclasses.add(cls.get());
+
+		while (!superclasses.isEmpty()) {
+			superclasses = superclasses.stream().flatMap(c -> getDirectSuperclasses(c).stream()).peek(c -> {
+				if (nameMap.containsValue(c)) {
+					ret.add(classToId(c, true));
+				}
+			}).collect(Collectors.toSet());
+		}
+
+		return ret;
+	}
+
 	public Set<Integer> getMostSpecificSuperclasses(Integer conceptNameId, Set<Integer> types) {
 		Optional<OWLClass> cls = checkUsedClass(conceptNameId);
 		if (!cls.isPresent()) {
@@ -397,7 +413,8 @@ class UelOntology {
 
 	/**
 	 * Retrieve the atom id of the top concept.
-	 * @param onlyTypes 
+	 * 
+	 * @param onlyTypes
 	 * 
 	 * @return top id
 	 */
@@ -477,6 +494,26 @@ class UelOntology {
 	private OWLObjectProperty toOWLObjectProperty(Integer roleId) {
 		IRI roleIRI = IRI.create(atomManager.getRoleName(roleId));
 		return OWLManager.getOWLDataFactory().getOWLObjectProperty(roleIRI);
+	}
+
+	/**
+	 * @param varId1
+	 * @param varId2
+	 */
+	public Set<OWLClass> extractDefinitionsUsing(Set<Integer> varIds) {
+		Set<OWLClass> classes = varIds.stream().map(this::checkUsedClass).filter(cls -> cls.isPresent())
+				.map(cls -> cls.get()).collect(Collectors.toSet());
+		return extractInformation(o -> f(o, classes), Function.identity(), cls -> Collections.singleton(cls),
+				() -> Collections.emptySet());
+		// TODO also for full definitions!
+	}
+
+	Stream<OWLClass> f(OWLOntology o, Set<OWLClass> classes) {
+		Stream<OWLSubClassOfAxiom> s2 = o.getAxioms(AxiomType.SUBCLASS_OF).stream();
+		return s2
+				.filter(ax -> Sets.intersection(ax.getSuperClass().asConjunctSet(), classes).size() > 1
+						&& !ax.getSubClass().isAnonymous())
+				.map(ax -> ax.getSubClass().asOWLClass()).filter(cls -> !nameMap.containsValue(cls));
 	}
 
 }

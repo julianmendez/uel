@@ -47,7 +47,9 @@ public class UelOntologyGoal implements Goal {
 	private final Set<Disequation> disequations = new HashSet<Disequation>();
 	private final Set<Dissubsumption> dissubsumptions = new HashSet<Dissubsumption>();
 	private final Map<Integer, Set<Integer>> domains = new HashMap<Integer, Set<Integer>>();
+	private final boolean enforceUniqueExistentialRestrictions;
 	private final Set<Equation> equations = new HashSet<Equation>();
+	private final Set<Set<Integer>> ideals = new HashSet<Set<Integer>>();
 	private UelOntology ontology;
 	private final Map<Integer, Set<Integer>> ranges = new HashMap<Integer, Set<Integer>>();
 	private final Map<Integer, Integer> roleGroupTypes = new HashMap<Integer, Integer>();
@@ -63,10 +65,12 @@ public class UelOntologyGoal implements Goal {
 	 *            all 'local' flat atoms
 	 * @param ontology
 	 *            the background ontology
+	 * @param enforceUniqueExistentialRestrictions
 	 */
-	public UelOntologyGoal(AtomManager manager, UelOntology ontology) {
+	public UelOntologyGoal(AtomManager manager, UelOntology ontology, boolean enforceUniqueExistentialRestrictions) {
 		this.atomManager = manager;
 		this.ontology = ontology;
+		this.enforceUniqueExistentialRestrictions = enforceUniqueExistentialRestrictions;
 	}
 
 	private void addDefinition(Definition definition) {
@@ -168,12 +172,89 @@ public class UelOntologyGoal implements Goal {
 		subsumptions.add(createAxiom(Subsumption.class, axiom));
 	}
 
+	@Override
+	public boolean areCompatible(Integer atomId1, Integer atomId2) {
+		if (!enforceUniqueExistentialRestrictions) {
+			return true;
+		}
+
+		if (!atomManager.getDefinitionVariables().contains(atomId1) && !atomManager.getConstants().contains(atomId1)) {
+			return true;
+		}
+		if (!atomManager.getDefinitionVariables().contains(atomId2) && !atomManager.getConstants().contains(atomId2)) {
+			return true;
+		}
+
+		if (atomManager.getUndefNames().contains(atomId1)) {
+			atomId1 = atomManager.removeUndef(atomId1);
+		}
+		if (atomManager.getUndefNames().contains(atomId2)) {
+			atomId2 = atomManager.removeUndef(atomId2);
+		}
+
+		Integer type1 = types.contains(atomId1) ? atomId1 : typeAssignment.get(atomId1);
+		Integer type2 = types.contains(atomId2) ? atomId2 : typeAssignment.get(atomId2);
+		if ((type1 == null) || (type2 == null) || areDisjoint(type1, type2)) {
+			return true;
+		}
+
+		if (atomId1.equals(atomId2)) {
+			return true;
+		}
+
+		for (Set<Integer> ideal : ideals) {
+			if (ideal.contains(atomId1) && ideal.contains(atomId2)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	private <S, T> Set<T> collectSets(Set<S> input, Function<S, Set<T>> mapper) {
 		return input.stream().map(mapper).flatMap(Set::stream).collect(Collectors.toSet());
 	}
 
 	private <S, T> Set<T> collectSets(Set<S> input, Predicate<S> filter, Function<S, Set<T>> mapper) {
 		return input.stream().filter(filter).map(mapper).flatMap(Set::stream).collect(Collectors.toSet());
+	}
+
+	public void computeCompatibilityRelation(StringRenderer renderer) {
+		Set<Integer> processed = new HashSet<Integer>();
+		Set<Integer> toProcess = new HashSet<Integer>(
+				Sets.union(atomManager.getDefinitionVariables(), atomManager.getConstants()));
+		while (!toProcess.isEmpty()) {
+			Integer varId = toProcess.iterator().next();
+			Set<Integer> superclasses = ontology.getKnownSuperclasses(varId);
+			ideals.add(superclasses);
+			processed.addAll(superclasses);
+			toProcess.removeAll(processed);
+		}
+
+		printIdeals(renderer);
+
+		// minimize the set of ideals
+		Set<Set<Integer>> notMaximal = new HashSet<Set<Integer>>();
+		for (Set<Integer> ideal1 : ideals) {
+			for (Set<Integer> ideal2 : ideals) {
+				if (!ideal1.equals(ideal2) && ideal1.containsAll(ideal2)) {
+					notMaximal.add(ideal2);
+				}
+			}
+		}
+		ideals.removeAll(notMaximal);
+
+		printIdeals(renderer);
+	}
+
+	private void printIdeals(StringRenderer renderer) {
+		int i = 1;
+		for (Set<Integer> ideal : ideals) {
+			System.out.println(renderer.renderAtomList("Ideal " + i, ideal));
+			i++;
+		}
+		System.out.println("#####################");
+		System.out.println();
 	}
 
 	private <T extends Axiom> T createAxiom(Class<T> type, OWLClassExpression left, OWLClassExpression right) {
@@ -206,6 +287,11 @@ public class UelOntologyGoal implements Goal {
 	 */
 	public void disposeOntology() {
 		ontology = null;
+	}
+
+	@Override
+	public boolean enforceUniqueExistentialRestrictions() {
+		return enforceUniqueExistentialRestrictions;
 	}
 
 	private void extractDomainsAndRanges() {
@@ -425,29 +511,6 @@ public class UelOntologyGoal implements Goal {
 	public void introduceBlankExistentialRestrictions() {
 		for (Integer roleId : atomManager.getRoleIds()) {
 			atomManager.createBlankExistentialRestriction(roleId);
-		}
-	}
-
-	/**
-	 * Introduce new dissubsumptions restricting the subsumptions between UNDEF
-	 * variables.
-	 */
-	public void introduceDissubsumptionsForUndefVariables() {
-		for (Integer undefId1 : atomManager.getUndefNames()) {
-			if (atomManager.getUserVariables().contains(undefId1)) {
-				for (Integer undefId2 : atomManager.getUndefNames()) {
-					if (atomManager.getConstants().contains(undefId2)) {
-						Integer origId1 = atomManager.removeUndef(undefId1);
-						Integer origId2 = atomManager.removeUndef(undefId2);
-						if (ontology.getClassification(origId1).equals(ontology.getClassification(origId2))) {
-							if (!ontology.isSubclass(origId1, origId2)) {
-								dissubsumptions.add(new Dissubsumption(Collections.singleton(undefId1),
-										Collections.singleton(undefId2)));
-							}
-						}
-					}
-				}
-			}
 		}
 	}
 

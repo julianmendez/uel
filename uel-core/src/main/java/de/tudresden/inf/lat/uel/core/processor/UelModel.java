@@ -17,6 +17,7 @@ import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 
 import de.tudresden.inf.lat.uel.core.renderer.OWLRenderer;
 import de.tudresden.inf.lat.uel.core.renderer.StringRenderer;
+import de.tudresden.inf.lat.uel.sat.solver.SatUnificationAlgorithm;
 import de.tudresden.inf.lat.uel.type.api.AtomManager;
 import de.tudresden.inf.lat.uel.type.api.Goal;
 import de.tudresden.inf.lat.uel.type.api.UnificationAlgorithm;
@@ -104,7 +105,7 @@ public class UelModel {
 			while (algorithm.computeNextUnifier()) {
 				System.out.print(".");
 				Unifier result = algorithm.getUnifier();
-				result = postprocessor.minimizeUnifier(result);
+				// result = postprocessor.minimizeUnifier(result);
 
 				if (!isNew(result)) {
 					continue;
@@ -272,6 +273,9 @@ public class UelModel {
 		allUnifiersFound = false;
 		algorithm = UnificationAlgorithmFactory.instantiateAlgorithm(name, goal);
 		postprocessor = new UnifierPostprocessor(atomManager, goal, getStringRenderer(null));
+		if (algorithm instanceof SatUnificationAlgorithm) {
+			((SatUnificationAlgorithm) algorithm).setShortFormMap(provider::getShortForm);
+		}
 	}
 
 	private boolean isNew(Unifier newUnifier) {
@@ -454,18 +458,6 @@ public class UelModel {
 		}
 	}
 
-	private void setUndefVariablesFromTypes(Set<Integer> siblingUndefIds) {
-		// for (Integer undefId : atomManager.getUndefNames()) {
-		// Integer origId = atomManager.removeUndef(undefId);
-		// if (!goal.getTypes().contains(origId) &&
-		// !siblingUndefIds.contains(undefId)) {
-		// // all UNDEF names belonging to types or siblings are
-		// // constants, all others are variables
-		// atomManager.makeUserVariable(undefId);
-		// }
-		// }
-	}
-
 	/**
 	 * Initializes the unification goal with the given ontologies.
 	 * 
@@ -487,6 +479,9 @@ public class UelModel {
 	 *            indicates whether the cached short forms should be reloaded
 	 *            from the OntologyProvider
 	 * @param expandPrimitiveDefinitions
+	 *            indicates whether primitive definitions should be expanded
+	 *            ('true') or the defined concepts should simply be constants
+	 *            ('false')
 	 */
 	public void setupGoal(Set<OWLOntology> bgOntologies, OWLOntology positiveProblem, OWLOntology negativeProblem,
 			OWLOntology constraintOntology, OWLClass owlThingAlias, boolean snomedMode, boolean resetShortFormCache,
@@ -500,7 +495,7 @@ public class UelModel {
 
 		OWLClass owlThing = getOWLThing(owlThingAlias, snomedMode);
 		goal = new UelOntologyGoal(atomManager,
-				new UelOntology(atomManager, bgOntologies, owlThing, expandPrimitiveDefinitions));
+				new UelOntology(atomManager, bgOntologies, owlThing, expandPrimitiveDefinitions), snomedMode);
 
 		if (positiveProblem != null) {
 			goal.addPositiveAxioms(positiveProblem.getAxioms());
@@ -514,11 +509,10 @@ public class UelModel {
 
 		// extract types from background ontologies
 		if (snomedMode) {
-			Set<Integer> siblingUndefIds = goal.extractSiblings(getStringRenderer(null));
+			goal.extractSiblings(getStringRenderer(null));
 			goal.extractTypes();
-			setUndefVariablesFromTypes(siblingUndefIds);
-			goal.introduceDissubsumptionsForUndefVariables();
 			goal.introduceBlankExistentialRestrictions();
+			goal.computeCompatibilityRelation(getStringRenderer(null));
 		}
 
 		if (constraintOntology != null) {

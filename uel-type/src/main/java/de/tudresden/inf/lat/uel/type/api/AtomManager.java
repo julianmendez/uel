@@ -47,7 +47,7 @@ public interface AtomManager {
 	 * 
 	 * @param conceptName
 	 *            the string representation of the concept name (OWLClass)
-	 * @param onlyTypes 
+	 * @param onlyTypes
 	 * @return the integer id of the concept name
 	 */
 	Integer createConceptName(String conceptName, boolean onlyTypes);
@@ -164,6 +164,16 @@ public interface AtomManager {
 	 * @return the associated role id
 	 */
 	Integer getRoleId(String roleName);
+
+	/**
+	 * Retrieve the role id of an existential restriction.
+	 * 
+	 * @param atomId
+	 *            the atom id
+	 * @return the role id of the existential restriction represented by the
+	 *         atom id
+	 */
+	Integer getRoleId(Integer atomId);
 
 	/**
 	 * Obtain the set of all role ids (different from atom ids).

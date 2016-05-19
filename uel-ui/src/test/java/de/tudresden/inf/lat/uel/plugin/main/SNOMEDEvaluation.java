@@ -104,9 +104,9 @@ public class SNOMEDEvaluation {
 						skip = true;
 					}
 				}
-				// if (i == 0) {
-				// skip = false;
-				// }
+				if (i == 0) {
+					skip = false;
+				}
 
 				i++;
 				System.out.println();
@@ -116,8 +116,9 @@ public class SNOMEDEvaluation {
 
 					// TODO compute unifiers modulo equivalence?
 
+					// System.out.println(model.printCurrentUnifier());
 					System.out.println(
-							model.getStringRenderer(null).renderUnifier(model.getCurrentUnifier(), false, true, true));
+							model.getStringRenderer(null).renderUnifier(model.getCurrentUnifier(), false, false, true));
 
 					Set<OWLEquivalentClassesAxiom> unifier = iterator.next();
 					OWLOntologyManager ontologyManager = OWLManager.createOWLOntologyManager();
@@ -131,18 +132,31 @@ public class SNOMEDEvaluation {
 					OWLReasoner reasoner = new JcelReasonerFactory().createNonBufferingReasoner(extendedOntology);
 					reasoner.precomputeInferences();
 
+					boolean solution = true;
 					for (OWLAxiom a : pos.getAxioms(AxiomType.SUBCLASS_OF)) {
-						System.out.println(a + " (pos): " + reasoner.isEntailed(a));
+						// System.out.println(a + " (pos): " +
+						// reasoner.isEntailed(a));
+						if (!reasoner.isEntailed(a)) {
+							solution = false;
+						}
 						// Assert.assertTrue(reasoner.isEntailed(a));
 					}
 					for (OWLAxiom a : neg.getAxioms(AxiomType.SUBCLASS_OF)) {
-						System.out.println(a + " (neg): " + reasoner.isEntailed(a));
+						// System.out.println(a + " (neg): " +
+						// reasoner.isEntailed(a));
+						if (reasoner.isEntailed(a)) {
+							solution = false;
+						}
 						// Assert.assertTrue(!reasoner.isEntailed(a));
 					}
+					if (!solution) {
+						System.out.println("This is not a real solution (due to the replacement of UNDEF names)!");
+					}
 
-					System.out.println(goalAxiom + " (goal): " + reasoner.isEntailed(goalAxiom));
+					// System.out.println(goalAxiom + " (goal): " +
+					// reasoner.isEntailed(goalAxiom));
 					if (reasoner.isEntailed(goalAxiom)) {
-						System.out.println("Success! " + i);
+						System.out.println("This is the wanted solution!");
 						// break;
 					}
 
