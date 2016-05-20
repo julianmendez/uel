@@ -17,13 +17,15 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import de.tudresden.inf.lat.uel.sat.literals.Choice;
+import de.tudresden.inf.lat.uel.sat.literals.ChoiceLiteral;
 import de.tudresden.inf.lat.uel.sat.literals.Literal;
 import de.tudresden.inf.lat.uel.sat.literals.OrderLiteral;
 import de.tudresden.inf.lat.uel.sat.literals.SubsumptionLiteral;
 import de.tudresden.inf.lat.uel.sat.literals.SubtypeLiteral;
+import de.tudresden.inf.lat.uel.sat.literals.UnaryChoice;
 import de.tudresden.inf.lat.uel.sat.type.SatInput;
 import de.tudresden.inf.lat.uel.sat.type.SatOutput;
-import de.tudresden.inf.lat.uel.sat.type.Solver;
+import de.tudresden.inf.lat.uel.sat.type.SatSolver;
 import de.tudresden.inf.lat.uel.type.api.Atom;
 import de.tudresden.inf.lat.uel.type.api.AtomManager;
 import de.tudresden.inf.lat.uel.type.api.Definition;
@@ -135,11 +137,12 @@ import de.tudresden.inf.lat.uel.type.impl.Unifier;
  */
 public class SatUnificationAlgorithm implements UnificationAlgorithm {
 
+	private static final String keyAverageSize = "Average size of a clause";
 	private static final String keyConfiguration = "Configuration";
 	private static final String keyName = "Name";
 	private static final String keyNumberOfClauses = "Number of clauses";
 	private static final String keyNumberOfPropositions = "Number of propositions";
-	private static final String keyNumberOfVariables = "Number of variables";
+	private static final String keyTotalSize = "Total size of all clauses";
 	private static final Logger logger = Logger.getLogger(SatUnificationAlgorithm.class.getName());
 	private static final String notUsingMinimalAssignments = "all local assignments";
 	private static final String algorithmName = "SAT-based algorithm";
@@ -148,9 +151,11 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 	private boolean firstTime = true;
 	private final IndexedSet<Literal> literalManager = new IndexedSetImpl<Literal>();
 	private long numberOfClauses = 0;
+	private long totalSize = 0;
+	private double averageSize = 0;
 	private final boolean onlyMinimalAssignments;
 	private Unifier result;
-	private Solver solver;
+	private SatSolver solver;
 	private final Map<Integer, Set<Integer>> subsumers = new HashMap<Integer, Set<Integer>>();
 	private final Set<Integer> trueLiterals = new HashSet<Integer>();
 	private final Set<Integer> nonVariableAtoms = new HashSet<Integer>();
@@ -341,6 +346,11 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 		return head;
 	}
 
+	private Choice choice(SatInput input, Set<Integer> previousChoiceLiterals, IndexedSet<Literal> literalManager,
+			int numberOfChoices) {
+		return new UnaryChoice(input, previousChoiceLiterals, literalManager, numberOfChoices);
+	}
+
 	@Override
 	public void cleanup() {
 		if (solver != null) {
@@ -354,6 +364,7 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 		boolean unifiable = false;
 		try {
 			if (this.firstTime) {
+				System.out.println("Initializing SAT problem ...");
 				if (this.onlyMinimalAssignments) {
 					this.solver = new Sat4jMaxSatSolver();
 				} else {
@@ -393,7 +404,15 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 				// }
 				// sbuf.append(Solver.NEWLINE);
 				// }
-				this.numberOfClauses = satInput.getClauses().size();
+				numberOfClauses = satInput.getClauses().size();
+				totalSize = satInput.getClauses().stream().mapToInt(c -> c.size()).sum();
+				averageSize = ((float) totalSize) / ((float) numberOfClauses);
+				System.out.println("SAT Input:");
+				for (Entry<String, String> entry : getInfo()) {
+					System.out.println(entry.getKey() + ":");
+					System.out.println(entry.getValue());
+				}
+				System.out.println("Starting SAT solver ...");
 				satoutput = this.solver.solve(satInput);
 				unifiable = satoutput.isSatisfiable();
 			} else {
@@ -517,8 +536,11 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 			addTypeRestrictions(ret);
 		}
 
-		logger.finer("enforcing unique existential restrictions ...");
-		enforceUniqueExistentialRestrictions(ret);
+		if (goal.enforceUniqueExistentialRestrictions()) {
+			logger.finer("enforcing unique existential restrictions ...");
+			enforceUniqueExistentialRestrictions(ret);
+			enforceUndefContext(ret);
+		}
 
 		if (this.onlyMinimalAssignments) {
 			logger.finer("adding literals to be minimized ...");
@@ -550,6 +572,17 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 		}
 	}
 
+	private void enforceUndefContext(SatInput input) {
+		// UNDEF names can only occur in the context of their associated
+		// definition
+		for (Integer undefId : goal.getAtomManager().getUndefNames()) {
+			Integer origId = goal.getAtomManager().removeUndef(undefId);
+			for (Integer varId : getVariables()) {
+				input.add(implication(subsumption(varId, origId), subsumption(varId, undefId)));
+			}
+		}
+	}
+
 	private void enforceUniqueExistentialRestrictions(SatInput input) {
 
 		for (Integer eatomId1 : getExistentialRestrictions()) {
@@ -569,17 +602,43 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 							// even if compatible, they need to be related via
 							// subsumption if possible
 							if (getVariables().contains(child1) || getVariables().contains(child2)) {
-								System.out.println(
-										"Possibly compatible: " + printAtom(eatomId1) + " and " + printAtom(eatomId2));
-								// TODO: why are Action and Evaluation-action not compatible??
-								// for (Integer varId : getVariables()) {
-								// Set<Integer> head = new HashSet<Integer>(
-								// Arrays.asList(subsumption(child1, child2),
-								// subsumption(child2, child1)));
-								// input.add(implication(head,
-								// subsumption(varId, eatomId1),
-								// subsumption(varId, eatomId2)));
+								// System.out.println(
+								// "Possibly compatible: " + printAtom(eatomId1)
+								// + " and " + printAtom(eatomId2));
+								// List<Entry<String, String>> cases =
+								// Arrays.asList(
+								// new SimpleEntry<String,
+								// String>("http://www.ihtsdo.org/SCT_363714003_VAR",
+								// "http://www.ihtsdo.org/SCT_307124006"),
+								// new SimpleEntry<String,
+								// String>("http://www.ihtsdo.org/RoleGroup_VAR",
+								// "var0"),
+								// new SimpleEntry<String, String>("var1",
+								// "var0"),
+								// new SimpleEntry<String,
+								// String>("http://www.ihtsdo.org/SCT_260686004_VAR",
+								// "http://www.ihtsdo.org/SCT_129265001"),
+								// new SimpleEntry<String, String>("var4",
+								// "var3"));
+								// if (cases.stream().anyMatch(
+								// e ->
+								// child1.equals(goal.getAtomManager().createConceptName(e.getKey(),
+								// true))
+								// && child2.equals(
+								// goal.getAtomManager().createConceptName(e.getValue(),
+								// true)))) {
+								// System.out.println("!");
+								for (Integer varId : getVariables()) {
+									Set<Integer> head = new HashSet<Integer>(
+											Arrays.asList(subsumption(child1, child2), subsumption(child2, child1)));
+									input.add(implication(head, subsumption(varId, eatomId1),
+											subsumption(varId, eatomId2)));
+								}
 								// }
+							} else {
+								// System.out
+								// .println("Compatible: " + printAtom(eatomId1)
+								// + " and " + printAtom(eatomId2));
 							}
 						}
 					}
@@ -587,8 +646,10 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 			}
 		}
 
-		for (Integer atomId1 : goal.getAtomManager().getConstants()) {
-			for (Integer atomId2 : goal.getAtomManager().getConstants()) {
+		// for (Integer atomId1 : goal.getAtomManager().getConstants()) {
+		// for (Integer atomId2 : goal.getAtomManager().getConstants()) {
+		for (Integer atomId1 : getConceptNames()) {
+			for (Integer atomId2 : getConceptNames()) {
 				if (!goal.areCompatible(atomId1, atomId2)) {
 					// System.out.println("Not compatible: " +
 					// printAtom(atomId1) + " and " + printAtom(atomId2));
@@ -654,17 +715,26 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 		List<Entry<String, String>> ret = new ArrayList<Entry<String, String>>();
 		addEntry(ret, keyName, algorithmName);
 
-		if (this.onlyMinimalAssignments) {
+		if (onlyMinimalAssignments) {
 			addEntry(ret, keyConfiguration, usingMinimalAssignments);
 		} else {
 			addEntry(ret, keyConfiguration, notUsingMinimalAssignments);
 		}
 
 		if (this.literalManager != null) {
-			addEntry(ret, keyNumberOfPropositions, "" + this.literalManager.size());
+			addEntry(ret, keyNumberOfPropositions, "" + literalManager.size());
+			addEntry(ret, "Choice propositions",
+					"" + literalManager.stream().filter(l -> l instanceof ChoiceLiteral).count());
+			addEntry(ret, "Subsumption propositions",
+					"" + literalManager.stream().filter(l -> l instanceof SubsumptionLiteral).count());
+			addEntry(ret, "Subtype propositions",
+					"" + literalManager.stream().filter(l -> l instanceof SubtypeLiteral).count());
+			addEntry(ret, "Order propositions",
+					"" + literalManager.stream().filter(l -> l instanceof OrderLiteral).count());
 		}
-		addEntry(ret, keyNumberOfClauses, "" + this.numberOfClauses);
-		addEntry(ret, keyNumberOfVariables, "" + getVariables().size());
+		addEntry(ret, keyNumberOfClauses, "" + numberOfClauses);
+		addEntry(ret, keyTotalSize, "" + totalSize);
+		addEntry(ret, keyAverageSize, "" + averageSize);
 		return Collections.unmodifiableList(ret);
 	}
 
@@ -829,7 +899,7 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 
 	private void runStep1(Disequation e, SatInput input) {
 		// choose which direction of the equation does not hold
-		Choice c = new Choice(literalManager, 2);
+		Choice c = choice(input, Collections.emptySet(), literalManager, 2);
 		runStep1(c.getChoiceLiterals(0), new Dissubsumption(e.getLeft(), e.getRight()), input);
 		runStep1(c.getChoiceLiterals(1), new Dissubsumption(e.getRight(), e.getLeft()), input);
 	}
@@ -846,13 +916,12 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 		} else {
 			// choose which of the right-hand side atoms does not subsume the
 			// left-hand side
-			Choice c = new Choice(literalManager, e.getRight().size());
+			Choice c = choice(input, choiceLiterals, literalManager, e.getRight().size());
 			int j = 0;
 			for (Integer rightId : e.getRight()) {
 				runStep1Dissubsumption(c.addChoiceLiterals(choiceLiterals, j), e.getLeft(), rightId, input);
 				j++;
 			}
-			c.ruleOutOtherChoices(input);
 		}
 	}
 
@@ -876,7 +945,7 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 	private void runStep1DissubsumptionVariable(Set<Integer> choiceLiterals, Set<Integer> leftIds, Integer rightId,
 			SatInput input) {
 		// choose which non-variable atom solves the dissubsumption
-		Choice c = new Choice(literalManager, getNonVariableAtoms().size());
+		Choice c = choice(input, choiceLiterals, literalManager, getNonVariableAtoms().size());
 		int j = 0;
 		for (Integer atomId : getNonVariableAtoms()) {
 			Set<Integer> currentChoiceLiterals = c.addChoiceLiterals(choiceLiterals, j);
@@ -893,7 +962,6 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 			// next choice
 			j++;
 		}
-		c.ruleOutOtherChoices(input);
 	}
 
 	private void runStep1DissubsumptionNonVariableAtom(Set<Integer> choiceLiterals, Set<Integer> leftIds,

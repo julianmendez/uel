@@ -13,14 +13,14 @@ import java.util.StringTokenizer;
 
 import de.tudresden.inf.lat.uel.sat.type.SatInput;
 import de.tudresden.inf.lat.uel.sat.type.SatOutput;
-import de.tudresden.inf.lat.uel.sat.type.Solver;
+import de.tudresden.inf.lat.uel.sat.type.SatSolver;
 
 /**
  * This class runs an external MaxSAT solver on a constructed WCNF input file.
  *
  * @author Stefan Borgwardt
  */
-public class CNFMaxSatSolver implements Solver {
+public class CNFMaxSatSolver implements SatSolver {
 
 	/** the type constant for the AKMAXSAT solver */
 	public static final int AKMAXSAT = 2;
@@ -85,7 +85,7 @@ public class CNFMaxSatSolver implements Solver {
 		}
 		reader.close();
 		p.destroy();
-		clause.remove(Solver.END_OF_CLAUSE);
+		clause.remove(SatSolver.END_OF_CLAUSE);
 
 		return new SatOutput(satisfiable, clause);
 	}

@@ -12,14 +12,14 @@ import java.util.StringTokenizer;
 
 import de.tudresden.inf.lat.uel.sat.type.SatInput;
 import de.tudresden.inf.lat.uel.sat.type.SatOutput;
-import de.tudresden.inf.lat.uel.sat.type.Solver;
+import de.tudresden.inf.lat.uel.sat.type.SatSolver;
 
 /**
  * An object of this class uses the MiniSat solver to solve a SAT problem.
  * 
  * @author Julian Mendez
  */
-public class MiniSatSolver implements Solver {
+public class MiniSatSolver implements SatSolver {
 
 	private static final String minisatCommand = "MiniSat";
 	private static final String tempPrefix = "uelMiniSat";
@@ -65,13 +65,13 @@ public class MiniSatSolver implements Solver {
 		String line = satoutputReader.readLine();
 		boolean satisfiable = false;
 		Set<Integer> clause = new HashSet<Integer>();
-		if (line.trim().equals(Solver.SAT)) {
+		if (line.trim().equals(SatSolver.SAT)) {
 			satisfiable = true;
 			StringTokenizer stok = new StringTokenizer(satoutputReader.readLine());
 			while (stok.hasMoreTokens()) {
 				clause.add(Integer.parseInt(stok.nextToken()));
 			}
-			clause.remove(Solver.END_OF_CLAUSE);
+			clause.remove(SatSolver.END_OF_CLAUSE);
 		}
 
 		satinput.delete();

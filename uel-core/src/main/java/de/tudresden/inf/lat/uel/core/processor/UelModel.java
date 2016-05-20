@@ -105,7 +105,7 @@ public class UelModel {
 			while (algorithm.computeNextUnifier()) {
 				System.out.print(".");
 				Unifier result = algorithm.getUnifier();
-				// result = postprocessor.minimizeUnifier(result);
+				 result = postprocessor.minimizeUnifier(result);
 
 				if (!isNew(result)) {
 					continue;

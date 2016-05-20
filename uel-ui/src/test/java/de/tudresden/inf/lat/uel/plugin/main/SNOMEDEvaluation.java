@@ -21,6 +21,8 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 
+import com.google.common.base.Stopwatch;
+
 import de.tudresden.inf.lat.jcel.owlapi.main.JcelReasonerFactory;
 import de.tudresden.inf.lat.uel.core.main.AlternativeUelStarter;
 import de.tudresden.inf.lat.uel.core.main.UnifierIterator;
@@ -56,6 +58,9 @@ public class SNOMEDEvaluation {
 	 *            arguments (ignored)
 	 */
 	public static void main(String[] args) {
+
+		Stopwatch timer = Stopwatch.createStarted();
+
 		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
 		OWLOntology snomed = AlternativeUelStarter.loadOntology(SNOMED_PATH, manager);
 		OWLOntology snomedRestrictions = AlternativeUelStarter.loadOntology(SNOMED_RESTR_PATH, manager);
@@ -74,7 +79,7 @@ public class SNOMEDEvaluation {
 		String[] varNames = { "X" };
 		UnifierIterator iterator = (UnifierIterator) starter.modifyOntologyAndSolve(pos, neg, null,
 				Arrays.asList(varNames).stream().map(SNOMEDEvaluation::cls).collect(Collectors.toSet()),
-				UnificationAlgorithmFactory.SAT_BASED_ALGORITHM_MINIMAL, false);
+				UnificationAlgorithmFactory.SAT_BASED_ALGORITHM, true);
 
 		Set<OWLAxiom> background = iterator.getUelModel().renderDefinitions();
 		UelModel model = iterator.getUelModel();
@@ -87,6 +92,8 @@ public class SNOMEDEvaluation {
 										fac.getOWLObjectIntersectionOf(fac.getOWLObjectSomeValuesFrom(
 												prp("SCT_363713009"), cls("SCT_371157007")),
 										fac.getOWLObjectSomeValuesFrom(prp("SCT_363714003"), cls("SCT_307124006"))))));
+
+		output(timer, "Building the unification problem", true);
 
 		System.out.println("Unifiers:");
 
@@ -104,9 +111,9 @@ public class SNOMEDEvaluation {
 						skip = true;
 					}
 				}
-				if (i == 0) {
-					skip = false;
-				}
+				// if (i == 0) {
+				// skip = false;
+				// }
 
 				i++;
 				System.out.println();
@@ -116,9 +123,10 @@ public class SNOMEDEvaluation {
 
 					// TODO compute unifiers modulo equivalence?
 
-					// System.out.println(model.printCurrentUnifier());
-					System.out.println(
-							model.getStringRenderer(null).renderUnifier(model.getCurrentUnifier(), false, false, true));
+					System.out.println(model.printCurrentUnifier());
+					// System.out.println(
+					// model.getStringRenderer(null).renderUnifier(model.getCurrentUnifier(),
+					// false, false, true));
 
 					Set<OWLEquivalentClassesAxiom> unifier = iterator.next();
 					OWLOntologyManager ontologyManager = OWLManager.createOWLOntologyManager();
@@ -157,7 +165,12 @@ public class SNOMEDEvaluation {
 					// reasoner.isEntailed(goalAxiom));
 					if (reasoner.isEntailed(goalAxiom)) {
 						System.out.println("This is the wanted solution!");
+						output(timer, "Time to compute the wanted solution", false);
 						// break;
+					} else {
+						if (i == 1) {
+							output(timer, "Time to compute first solution", false);
+						}
 					}
 
 					reasoner.dispose();
@@ -167,12 +180,21 @@ public class SNOMEDEvaluation {
 					System.out.flush();
 				} else {
 					System.out.println("No more unifiers.");
+					output(timer, "Time to compute all solutions", false);
 					break;
 				}
 			}
 			in.close();
 		} catch (Exception ex) {
 			ex.printStackTrace();
+		}
+	}
+
+	private static void output(Stopwatch timer, String description, boolean reset) {
+		System.out.println(description + ": " + timer);
+		if (reset) {
+			timer.reset();
+			timer.start();
 		}
 	}
 

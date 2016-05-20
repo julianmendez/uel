@@ -8,7 +8,7 @@ import java.util.Set;
  *
  * @author Julian Mendez
  */
-public interface Solver {
+public interface SatSolver {
 
 	/**
 	 * The integer 0 that signals the end of a clause.

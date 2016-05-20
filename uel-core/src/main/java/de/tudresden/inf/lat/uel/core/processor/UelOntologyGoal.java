@@ -222,7 +222,8 @@ public class UelOntologyGoal implements Goal {
 	public void computeCompatibilityRelation(StringRenderer renderer) {
 		Set<Integer> processed = new HashSet<Integer>();
 		Set<Integer> toProcess = new HashSet<Integer>(
-				Sets.union(atomManager.getDefinitionVariables(), atomManager.getConstants()));
+				Sets.difference(Sets.union(atomManager.getDefinitionVariables(), atomManager.getConstants()),
+						atomManager.getUndefNames()));
 		while (!toProcess.isEmpty()) {
 			Integer varId = toProcess.iterator().next();
 			Set<Integer> superclasses = ontology.getKnownSuperclasses(varId);
@@ -231,9 +232,9 @@ public class UelOntologyGoal implements Goal {
 			toProcess.removeAll(processed);
 		}
 
-		printIdeals(renderer);
+		// printIdeals(renderer);
 
-		// minimize the set of ideals
+		// remove redundant ideals
 		Set<Set<Integer>> notMaximal = new HashSet<Set<Integer>>();
 		for (Set<Integer> ideal1 : ideals) {
 			for (Set<Integer> ideal2 : ideals) {
@@ -244,7 +245,7 @@ public class UelOntologyGoal implements Goal {
 		}
 		ideals.removeAll(notMaximal);
 
-		printIdeals(renderer);
+		// printIdeals(renderer);
 	}
 
 	private void printIdeals(StringRenderer renderer) {
@@ -337,12 +338,13 @@ public class UelOntologyGoal implements Goal {
 		// do not occur in the goal
 		Set<Integer> leafIds = filterSet(Sets.union(atomManager.getDefinitionVariables(), atomManager.getConstants()),
 				id -> !types.contains(id) && isLeaf(id) && notInGoal(id));
-		System.out.println(renderer.renderAtomList("Leaves", leafIds));
+				// System.out.println(renderer.renderAtomList("Leaves",
+				// leafIds));
 
 		// pull in all siblings of leaves from ontology
 		Set<OWLClass> siblings = collectSets(leafIds, id -> true, ontology::getSiblings);
 		Set<Integer> siblingIds = processClasses(siblings, false);
-		System.out.println(renderer.renderAtomList("Siblings", siblingIds));
+		// System.out.println(renderer.renderAtomList("Siblings", siblingIds));
 
 		// return all UNDEF variables created for the siblings' definitions
 		// (only the "most specific" ones)

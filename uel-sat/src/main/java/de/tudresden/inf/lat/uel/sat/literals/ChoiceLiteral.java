@@ -9,10 +9,13 @@ package de.tudresden.inf.lat.uel.sat.literals;
  */
 public class ChoiceLiteral implements Literal {
 
+	private static int choiceLiteralCount = 0;
+
 	private final int index;
 
-	public ChoiceLiteral(int index) {
-		this.index = index;
+	public ChoiceLiteral() {
+		this.index = choiceLiteralCount;
+		choiceLiteralCount++;
 	}
 
 	@Override

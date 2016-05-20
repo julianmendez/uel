@@ -16,36 +16,36 @@ public class SatInput {
 	public static void appendCNFClause(StringBuffer sbuf, Collection<Integer> clause) {
 		for (Integer literal : clause) {
 			sbuf.append(literal);
-			sbuf.append(Solver.SPACE);
+			sbuf.append(SatSolver.SPACE);
 		}
-		sbuf.append(Solver.END_OF_CLAUSE);
-		sbuf.append(Solver.NEWLINE);
+		sbuf.append(SatSolver.END_OF_CLAUSE);
+		sbuf.append(SatSolver.NEWLINE);
 	}
 
 	public static void appendCNFLine(StringBuffer sbuf, int nbVars, int nbClauses) {
-		sbuf.append(Solver.P_CNF);
-		sbuf.append(Solver.SPACE);
+		sbuf.append(SatSolver.P_CNF);
+		sbuf.append(SatSolver.SPACE);
 		sbuf.append(nbVars);
-		sbuf.append(Solver.SPACE);
+		sbuf.append(SatSolver.SPACE);
 		sbuf.append(nbClauses);
-		sbuf.append(Solver.NEWLINE);
+		sbuf.append(SatSolver.NEWLINE);
 	}
 
 	public static void appendWCNFClause(StringBuffer sbuf, Set<Integer> clause, int weight) {
 		sbuf.append(weight);
-		sbuf.append(Solver.SPACE);
+		sbuf.append(SatSolver.SPACE);
 		appendCNFClause(sbuf, clause);
 	}
 
 	public static void appendWCNFLine(StringBuffer sbuf, int nbVars, int nbClauses, int maxWeight) {
-		sbuf.append(Solver.P_WCNF);
-		sbuf.append(Solver.SPACE);
+		sbuf.append(SatSolver.P_WCNF);
+		sbuf.append(SatSolver.SPACE);
 		sbuf.append(nbVars);
-		sbuf.append(Solver.SPACE);
+		sbuf.append(SatSolver.SPACE);
 		sbuf.append(nbClauses);
-		sbuf.append(Solver.SPACE);
+		sbuf.append(SatSolver.SPACE);
 		sbuf.append(maxWeight);
-		sbuf.append(Solver.NEWLINE);
+		sbuf.append(SatSolver.NEWLINE);
 	}
 
 	/**
@@ -102,8 +102,8 @@ public class SatInput {
 		if (clause.isEmpty()) {
 			throw new IllegalArgumentException("Clause cannot be empty.");
 		}
-		if (clause.contains(Solver.END_OF_CLAUSE)) {
-			throw new IllegalArgumentException("Clause cannot contain " + Solver.END_OF_CLAUSE + ".");
+		if (clause.contains(SatSolver.END_OF_CLAUSE)) {
+			throw new IllegalArgumentException("Clause cannot contain " + SatSolver.END_OF_CLAUSE + ".");
 		}
 
 		boolean ret = this.clauses.add(Collections.unmodifiableSet(clause));

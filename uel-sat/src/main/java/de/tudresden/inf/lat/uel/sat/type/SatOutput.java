@@ -34,7 +34,7 @@ public class SatOutput {
 		this.satisfiable = satisf;
 		if (satisf) {
 			this.clause.addAll(c);
-			this.clause.remove(Solver.END_OF_CLAUSE);
+			this.clause.remove(SatSolver.END_OF_CLAUSE);
 		}
 	}
 
@@ -57,14 +57,14 @@ public class SatOutput {
 	@Override
 	public String toString() {
 		StringBuffer sbuf = new StringBuffer();
-		sbuf.append((this.satisfiable ? Solver.SAT : Solver.UNSAT));
-		sbuf.append(Solver.NEWLINE);
+		sbuf.append((this.satisfiable ? SatSolver.SAT : SatSolver.UNSAT));
+		sbuf.append(SatSolver.NEWLINE);
 		for (Integer e : this.clause) {
 			sbuf.append(e);
-			sbuf.append(Solver.SPACE);
+			sbuf.append(SatSolver.SPACE);
 		}
-		sbuf.append(Solver.END_OF_CLAUSE);
-		sbuf.append(Solver.NEWLINE);
+		sbuf.append(SatSolver.END_OF_CLAUSE);
+		sbuf.append(SatSolver.NEWLINE);
 		return sbuf.toString();
 	}
 

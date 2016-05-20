@@ -14,7 +14,7 @@ import org.sat4j.specs.TimeoutException;
 
 import de.tudresden.inf.lat.uel.sat.type.SatInput;
 import de.tudresden.inf.lat.uel.sat.type.SatOutput;
-import de.tudresden.inf.lat.uel.sat.type.Solver;
+import de.tudresden.inf.lat.uel.sat.type.SatSolver;
 
 /**
  * An object of this class uses the Sat4j MaxSAT solver to solve a SAT problem
@@ -23,7 +23,7 @@ import de.tudresden.inf.lat.uel.sat.type.Solver;
  * 
  * @author Stefan Borgwardt
  */
-public class Sat4jMaxSatSolver implements Solver {
+public class Sat4jMaxSatSolver implements SatSolver {
 
 	private Integer nbVars;
 	private WeightedMaxSatDecorator solver;

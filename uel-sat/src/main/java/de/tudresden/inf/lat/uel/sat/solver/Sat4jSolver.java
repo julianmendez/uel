@@ -13,14 +13,14 @@ import org.sat4j.specs.TimeoutException;
 
 import de.tudresden.inf.lat.uel.sat.type.SatInput;
 import de.tudresden.inf.lat.uel.sat.type.SatOutput;
-import de.tudresden.inf.lat.uel.sat.type.Solver;
+import de.tudresden.inf.lat.uel.sat.type.SatSolver;
 
 /**
  * An object of this class uses the Sat4j solver to solve a SAT problem.
  * 
  * @author Julian Mendez
  */
-public class Sat4jSolver implements Solver {
+public class Sat4jSolver implements SatSolver {
 
 	private ISolver solver;
 
