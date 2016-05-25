@@ -23,6 +23,7 @@ public class AtomManagerImpl implements AtomManager {
 	private final IndexedSet<String> conceptNames = new IndexedSetImpl<String>();
 	private final Set<Integer> constants = new HashSet<Integer>();
 	private final Set<Integer> definitionVariables = new HashSet<Integer>();
+	private final Map<Integer, Set<Integer>> existentialRestrictions = new HashMap<Integer, Set<Integer>>();
 	private final Set<Integer> flatteningVariables = new HashSet<Integer>();
 	private final Map<Integer, Integer> roleIdMap = new HashMap<Integer, Integer>();
 	private final IndexedSet<String> roleNames = new IndexedSetImpl<String>();
@@ -65,8 +66,17 @@ public class AtomManagerImpl implements AtomManager {
 	public Integer createExistentialRestriction(String roleName, Integer childId) {
 		Integer roleId = roleNames.addAndGetIndex(roleName);
 		Integer atomId = atoms.addAndGetIndex(new ExistentialRestriction(roleId, getConceptName(childId)));
+
 		childMap.put(atomId, childId);
 		roleIdMap.put(atomId, roleId);
+
+		Set<Integer> set = existentialRestrictions.get(roleId);
+		if (set == null) {
+			set = new HashSet<Integer>();
+			existentialRestrictions.put(roleId, set);
+		}
+		set.add(atomId);
+
 		return atomId;
 	}
 
@@ -127,6 +137,11 @@ public class AtomManagerImpl implements AtomManager {
 	}
 
 	@Override
+	public Set<Integer> getExistentialRestrictions(Integer roleId) {
+		return Collections.unmodifiableSet(existentialRestrictions.get(roleId));
+	}
+
+	@Override
 	public Set<Integer> getFlatteningVariables() {
 		return Collections.unmodifiableSet(flatteningVariables);
 	}
@@ -137,13 +152,13 @@ public class AtomManagerImpl implements AtomManager {
 	}
 
 	@Override
-	public Integer getRoleId(String roleName) {
-		return roleNames.getIndex(roleName);
+	public Integer getRoleId(Integer atomId) {
+		return roleIdMap.get(atomId);
 	}
 
 	@Override
-	public Integer getRoleId(Integer atomId) {
-		return roleIdMap.get(atomId);
+	public Integer getRoleId(String roleName) {
+		return roleNames.getIndex(roleName);
 	}
 
 	@Override

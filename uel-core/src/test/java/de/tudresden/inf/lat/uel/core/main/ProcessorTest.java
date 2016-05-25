@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -33,6 +34,8 @@ import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import de.tudresden.inf.lat.jcel.owlapi.main.JcelReasonerFactory;
 import de.tudresden.inf.lat.uel.core.processor.BasicOntologyProvider;
 import de.tudresden.inf.lat.uel.core.processor.UelModel;
+import de.tudresden.inf.lat.uel.core.processor.UelOptions;
+import de.tudresden.inf.lat.uel.type.api.AtomManager;
 import de.tudresden.inf.lat.uel.type.impl.Unifier;
 
 @RunWith(value = Parameterized.class)
@@ -146,7 +149,7 @@ public class ProcessorTest {
 	public void tryOntology() throws OWLOntologyCreationException, IOException, InterruptedException {
 		OWLOntology owlOntology = loadKRSSOntology(ontologyName);
 		OWLOntologyManager ontologyManager = owlOntology.getOWLOntologyManager();
-		UelModel uelModel = new UelModel(new BasicOntologyProvider(ontologyManager));
+		UelModel uelModel = new UelModel(new BasicOntologyProvider(ontologyManager), new UelOptions());
 
 		Map<String, OWLClass> idClassMap = new HashMap<String, OWLClass>();
 		for (OWLClass cls : owlOntology.getClassesInSignature()) {
@@ -157,11 +160,10 @@ public class ProcessorTest {
 		ontologyManager.addAxiom(positiveProblem, ontologyManager.getOWLDataFactory()
 				.getOWLEquivalentClassesAxiom(idClassMap.get(conceptC), idClassMap.get(conceptD)));
 		OWLOntology negativeProblem = ontologyManager.createOntology();
-		uelModel.setupGoal(Collections.singleton(owlOntology), positiveProblem, negativeProblem, null, null, false,
-				true, true);
-		uelModel.makeClassesVariables(varNames.stream().map(idClassMap::get), false, true);
-		uelModel.makeClassesVariables(undefVarNames.stream().map(idClassMap::get), true, true);
-		uelModel.initializeUnificationAlgorithm(algorithmName);
+		undefVarNames.stream().map(s -> s += AtomManager.UNDEF_SUFFIX).forEach(varNames::add);
+		uelModel.setupGoal(Collections.singleton(owlOntology), positiveProblem, negativeProblem, null,
+				varNames.stream().map(idClassMap::get).collect(Collectors.toSet()), true);
+		uelModel.initializeUnificationAlgorithm();
 
 		// System.out.println(uelModel.getStringRenderer(null).renderGoal(uelModel.getGoal()));
 

@@ -13,7 +13,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.semanticweb.owlapi.apibinding.OWLManager;
@@ -27,10 +26,8 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
 
 import de.tudresden.inf.lat.uel.core.processor.BasicOntologyProvider;
 import de.tudresden.inf.lat.uel.core.processor.UelModel;
+import de.tudresden.inf.lat.uel.core.processor.UelOptions;
 import de.tudresden.inf.lat.uel.core.processor.UnificationAlgorithmFactory;
-import de.tudresden.inf.lat.uel.type.api.AtomManager;
-import de.tudresden.inf.lat.uel.type.api.Goal;
-import de.tudresden.inf.lat.uel.type.api.UnificationAlgorithm;
 
 /**
  * This class provides an acces point to UEL without the user interface.
@@ -109,10 +106,8 @@ public class AlternativeUelStarter {
 		String posFilename = "";
 		String negFilename = "";
 		String varFilename = "";
-		String owlThingAliasName = "";
-		boolean printInfo = false;
-		boolean snomedMode = false;
-		int algorithmIdx = 0;
+		UelOptions options = new UelOptions();
+
 		while (argIdx < args.length) {
 			if ((args[argIdx].length() == 2) && (args[argIdx].charAt(0) == '-')) {
 				switch (args[argIdx].charAt(1)) {
@@ -130,12 +125,20 @@ public class AlternativeUelStarter {
 					break;
 				case 't':
 					argIdx++;
-					owlThingAliasName = args[argIdx];
+					if (!args[argIdx].isEmpty()) {
+						options.owlThingAlias = OWLManager.getOWLDataFactory().getOWLClass(IRI.create(args[argIdx]));
+					}
 					break;
 				case 'a':
 					argIdx++;
 					try {
-						algorithmIdx = Integer.parseInt(args[argIdx]) - 1;
+						int algorithmIdx = Integer.parseInt(args[argIdx]) - 1;
+						List<String> algorithmNames = UnificationAlgorithmFactory.getAlgorithmNames();
+						if ((algorithmIdx < 0) || (algorithmIdx >= algorithmNames.size())) {
+							System.err.println("Invalid algorithm index.");
+							return;
+						}
+						options.unificationAlgorithmName = algorithmNames.get(algorithmIdx);
 					} catch (NumberFormatException e) {
 						System.err.println("Invalid algorithm index.");
 						return;
@@ -145,10 +148,10 @@ public class AlternativeUelStarter {
 					printSyntax();
 					return;
 				case 'i':
-					printInfo = true;
+					options.verbose = true;
 					break;
 				case 's':
-					snomedMode = true;
+					options.snomedMode = true;
 					break;
 				default:
 					mainFilename = args[argIdx];
@@ -161,13 +164,10 @@ public class AlternativeUelStarter {
 		}
 
 		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
-		AlternativeUelStarter starter = new AlternativeUelStarter(loadOntology(mainFilename, manager));
-		starter.setVerbose(printInfo);
-		starter.setSnomedMode(snomedMode);
-		if (!owlThingAliasName.isEmpty()) {
-			starter.setOwlThingAlias(OWLManager.getOWLDataFactory().getOWLClass(IRI.create(owlThingAliasName)));
+		OWLOntology bgOntology = loadOntology(mainFilename, manager);
+		if (bgOntology == null) {
+			return;
 		}
-
 		OWLOntology posOntology = loadOntology(posFilename, manager);
 		if (posOntology == null) {
 			return;
@@ -180,16 +180,9 @@ public class AlternativeUelStarter {
 		if (variables == null) {
 			return;
 		}
-		List<String> algorithmNames = UnificationAlgorithmFactory.getAlgorithmNames();
-		if ((algorithmIdx < 0) || (algorithmIdx >= algorithmNames.size())) {
-			System.err.println("Invalid algorithm index.");
-			return;
-		}
-		String algorithmName = algorithmNames.get(algorithmIdx);
 
-		// TODO add options
-		Iterator<Set<OWLEquivalentClassesAxiom>> result = starter.modifyOntologyAndSolve(posOntology, negOntology, null,
-				variables, algorithmName, true);
+		Iterator<Set<OWLEquivalentClassesAxiom>> result = AlternativeUelStarter.solve(bgOntology, posOntology,
+				negOntology, null, variables, options);
 		int unifierIdx = 1;
 		while (result.hasNext()) {
 			System.out.println("Unifier " + unifierIdx + ":");
@@ -204,13 +197,6 @@ public class AlternativeUelStarter {
 			System.out.println("Not unifiable.");
 		}
 
-		if (printInfo) {
-			System.out.println("Stats:");
-			for (Entry<String, String> entry : starter.getStats()) {
-				System.out.println(entry.getKey() + ":");
-				System.out.println(entry.getValue());
-			}
-		}
 	}
 
 	private static void printSyntax() {
@@ -228,79 +214,11 @@ public class AlternativeUelStarter {
 		}
 	}
 
-	private Set<OWLOntology> ontologies;
-	private UnificationAlgorithm uelProcessor;
-	private boolean verbose = false;
-	private boolean snomedMode = false;
-	private OWLClass owlThingAlias = null;
-	private boolean markUndefAsVariables = true;
-	private boolean markUndefAsAuxVariables = false;
-
-	/**
-	 * Construct a new starter for UEL.
-	 * 
-	 * @param ontology
-	 *            the background ontology
-	 */
-	public AlternativeUelStarter(OWLOntology ontology) {
-		if (ontology == null) {
-			throw new IllegalArgumentException("Null argument.");
-		}
-		this.ontologies = new HashSet<OWLOntology>();
-		this.ontologies.add(ontology);
-	}
-
-	/**
-	 * Construct a new starter for UEL
-	 * 
-	 * @param ontologies
-	 *            the set of background ontologies
-	 */
-	public AlternativeUelStarter(Set<OWLOntology> ontologies) {
-		if (ontologies == null) {
-			throw new IllegalArgumentException("Null argument.");
-		}
-		this.ontologies = ontologies;
-	}
-
-	/**
-	 * Retrieve additional information about the unification process.
-	 * 
-	 * @return a list of string entries, labeled by strings
-	 */
-	public List<Entry<String, String>> getStats() {
-		return uelProcessor.getInfo();
-	}
-
-	/**
-	 * Mark all UNDEF classes as auxiliary variables (they are not shown in the
-	 * unifiers).
-	 * 
-	 * @param markUndefAsAuxVariables
-	 *            indicates whether UNDEF classes should be marked as auxiliary
-	 *            variables, defaults to 'false'
-	 */
-	public void markUndefAsAuxVariables(boolean markUndefAsAuxVariables) {
-		this.markUndefAsAuxVariables = markUndefAsAuxVariables;
-		this.markUndefAsVariables = false;
-	}
-
-	/**
-	 * Mark all UNDEF classes as user variables (these are shown in the
-	 * unifiers).
-	 * 
-	 * @param markUndefAsVariables
-	 *            indicates whether UNDEF classes should be marked as user
-	 *            variables, defaults to 'true'
-	 */
-	public void markUndefAsVariables(boolean markUndefAsVariables) {
-		this.markUndefAsVariables = markUndefAsVariables;
-		this.markUndefAsAuxVariables = false;
-	}
-
 	/**
 	 * Start the unification process.
 	 * 
+	 * @param bgOntology
+	 *            the background ontology
 	 * @param positiveProblem
 	 *            the positive part of the unification problem
 	 * @param negativeProblem
@@ -310,21 +228,45 @@ public class AlternativeUelStarter {
 	 *            finished (only relevant in SNOMED mode)
 	 * @param variables
 	 *            the set of user variables
-	 * @param algorithmName
-	 *            the name of the unification algorithm to be used (see
-	 *            UnificationAlgorithmFactory)
-	 * @param expandPrimitiveDefinitions
+	 * @param options
+	 *            describes the execution options of UEL
 	 * @return an iterator yielding all produced unifiers (as sets of
 	 *         OWLEquivalentClassesAxioms describing the definitions of the user
 	 *         variables)
 	 */
-	public Iterator<Set<OWLEquivalentClassesAxiom>> modifyOntologyAndSolve(OWLOntology positiveProblem,
-			OWLOntology negativeProblem, OWLOntology constraints, Set<OWLClass> variables, String algorithmName,
-			boolean expandPrimitiveDefinitions) {
+	public static Iterator<Set<OWLEquivalentClassesAxiom>> solve(OWLOntology bgOntology, OWLOntology positiveProblem,
+			OWLOntology negativeProblem, OWLOntology constraints, Set<OWLClass> variables, UelOptions options) {
+		return solve(Collections.singleton(bgOntology), positiveProblem, negativeProblem, constraints, variables,
+				options);
+	}
+
+	/**
+	 * Start the unification process.
+	 * 
+	 * @param bgOntologies
+	 *            the background ontologies
+	 * @param positiveProblem
+	 *            the positive part of the unification problem
+	 * @param negativeProblem
+	 *            the negative part of the unification problem
+	 * @param constraints
+	 *            additional constraints to be loaded after all processing
+	 *            finished (only relevant in SNOMED mode)
+	 * @param variables
+	 *            the set of user variables
+	 * @param options
+	 *            describes the execution options of UEL
+	 * @return an iterator yielding all produced unifiers (as sets of
+	 *         OWLEquivalentClassesAxioms describing the definitions of the user
+	 *         variables)
+	 */
+	public static Iterator<Set<OWLEquivalentClassesAxiom>> solve(Set<OWLOntology> bgOntologies,
+			OWLOntology positiveProblem, OWLOntology negativeProblem, OWLOntology constraints, Set<OWLClass> variables,
+			UelOptions options) {
 
 		OWLOntologyManager manager;
-		if (ontologies.size() > 0) {
-			manager = ontologies.iterator().next().getOWLOntologyManager();
+		if (bgOntologies.size() > 0) {
+			manager = bgOntologies.iterator().next().getOWLOntologyManager();
 		} else if (positiveProblem != null) {
 			manager = positiveProblem.getOWLOntologyManager();
 		} else if (negativeProblem != null) {
@@ -335,82 +277,11 @@ public class AlternativeUelStarter {
 			manager = OWLManager.createOWLOntologyManager();
 		}
 
-		UelModel uelModel = new UelModel(new BasicOntologyProvider(manager));
-		uelModel.setupGoal(ontologies, positiveProblem, negativeProblem, constraints, owlThingAlias, snomedMode, true,
-				expandPrimitiveDefinitions);
+		UelModel uelModel = new UelModel(new BasicOntologyProvider(manager), options);
+		uelModel.setupGoal(bgOntologies, positiveProblem, negativeProblem, constraints, variables, true);
 
-		return modifyOntologyAndSolve(uelModel, variables, algorithmName);
-	}
-
-	private Iterator<Set<OWLEquivalentClassesAxiom>> modifyOntologyAndSolve(UelModel uelModel, Set<OWLClass> variables,
-			String algorithmName) {
-
-		uelModel.makeClassesVariables(variables.stream(), false, true);
-
-		if (markUndefAsVariables) {
-			uelModel.makeAllUndefClassesVariables(true);
-		}
-
-		if (markUndefAsAuxVariables) {
-			uelModel.makeAllUndefClassesVariables(false);
-		}
-
-		if (verbose) {
-			// output unification problem
-			Goal goal = uelModel.getGoal();
-			AtomManager atomManager = goal.getAtomManager();
-			System.out.println("Final number of atoms: " + atomManager.size());
-			System.out.println("Final number of constants: " + atomManager.getConstants().size());
-			System.out.println("Final number of variables: " + atomManager.getVariables().size());
-			System.out.println("Final number of user variables: " + atomManager.getUserVariables().size());
-			System.out.println("Final number of equations: " + goal.getEquations().size());
-			System.out.println("Final number of disequations: " + goal.getDisequations().size());
-			System.out.println("Final number of subsumptions: " + goal.getSubsumptions().size());
-			System.out.println("Final number of dissubsumptions: " + goal.getDissubsumptions().size());
-			System.out.println("(Dis-)Unification problem:");
-			System.out.println(uelModel.printGoal());
-		}
-
-		uelModel.initializeUnificationAlgorithm(algorithmName);
+		uelModel.initializeUnificationAlgorithm();
 		return new UnifierIterator(uelModel);
-	}
-
-	/**
-	 * Set an alias for 'owl:Thing', e.g., 'SNOMED CT Concept'. The background
-	 * ontology is not expanded above this class.
-	 * 
-	 * @param owlThingAlias
-	 *            the OWL class serving as owl:Thing
-	 */
-	public void setOwlThingAlias(OWLClass owlThingAlias) {
-		this.owlThingAlias = owlThingAlias;
-	}
-
-	/**
-	 * EXPERIMENTAL. Enable 'SNOMED mode', which extracts additional information
-	 * about the type hierarchy from the background ontology and makes some
-	 * other modifications to the unfication process.
-	 * 
-	 * @param snomedMode
-	 *            indicates whether 'SNOMED mode' should be activated
-	 */
-	public void setSnomedMode(boolean snomedMode) {
-		this.snomedMode = snomedMode;
-		if (snomedMode) {
-			this.markUndefAsVariables = false;
-			this.markUndefAsAuxVariables = false;
-		}
-	}
-
-	/**
-	 * Switch debug output.
-	 * 
-	 * @param verbose
-	 *            indicates whether additional information about the unification
-	 *            process should be shown.
-	 */
-	public void setVerbose(boolean verbose) {
-		this.verbose = verbose;
 	}
 
 }

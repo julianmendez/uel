@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -47,14 +48,18 @@ public class UelOntologyGoal implements Goal {
 	private final Set<Disequation> disequations = new HashSet<Disequation>();
 	private final Set<Dissubsumption> dissubsumptions = new HashSet<Dissubsumption>();
 	private final Map<Integer, Set<Integer>> domains = new HashMap<Integer, Set<Integer>>();
-	private final boolean enforceUniqueExistentialRestrictions;
 	private final Set<Equation> equations = new HashSet<Equation>();
 	private final Set<Set<Integer>> ideals = new HashSet<Set<Integer>>();
 	private UelOntology ontology;
 	private final Map<Integer, Set<Integer>> ranges = new HashMap<Integer, Set<Integer>>();
+	private StringRenderer renderer;
+	private boolean restrictUndefContext = false;
 	private final Map<Integer, Integer> roleGroupTypes = new HashMap<Integer, Integer>();
+	private final Map<Integer, Integer> roleNumberRestrictions = new HashMap<Integer, Integer>();
 	private final Set<Subsumption> subsumptions = new HashSet<Subsumption>();
+
 	private final Map<Integer, Integer> typeAssignment = new HashMap<Integer, Integer>();
+
 	private final Set<Integer> types = new HashSet<Integer>();
 
 	/**
@@ -65,12 +70,11 @@ public class UelOntologyGoal implements Goal {
 	 *            all 'local' flat atoms
 	 * @param ontology
 	 *            the background ontology
-	 * @param enforceUniqueExistentialRestrictions
 	 */
-	public UelOntologyGoal(AtomManager manager, UelOntology ontology, boolean enforceUniqueExistentialRestrictions) {
+	public UelOntologyGoal(AtomManager manager, UelOntology ontology, StringRenderer renderer) {
 		this.atomManager = manager;
 		this.ontology = ontology;
-		this.enforceUniqueExistentialRestrictions = enforceUniqueExistentialRestrictions;
+		this.renderer = renderer;
 	}
 
 	private void addDefinition(Definition definition) {
@@ -174,7 +178,7 @@ public class UelOntologyGoal implements Goal {
 
 	@Override
 	public boolean areCompatible(Integer atomId1, Integer atomId2) {
-		if (!enforceUniqueExistentialRestrictions) {
+		if (ideals.isEmpty()) {
 			return true;
 		}
 
@@ -219,7 +223,11 @@ public class UelOntologyGoal implements Goal {
 		return input.stream().filter(filter).map(mapper).flatMap(Set::stream).collect(Collectors.toSet());
 	}
 
-	public void computeCompatibilityRelation(StringRenderer renderer) {
+	/**
+	 * Extract the compatibility relation for concept names from the definitions
+	 * of the background ontology.
+	 */
+	public void computeCompatibilityRelation() {
 		Set<Integer> processed = new HashSet<Integer>();
 		Set<Integer> toProcess = new HashSet<Integer>(
 				Sets.difference(Sets.union(atomManager.getDefinitionVariables(), atomManager.getConstants()),
@@ -246,16 +254,6 @@ public class UelOntologyGoal implements Goal {
 		ideals.removeAll(notMaximal);
 
 		// printIdeals(renderer);
-	}
-
-	private void printIdeals(StringRenderer renderer) {
-		int i = 1;
-		for (Set<Integer> ideal : ideals) {
-			System.out.println(renderer.renderAtomList("Ideal " + i, ideal));
-			i++;
-		}
-		System.out.println("#####################");
-		System.out.println();
 	}
 
 	private <T extends Axiom> T createAxiom(Class<T> type, OWLClassExpression left, OWLClassExpression right) {
@@ -290,11 +288,6 @@ public class UelOntologyGoal implements Goal {
 		ontology = null;
 	}
 
-	@Override
-	public boolean enforceUniqueExistentialRestrictions() {
-		return enforceUniqueExistentialRestrictions;
-	}
-
 	private void extractDomainsAndRanges() {
 		// extract all types from domain/range restrictions of used role names
 		Set<Integer> processedRoleIds = new HashSet<Integer>();
@@ -327,19 +320,17 @@ public class UelOntologyGoal implements Goal {
 	 * used (in other definitions), and do not occur directly in the
 	 * user-specified goal.
 	 * 
-	 * @param renderer
-	 *            for debugging
 	 * @return he set of IDs of the UNDEF variables introduced to directly
 	 *         define the siblings (i.e., not the ones belonging to their
 	 *         superclasses)
 	 */
-	public Set<Integer> extractSiblings(StringRenderer renderer) {
+	public Set<Integer> extractSiblings() {
 		// find all parents of leaves (ids that are not used in other defs) that
 		// do not occur in the goal
 		Set<Integer> leafIds = filterSet(Sets.union(atomManager.getDefinitionVariables(), atomManager.getConstants()),
 				id -> !types.contains(id) && isLeaf(id) && notInGoal(id));
-				// System.out.println(renderer.renderAtomList("Leaves",
-				// leafIds));
+		// System.out.println(renderer.renderAtomList("Leaves",
+		// leafIds));
 
 		// pull in all siblings of leaves from ontology
 		Set<OWLClass> siblings = collectSets(leafIds, id -> true, ontology::getSiblings);
@@ -356,6 +347,24 @@ public class UelOntologyGoal implements Goal {
 		// ontology; skip those that only occur in the goal or are UNDEF names
 		new HashSet<Integer>(Sets.union(atomManager.getVariables(), atomManager.getConstants())).stream()
 				.map(ontology::getClassification).filter(Optional::isPresent).map(Optional::get).forEach(types::add);
+	}
+
+	private void extractTypeAssignment() {
+		for (Integer conceptNameId : Sets.union(atomManager.getConstants(), atomManager.getVariables())) {
+			if (!types.contains(conceptNameId)) {
+				Set<Integer> supertypes = ontology.getMostSpecificSuperclasses(conceptNameId, types);
+				List<Integer> minimalTypes = UnifierPostprocessor
+						.minimize((s, t) -> subtypeOrEquals(s, t) ? -1 : (subtypeOrEquals(t, s) ? 1 : 0), supertypes);
+				if (minimalTypes.size() > 1) {
+					System.out.println(renderer.renderAtomList(
+							"Extracted types for " + renderer.renderAtom(conceptNameId, false), minimalTypes));
+					throw new RuntimeException("A concept name cannot belong to different types.");
+				}
+				if (minimalTypes.size() == 1) {
+					typeAssignment.put(conceptNameId, minimalTypes.iterator().next());
+				}
+			}
+		}
 	}
 
 	private void extractTypeHierarchy() {
@@ -375,20 +384,6 @@ public class UelOntologyGoal implements Goal {
 		}
 	}
 
-	private void extractTypeAssignment() {
-		for (Integer conceptNameId : Sets.union(atomManager.getConstants(), atomManager.getVariables())) {
-			if (!types.contains(conceptNameId)) {
-				Set<Integer> supertypes = ontology.getMostSpecificSuperclasses(conceptNameId, types);
-				if (supertypes.size() > 1) {
-					throw new RuntimeException("A concept name cannot belong to different types.");
-				}
-				if (supertypes.size() == 1) {
-					typeAssignment.put(conceptNameId, supertypes.iterator().next());
-				}
-			}
-		}
-	}
-
 	/**
 	 * Extract (SNOMED) type information from domain and range restrictions and
 	 * the concept definitions.
@@ -398,6 +393,7 @@ public class UelOntologyGoal implements Goal {
 		extractTopLevelTypes();
 		extractTypeHierarchy();
 		introduceRoleGroupTypes();
+//		System.out.println(renderer.renderGoal(this, true));
 		extractTypeAssignment();
 	}
 
@@ -458,6 +454,11 @@ public class UelOntologyGoal implements Goal {
 	@Override
 	public Map<Integer, Integer> getRoleGroupTypes() {
 		return roleGroupTypes;
+	}
+
+	@Override
+	public Map<Integer, Integer> getRoleNumberRestrictions() {
+		return roleNumberRestrictions;
 	}
 
 	@Override
@@ -538,9 +539,39 @@ public class UelOntologyGoal implements Goal {
 
 		// change the domains of all roles to the corresponding 'role group
 		// types'
-		for (Integer type : domains.keySet()) {
-			Set<Integer> domain = domains.get(type);
-			domains.put(type, mapSet(domain, roleGroupTypes::get));
+		for (Integer roleId : domains.keySet()) {
+			String roleName = atomManager.getRoleName(roleId);
+			// 'Laterality', 'Has dose form', and 'Has active ingredient' do not
+			// occur inside RoleGroups
+			if (!roleName.contains("272741003") && !roleName.contains("411116001") && !roleName.contains("127489000")) {
+				Set<Integer> domain = domains.get(roleId);
+				domains.put(roleId, mapSet(domain, roleGroupTypes::get));
+			}
+		}
+	}
+
+	/**
+	 * Initialize the restrictions on the number of simultaneous role
+	 * restrictions in one substitution set.
+	 * 
+	 * @param numberOfRoleGroups
+	 *            the number of 'RoleGroups' allowed (0 - unlimited)
+	 */
+	public void introduceRoleNumberRestrictions(int numberOfRoleGroups) {
+		for (Integer roleId : atomManager.getRoleIds()) {
+			String roleName = atomManager.getRoleName(roleId);
+			if (roleName.contains("RoleGroup")) {
+				// restrict the number of RoleGroups in the same substitution
+				// set
+				roleNumberRestrictions.put(roleId, numberOfRoleGroups);
+			} else if (roleName.contains("363698007") || roleName.contains("116676008")) {
+				// a RoleGroup may contain several 'Finding sites' or
+				// 'Associated morphologies'
+				roleNumberRestrictions.put(roleId, 0);
+			} else {
+				// all other roles may only have one restriction per RoleGroup
+				roleNumberRestrictions.put(roleId, 1);
+			}
 		}
 	}
 
@@ -565,6 +596,16 @@ public class UelOntologyGoal implements Goal {
 	private boolean notInGoal(Integer atomId) {
 		return notInAxioms(equations, atomId) && notInAxioms(subsumptions, atomId) && notInAxioms(disequations, atomId)
 				&& notInAxioms(dissubsumptions, atomId);
+	}
+
+	private void printIdeals(StringRenderer renderer) {
+		int i = 1;
+		for (Set<Integer> ideal : ideals) {
+			System.out.println(renderer.renderAtomList("Ideal " + i, ideal));
+			i++;
+		}
+		System.out.println("#####################");
+		System.out.println();
 	}
 
 	private Set<Integer> processClasses(Set<OWLClass> classes, boolean onlyTypes) {
@@ -596,5 +637,21 @@ public class UelOntologyGoal implements Goal {
 		Set<Integer> newRightIds = new HashSet<Integer>(def.getRight());
 		newRightIds.add(undefId);
 		return new Definition(defId, newRightIds, false);
+	}
+
+	@Override
+	public boolean restrictUndefContext() {
+		return restrictUndefContext;
+	}
+
+	/**
+	 * Indicate whether the UNDEF names should be restricted to the context of
+	 * their original definitions.
+	 * 
+	 * @param restrictUndefContext
+	 *            the option value
+	 */
+	public void setRestrictUndefContext(boolean restrictUndefContext) {
+		this.restrictUndefContext = restrictUndefContext;
 	}
 }

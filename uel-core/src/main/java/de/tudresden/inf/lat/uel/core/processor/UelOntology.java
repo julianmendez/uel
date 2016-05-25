@@ -38,7 +38,7 @@ import de.tudresden.inf.lat.uel.type.api.Definition;
  *
  * @author Stefan Borgwardt
  */
-class UelOntology {
+public class UelOntology {
 
 	private static Function<Set<OWLClassExpression>, OWLClassExpression> constructIntersection = e -> OWLManager
 			.getOWLDataFactory().getOWLObjectIntersectionOf(e);
@@ -73,6 +73,8 @@ class UelOntology {
 	 * @param top
 	 *            the top concept (or an alias)
 	 * @param expandPrimitiveDefinitions
+	 *            indicates whether to expand simple primitive definitions, or
+	 *            mark the subclass as a constant
 	 */
 	public UelOntology(AtomManager atomManager, Set<OWLOntology> ontologies, OWLClass top,
 			boolean expandPrimitiveDefinitions) {
@@ -234,7 +236,7 @@ class UelOntology {
 		return getDirectSuperclasses(subclass).stream().anyMatch(cls -> isSubclass(cls, superclass));
 	}
 
-	private OWLClassExpression getDefinition(OWLClass cls) {
+	public OWLClassExpression getDefinition(OWLClass cls) {
 		return extractInformation(ont -> getDefinition(ont, cls),
 				exception("Multiple candidate definitions found for class: " + cls), Function.identity(), () -> null);
 	}
@@ -297,7 +299,7 @@ class UelOntology {
 		return ret;
 	}
 
-	private Set<OWLClass> getDirectSuperclasses(OWLClass cls) {
+	public Set<OWLClass> getDirectSuperclasses(OWLClass cls) {
 		if (cls.equals(top)) {
 			return Collections.emptySet();
 		}
@@ -337,7 +339,7 @@ class UelOntology {
 	}
 
 	/**
-	 * Retrieve all siblings of the given concept name from the background
+	 * Retrieve the siblings of the given concept name from the background
 	 * ontologies, but only those that have not yet been processed.
 	 * 
 	 * @param conceptNameId
@@ -384,7 +386,7 @@ class UelOntology {
 		return Stream.concat(subClasses1, subClasses2).filter(c -> !nameMap.containsValue(c));
 	}
 
-	private OWLClassExpression getPrimitiveDefinition(OWLClass cls) {
+	public OWLClassExpression getPrimitiveDefinition(OWLClass cls) {
 		return extractInformation(ont -> getPrimitiveDefinition(ont, cls), constructIntersection, Function.identity(),
 				() -> null);
 	}

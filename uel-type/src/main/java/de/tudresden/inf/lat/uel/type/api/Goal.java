@@ -127,7 +127,11 @@ public interface Goal {
 		return Collections.emptyMap();
 	}
 
-	default boolean enforceUniqueExistentialRestrictions() {
+	default Map<Integer, Integer> getRoleNumberRestrictions() {
+		return Collections.emptyMap();
+	}
+	
+	default boolean restrictUndefContext() {
 		return false;
 	}
 

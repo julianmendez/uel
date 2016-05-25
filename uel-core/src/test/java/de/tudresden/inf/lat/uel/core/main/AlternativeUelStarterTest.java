@@ -20,6 +20,8 @@ import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 
 import de.tudresden.inf.lat.jcel.owlapi.main.JcelReasonerFactory;
+import de.tudresden.inf.lat.uel.core.processor.UelOptions;
+import de.tudresden.inf.lat.uel.core.processor.UelOptions.UndefBehavior;
 import de.tudresden.inf.lat.uel.core.processor.UnificationAlgorithmFactory;
 
 /**
@@ -111,12 +113,13 @@ public class AlternativeUelStarterTest {
 	@Test
 	public void tryOntology() throws OWLOntologyCreationException {
 
-		AlternativeUelStarter starter = new AlternativeUelStarter(mainOntology);
-		starter.markUndefAsVariables(false);
-		starter.setVerbose(true);
+		UelOptions options = new UelOptions();
+		options.undefBehavior = UndefBehavior.CONSTANTS;
+		options.verbose = true;
+		options.unificationAlgorithmName = UnificationAlgorithmFactory.SAT_BASED_ALGORITHM;
 
-		UnifierIterator iterator = (UnifierIterator) starter.modifyOntologyAndSolve(subsumptions, dissubsumptions, null,
-				variables, UnificationAlgorithmFactory.SAT_BASED_ALGORITHM, true);
+		UnifierIterator iterator = (UnifierIterator) AlternativeUelStarter.solve(mainOntology,
+				subsumptions, dissubsumptions, null, variables, options);
 
 		Set<OWLAxiom> background = iterator.getUelModel().renderDefinitions();
 

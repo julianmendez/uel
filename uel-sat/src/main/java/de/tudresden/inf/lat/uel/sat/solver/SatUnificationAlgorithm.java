@@ -8,10 +8,12 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.Stack;
 import java.util.function.Function;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -198,8 +200,8 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 		}
 	}
 
-	private boolean addEntry(List<Entry<String, String>> list, String key, String value) {
-		return list.add(new SimpleEntry<String, String>(key, value));
+	private void addInfo(String key, Object value) {
+		info.add(new SimpleEntry<String, String>(key, value.toString()));
 	}
 
 	private boolean addToSetOfSubsumers(Integer atomId1, Integer atomId2) {
@@ -364,7 +366,7 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 		boolean unifiable = false;
 		try {
 			if (this.firstTime) {
-				System.out.println("Initializing SAT problem ...");
+				// System.out.println("Initializing SAT problem ...");
 				if (this.onlyMinimalAssignments) {
 					this.solver = new Sat4jMaxSatSolver();
 				} else {
@@ -404,15 +406,8 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 				// }
 				// sbuf.append(Solver.NEWLINE);
 				// }
-				numberOfClauses = satInput.getClauses().size();
-				totalSize = satInput.getClauses().stream().mapToInt(c -> c.size()).sum();
-				averageSize = ((float) totalSize) / ((float) numberOfClauses);
-				System.out.println("SAT Input:");
-				for (Entry<String, String> entry : getInfo()) {
-					System.out.println(entry.getKey() + ":");
-					System.out.println(entry.getValue());
-				}
-				System.out.println("Starting SAT solver ...");
+				initializeInfo(satInput);
+				// System.out.println("Starting SAT solver ...");
 				satoutput = this.solver.solve(satInput);
 				unifiable = satoutput.isSatisfiable();
 			} else {
@@ -440,6 +435,30 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 
 		this.firstTime = false;
 		return unifiable;
+	}
+
+	private void initializeInfo(SatInput satInput) {
+		addInfo(keyName, algorithmName);
+
+		if (onlyMinimalAssignments) {
+			addInfo(keyConfiguration, usingMinimalAssignments);
+		} else {
+			addInfo(keyConfiguration, notUsingMinimalAssignments);
+		}
+
+		if (this.literalManager != null) {
+			addInfo(keyNumberOfPropositions, literalManager.size());
+			addInfo("Choice propositions", literalManager.stream().filter(l -> l instanceof ChoiceLiteral).count());
+			addInfo("Subsumption propositions",
+					literalManager.stream().filter(l -> l instanceof SubsumptionLiteral).count());
+			addInfo("Subtype propositions", literalManager.stream().filter(l -> l instanceof SubtypeLiteral).count());
+			addInfo("Order propositions", literalManager.stream().filter(l -> l instanceof OrderLiteral).count());
+		}
+		numberOfClauses = satInput.getClauses().size();
+		totalSize = satInput.getClauses().stream().mapToInt(c -> c.size()).sum();
+		addInfo(keyNumberOfClauses, numberOfClauses);
+		addInfo(keyTotalSize, totalSize);
+		addInfo(keyAverageSize, ((float) totalSize) / ((float) numberOfClauses));
 	}
 
 	//// DEBUG
@@ -536,9 +555,13 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 			addTypeRestrictions(ret);
 		}
 
-		if (goal.enforceUniqueExistentialRestrictions()) {
-			logger.finer("enforcing unique existential restrictions ...");
-			enforceUniqueExistentialRestrictions(ret);
+		if (!goal.getRoleNumberRestrictions().isEmpty()) {
+			logger.finer("enforcing role number restrictions ...");
+			enforceRoleNumberRestrictions(ret);
+		}
+
+		if (goal.restrictUndefContext()) {
+			logger.finer("enforcing contexts for UNDEF names ...");
 			enforceUndefContext(ret);
 		}
 
@@ -583,71 +606,110 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 		}
 	}
 
-	private void enforceUniqueExistentialRestrictions(SatInput input) {
+	private void enforceRoleNumberRestrictions(SatInput input) {
 
-		for (Integer eatomId1 : getExistentialRestrictions()) {
-			for (Integer eatomId2 : getExistentialRestrictions()) {
-				if (!eatomId1.equals(eatomId2)) {
-					if (goal.getAtomManager().getRoleId(eatomId1).equals(goal.getAtomManager().getRoleId(eatomId2))) {
-						Integer child1 = goal.getAtomManager().getChild(eatomId1);
-						Integer child2 = goal.getAtomManager().getChild(eatomId2);
-						if (!goal.areCompatible(child1, child2)) {
-							// System.out
-							// .println("Not compatible: " + printAtom(eatomId1)
-							// + " and " + printAtom(eatomId2));
-							for (Integer varId : getVariables()) {
-								input.add(negativeClause(subsumption(varId, eatomId1), subsumption(varId, eatomId2)));
-							}
-						} else {
-							// even if compatible, they need to be related via
-							// subsumption if possible
+		System.out.println("enforcing number restrictions");
+		for (Integer roleId : goal.getAtomManager().getRoleIds()) {
+			int number = goal.getRoleNumberRestrictions().get(roleId);
+			System.out.println(goal.getAtomManager().getRoleName(roleId));
+			System.out.println(number);
+			if (number > 0) {
+				Set<Integer> ex = goal.getAtomManager().getExistentialRestrictions(roleId);
+				System.out.println("restrictions: " + ex);
+				Set<Set<Integer>> subsets = getSubsets(ex, number + 1);
+				for (Set<Integer> subset : subsets) {
+					System.out.println("subset " + subset);
+					Set<Integer> options = new HashSet<Integer>();
+					Set<Integer> children = subset.stream().map(atomId -> goal.getAtomManager().getChild(atomId))
+							.collect(Collectors.toSet());
+					for (Set<Integer> twoChildren : getSubsets(children, 2)) {
+						Iterator<Integer> it = twoChildren.iterator();
+						Integer child1 = it.next();
+						Integer child2 = it.next();
+						if (goal.areCompatible(child1, child2)) {
 							if (getVariables().contains(child1) || getVariables().contains(child2)) {
-								// System.out.println(
-								// "Possibly compatible: " + printAtom(eatomId1)
-								// + " and " + printAtom(eatomId2));
-								// List<Entry<String, String>> cases =
-								// Arrays.asList(
-								// new SimpleEntry<String,
-								// String>("http://www.ihtsdo.org/SCT_363714003_VAR",
-								// "http://www.ihtsdo.org/SCT_307124006"),
-								// new SimpleEntry<String,
-								// String>("http://www.ihtsdo.org/RoleGroup_VAR",
-								// "var0"),
-								// new SimpleEntry<String, String>("var1",
-								// "var0"),
-								// new SimpleEntry<String,
-								// String>("http://www.ihtsdo.org/SCT_260686004_VAR",
-								// "http://www.ihtsdo.org/SCT_129265001"),
-								// new SimpleEntry<String, String>("var4",
-								// "var3"));
-								// if (cases.stream().anyMatch(
-								// e ->
-								// child1.equals(goal.getAtomManager().createConceptName(e.getKey(),
-								// true))
-								// && child2.equals(
-								// goal.getAtomManager().createConceptName(e.getValue(),
-								// true)))) {
-								// System.out.println("!");
-								for (Integer varId : getVariables()) {
-									Set<Integer> head = new HashSet<Integer>(
-											Arrays.asList(subsumption(child1, child2), subsumption(child2, child1)));
-									input.add(implication(head, subsumption(varId, eatomId1),
-											subsumption(varId, eatomId2)));
-								}
-								// }
-							} else {
-								// System.out
-								// .println("Compatible: " + printAtom(eatomId1)
-								// + " and " + printAtom(eatomId2));
+								options.add(subsumption(child1, child2));
+								options.add(subsumption(child2, child1));
 							}
 						}
+					}
+					for (Integer varId : getVariables()) {
+						Set<Integer> clause = new HashSet<Integer>(options);
+						for (Integer eatomId : subset) {
+							clause.add(neg(subsumption(varId, eatomId)));
+						}
+						input.add(clause);
 					}
 				}
 			}
 		}
 
-		// for (Integer atomId1 : goal.getAtomManager().getConstants()) {
-		// for (Integer atomId2 : goal.getAtomManager().getConstants()) {
+		// for (Integer eatomId1 : getExistentialRestrictions()) {
+		// for (Integer eatomId2 : getExistentialRestrictions()) {
+		// if (!eatomId1.equals(eatomId2)) {
+		// if
+		// (goal.getAtomManager().getRoleId(eatomId1).equals(goal.getAtomManager().getRoleId(eatomId2)))
+		// {
+		// Integer child1 = goal.getAtomManager().getChild(eatomId1);
+		// Integer child2 = goal.getAtomManager().getChild(eatomId2);
+		// if (!goal.areCompatible(child1, child2)) {
+		// // System.out
+		// // .println("Not compatible: " + printAtom(eatomId1)
+		// // + " and " + printAtom(eatomId2));
+		// for (Integer varId : getVariables()) {
+		// input.add(negativeClause(subsumption(varId, eatomId1),
+		// subsumption(varId, eatomId2)));
+		// }
+		// } else {
+		// // even if compatible, they need to be related via
+		// // subsumption if possible
+		// if (getVariables().contains(child1) ||
+		// getVariables().contains(child2)) {
+		// // System.out.println(
+		// // "Possibly compatible: " + printAtom(eatomId1)
+		// // + " and " + printAtom(eatomId2));
+		// // List<Entry<String, String>> cases =
+		// // Arrays.asList(
+		// // new SimpleEntry<String,
+		// // String>("http://www.ihtsdo.org/SCT_363714003_VAR",
+		// // "http://www.ihtsdo.org/SCT_307124006"),
+		// // new SimpleEntry<String,
+		// // String>("http://www.ihtsdo.org/RoleGroup_VAR",
+		// // "var0"),
+		// // new SimpleEntry<String, String>("var1",
+		// // "var0"),
+		// // new SimpleEntry<String,
+		// // String>("http://www.ihtsdo.org/SCT_260686004_VAR",
+		// // "http://www.ihtsdo.org/SCT_129265001"),
+		// // new SimpleEntry<String, String>("var4",
+		// // "var3"));
+		// // if (cases.stream().anyMatch(
+		// // e ->
+		// // child1.equals(goal.getAtomManager().createConceptName(e.getKey(),
+		// // true))
+		// // && child2.equals(
+		// // goal.getAtomManager().createConceptName(e.getValue(),
+		// // true)))) {
+		// // System.out.println("!");
+		// for (Integer varId : getVariables()) {
+		// Set<Integer> head = new HashSet<Integer>(
+		// Arrays.asList(subsumption(child1, child2), subsumption(child2,
+		// child1)));
+		// input.add(implication(head, subsumption(varId, eatomId1),
+		// subsumption(varId, eatomId2)));
+		// }
+		// // }
+		// } else {
+		// // System.out
+		// // .println("Compatible: " + printAtom(eatomId1)
+		// // + " and " + printAtom(eatomId2));
+		// }
+		// }
+		// }
+		// }
+		// }
+		// }
+
 		for (Integer atomId1 : getConceptNames()) {
 			for (Integer atomId2 : getConceptNames()) {
 				if (!goal.areCompatible(atomId1, atomId2)) {
@@ -658,6 +720,39 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 					}
 				}
 			}
+		}
+	}
+
+	private Set<Set<Integer>> getSubsets(Set<Integer> set, int cardinality) {
+		if (cardinality > set.size()) {
+			return Collections.emptySet();
+		}
+
+		Integer[] array = new Integer[set.size()];
+		Iterator<Integer> it = set.iterator();
+		for (int i = 0; i < set.size(); i++) {
+			array[i] = it.next();
+		}
+
+		Set<Set<Integer>> subsets = new HashSet<Set<Integer>>();
+		addSubsets(subsets, new Stack<Integer>(), array, 0, cardinality);
+		return subsets;
+	}
+
+	private void addSubsets(Set<Set<Integer>> subsets, Stack<Integer> currentStack, Integer[] array, int left,
+			int remainingCardinality) {
+		System.out.println("Current stack: " + currentStack);
+		if (remainingCardinality == 0) {
+			subsets.add(new HashSet<Integer>(currentStack));
+			return;
+		}
+
+		for (int i = left; i < array.length; i++) {
+			currentStack.push(array[i]);
+			System.out.println("Pushed " + array[i] + " onto the current stack.");
+			addSubsets(subsets, currentStack, array, i + 1, remainingCardinality - 1);
+			Integer k = currentStack.pop();
+			System.out.println("Popped " + k + " from the stack. Current stack: " + currentStack);
 		}
 	}
 
@@ -710,32 +805,11 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 		return nonVariableAtoms;
 	}
 
+	private List<Entry<String, String>> info = new ArrayList<Entry<String, String>>();
+
 	@Override
 	public List<Entry<String, String>> getInfo() {
-		List<Entry<String, String>> ret = new ArrayList<Entry<String, String>>();
-		addEntry(ret, keyName, algorithmName);
-
-		if (onlyMinimalAssignments) {
-			addEntry(ret, keyConfiguration, usingMinimalAssignments);
-		} else {
-			addEntry(ret, keyConfiguration, notUsingMinimalAssignments);
-		}
-
-		if (this.literalManager != null) {
-			addEntry(ret, keyNumberOfPropositions, "" + literalManager.size());
-			addEntry(ret, "Choice propositions",
-					"" + literalManager.stream().filter(l -> l instanceof ChoiceLiteral).count());
-			addEntry(ret, "Subsumption propositions",
-					"" + literalManager.stream().filter(l -> l instanceof SubsumptionLiteral).count());
-			addEntry(ret, "Subtype propositions",
-					"" + literalManager.stream().filter(l -> l instanceof SubtypeLiteral).count());
-			addEntry(ret, "Order propositions",
-					"" + literalManager.stream().filter(l -> l instanceof OrderLiteral).count());
-		}
-		addEntry(ret, keyNumberOfClauses, "" + numberOfClauses);
-		addEntry(ret, keyTotalSize, "" + totalSize);
-		addEntry(ret, keyAverageSize, "" + averageSize);
-		return Collections.unmodifiableList(ret);
+		return Collections.unmodifiableList(info);
 	}
 
 	@Override
@@ -1225,14 +1299,11 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 		/*
 		 * Define S_X for each variable X
 		 */
-
-		for (Integer i : this.literalManager.getIndices()) {
-
-			if (this.literalManager.get(i).isSubsumption()) {
+		for (Integer i : literalManager.getIndices()) {
+			if (literalManager.get(i).isSubsumption()) {
 				if (getLiteralValue(i)) {
-
-					Integer atomId1 = this.literalManager.get(i).getFirst();
-					Integer atomId2 = this.literalManager.get(i).getSecond();
+					Integer atomId1 = literalManager.get(i).getFirst();
+					Integer atomId2 = literalManager.get(i).getSecond();
 					// if (getVariables().contains(atomId1) &&
 					// !atomId1.equals(atomId2)) {
 					if (getNonVariableAtoms().contains(atomId2)) {
@@ -1242,7 +1313,6 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 				}
 			}
 		}
-
 	}
 
 	private Function<String, String> shortFormMap = Function.identity();

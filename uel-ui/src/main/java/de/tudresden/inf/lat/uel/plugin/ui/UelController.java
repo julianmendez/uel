@@ -177,7 +177,8 @@ public class UelController {
 	 * opens the 'Unifier' view.
 	 */
 	public void setupComputation() {
-		model.initializeUnificationAlgorithm(view.getSelectedAlgorithm());
+		model.getOptions().unificationAlgorithmName = view.getSelectedAlgorithm();
+		model.initializeUnificationAlgorithm();
 
 		unifierController = new UnifierController(new UnifierView(view), model);
 		unifierController.addRefineListener(e -> executeRefine());
@@ -195,12 +196,14 @@ public class UelController {
 	 *            reset in order to refresh the presentation
 	 */
 	public void setupGoal(boolean resetShortFormCache) {
+		model.getOptions().snomedMode = view.getSnomedMode();
+		model.getOptions().expandPrimitiveDefinitions = view.getExpandPrimitiveDefinitions();
 		Set<OWLOntology> bgOntologies = new HashSet<OWLOntology>();
 		bgOntologies.add(view.getSelectedOntologyBg00());
 		bgOntologies.add(view.getSelectedOntologyBg01());
 		OWLOntology constraintOntology = constraints.empty() ? null : constraints.peek();
 		model.setupGoal(bgOntologies, view.getSelectedOntologyPos(), view.getSelectedOntologyNeg(), constraintOntology,
-				null, view.getSnomedMode(), resetShortFormCache, view.getExpandPrimitiveDefinitions());
+				null, resetShortFormCache);
 	}
 
 	/**

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -15,6 +16,7 @@ import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 
+import de.tudresden.inf.lat.uel.core.processor.UelOptions.UndefBehavior;
 import de.tudresden.inf.lat.uel.core.renderer.OWLRenderer;
 import de.tudresden.inf.lat.uel.core.renderer.StringRenderer;
 import de.tudresden.inf.lat.uel.sat.solver.SatUnificationAlgorithm;
@@ -55,6 +57,7 @@ public class UelModel {
 	private UnifierPostprocessor postprocessor;
 	private OntologyProvider provider;
 	private List<Unifier> unifierList;
+	private UelOptions options;
 
 	/**
 	 * Constructs a new UEL model.
@@ -62,9 +65,12 @@ public class UelModel {
 	 * @param provider
 	 *            the OntologyProvider that should be used to load ontologies
 	 *            and short forms
+	 * @param options
+	 *            the UelOptions that specify the parameters for unification
 	 */
-	public UelModel(OntologyProvider provider) {
+	public UelModel(OntologyProvider provider, UelOptions options) {
 		this.provider = provider;
+		this.options = options;
 	}
 
 	/**
@@ -103,17 +109,32 @@ public class UelModel {
 	public boolean computeNextUnifier() throws InterruptedException {
 		if (!allUnifiersFound) {
 			while (algorithm.computeNextUnifier()) {
-				System.out.print(".");
 				Unifier result = algorithm.getUnifier();
-				 result = postprocessor.minimizeUnifier(result);
+				if (options.minimize) {
+					result = postprocessor.minimizeUnifier(result);
+				}
 
 				if (!isNew(result)) {
+					if (options.verbose) {
+						System.out.print(".");
+					}
 					continue;
 				} else {
 					unifierList.add(result);
-					// System.out.println(getStringRenderer(null).renderUnifier(result,
-					// true, true, true));
-					// System.out.println(printUnifier(result));
+					if (options.verbose) {
+						if (unifierList.size() == 1) {
+							System.out.println("Information about the algorithm:");
+							for (Entry<String, String> e : algorithm.getInfo()) {
+								System.out.println(e.getKey() + ":");
+								System.out.println(e.getValue());
+							}
+						}
+
+						System.out.println("Unifier " + unifierList.size() + ":");
+						// System.out.println(getStringRenderer(null).renderUnifier(result,
+						// true, true, true));
+						System.out.println(printUnifier(result));
+					}
 					return true;
 				}
 			}
@@ -195,6 +216,15 @@ public class UelModel {
 	}
 
 	/**
+	 * Return the current options.
+	 * 
+	 * @return the current options
+	 */
+	public UelOptions getOptions() {
+		return options;
+	}
+
+	/**
 	 * Construct a renderer for output of unifiers etc. as OWL API objects.
 	 * 
 	 * @param background
@@ -262,16 +292,12 @@ public class UelModel {
 
 	/**
 	 * Initializes the unification algorithm with the current goal.
-	 * 
-	 * @param name
-	 *            The string identifier of the unification algorithm, as defined
-	 *            by 'UnificationAlgorithmFactory'
 	 */
-	public void initializeUnificationAlgorithm(String name) {
+	public void initializeUnificationAlgorithm() {
 		unifierList = new ArrayList<Unifier>();
 		currentUnifierIndex = -1;
 		allUnifiersFound = false;
-		algorithm = UnificationAlgorithmFactory.instantiateAlgorithm(name, goal);
+		algorithm = UnificationAlgorithmFactory.instantiateAlgorithm(options.unificationAlgorithmName, goal);
 		postprocessor = new UnifierPostprocessor(atomManager, goal, getStringRenderer(null));
 		if (algorithm instanceof SatUnificationAlgorithm) {
 			((SatUnificationAlgorithm) algorithm).setShortFormMap(provider::getShortForm);
@@ -298,14 +324,7 @@ public class UelModel {
 		provider.loadOntology(file);
 	}
 
-	/**
-	 * Marks all 'undef' variables as variables.
-	 * 
-	 * @param userVariables
-	 *            a flag indicating whether to create user variables or
-	 *            definition variables
-	 */
-	public void makeAllUndefClassesVariables(boolean userVariables) {
+	private void makeAllUndefClassesVariables(boolean userVariables) {
 		// first copy the list of constants since we need to modify it
 		Set<Integer> constants = new HashSet<Integer>(atomManager.getConstants());
 		makeIdsVariables(
@@ -313,19 +332,7 @@ public class UelModel {
 				userVariables);
 	}
 
-	/**
-	 * Marks a given set of classes as variables.
-	 * 
-	 * @param variables
-	 *            a set of variables given as instances of OWLClass
-	 * @param addUndefSuffix
-	 *            a flag indicating whether to add an _UNDEF suffix to the given
-	 *            classes
-	 * @param userVariables
-	 *            a flag indicating whether to create user variables ('true') or
-	 *            definition variables ('false')
-	 */
-	public void makeClassesVariables(Stream<OWLClass> variables, boolean addUndefSuffix, boolean userVariables) {
+	private void makeClassesVariables(Stream<OWLClass> variables, boolean addUndefSuffix, boolean userVariables) {
 		makeNamesVariables(variables
 				.map(addUndefSuffix ? (cls -> cls.toStringID() + AtomManager.UNDEF_SUFFIX) : (cls -> cls.toStringID())),
 				userVariables);
@@ -470,22 +477,14 @@ public class UelModel {
 	 * @param constraintOntology
 	 *            additional negative constraints to be added after all
 	 *            pre-processing
-	 * @param owlThingAlias
-	 *            (optional) an alias for owl:Thing, e.g., 'SNOMED CT Concept'
-	 * @param snomedMode
-	 *            indicates whether "SNOMED mode" should be activated, loading
-	 *            additional type information
+	 * @param userVariables
+	 *            a set of OWLClasses to be marked as user variables
 	 * @param resetShortFormCache
 	 *            indicates whether the cached short forms should be reloaded
 	 *            from the OntologyProvider
-	 * @param expandPrimitiveDefinitions
-	 *            indicates whether primitive definitions should be expanded
-	 *            ('true') or the defined concepts should simply be constants
-	 *            ('false')
 	 */
 	public void setupGoal(Set<OWLOntology> bgOntologies, OWLOntology positiveProblem, OWLOntology negativeProblem,
-			OWLOntology constraintOntology, OWLClass owlThingAlias, boolean snomedMode, boolean resetShortFormCache,
-			boolean expandPrimitiveDefinitions) {
+			OWLOntology constraintOntology, Set<OWLClass> userVariables, boolean resetShortFormCache) {
 
 		atomManager = new AtomManagerImpl();
 
@@ -493,9 +492,10 @@ public class UelModel {
 			resetShortFormCache();
 		}
 
-		OWLClass owlThing = getOWLThing(owlThingAlias, snomedMode);
+		OWLClass owlThing = getOWLThing(options.owlThingAlias, options.snomedMode);
 		goal = new UelOntologyGoal(atomManager,
-				new UelOntology(atomManager, bgOntologies, owlThing, expandPrimitiveDefinitions), snomedMode);
+				new UelOntology(atomManager, bgOntologies, owlThing, options.expandPrimitiveDefinitions),
+				getStringRenderer(null));
 
 		if (positiveProblem != null) {
 			goal.addPositiveAxioms(positiveProblem.getAxioms());
@@ -508,15 +508,42 @@ public class UelModel {
 		goal.addDefinition(owlThing, OWLManager.getOWLDataFactory().getOWLObjectIntersectionOf());
 
 		// extract types from background ontologies
-		if (snomedMode) {
-			goal.extractSiblings(getStringRenderer(null));
+		if (options.snomedMode) {
+			goal.extractSiblings();
 			goal.extractTypes();
 			goal.introduceBlankExistentialRestrictions();
-			goal.computeCompatibilityRelation(getStringRenderer(null));
+			goal.computeCompatibilityRelation();
+			goal.introduceRoleNumberRestrictions(options.numberOfRoleGroups);
 		}
+
+		goal.setRestrictUndefContext(options.restrictUndefContext);
 
 		if (constraintOntology != null) {
 			goal.addNegativeAxioms(constraintOntology.getAxioms());
+		}
+
+		makeClassesVariables(userVariables.stream(), false, true);
+
+		if (options.undefBehavior == UndefBehavior.USER_VARIABLES) {
+			makeAllUndefClassesVariables(true);
+		}
+
+		if (options.undefBehavior == UndefBehavior.INTERNAL_VARIABLES) {
+			makeAllUndefClassesVariables(false);
+		}
+
+		if (options.verbose) {
+			// output unification problem
+			System.out.println("Final number of atoms: " + atomManager.size());
+			System.out.println("Final number of constants: " + atomManager.getConstants().size());
+			System.out.println("Final number of variables: " + atomManager.getVariables().size());
+			System.out.println("Final number of user variables: " + atomManager.getUserVariables().size());
+			System.out.println("Final number of equations: " + goal.getEquations().size());
+			System.out.println("Final number of disequations: " + goal.getDisequations().size());
+			System.out.println("Final number of subsumptions: " + goal.getSubsumptions().size());
+			System.out.println("Final number of dissubsumptions: " + goal.getDissubsumptions().size());
+			System.out.println("(Dis-)Unification problem:");
+			System.out.println(printGoal());
 		}
 
 		goal.disposeOntology();

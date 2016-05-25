@@ -5,6 +5,7 @@ package de.tudresden.inf.lat.uel.core.processor;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -243,7 +244,8 @@ public class UnifierPostprocessor {
 		// saturate all substitutions of user variables by exhaustively applying
 		// all background definitions "backward"
 		saturateWithDefinitions(defs);
-//		System.out.println(renderer.renderUnifier(new Unifier(defs), false, false, true));
+		// System.out.println(renderer.renderUnifier(new Unifier(defs), false,
+		// false, true));
 
 		for (Integer varId : atomManager.getVariables()) {
 			if (atomManager.getDefinitionVariables().contains(varId)) {
@@ -255,38 +257,7 @@ public class UnifierPostprocessor {
 			// set", defs.getDefiniens(varId)));
 
 			// keep only minimal atoms (w.r.t. subsumption and size)
-			Set<Integer> minimalAtoms = new HashSet<Integer>();
-			for (Integer atomId : defs.getDefiniens(varId)) {
-				// if there is not yet a minimal atom smaller than 'atomId' ...
-				List<Integer> replaceAtoms = new ArrayList<Integer>();
-				boolean notMinimal = false;
-				for (Integer minimalId : minimalAtoms) {
-					int c = compare(minimalId, atomId, defs);
-					if (c < 0) {
-						// System.out.println(renderer.renderAtom(minimalId,
-						// true) + " is smaller than "
-						// + renderer.renderAtom(atomId, true));
-						notMinimal = true;
-						break;
-					}
-					if (c > 0) {
-						// System.out.println(renderer.renderAtom(atomId, true)
-						// + " is smaller than "
-						// + renderer.renderAtom(minimalId, true));
-						replaceAtoms.add(minimalId);
-					}
-					// c == 0 means that the atoms are incomparable
-				}
-				if (notMinimal) {
-					// System.out.println(renderer.renderAtom(atomId, true) + "
-					// is not minimal.");
-				} else {
-					minimalAtoms.removeAll(replaceAtoms);
-					minimalAtoms.add(atomId);
-					// System.out.println("New minimal atom: " +
-					// renderer.renderAtom(atomId, true));
-				}
-			}
+			List<Integer> minimalAtoms = minimize((a, b) -> compare(a, b, defs), defs.getDefiniens(varId));
 			defs.getDefiniens(varId).retainAll(minimalAtoms);
 
 			// System.out.println(renderer.renderAtomList("Final substitution
@@ -296,6 +267,42 @@ public class UnifierPostprocessor {
 		}
 
 		return new Unifier(defs, unifier.getTypeAssignment());
+	}
+
+	public static <T> List<T> minimize(Comparator<T> comparator, Set<T> set) {
+		List<T> minimalAtoms = new ArrayList<T>();
+		for (T atomId : set) {
+			// if there is not yet a minimal atom smaller than 'atomId' ...
+			List<T> replaceAtoms = new ArrayList<T>();
+			boolean notMinimal = false;
+			for (T minimalId : minimalAtoms) {
+				int c = comparator.compare(minimalId, atomId);
+				if (c < 0) {
+					// System.out.println(renderer.renderAtom(minimalId,
+					// true) + " is smaller than "
+					// + renderer.renderAtom(atomId, true));
+					notMinimal = true;
+					break;
+				}
+				if (c > 0) {
+					// System.out.println(renderer.renderAtom(atomId, true)
+					// + " is smaller than "
+					// + renderer.renderAtom(minimalId, true));
+					replaceAtoms.add(minimalId);
+				}
+				// c == 0 means that the atoms are incomparable
+			}
+			if (notMinimal) {
+				// System.out.println(renderer.renderAtom(atomId, true) + "
+				// is not minimal.");
+			} else {
+				minimalAtoms.removeAll(replaceAtoms);
+				minimalAtoms.add(atomId);
+				// System.out.println("New minimal atom: " +
+				// renderer.renderAtom(atomId, true));
+			}
+		}
+		return minimalAtoms;
 	}
 
 	private void saturateWithDefinitions(DefinitionSet defs) {

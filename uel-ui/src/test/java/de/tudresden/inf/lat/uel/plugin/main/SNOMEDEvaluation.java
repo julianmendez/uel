@@ -4,6 +4,7 @@
 package de.tudresden.inf.lat.uel.plugin.main;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -11,6 +12,7 @@ import java.util.Map.Entry;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.AxiomType;
@@ -23,6 +25,7 @@ import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLObjectSomeValuesFrom;
 import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
@@ -33,7 +36,12 @@ import de.tudresden.inf.lat.jcel.owlapi.main.JcelReasonerFactory;
 import de.tudresden.inf.lat.uel.core.main.AlternativeUelStarter;
 import de.tudresden.inf.lat.uel.core.main.UnifierIterator;
 import de.tudresden.inf.lat.uel.core.processor.UelModel;
+import de.tudresden.inf.lat.uel.core.processor.UelOntology;
+import de.tudresden.inf.lat.uel.core.processor.UelOptions;
+import de.tudresden.inf.lat.uel.core.processor.UelOptions.UndefBehavior;
 import de.tudresden.inf.lat.uel.core.processor.UnificationAlgorithmFactory;
+import de.tudresden.inf.lat.uel.type.api.Definition;
+import de.tudresden.inf.lat.uel.type.impl.AtomManagerImpl;
 
 /**
  * @author Stefan Borgwardt
@@ -78,6 +86,10 @@ public class SNOMEDEvaluation {
 	 *            arguments (ignored)
 	 */
 	public static void main(String[] args) {
+		test();
+	}
+
+	private static void statistics() {
 		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
 		OWLOntology snomed = AlternativeUelStarter.loadOntology(SNOMED_PATH, manager);
 
@@ -204,39 +216,74 @@ public class SNOMEDEvaluation {
 	private static void test() {
 		Stopwatch timer = Stopwatch.createStarted();
 
+		UelOptions options = new UelOptions();
+		options.verbose = true;
+		options.undefBehavior = UndefBehavior.CONSTANTS;
+		options.snomedMode = true;
+		options.unificationAlgorithmName = UnificationAlgorithmFactory.SAT_BASED_ALGORITHM;
+		options.expandPrimitiveDefinitions = true;
+		options.restrictUndefContext = true;
+		options.numberOfRoleGroups = 1;
+		options.minimize = true;
+
 		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
+		OWLDataFactory factory = manager.getOWLDataFactory();
 		OWLOntology snomed = AlternativeUelStarter.loadOntology(SNOMED_PATH, manager);
 		OWLOntology snomedRestrictions = AlternativeUelStarter.loadOntology(SNOMED_RESTR_PATH, manager);
-		AlternativeUelStarter starter = new AlternativeUelStarter(
-				new HashSet<OWLOntology>(Arrays.asList(snomed, snomedRestrictions)));
-		starter.setVerbose(true);
-		starter.markUndefAsVariables(false);
-		// starter.markUndefAsAuxVariables(true);
-		starter.setSnomedMode(true);
+		Set<OWLOntology> bg = new HashSet<OWLOntology>(Arrays.asList(snomed, snomedRestrictions));
 
-		OWLOntology pos = AlternativeUelStarter.loadOntology(POS_PATH, manager);
-		OWLOntology neg = AlternativeUelStarter.loadOntology(NEG_PATH, manager);
-		OWLOntology constraints = AlternativeUelStarter.loadOntology(CONSTRAINTS_PATH, manager);
-		// OWLOntology neg = UelModel.EMPTY_ONTOLOGY;
-		// String[] varNames = { "X" };
-		String[] varNames = { "X" };
-		UnifierIterator iterator = (UnifierIterator) starter.modifyOntologyAndSolve(pos, neg, null,
-				Arrays.asList(varNames).stream().map(SNOMEDEvaluation::cls).collect(Collectors.toSet()),
-				UnificationAlgorithmFactory.SAT_BASED_ALGORITHM, true);
+		OWLClass x = cls("X");
+		OWLClass top = cls("SCT_138875005");
+		OWLClass goalClass = cls("SCT_102938007");
+		Set<OWLClass> vars = new HashSet<OWLClass>(Arrays.asList(x));
 
-		Set<OWLAxiom> background = iterator.getUelModel().renderDefinitions();
-		UelModel model = iterator.getUelModel();
+		UelOntology ont = new UelOntology(new AtomManagerImpl(), Collections.singleton(snomed), top, true);
+		Set<Integer> id = ont.processClassExpression(goalClass, new HashSet<Definition>(), false);
+		Set<OWLClass> superclasses = ont.getDirectSuperclasses(goalClass);
+		Set<OWLClass> siblings = ont.getSiblings(id.iterator().next());
 
-		OWLDataFactory fac = manager.getOWLDataFactory();
-		OWLAxiom goalAxiom = fac
-				.getOWLEquivalentClassesAxiom(cls("X"),
-						fac.getOWLObjectIntersectionOf(cls("SCT_106133000"), cls("SCT_365781004"),
-								fac.getOWLObjectSomeValuesFrom(prp("RoleGroup"),
-										fac.getOWLObjectIntersectionOf(fac.getOWLObjectSomeValuesFrom(
-												prp("SCT_363713009"), cls("SCT_371157007")),
-										fac.getOWLObjectSomeValuesFrom(prp("SCT_363714003"), cls("SCT_307124006"))))));
+		OWLOntology pos;
+		OWLOntology neg;
+		try {
+			pos = manager.createOntology();
+			neg = manager.createOntology();
+		} catch (OWLOntologyCreationException ex) {
+			throw new RuntimeException(ex);
+		}
+		manager.addAxioms(pos,
+				superclasses.stream().map(cls -> factory.getOWLSubClassOfAxiom(x, cls)).collect(Collectors.toSet()));
+		manager.addAxioms(neg,
+				superclasses.stream().map(cls -> factory.getOWLSubClassOfAxiom(cls, x)).collect(Collectors.toSet()));
+		manager.addAxioms(neg,
+				siblings.stream().flatMap(
+						cls -> Stream.of(factory.getOWLSubClassOfAxiom(x, cls), factory.getOWLSubClassOfAxiom(cls, x)))
+						.collect(Collectors.toSet()));
 
+		OWLClassExpression def = ont.getDefinition(goalClass);
+		if (def == null) {
+			def = ont.getPrimitiveDefinition(goalClass);
+		}
+		OWLAxiom goalAxiom = factory.getOWLEquivalentClassesAxiom(x, def);
+		// factory.getOWLObjectIntersectionOf(cls("SCT_106133000"),
+		// cls("SCT_365781004"),
+		// factory.getOWLObjectSomeValuesFrom(prp("RoleGroup"),
+		// factory.getOWLObjectIntersectionOf(factory
+		// .getOWLObjectSomeValuesFrom(prp("SCT_363713009"),
+		// cls("SCT_371157007")),
+		// factory.getOWLObjectSomeValuesFrom(prp("SCT_363714003"),
+		// cls("SCT_307124006"))))));
+
+		UnifierIterator iterator = (UnifierIterator) AlternativeUelStarter.solve(bg, pos, neg, null, vars, options);
 		output(timer, "Building the unification problem", true);
+
+		computeUnifiers(timer, pos, neg, iterator, goalAxiom);
+	}
+
+	private static void computeUnifiers(Stopwatch timer, OWLOntology pos, OWLOntology neg, UnifierIterator iterator,
+			OWLAxiom goalAxiom) {
+
+		UelModel model = iterator.getUelModel();
+		Set<OWLAxiom> background = model.renderDefinitions();
 
 		System.out.println("Unifiers:");
 
@@ -259,14 +306,12 @@ public class SNOMEDEvaluation {
 				// }
 
 				i++;
-				System.out.println();
-				System.out.println("--- " + i);
+				// System.out.println();
+				// System.out.println("--- " + i);
 
 				if (iterator.hasNext()) {
 
-					// TODO compute unifiers modulo equivalence?
-
-					System.out.println(model.printCurrentUnifier());
+					// System.out.println(model.printCurrentUnifier());
 					// System.out.println(
 					// model.getStringRenderer(null).renderUnifier(model.getCurrentUnifier(),
 					// false, false, true));

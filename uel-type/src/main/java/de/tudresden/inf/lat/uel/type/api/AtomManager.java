@@ -15,14 +15,14 @@ import de.tudresden.inf.lat.uel.type.impl.ExistentialRestriction;
 public interface AtomManager {
 
 	/**
-	 * A string used to distinguish 'undef' concept names from regular ones.
-	 */
-	String UNDEF_SUFFIX = "_UNDEF";
-
-	/**
 	 * A string used to distinguish 'rolegroup' type identifiers.
 	 */
 	String ROLEGROUP_SUFFIX = "_ROLEGROUP";
+
+	/**
+	 * A string used to distinguish 'undef' concept names from regular ones.
+	 */
+	String UNDEF_SUFFIX = "_UNDEF";
 
 	/**
 	 * A string used to designate 'fresh' variables introduced as filles for
@@ -48,6 +48,8 @@ public interface AtomManager {
 	 * @param conceptName
 	 *            the string representation of the concept name (OWLClass)
 	 * @param onlyTypes
+	 *            indicates whether the concept name should be added to the set
+	 *            of constants ('false') or not ('true')
 	 * @return the integer id of the concept name
 	 */
 	Integer createConceptName(String conceptName, boolean onlyTypes);
@@ -141,6 +143,15 @@ public interface AtomManager {
 	Set<Integer> getExistentialRestrictions();
 
 	/**
+	 * Retrieve all existential restrictions that use a given role.
+	 * 
+	 * @param roleId
+	 *            the role id
+	 * @return the set of all existential restrictions using the role
+	 */
+	Set<Integer> getExistentialRestrictions(Integer roleId);
+
+	/**
 	 * Obtain the set of all flattening variables.
 	 * 
 	 * @return the concept name ids
@@ -157,15 +168,6 @@ public interface AtomManager {
 	Integer getIndex(Atom atom);
 
 	/**
-	 * Retrieve the role id of a certain role name.
-	 * 
-	 * @param roleName
-	 *            the string representation of the role name
-	 * @return the associated role id
-	 */
-	Integer getRoleId(String roleName);
-
-	/**
 	 * Retrieve the role id of an existential restriction.
 	 * 
 	 * @param atomId
@@ -174,6 +176,15 @@ public interface AtomManager {
 	 *         atom id
 	 */
 	Integer getRoleId(Integer atomId);
+
+	/**
+	 * Retrieve the role id of a certain role name.
+	 * 
+	 * @param roleName
+	 *            the string representation of the role name
+	 * @return the associated role id
+	 */
+	Integer getRoleId(String roleName);
 
 	/**
 	 * Obtain the set of all role ids (different from atom ids).

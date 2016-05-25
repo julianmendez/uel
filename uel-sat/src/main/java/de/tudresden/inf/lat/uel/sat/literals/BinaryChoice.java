@@ -11,14 +11,26 @@ import de.tudresden.inf.lat.uel.sat.type.SatInput;
 import de.tudresden.inf.lat.uel.type.api.IndexedSet;
 
 /**
+ * This class represents a choice in a SAT instance using a binary encoding ('ld
+ * n' literals for 'n' options).
+ * 
  * @author Stefan Borgwardt
- *
  */
 public class BinaryChoice extends Choice {
 
 	private Integer[] choiceLiterals;
 	private int log;
 
+	/**
+	 * Create a new binary choice.
+	 * 
+	 * @param input
+	 *            the SAT input
+	 * @param literalManager
+	 *            the literal manager
+	 * @param numberOfChoices
+	 *            the required number of choices
+	 */
 	public BinaryChoice(SatInput input, IndexedSet<Literal> literalManager, int numberOfChoices) {
 		super(literalManager, numberOfChoices);
 		this.log = (int) Math.ceil(Math.log(numberOfChoices) / Math.log(2));
@@ -33,10 +45,6 @@ public class BinaryChoice extends Choice {
 			// TODO negate choice literals?
 			input.add(addChoiceLiterals(Collections.<Integer> emptySet(), j));
 		}
-		// System.out.println(log + " choice literals, " + ((int) Math.pow(2,
-		// log)) + " choices, " + numberOfChoices
-		// + " used, " + (((float) numberOfChoices) / Math.pow(2, log)) + "%
-		// ratio");
 	}
 
 	public Set<Integer> getChoiceLiterals(int j) {
