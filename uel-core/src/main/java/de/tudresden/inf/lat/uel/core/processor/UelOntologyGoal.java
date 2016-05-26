@@ -333,7 +333,7 @@ public class UelOntologyGoal implements Goal {
 		// leafIds));
 
 		// pull in all siblings of leaves from ontology
-		Set<OWLClass> siblings = collectSets(leafIds, id -> true, ontology::getSiblings);
+		Set<OWLClass> siblings = collectSets(leafIds, id -> true, id -> ontology.getSiblings(id, true));
 		Set<Integer> siblingIds = processClasses(siblings, false);
 		// System.out.println(renderer.renderAtomList("Siblings", siblingIds));
 
@@ -393,7 +393,7 @@ public class UelOntologyGoal implements Goal {
 		extractTopLevelTypes();
 		extractTypeHierarchy();
 		introduceRoleGroupTypes();
-//		System.out.println(renderer.renderGoal(this, true));
+		// System.out.println(renderer.renderGoal(this, true));
 		extractTypeAssignment();
 	}
 

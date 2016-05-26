@@ -52,7 +52,7 @@ public class SNOMEDEvaluation {
 	// private static final String WORK_DIR = "C:\\Users\\Stefan\\Work\\";
 	private static final String WORK_DIR = "/Users/stefborg/Documents/";
 	private static final String SNOMED_PATH = WORK_DIR + "Ontologies/snomed-english-rdf.owl";
-	private static final String SNOMED_RESTR_PATH = WORK_DIR + "Ontologies/snomed-restrictions.owl";
+	private static final String SNOMED_RESTR_PATH = WORK_DIR + "Ontologies/snomed-restrictions-revised.owl";
 	private static final String POS_PATH = WORK_DIR + "Projects/uel-snomed/uel-snomed-pos.owl";
 	private static final String NEG_PATH = WORK_DIR + "Projects/uel-snomed/uel-snomed-neg.owl";
 	private static final String CONSTRAINTS_PATH = WORK_DIR + "Projects/uel-snomed/constraints_const.owl";
@@ -234,13 +234,25 @@ public class SNOMEDEvaluation {
 
 		OWLClass x = cls("X");
 		OWLClass top = cls("SCT_138875005");
-		OWLClass goalClass = cls("SCT_102938007");
+
+		// 'Difficulty writing (finding)': 30s
+		// OWLClass goalClass = cls("SCT_102938007");
+
+		// 'Does not use words (finding)': 12s / 42s
+		// OWLClass goalClass = cls("SCT_288613006");
+
+		// 'Circumlocution (finding)': too large (1732 atoms)
+		// OWLClass goalClass = cls("SCT_48364004");
+
+		// 'Finding relating to crying (finding)'
+		OWLClass goalClass = cls("SCT_303220007");
+
 		Set<OWLClass> vars = new HashSet<OWLClass>(Arrays.asList(x));
 
 		UelOntology ont = new UelOntology(new AtomManagerImpl(), Collections.singleton(snomed), top, true);
 		Set<Integer> id = ont.processClassExpression(goalClass, new HashSet<Definition>(), false);
 		Set<OWLClass> superclasses = ont.getDirectSuperclasses(goalClass);
-		Set<OWLClass> siblings = ont.getSiblings(id.iterator().next());
+		Set<OWLClass> siblings = ont.getSiblings(id.iterator().next(), false);
 
 		OWLOntology pos;
 		OWLOntology neg;

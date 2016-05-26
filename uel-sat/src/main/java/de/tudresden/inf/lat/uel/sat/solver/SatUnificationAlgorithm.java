@@ -306,10 +306,12 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 					Integer subsumptionLiteral = subsumption(varId, eatomId);
 					for (Integer type : goal.getRoleGroupTypes().keySet()) {
 						Integer roleGroupType = goal.getRoleGroupTypes().get(type);
-						Integer varTypeLiteral = subtype(varId, type);
-						Integer childRoleGroupTypeLiteral = subtype(childId, roleGroupType);
-						input.add(implication(childRoleGroupTypeLiteral, varTypeLiteral, subsumptionLiteral));
-						input.add(implication(varTypeLiteral, childRoleGroupTypeLiteral, subsumptionLiteral));
+						if (roleGroupType != null) {
+							Integer varTypeLiteral = subtype(varId, type);
+							Integer childRoleGroupTypeLiteral = subtype(childId, roleGroupType);
+							input.add(implication(childRoleGroupTypeLiteral, varTypeLiteral, subsumptionLiteral));
+							input.add(implication(varTypeLiteral, childRoleGroupTypeLiteral, subsumptionLiteral));
+						}
 					}
 				}
 			}
@@ -608,17 +610,17 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 
 	private void enforceRoleNumberRestrictions(SatInput input) {
 
-		System.out.println("enforcing number restrictions");
+		// System.out.println("enforcing number restrictions");
 		for (Integer roleId : goal.getAtomManager().getRoleIds()) {
 			int number = goal.getRoleNumberRestrictions().get(roleId);
-			System.out.println(goal.getAtomManager().getRoleName(roleId));
-			System.out.println(number);
+//			System.out.println(goal.getAtomManager().getRoleName(roleId));
+//			System.out.println(number);
 			if (number > 0) {
 				Set<Integer> ex = goal.getAtomManager().getExistentialRestrictions(roleId);
-				System.out.println("restrictions: " + ex);
+				// System.out.println("restrictions: " + ex);
 				Set<Set<Integer>> subsets = getSubsets(ex, number + 1);
 				for (Set<Integer> subset : subsets) {
-					System.out.println("subset " + subset);
+					// System.out.println("subset " + subset);
 					Set<Integer> options = new HashSet<Integer>();
 					Set<Integer> children = subset.stream().map(atomId -> goal.getAtomManager().getChild(atomId))
 							.collect(Collectors.toSet());
@@ -741,7 +743,7 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 
 	private void addSubsets(Set<Set<Integer>> subsets, Stack<Integer> currentStack, Integer[] array, int left,
 			int remainingCardinality) {
-		System.out.println("Current stack: " + currentStack);
+		// System.out.println("Current stack: " + currentStack);
 		if (remainingCardinality == 0) {
 			subsets.add(new HashSet<Integer>(currentStack));
 			return;
@@ -749,10 +751,12 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 
 		for (int i = left; i < array.length; i++) {
 			currentStack.push(array[i]);
-			System.out.println("Pushed " + array[i] + " onto the current stack.");
+			// System.out.println("Pushed " + array[i] + " onto the current
+			// stack.");
 			addSubsets(subsets, currentStack, array, i + 1, remainingCardinality - 1);
 			Integer k = currentStack.pop();
-			System.out.println("Popped " + k + " from the stack. Current stack: " + currentStack);
+			// System.out.println("Popped " + k + " from the stack. Current
+			// stack: " + currentStack);
 		}
 	}
 

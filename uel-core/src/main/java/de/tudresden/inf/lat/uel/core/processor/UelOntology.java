@@ -344,17 +344,21 @@ public class UelOntology {
 	 * 
 	 * @param conceptNameId
 	 *            the atom id of the concept name
+	 * @param union
+	 *            indicates whether to return the union ('true') or the
+	 *            intersection ('false') of the sets of siblings w.r.t.
+	 *            different superclasses
 	 * @return the set of all new siblings
 	 */
-	public Set<OWLClass> getSiblings(Integer conceptNameId) {
+	public Set<OWLClass> getSiblings(Integer conceptNameId, boolean union) {
 		Optional<OWLClass> cls = checkUsedClass(conceptNameId);
 		if (!cls.isPresent()) {
 			return Collections.emptySet();
 		} else {
-			return getDirectSuperclasses(cls.get())
-					.stream().flatMap(parent -> extractInformation(ont -> getOtherChildren(ont, parent),
-							Function.identity(), Collections::singleton, Collections::emptySet).stream())
-					.collect(Collectors.toSet());
+			Stream<Set<OWLClass>> siblingSets = getDirectSuperclasses(cls.get()).stream()
+					.map(parent -> extractInformation(ont -> getOtherChildren(ont, parent), Function.identity(),
+							Collections::singleton, Collections::emptySet));
+			return siblingSets.reduce(union ? Sets::union : Sets::intersection).get();
 		}
 	}
 
@@ -381,8 +385,6 @@ public class UelOntology {
 				// Then get the concept name that this axiom defines.
 				.map(ax -> ax.getSubClass()).filter(expr -> !expr.isAnonymous()).map(expr -> expr.asOWLClass());
 
-		// Finally, filter both sets for concept names that have not yet been
-		// processed.
 		return Stream.concat(subClasses1, subClasses2).filter(c -> !nameMap.containsValue(c));
 	}
 
