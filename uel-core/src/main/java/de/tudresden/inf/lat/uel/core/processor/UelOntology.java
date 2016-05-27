@@ -419,6 +419,7 @@ public class UelOntology {
 	 * Retrieve the atom id of the top concept.
 	 * 
 	 * @param onlyTypes
+	 *            only types
 	 * 
 	 * @return top id
 	 */
@@ -475,6 +476,7 @@ public class UelOntology {
 	 * @param newDefinitions
 	 *            a set of new definitions produced by this method
 	 * @param onlyTypes
+	 *            only types
 	 * @return the UEL representation of the input expression, as a set
 	 *         (conjunction) of atom ids
 	 */
@@ -501,8 +503,11 @@ public class UelOntology {
 	}
 
 	/**
-	 * @param varId1
-	 * @param varId2
+	 * Returns the definitions using a set of variable identifiers.
+	 * 
+	 * @param varIds
+	 *            variable identifiers
+	 * @return the definitions
 	 */
 	public Set<OWLClass> extractDefinitionsUsing(Set<Integer> varIds) {
 		Set<OWLClass> classes = varIds.stream().map(this::checkUsedClass).filter(cls -> cls.isPresent())

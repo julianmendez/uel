@@ -68,6 +68,8 @@ public class UelOntologyGoal implements Goal {
 	 * @param manager
 	 *            the global AtomManager to be used for storage and indexing of
 	 *            all 'local' flat atoms
+	 * @param renderer
+	 *            renderer
 	 * @param ontology
 	 *            the background ontology
 	 */
@@ -332,8 +334,8 @@ public class UelOntologyGoal implements Goal {
 		// do not occur in the goal
 		Set<Integer> leafIds = filterSet(Sets.union(atomManager.getDefinitionVariables(), atomManager.getConstants()),
 				id -> !types.contains(id) && isLeaf(id) && notInGoal(id));
-		// System.out.println(renderer.renderAtomList("Leaves",
-		// leafIds));
+				// System.out.println(renderer.renderAtomList("Leaves",
+				// leafIds));
 
 		// pull in all siblings of leaves from ontology
 		Set<OWLClass> siblings = collectSets(leafIds, id -> true, id -> ontology.getSiblings(id, true));
