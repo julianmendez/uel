@@ -8,12 +8,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.Stack;
+import java.util.Vector;
 import java.util.function.Function;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -29,7 +28,6 @@ import de.tudresden.inf.lat.uel.sat.type.SatInput;
 import de.tudresden.inf.lat.uel.sat.type.SatOutput;
 import de.tudresden.inf.lat.uel.sat.type.SatSolver;
 import de.tudresden.inf.lat.uel.type.api.Atom;
-import de.tudresden.inf.lat.uel.type.api.AtomManager;
 import de.tudresden.inf.lat.uel.type.api.Definition;
 import de.tudresden.inf.lat.uel.type.api.Disequation;
 import de.tudresden.inf.lat.uel.type.api.Dissubsumption;
@@ -214,66 +212,95 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 	}
 
 	private void addTypeRestrictions(SatInput input) {
-		// experimental - minimize subtype literals
-		for (Integer conceptNameId : getConceptNames()) {
-			for (Integer type : goal.getTypes()) {
-				input.addMinimizeLiteral(subtype(conceptNameId, type));
-			}
-		}
+		// // experimental - minimize subtype literals
+		// for (Integer conceptNameId : getConceptNames()) {
+		// for (Integer type : goal.getTypes()) {
+		// input.addMinimizeLiteral(subtype(conceptNameId, type));
+		// }
+		// }
+		//
+		// // a - all types have themselves as types
+		// for (Integer type : goal.getRoleGroupTypes().keySet()) {
+		// input.add(subtype(type, type));
+		// }
+		//
+		// // b - every other concept name must also have a type
+		// for (Integer conceptNameId : getConceptNames()) {
+		// if (!goal.getTypes().contains(conceptNameId)) {
+		// if (goal.getTypeAssignment().containsKey(conceptNameId)) {
+		// // if there is a direct type hint in the goal, use it ...
+		// input.add(subtype(conceptNameId,
+		// goal.getTypeAssignment().get(conceptNameId)));
+		// } else {
+		// // otherwise only assert that there must exist a type
+		// input.add(goal.getTypes().stream().map(type -> subtype(conceptNameId,
+		// type))
+		// .collect(Collectors.toSet()));
+		// }
+		// }
+		// }
+		//
+		// // c - types are inherited by subconcepts
+		// for (Integer conceptNameId1 : getConceptNames()) {
+		// for (Integer conceptNameId2 : getConceptNames()) {
+		// for (Integer type : goal.getTypes()) {
+		// input.add(implication(subtype(conceptNameId1, type),
+		// subsumption(conceptNameId1, conceptNameId2),
+		// subtype(conceptNameId2, type)));
+		// }
+		// }
+		// }
+		//
+		// // c' - types are inherited by/from UNDEF concept names
+		// for (Integer undefId : goal.getAtomManager().getUndefNames()) {
+		// Integer origId = goal.getAtomManager().removeUndef(undefId);
+		// for (Integer type : goal.getTypes()) {
+		// Integer origTypeLiteral = subtype(origId, type);
+		// Integer undefTypeLiteral = subtype(undefId, type);
+		// input.add(implication(undefTypeLiteral, origTypeLiteral));
+		// input.add(implication(origTypeLiteral, undefTypeLiteral));
+		// }
+		// }
+		//
+		// // d - no concept name can have disjoint types
+		// List<Integer> types = new ArrayList<Integer>(goal.getTypes());
+		// for (int i = 0; i < types.size(); i++) {
+		// for (int j = i + 1; j < types.size(); j++) {
+		// Integer type1 = types.get(i);
+		// Integer type2 = types.get(j);
+		// if (goal.areDisjoint(type1, type2)) {
+		// for (Integer conceptNameId : getConceptNames()) {
+		// input.add(negativeClause(subtype(conceptNameId, type1),
+		// subtype(conceptNameId, type2)));
+		// }
+		// }
+		// }
+		// }
 
-		// a - all types have themselves as types
-		for (Integer type : goal.getRoleGroupTypes().keySet()) {
-			input.add(subtype(type, type));
-		}
+		// d' - no variable can have incompatible role group types
+		// for (List<Integer> typePair :
+		// getSubsets(goal.getRoleGroupTypes().keySet(), 2)) {
+		// Integer type1 = typePair.get(0);
+		// Integer type2 = typePair.get(1);
+		// if (!goal.areCompatible(type1, type2)) {
+		// Integer roleGroupType1 = goal.getRoleGroupTypes().get(type1);
+		// Integer roleGroupType2 = goal.getRoleGroupTypes().get(type2);
+		// for (Integer varId : getVariables()) {
+		// input.add(negativeClause(subtype(varId, roleGroupType1),
+		// subtype(varId, roleGroupType2)));
+		// }
+		// }
+		// }
 
-		// b - every other concept name must also have a type
-		for (Integer conceptNameId : getConceptNames()) {
-			if (!goal.getTypes().contains(conceptNameId)) {
-				if (goal.getTypeAssignment().containsKey(conceptNameId)) {
-					// if there is a direct type hint in the goal, use it ...
-					input.add(subtype(conceptNameId, goal.getTypeAssignment().get(conceptNameId)));
-				} else {
-					// otherwise only assert that there must exist a type
-					input.add(goal.getTypes().stream().map(type -> subtype(conceptNameId, type))
-							.collect(Collectors.toSet()));
-				}
-			}
-		}
-
-		// c - types are inherited by subconcepts
-		for (Integer conceptNameId1 : getConceptNames()) {
-			for (Integer conceptNameId2 : getConceptNames()) {
-				for (Integer type : goal.getTypes()) {
-					input.add(implication(subtype(conceptNameId1, type), subsumption(conceptNameId1, conceptNameId2),
-							subtype(conceptNameId2, type)));
-				}
-			}
-		}
-
-		// c' - types are inherited by/from UNDEF concept names
-		for (Integer undefId : goal.getAtomManager().getUndefNames()) {
-			Integer origId = goal.getAtomManager().removeUndef(undefId);
-			for (Integer type : goal.getTypes()) {
-				Integer origTypeLiteral = subtype(origId, type);
-				Integer undefTypeLiteral = subtype(undefId, type);
-				input.add(implication(undefTypeLiteral, origTypeLiteral));
-				input.add(implication(origTypeLiteral, undefTypeLiteral));
-			}
-		}
-
-		// d - no concept name can have disjoint types
-		List<Integer> types = new ArrayList<Integer>(goal.getTypes());
-		for (int i = 0; i < types.size(); i++) {
-			for (int j = i + 1; j < types.size(); j++) {
-				Integer type1 = types.get(i);
-				Integer type2 = types.get(j);
-				if (goal.areDisjoint(type1, type2)) {
-					for (Integer conceptNameId : getConceptNames()) {
-						input.add(negativeClause(subtype(conceptNameId, type1), subtype(conceptNameId, type2)));
-					}
-				}
-			}
-		}
+		// d'' - no variable can have a role group type and a normal type
+		// for (Integer type : goal.getTypes()) {
+		// for (Integer roleGroupType : goal.getRoleGroupTypes().values()) {
+		// for (Integer varId : getVariables()) {
+		// input.add(negativeClause(subsumption(varId, type), subtype(varId,
+		// roleGroupType)));
+		// }
+		// }
+		// }
 
 		// domain restrictions
 		for (Integer varId : getVariables()) {
@@ -281,7 +308,8 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 				Integer roleId = goal.getAtomManager().getRoleId(eatomId);
 				Set<Integer> domain = goal.getDomains().get(roleId);
 				if (domain != null) {
-					Set<Integer> head = domain.stream().map(type -> subtype(varId, type)).collect(Collectors.toSet());
+					Set<Integer> head = domain.stream().map(type -> goal.getRoleGroupTypes().values().contains(type)
+							? subtype(varId, type) : subsumption(varId, type)).collect(Collectors.toSet());
 					input.add(implication(head, subsumption(varId, eatomId)));
 				}
 			}
@@ -293,29 +321,36 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 			Integer childId = goal.getAtomManager().getChild(eatomId);
 			Set<Integer> range = goal.getRanges().get(roleId);
 			if (range != null) {
-				input.add(range.stream().map(type -> subtype(childId, type)).collect(Collectors.toSet()));
+				input.add(range.stream().map(type -> subsumption(childId, type)).collect(Collectors.toSet()));
 			}
 		}
 
 		// 'RoleGroup' translates between 'normal types' and 'role group types'
-		Integer roleGroupId = goal.getAtomManager().getRoleId("http://www.ihtsdo.org/RoleGroup");
-		for (Integer eatomId : getExistentialRestrictions()) {
-			if (goal.getAtomManager().getRoleId(eatomId).equals(roleGroupId)) {
-				Integer childId = goal.getAtomManager().getChild(eatomId);
-				for (Integer varId : getVariables()) {
-					Integer subsumptionLiteral = subsumption(varId, eatomId);
-					for (Integer type : goal.getRoleGroupTypes().keySet()) {
-						Integer roleGroupType = goal.getRoleGroupTypes().get(type);
-						if (roleGroupType != null) {
-							Integer varTypeLiteral = subtype(varId, type);
-							Integer childRoleGroupTypeLiteral = subtype(childId, roleGroupType);
-							input.add(implication(childRoleGroupTypeLiteral, varTypeLiteral, subsumptionLiteral));
-							input.add(implication(varTypeLiteral, childRoleGroupTypeLiteral, subsumptionLiteral));
-						}
-					}
-				}
-			}
-		}
+		// Integer roleGroupId =
+		// goal.getAtomManager().getRoleId("http://www.ihtsdo.org/RoleGroup");
+		// for (Integer eatomId : getExistentialRestrictions()) {
+		// if (goal.getAtomManager().getRoleId(eatomId).equals(roleGroupId)) {
+		// Integer childId = goal.getAtomManager().getChild(eatomId);
+		// for (Integer varId : getVariables()) {
+		// Integer subsumptionLiteral = subsumption(varId, eatomId);
+		// for (Integer type : goal.getRoleGroupTypes().keySet()) {
+		// Integer roleGroupType = goal.getRoleGroupTypes().get(type);
+		// Integer varTypeLiteral = subsumption(varId, type);
+		// Integer childRoleGroupTypeLiteral = subtype(childId, roleGroupType);
+		// // System.out.println("If subsumption(" + printAtom(varId) + "," +
+		// // printAtom(eatomId)
+		// // + "), then subsumption(" + printAtom(varId) + "," +
+		// // printAtom(type) +
+		// // ") <-> subtype("
+		// // + printAtom(childId) + "," + printAtom(roleGroupType) + ")");
+		// input.add(implication(childRoleGroupTypeLiteral, varTypeLiteral,
+		// subsumptionLiteral));
+		// input.add(implication(varTypeLiteral, childRoleGroupTypeLiteral,
+		// subsumptionLiteral));
+		// }
+		// }
+		// }
+		// }
 		// OLD: transparent roles
 		// for (Integer eatomId : getExistentialRestrictions()) {
 		// Integer roleId =
@@ -613,21 +648,19 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 		// System.out.println("enforcing number restrictions");
 		for (Integer roleId : goal.getAtomManager().getRoleIds()) {
 			int number = goal.getRoleNumberRestrictions().get(roleId);
-//			System.out.println(goal.getAtomManager().getRoleName(roleId));
-//			System.out.println(number);
+			// System.out.println(goal.getAtomManager().getRoleName(roleId));
+			// System.out.println(number);
 			if (number > 0) {
 				Set<Integer> ex = goal.getAtomManager().getExistentialRestrictions(roleId);
 				// System.out.println("restrictions: " + ex);
-				Set<Set<Integer>> subsets = getSubsets(ex, number + 1);
-				for (Set<Integer> subset : subsets) {
+				for (List<Integer> subset : getSubsets(ex, number + 1)) {
 					// System.out.println("subset " + subset);
 					Set<Integer> options = new HashSet<Integer>();
 					Set<Integer> children = subset.stream().map(atomId -> goal.getAtomManager().getChild(atomId))
 							.collect(Collectors.toSet());
-					for (Set<Integer> twoChildren : getSubsets(children, 2)) {
-						Iterator<Integer> it = twoChildren.iterator();
-						Integer child1 = it.next();
-						Integer child2 = it.next();
+					for (List<Integer> twoChildren : getSubsets(children, 2)) {
+						Integer child1 = twoChildren.get(0);
+						Integer child2 = twoChildren.get(1);
 						if (goal.areCompatible(child1, child2)) {
 							if (getVariables().contains(child1) || getVariables().contains(child2)) {
 								options.add(subsumption(child1, child2));
@@ -715,8 +748,7 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 		for (Integer atomId1 : getConceptNames()) {
 			for (Integer atomId2 : getConceptNames()) {
 				if (!goal.areCompatible(atomId1, atomId2)) {
-					// System.out.println("Not compatible: " +
-					// printAtom(atomId1) + " and " + printAtom(atomId2));
+					System.out.println("Not compatible: " + printAtom(atomId1) + " and " + printAtom(atomId2));
 					for (Integer varId : getVariables()) {
 						input.add(negativeClause(subsumption(varId, atomId1), subsumption(varId, atomId2)));
 					}
@@ -725,73 +757,74 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 		}
 	}
 
-	private Set<Set<Integer>> getSubsets(Set<Integer> set, int cardinality) {
+	private Collection<List<Integer>> getSubsets(Set<Integer> set, int cardinality) {
 		if (cardinality > set.size()) {
 			return Collections.emptySet();
 		}
 
-		Integer[] array = new Integer[set.size()];
-		Iterator<Integer> it = set.iterator();
-		for (int i = 0; i < set.size(); i++) {
-			array[i] = it.next();
-		}
+		List<Integer> list = new ArrayList<Integer>(set);
 
-		Set<Set<Integer>> subsets = new HashSet<Set<Integer>>();
-		addSubsets(subsets, new Stack<Integer>(), array, 0, cardinality);
+		Collection<List<Integer>> subsets = new ArrayList<List<Integer>>();
+		addSubsets(subsets, new Vector<Integer>(list.size()), list, 0, cardinality);
 		return subsets;
 	}
 
-	private void addSubsets(Set<Set<Integer>> subsets, Stack<Integer> currentStack, Integer[] array, int left,
-			int remainingCardinality) {
+	private void addSubsets(Collection<List<Integer>> subsets, Vector<Integer> currentStack, List<Integer> list,
+			int left, int remainingCardinality) {
 		// System.out.println("Current stack: " + currentStack);
 		if (remainingCardinality == 0) {
-			subsets.add(new HashSet<Integer>(currentStack));
+			subsets.add(new ArrayList<Integer>(currentStack));
 			return;
 		}
 
-		for (int i = left; i < array.length; i++) {
-			currentStack.push(array[i]);
-			// System.out.println("Pushed " + array[i] + " onto the current
+		for (int i = left; i < list.size(); i++) {
+			currentStack.addElement(list.get(i));
+			// System.out.println("Pushed " + list.get(i) + " onto the current
 			// stack.");
-			addSubsets(subsets, currentStack, array, i + 1, remainingCardinality - 1);
-			Integer k = currentStack.pop();
+			addSubsets(subsets, currentStack, list, i + 1, remainingCardinality - 1);
+			currentStack.removeElementAt(currentStack.size() - 1);
 			// System.out.println("Popped " + k + " from the stack. Current
 			// stack: " + currentStack);
 		}
 	}
 
-	private Set<Integer> getSuperclasses(Integer varId) {
-		Set<Integer> allSuperclasses = new HashSet<Integer>();
-		allSuperclasses.add(varId);
-		Set<Integer> directSuperclasses = goal.getDefiniens(varId);
-		if (directSuperclasses != null) {
-			for (Integer id : directSuperclasses) {
-				allSuperclasses.addAll(getSuperclasses(id));
-			}
-		}
-		return allSuperclasses;
-	}
-
-	private boolean areCompatible(Set<Set<Integer>> ideals, Integer atomId1, Integer atomId2) {
-		if (goal.getAtomManager().printConceptName(atomId1).endsWith(AtomManager.UNDEF_SUFFIX)) {
-			atomId1 = goal.getAtomManager().removeUndef(atomId1);
-		}
-		if (goal.getAtomManager().printConceptName(atomId2).endsWith(AtomManager.UNDEF_SUFFIX)) {
-			atomId2 = goal.getAtomManager().removeUndef(atomId2);
-		}
-
-		if (atomId1.equals(atomId2)) {
-			return true;
-		}
-
-		for (Set<Integer> ideal : ideals) {
-			if (ideal.contains(atomId1) && ideal.contains(atomId2)) {
-				return true;
-			}
-		}
-
-		return false;
-	}
+	// private Set<Integer> getSuperclasses(Integer varId) {
+	// Set<Integer> allSuperclasses = new HashSet<Integer>();
+	// allSuperclasses.add(varId);
+	// Set<Integer> directSuperclasses = goal.getDefiniens(varId);
+	// if (directSuperclasses != null) {
+	// for (Integer id : directSuperclasses) {
+	// allSuperclasses.addAll(getSuperclasses(id));
+	// }
+	// }
+	// return allSuperclasses;
+	// }
+	//
+	// private boolean areCompatible(Set<Set<Integer>> ideals, Integer atomId1,
+	// Integer atomId2) {
+	// if
+	// (goal.getAtomManager().printConceptName(atomId1).endsWith(AtomManager.UNDEF_SUFFIX))
+	// {
+	// atomId1 = goal.getAtomManager().removeUndef(atomId1);
+	// }
+	// if
+	// (goal.getAtomManager().printConceptName(atomId2).endsWith(AtomManager.UNDEF_SUFFIX))
+	// {
+	// atomId2 = goal.getAtomManager().removeUndef(atomId2);
+	// }
+	//
+	// if (atomId1.equals(atomId2)) {
+	// return true;
+	// }
+	//
+	// for (Set<Integer> ideal : ideals) {
+	// if (ideal.contains(atomId1) && ideal.contains(atomId2)) {
+	// return true;
+	// }
+	// }
+	//
+	// return false;
+	// }
 
 	private Set<Integer> getConceptNames() {
 		return conceptNames;

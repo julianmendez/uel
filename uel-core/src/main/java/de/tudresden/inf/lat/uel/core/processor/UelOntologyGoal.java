@@ -196,11 +196,14 @@ public class UelOntologyGoal implements Goal {
 			atomId2 = atomManager.removeUndef(atomId2);
 		}
 
-		Integer type1 = types.contains(atomId1) ? atomId1 : typeAssignment.get(atomId1);
-		Integer type2 = types.contains(atomId2) ? atomId2 : typeAssignment.get(atomId2);
-		if ((type1 == null) || (type2 == null) || areDisjoint(type1, type2)) {
-			return true;
-		}
+		// Integer type1 = types.contains(atomId1) ? atomId1 :
+		// typeAssignment.get(atomId1);
+		// Integer type2 = types.contains(atomId2) ? atomId2 :
+		// typeAssignment.get(atomId2);
+		// if ((type1 == null) || (type2 == null) || areDisjoint(type1, type2))
+		// {
+		// return true;
+		// }
 
 		if (atomId1.equals(atomId2)) {
 			return true;
@@ -221,39 +224,6 @@ public class UelOntologyGoal implements Goal {
 
 	private <S, T> Set<T> collectSets(Set<S> input, Predicate<S> filter, Function<S, Set<T>> mapper) {
 		return input.stream().filter(filter).map(mapper).flatMap(Set::stream).collect(Collectors.toSet());
-	}
-
-	/**
-	 * Extract the compatibility relation for concept names from the definitions
-	 * of the background ontology.
-	 */
-	public void computeCompatibilityRelation() {
-		Set<Integer> processed = new HashSet<Integer>();
-		Set<Integer> toProcess = new HashSet<Integer>(
-				Sets.difference(Sets.union(atomManager.getDefinitionVariables(), atomManager.getConstants()),
-						atomManager.getUndefNames()));
-		while (!toProcess.isEmpty()) {
-			Integer varId = toProcess.iterator().next();
-			Set<Integer> superclasses = ontology.getKnownSuperclasses(varId);
-			ideals.add(superclasses);
-			processed.addAll(superclasses);
-			toProcess.removeAll(processed);
-		}
-
-		// printIdeals(renderer);
-
-		// remove redundant ideals
-		Set<Set<Integer>> notMaximal = new HashSet<Set<Integer>>();
-		for (Set<Integer> ideal1 : ideals) {
-			for (Set<Integer> ideal2 : ideals) {
-				if (!ideal1.equals(ideal2) && ideal1.containsAll(ideal2)) {
-					notMaximal.add(ideal2);
-				}
-			}
-		}
-		ideals.removeAll(notMaximal);
-
-		// printIdeals(renderer);
 	}
 
 	private <T extends Axiom> T createAxiom(Class<T> type, OWLClassExpression left, OWLClassExpression right) {
@@ -286,6 +256,39 @@ public class UelOntologyGoal implements Goal {
 	 */
 	public void disposeOntology() {
 		ontology = null;
+	}
+
+	/**
+	 * Extract the compatibility relation for concept names from the definitions
+	 * of the background ontology.
+	 */
+	public void extractCompatibilityRelation() {
+		Set<Integer> processed = new HashSet<Integer>();
+		Set<Integer> toProcess = new HashSet<Integer>(
+				Sets.difference(Sets.union(atomManager.getDefinitionVariables(), atomManager.getConstants()),
+						atomManager.getUndefNames()));
+		while (!toProcess.isEmpty()) {
+			Integer varId = toProcess.iterator().next();
+			Set<Integer> superclasses = ontology.getKnownSuperclasses(varId);
+			ideals.add(superclasses);
+			processed.addAll(superclasses);
+			toProcess.removeAll(processed);
+		}
+
+		// printIdeals(renderer);
+
+		// remove redundant ideals
+		Set<Set<Integer>> notMaximal = new HashSet<Set<Integer>>();
+		for (Set<Integer> ideal1 : ideals) {
+			for (Set<Integer> ideal2 : ideals) {
+				if (!ideal1.equals(ideal2) && ideal1.containsAll(ideal2)) {
+					notMaximal.add(ideal2);
+				}
+			}
+		}
+		ideals.removeAll(notMaximal);
+
+		// printIdeals(renderer);
 	}
 
 	private void extractDomainsAndRanges() {

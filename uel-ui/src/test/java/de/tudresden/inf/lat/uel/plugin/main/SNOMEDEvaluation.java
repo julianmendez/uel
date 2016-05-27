@@ -52,7 +52,7 @@ public class SNOMEDEvaluation {
 	// private static final String WORK_DIR = "C:\\Users\\Stefan\\Work\\";
 	private static final String WORK_DIR = "/Users/stefborg/Documents/";
 	private static final String SNOMED_PATH = WORK_DIR + "Ontologies/snomed-english-rdf.owl";
-	private static final String SNOMED_RESTR_PATH = WORK_DIR + "Ontologies/snomed-restrictions-revised.owl";
+	private static final String SNOMED_RESTR_PATH = WORK_DIR + "Ontologies/snomed-restrictions.owl";
 	private static final String POS_PATH = WORK_DIR + "Projects/uel-snomed/uel-snomed-pos.owl";
 	private static final String NEG_PATH = WORK_DIR + "Projects/uel-snomed/uel-snomed-neg.owl";
 	private static final String CONSTRAINTS_PATH = WORK_DIR + "Projects/uel-snomed/constraints_const.owl";
@@ -220,11 +220,11 @@ public class SNOMEDEvaluation {
 		options.verbose = true;
 		options.undefBehavior = UndefBehavior.CONSTANTS;
 		options.snomedMode = true;
-		options.unificationAlgorithmName = UnificationAlgorithmFactory.SAT_BASED_ALGORITHM;
+		options.unificationAlgorithmName = UnificationAlgorithmFactory.SAT_BASED_ALGORITHM_MINIMAL;
 		options.expandPrimitiveDefinitions = true;
 		options.restrictUndefContext = true;
 		options.numberOfRoleGroups = 1;
-		options.minimize = true;
+		options.minimize = false;
 
 		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
 		OWLDataFactory factory = manager.getOWLDataFactory();
@@ -236,7 +236,7 @@ public class SNOMEDEvaluation {
 		OWLClass top = cls("SCT_138875005");
 
 		// 'Difficulty writing (finding)': 30s
-		// OWLClass goalClass = cls("SCT_102938007");
+		OWLClass goalClass = cls("SCT_102938007");
 
 		// 'Does not use words (finding)': 12s / 42s
 		// OWLClass goalClass = cls("SCT_288613006");
@@ -244,8 +244,11 @@ public class SNOMEDEvaluation {
 		// 'Circumlocution (finding)': too large (1732 atoms)
 		// OWLClass goalClass = cls("SCT_48364004");
 
-		// 'Finding relating to crying (finding)'
-		OWLClass goalClass = cls("SCT_303220007");
+		// 'Finding relating to crying (finding)': too large (1816 atoms)
+		// OWLClass goalClass = cls("SCT_303220007");
+
+		// 'Routine procedure (procedure)':
+		// OWLClass goalClass = cls("SCT_373113001");
 
 		Set<OWLClass> vars = new HashSet<OWLClass>(Arrays.asList(x));
 
