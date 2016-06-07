@@ -174,7 +174,7 @@ public class UelOntology {
 
 		if (fillerIds.size() == 0) {
 			// the empty conjunction is top
-			fillerId = getTop(false);
+			fillerId = getTop();
 		} else if (fillerIds.size() == 1) {
 			fillerId = fillerIds.iterator().next();
 		}
@@ -418,13 +418,10 @@ public class UelOntology {
 	/**
 	 * Retrieve the atom id of the top concept.
 	 * 
-	 * @param onlyTypes
-	 *            only types
-	 * 
 	 * @return top id
 	 */
-	public Integer getTop(boolean onlyTypes) {
-		return classToId(top, onlyTypes);
+	public Integer getTop() {
+		return classToId(top, false);
 	}
 
 	private void loadFlatDefinition(Integer id, Set<Definition> newDefinitions, Set<Integer> toVisit) {

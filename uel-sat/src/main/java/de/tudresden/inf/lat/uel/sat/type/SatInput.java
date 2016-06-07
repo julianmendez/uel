@@ -1,6 +1,7 @@
 package de.tudresden.inf.lat.uel.sat.type;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -80,10 +81,9 @@ public class SatInput {
 	 * 
 	 * @param literal
 	 *            the only literal of the unit clause
-	 * @return a value indicating whether the SatInput was changed
 	 */
-	public boolean add(Integer literal) {
-		return add(Collections.singleton(literal));
+	public void add(Integer literal) {
+		add(Collections.singleton(literal));
 	}
 
 	/**
@@ -91,10 +91,8 @@ public class SatInput {
 	 * 
 	 * @param clause
 	 *            new non-empty clause
-	 * @return a value indicating whether the SatInput was changed
-	 * 
 	 */
-	public boolean add(Set<Integer> clause) {
+	public void add(Set<Integer> clause) {
 		if (clause == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
@@ -106,11 +104,8 @@ public class SatInput {
 			throw new IllegalArgumentException("Clause cannot contain " + SatSolver.END_OF_CLAUSE + ".");
 		}
 
-		boolean ret = this.clauses.add(Collections.unmodifiableSet(clause));
-		if (ret) {
-			updateLastId(clause);
-		}
-		return ret;
+		clauses.add(clause);
+		updateLastId(clause);
 	}
 
 	/**
@@ -118,19 +113,13 @@ public class SatInput {
 	 * 
 	 * @param clauses
 	 *            set of new non-empty clauses
-	 * @return a value indicating whether the SatInput was changed
 	 */
-	public boolean addAll(Collection<? extends Set<Integer>> clauses) {
+	public void addAll(Collection<? extends Set<Integer>> clauses) {
 		if (clauses == null) {
 			throw new IllegalArgumentException("Null argument.");
 		}
 
-		boolean ret = false;
-		for (Set<Integer> clause : clauses) {
-			boolean changed = add(clause);
-			ret = ret || changed;
-		}
-		return ret;
+		clauses.forEach(this::add);
 	}
 
 	/**
@@ -138,10 +127,9 @@ public class SatInput {
 	 * 
 	 * @param literal
 	 *            the literal identifier
-	 * @return true iff the set changed as a result of this operation
 	 */
-	public boolean addMinimizeLiteral(Integer literal) {
-		return this.minimizeLiterals.add(literal);
+	public void addMinimizeLiteral(Integer literal) {
+		addMinimizeLiterals(Collections.singleton(literal));
 	}
 
 	/**
@@ -149,10 +137,10 @@ public class SatInput {
 	 * 
 	 * @param literals
 	 *            a set of literal identifiers
-	 * @return true iff the set changed as a result of this operation
 	 */
-	public boolean addMinimizeLiterals(Set<Integer> literals) {
-		return this.minimizeLiterals.addAll(literals);
+	public void addMinimizeLiterals(Set<Integer> literals) {
+		minimizeLiterals.addAll(literals);
+		updateLastId(literals);
 	}
 
 	/**
@@ -179,7 +167,7 @@ public class SatInput {
 	 * @return the clauses
 	 */
 	public Collection<Set<Integer>> getClauses() {
-		return Collections.unmodifiableCollection(this.clauses);
+		return Collections.unmodifiableCollection(clauses);
 	}
 
 	/**
@@ -188,7 +176,7 @@ public class SatInput {
 	 * @return the greatest propositional variable identifier
 	 */
 	public Integer getLastId() {
-		return this.lastId;
+		return lastId;
 	}
 
 	/**
@@ -243,16 +231,21 @@ public class SatInput {
 		return sbuf.toString();
 	}
 
-	private boolean updateLastId(Collection<Integer> newSet) {
-		boolean ret = false;
-		for (Integer elem : newSet) {
-			Integer absElem = elem < 0 ? (-1) * elem : elem;
-			if (absElem > lastId) {
-				lastId = absElem;
-				ret = true;
-			}
-		}
-		return ret;
+	private void updateLastId(Collection<Integer> newSet) {
+		lastId = newSet.stream().map(Math::abs).reduce(lastId, Math::max);
+	}
+
+	public void addImplication(Integer head, Integer... body) {
+		addImplication(new HashSet<Integer>(Arrays.asList(head)), body);
+	}
+
+	public void addImplication(Set<Integer> head, Integer... body) {
+		Arrays.stream(body).forEach(l -> head.add(-l));
+		add(head);
+	}
+
+	public void addNegativeClause(Integer... body) {
+		addImplication(new HashSet<Integer>(), body);
 	}
 
 }

@@ -334,8 +334,8 @@ public class UelOntologyGoal implements Goal {
 		// do not occur in the goal
 		Set<Integer> leafIds = filterSet(Sets.union(atomManager.getDefinitionVariables(), atomManager.getConstants()),
 				id -> !types.contains(id) && isLeaf(id) && notInGoal(id));
-				// System.out.println(renderer.renderAtomList("Leaves",
-				// leafIds));
+		// System.out.println(renderer.renderAtomList("Leaves",
+		// leafIds));
 
 		// pull in all siblings of leaves from ontology
 		Set<OWLClass> siblings = collectSets(leafIds, id -> true, id -> ontology.getSiblings(id, true));
@@ -374,7 +374,7 @@ public class UelOntologyGoal implements Goal {
 
 	private void extractTypeHierarchy() {
 		// designate the top concept as the most general type
-		types.add(ontology.getTop(true));
+		types.add(ontology.getTop());
 
 		// extract type hierarchy
 		for (Integer type : types) {
@@ -525,10 +525,7 @@ public class UelOntologyGoal implements Goal {
 	private void introduceRoleGroupTypes() {
 		// copy type hierarchy
 		for (Integer type : types) {
-			if (type.equals(ontology.getTop(true))) {
-				// keep the top concept as the unique most general type
-				roleGroupTypes.put(type, type);
-			} else {
+			if (!type.equals(ontology.getTop())) {
 				roleGroupTypes.put(type, atomManager.createRoleGroupConceptName(type));
 			}
 		}

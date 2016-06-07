@@ -131,9 +131,8 @@ public class UelModel {
 						}
 
 						System.out.println("Unifier " + unifierList.size() + ":");
-						 System.out.println(getStringRenderer(null).renderUnifier(result,
-						 true, true, true));
-//						System.out.println(printUnifier(result));
+						System.out.println(getStringRenderer(null).renderUnifier(result, true, true, true));
+						// System.out.println(printUnifier(result));
 					}
 					return true;
 				}
@@ -300,7 +299,7 @@ public class UelModel {
 		algorithm = UnificationAlgorithmFactory.instantiateAlgorithm(options.unificationAlgorithmName, goal);
 		postprocessor = new UnifierPostprocessor(atomManager, goal, getStringRenderer(null));
 		if (algorithm instanceof SatUnificationAlgorithm) {
-			((SatUnificationAlgorithm) algorithm).setShortFormMap(provider::getShortForm);
+			((SatUnificationAlgorithm) algorithm).setShortFormMap(getStringRenderer(null)::getShortForm);
 		}
 	}
 
@@ -522,7 +521,9 @@ public class UelModel {
 			goal.addNegativeAxioms(constraintOntology.getAxioms());
 		}
 
-		makeClassesVariables(userVariables.stream(), false, true);
+		if (userVariables != null) {
+			makeClassesVariables(userVariables.stream(), false, true);
+		}
 
 		if (options.undefBehavior == UndefBehavior.USER_VARIABLES) {
 			makeAllUndefClassesVariables(true);

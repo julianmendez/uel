@@ -125,7 +125,7 @@ public abstract class Renderer<ExpressionType, RoleType, AxiomsType> {
 	 *            a string representation of an entity, e.g. an IRI
 	 * @return the short form of 'id'
 	 */
-	private String getShortForm(String id) {
+	public String getShortForm(String id) {
 		if (provider == null) {
 			return id;
 		}

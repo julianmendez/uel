@@ -31,22 +31,6 @@ public interface UnificationAlgorithm {
 	boolean computeNextUnifier() throws InterruptedException;
 
 	/**
-	 * Returns information about the last computation. This information can
-	 * contain, for example, the processor's name or the number of (atom)
-	 * variables required.
-	 * 
-	 * @return information about the last computation
-	 */
-	List<Entry<String, String>> getInfo();
-
-	/**
-	 * Returns the input to be used to compute the next unifier.
-	 * 
-	 * @return the input to be used to compute the next unifier
-	 */
-	Goal getGoal();
-
-	/**
 	 * Returns the result of the last computation.
 	 * 
 	 * @return the result of the last computation
@@ -55,5 +39,14 @@ public interface UnificationAlgorithm {
 	 *             if invoked before the first computation
 	 */
 	Unifier getUnifier();
+
+	/**
+	 * Returns information about the last computation. This information can
+	 * contain, for example, the processor's name or the number of (atom)
+	 * variables required.
+	 * 
+	 * @return information about the last computation
+	 */
+	public List<Entry<String, String>> getInfo();
 
 }

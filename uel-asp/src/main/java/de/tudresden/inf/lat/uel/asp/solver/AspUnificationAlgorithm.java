@@ -1,35 +1,31 @@
 package de.tudresden.inf.lat.uel.asp.solver;
 
 import java.io.IOException;
-import java.util.AbstractMap.SimpleEntry;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import de.tudresden.inf.lat.uel.type.api.Definition;
 import de.tudresden.inf.lat.uel.type.api.Goal;
-import de.tudresden.inf.lat.uel.type.api.UnificationAlgorithm;
+import de.tudresden.inf.lat.uel.type.impl.AbstractUnificationAlgorithm;
 import de.tudresden.inf.lat.uel.type.impl.DefinitionSet;
 import de.tudresden.inf.lat.uel.type.impl.Unifier;
 
-public class AspUnificationAlgorithm implements UnificationAlgorithm {
+public class AspUnificationAlgorithm extends AbstractUnificationAlgorithm {
 
 	private Goal goal;
 	private AspInput aspInput;
 	private AspOutput aspOutput;
 	private boolean initialized;
 	private Unifier currentUnifier;
-	private boolean isSynchronized;
 	private boolean minimize;
 
 	public AspUnificationAlgorithm(Goal goal, boolean minimize) {
-		this.goal = goal;
+		super(goal);
 		this.aspInput = new AspInput(goal);
+		addInfo("ASP encoding", aspInput.getProgram());
 		this.initialized = false;
 		this.currentUnifier = null;
-		this.isSynchronized = false;
 		this.minimize = minimize;
 	}
 
@@ -55,22 +51,16 @@ public class AspUnificationAlgorithm implements UnificationAlgorithm {
 			initialized = true;
 		}
 
-		isSynchronized = false;
 		boolean hasNext = aspOutput.hasNext();
+
 		if (Thread.interrupted()) {
 			throw new InterruptedException();
 		}
+
+		if (hasNext) {
+			currentUnifier = toUnifier(aspOutput.next());
+		}
 		return hasNext;
-	}
-
-	@Override
-	public List<Entry<String, String>> getInfo() {
-		return Collections.singletonList(new SimpleEntry<String, String>("ASP encoding", aspInput.getProgram()));
-	}
-
-	@Override
-	public Goal getGoal() {
-		return this.goal;
 	}
 
 	@Override
@@ -82,10 +72,6 @@ public class AspUnificationAlgorithm implements UnificationAlgorithm {
 			throw new IllegalStateException("There are no more unifiers.");
 		}
 
-		if (!isSynchronized) {
-			currentUnifier = toUnifier(aspOutput.next());
-			isSynchronized = true;
-		}
 		return currentUnifier;
 	}
 
@@ -99,5 +85,9 @@ public class AspUnificationAlgorithm implements UnificationAlgorithm {
 			definitions.add(new Definition(varId, Collections.unmodifiableSet(body), false));
 		}
 		return new Unifier(definitions);
+	}
+
+	@Override
+	protected void updateInfo() {
 	}
 }

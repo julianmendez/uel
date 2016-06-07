@@ -3,6 +3,7 @@
  */
 package de.tudresden.inf.lat.uel.type.impl;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
@@ -26,11 +27,9 @@ public class DefinitionSet extends HashMap<Integer, Definition> implements Itera
 		super(initialSize);
 	}
 
-	public DefinitionSet(Set<Definition> definitions) {
+	public DefinitionSet(Collection<Definition> definitions) {
 		super(definitions.size());
-		for (Definition def : definitions) {
-			add(def);
-		}
+		definitions.forEach(this::add);
 	}
 
 	public DefinitionSet(DefinitionSet definitions) {
