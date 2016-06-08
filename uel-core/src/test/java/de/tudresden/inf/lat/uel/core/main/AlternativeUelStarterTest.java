@@ -12,16 +12,19 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
+import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 
 import de.tudresden.inf.lat.jcel.owlapi.main.JcelReasonerFactory;
 import de.tudresden.inf.lat.uel.core.processor.UelOptions;
 import de.tudresden.inf.lat.uel.core.processor.UelOptions.UndefBehavior;
+import de.tudresden.inf.lat.uel.core.processor.UelOptions.Verbosity;
 import de.tudresden.inf.lat.uel.core.processor.UnificationAlgorithmFactory;
 
 /**
@@ -115,19 +118,20 @@ public class AlternativeUelStarterTest {
 
 		UelOptions options = new UelOptions();
 		options.undefBehavior = UndefBehavior.CONSTANTS;
-		options.verbose = true;
 		options.unificationAlgorithmName = UnificationAlgorithmFactory.SAT_BASED_ALGORITHM;
+		options.verbosity = Verbosity.SILENT;
 
-		UnifierIterator iterator = (UnifierIterator) AlternativeUelStarter.solve(mainOntology,
-				subsumptions, dissubsumptions, null, variables, options);
+		UnifierIterator iterator = (UnifierIterator) AlternativeUelStarter.solve(mainOntology, subsumptions,
+				dissubsumptions, null, variables, options);
 
 		Set<OWLAxiom> background = iterator.getUelModel().renderDefinitions();
+		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
 
 		Integer actualNumberOfUnifiers = 0;
 		while (iterator.hasNext()) {
 			actualNumberOfUnifiers++;
 			Set<OWLEquivalentClassesAxiom> unifier = iterator.next();
-			OWLOntology extendedOntology = ProcessorTest.createOntology(background, unifier);
+			OWLOntology extendedOntology = ProcessorTest.clearManagerAndCreateOntology(manager, background, unifier);
 			// try {
 			// System.out.println();
 			// System.out.println("---" + actualNumberOfUnifiers);

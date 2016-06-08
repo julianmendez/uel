@@ -10,8 +10,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import de.tudresden.inf.lat.uel.type.api.Atom;
 import de.tudresden.inf.lat.uel.type.api.Goal;
 import de.tudresden.inf.lat.uel.type.api.UnificationAlgorithm;
 
@@ -26,6 +28,7 @@ public abstract class AbstractUnificationAlgorithm implements UnificationAlgorit
 	private List<Entry<String, String>> info = new ArrayList<Entry<String, String>>();
 	protected final Set<Integer> nonVariableAtoms = new HashSet<Integer>();
 	private final Set<Integer> usedAtomIds = new HashSet<Integer>();
+	private Function<String, String> shortFormMap = Function.identity();
 
 	protected AbstractUnificationAlgorithm(Goal goal) {
 		this.goal = goal;
@@ -77,5 +80,33 @@ public abstract class AbstractUnificationAlgorithm implements UnificationAlgorit
 	}
 
 	protected abstract void updateInfo();
+
+	protected String printAtom(Integer atomId) {
+		Atom a = goal.getAtomManager().getAtom(atomId);
+		if (a instanceof ExistentialRestriction) {
+			String roleName = shortFormMap.apply(goal.getAtomManager().printRoleName(atomId));
+			String child = shortFormMap
+					.apply(goal.getAtomManager().printConceptName(goal.getAtomManager().getChild(atomId)));
+			return "(" + roleName + " some " + child + ")";
+		} else {
+			return shortFormMap.apply(goal.getAtomManager().printConceptName(atomId));
+		}
+	}
+
+	protected String printAtoms(Set<Integer> atomIds) {
+		StringBuilder sb = new StringBuilder();
+		for (Integer atomId : atomIds) {
+			sb.append(printAtom(atomId));
+			sb.append(", ");
+		}
+		if (sb.length() > 0) {
+			sb.setLength(sb.length() - 2);
+		}
+		return sb.toString();
+	}
+
+	public void setShortFormMap(Function<String, String> map) {
+		shortFormMap = map;
+	}
 
 }

@@ -27,6 +27,7 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
 import de.tudresden.inf.lat.uel.core.processor.BasicOntologyProvider;
 import de.tudresden.inf.lat.uel.core.processor.UelModel;
 import de.tudresden.inf.lat.uel.core.processor.UelOptions;
+import de.tudresden.inf.lat.uel.core.processor.UelOptions.Verbosity;
 import de.tudresden.inf.lat.uel.core.processor.UnificationAlgorithmFactory;
 
 /**
@@ -148,7 +149,7 @@ public class AlternativeUelStarter {
 					printSyntax();
 					return;
 				case 'i':
-					options.verbose = true;
+					options.verbosity = Verbosity.NORMAL;
 					break;
 				case 's':
 					options.snomedMode = true;

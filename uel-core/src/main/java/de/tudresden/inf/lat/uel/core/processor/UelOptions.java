@@ -30,6 +30,21 @@ public class UelOptions {
 		CONSTANTS
 	};
 
+	public enum Verbosity {
+		/**
+		 * No output.
+		 */
+		SILENT,
+		/**
+		 * Standard output.
+		 */
+		NORMAL,
+		/**
+		 * Detailed output.
+		 */
+		FULL
+	}
+
 	/**
 	 * Indicates whether 'SNOMED mode' is active. If yes, then certain
 	 * syntactical restrictions are enabled, e.g., type compatibility and the
@@ -65,12 +80,12 @@ public class UelOptions {
 	public boolean expandPrimitiveDefinitions = true;
 
 	/**
-	 * Indicates whether additional information about the unification process is
-	 * printed.
+	 * Indicates how much information about the unification process is printed
+	 * to System.out.
 	 * 
-	 * Default: false.
+	 * Default: SILENT.
 	 */
-	public boolean verbose = false;
+	public Verbosity verbosity = Verbosity.SILENT;
 
 	/**
 	 * Designates an alias to be used to express 'owl:Thing', e.g., 'SNOMED CT
@@ -94,6 +109,20 @@ public class UelOptions {
 	 */
 	public String unificationAlgorithmName = UnificationAlgorithmFactory.SAT_BASED_ALGORITHM;
 
-	
+	/**
+	 * Indicates whether unifiers should be minimized w.r.t. the background
+	 * ontology as a post-processing step.
+	 * 
+	 * Default: false
+	 */
 	public boolean minimize = false;
+
+	/**
+	 * Indicates whether the computed solutions should be checked for
+	 * equivalence (w.r.t. the background ontology) and no two equivalent
+	 * solutions should be returned.
+	 * 
+	 * Default: false
+	 */
+	public boolean noEquivalentSolutions = false;
 }

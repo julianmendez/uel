@@ -8,11 +8,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -22,6 +21,7 @@ import org.junit.runners.Parameterized.Parameters;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.io.StreamDocumentSource;
 import org.semanticweb.owlapi.krss2.parser.KRSS2OWLParser;
+import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLOntology;
@@ -31,10 +31,14 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.reasoner.Node;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 
+import com.google.common.base.Stopwatch;
+
 import de.tudresden.inf.lat.jcel.owlapi.main.JcelReasonerFactory;
 import de.tudresden.inf.lat.uel.core.processor.BasicOntologyProvider;
 import de.tudresden.inf.lat.uel.core.processor.UelModel;
 import de.tudresden.inf.lat.uel.core.processor.UelOptions;
+import de.tudresden.inf.lat.uel.core.processor.UelOptions.UndefBehavior;
+import de.tudresden.inf.lat.uel.core.processor.UelOptions.Verbosity;
 import de.tudresden.inf.lat.uel.type.api.AtomManager;
 import de.tudresden.inf.lat.uel.type.impl.Unifier;
 
@@ -44,54 +48,21 @@ public class ProcessorTest {
 	private static final String apath = "src/test/resources/";
 	private static final String conceptC = "C";
 	private static final String conceptD = "D";
-	private static final String prefix = "testOntology-";
 	private static final String krss = ".krss";
-	private static final String test = ".test";
 	private static final int maxTest = 17;
+	private static final String prefix = "testOntology-";
+	private static final String test = ".test";
+	private static final OWLClass c = toOWLClass(conceptC);
+	private static final OWLClass d = toOWLClass(conceptD);
 
-	private String ontologyName;
-	private Set<String> varNames;
-	private Set<String> undefVarNames;
-	private Integer numberOfUnifiers;
-	private String algorithmName;
-
-	String getMemoryUsage() {
-		long totalMemory = Runtime.getRuntime().totalMemory() / 0x100000;
-		long freeMemory = Runtime.getRuntime().freeMemory() / 0x100000;
-		StringBuffer sbuf = new StringBuffer();
-		sbuf.append("([X]:");
-		sbuf.append("" + (totalMemory - freeMemory));
-		sbuf.append(" MB, [ ]:");
-		sbuf.append("" + freeMemory);
-		sbuf.append(" MB)");
-		return sbuf.toString();
-	}
-
-	public ProcessorTest(String ontologyName, Set<String> varNames, Set<String> undefVarNames, Integer numberOfUnifiers,
-			String algorithmName) {
-		this.ontologyName = ontologyName;
-		this.varNames = varNames;
-		this.undefVarNames = undefVarNames;
-		this.numberOfUnifiers = numberOfUnifiers;
-		this.algorithmName = algorithmName;
-		System.out.println("Testing " + ontologyName + " with " + algorithmName + " " + getMemoryUsage() + ".");
-	}
-
-	static OWLOntology loadKRSSOntology(String input) throws OWLOntologyCreationException, IOException {
-		OWLOntologyManager ontologyManager = OWLManager.createOWLOntologyManager();
-		OWLOntology ontology = ontologyManager.createOntology();
-		KRSS2OWLParser parser = new KRSS2OWLParser();
-		parser.parse(new StreamDocumentSource(new FileInputStream(input)), ontology,
-				new OWLOntologyLoaderConfiguration());
-		return ontology;
-	}
-
-	static OWLOntology createOntology(Set<? extends OWLAxiom> background, Set<? extends OWLAxiom> unifier)
-			throws OWLOntologyCreationException {
-		OWLOntologyManager ontologyManager = OWLManager.createOWLOntologyManager();
-		OWLOntology ontology = ontologyManager.createOntology();
-		ontologyManager.addAxioms(ontology, background);
-		ontologyManager.addAxioms(ontology, unifier);
+	static OWLOntology clearManagerAndCreateOntology(OWLOntologyManager manager, Set<? extends OWLAxiom> background,
+			Set<? extends OWLAxiom> unifier) throws OWLOntologyCreationException {
+		for (OWLOntology o : manager.getOntologies()) {
+			manager.removeOntology(o);
+		}
+		OWLOntology ontology = manager.createOntology();
+		manager.addAxioms(ontology, background);
+		manager.addAxioms(ontology, unifier);
 		return ontology;
 	}
 
@@ -137,32 +108,74 @@ public class ProcessorTest {
 		return data;
 	}
 
+	static OWLOntology loadKRSSOntology(String input) throws OWLOntologyCreationException, IOException {
+		OWLOntologyManager ontologyManager = OWLManager.createOWLOntologyManager();
+		OWLOntology ontology = ontologyManager.createOntology();
+		KRSS2OWLParser parser = new KRSS2OWLParser();
+		parser.parse(new StreamDocumentSource(new FileInputStream(input)), ontology,
+				new OWLOntologyLoaderConfiguration());
+		return ontology;
+	}
+
 	private static Set<String> parseSet(String input) {
-		if (input.equals("")) {
-			return Collections.emptySet();
-		} else {
-			return new HashSet<String>(Arrays.asList(input.split(",")));
-		}
+		Set<String> ret = new HashSet<String>(Arrays.asList(input.split(",")));
+		ret.remove("");
+		return ret;
+	}
+
+	private static OWLClass toOWLClass(String name) {
+		return OWLManager.getOWLDataFactory().getOWLClass(IRI.create("x#" + name));
+	}
+
+	private String algorithmName;
+
+	private Integer numberOfUnifiers;
+
+	private String ontologyName;
+
+	private Set<String> undefVarNames;
+
+	private Set<String> varNames;
+
+	public ProcessorTest(String ontologyName, Set<String> varNames, Set<String> undefVarNames, Integer numberOfUnifiers,
+			String algorithmName) {
+		this.ontologyName = ontologyName;
+		this.varNames = varNames;
+		this.undefVarNames = undefVarNames;
+		this.numberOfUnifiers = numberOfUnifiers;
+		this.algorithmName = algorithmName;
+		System.out.println("Testing " + ontologyName + " with " + algorithmName + " " + getMemoryUsage() + ".");
+	}
+
+	String getMemoryUsage() {
+		long totalMemory = Runtime.getRuntime().totalMemory() / 0x100000;
+		long freeMemory = Runtime.getRuntime().freeMemory() / 0x100000;
+		StringBuffer sbuf = new StringBuffer();
+		sbuf.append("([X]:");
+		sbuf.append("" + (totalMemory - freeMemory));
+		sbuf.append(" MB, [ ]:");
+		sbuf.append("" + freeMemory);
+		sbuf.append(" MB)");
+		return sbuf.toString();
 	}
 
 	@Test
 	public void tryOntology() throws OWLOntologyCreationException, IOException, InterruptedException {
 		OWLOntology owlOntology = loadKRSSOntology(ontologyName);
-		OWLOntologyManager ontologyManager = owlOntology.getOWLOntologyManager();
-		UelModel uelModel = new UelModel(new BasicOntologyProvider(ontologyManager), new UelOptions());
+		OWLOntologyManager manager = owlOntology.getOWLOntologyManager();
+		UelOptions options = new UelOptions();
+		options.undefBehavior = UndefBehavior.CONSTANTS;
+		options.unificationAlgorithmName = algorithmName;
+		options.verbosity = Verbosity.SILENT;
+		UelModel uelModel = new UelModel(new BasicOntologyProvider(manager), options);
 
-		Map<String, OWLClass> idClassMap = new HashMap<String, OWLClass>();
-		for (OWLClass cls : owlOntology.getClassesInSignature()) {
-			idClassMap.put(cls.getIRI().getShortForm(), cls);
-		}
-
-		OWLOntology positiveProblem = ontologyManager.createOntology();
-		ontologyManager.addAxiom(positiveProblem, ontologyManager.getOWLDataFactory()
-				.getOWLEquivalentClassesAxiom(idClassMap.get(conceptC), idClassMap.get(conceptD)));
-		OWLOntology negativeProblem = ontologyManager.createOntology();
-		undefVarNames.stream().map(s -> s += AtomManager.UNDEF_SUFFIX).forEach(varNames::add);
+		OWLOntology positiveProblem = manager.createOntology();
+		manager.addAxiom(positiveProblem, manager.getOWLDataFactory().getOWLEquivalentClassesAxiom(c, d));
+		OWLOntology negativeProblem = manager.createOntology();
 		uelModel.setupGoal(Collections.singleton(owlOntology), positiveProblem, negativeProblem, null,
-				varNames.stream().map(idClassMap::get).collect(Collectors.toSet()), true);
+				Stream.concat(varNames.stream(), undefVarNames.stream().map(s -> s + AtomManager.UNDEF_SUFFIX))
+						.map(ProcessorTest::toOWLClass).collect(Collectors.toSet()),
+				true);
 		uelModel.initializeUnificationAlgorithm();
 
 		// System.out.println(uelModel.getStringRenderer(null).renderGoal(uelModel.getGoal()));
@@ -182,7 +195,8 @@ public class ProcessorTest {
 			// System.out.println();
 			// System.out.println();
 			// System.out.println();
-			OWLOntology extendedOntology = createOntology(background, uelModel.renderUnifier(unifier));
+			Set<OWLAxiom> s = uelModel.renderUnifier(unifier);
+			OWLOntology extendedOntology = clearManagerAndCreateOntology(manager, background, s);
 			// try {
 			// extendedOntology.saveOntology(new
 			// FunctionalSyntaxDocumentFormat(), System.out);
@@ -190,14 +204,20 @@ public class ProcessorTest {
 			// e.printStackTrace();
 			// }
 			OWLReasoner reasoner = createReasoner(extendedOntology);
-			Node<OWLClass> node = reasoner.getEquivalentClasses(idClassMap.get(conceptC));
-			OWLClass elem = idClassMap.get(conceptD);
+			Node<OWLClass> node = reasoner.getEquivalentClasses(c);
+			OWLClass elem = d;
 			Assert.assertTrue(node.contains(elem));
 			reasoner.dispose();
 		}
 
 		Assert.assertEquals(numberOfUnifiers, (Integer) uelModel.getUnifierList().size());
 		System.out.println("Test OK " + getMemoryUsage() + ".");
+	}
+
+	private static void tick(Stopwatch timer) {
+		System.out.print(timer.toString() + " ");
+		timer.reset();
+		timer.start();
 	}
 
 }

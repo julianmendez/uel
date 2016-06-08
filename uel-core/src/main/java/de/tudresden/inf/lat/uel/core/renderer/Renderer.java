@@ -313,8 +313,6 @@ public abstract class Renderer<ExpressionType, RoleType, AxiomsType> {
 	 * 
 	 * @param unifier
 	 *            the unifier
-	 * @param identity
-	 *            indicates whether identity assignments should be rendered
 	 * @param typeInfo
 	 *            indicates whether type information should be rendered
 	 * @param sorted
@@ -322,14 +320,12 @@ public abstract class Renderer<ExpressionType, RoleType, AxiomsType> {
 	 *            sorted by the label of the variable
 	 * @return the rendered unifier
 	 */
-	public AxiomsType renderUnifier(Unifier unifier, boolean identity, boolean typeInfo, boolean sorted) {
+	public AxiomsType renderUnifier(Unifier unifier, boolean typeInfo, boolean sorted) {
 		initialize();
 
 		for (Definition definition : sortDefinitions(unifier.getDefinitions(), sorted)) {
 			if (!restrictToUserVariables || atomManager.getUserVariables().contains(definition.getDefiniendum())) {
-				if (!identity || !definition.getRight().equals(Collections.singleton(definition.getDefiniendum()))) {
-					translateAxiom(definition);
-				}
+				translateAxiom(definition);
 			}
 		}
 

@@ -7,7 +7,6 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import de.tudresden.inf.lat.uel.sat.type.SatInput;
 import de.tudresden.inf.lat.uel.sat.type.SatOutput;
 import de.tudresden.inf.lat.uel.sat.type.SatSolver;
 import de.tudresden.inf.lat.uel.type.api.Definition;
@@ -155,7 +154,7 @@ public class SatUnificationAlgorithm extends AbstractSatUnificationAlgorithm {
 				} else {
 					solver = new Sat4jSolver();
 				}
-				SatInput satInput = computeSatInput();
+				computeSatInput();
 				//// DEBUG
 				// StringBuffer sbuf = new StringBuffer();
 				// for (Set<Integer> clause : satInput.getClauses()) {
@@ -190,8 +189,11 @@ public class SatUnificationAlgorithm extends AbstractSatUnificationAlgorithm {
 				// sbuf.append(Solver.NEWLINE);
 				// }
 				// System.out.println("Starting SAT solver ...");
-				satoutput = solver.solve(satInput);
+				satoutput = solver.solve(input);
 				unifiable = satoutput.isSatisfiable();
+
+				// the SatInput object is not needed anymore
+				input = null;
 			} else {
 				Set<Integer> update = computeUpdate();
 				if (update.isEmpty()) {
@@ -225,6 +227,9 @@ public class SatUnificationAlgorithm extends AbstractSatUnificationAlgorithm {
 	}
 
 	private Map<Integer, Set<Integer>> computeTypeAssignment() {
+		if (goal.getTypes().isEmpty()) {
+			return null;
+		}
 		return getConceptNames().stream()
 				.collect(Collectors.toMap(Function.identity(), atomId -> computeTypes(atomId)));
 	}

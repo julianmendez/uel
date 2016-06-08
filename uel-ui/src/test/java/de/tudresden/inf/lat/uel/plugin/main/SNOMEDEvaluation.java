@@ -39,6 +39,7 @@ import de.tudresden.inf.lat.uel.core.processor.UelModel;
 import de.tudresden.inf.lat.uel.core.processor.UelOntology;
 import de.tudresden.inf.lat.uel.core.processor.UelOptions;
 import de.tudresden.inf.lat.uel.core.processor.UelOptions.UndefBehavior;
+import de.tudresden.inf.lat.uel.core.processor.UelOptions.Verbosity;
 import de.tudresden.inf.lat.uel.core.processor.UnificationAlgorithmFactory;
 import de.tudresden.inf.lat.uel.type.api.Definition;
 import de.tudresden.inf.lat.uel.type.impl.AtomManagerImpl;
@@ -217,14 +218,15 @@ public class SNOMEDEvaluation {
 		Stopwatch timer = Stopwatch.createStarted();
 
 		UelOptions options = new UelOptions();
-		options.verbose = true;
+		options.verbosity = Verbosity.NORMAL;
 		options.undefBehavior = UndefBehavior.CONSTANTS;
 		options.snomedMode = true;
-		options.unificationAlgorithmName = UnificationAlgorithmFactory.SAT_BASED_ALGORITHM_MINIMAL;
+		options.unificationAlgorithmName = UnificationAlgorithmFactory.SAT_BASED_ALGORITHM;
 		options.expandPrimitiveDefinitions = true;
 		options.restrictUndefContext = true;
 		options.numberOfRoleGroups = 1;
-		options.minimize = false;
+		options.minimize = true;
+		options.noEquivalentSolutions = true;
 
 		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
 		OWLDataFactory factory = manager.getOWLDataFactory();
@@ -235,7 +237,7 @@ public class SNOMEDEvaluation {
 		OWLClass x = cls("X");
 		OWLClass top = cls("SCT_138875005");
 
-		// 'Difficulty writing (finding)': 30s
+		// 'Difficulty writing (finding)': 30s; new: 21 s / 6,7 min
 		OWLClass goalClass = cls("SCT_102938007");
 
 		// 'Does not use words (finding)': 12s / 42s

@@ -17,12 +17,13 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 
 import de.tudresden.inf.lat.uel.core.processor.UelOptions.UndefBehavior;
+import de.tudresden.inf.lat.uel.core.processor.UelOptions.Verbosity;
 import de.tudresden.inf.lat.uel.core.renderer.OWLRenderer;
 import de.tudresden.inf.lat.uel.core.renderer.StringRenderer;
-import de.tudresden.inf.lat.uel.sat.solver.SatUnificationAlgorithm;
 import de.tudresden.inf.lat.uel.type.api.AtomManager;
 import de.tudresden.inf.lat.uel.type.api.Goal;
 import de.tudresden.inf.lat.uel.type.api.UnificationAlgorithm;
+import de.tudresden.inf.lat.uel.type.impl.AbstractUnificationAlgorithm;
 import de.tudresden.inf.lat.uel.type.impl.AtomManagerImpl;
 import de.tudresden.inf.lat.uel.type.impl.DefinitionSet;
 import de.tudresden.inf.lat.uel.type.impl.Unifier;
@@ -114,14 +115,14 @@ public class UelModel {
 					result = postprocessor.minimizeUnifier(result);
 				}
 
-				if (!isNew(result)) {
-					if (options.verbose) {
+				if (options.noEquivalentSolutions && !isNew(result)) {
+					if (options.verbosity == Verbosity.FULL) {
 						System.out.print(".");
 					}
 					continue;
 				} else {
 					unifierList.add(result);
-					if (options.verbose) {
+					if (options.verbosity != Verbosity.SILENT) {
 						if (unifierList.size() == 1) {
 							System.out.println("Information about the algorithm:");
 							for (Entry<String, String> e : algorithm.getInfo()) {
@@ -131,8 +132,11 @@ public class UelModel {
 						}
 
 						System.out.println("Unifier " + unifierList.size() + ":");
-						System.out.println(getStringRenderer(null).renderUnifier(result, true, true, true));
-						// System.out.println(printUnifier(result));
+						if (options.verbosity == Verbosity.NORMAL) {
+							System.out.println(printUnifier(result));
+						} else {
+							System.out.println(getStringRenderer(null).renderUnifier(result, true, true));
+						}
 					}
 					return true;
 				}
@@ -298,9 +302,7 @@ public class UelModel {
 		allUnifiersFound = false;
 		algorithm = UnificationAlgorithmFactory.instantiateAlgorithm(options.unificationAlgorithmName, goal);
 		postprocessor = new UnifierPostprocessor(atomManager, goal, getStringRenderer(null));
-		if (algorithm instanceof SatUnificationAlgorithm) {
-			((SatUnificationAlgorithm) algorithm).setShortFormMap(getStringRenderer(null)::getShortForm);
-		}
+		((AbstractUnificationAlgorithm) algorithm).setShortFormMap(getStringRenderer(null)::getShortForm);
 	}
 
 	private boolean isNew(Unifier newUnifier) {
@@ -332,8 +334,9 @@ public class UelModel {
 	}
 
 	private void makeClassesVariables(Stream<OWLClass> variables, boolean addUndefSuffix, boolean userVariables) {
-		makeNamesVariables(variables
-				.map(addUndefSuffix ? (cls -> cls.toStringID() + AtomManager.UNDEF_SUFFIX) : (cls -> cls.toStringID())),
+		makeNamesVariables(
+				variables.map(
+						addUndefSuffix ? (cls -> cls.toStringID() + AtomManager.UNDEF_SUFFIX) : (OWLClass::toStringID)),
 				userVariables);
 	}
 
@@ -384,7 +387,7 @@ public class UelModel {
 	 * @return a string representation of the unifier
 	 */
 	public String printUnifier(Unifier unifier) {
-		return getStringRenderer(unifier.getDefinitions()).renderUnifier(unifier, true, false, true);
+		return getStringRenderer(unifier.getDefinitions()).renderUnifier(unifier, false, true);
 	}
 
 	/**
@@ -417,7 +420,7 @@ public class UelModel {
 	 * @return the OWL representation of the unifier
 	 */
 	public Set<OWLAxiom> renderUnifier(Unifier unifier) {
-		return getOWLRenderer(unifier.getDefinitions()).renderUnifier(unifier, true, false, false);
+		return getOWLRenderer(unifier.getDefinitions()).renderUnifier(unifier, false, false);
 	}
 
 	/**
@@ -533,12 +536,13 @@ public class UelModel {
 			makeAllUndefClassesVariables(false);
 		}
 
-		if (options.verbose) {
+		if (options.verbosity != Verbosity.SILENT) {
 			// output unification problem
 			System.out.println("Final number of atoms: " + atomManager.size());
 			System.out.println("Final number of constants: " + atomManager.getConstants().size());
 			System.out.println("Final number of variables: " + atomManager.getVariables().size());
 			System.out.println("Final number of user variables: " + atomManager.getUserVariables().size());
+			System.out.println("Final number of definitions: " + goal.getDefinitions().size());
 			System.out.println("Final number of equations: " + goal.getEquations().size());
 			System.out.println("Final number of disequations: " + goal.getDisequations().size());
 			System.out.println("Final number of subsumptions: " + goal.getSubsumptions().size());
