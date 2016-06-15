@@ -440,14 +440,15 @@ public class UelModel {
 	 *            the negative part of the unification problem
 	 * @param owlThingAlias
 	 *            (optional) an alias for owl:Thing, e.g., 'SNOMED CT Concept'
+	 * @param resetShortFormCache
+	 *            reset short form cache
 	 */
 	public void setupGoal(Set<OWLOntology> bgOntologies, OWLOntology positiveProblem, OWLOntology negativeProblem,
 			OWLClass owlThingAlias, boolean resetShortFormCache) {
 		setupGoal(bgOntologies, positiveProblem.getAxioms(AxiomType.SUBCLASS_OF),
 				positiveProblem.getAxioms(AxiomType.EQUIVALENT_CLASSES),
 				negativeProblem.getAxioms(AxiomType.SUBCLASS_OF),
-				negativeProblem.getAxioms(AxiomType.EQUIVALENT_CLASSES), owlThingAlias,
-				resetShortFormCache);
+				negativeProblem.getAxioms(AxiomType.EQUIVALENT_CLASSES), owlThingAlias, resetShortFormCache);
 	}
 
 	/**
@@ -465,11 +466,12 @@ public class UelModel {
 	 *            the goal disequations, as binary OWLEquivalentClassesAxioms
 	 * @param owlThingAlias
 	 *            (optional) an alias for owl:Thing, e.g., 'SNOMED CT Concept'
+	 * @param resetShortFormCache
+	 *            reset short form cache
 	 */
 	public void setupGoal(Set<OWLOntology> bgOntologies, Set<OWLSubClassOfAxiom> subsumptions,
 			Set<OWLEquivalentClassesAxiom> equations, Set<OWLSubClassOfAxiom> dissubsumptions,
-			Set<OWLEquivalentClassesAxiom> disequations, OWLClass owlThingAlias,
-			boolean resetShortFormCache) {
+			Set<OWLEquivalentClassesAxiom> disequations, OWLClass owlThingAlias, boolean resetShortFormCache) {
 
 		algorithm = null;
 		unifierList = new ArrayList<Unifier>();

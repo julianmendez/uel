@@ -195,6 +195,9 @@ public class UelController {
 	/**
 	 * Uses the UEL model to initialize the goal for the unification algorithm
 	 * with the currently selected ontologies.
+	 * 
+	 * @param resetShortFormCache
+	 *            reset short form cache
 	 */
 	public void setupGoal(boolean resetShortFormCache) {
 		Set<OWLOntology> bgOntologies = new HashSet<OWLOntology>();

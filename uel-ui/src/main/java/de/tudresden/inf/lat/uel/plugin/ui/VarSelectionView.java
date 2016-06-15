@@ -31,6 +31,9 @@ class VarSelectionView extends UelDialog {
 
 	/**
 	 * Construct a new variable selection dialog.
+	 * 
+	 * @param parent
+	 *            parent
 	 */
 	public VarSelectionView(Component parent) {
 		setup(parent, "Variable selection");

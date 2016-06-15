@@ -43,6 +43,9 @@ class RefineView extends UelDialog {
 
 	/**
 	 * Construct a new unifier refinement view.
+	 * 
+	 * @param parent
+	 *            parent
 	 */
 	public RefineView(Component parent) {
 		setup(parent, "Refine unifier");

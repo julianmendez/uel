@@ -36,6 +36,9 @@ class RefineController {
 	/**
 	 * Constructs a new Refine controller using the given model.
 	 * 
+	 * @param view
+	 *            view
+	 * 
 	 * @param model
 	 *            the UEL model
 	 */
