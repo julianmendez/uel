@@ -125,4 +125,12 @@ public class UelOptions {
 	 * Default: false
 	 */
 	public boolean noEquivalentSolutions = false;
+
+	/**
+	 * Limits the number of siblings extracted from the background ontology (-1
+	 * = unlimited).
+	 * 
+	 * Default: -1
+	 */
+	public int numberOfSiblings = -1;
 }

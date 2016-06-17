@@ -188,7 +188,7 @@ public class SatUnificationAlgorithm extends AbstractSatUnificationAlgorithm {
 				// }
 				// sbuf.append(Solver.NEWLINE);
 				// }
-				// System.out.println("Starting SAT solver ...");
+				System.out.println("Starting SAT solver ...");
 				satoutput = solver.solve(input);
 				unifiable = satoutput.isSatisfiable();
 

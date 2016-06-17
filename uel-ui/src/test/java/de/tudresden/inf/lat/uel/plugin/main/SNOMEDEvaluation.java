@@ -227,6 +227,7 @@ public class SNOMEDEvaluation {
 		options.numberOfRoleGroups = 1;
 		options.minimize = true;
 		options.noEquivalentSolutions = true;
+		options.numberOfSiblings = -1;
 
 		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
 		OWLDataFactory factory = manager.getOWLDataFactory();
@@ -238,12 +239,12 @@ public class SNOMEDEvaluation {
 		OWLClass top = cls("SCT_138875005");
 
 		// 'Difficulty writing (finding)': 30s; new: 21 s / 6,7 min
-		OWLClass goalClass = cls("SCT_102938007");
+		// OWLClass goalClass = cls("SCT_102938007");
 
 		// 'Does not use words (finding)': 12s / 42s
 		// OWLClass goalClass = cls("SCT_288613006");
 
-		// 'Circumlocution (finding)': too large (1732 atoms)
+		// 'Circumlocution (finding)': too large (1732 atoms), primitive!
 		// OWLClass goalClass = cls("SCT_48364004");
 
 		// 'Finding relating to crying (finding)': too large (1816 atoms)
@@ -252,12 +253,28 @@ public class SNOMEDEvaluation {
 		// 'Routine procedure (procedure)':
 		// OWLClass goalClass = cls("SCT_373113001");
 
+		// 'Contraception (finding)': impossible
+		// OWLClass goalClass = cls("SCT_13197004");
+
+		// 'Calculus finding (finding)': too large
+		// OWLClass goalClass = cls("SCT_313413008");
+
+		// 'Abnormal gallbladder function (finding)': huge (3718 atoms)
+		// OWLClass goalClass = cls("SCT_51047007");
+
+		// 'Unable to air laundry (finding)': needs 3 RoleGroups; 1min (5) / >
+		// 20min
+		// OWLClass goalClass = cls("SCT_286073006");
+
+		// 'Echoencephalogram abnormal (finding)': too large
+		OWLClass goalClass = cls("SCT_274538008");
+
 		Set<OWLClass> vars = new HashSet<OWLClass>(Arrays.asList(x));
 
 		UelOntology ont = new UelOntology(new AtomManagerImpl(), Collections.singleton(snomed), top, true);
 		Set<Integer> id = ont.processClassExpression(goalClass, new HashSet<Definition>(), false);
 		Set<OWLClass> superclasses = ont.getDirectSuperclasses(goalClass);
-		Set<OWLClass> siblings = ont.getSiblings(id.iterator().next(), false);
+		Set<OWLClass> siblings = ont.getSiblings(id.iterator().next(), false, options.numberOfSiblings);
 
 		OWLOntology pos;
 		OWLOntology neg;
@@ -369,7 +386,7 @@ public class SNOMEDEvaluation {
 					// System.out.println(goalAxiom + " (goal): " +
 					// reasoner.isEntailed(goalAxiom));
 					if (reasoner.isEntailed(goalAxiom)) {
-						System.out.println("This is the wanted solution!");
+						System.out.println("----------------- This is the wanted solution! ------------------");
 						output(timer, "Time to compute the wanted solution", false);
 						// break;
 					} else {

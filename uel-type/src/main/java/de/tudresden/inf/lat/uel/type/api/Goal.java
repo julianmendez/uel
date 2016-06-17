@@ -126,13 +126,17 @@ public interface Goal {
 	default Map<Integer, Integer> getRoleNumberRestrictions() {
 		return Collections.emptyMap();
 	}
-	
+
 	default boolean restrictUndefContext() {
 		return false;
 	}
 
 	default boolean areCompatible(Integer atomId1, Integer atomId2) {
 		return true;
+	}
+
+	default boolean isTop(Integer id) {
+		return false;
 	}
 
 }

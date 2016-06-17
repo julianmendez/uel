@@ -511,7 +511,8 @@ public class UelModel {
 
 		// extract types from background ontologies
 		if (options.snomedMode) {
-			goal.extractSiblings();
+			// System.out.println(printGoal());
+			goal.extractSiblings(options.numberOfSiblings);
 			goal.extractTypes();
 			goal.introduceBlankExistentialRestrictions();
 			goal.extractCompatibilityRelation();

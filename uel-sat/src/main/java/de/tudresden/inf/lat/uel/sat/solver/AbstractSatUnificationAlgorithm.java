@@ -569,7 +569,7 @@ public abstract class AbstractSatUnificationAlgorithm extends AbstractUnificatio
 		// d'' - no variable can have a role group type and a normal type
 		for (Integer type : goal.getTypes()) {
 			// ignore the top concept
-			if (goal.getDirectSupertype(type) != null) {
+			if (!goal.isTop(type)) {
 				for (Integer roleGroupType : goal.getRoleGroupTypes().values()) {
 					for (Integer varId : getVariables()) {
 						input.addNegativeClause(subsumption(varId, type), subtype(varId, roleGroupType));
@@ -606,6 +606,7 @@ public abstract class AbstractSatUnificationAlgorithm extends AbstractUnificatio
 		for (Integer eatomId : getExistentialRestrictions()) {
 			if (goal.getAtomManager().getRoleId(eatomId).equals(roleGroupId)) {
 				Integer childId = goal.getAtomManager().getChild(eatomId);
+
 				for (Integer varId : getVariables()) {
 					Integer subsumptionLiteral = subsumption(varId, eatomId);
 					for (Integer type : goal.getRoleGroupTypes().keySet()) {
@@ -620,6 +621,13 @@ public abstract class AbstractSatUnificationAlgorithm extends AbstractUnificatio
 						// input.addImplication(childRoleGroupTypeLiteral,
 						// varTypeLiteral, subsumptionLiteral);
 					}
+				}
+
+				// variables occurring inside RoleGroup must have a role group
+				// type
+				if (getVariables().contains(childId)) {
+					input.add(goal.getRoleGroupTypes().values().stream()
+							.map(roleGroupType -> subtype(childId, roleGroupType)).collect(Collectors.toSet()));
 				}
 			}
 		}

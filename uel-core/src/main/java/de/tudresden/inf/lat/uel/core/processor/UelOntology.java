@@ -348,9 +348,11 @@ public class UelOntology {
 	 *            indicates whether to return the union ('true') or the
 	 *            intersection ('false') of the sets of siblings w.r.t.
 	 *            different superclasses
+	 * @param limit
+	 *            limit the total number of siblings returned
 	 * @return the set of all new siblings
 	 */
-	public Set<OWLClass> getSiblings(Integer conceptNameId, boolean union) {
+	public Set<OWLClass> getSiblings(Integer conceptNameId, boolean union, int limit) {
 		Optional<OWLClass> cls = checkUsedClass(conceptNameId);
 		if (!cls.isPresent()) {
 			return Collections.emptySet();
@@ -358,7 +360,11 @@ public class UelOntology {
 			Stream<Set<OWLClass>> siblingSets = getDirectSuperclasses(cls.get()).stream()
 					.map(parent -> extractInformation(ont -> getOtherChildren(ont, parent), Function.identity(),
 							Collections::singleton, Collections::emptySet));
-			return siblingSets.reduce(union ? Sets::union : Sets::intersection).get();
+			Stream<OWLClass> collected = siblingSets.reduce(union ? Sets::union : Sets::intersection).get().stream();
+			if (limit >= 0) {
+				collected = collected.limit(limit);
+			}
+			return collected.collect(Collectors.toSet());
 		}
 	}
 

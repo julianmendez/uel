@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -77,6 +76,14 @@ public class UelOntologyGoal implements Goal {
 		this.atomManager = manager;
 		this.ontology = ontology;
 		this.renderer = renderer;
+		this.top = ontology.getTop();
+	}
+
+	private final Integer top;
+
+	@Override
+	public boolean isTop(Integer id) {
+		return top.equals(id);
 	}
 
 	private void addDefinition(Definition definition) {
@@ -325,22 +332,29 @@ public class UelOntologyGoal implements Goal {
 	 * used (in other definitions), and do not occur directly in the
 	 * user-specified goal.
 	 * 
+	 * @param limit
+	 *            limit the number of siblings extracted for each leaf
 	 * @return he set of IDs of the UNDEF variables introduced to directly
 	 *         define the siblings (i.e., not the ones belonging to their
 	 *         superclasses)
 	 */
-	public Set<Integer> extractSiblings() {
+	public Set<Integer> extractSiblings(int limit) {
 		// find all parents of leaves (ids that are not used in other defs) that
 		// do not occur in the goal
 		Set<Integer> leafIds = filterSet(Sets.union(atomManager.getDefinitionVariables(), atomManager.getConstants()),
 				id -> !types.contains(id) && isLeaf(id) && notInGoal(id));
-		// System.out.println(renderer.renderAtomList("Leaves",
-		// leafIds));
+		System.out.println(renderer.renderAtomList("Leaves", leafIds));
 
 		// pull in all siblings of leaves from ontology
-		Set<OWLClass> siblings = collectSets(leafIds, id -> true, id -> ontology.getSiblings(id, true));
-		Set<Integer> siblingIds = processClasses(siblings, false);
-		// System.out.println(renderer.renderAtomList("Siblings", siblingIds));
+		// Set<OWLClass> siblings = collectSets(leafIds, id -> true, id ->
+		// ontology.getSiblings(id, true));
+		// Set<Integer> siblingIds = processClasses(siblings, false);
+		Set<Integer> siblingIds = new HashSet<Integer>();
+		for (Integer leaf : leafIds) {
+			Set<OWLClass> s1 = ontology.getSiblings(leaf, true, limit);
+			Set<Integer> s2 = processClasses(s1, false);
+			System.out.println(renderer.renderAtomList("Siblings of " + renderer.renderAtom(leaf, false), s2));
+		}
 
 		// return all UNDEF variables created for the siblings' definitions
 		// (only the "most specific" ones)
@@ -355,21 +369,26 @@ public class UelOntologyGoal implements Goal {
 	}
 
 	private void extractTypeAssignment() {
-		for (Integer conceptNameId : Sets.union(atomManager.getConstants(), atomManager.getVariables())) {
-			if (!types.contains(conceptNameId)) {
-				Set<Integer> supertypes = ontology.getMostSpecificSuperclasses(conceptNameId, types);
-				List<Integer> minimalTypes = UnifierPostprocessor
-						.minimize((s, t) -> subtypeOrEquals(s, t) ? -1 : (subtypeOrEquals(t, s) ? 1 : 0), supertypes);
-				if (minimalTypes.size() > 1) {
-					System.out.println(renderer.renderAtomList(
-							"Extracted types for " + renderer.renderAtom(conceptNameId, false), minimalTypes));
-					throw new RuntimeException("A concept name cannot belong to different types.");
-				}
-				if (minimalTypes.size() == 1) {
-					typeAssignment.put(conceptNameId, minimalTypes.iterator().next());
-				}
-			}
-		}
+		// for (Integer conceptNameId : Sets.union(atomManager.getConstants(),
+		// atomManager.getVariables())) {
+		// if (!types.contains(conceptNameId)) {
+		// Set<Integer> supertypes =
+		// ontology.getMostSpecificSuperclasses(conceptNameId, types);
+		// List<Integer> minimalTypes = UnifierPostprocessor
+		// .minimize((s, t) -> subtypeOrEquals(s, t) ? -1 : (subtypeOrEquals(t,
+		// s) ? 1 : 0), supertypes);
+		// if (minimalTypes.size() > 1) {
+		// System.out.println(renderer.renderAtomList(
+		// "Extracted types for " + renderer.renderAtom(conceptNameId, false),
+		// minimalTypes));
+		// throw new RuntimeException("A concept name cannot belong to different
+		// types.");
+		// }
+		// if (minimalTypes.size() == 1) {
+		// typeAssignment.put(conceptNameId, minimalTypes.iterator().next());
+		// }
+		// }
+		// }
 	}
 
 	private void extractTypeHierarchy() {
@@ -377,16 +396,18 @@ public class UelOntologyGoal implements Goal {
 		types.add(ontology.getTop());
 
 		// extract type hierarchy
-		for (Integer type : types) {
-			// traverse the class hierarchy and try to find another type
-			Set<Integer> supertypes = ontology.getMostSpecificSuperclasses(type, types);
-			if (supertypes.size() > 1) {
-				throw new RuntimeException("A type can only have one direct supertype.");
-			}
-			if (supertypes.size() == 1) {
-				directSupertype.put(type, supertypes.iterator().next());
-			}
-		}
+		// for (Integer type : types) {
+		// // traverse the class hierarchy and try to find another type
+		// Set<Integer> supertypes = ontology.getMostSpecificSuperclasses(type,
+		// types);
+		// if (supertypes.size() > 1) {
+		// throw new RuntimeException("A type can only have one direct
+		// supertype.");
+		// }
+		// if (supertypes.size() == 1) {
+		// directSupertype.put(type, supertypes.iterator().next());
+		// }
+		// }
 	}
 
 	/**
@@ -525,16 +546,17 @@ public class UelOntologyGoal implements Goal {
 	private void introduceRoleGroupTypes() {
 		// copy type hierarchy
 		for (Integer type : types) {
-			if (!type.equals(ontology.getTop())) {
+			if (!type.equals(top)) {
 				roleGroupTypes.put(type, atomManager.createRoleGroupConceptName(type));
 			}
 		}
-		for (Integer type : types) {
-			Integer supertype = directSupertype.get(type);
-			if (supertype != null) {
-				directSupertype.put(roleGroupTypes.get(type), roleGroupTypes.get(supertype));
-			}
-		}
+		// for (Integer type : types) {
+		// Integer supertype = directSupertype.get(type);
+		// if (supertype != null) {
+		// directSupertype.put(roleGroupTypes.get(type),
+		// roleGroupTypes.get(supertype));
+		// }
+		// }
 
 		// finally add all newly created types to the collection
 		types.addAll(roleGroupTypes.values());
