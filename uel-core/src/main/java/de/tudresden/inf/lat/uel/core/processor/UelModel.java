@@ -55,10 +55,10 @@ public class UelModel {
 	private AtomManager atomManager;
 	private int currentUnifierIndex;
 	private UelOntologyGoal goal;
+	private UelOptions options;
 	private UnifierPostprocessor postprocessor;
 	private OntologyProvider provider;
 	private List<Unifier> unifierList;
-	private UelOptions options;
 
 	/**
 	 * Constructs a new UEL model.
@@ -379,6 +379,21 @@ public class UelModel {
 		return getStringRenderer(null).renderGoal(goal, true);
 	}
 
+	public void printGoalInfo() {
+		// output unification problem
+		System.out.println("Final number of atoms: " + atomManager.size());
+		System.out.println("Final number of constants: " + atomManager.getConstants().size());
+		System.out.println("Final number of variables: " + atomManager.getVariables().size());
+		System.out.println("Final number of user variables: " + atomManager.getUserVariables().size());
+		System.out.println("Final number of definitions: " + goal.getDefinitions().size());
+		System.out.println("Final number of equations: " + goal.getEquations().size());
+		System.out.println("Final number of disequations: " + goal.getDisequations().size());
+		System.out.println("Final number of subsumptions: " + goal.getSubsumptions().size());
+		System.out.println("Final number of dissubsumptions: " + goal.getDissubsumptions().size());
+		System.out.println("(Dis-)Unification problem:");
+		System.out.println(printGoal());
+	}
+
 	/**
 	 * Prints the given unifier using the default StringRenderer.
 	 * 
@@ -538,18 +553,7 @@ public class UelModel {
 		}
 
 		if (options.verbosity != Verbosity.SILENT) {
-			// output unification problem
-			System.out.println("Final number of atoms: " + atomManager.size());
-			System.out.println("Final number of constants: " + atomManager.getConstants().size());
-			System.out.println("Final number of variables: " + atomManager.getVariables().size());
-			System.out.println("Final number of user variables: " + atomManager.getUserVariables().size());
-			System.out.println("Final number of definitions: " + goal.getDefinitions().size());
-			System.out.println("Final number of equations: " + goal.getEquations().size());
-			System.out.println("Final number of disequations: " + goal.getDisequations().size());
-			System.out.println("Final number of subsumptions: " + goal.getSubsumptions().size());
-			System.out.println("Final number of dissubsumptions: " + goal.getDissubsumptions().size());
-			System.out.println("(Dis-)Unification problem:");
-			System.out.println(printGoal());
+			printGoalInfo();
 		}
 
 		goal.disposeOntology();

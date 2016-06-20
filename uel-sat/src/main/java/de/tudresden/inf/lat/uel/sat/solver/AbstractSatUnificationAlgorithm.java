@@ -111,35 +111,48 @@ public abstract class AbstractSatUnificationAlgorithm extends AbstractUnificatio
 	protected SatInput computeSatInput() throws InterruptedException {
 		input = new SatInput();
 
+		if (!goal.getRoleNumberRestrictions().isEmpty()) {
+			encodeRoleNumberRestrictionsAndCompatibility();
+			System.out.println("l");
+		}
+
+		System.out.println("a");
 		encodeGoal();
+		System.out.println("b");
 		encodeSubsumptionBetweenConstants();
+		System.out.println("c");
 		encodeSubsumptionBetweenExistentialRestrictions();
+		System.out.println("d");
 		encodeSubsumptionBetweenConstantsAndExistentialRestrictions();
+		System.out.println("e");
 		checkInterrupted();
 
 		encodeTransitivityOfSubsumption();
+		System.out.println("f");
 		encodeReflexivityOfOrder();
+		System.out.println("g");
 		encodeTransitivityOfOrder();
+		System.out.println("h");
 		encodeConnectionBetweenOrderAndSubsumption();
+		System.out.println("i");
 		checkInterrupted();
 
 		if (goal.hasNegativePart()) {
 			// add clauses with auxiliary variables needed for soundness of
 			// disunification
 			encodeConditionsForDissubsumptions();
+			System.out.println("j");
 		}
 
 		if (!goal.getTypes().isEmpty()) {
 			// encode type restrictions
 			encodeTypeRestrictions();
-		}
-
-		if (!goal.getRoleNumberRestrictions().isEmpty()) {
-			encodeRoleNumberRestrictionsAndCompatibility();
+			System.out.println("k");
 		}
 
 		if (goal.restrictUndefContext()) {
 			encodeUndefContextRestriction();
+			System.out.println("m");
 		}
 
 		if (onlyMinimalAssignments) {
@@ -322,14 +335,14 @@ public abstract class AbstractSatUnificationAlgorithm extends AbstractUnificatio
 
 	private void encodeRoleNumberRestrictionsAndCompatibility() {
 
-		// System.out.println("enforcing number restrictions");
+		 System.out.println("enforcing number restrictions");
 		for (Integer roleId : goal.getAtomManager().getRoleIds()) {
 			int number = goal.getRoleNumberRestrictions().get(roleId);
-			// System.out.println(goal.getAtomManager().getRoleName(roleId));
-			// System.out.println(number);
+			 System.out.println(goal.getAtomManager().getRoleName(roleId));
+			 System.out.println(number);
 			if (number > 0) {
 				Set<Integer> ex = goal.getAtomManager().getExistentialRestrictions(roleId);
-				// System.out.println("restrictions: " + ex);
+				 System.out.println("restrictions: " + ex);
 				for (List<Integer> subset : computeSubsets(ex, number + 1)) {
 					// System.out.println("subset " + subset);
 					Set<Integer> options = new HashSet<Integer>();

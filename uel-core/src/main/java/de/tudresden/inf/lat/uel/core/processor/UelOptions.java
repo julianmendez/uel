@@ -128,7 +128,7 @@ public class UelOptions {
 
 	/**
 	 * Limits the number of siblings extracted from the background ontology (-1
-	 * = unlimited).
+	 * = unlimited). Leafes with more siblings will be ignored.
 	 * 
 	 * Default: -1
 	 */

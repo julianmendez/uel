@@ -28,6 +28,7 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
+import org.semanticweb.owlapi.model.parameters.Imports;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 
 import com.google.common.base.Stopwatch;
@@ -57,13 +58,14 @@ public class SNOMEDEvaluation {
 	private static final String POS_PATH = WORK_DIR + "Projects/uel-snomed/uel-snomed-pos.owl";
 	private static final String NEG_PATH = WORK_DIR + "Projects/uel-snomed/uel-snomed-neg.owl";
 	private static final String CONSTRAINTS_PATH = WORK_DIR + "Projects/uel-snomed/constraints_const.owl";
+	private static final int MAX_TESTS = 100;
 
-	private static OWLClass cls(String name) {
-		return OWLManager.getOWLDataFactory().getOWLClass(IRI.create("http://www.ihtsdo.org/" + name));
+	private static OWLClass cls(OWLDataFactory factory, String name) {
+		return factory.getOWLClass(IRI.create("http://www.ihtsdo.org/" + name));
 	}
 
-	private static OWLObjectProperty prp(String name) {
-		return OWLManager.getOWLDataFactory().getOWLObjectProperty(IRI.create("http://www.ihtsdo.org/" + name));
+	private static OWLObjectProperty prp(OWLDataFactory factory, String name) {
+		return factory.getOWLObjectProperty(IRI.create("http://www.ihtsdo.org/" + name));
 	}
 
 	private static int definitions = 0;
@@ -78,7 +80,7 @@ public class SNOMEDEvaluation {
 	private static int maxOtherRoles = 0;
 	private static OWLClass maxOtherRolesClass = null;
 	private static OWLClassExpression maxOtherRolesDef = null;
-	private static OWLObjectProperty roleGroup = prp("RoleGroup");
+	private static OWLObjectProperty roleGroup = prp(OWLManager.getOWLDataFactory(), "RoleGroup");
 
 	/**
 	 * Entry point for tests.
@@ -215,10 +217,8 @@ public class SNOMEDEvaluation {
 	}
 
 	private static void test() {
-		Stopwatch timer = Stopwatch.createStarted();
-
 		UelOptions options = new UelOptions();
-		options.verbosity = Verbosity.NORMAL;
+		options.verbosity = Verbosity.SILENT;
 		options.undefBehavior = UndefBehavior.CONSTANTS;
 		options.snomedMode = true;
 		options.unificationAlgorithmName = UnificationAlgorithmFactory.SAT_BASED_ALGORITHM;
@@ -234,9 +234,6 @@ public class SNOMEDEvaluation {
 		OWLOntology snomed = AlternativeUelStarter.loadOntology(SNOMED_PATH, manager);
 		OWLOntology snomedRestrictions = AlternativeUelStarter.loadOntology(SNOMED_RESTR_PATH, manager);
 		Set<OWLOntology> bg = new HashSet<OWLOntology>(Arrays.asList(snomed, snomedRestrictions));
-
-		OWLClass x = cls("X");
-		OWLClass top = cls("SCT_138875005");
 
 		// 'Difficulty writing (finding)': 30s; new: 21 s / 6,7 min
 		// OWLClass goalClass = cls("SCT_102938007");
@@ -267,8 +264,47 @@ public class SNOMEDEvaluation {
 		// OWLClass goalClass = cls("SCT_286073006");
 
 		// 'Echoencephalogram abnormal (finding)': too large
-		OWLClass goalClass = cls("SCT_274538008");
+		// OWLClass goalClass = cls(factory, "SCT_274538008");
 
+		// 'Primary malignant neoplasm of pyriform sinus (disorder)'
+		OWLClass goalClass = cls(factory, "SCT_93978008");
+
+		// test single class
+		OWLClassExpression goalExpression = ((OWLEquivalentClassesAxiom) snomed.getAxioms(goalClass, Imports.EXCLUDED)
+				.iterator().next()).getClassExpressionsMinus(goalClass).iterator().next();
+		runTest(options, snomed, bg, goalClass, goalExpression);
+
+		// randomly select classes with full definition from SNOMED
+		// List<OWLEquivalentClassesAxiom> definitions = new
+		// ArrayList<OWLEquivalentClassesAxiom>(
+		// snomed.getAxioms(AxiomType.EQUIVALENT_CLASSES));
+		// Random rnd = new Random();
+		//
+		// for (int i = 0; i < MAX_TESTS; i++) {
+		// OWLEquivalentClassesAxiom axiom =
+		// definitions.get(rnd.nextInt(definitions.size()));
+		// OWLClass goalClass = axiom.getNamedClasses().iterator().next();
+		// OWLClassExpression goalExpression =
+		// axiom.getClassExpressionsMinus(goalClass).iterator().next();
+		// System.out
+		// .println("***** [" + i + "] Goal class: "
+		// + EntitySearcher
+		// .getAnnotations(goalClass, manager.getOntologies(),
+		// OWLManager.getOWLDataFactory().getRDFSLabel())
+		// .iterator().next().getValue());
+		// runTest(options, snomed, bg, goalClass, goalExpression);
+		// }
+	}
+
+	private static void runTest(UelOptions options, OWLOntology snomed, Set<OWLOntology> bg, OWLClass goalClass,
+			OWLClassExpression goalExpression) {
+		Stopwatch timer = Stopwatch.createStarted();
+
+		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
+		OWLDataFactory factory = manager.getOWLDataFactory();
+
+		OWLClass x = cls(factory, "X");
+		OWLClass top = cls(factory, "SCT_138875005");
 		Set<OWLClass> vars = new HashSet<OWLClass>(Arrays.asList(x));
 
 		UelOntology ont = new UelOntology(new AtomManagerImpl(), Collections.singleton(snomed), top, true);
@@ -293,24 +329,17 @@ public class SNOMEDEvaluation {
 						cls -> Stream.of(factory.getOWLSubClassOfAxiom(x, cls), factory.getOWLSubClassOfAxiom(cls, x)))
 						.collect(Collectors.toSet()));
 
-		OWLClassExpression def = ont.getDefinition(goalClass);
-		if (def == null) {
-			def = ont.getPrimitiveDefinition(goalClass);
-		}
-		OWLAxiom goalAxiom = factory.getOWLEquivalentClassesAxiom(x, def);
-		// factory.getOWLObjectIntersectionOf(cls("SCT_106133000"),
-		// cls("SCT_365781004"),
-		// factory.getOWLObjectSomeValuesFrom(prp("RoleGroup"),
-		// factory.getOWLObjectIntersectionOf(factory
-		// .getOWLObjectSomeValuesFrom(prp("SCT_363713009"),
-		// cls("SCT_371157007")),
-		// factory.getOWLObjectSomeValuesFrom(prp("SCT_363714003"),
-		// cls("SCT_307124006"))))));
-
+		options.verbosity = Verbosity.SILENT;
 		UnifierIterator iterator = (UnifierIterator) AlternativeUelStarter.solve(bg, pos, neg, null, vars, options);
 		output(timer, "Building the unification problem", true);
-
-		computeUnifiers(timer, pos, neg, iterator, goalAxiom);
+		int size = iterator.getUelModel().getGoal().getAtomManager().size();
+		if (size > 300) {
+			System.out.println("Problem is too large (" + size + ")!");
+		} else {
+			iterator.getUelModel().printGoalInfo();
+			options.verbosity = Verbosity.NORMAL;
+			computeUnifiers(timer, pos, neg, iterator, factory.getOWLEquivalentClassesAxiom(x, goalExpression));
+		}
 	}
 
 	private static void computeUnifiers(Stopwatch timer, OWLOntology pos, OWLOntology neg, UnifierIterator iterator,
@@ -324,11 +353,8 @@ public class SNOMEDEvaluation {
 		try {
 			Scanner in = new Scanner(System.in);
 			int i = 0;
-			boolean skip = true;
+			boolean skip = false;
 
-			if (!skip) {
-				System.out.println("Press RETURN to start computing the next unifier (input 'a' for all unifiers) ...");
-			}
 			while (skip || in.hasNextLine()) {
 				if (!skip) {
 					if (in.nextLine().equals("a")) {
@@ -404,6 +430,11 @@ public class SNOMEDEvaluation {
 					System.out.println("No more unifiers.");
 					output(timer, "Time to compute all solutions", false);
 					break;
+				}
+
+				if (!skip) {
+					System.out.println(
+							"Press RETURN to start computing the next unifier (input 'a' for all unifiers) ...");
 				}
 			}
 			in.close();

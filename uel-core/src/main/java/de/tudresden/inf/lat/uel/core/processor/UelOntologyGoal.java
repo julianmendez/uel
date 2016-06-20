@@ -333,32 +333,31 @@ public class UelOntologyGoal implements Goal {
 	 * user-specified goal.
 	 * 
 	 * @param limit
-	 *            limit the number of siblings extracted for each leaf
-	 * @return he set of IDs of the UNDEF variables introduced to directly
-	 *         define the siblings (i.e., not the ones belonging to their
-	 *         superclasses)
+	 *            limit the number of siblings extracted for each leaf; leaves
+	 *            with more siblings will be ignored
 	 */
-	public Set<Integer> extractSiblings(int limit) {
+	public void extractSiblings(int limit) {
 		// find all parents of leaves (ids that are not used in other defs) that
 		// do not occur in the goal
 		Set<Integer> leafIds = filterSet(Sets.union(atomManager.getDefinitionVariables(), atomManager.getConstants()),
 				id -> !types.contains(id) && isLeaf(id) && notInGoal(id));
-		System.out.println(renderer.renderAtomList("Leaves", leafIds));
+		// System.out.println(renderer.renderAtomList("Leaves", leafIds));
 
 		// pull in all siblings of leaves from ontology
 		// Set<OWLClass> siblings = collectSets(leafIds, id -> true, id ->
 		// ontology.getSiblings(id, true));
 		// Set<Integer> siblingIds = processClasses(siblings, false);
-		Set<Integer> siblingIds = new HashSet<Integer>();
 		for (Integer leaf : leafIds) {
 			Set<OWLClass> s1 = ontology.getSiblings(leaf, true, limit);
-			Set<Integer> s2 = processClasses(s1, false);
-			System.out.println(renderer.renderAtomList("Siblings of " + renderer.renderAtom(leaf, false), s2));
+			processClasses(s1, false);
+			// System.out.println(renderer.renderAtomList("Siblings of " +
+			// renderer.renderAtom(leaf, false), s2));
 		}
 
 		// return all UNDEF variables created for the siblings' definitions
 		// (only the "most specific" ones)
-		return collectSets(siblingIds, id -> true, this::getTopLevelUndefIds);
+		// return collectSets(siblingIds, id -> true,
+		// this::getTopLevelUndefIds);
 	}
 
 	private void extractTopLevelTypes() {
