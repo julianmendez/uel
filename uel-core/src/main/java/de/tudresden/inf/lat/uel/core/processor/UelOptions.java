@@ -34,15 +34,25 @@ public class UelOptions {
 		/**
 		 * No output.
 		 */
-		SILENT,
+		SILENT(0),
+		/**
+		 * Short output.
+		 */
+		SHORT(1),
 		/**
 		 * Standard output.
 		 */
-		NORMAL,
+		NORMAL(2),
 		/**
 		 * Detailed output.
 		 */
-		FULL
+		FULL(3);
+
+		public int level;
+
+		Verbosity(int level) {
+			this.level = level;
+		}
 	}
 
 	/**

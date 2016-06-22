@@ -122,7 +122,8 @@ public class UelModel {
 					continue;
 				} else {
 					unifierList.add(result);
-					if (options.verbosity != Verbosity.SILENT) {
+
+					if (options.verbosity.level > 1) {
 						if (unifierList.size() == 1) {
 							System.out.println("Information about the algorithm:");
 							for (Entry<String, String> e : algorithm.getInfo()) {
@@ -130,14 +131,23 @@ public class UelModel {
 								System.out.println(e.getValue());
 							}
 						}
-
-						System.out.println("Unifier " + unifierList.size() + ":");
-						if (options.verbosity == Verbosity.NORMAL) {
-							System.out.println(printUnifier(result));
-						} else {
-							System.out.println(getStringRenderer(null).renderUnifier(result, true, true));
-						}
 					}
+
+					if (options.verbosity.level > 0) {
+						System.out.println("Unifier " + unifierList.size() + ":");
+					}
+
+					switch (options.verbosity) {
+					case FULL:
+						System.out.println(getStringRenderer(null).renderUnifier(result, true, true));
+						break;
+					case NORMAL:
+						System.out.println(printUnifier(result));
+						break;
+					default:
+						break;
+					}
+
 					return true;
 				}
 			}
@@ -381,15 +391,15 @@ public class UelModel {
 
 	public void printGoalInfo() {
 		// output unification problem
-		System.out.println("Final number of atoms: " + atomManager.size());
-		System.out.println("Final number of constants: " + atomManager.getConstants().size());
-		System.out.println("Final number of variables: " + atomManager.getVariables().size());
-		System.out.println("Final number of user variables: " + atomManager.getUserVariables().size());
-		System.out.println("Final number of definitions: " + goal.getDefinitions().size());
-		System.out.println("Final number of equations: " + goal.getEquations().size());
-		System.out.println("Final number of disequations: " + goal.getDisequations().size());
-		System.out.println("Final number of subsumptions: " + goal.getSubsumptions().size());
-		System.out.println("Final number of dissubsumptions: " + goal.getDissubsumptions().size());
+		System.out.println("Number of atoms: " + atomManager.size());
+		System.out.println("Number of constants: " + atomManager.getConstants().size());
+		System.out.println("Number of variables: " + atomManager.getVariables().size());
+		System.out.println("Number of user variables: " + atomManager.getUserVariables().size());
+		System.out.println("Number of definitions: " + goal.getDefinitions().size());
+		System.out.println("Number of equations: " + goal.getEquations().size());
+		System.out.println("Number of disequations: " + goal.getDisequations().size());
+		System.out.println("Number of subsumptions: " + goal.getSubsumptions().size());
+		System.out.println("Number of dissubsumptions: " + goal.getDissubsumptions().size());
 		System.out.println("(Dis-)Unification problem:");
 		System.out.println(printGoal());
 	}
@@ -552,7 +562,7 @@ public class UelModel {
 			makeAllUndefClassesVariables(false);
 		}
 
-		if (options.verbosity != Verbosity.SILENT) {
+		if (options.verbosity.level > 1) {
 			printGoalInfo();
 		}
 

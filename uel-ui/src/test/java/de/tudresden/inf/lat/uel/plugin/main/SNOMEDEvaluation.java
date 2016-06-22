@@ -3,47 +3,37 @@
  */
 package de.tudresden.inf.lat.uel.plugin.main;
 
+import java.io.FileNotFoundException;
+import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
+import java.util.List;
 import java.util.Map.Entry;
-import java.util.Scanner;
+import java.util.Random;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.concurrent.TimeUnit;
 
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.IRI;
-import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
-import org.semanticweb.owlapi.model.OWLObjectSomeValuesFrom;
 import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
-import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
-import org.semanticweb.owlapi.model.parameters.Imports;
-import org.semanticweb.owlapi.reasoner.OWLReasoner;
+import org.semanticweb.owlapi.search.EntitySearcher;
 
 import com.google.common.base.Stopwatch;
 
-import de.tudresden.inf.lat.jcel.owlapi.main.JcelReasonerFactory;
 import de.tudresden.inf.lat.uel.core.main.AlternativeUelStarter;
-import de.tudresden.inf.lat.uel.core.main.UnifierIterator;
-import de.tudresden.inf.lat.uel.core.processor.UelModel;
-import de.tudresden.inf.lat.uel.core.processor.UelOntology;
 import de.tudresden.inf.lat.uel.core.processor.UelOptions;
 import de.tudresden.inf.lat.uel.core.processor.UelOptions.UndefBehavior;
 import de.tudresden.inf.lat.uel.core.processor.UelOptions.Verbosity;
 import de.tudresden.inf.lat.uel.core.processor.UnificationAlgorithmFactory;
-import de.tudresden.inf.lat.uel.type.api.Definition;
-import de.tudresden.inf.lat.uel.type.impl.AtomManagerImpl;
+import de.tudresden.inf.lat.uel.plugin.main.SNOMEDResult.SNOMEDStatus;
 
 /**
  * @author Stefan Borgwardt
@@ -52,35 +42,27 @@ import de.tudresden.inf.lat.uel.type.impl.AtomManagerImpl;
 public class SNOMEDEvaluation {
 
 	// private static final String WORK_DIR = "C:\\Users\\Stefan\\Work\\";
-	private static final String WORK_DIR = "/Users/stefborg/Documents/";
-	private static final String SNOMED_PATH = WORK_DIR + "Ontologies/snomed-english-rdf.owl";
-	private static final String SNOMED_RESTR_PATH = WORK_DIR + "Ontologies/snomed-restrictions.owl";
-	private static final String POS_PATH = WORK_DIR + "Projects/uel-snomed/uel-snomed-pos.owl";
-	private static final String NEG_PATH = WORK_DIR + "Projects/uel-snomed/uel-snomed-neg.owl";
-	private static final String CONSTRAINTS_PATH = WORK_DIR + "Projects/uel-snomed/constraints_const.owl";
+	static final String WORK_DIR = "/Users/stefborg/Documents/";
+	static final String OUTPUT_PATH = WORK_DIR + "Projects/uel-snomed/results.txt";
+	static final String SNOMED_PATH = WORK_DIR + "Ontologies/snomed-english-rdf.owl";
+	static final String SNOMED_RESTR_PATH = WORK_DIR + "Ontologies/snomed-restrictions.owl";
+	// private static final String POS_PATH = WORK_DIR +
+	// "Projects/uel-snomed/uel-snomed-pos.owl";
+	// private static final String NEG_PATH = WORK_DIR +
+	// "Projects/uel-snomed/uel-snomed-neg.owl";
+	// private static final String CONSTRAINTS_PATH = WORK_DIR +
+	// "Projects/uel-snomed/constraints_const.owl";
 	private static final int MAX_TESTS = 100;
+	private static final long TIMEOUT = 5 * 60 * 1000;
+	private static List<SNOMEDResult> results = new ArrayList<SNOMEDResult>();
 
-	private static OWLClass cls(OWLDataFactory factory, String name) {
+	static OWLClass cls(OWLDataFactory factory, String name) {
 		return factory.getOWLClass(IRI.create("http://www.ihtsdo.org/" + name));
 	}
 
-	private static OWLObjectProperty prp(OWLDataFactory factory, String name) {
+	static OWLObjectProperty prp(OWLDataFactory factory, String name) {
 		return factory.getOWLObjectProperty(IRI.create("http://www.ihtsdo.org/" + name));
 	}
-
-	private static int definitions = 0;
-	private static int occurrencesWithoutRoleGroup = 0;
-	private static int siblingsOfRolesWithoutRoleGroup = 0;
-	private static Set<OWLObjectProperty> rolesWithoutRoleGroup = new HashSet<OWLObjectProperty>();
-	private static int maxRoleGroups = 0;
-	private static OWLClass maxRoleGroupsClass = null;
-	private static OWLClassExpression maxRoleGroupsDef = null;
-	private static Map<Integer, Integer> roleGroups = new HashMap<Integer, Integer>();
-	private static Map<OWLObjectProperty, Map<Integer, Integer>> otherRoles = new HashMap<OWLObjectProperty, Map<Integer, Integer>>();
-	private static int maxOtherRoles = 0;
-	private static OWLClass maxOtherRolesClass = null;
-	private static OWLClassExpression maxOtherRolesDef = null;
-	private static OWLObjectProperty roleGroup = prp(OWLManager.getOWLDataFactory(), "RoleGroup");
 
 	/**
 	 * Entry point for tests.
@@ -89,142 +71,37 @@ public class SNOMEDEvaluation {
 	 *            arguments (ignored)
 	 */
 	public static void main(String[] args) {
-		test();
-	}
 
-	private static void statistics() {
-		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
-		OWLOntology snomed = AlternativeUelStarter.loadOntology(SNOMED_PATH, manager);
-
-		for (OWLSubClassOfAxiom a : snomed.getAxioms(AxiomType.SUBCLASS_OF)) {
-			checkDefinition((OWLClass) a.getSubClass(), a.getSuperClass());
-		}
-		for (OWLEquivalentClassesAxiom a : snomed.getAxioms(AxiomType.EQUIVALENT_CLASSES)) {
-			for (OWLClassExpression e : a.getClassExpressions()) {
-				if (!e.isAnonymous()) {
-					checkDefinition((OWLClass) e,
-							manager.getOWLDataFactory().getOWLObjectIntersectionOf(a.getClassExpressionsMinus(e)));
+		Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+			if (results != null) {
+				try {
+					System.out.println("Saving results to file...");
+					PrintStream out = new PrintStream(OUTPUT_PATH);
+					out.println(
+							"Goal class                              |Status    |Build |Size  |Pre   |First |Goal  |All   |Number");
+					out.println(
+							"----------------------------------------+----------+------+------+------+------+------+------+------");
+					for (SNOMEDResult result : results) {
+						out.printf("%-40s|%-10s|%5ds|%6d|%5ds|%5ds|%5ds|%5ds|%6d", result.goalClass, result.status,
+								result.buildGoal, result.goalSize, result.preprocessing, result.firstUnifier,
+								result.goalUnifier, result.allUnifiers, result.numberOfSolutions);
+						out.println();
+					}
+					out.close();
+				} catch (FileNotFoundException ex) {
+					ex.printStackTrace();
 				}
 			}
-		}
-		System.out.println();
-		{
-			System.out.println("Checked " + definitions + " definitions.");
-			System.out.println("Occurrences of roles without RoleGroup: " + occurrencesWithoutRoleGroup);
-			System.out.println("Average number of existential restrictions in such definitions: "
-					+ (((float) siblingsOfRolesWithoutRoleGroup) / ((float) occurrencesWithoutRoleGroup)));
-			System.out.println("Roles that occur without RoleGroup:");
-			for (OWLObjectProperty prop : rolesWithoutRoleGroup) {
-				System.out.println(prop);
-			}
-		}
-		System.out.println();
-		{
-			System.out.println("Maximum number of RoleGroups in one definition: " + maxRoleGroups);
-			System.out.println("Definition of " + maxRoleGroupsClass + ": " + maxRoleGroupsDef);
-			int sum = 0;
-			int num = 0;
-			for (Entry<Integer, Integer> e : roleGroups.entrySet()) {
-				num += e.getValue();
-				sum += e.getKey() * e.getValue();
-				System.out.println("Definitions with " + e.getKey() + " RoleGroups: " + e.getValue());
-			}
-			System.out.println("Average number of RoleGroups: " + (((float) sum) / ((float) num)));
-		}
-		System.out.println();
-		{
-			System.out.println("Maximum number of occurrences of the same role within one RoleGroup: " + maxOtherRoles);
-			System.out.println("Definition of " + maxOtherRolesClass + ": " + maxOtherRolesDef);
-			int sum = 0;
-			int num = 0;
-			for (Entry<OWLObjectProperty, Map<Integer, Integer>> e1 : otherRoles.entrySet()) {
-				for (Entry<Integer, Integer> e2 : e1.getValue().entrySet()) {
-					num += e2.getValue();
-					sum += e2.getKey() * e2.getValue();
-					System.out.println(
-							"RoleGroups with " + e2.getKey() + " occurrences of " + e1.getKey() + ": " + e2.getValue());
-				}
-			}
-			System.out.println("Average number of occurrences of a single role in a RoleGroup: "
-					+ (((float) sum) / ((float) num)));
-		}
-		System.out.println();
-	}
+		}));
 
-	private static void checkDefinition(OWLClass definiendum, OWLClassExpression definiens) {
-		definitions++;
-		Set<OWLObjectSomeValuesFrom> restrictions = getRestrictions(definiens);
-
-		long c = restrictions.stream().filter(r -> !r.getProperty().equals(roleGroup))
-				.map(r -> r.getProperty().asOWLObjectProperty()).peek(rolesWithoutRoleGroup::add).count();
-		if (c > 0) {
-			if (c > 2) {
-				System.out.println("The definition of " + definiendum + " does not use RoleGroup:"
-						+ System.lineSeparator() + definiens);
-			}
-			occurrencesWithoutRoleGroup++;
-			siblingsOfRolesWithoutRoleGroup += restrictions.size();
-		} else {
-			addToMap(roleGroups, restrictions.size());
-			if (restrictions.size() > maxRoleGroups) {
-				maxRoleGroups = restrictions.size();
-				maxRoleGroupsClass = definiendum;
-				maxRoleGroupsDef = definiens;
-			}
-			restrictions.stream().forEach(r -> checkInnerRestrictions(definiendum, definiens, r.getFiller()));
-		}
-	}
-
-	private static <T> void addToMap(Map<T, Integer> map, T key) {
-		Integer value = map.get(key);
-		if (value == null) {
-			value = 0;
-		}
-		map.put(key, value + 1);
-	}
-
-	private static void checkInnerRestrictions(OWLClass definiendum, OWLClassExpression definiens,
-			OWLClassExpression expr) {
-		Set<OWLObjectSomeValuesFrom> restrictions = getRestrictions(expr);
-		Map<OWLObjectProperty, Integer> count = new HashMap<OWLObjectProperty, Integer>();
-
-		for (OWLObjectSomeValuesFrom r : restrictions) {
-			OWLObjectProperty prop = r.getProperty().asOWLObjectProperty();
-			Integer c = count.get(prop);
-			if (c == null) {
-				c = 0;
-			}
-			count.put(prop, c + 1);
-		}
-
-		for (Entry<OWLObjectProperty, Integer> e : count.entrySet()) {
-			Map<Integer, Integer> map = otherRoles.get(e.getKey());
-			if (map == null) {
-				otherRoles.put(e.getKey(), new HashMap<Integer, Integer>());
-			}
-			addToMap(otherRoles.get(e.getKey()), e.getValue());
-			if (e.getValue() > maxOtherRoles) {
-				maxOtherRoles = e.getValue();
-				maxOtherRolesClass = definiendum;
-				maxOtherRolesDef = definiens;
-			}
-		}
-	}
-
-	private static Set<OWLObjectSomeValuesFrom> getRestrictions(OWLClassExpression expr) {
-		return expr.asConjunctSet().stream().filter(e -> e instanceof OWLObjectSomeValuesFrom)
-				.map(OWLObjectSomeValuesFrom.class::cast).collect(Collectors.toSet());
-	}
-
-	private static void test() {
 		UelOptions options = new UelOptions();
-		options.verbosity = Verbosity.SILENT;
+		options.verbosity = Verbosity.SHORT;
 		options.undefBehavior = UndefBehavior.CONSTANTS;
 		options.snomedMode = true;
 		options.unificationAlgorithmName = UnificationAlgorithmFactory.SAT_BASED_ALGORITHM;
 		options.expandPrimitiveDefinitions = true;
 		options.restrictUndefContext = true;
-		options.numberOfRoleGroups = 1;
+		options.numberOfRoleGroups = 2;
 		options.minimize = true;
 		options.noEquivalentSolutions = true;
 		options.numberOfSiblings = -1;
@@ -267,188 +144,66 @@ public class SNOMEDEvaluation {
 		// OWLClass goalClass = cls(factory, "SCT_274538008");
 
 		// 'Primary malignant neoplasm of pyriform sinus (disorder)'
-		OWLClass goalClass = cls(factory, "SCT_93978008");
+		// OWLClass goalClass = cls(factory, "SCT_93978008");
 
 		// test single class
-		OWLClassExpression goalExpression = ((OWLEquivalentClassesAxiom) snomed.getAxioms(goalClass, Imports.EXCLUDED)
-				.iterator().next()).getClassExpressionsMinus(goalClass).iterator().next();
-		runTest(options, snomed, bg, goalClass, goalExpression);
+		// OWLClassExpression goalExpression = ((OWLEquivalentClassesAxiom)
+		// snomed.getAxioms(goalClass, Imports.EXCLUDED)
+		// .iterator().next()).getClassExpressionsMinus(goalClass).iterator().next();
+		// runTest(options, snomed, bg, goalClass, goalExpression);
 
 		// randomly select classes with full definition from SNOMED
-		// List<OWLEquivalentClassesAxiom> definitions = new
-		// ArrayList<OWLEquivalentClassesAxiom>(
-		// snomed.getAxioms(AxiomType.EQUIVALENT_CLASSES));
-		// Random rnd = new Random();
-		//
-		// for (int i = 0; i < MAX_TESTS; i++) {
-		// OWLEquivalentClassesAxiom axiom =
-		// definitions.get(rnd.nextInt(definitions.size()));
-		// OWLClass goalClass = axiom.getNamedClasses().iterator().next();
-		// OWLClassExpression goalExpression =
-		// axiom.getClassExpressionsMinus(goalClass).iterator().next();
-		// System.out
-		// .println("***** [" + i + "] Goal class: "
-		// + EntitySearcher
-		// .getAnnotations(goalClass, manager.getOntologies(),
-		// OWLManager.getOWLDataFactory().getRDFSLabel())
-		// .iterator().next().getValue());
-		// runTest(options, snomed, bg, goalClass, goalExpression);
-		// }
-	}
+		List<OWLEquivalentClassesAxiom> definitions = new ArrayList<OWLEquivalentClassesAxiom>(
+				snomed.getAxioms(AxiomType.EQUIVALENT_CLASSES));
+		Random rnd = new Random();
 
-	private static void runTest(UelOptions options, OWLOntology snomed, Set<OWLOntology> bg, OWLClass goalClass,
-			OWLClassExpression goalExpression) {
-		Stopwatch timer = Stopwatch.createStarted();
+		for (int i = 0; i < MAX_TESTS; i++) {
+			OWLEquivalentClassesAxiom axiom = definitions.get(rnd.nextInt(definitions.size()));
+			OWLClass goalClass = axiom.getNamedClasses().iterator().next();
+			OWLClassExpression goalExpression = axiom.getClassExpressionsMinus(goalClass).iterator().next();
+			printThreadInfo();
+			System.out
+					.println("***** [" + i + "] Goal class: "
+							+ EntitySearcher
+									.getAnnotations(goalClass, manager.getOntologies(),
+											OWLManager.getOWLDataFactory().getRDFSLabel())
+									.iterator().next().getValue());
 
-		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
-		OWLDataFactory factory = manager.getOWLDataFactory();
-
-		OWLClass x = cls(factory, "X");
-		OWLClass top = cls(factory, "SCT_138875005");
-		Set<OWLClass> vars = new HashSet<OWLClass>(Arrays.asList(x));
-
-		UelOntology ont = new UelOntology(new AtomManagerImpl(), Collections.singleton(snomed), top, true);
-		Set<Integer> id = ont.processClassExpression(goalClass, new HashSet<Definition>(), false);
-		Set<OWLClass> superclasses = ont.getDirectSuperclasses(goalClass);
-		Set<OWLClass> siblings = ont.getSiblings(id.iterator().next(), false, options.numberOfSiblings);
-
-		OWLOntology pos;
-		OWLOntology neg;
-		try {
-			pos = manager.createOntology();
-			neg = manager.createOntology();
-		} catch (OWLOntologyCreationException ex) {
-			throw new RuntimeException(ex);
-		}
-		manager.addAxioms(pos,
-				superclasses.stream().map(cls -> factory.getOWLSubClassOfAxiom(x, cls)).collect(Collectors.toSet()));
-		manager.addAxioms(neg,
-				superclasses.stream().map(cls -> factory.getOWLSubClassOfAxiom(cls, x)).collect(Collectors.toSet()));
-		manager.addAxioms(neg,
-				siblings.stream().flatMap(
-						cls -> Stream.of(factory.getOWLSubClassOfAxiom(x, cls), factory.getOWLSubClassOfAxiom(cls, x)))
-						.collect(Collectors.toSet()));
-
-		options.verbosity = Verbosity.SILENT;
-		UnifierIterator iterator = (UnifierIterator) AlternativeUelStarter.solve(bg, pos, neg, null, vars, options);
-		output(timer, "Building the unification problem", true);
-		int size = iterator.getUelModel().getGoal().getAtomManager().size();
-		if (size > 300) {
-			System.out.println("Problem is too large (" + size + ")!");
-		} else {
-			iterator.getUelModel().printGoalInfo();
-			options.verbosity = Verbosity.NORMAL;
-			computeUnifiers(timer, pos, neg, iterator, factory.getOWLEquivalentClassesAxiom(x, goalExpression));
-		}
-	}
-
-	private static void computeUnifiers(Stopwatch timer, OWLOntology pos, OWLOntology neg, UnifierIterator iterator,
-			OWLAxiom goalAxiom) {
-
-		UelModel model = iterator.getUelModel();
-		Set<OWLAxiom> background = model.renderDefinitions();
-
-		System.out.println("Unifiers:");
-
-		try {
-			Scanner in = new Scanner(System.in);
-			int i = 0;
-			boolean skip = false;
-
-			while (skip || in.hasNextLine()) {
-				if (!skip) {
-					if (in.nextLine().equals("a")) {
-						skip = true;
-					}
-				}
-				// if (i == 0) {
-				// skip = false;
-				// }
-
-				i++;
-				// System.out.println();
-				// System.out.println("--- " + i);
-
-				if (iterator.hasNext()) {
-
-					// System.out.println(model.printCurrentUnifier());
-					// System.out.println(
-					// model.getStringRenderer(null).renderUnifier(model.getCurrentUnifier(),
-					// false, false, true));
-
-					Set<OWLEquivalentClassesAxiom> unifier = iterator.next();
-					OWLOntologyManager ontologyManager = OWLManager.createOWLOntologyManager();
-					OWLOntology extendedOntology = ontologyManager.createOntology();
-					ontologyManager.addAxioms(extendedOntology, background);
-					ontologyManager.addAxioms(extendedOntology, unifier);
-
-					// ontologyManager.saveOntology(extendedOntology, new
-					// FunctionalSyntaxDocumentFormat(), System.out);
-
-					OWLReasoner reasoner = new JcelReasonerFactory().createNonBufferingReasoner(extendedOntology);
-					reasoner.precomputeInferences();
-
-					boolean solution = true;
-					for (OWLAxiom a : pos.getAxioms(AxiomType.SUBCLASS_OF)) {
-						// System.out.println(a + " (pos): " +
-						// reasoner.isEntailed(a));
-						if (!reasoner.isEntailed(a)) {
-							solution = false;
-						}
-						// Assert.assertTrue(reasoner.isEntailed(a));
-					}
-					for (OWLAxiom a : neg.getAxioms(AxiomType.SUBCLASS_OF)) {
-						// System.out.println(a + " (neg): " +
-						// reasoner.isEntailed(a));
-						if (reasoner.isEntailed(a)) {
-							solution = false;
-						}
-						// Assert.assertTrue(!reasoner.isEntailed(a));
-					}
-					if (!solution) {
-						System.out.println("This is not a real solution (due to the replacement of UNDEF names)!");
-					}
-
-					// System.out.println(goalAxiom + " (goal): " +
-					// reasoner.isEntailed(goalAxiom));
-					if (reasoner.isEntailed(goalAxiom)) {
-						System.out.println("----------------- This is the wanted solution! ------------------");
-						output(timer, "Time to compute the wanted solution", false);
-						// break;
-					} else {
-						if (i == 1) {
-							output(timer, "Time to compute first solution", false);
-						}
-					}
-
-					reasoner.dispose();
-
-					System.out.println();
-
-					System.out.flush();
-				} else {
-					System.out.println("No more unifiers.");
-					output(timer, "Time to compute all solutions", false);
-					break;
-				}
-
-				if (!skip) {
-					System.out.println(
-							"Press RETURN to start computing the next unifier (input 'a' for all unifiers) ...");
-				}
+			SNOMEDTest test = new SNOMEDTest(options, snomed, bg, goalClass, goalExpression);
+			test.start();
+			try {
+				test.join(TIMEOUT);
+			} catch (InterruptedException ex) {
+				ex.printStackTrace();
+				return;
 			}
-			in.close();
-		} catch (Exception ex) {
-			ex.printStackTrace();
+
+			SNOMEDResult result = test.result;
+			if (test.isAlive()) {
+				test.interrupt();
+				result.status = SNOMEDStatus.TIMEOUT;
+			}
+			results.add(result);
 		}
 	}
 
-	private static void output(Stopwatch timer, String description, boolean reset) {
+	static long output(Stopwatch timer, String description, boolean reset) {
 		System.out.println(description + ": " + timer);
+		long elapsedTime = timer.elapsed(TimeUnit.SECONDS);
 		if (reset) {
 			timer.reset();
 			timer.start();
 		}
+		return elapsedTime;
 	}
 
+	static void printThreadInfo() {
+		for (Entry<Thread, StackTraceElement[]> e : Thread.getAllStackTraces().entrySet()) {
+			Thread t = e.getKey();
+			System.out.println("Thread " + t.getName() + ", " + t.getState());
+			for (StackTraceElement el : e.getValue()) {
+				System.out.println(el);
+			}
+		}
+	}
 }

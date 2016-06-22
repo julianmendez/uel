@@ -348,7 +348,7 @@ public class UelOntologyGoal implements Goal {
 		// ontology.getSiblings(id, true));
 		// Set<Integer> siblingIds = processClasses(siblings, false);
 		for (Integer leaf : leafIds) {
-			Set<OWLClass> s1 = ontology.getSiblings(leaf, true, limit);
+			Set<OWLClass> s1 = ontology.getSiblings(leaf, true, limit, true);
 			processClasses(s1, false);
 			// System.out.println(renderer.renderAtomList("Siblings of " +
 			// renderer.renderAtom(leaf, false), s2));

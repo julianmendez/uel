@@ -350,24 +350,28 @@ public class UelOntology {
 	 *            different superclasses
 	 * @param limit
 	 *            sets of siblings greater than this number will not be returned
+	 * @param includePrimitiveDefinitions
+	 *            indicates whether to include siblings that only have a
+	 *            primitive definition
 	 * @return the set of all new siblings
 	 */
-	public Set<OWLClass> getSiblings(Integer conceptNameId, boolean union, int limit) {
+	public Set<OWLClass> getSiblings(Integer conceptNameId, boolean union, int limit,
+			boolean includePrimitiveDefinitions) {
 		Optional<OWLClass> cls = checkUsedClass(conceptNameId);
 		if (!cls.isPresent()) {
 			return Collections.emptySet();
 		} else {
 			Stream<Set<OWLClass>> siblingSets = getDirectSuperclasses(cls.get()).stream()
-					.map(parent -> extractInformation(ont -> getOtherChildren(ont, parent), Function.identity(),
-							Collections::singleton, Collections::emptySet));
+					.map(parent -> extractInformation(ont -> getOtherChildren(ont, parent, includePrimitiveDefinitions),
+							Function.identity(), Collections::singleton, Collections::emptySet));
 
 			if (union && (limit >= 0)) {
 				// for the union, first filter out sets above the limit
 				siblingSets = siblingSets.filter(set -> set.size() <= limit);
 			}
 
-			Set<OWLClass> collected = siblingSets.reduce(union ? Sets::union : Sets::intersection).get().stream()
-					.collect(Collectors.toSet());
+			Set<OWLClass> collected = siblingSets.reduce(Collections.emptySet(),
+					union ? Sets::union : Sets::intersection);
 
 			if ((!union) && (limit >= 0) && (collected.size() > limit)) {
 				// for the intersection, apply the filter only after combining
@@ -379,8 +383,8 @@ public class UelOntology {
 		}
 	}
 
-	private Stream<OWLClass> getOtherChildren(OWLOntology ont, OWLClass cls) {
-		Stream<OWLClass> subClasses1 = ont
+	private Stream<OWLClass> getOtherChildren(OWLOntology ont, OWLClass cls, boolean includePrimitiveDefinitions) {
+		Stream<OWLClass> subClasses = ont
 				// Get all OWLEquivalentClassesAxioms that mention 'cls', ...
 				.getAxioms(OWLEquivalentClassesAxiom.class, cls, Imports.EXCLUDED, Navigation.IN_SUPER_POSITION)
 				// ... do not directly mention 'cls', ...
@@ -391,18 +395,30 @@ public class UelOntology {
 				// Then get the concept name that this axiom defines.
 				.map(ax -> ax.getNamedClasses().iterator().next());
 
-		Stream<OWLClass> subClasses2 = ont
-				// Get all OWLSubClassOfAxioms that mention 'cls', ...
-				.getAxioms(OWLSubClassOfAxiom.class, cls, Imports.EXCLUDED, Navigation.IN_SUPER_POSITION).stream()
-				// ... are not a primitive defintion of 'cls', ...
-				.filter(ax -> !ax.getSubClass().equals(cls))
-				// ... but contain 'cls' as a conjunct of the superclass
-				// expression.
-				.filter(ax -> ax.getSuperClass().asConjunctSet().contains(cls))
-				// Then get the concept name that this axiom defines.
-				.map(ax -> ax.getSubClass()).filter(expr -> !expr.isAnonymous()).map(expr -> expr.asOWLClass());
+		// TODO ignore primitive definitions?
+		if (includePrimitiveDefinitions) {
+			subClasses = Stream
+					.concat(subClasses,
+							ont
+									// Get all OWLSubClassOfAxioms that mention
+									// 'cls', ...
+									.getAxioms(OWLSubClassOfAxiom.class, cls, Imports.EXCLUDED,
+											Navigation.IN_SUPER_POSITION)
+									.stream()
+									// ... are not a primitive defintion of
+									// 'cls', ...
+									.filter(ax -> !ax.getSubClass().equals(cls))
+									// ... but contain 'cls' as a conjunct of
+									// the superclass expression.
+									.filter(ax -> ax.getSuperClass().asConjunctSet().contains(cls))
+									// Then get the concept name that this axiom
+									// defines.
+									.map(ax -> ax.getSubClass()).filter(expr -> !expr.isAnonymous())
+									.map(expr -> expr.asOWLClass()));
+		}
 
-		return Stream.concat(subClasses1, subClasses2).filter(c -> !nameMap.containsValue(c));
+		return subClasses.filter(c -> !nameMap.containsValue(c));
+		// return subClasses1.filter(c -> !nameMap.containsValue(c));
 	}
 
 	public OWLClassExpression getPrimitiveDefinition(OWLClass cls) {
