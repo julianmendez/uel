@@ -53,8 +53,9 @@ public class SNOMEDEvaluation {
 	// private static final String CONSTRAINTS_PATH = WORK_DIR +
 	// "Projects/uel-snomed/constraints_const.owl";
 	private static final int MAX_TESTS = 100;
-	private static final long TIMEOUT = 5 * 60 * 1000;
+	private static final long TIMEOUT = 10 * 60 * 1000;
 	private static List<SNOMEDResult> results = new ArrayList<SNOMEDResult>();
+	private static UelOptions options = new UelOptions();
 
 	static OWLClass cls(OWLDataFactory factory, String name) {
 		return factory.getOWLClass(IRI.create("http://www.ihtsdo.org/" + name));
@@ -77,15 +78,17 @@ public class SNOMEDEvaluation {
 				try {
 					System.out.println("Saving results to file...");
 					PrintStream out = new PrintStream(OUTPUT_PATH);
+					out.println(options);
+					out.println("Timeout (s): " + (TIMEOUT / 1000));
+					out.println();
 					out.println(
 							"Goal class                              |Status    |Build |Size  |Pre   |First |Goal  |All   |Number");
 					out.println(
 							"----------------------------------------+----------+------+------+------+------+------+------+------");
 					for (SNOMEDResult result : results) {
-						out.printf("%-40s|%-10s|%5ds|%6d|%5ds|%5ds|%5ds|%5ds|%6d", result.goalClass, result.status,
+						out.printf("%-40s|%-10s|%5ds|%6d|%5ds|%5ds|%5ds|%5ds|%6d%n", result.goalClass, result.status,
 								result.buildGoal, result.goalSize, result.preprocessing, result.firstUnifier,
 								result.goalUnifier, result.allUnifiers, result.numberOfSolutions);
-						out.println();
 					}
 					out.close();
 				} catch (FileNotFoundException ex) {
@@ -94,15 +97,14 @@ public class SNOMEDEvaluation {
 			}
 		}));
 
-		UelOptions options = new UelOptions();
 		options.verbosity = Verbosity.SHORT;
 		options.undefBehavior = UndefBehavior.CONSTANTS;
 		options.snomedMode = true;
 		options.unificationAlgorithmName = UnificationAlgorithmFactory.SAT_BASED_ALGORITHM;
 		options.expandPrimitiveDefinitions = true;
 		options.restrictUndefContext = true;
-		options.numberOfRoleGroups = 2;
-		options.minimize = true;
+		options.numberOfRoleGroups = 3;
+		options.minimizeSolutions = true;
 		options.noEquivalentSolutions = true;
 		options.numberOfSiblings = -1;
 

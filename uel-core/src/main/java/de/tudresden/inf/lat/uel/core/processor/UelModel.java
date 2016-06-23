@@ -111,7 +111,7 @@ public class UelModel {
 		if (!allUnifiersFound) {
 			while (algorithm.computeNextUnifier()) {
 				Unifier result = algorithm.getUnifier();
-				if (options.minimize) {
+				if (options.minimizeSolutions) {
 					result = postprocessor.minimizeUnifier(result);
 				}
 

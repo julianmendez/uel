@@ -17,36 +17,36 @@ public class UelOptions {
 	 */
 	public enum UndefBehavior {
 		/**
-		 * All UNDEF names are marked as user variables.
+		 * All UNDEF names are marked as constants.
 		 */
-		USER_VARIABLES,
+		CONSTANTS,
 		/**
 		 * All UNDEF names are marked as definition variables.
 		 */
 		INTERNAL_VARIABLES,
 		/**
-		 * All UNDEF names are marked as constants.
+		 * All UNDEF names are marked as user variables.
 		 */
-		CONSTANTS
+		USER_VARIABLES
 	};
 
 	public enum Verbosity {
 		/**
-		 * No output.
+		 * Detailed output.
 		 */
-		SILENT(0),
-		/**
-		 * Short output.
-		 */
-		SHORT(1),
+		FULL(3),
 		/**
 		 * Standard output.
 		 */
 		NORMAL(2),
 		/**
-		 * Detailed output.
+		 * Short output.
 		 */
-		FULL(3);
+		SHORT(1),
+		/**
+		 * No output.
+		 */
+		SILENT(0);
 
 		public int level;
 
@@ -54,31 +54,6 @@ public class UelOptions {
 			this.level = level;
 		}
 	}
-
-	/**
-	 * Indicates whether 'SNOMED mode' is active. If yes, then certain
-	 * syntactical restrictions are enabled, e.g., type compatibility and the
-	 * number of occurrences of restrictions over the same role in one variable.
-	 * 
-	 * Default: false.
-	 */
-	public boolean snomedMode = false;
-
-	/**
-	 * Indicates how many RoleGroups to allow in the same substitution set
-	 * (modulo subsumption). Only relevant for SNOMED.
-	 * 
-	 * Default: 0 (unlimited).
-	 */
-	public int numberOfRoleGroups = 0;
-
-	/**
-	 * Indicates whether UNDEF names are restricted to occur only in the context
-	 * of their original definition.
-	 * 
-	 * Default: false.
-	 */
-	public boolean restrictUndefContext = false;
 
 	/**
 	 * Indicates whether to expand simple primitive definitions like A ⊑ B and
@@ -90,12 +65,37 @@ public class UelOptions {
 	public boolean expandPrimitiveDefinitions = true;
 
 	/**
-	 * Indicates how much information about the unification process is printed
-	 * to System.out.
+	 * Indicates whether solutions should be minimized w.r.t. the background
+	 * ontology as a post-processing step.
 	 * 
-	 * Default: SILENT.
+	 * Default: false
 	 */
-	public Verbosity verbosity = Verbosity.SILENT;
+	public boolean minimizeSolutions = false;
+
+	/**
+	 * Indicates whether the computed solutions should be checked for
+	 * equivalence (w.r.t. the background ontology) and no two equivalent
+	 * solutions should be returned.
+	 * 
+	 * Default: false
+	 */
+	public boolean noEquivalentSolutions = false;
+
+	/**
+	 * Indicates how many RoleGroups to allow in the same substitution set
+	 * (modulo subsumption). Only relevant for SNOMED.
+	 * 
+	 * Default: 0 (unlimited).
+	 */
+	public int numberOfRoleGroups = 0;
+
+	/**
+	 * Limits the number of siblings extracted from the background ontology (-1
+	 * = unlimited). Leaves with more siblings will be ignored.
+	 * 
+	 * Default: -1
+	 */
+	public int numberOfSiblings = -1;
 
 	/**
 	 * Designates an alias to be used to express 'owl:Thing', e.g., 'SNOMED CT
@@ -104,6 +104,23 @@ public class UelOptions {
 	 * Default: null (no alias).
 	 */
 	public OWLClass owlThingAlias = null;
+
+	/**
+	 * Indicates whether UNDEF names are restricted to occur only in the context
+	 * of their original definition.
+	 * 
+	 * Default: false.
+	 */
+	public boolean restrictUndefContext = false;
+
+	/**
+	 * Indicates whether 'SNOMED mode' is active. If yes, then certain
+	 * syntactical restrictions are enabled, e.g., type compatibility and the
+	 * number of occurrences of restrictions over the same role in one variable.
+	 * 
+	 * Default: false.
+	 */
+	public boolean snomedMode = false;
 
 	/**
 	 * Indicates how the UNDEF names should be treated.
@@ -120,27 +137,64 @@ public class UelOptions {
 	public String unificationAlgorithmName = UnificationAlgorithmFactory.SAT_BASED_ALGORITHM;
 
 	/**
-	 * Indicates whether unifiers should be minimized w.r.t. the background
-	 * ontology as a post-processing step.
+	 * Indicates how much information about the unification process is printed
+	 * to System.out.
 	 * 
-	 * Default: false
+	 * Default: SILENT.
 	 */
-	public boolean minimize = false;
+	public Verbosity verbosity = Verbosity.SILENT;
 
-	/**
-	 * Indicates whether the computed solutions should be checked for
-	 * equivalence (w.r.t. the background ontology) and no two equivalent
-	 * solutions should be returned.
-	 * 
-	 * Default: false
-	 */
-	public boolean noEquivalentSolutions = false;
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
 
-	/**
-	 * Limits the number of siblings extracted from the background ontology (-1
-	 * = unlimited). Leafes with more siblings will be ignored.
-	 * 
-	 * Default: -1
-	 */
-	public int numberOfSiblings = -1;
+		sb.append("UEL Options:");
+		sb.append(System.lineSeparator());
+
+		sb.append("Expand primitive definitions: ");
+		sb.append(expandPrimitiveDefinitions);
+		sb.append(System.lineSeparator());
+
+		sb.append("Minimize solutions: ");
+		sb.append(minimizeSolutions);
+		sb.append(System.lineSeparator());
+
+		sb.append("Skip equivalent solutions: ");
+		sb.append(noEquivalentSolutions);
+		sb.append(System.lineSeparator());
+
+		sb.append("Number of role groups: ");
+		sb.append(numberOfRoleGroups);
+		sb.append(System.lineSeparator());
+
+		sb.append("Number of extracted siblings: ");
+		sb.append(numberOfSiblings);
+		sb.append(System.lineSeparator());
+
+		sb.append("owl:Thing alias: ");
+		sb.append(owlThingAlias);
+		sb.append(System.lineSeparator());
+
+		sb.append("Restrict UNDEF names to their original context: ");
+		sb.append(restrictUndefContext);
+		sb.append(System.lineSeparator());
+
+		sb.append("SNOMED mode: ");
+		sb.append(snomedMode);
+		sb.append(System.lineSeparator());
+
+		sb.append("Treat UNDEF names as: ");
+		sb.append(undefBehavior);
+		sb.append(System.lineSeparator());
+
+		sb.append("Unification algorithm: ");
+		sb.append(unificationAlgorithmName);
+		sb.append(System.lineSeparator());
+
+		sb.append("Verbosity: ");
+		sb.append(verbosity);
+		sb.append(System.lineSeparator());
+
+		return sb.toString();
+	}
 }
