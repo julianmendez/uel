@@ -3,7 +3,7 @@
 
 | version | release date | Java | OWL API | Protégé       |
 |:--------|:-------------|:----:|:--------|:--------------|
-| v1.5.0  | unreleased   | 8    | 4.1.3   | 5.0.0-beta-23 |
+| v1.5.0  | unreleased   | 8    | 4.2.5   | 5.0.0         |
 | v1.4.0  | 2016-04-11   | 8    | 4.1.3   | 5.0.0-beta-23 |
 | v1.3.1  | 2015-09-09   | 7    | 3.5.1   | 5.0.0-beta-17 |
 | v1.3.0  | 2015-04-15   | 7    | 3.5.0   | 4.3           |
@@ -15,6 +15,13 @@
 
 ### v1.5.0
 *(unreleased)*
+* uses the OWL API 4.2.5
+* can be used as a plug-in for Protégé 5.0.0
+* build commands:
+```
+$ mvn clean install
+```
+* release: `target/uel-1.5.0.zip`
 
 
 ### v1.4.0
@@ -25,7 +32,7 @@
 * uses the OWL API 4.1.3
 * can be used as a plug-in for Protégé 5.0.0-beta-23
 * runs on Java 8
-* build commands: 
+* build commands:
 ```
 $ mvn clean install
 ```

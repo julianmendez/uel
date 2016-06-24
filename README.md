@@ -72,14 +72,14 @@ where *NEW_VERSION* is the new version.
 
 ## Download
 
-  * [all-in-one ZIP file](https://sourceforge.net/projects/uel/files/uel/1.3.1/zip/uel-1.3.1.zip/download)
+  * [all-in-one ZIP file](https://sourceforge.net/projects/uel/files/uel/1.4.0/zip/uel-1.4.0.zip/download)
   * [The Central Repository](https://repo1.maven.org/maven2/de/tu-dresden/inf/lat/uel/)
   * [older versions](https://sourceforge.net/projects/uel/files/):
 
 
 | version            | zip   | release date | Java | OWL API | Protégé       |
 |:-------------------|:------|:-------------|:----:|:--------|:--------------|
-| uel-1.5.0-SNAPSHOT |       |              | 8    | 4.1.3   | 5.0.0-beta-23 |
+| uel-1.5.0-SNAPSHOT |       |              | 8    | 4.2.5   | 5.0.0         |
 | [uel-1.4.0](https://sourceforge.net/projects/uel/files/uel/1.4.0/plugin/de.tu-dresden.inf.lat.uel-1.4.0.jar/download)   | [(zip)](https://sourceforge.net/projects/uel/files/uel/1.4.0/zip/uel-1.4.0.zip/download)   | 2016-04-11  | 8    | 4.1.3   | 5.0.0-beta-23 | 
 | [uel-1.3.1](https://sourceforge.net/projects/uel/files/uel/1.3.1/plugin/de.tu-dresden.inf.lat.uel-1.3.1.jar/download)   | [(zip)](https://sourceforge.net/projects/uel/files/uel/1.3.1/zip/uel-1.3.1.zip/download)   | 2015-09-09  | 7    | 3.5.1   | 5.0.0-beta-17 |
 | [uel-1.3.0](https://sourceforge.net/projects/uel/files/uel/1.3.0/plugin/de.tudresden.inf.lat.uel.jar/download)   | [(zip)](https://sourceforge.net/projects/uel/files/uel/1.3.0/zip/uel-1.3.0.zip/download) |	2015-04-15  | 7    | 3.5.0   | 4.3           |
