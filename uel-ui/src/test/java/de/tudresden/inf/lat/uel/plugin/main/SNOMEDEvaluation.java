@@ -24,6 +24,7 @@ import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.model.parameters.Imports;
 import org.semanticweb.owlapi.search.EntitySearcher;
 
 import com.google.common.base.Stopwatch;
@@ -97,7 +98,7 @@ public class SNOMEDEvaluation {
 			}
 		}));
 
-		options.verbosity = Verbosity.SHORT;
+		options.verbosity = Verbosity.NORMAL;
 		options.undefBehavior = UndefBehavior.CONSTANTS;
 		options.snomedMode = true;
 		options.unificationAlgorithmName = UnificationAlgorithmFactory.SAT_BASED_ALGORITHM;
@@ -146,15 +147,21 @@ public class SNOMEDEvaluation {
 		// OWLClass goalClass = cls(factory, "SCT_274538008");
 
 		// 'Primary malignant neoplasm of pyriform sinus (disorder)'
-		// OWLClass goalClass = cls(factory, "SCT_93978008");
+		//
+
+		// 'Entire left kidney (body structure)'
+		OWLClass goalClass = cls(factory, "SCT_362209008");
 
 		// test single class
-		// OWLClassExpression goalExpression = ((OWLEquivalentClassesAxiom)
-		// snomed.getAxioms(goalClass, Imports.EXCLUDED)
-		// .iterator().next()).getClassExpressionsMinus(goalClass).iterator().next();
-		// runTest(options, snomed, bg, goalClass, goalExpression);
+		OWLClassExpression goalExpression = ((OWLEquivalentClassesAxiom) snomed.getAxioms(goalClass, Imports.EXCLUDED)
+				.iterator().next()).getClassExpressionsMinus(goalClass).iterator().next();
+		runSingleTest(snomed, bg, goalClass, goalExpression);
 
 		// randomly select classes with full definition from SNOMED
+		// randomTests(manager, snomed, bg);
+	}
+
+	private static void randomTests(OWLOntologyManager manager, OWLOntology snomed, Set<OWLOntology> bg) {
 		List<OWLEquivalentClassesAxiom> definitions = new ArrayList<OWLEquivalentClassesAxiom>(
 				snomed.getAxioms(AxiomType.EQUIVALENT_CLASSES));
 		Random rnd = new Random();
@@ -171,22 +178,30 @@ public class SNOMEDEvaluation {
 											OWLManager.getOWLDataFactory().getRDFSLabel())
 									.iterator().next().getValue());
 
-			SNOMEDTest test = new SNOMEDTest(options, snomed, bg, goalClass, goalExpression);
-			test.start();
-			try {
-				test.join(TIMEOUT);
-			} catch (InterruptedException ex) {
-				ex.printStackTrace();
+			if (!runSingleTest(snomed, bg, goalClass, goalExpression)) {
 				return;
 			}
-
-			SNOMEDResult result = test.result;
-			if (test.isAlive()) {
-				test.interrupt();
-				result.status = SNOMEDStatus.TIMEOUT;
-			}
-			results.add(result);
 		}
+	}
+
+	private static boolean runSingleTest(OWLOntology snomed, Set<OWLOntology> bg, OWLClass goalClass,
+			OWLClassExpression goalExpression) {
+		SNOMEDTest test = new SNOMEDTest(options, snomed, bg, goalClass, goalExpression);
+		test.start();
+		try {
+			test.join(TIMEOUT);
+		} catch (InterruptedException ex) {
+			ex.printStackTrace();
+			return false;
+		}
+
+		SNOMEDResult result = test.result;
+		if (test.isAlive()) {
+			test.interrupt();
+			result.status = SNOMEDStatus.TIMEOUT;
+		}
+		results.add(result);
+		return true;
 	}
 
 	static long output(Stopwatch timer, String description, boolean reset) {
