@@ -26,7 +26,9 @@ public class BasicOntologyProvider extends OntologyProvider {
 
 	/**
 	 * Construct a new ontology provider based on an OWL ontology manager.
-	 * @param manager the OWL ontology manager
+	 * 
+	 * @param manager
+	 *            the OWL ontology manager
 	 */
 	public BasicOntologyProvider(OWLOntologyManager manager) {
 		this.manager = manager;
@@ -59,7 +61,7 @@ public class BasicOntologyProvider extends OntologyProvider {
 	public String getShortForm(OWLEntity entity) {
 		for (OWLAnnotation annotation : EntitySearcher.getAnnotations(entity, manager.getOntologies(),
 				OWLManager.getOWLDataFactory().getRDFSLabel())) {
-			return annotation.getValue().toString();
+			return annotation.getValue().asLiteral().get().getLiteral();
 		}
 
 		return null;

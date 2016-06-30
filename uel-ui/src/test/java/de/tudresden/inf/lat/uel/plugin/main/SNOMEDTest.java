@@ -80,6 +80,10 @@ public class SNOMEDTest extends Thread {
 	private void runTest() throws OWLOntologyCreationException, InterruptedException {
 		Stopwatch timer = Stopwatch.createStarted();
 
+		if (options.verbosity.level > 1) {
+			System.out.println("Goal expression: " + goalExpression);
+		}
+
 		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
 		OWLDataFactory factory = manager.getOWLDataFactory();
 
@@ -90,8 +94,15 @@ public class SNOMEDTest extends Thread {
 		UelOntology ont = new UelOntology(new AtomManagerImpl(), Collections.singleton(snomed), top, true);
 		Set<Integer> id = ont.processClassExpression(goalClass, new HashSet<Definition>(), false);
 		Set<OWLClass> superclasses = ont.getDirectSuperclasses(goalClass);
-		// TODO ignore siblings with primitive definitions
 		Set<OWLClass> siblings = ont.getSiblings(id.iterator().next(), false, options.numberOfSiblings, false);
+		if (siblings.size() > 15) {
+			System.out.println("Too many siblings!");
+			result.status = SNOMEDStatus.TOO_LARGE;
+			return;
+		}
+		if (options.verbosity.level > 1) {
+			System.out.println("Siblings extracted");
+		}
 
 		pos = manager.createOntology();
 		neg = manager.createOntology();

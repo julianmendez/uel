@@ -370,8 +370,8 @@ public class UelOntology {
 				siblingSets = siblingSets.filter(set -> set.size() <= limit);
 			}
 
-			Set<OWLClass> collected = siblingSets.reduce(Collections.emptySet(),
-					union ? Sets::union : Sets::intersection);
+			Set<OWLClass> collected = siblingSets.reduce(union ? Sets::union : Sets::intersection)
+					.orElse(Collections.emptySet());
 
 			if ((!union) && (limit >= 0) && (collected.size() > limit)) {
 				// for the intersection, apply the filter only after combining
@@ -388,12 +388,17 @@ public class UelOntology {
 				// Get all OWLEquivalentClassesAxioms that mention 'cls', ...
 				.getAxioms(OWLEquivalentClassesAxiom.class, cls, Imports.EXCLUDED, Navigation.IN_SUPER_POSITION)
 				// ... do not directly mention 'cls', ...
-				.stream().filter(ax -> !ax.getClassExpressions().contains(cls))
+				.stream()
+				// .peek(ax -> System.out.println("1 " + ax))
+				.filter(ax -> !ax.getClassExpressions().contains(cls))
+				// .peek(ax -> System.out.println("2 " + ax))
 				// ... but contain 'cls' as a conjunct in one of the equivalent
 				// expressions.
 				.filter(ax -> ax.getClassExpressions().stream().anyMatch(expr -> expr.asConjunctSet().contains(cls)))
+				// .peek(ax -> System.out.println("3 " + ax))
 				// Then get the concept name that this axiom defines.
 				.map(ax -> ax.getNamedClasses().iterator().next());
+		// .peek(c -> System.out.println("4 " + c));
 
 		// TODO ignore primitive definitions?
 		if (includePrimitiveDefinitions) {
@@ -418,6 +423,7 @@ public class UelOntology {
 		}
 
 		return subClasses.filter(c -> !nameMap.containsValue(c));
+		// .peek(c -> System.out.println("5 " + c));
 		// return subClasses1.filter(c -> !nameMap.containsValue(c));
 	}
 

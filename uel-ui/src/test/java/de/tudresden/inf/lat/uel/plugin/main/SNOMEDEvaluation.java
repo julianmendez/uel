@@ -4,9 +4,14 @@
 package de.tudresden.inf.lat.uel.plugin.main;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.PrintStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
@@ -15,7 +20,6 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
@@ -44,9 +48,12 @@ public class SNOMEDEvaluation {
 
 	// private static final String WORK_DIR = "C:\\Users\\Stefan\\Work\\";
 	static final String WORK_DIR = "/Users/stefborg/Documents/";
-	static final String OUTPUT_PATH = WORK_DIR + "Projects/uel-snomed/results.txt";
-	static final String SNOMED_PATH = WORK_DIR + "Ontologies/snomed-english-rdf.owl";
-	static final String SNOMED_RESTR_PATH = WORK_DIR + "Ontologies/snomed-restrictions.owl";
+	static final String OUTPUT_PATH = WORK_DIR + "Projects/uel-snomed/results";
+	// static final String SNOMED_PATH = WORK_DIR +
+	// "Ontologies/snomed-english-rdf.owl";
+	static final String SNOMED_PATH = WORK_DIR + "Ontologies/snomed-ClinicalFindingModule.owl";
+	static final String CF_LIST = WORK_DIR + "Ontologies/ClinicalFindings.txt";
+	static final String SNOMED_RESTR_PATH = WORK_DIR + "Ontologies/snomed-restrictions-no-imports.owl";
 	// private static final String POS_PATH = WORK_DIR +
 	// "Projects/uel-snomed/uel-snomed-pos.owl";
 	// private static final String NEG_PATH = WORK_DIR +
@@ -54,7 +61,7 @@ public class SNOMEDEvaluation {
 	// private static final String CONSTRAINTS_PATH = WORK_DIR +
 	// "Projects/uel-snomed/constraints_const.owl";
 	private static final int MAX_TESTS = 100;
-	private static final long TIMEOUT = 10 * 60 * 1000;
+	private static final long TIMEOUT = 3 * 60 * 1000;
 	private static List<SNOMEDResult> results = new ArrayList<SNOMEDResult>();
 	private static UelOptions options = new UelOptions();
 
@@ -78,7 +85,8 @@ public class SNOMEDEvaluation {
 			if (results != null) {
 				try {
 					System.out.println("Saving results to file...");
-					PrintStream out = new PrintStream(OUTPUT_PATH);
+					PrintStream out = new PrintStream(OUTPUT_PATH
+							+ new SimpleDateFormat("yyMMddHHmmss").format(Calendar.getInstance().getTime()) + ".txt");
 					out.println(options);
 					out.println("Timeout (s): " + (TIMEOUT / 1000));
 					out.println();
@@ -98,7 +106,7 @@ public class SNOMEDEvaluation {
 			}
 		}));
 
-		options.verbosity = Verbosity.NORMAL;
+		options.verbosity = Verbosity.SHORT;
 		options.undefBehavior = UndefBehavior.CONSTANTS;
 		options.snomedMode = true;
 		options.unificationAlgorithmName = UnificationAlgorithmFactory.SAT_BASED_ALGORITHM;
@@ -150,33 +158,75 @@ public class SNOMEDEvaluation {
 		//
 
 		// 'Entire left kidney (body structure)'
-		OWLClass goalClass = cls(factory, "SCT_362209008");
+		// OWLClass goalClass = cls(factory, "SCT_362209008");
 
-		// test single class
+		// 'Finding related to ability to use contact lenses (finding)'
+		// OWLClass goalClass = cls(factory, "SCT_365239009");
+
+		// 'Biguanide overdose (disorder)'
+		// singleTest("SCT_296872003", snomed, bg);
+
+		// 'Chronic progressive epilepsia partialis continua (disorder)'
+		// singleTest("SCT_39745004", snomed, bg);
+
+		// randomly select classes with full definition from SNOMED
+		randomTests(manager, snomed, bg);
+	}
+
+	private static void singleTest(String id, OWLOntology snomed, Set<OWLOntology> bg) {
+		OWLClass goalClass = cls(snomed.getOWLOntologyManager().getOWLDataFactory(), id);
 		OWLClassExpression goalExpression = ((OWLEquivalentClassesAxiom) snomed.getAxioms(goalClass, Imports.EXCLUDED)
 				.iterator().next()).getClassExpressionsMinus(goalClass).iterator().next();
 		runSingleTest(snomed, bg, goalClass, goalExpression);
-
-		// randomly select classes with full definition from SNOMED
-		// randomTests(manager, snomed, bg);
 	}
 
 	private static void randomTests(OWLOntologyManager manager, OWLOntology snomed, Set<OWLOntology> bg) {
-		List<OWLEquivalentClassesAxiom> definitions = new ArrayList<OWLEquivalentClassesAxiom>(
-				snomed.getAxioms(AxiomType.EQUIVALENT_CLASSES));
+		List<OWLEquivalentClassesAxiom> definitions = new ArrayList<OWLEquivalentClassesAxiom>();
+		try {
+			for (String line : Files.readAllLines(Paths.get(CF_LIST))) {
+				line = line.substring(1, line.length() - 1);
+				snomed.getAxioms(manager.getOWLDataFactory().getOWLClass(IRI.create(line)), Imports.EXCLUDED).stream()
+						.filter(ax -> ax instanceof OWLEquivalentClassesAxiom)
+						.forEach(ax -> definitions.add((OWLEquivalentClassesAxiom) ax));
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			return;
+		}
+		// snomed.filterAxioms(new OWLAxiomSearchFilter() {
+		// @Override
+		// public Iterable<AxiomType<?>> getAxiomTypes() {
+		// return Collections.singleton(AxiomType.EQUIVALENT_CLASSES);
+		// }
+		//
+		// @Override
+		// public boolean pass(OWLAxiom axiom, Object key) {
+		// OWLEquivalentClassesAxiom eq = (OWLEquivalentClassesAxiom) axiom;
+		// OWLClass subclass = eq.getNamedClasses().iterator().next();
+		// for (OWLAnnotation ann : EntitySearcher.getAnnotations(subclass,
+		// snomed,
+		// OWLManager.getOWLDataFactory().getRDFSLabel())) {
+		// OWLLiteral s = (OWLLiteral) ann.getValue().asLiteral().get();
+		// // System.out.println(subclass + " " +
+		// // s.getLiteral());
+		// return s.getLiteral().endsWith((String) key);
+		// }
+		// return false;
+		// }
+		// }, " (finding)", Imports.EXCLUDED));
 		Random rnd = new Random();
+		System.out.println("Loading finished.");
 
 		for (int i = 0; i < MAX_TESTS; i++) {
 			OWLEquivalentClassesAxiom axiom = definitions.get(rnd.nextInt(definitions.size()));
 			OWLClass goalClass = axiom.getNamedClasses().iterator().next();
 			OWLClassExpression goalExpression = axiom.getClassExpressionsMinus(goalClass).iterator().next();
 			printThreadInfo();
-			System.out
-					.println("***** [" + i + "] Goal class: "
-							+ EntitySearcher
-									.getAnnotations(goalClass, manager.getOntologies(),
-											OWLManager.getOWLDataFactory().getRDFSLabel())
-									.iterator().next().getValue());
+			System.out.println("***** [" + i + "] Goal class: "
+					+ EntitySearcher
+							.getAnnotations(goalClass, manager.getOntologies(),
+									OWLManager.getOWLDataFactory().getRDFSLabel())
+							.iterator().next().getValue().asLiteral().get().getLiteral());
 
 			if (!runSingleTest(snomed, bg, goalClass, goalExpression)) {
 				return;

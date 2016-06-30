@@ -278,7 +278,8 @@ public class UelOntologyGoal implements Goal {
 						atomManager.getUndefNames()));
 		while (!toProcess.isEmpty()) {
 			Integer varId = toProcess.iterator().next();
-			Set<Integer> superclasses = ontology.getKnownSuperclasses(varId);
+			Set<Integer> superclasses = Sets.union(ontology.getKnownSuperclasses(varId),
+					getAssertedSuperclasses(varId));
 			ideals.add(superclasses);
 			processed.addAll(superclasses);
 			toProcess.removeAll(processed);
@@ -298,6 +299,13 @@ public class UelOntologyGoal implements Goal {
 		ideals.removeAll(notMaximal);
 
 		// printIdeals(renderer);
+	}
+
+	private Set<Integer> getAssertedSuperclasses(Integer varId) {
+		return subsumptions.stream().filter(sub -> (sub.getLeft().size() == 1 && sub.getLeft().contains(varId)))
+				.flatMap(sub -> sub.getRight().stream())
+				.filter(id -> !atomManager.getExistentialRestrictions().contains(id))
+				.flatMap(id -> ontology.getKnownSuperclasses(id).stream()).collect(Collectors.toSet());
 	}
 
 	private void extractDomainsAndRanges() {
