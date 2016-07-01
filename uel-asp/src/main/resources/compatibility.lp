@@ -1,6 +1,4 @@
 
-% TODO: compute the compatibility relation only from the _background_ equations (definitions)
-
 % Compatibility is ...
 
 % ... reflexive
@@ -16,8 +14,6 @@ compatible(var(F),var(G),var(Z)) :- compatible(var(F),_,var(X)), compatible(var(
                                     not hasatom(W,1-P,E):hasatom(W,1-P,E),W!=Z.
 compatible(var(X),var(Z),var(Z)) :- hasatom(var(X),P,E), hasatom(var(Z),1-P,E), eq(E),
                                     not hasatom(W,1-P,E):hasatom(W,1-P,E),W!=Z.
-
-
 
 
 % TODO: role number restrictions?

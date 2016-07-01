@@ -95,7 +95,10 @@ public class SNOMEDTest extends Thread {
 		Set<Integer> id = ont.processClassExpression(goalClass, new HashSet<Definition>(), false);
 		Set<OWLClass> superclasses = ont.getDirectSuperclasses(goalClass);
 		Set<OWLClass> siblings = ont.getSiblings(id.iterator().next(), false, options.numberOfSiblings, false);
-		if (siblings.size() > 15) {
+		if (options.verbosity.level > 0) {
+			System.out.println("Siblings: " + siblings.size());
+		}
+		if (siblings.size() > SNOMEDEvaluation.MAX_SIBLINGS) {
 			System.out.println("Too many siblings!");
 			result.status = SNOMEDStatus.TOO_LARGE;
 			return;
@@ -121,8 +124,10 @@ public class SNOMEDTest extends Thread {
 
 		int size = iterator.getUelModel().getGoal().getAtomManager().size();
 		result.goalSize = size;
-		System.out.println("Size: " + size);
-		if (size > 260) {
+		if (options.verbosity.level > 0) {
+			System.out.println("Size: " + size);
+		}
+		if (size > SNOMEDEvaluation.MAX_ATOMS) {
 			System.out.println("Problem is too large!");
 			result.status = SNOMEDStatus.TOO_LARGE;
 		} else {

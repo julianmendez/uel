@@ -67,6 +67,7 @@ class UnifierController {
 			try {
 				model.computeNextUnifier();
 			} catch (InterruptedException ex) {
+				throw new RuntimeException(ex);
 			}
 		}
 		model.setCurrentUnifierIndex(model.getUnifierList().size() - 1);
@@ -78,6 +79,7 @@ class UnifierController {
 			try {
 				model.computeNextUnifier();
 			} catch (InterruptedException ex) {
+				throw new RuntimeException(ex);
 			}
 		}
 		model.setCurrentUnifierIndex(model.getCurrentUnifierIndex() + 1);

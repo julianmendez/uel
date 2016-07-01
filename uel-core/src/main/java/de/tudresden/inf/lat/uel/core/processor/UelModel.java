@@ -110,6 +110,11 @@ public class UelModel {
 	public boolean computeNextUnifier() throws InterruptedException {
 		if (!allUnifiersFound) {
 			while (algorithm.computeNextUnifier()) {
+
+				if (Thread.interrupted()) {
+					throw new InterruptedException();
+				}
+
 				Unifier result = algorithm.getUnifier();
 				if (options.minimizeSolutions) {
 					result = postprocessor.minimizeUnifier(result);

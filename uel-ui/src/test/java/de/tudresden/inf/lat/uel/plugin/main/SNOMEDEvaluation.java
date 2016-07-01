@@ -51,8 +51,8 @@ public class SNOMEDEvaluation {
 	static final String OUTPUT_PATH = WORK_DIR + "Projects/uel-snomed/results";
 	// static final String SNOMED_PATH = WORK_DIR +
 	// "Ontologies/snomed-english-rdf.owl";
-	static final String SNOMED_PATH = WORK_DIR + "Ontologies/snomed-ClinicalFindingModule.owl";
-	static final String CF_LIST = WORK_DIR + "Ontologies/ClinicalFindings.txt";
+	static final String SNOMED_PATH = WORK_DIR + "Ontologies/snomed-FunctionalFindingModule.owl";
+	static final String CLASSES_LIST = WORK_DIR + "Ontologies/FunctionalFindings.txt";
 	static final String SNOMED_RESTR_PATH = WORK_DIR + "Ontologies/snomed-restrictions-no-imports.owl";
 	// private static final String POS_PATH = WORK_DIR +
 	// "Projects/uel-snomed/uel-snomed-pos.owl";
@@ -60,8 +60,10 @@ public class SNOMEDEvaluation {
 	// "Projects/uel-snomed/uel-snomed-neg.owl";
 	// private static final String CONSTRAINTS_PATH = WORK_DIR +
 	// "Projects/uel-snomed/constraints_const.owl";
-	private static final int MAX_TESTS = 100;
-	private static final long TIMEOUT = 3 * 60 * 1000;
+	static final int MAX_SIBLINGS = 15;
+	static final int MAX_ATOMS = 240;
+	private static final int MAX_TESTS = 1000;
+	private static final long TIMEOUT = 10 * 60 * 1000;
 	private static List<SNOMEDResult> results = new ArrayList<SNOMEDResult>();
 	private static UelOptions options = new UelOptions();
 
@@ -89,6 +91,10 @@ public class SNOMEDEvaluation {
 							+ new SimpleDateFormat("yyMMddHHmmss").format(Calendar.getInstance().getTime()) + ".txt");
 					out.println(options);
 					out.println("Timeout (s): " + (TIMEOUT / 1000));
+					out.println("Ontology path: " + SNOMED_PATH);
+					out.println("List of goal classes: " + CLASSES_LIST);
+					out.println("Cut-off for number of siblings of the goal class: " + MAX_SIBLINGS);
+					out.println("Cut-off for number of atoms: " + MAX_ATOMS);
 					out.println();
 					out.println(
 							"Goal class                              |Status    |Build |Size  |Pre   |First |Goal  |All   |Number");
@@ -183,7 +189,7 @@ public class SNOMEDEvaluation {
 	private static void randomTests(OWLOntologyManager manager, OWLOntology snomed, Set<OWLOntology> bg) {
 		List<OWLEquivalentClassesAxiom> definitions = new ArrayList<OWLEquivalentClassesAxiom>();
 		try {
-			for (String line : Files.readAllLines(Paths.get(CF_LIST))) {
+			for (String line : Files.readAllLines(Paths.get(CLASSES_LIST))) {
 				line = line.substring(1, line.length() - 1);
 				snomed.getAxioms(manager.getOWLDataFactory().getOWLClass(IRI.create(line)), Imports.EXCLUDED).stream()
 						.filter(ax -> ax instanceof OWLEquivalentClassesAxiom)
