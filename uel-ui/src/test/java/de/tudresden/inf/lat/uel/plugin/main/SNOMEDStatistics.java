@@ -41,7 +41,7 @@ public class SNOMEDStatistics {
 	private static int maxOtherRoles = 0;
 	private static OWLClass maxOtherRolesClass = null;
 	private static OWLClassExpression maxOtherRolesDef = null;
-	private static OWLObjectProperty roleGroup = SNOMEDEvaluation.prp(OWLManager.getOWLDataFactory(), "RoleGroup");
+	private static OWLObjectProperty roleGroup = SNOMEDEvaluation.prp("RoleGroup");
 
 	public static void main(String[] args) {
 		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();

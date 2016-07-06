@@ -87,8 +87,8 @@ public class SNOMEDTest extends Thread {
 		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
 		OWLDataFactory factory = manager.getOWLDataFactory();
 
-		OWLClass x = SNOMEDEvaluation.cls(factory, "X");
-		OWLClass top = SNOMEDEvaluation.cls(factory, "SCT_138875005");
+		OWLClass x = SNOMEDEvaluation.cls("X");
+		OWLClass top = SNOMEDEvaluation.cls("SCT_138875005");
 		Set<OWLClass> vars = new HashSet<OWLClass>(Arrays.asList(x));
 
 		UelOntology ont = new UelOntology(new AtomManagerImpl(), Collections.singleton(snomed), top, true);
