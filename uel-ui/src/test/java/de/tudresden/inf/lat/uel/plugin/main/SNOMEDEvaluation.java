@@ -53,8 +53,13 @@ public class SNOMEDEvaluation {
 	static final String OUTPUT_PATH = WORK_DIR + "Projects/uel-snomed/results";
 	// static final String SNOMED_PATH = WORK_DIR +
 	// "Ontologies/snomed-english-rdf.owl";
-	static final String SNOMED_PATH = WORK_DIR + "Ontologies/snomed-FunctionalFindingModule.owl";
-	static final String CLASSES_LIST = WORK_DIR + "Ontologies/FunctionalFindings.txt";
+	// static final String PARENT_CLASS = "Bodystructure(bodystructure)";
+	// static final String PARENT_CLASS = "Event(event)";
+	// static final String PARENT_CLASS = "Observableentity(observableentity)";
+	// static final String PARENT_CLASS = "Circumlocution(finding)";
+	static final String PARENT_CLASS = "Bleeding (finding)";
+	static final String SNOMED_MODULE_PATH = WORK_DIR + "Ontologies/snomed-" + PARENT_CLASS + "ModuleNEW.owl";
+	static final String CLASSES_LIST = WORK_DIR + "Ontologies/" + PARENT_CLASS + "NEW.txt";
 	static final String SNOMED_RESTR_PATH = WORK_DIR + "Ontologies/snomed-restrictions-no-imports.owl";
 	// private static final String POS_PATH = WORK_DIR +
 	// "Projects/uel-snomed/uel-snomed-pos.owl";
@@ -63,7 +68,7 @@ public class SNOMEDEvaluation {
 	// private static final String CONSTRAINTS_PATH = WORK_DIR +
 	// "Projects/uel-snomed/constraints_const.owl";
 
-	static final int MAX_SIBLINGS = 15;
+	static final int MAX_SIBLINGS = 100;
 	static final int MAX_ATOMS = 240;
 	private static final int MAX_TESTS = 1000;
 	private static final long TIMEOUT = 10 * 60 * 1000;
@@ -99,7 +104,7 @@ public class SNOMEDEvaluation {
 						+ new SimpleDateFormat("yyMMddHHmmss").format(Calendar.getInstance().getTime()) + ".txt");
 				out.println(options);
 				out.println("Timeout (s): " + (TIMEOUT / 1000));
-				out.println("Ontology path: " + SNOMED_PATH);
+				out.println("Ontology path: " + SNOMED_MODULE_PATH);
 				out.println("List of goal classes: " + CLASSES_LIST);
 				out.println("Cut-off for number of siblings of the goal class: " + MAX_SIBLINGS);
 				out.println("Cut-off for number of atoms: " + MAX_ATOMS);
@@ -137,7 +142,7 @@ public class SNOMEDEvaluation {
 		results = new ArrayList<SNOMEDResult>();
 		manager = OWLManager.createOWLOntologyManager();
 		factory = manager.getOWLDataFactory();
-		snomed = AlternativeUelStarter.loadOntology(SNOMED_PATH, manager);
+		snomed = AlternativeUelStarter.loadOntology(SNOMED_MODULE_PATH, manager);
 		snomedRestrictions = AlternativeUelStarter.loadOntology(SNOMED_RESTR_PATH, manager);
 		bg = new HashSet<OWLOntology>(Arrays.asList(snomed, snomedRestrictions));
 
@@ -227,8 +232,9 @@ public class SNOMEDEvaluation {
 		Random rnd = new Random();
 		System.out.println("Loading finished.");
 
-		for (int i = 0; i < MAX_TESTS; i++) {
+		for (int i = 0; (i < MAX_TESTS) && (definitions.size() > 0); i++) {
 			OWLEquivalentClassesAxiom axiom = definitions.get(rnd.nextInt(definitions.size()));
+			definitions.remove(axiom);
 			OWLClass goalClass = axiom.getNamedClasses().iterator().next();
 			OWLClassExpression goalExpression = axiom.getClassExpressionsMinus(goalClass).iterator().next();
 			printThreadInfo();

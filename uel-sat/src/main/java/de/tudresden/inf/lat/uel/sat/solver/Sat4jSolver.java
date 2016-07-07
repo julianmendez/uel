@@ -1,8 +1,8 @@
 package de.tudresden.inf.lat.uel.sat.solver;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
-import java.util.TreeSet;
 
 import org.sat4j.core.VecInt;
 import org.sat4j.minisat.SolverFactory;
@@ -38,7 +38,7 @@ public class Sat4jSolver implements SatSolver {
 
 	private SatOutput getSatOutput() {
 		IProblem problem = solver;
-		Set<Integer> model = new TreeSet<Integer>();
+		Set<Integer> model = new HashSet<Integer>();
 		boolean satisfiable;
 		try {
 			satisfiable = problem.isSatisfiable();
