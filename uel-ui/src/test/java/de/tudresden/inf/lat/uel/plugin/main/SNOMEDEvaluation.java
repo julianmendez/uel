@@ -53,20 +53,20 @@ public class SNOMEDEvaluation {
 	static final String OUTPUT_PATH = WORK_DIR + "Projects/uel-snomed/results";
 	// static final String SNOMED_PATH = WORK_DIR +
 	// "Ontologies/snomed-english-rdf.owl";
+
 	// static final String PARENT_CLASS = "Bodystructure(bodystructure)";
 	// static final String PARENT_CLASS = "Event(event)";
 	// static final String PARENT_CLASS = "Observableentity(observableentity)";
 	// static final String PARENT_CLASS = "Circumlocution(finding)";
-	static final String PARENT_CLASS = "Bleeding (finding)";
+	// static final String PARENT_CLASS = "Bleeding (finding)";
+	// static final String PARENT_CLASS = "Clinical history and observation
+	// findings (finding)";
+	// static final String PARENT_CLASS = "Finding by site (finding)";
+	static final String PARENT_CLASS = "Disease (disorder)";
 	static final String SNOMED_MODULE_PATH = WORK_DIR + "Ontologies/snomed-" + PARENT_CLASS + "ModuleNEW.owl";
 	static final String CLASSES_LIST = WORK_DIR + "Ontologies/" + PARENT_CLASS + "NEW.txt";
+
 	static final String SNOMED_RESTR_PATH = WORK_DIR + "Ontologies/snomed-restrictions-no-imports.owl";
-	// private static final String POS_PATH = WORK_DIR +
-	// "Projects/uel-snomed/uel-snomed-pos.owl";
-	// private static final String NEG_PATH = WORK_DIR +
-	// "Projects/uel-snomed/uel-snomed-neg.owl";
-	// private static final String CONSTRAINTS_PATH = WORK_DIR +
-	// "Projects/uel-snomed/constraints_const.owl";
 
 	static final int MAX_SIBLINGS = 100;
 	static final int MAX_ATOMS = 240;
@@ -280,9 +280,12 @@ public class SNOMEDEvaluation {
 	static void printThreadInfo() {
 		for (Entry<Thread, StackTraceElement[]> e : Thread.getAllStackTraces().entrySet()) {
 			Thread t = e.getKey();
-			System.out.println("Thread " + t.getName() + ", " + t.getState());
-			for (StackTraceElement el : e.getValue()) {
-				System.out.println(el);
+			if (!t.getName().equals("main") && !t.getName().equals("Finalizer")
+					&& !t.getName().equals("Reference Handler")) {
+				System.out.println("Thread " + t.getName() + ", " + t.getState());
+				for (StackTraceElement el : e.getValue()) {
+					System.out.println(el);
+				}
 			}
 		}
 	}
