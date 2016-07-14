@@ -243,7 +243,7 @@ public abstract class AbstractSatUnificationAlgorithm extends AbstractUnificatio
 	}
 
 	private void encodeDissubsumption(Dissubsumption e) {
-		encodeDissubsumption(Collections.<Integer> emptySet(), e);
+		encodeDissubsumption(Collections.<Integer>emptySet(), e);
 	}
 
 	private void encodeDissubsumption(Set<Integer> choiceLiterals, Dissubsumption e) {
@@ -589,13 +589,13 @@ public abstract class AbstractSatUnificationAlgorithm extends AbstractUnificatio
 		// d'' - no variable can have a role group type and a normal type
 		for (Integer type : goal.getTypes()) {
 			// ignore the top concept
-			if (!goal.isTop(type)) {
-				for (Integer roleGroupType : goal.getRoleGroupTypes().values()) {
-					for (Integer varId : getVariables()) {
-						input.addNegativeClause(subsumption(varId, type), subtype(varId, roleGroupType));
-					}
+			// if (!goal.isTop(type)) {
+			for (Integer roleGroupType : goal.getRoleGroupTypes().values()) {
+				for (Integer varId : getVariables()) {
+					input.addNegativeClause(subsumption(varId, type), subtype(varId, roleGroupType));
 				}
 			}
+			// }
 		}
 
 		// domain restrictions

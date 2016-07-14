@@ -15,12 +15,16 @@ compatible(var(F),var(G),var(Z)) :- compatible(var(F),_,var(X)), compatible(var(
 compatible(var(X),var(Z),var(Z)) :- hasatom(var(X),P,E), hasatom(var(Z),1-P,E), eq(E),
                                     not hasatom(W,1-P,E):hasatom(W,1-P,E),W!=Z.
 
-
-% TODO: role number restrictions?
+% role number restrictions
+1 { subs(D,E):subs(var(X),exists(R,D)),subs(var(X),exists(R,E)),D!=E } :-
+        number(R,N), atom(var(X)), M = { subs(var(X),exists(R,C)) }, N < M.
 
 % Two variables in the same substitution set must be compatible
 :- subs(var(X),var(Y)), subs(var(X),var(Z)), not compatible(var(Y),var(Z),_).
 
+
+% UNDEF context restrictions
+subs(var(X),Y) :- subs(var(X),U), undef(Y,U).
 
 % Type constraints
 
@@ -29,8 +33,8 @@ rgtype(rg(X)) :- type(X).
 % role group types must be compatible
 :- subtype(var(X),rg(S)), subtype(var(X),rg(T)), not compatible(S,T,_).
 
-% a variable cannot have both a role group type and a normal type (except top)
-:- subtype(var(X),rg(T)), subs(var(X),S), type(S), not top(S).
+% a variable cannot have both a role group type and a normal type
+:- subtype(var(X),rg(T)), subs(var(X),S), type(S).
 
 % domain restrictions, possibly with role group types
 1 { subtype(var(X),T):domain(R,T),rgtype(T); subs(var(X),T):domain(R,T),type(T) } :-
@@ -39,4 +43,8 @@ rgtype(rg(X)) :- type(X).
 % range restrictions (no role group types)
 1 { subs(var(X),T):range(R,T) } :- atom(exists(R,var(X))), 1 { range(R,T) }.
 
-% TODO: add 'type', 'top', 'domain', 'range' to the input encoding
+% 'RoleGroup' translates between role group types and normal types
+subs(var(X),T) :- rolegroup(R), subs(var(X),exists(R,C)), rgtype(rg(T)), subtype(C,rg(T)).
+
+% TODO: add 'type', 'domain', 'range', 'rolegroup', 'undef' to the input encoding
+

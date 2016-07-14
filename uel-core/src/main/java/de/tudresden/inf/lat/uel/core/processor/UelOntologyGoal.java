@@ -400,7 +400,7 @@ public class UelOntologyGoal implements Goal {
 
 	private void extractTypeHierarchy() {
 		// designate the top concept as the most general type
-		types.add(ontology.getTop());
+		// types.add(ontology.getTop());
 
 		// extract type hierarchy
 		// for (Integer type : types) {
@@ -553,9 +553,9 @@ public class UelOntologyGoal implements Goal {
 	private void introduceRoleGroupTypes() {
 		// copy type hierarchy
 		for (Integer type : types) {
-			if (!type.equals(top)) {
-				roleGroupTypes.put(type, atomManager.createRoleGroupConceptName(type));
-			}
+			// if (!type.equals(top)) {
+			roleGroupTypes.put(type, atomManager.createRoleGroupConceptName(type));
+			// }
 		}
 		// for (Integer type : types) {
 		// Integer supertype = directSupertype.get(type);
