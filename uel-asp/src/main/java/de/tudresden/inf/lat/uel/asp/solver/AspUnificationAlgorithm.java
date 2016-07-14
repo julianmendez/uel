@@ -13,7 +13,6 @@ import de.tudresden.inf.lat.uel.type.impl.Unifier;
 
 public class AspUnificationAlgorithm extends AbstractUnificationAlgorithm {
 
-	private Goal goal;
 	private AspInput aspInput;
 	private AspOutput aspOutput;
 	private boolean initialized;
@@ -42,7 +41,7 @@ public class AspUnificationAlgorithm extends AbstractUnificationAlgorithm {
 	public boolean computeNextUnifier() throws InterruptedException {
 		// TODO: implement asynchronous execution of ClingoSolver
 		if (!initialized) {
-			AspSolver solver = new ClingoSolver(goal.hasNegativePart(), false, minimize);
+			AspSolver solver = new ClingoSolver(goal.hasNegativePart(), !goal.getTypes().isEmpty(), minimize, this);
 			try {
 				aspOutput = solver.solve(aspInput);
 			} catch (IOException e) {

@@ -1,5 +1,6 @@
 package de.tudresden.inf.lat.uel.asp.solver;
 
+import java.util.Map.Entry;
 import java.util.Set;
 
 import de.tudresden.inf.lat.uel.type.api.Atom;
@@ -60,13 +61,106 @@ public class AspInput {
 			encodeAxiom(encoding, s, i, "dissubsumption", "dissubs");
 			i++;
 		}
+
+		encoding.append("% Types");
+		encoding.append(System.lineSeparator());
+		for (Integer type : goal.getTypes()) {
+			encoding.append("type(");
+			encodeAtom(encoding, type);
+			encoding.append(").");
+			encoding.append(System.lineSeparator());
+		}
+		encoding.append(System.lineSeparator());
+
+		encoding.append("% Domains");
+		encoding.append(System.lineSeparator());
+		for (Entry<Integer, Set<Integer>> e : goal.getDomains().entrySet()) {
+			for (Integer type : e.getValue()) {
+				encoding.append("domain(r");
+				encoding.append(e.getKey());
+				encoding.append(",");
+				if (goal.getRoleGroupTypes().containsValue(type)) {
+					encoding.append("rg(");
+					encodeAtom(encoding, goal.getAtomManager().getAtom(getOriginalType(type)));
+					encoding.append(")");
+				} else {
+					encodeAtom(encoding, type);
+				}
+				encoding.append(").");
+				encoding.append(System.lineSeparator());
+			}
+		}
+		encoding.append(System.lineSeparator());
+
+		encoding.append("% Ranges");
+		encoding.append(System.lineSeparator());
+		for (Entry<Integer, Set<Integer>> e : goal.getRanges().entrySet()) {
+			for (Integer type : e.getValue()) {
+				encoding.append("range(r");
+				encoding.append(e.getKey());
+				encoding.append(",");
+				encodeAtom(encoding, type);
+				encoding.append(").");
+				encoding.append(System.lineSeparator());
+			}
+		}
+		encoding.append(System.lineSeparator());
+
+		encoding.append("% 'RoleGroup'");
+		encoding.append(System.lineSeparator());
+		encoding.append("rolegroup(r");
+		encoding.append(goal.getAtomManager().getRoleId("http://www.ihtsdo.org/RoleGroup"));
+		encoding.append(").");
+		encoding.append(System.lineSeparator());
+		encoding.append(System.lineSeparator());
+
+		encoding.append("% UNDEF names");
+		encoding.append(System.lineSeparator());
+		for (Integer undefId : goal.getAtomManager().getUndefNames()) {
+			Integer origId = goal.getAtomManager().removeUndef(undefId);
+			encoding.append("undef(");
+			encodeAtom(encoding, origId);
+			encoding.append(",");
+			encodeAtom(encoding, undefId);
+			encoding.append(").");
+			encoding.append(System.lineSeparator());
+		}
+		encoding.append(System.lineSeparator());
+		encoding.append(System.lineSeparator());
+
+		encoding.append("% role number restrictions");
+		encoding.append(System.lineSeparator());
+		for (Entry<Integer, Integer> e : goal.getRoleNumberRestrictions().entrySet()) {
+			encoding.append("number(r");
+			encoding.append(e.getKey());
+			encoding.append(",");
+			encoding.append(e.getValue());
+			encoding.append(").");
+			encoding.append(System.lineSeparator());
+		}
+		encoding.append(System.lineSeparator());
+		encoding.append(System.lineSeparator());
+
+		encoding.append("% User variables");
+		encoding.append(System.lineSeparator());
 		for (Integer var : goal.getAtomManager().getUserVariables()) {
 			encoding.append("relevant(x");
 			encoding.append(var);
 			encoding.append(").");
 			encoding.append(System.lineSeparator());
 		}
+		encoding.append(System.lineSeparator());
+
 		program = encoding.toString();
+	}
+
+	private Integer getOriginalType(Integer roleGroupType) {
+		for (Integer type : goal.getRoleGroupTypes().keySet()) {
+			if (goal.getRoleGroupTypes().get(type).equals(roleGroupType)) {
+				return type;
+			}
+		}
+		return null;
 	}
 
 	private void encodeAxiom(StringBuilder encoding, Axiom d, int index, String comment, String predicate) {
@@ -115,7 +209,7 @@ public class AspInput {
 
 	private void encodeAtom(StringBuilder encoding, Integer atomId, int side, int equationId) {
 		encoding.append("hasatom(");
-		encodeAtom(encoding, goal.getAtomManager().getAtom(atomId));
+		encodeAtom(encoding, atomId);
 		encoding.append(", ");
 		encoding.append(side);
 		encoding.append(", ");
@@ -140,5 +234,9 @@ public class AspInput {
 			encoding.append(goal.getAtomManager().getIndex(atom));
 		}
 		encoding.append(")");
+	}
+
+	private void encodeAtom(StringBuilder encoding, Integer origId) {
+		encodeAtom(encoding, goal.getAtomManager().getAtom(origId));
 	}
 }

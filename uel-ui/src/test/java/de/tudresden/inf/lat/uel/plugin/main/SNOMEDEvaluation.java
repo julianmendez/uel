@@ -48,8 +48,8 @@ import de.tudresden.inf.lat.uel.plugin.main.SNOMEDResult.SNOMEDStatus;
  */
 public class SNOMEDEvaluation {
 
-	// private static final String WORK_DIR = "C:\\Users\\Stefan\\Work\\";
-	static final String WORK_DIR = "/Users/stefborg/Documents/";
+	private static final String WORK_DIR = "C:\\Users\\Stefan\\Work\\";
+	// static final String WORK_DIR = "/Users/stefborg/Documents/";
 	static final String OUTPUT_PATH = WORK_DIR + "Projects/uel-snomed/results";
 	// static final String SNOMED_PATH = WORK_DIR +
 	// "Ontologies/snomed-english-rdf.owl";
@@ -63,8 +63,12 @@ public class SNOMEDEvaluation {
 	// findings (finding)";
 	// static final String PARENT_CLASS = "Finding by site (finding)";
 	static final String PARENT_CLASS = "Disease (disorder)";
-	static final String SNOMED_MODULE_PATH = WORK_DIR + "Ontologies/snomed-" + PARENT_CLASS + "ModuleNEW.owl";
-	static final String CLASSES_LIST = WORK_DIR + "Ontologies/" + PARENT_CLASS + "NEW.txt";
+	// static final String SNOMED_MODULE_PATH = WORK_DIR + "Ontologies/snomed-"
+	// + PARENT_CLASS + "ModuleNEW.owl";
+	// static final String CLASSES_LIST = WORK_DIR + "Ontologies/" +
+	// PARENT_CLASS + "NEW.txt";
+	static final String SNOMED_MODULE_PATH = WORK_DIR + "Ontologies/snomed-FunctionalFindingModule.owl";
+	static final String CLASSES_LIST = WORK_DIR + "Ontologies/FunctionaFindings.txt";
 
 	static final String SNOMED_RESTR_PATH = WORK_DIR + "Ontologies/snomed-restrictions-no-imports.owl";
 
@@ -150,16 +154,16 @@ public class SNOMEDEvaluation {
 		options.verbosity = Verbosity.SHORT;
 		options.undefBehavior = UndefBehavior.CONSTANTS;
 		options.snomedMode = true;
-		options.unificationAlgorithmName = UnificationAlgorithmFactory.SAT_BASED_ALGORITHM;
+		options.unificationAlgorithmName = UnificationAlgorithmFactory.ASP_BASED_ALGORITHM;
 		options.expandPrimitiveDefinitions = true;
 		options.restrictUndefContext = true;
-		options.numberOfRoleGroups = 3;
+		options.numberOfRoleGroups = 1;
 		options.minimizeSolutions = true;
 		options.noEquivalentSolutions = true;
 		options.numberOfSiblings = -1;
 
 		// 'Difficulty writing (finding)': 30s; new: 21 s / 6,7 min
-		// OWLClass goalClass = cls("SCT_102938007");
+		singleTest("SCT_102938007");
 
 		// 'Does not use words (finding)': 12s / 42s
 		// OWLClass goalClass = cls("SCT_288613006");
@@ -205,7 +209,7 @@ public class SNOMEDEvaluation {
 		// singleTest("SCT_39745004");
 
 		// randomly select classes with full definition from SNOMED
-		randomTests();
+		// randomTests();
 	}
 
 	private static void singleTest(String id) {
@@ -238,10 +242,7 @@ public class SNOMEDEvaluation {
 			OWLClass goalClass = axiom.getNamedClasses().iterator().next();
 			OWLClassExpression goalExpression = axiom.getClassExpressionsMinus(goalClass).iterator().next();
 			printThreadInfo();
-			System.out.println("***** [" + i + "] Goal class: "
-					+ EntitySearcher.getAnnotations(goalClass, snomed, factory.getRDFSLabel()).iterator().next()
-							.getValue().asLiteral().get().getLiteral());
-
+			System.out.print("***** [" + i + "] ");
 			if (!runSingleTest(goalClass, goalExpression)) {
 				return;
 			}
@@ -249,6 +250,8 @@ public class SNOMEDEvaluation {
 	}
 
 	private static boolean runSingleTest(OWLClass goalClass, OWLClassExpression goalExpression) {
+		System.out.println("Goal class: " + EntitySearcher.getAnnotations(goalClass, snomed, factory.getRDFSLabel())
+				.iterator().next().getValue().asLiteral().get().getLiteral());
 		SNOMEDTest test = new SNOMEDTest(options, snomed, bg, goalClass, goalExpression);
 		test.start();
 		try {

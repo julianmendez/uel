@@ -154,9 +154,9 @@ public class SNOMEDTest extends Thread {
 					skip = true;
 				}
 			}
-			// if (i == 0) {
-			// skip = false;
-			// }
+			 if (i == 0) {
+			 skip = false;
+			 }
 
 			i++;
 			// System.out.println();

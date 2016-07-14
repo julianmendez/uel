@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import de.tudresden.inf.lat.uel.type.impl.AbstractUnificationAlgorithm;
+
 /**
  * @author Stefan Borgwardt
  * 
@@ -23,7 +25,7 @@ public class ClingoSolver implements AspSolver {
 
 	private static String UNIFICATION_PROGRAM = "/unification.lp";
 	private static String DISUNIFICATION_PROGRAM = "/disunification.lp";
-	private static String TYPES_PROGRAM = "/types.lp";
+	private static String TYPES_PROGRAM = "/compatibility.lp";
 	private static String FINAL_PROGRAM = "/final.lp";
 	private static String CLINGO_COMMAND = "clingo";
 	// TODO: multi-threading?
@@ -36,11 +38,13 @@ public class ClingoSolver implements AspSolver {
 	private int maxSolutions = 1;
 	private String program;
 	private File outputFile;
+	AbstractUnificationAlgorithm parent;
 
-	public ClingoSolver(boolean hasNegativePart, boolean types, boolean minimize) {
+	public ClingoSolver(boolean hasNegativePart, boolean types, boolean minimize, AbstractUnificationAlgorithm parent) {
 		this.hasNegativePart = hasNegativePart;
 		this.types = types;
 		this.minimize = minimize;
+		this.parent = parent;
 		try {
 			this.outputFile = File.createTempFile("uel-asp-clingo", ".tmp");
 		} catch (IOException ex) {
@@ -155,6 +159,7 @@ public class ClingoSolver implements AspSolver {
 				new InputStreamReader(AspUnificationAlgorithm.class.getResourceAsStream(resourceName)));
 		String line = null;
 		while ((line = reader.readLine()) != null) {
+			System.out.println(line);
 			output.append(line);
 			output.append(System.lineSeparator());
 		}

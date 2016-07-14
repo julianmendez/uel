@@ -81,7 +81,7 @@ public abstract class AbstractUnificationAlgorithm implements UnificationAlgorit
 
 	protected abstract void updateInfo();
 
-	protected String printAtom(Integer atomId) {
+	public String printAtom(Integer atomId) {
 		Atom a = goal.getAtomManager().getAtom(atomId);
 		if (a instanceof ExistentialRestriction) {
 			String roleName = shortFormMap.apply(goal.getAtomManager().printRoleName(atomId));
@@ -93,7 +93,7 @@ public abstract class AbstractUnificationAlgorithm implements UnificationAlgorit
 		}
 	}
 
-	protected String printAtoms(Set<Integer> atomIds) {
+	public String printAtoms(Set<Integer> atomIds) {
 		StringBuilder sb = new StringBuilder();
 		for (Integer atomId : atomIds) {
 			sb.append(printAtom(atomId));
