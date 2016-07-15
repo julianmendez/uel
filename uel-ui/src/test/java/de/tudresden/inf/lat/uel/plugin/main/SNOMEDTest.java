@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
@@ -154,9 +155,9 @@ public class SNOMEDTest extends Thread {
 					skip = true;
 				}
 			}
-			 if (i == 0) {
-			 skip = false;
-			 }
+			if (i == 0) {
+				skip = false;
+			}
 
 			i++;
 			// System.out.println();
@@ -188,27 +189,26 @@ public class SNOMEDTest extends Thread {
 				OWLReasoner reasoner = new JcelReasonerFactory().createNonBufferingReasoner(extendedOntology);
 				reasoner.precomputeInferences();
 
-				// boolean solution = true;
-				// for (OWLAxiom a : pos.getAxioms(AxiomType.SUBCLASS_OF)) {
-				// // System.out.println(a + " (pos): " +
-				// // reasoner.isEntailed(a));
-				// if (!reasoner.isEntailed(a)) {
-				// solution = false;
-				// }
-				// // Assert.assertTrue(reasoner.isEntailed(a));
-				// }
-				// for (OWLAxiom a : neg.getAxioms(AxiomType.SUBCLASS_OF)) {
-				// // System.out.println(a + " (neg): " +
-				// // reasoner.isEntailed(a));
-				// if (reasoner.isEntailed(a)) {
-				// solution = false;
-				// }
-				// // Assert.assertTrue(!reasoner.isEntailed(a));
-				// }
-				// if (!solution) {
-				// System.out.println("This is not a real solution (due to
-				// the replacement of UNDEF names)!");
-				// }
+				boolean solution = true;
+				for (OWLAxiom a : pos.getAxioms(AxiomType.SUBCLASS_OF)) {
+					// System.out.println(a + " (pos): " +
+					// reasoner.isEntailed(a));
+					if (!reasoner.isEntailed(a)) {
+						solution = false;
+					}
+					// Assert.assertTrue(reasoner.isEntailed(a));
+				}
+				for (OWLAxiom a : neg.getAxioms(AxiomType.SUBCLASS_OF)) {
+					// System.out.println(a + " (neg): " +
+					// reasoner.isEntailed(a));
+					if (reasoner.isEntailed(a)) {
+						solution = false;
+					}
+					// Assert.assertTrue(!reasoner.isEntailed(a));
+				}
+				if (!solution) {
+					System.out.println("This is not a real solution!");
+				}
 
 				// System.out.println(goalAxiom + " (goal): " +
 				// reasoner.isEntailed(goalAxiom));

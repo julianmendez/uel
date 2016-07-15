@@ -21,8 +21,6 @@ public class AspUnificationAlgorithm extends AbstractUnificationAlgorithm {
 
 	public AspUnificationAlgorithm(Goal goal, boolean minimize) {
 		super(goal);
-		this.aspInput = new AspInput(goal);
-		addInfo("ASP encoding", aspInput.getProgram());
 		this.initialized = false;
 		this.currentUnifier = null;
 		this.minimize = minimize;
@@ -41,6 +39,8 @@ public class AspUnificationAlgorithm extends AbstractUnificationAlgorithm {
 	public boolean computeNextUnifier() throws InterruptedException {
 		// TODO: implement asynchronous execution of ClingoSolver
 		if (!initialized) {
+			aspInput = new AspInput(goal, this);
+			addInfo("ASP encoding", aspInput.getProgram());
 			AspSolver solver = new ClingoSolver(goal.hasNegativePart(), !goal.getTypes().isEmpty(), minimize, this);
 			try {
 				aspOutput = solver.solve(aspInput);

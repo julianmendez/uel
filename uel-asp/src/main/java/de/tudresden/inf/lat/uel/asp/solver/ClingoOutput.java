@@ -65,20 +65,26 @@ public class ClingoOutput implements AspOutput {
 		if (result.equals(SATISFIABLE) || result.equals(OPTIMUM_FOUND)) {
 			// Witnesses -> assignments (using atomManager)
 			for (JsonNode witness : root.get("Call").get(0).get("Witnesses")) {
+//				System.out.println();
+//				System.out.println();
+//				System.out.println("New Witness!");
+//				System.out.println();
+//				System.out.println();
 				Map<Integer, Set<Integer>> assignment = new HashMap<Integer, Set<Integer>>();
-				Pattern p = Pattern.compile("var\\(x(.*?)\\)");
+//				Pattern p = Pattern.compile("var\\(x(.*?)\\)");
 				for (JsonNode subsumption : witness.get("Value")) {
 					String text = subsumption.asText();
 					if (text.startsWith("relsubs")) {
 						extendAssignment(assignment, text);
-					} else if (text.startsWith("compatible")) {
-						Matcher m = p.matcher(text);
-						System.out.print("Compatible: ");
-						while (m.find()) {
-							Integer varId = Integer.parseInt(m.group(1));
-							System.out.print(solver.parent.printAtom(varId) + " / ");
-						}
-						System.out.println();
+//					} else if (text.startsWith("compatible")) {
+//						System.out.println(text);
+//						Matcher m = p.matcher(text);
+//						System.out.print("Compatible: ");
+//						while (m.find()) {
+//							Integer varId = Integer.parseInt(m.group(1));
+//							System.out.print(solver.parent.printAtom(varId) + " / ");
+//						}
+//						System.out.println();
 					}
 				}
 				if (!assignments.contains(assignment)) {

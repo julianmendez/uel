@@ -159,7 +159,7 @@ public class ClingoSolver implements AspSolver {
 				new InputStreamReader(AspUnificationAlgorithm.class.getResourceAsStream(resourceName)));
 		String line = null;
 		while ((line = reader.readLine()) != null) {
-			System.out.println(line);
+			// System.out.println(line);
 			output.append(line);
 			output.append(System.lineSeparator());
 		}

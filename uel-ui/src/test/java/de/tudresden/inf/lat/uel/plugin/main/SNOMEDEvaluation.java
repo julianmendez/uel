@@ -48,8 +48,8 @@ import de.tudresden.inf.lat.uel.plugin.main.SNOMEDResult.SNOMEDStatus;
  */
 public class SNOMEDEvaluation {
 
-	private static final String WORK_DIR = "C:\\Users\\Stefan\\Work\\";
-	// static final String WORK_DIR = "/Users/stefborg/Documents/";
+	// private static final String WORK_DIR = "C:\\Users\\Stefan\\Work\\";
+	static final String WORK_DIR = "/Users/stefborg/Documents/";
 	static final String OUTPUT_PATH = WORK_DIR + "Projects/uel-snomed/results";
 	// static final String SNOMED_PATH = WORK_DIR +
 	// "Ontologies/snomed-english-rdf.owl";
@@ -163,7 +163,7 @@ public class SNOMEDEvaluation {
 		options.numberOfSiblings = -1;
 
 		// 'Difficulty writing (finding)': 30s; new: 21 s / 6,7 min
-		singleTest("SCT_102938007");
+		// singleTest("SCT_102938007");
 
 		// 'Does not use words (finding)': 12s / 42s
 		// OWLClass goalClass = cls("SCT_288613006");
@@ -209,7 +209,7 @@ public class SNOMEDEvaluation {
 		// singleTest("SCT_39745004");
 
 		// randomly select classes with full definition from SNOMED
-		// randomTests();
+		randomTests();
 	}
 
 	private static void singleTest(String id) {

@@ -1,5 +1,6 @@
 package de.tudresden.inf.lat.uel.asp.solver;
 
+import java.util.HashSet;
 import java.util.Map.Entry;
 import java.util.Set;
 
@@ -12,6 +13,7 @@ import de.tudresden.inf.lat.uel.type.api.Dissubsumption;
 import de.tudresden.inf.lat.uel.type.api.Equation;
 import de.tudresden.inf.lat.uel.type.api.Goal;
 import de.tudresden.inf.lat.uel.type.api.Subsumption;
+import de.tudresden.inf.lat.uel.type.impl.AbstractUnificationAlgorithm;
 import de.tudresden.inf.lat.uel.type.impl.ExistentialRestriction;
 
 /**
@@ -24,10 +26,13 @@ public class AspInput {
 
 	private Goal goal;
 	private String program;
+	private AbstractUnificationAlgorithm parent;
 
-	public AspInput(Goal goal) {
+	public AspInput(Goal goal, AbstractUnificationAlgorithm parent) {
 		this.goal = goal;
+		this.parent = parent;
 		updateProgram();
+//		System.out.println(program);
 	}
 
 	public String getProgram() {
@@ -41,32 +46,48 @@ public class AspInput {
 	private void updateProgram() {
 		StringBuilder encoding = new StringBuilder();
 		int i = 1;
+		Set<Integer> remainingAtoms = new HashSet<Integer>(goal.getAtomManager().getExistentialRestrictions());
+		Set<Integer> emptySet = new HashSet<Integer>();
 		for (Definition d : goal.getDefinitions()) {
-			encodeAxiom(encoding, d, i, "definition", "eq");
+			encodeAxiom(encoding, d, i, "definition", "eq", remainingAtoms);
 			i++;
 		}
 		for (Equation e : goal.getEquations()) {
-			encodeAxiom(encoding, e, i, "equation", "eq");
+			encodeAxiom(encoding, e, i, "equation", "eq", remainingAtoms);
 			i++;
 		}
 		for (Subsumption s : goal.getSubsumptions()) {
-			encodeSubsumption(encoding, s, i);
+			encodeSubsumption(encoding, s, i, remainingAtoms);
 			i++;
 		}
 		for (Disequation e : goal.getDisequations()) {
-			encodeAxiom(encoding, e, i, "disequation", "diseq");
+			encodeAxiom(encoding, e, i, "disequation", "diseq", remainingAtoms);
 			i++;
 		}
 		for (Dissubsumption s : goal.getDissubsumptions()) {
-			encodeAxiom(encoding, s, i, "dissubsumption", "dissubs");
+			encodeAxiom(encoding, s, i, "dissubsumption", "dissubs", remainingAtoms);
 			i++;
 		}
+
+		encoding.append("% Additional atoms (blank existential restrictions)");
+		encoding.append(System.lineSeparator());
+		for (Integer remainingAtom : remainingAtoms) {
+			encoding.append("atom(");
+			encodeAtom(encoding, remainingAtom, emptySet);
+			encoding.append(").");
+			encoding.append(System.lineSeparator());
+			encoding.append("atom(");
+			encodeAtom(encoding, goal.getAtomManager().getChild(remainingAtom), emptySet);
+			encoding.append(").");
+			encoding.append(System.lineSeparator());
+		}
+		encoding.append(System.lineSeparator());
 
 		encoding.append("% Types");
 		encoding.append(System.lineSeparator());
 		for (Integer type : goal.getTypes()) {
 			encoding.append("type(");
-			encodeAtom(encoding, type);
+			encodeAtom(encoding, type, emptySet);
 			encoding.append(").");
 			encoding.append(System.lineSeparator());
 		}
@@ -81,10 +102,10 @@ public class AspInput {
 				encoding.append(",");
 				if (goal.getRoleGroupTypes().containsValue(type)) {
 					encoding.append("rg(");
-					encodeAtom(encoding, goal.getAtomManager().getAtom(getOriginalType(type)));
+					encodeAtom(encoding, goal.getAtomManager().getAtom(getOriginalType(type)), emptySet);
 					encoding.append(")");
 				} else {
-					encodeAtom(encoding, type);
+					encodeAtom(encoding, type, emptySet);
 				}
 				encoding.append(").");
 				encoding.append(System.lineSeparator());
@@ -99,7 +120,7 @@ public class AspInput {
 				encoding.append("range(r");
 				encoding.append(e.getKey());
 				encoding.append(",");
-				encodeAtom(encoding, type);
+				encodeAtom(encoding, type, emptySet);
 				encoding.append(").");
 				encoding.append(System.lineSeparator());
 			}
@@ -119,13 +140,12 @@ public class AspInput {
 		for (Integer undefId : goal.getAtomManager().getUndefNames()) {
 			Integer origId = goal.getAtomManager().removeUndef(undefId);
 			encoding.append("undef(");
-			encodeAtom(encoding, origId);
+			encodeAtom(encoding, origId, emptySet);
 			encoding.append(",");
-			encodeAtom(encoding, undefId);
+			encodeAtom(encoding, undefId, emptySet);
 			encoding.append(").");
 			encoding.append(System.lineSeparator());
 		}
-		encoding.append(System.lineSeparator());
 		encoding.append(System.lineSeparator());
 
 		encoding.append("% role number restrictions");
@@ -139,6 +159,24 @@ public class AspInput {
 			encoding.append(System.lineSeparator());
 		}
 		encoding.append(System.lineSeparator());
+
+		encoding.append("% Compatibility");
+		encoding.append(System.lineSeparator());
+		for (Integer var1 : goal.getAtomManager().getVariables()) {
+			for (Integer var2 : goal.getAtomManager().getVariables()) {
+				if (goal.areCompatible(var1, var2)) {
+					// encoding.append("% " + parent.printAtom(var1) + " and " +
+					// parent.printAtom(var2));
+					// encoding.append(System.lineSeparator());
+					encoding.append("compatible(var(x");
+					encoding.append(var1);
+					encoding.append("),var(x");
+					encoding.append(var2);
+					encoding.append(")).");
+					encoding.append(System.lineSeparator());
+				}
+			}
+		}
 		encoding.append(System.lineSeparator());
 
 		encoding.append("% User variables");
@@ -163,7 +201,8 @@ public class AspInput {
 		return null;
 	}
 
-	private void encodeAxiom(StringBuilder encoding, Axiom d, int index, String comment, String predicate) {
+	private void encodeAxiom(StringBuilder encoding, Axiom d, int index, String comment, String predicate,
+			Set<Integer> remainingAtoms) {
 		encoding.append("%");
 		encoding.append(comment);
 		encoding.append(" ");
@@ -176,11 +215,11 @@ public class AspInput {
 		encoding.append(").");
 		encoding.append(System.lineSeparator());
 
-		encodeAtoms(encoding, d, index);
+		encodeAtoms(encoding, d, index, remainingAtoms);
 		encoding.append(System.lineSeparator());
 	}
 
-	private void encodeSubsumption(StringBuilder encoding, Subsumption s, int index) {
+	private void encodeSubsumption(StringBuilder encoding, Subsumption s, int index, Set<Integer> remainingAtoms) {
 		// TODO more direct ASP encoding for subsumptions
 		encoding.append("%subsumption ");
 		encoding.append(index);
@@ -191,25 +230,27 @@ public class AspInput {
 		encoding.append(").");
 		encoding.append(System.lineSeparator());
 
-		encodeAtoms(encoding, s, index);
-		encodeAtoms(encoding, s.getLeft(), 1, index);
+		encodeAtoms(encoding, s, index, remainingAtoms);
+		encodeAtoms(encoding, s.getLeft(), 1, index, remainingAtoms);
 		encoding.append(System.lineSeparator());
 	}
 
-	private void encodeAtoms(StringBuilder encoding, Axiom axiom, int index) {
-		encodeAtoms(encoding, axiom.getLeft(), 0, index);
-		encodeAtoms(encoding, axiom.getRight(), 1, index);
+	private void encodeAtoms(StringBuilder encoding, Axiom axiom, int index, Set<Integer> remainingAtoms) {
+		encodeAtoms(encoding, axiom.getLeft(), 0, index, remainingAtoms);
+		encodeAtoms(encoding, axiom.getRight(), 1, index, remainingAtoms);
 	}
 
-	private void encodeAtoms(StringBuilder encoding, Set<Integer> atomIds, int side, int index) {
+	private void encodeAtoms(StringBuilder encoding, Set<Integer> atomIds, int side, int index,
+			Set<Integer> remainingAtoms) {
 		for (Integer atomId : atomIds) {
-			encodeAtom(encoding, atomId, side, index);
+			encodeAtom(encoding, atomId, side, index, remainingAtoms);
 		}
 	}
 
-	private void encodeAtom(StringBuilder encoding, Integer atomId, int side, int equationId) {
+	private void encodeAtom(StringBuilder encoding, Integer atomId, int side, int equationId,
+			Set<Integer> remainingAtoms) {
 		encoding.append("hasatom(");
-		encodeAtom(encoding, atomId);
+		encodeAtom(encoding, atomId, remainingAtoms);
 		encoding.append(", ");
 		encoding.append(side);
 		encoding.append(", ");
@@ -218,13 +259,14 @@ public class AspInput {
 		encoding.append(System.lineSeparator());
 	}
 
-	private void encodeAtom(StringBuilder encoding, Atom atom) {
+	private void encodeAtom(StringBuilder encoding, Atom atom, Set<Integer> remainingAtoms) {
+		remainingAtoms.remove(goal.getAtomManager().getIndex(atom));
 		if (atom.isExistentialRestriction()) {
 			ExistentialRestriction ex = (ExistentialRestriction) atom;
 			encoding.append("exists(r");
 			encoding.append(ex.getRoleId());
 			encoding.append(", ");
-			encodeAtom(encoding, ex.getConceptName());
+			encodeAtom(encoding, ex.getConceptName(), remainingAtoms);
 		} else {
 			if (atom.isVariable()) {
 				encoding.append("var(x");
@@ -236,7 +278,7 @@ public class AspInput {
 		encoding.append(")");
 	}
 
-	private void encodeAtom(StringBuilder encoding, Integer origId) {
-		encodeAtom(encoding, goal.getAtomManager().getAtom(origId));
+	private void encodeAtom(StringBuilder encoding, Integer origId, Set<Integer> remainingAtoms) {
+		encodeAtom(encoding, goal.getAtomManager().getAtom(origId), remainingAtoms);
 	}
 }
