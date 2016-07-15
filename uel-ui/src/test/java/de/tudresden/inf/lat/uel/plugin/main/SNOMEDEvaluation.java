@@ -68,7 +68,7 @@ public class SNOMEDEvaluation {
 	// static final String CLASSES_LIST = WORK_DIR + "Ontologies/" +
 	// PARENT_CLASS + "NEW.txt";
 	static final String SNOMED_MODULE_PATH = WORK_DIR + "Ontologies/snomed-FunctionalFindingModule.owl";
-	static final String CLASSES_LIST = WORK_DIR + "Ontologies/FunctionaFindings.txt";
+	static final String CLASSES_LIST = WORK_DIR + "Ontologies/FunctionalFindings.txt";
 
 	static final String SNOMED_RESTR_PATH = WORK_DIR + "Ontologies/snomed-restrictions-no-imports.owl";
 
@@ -242,6 +242,7 @@ public class SNOMEDEvaluation {
 			OWLClass goalClass = axiom.getNamedClasses().iterator().next();
 			OWLClassExpression goalExpression = axiom.getClassExpressionsMinus(goalClass).iterator().next();
 			printThreadInfo();
+			System.out.println();
 			System.out.print("***** [" + i + "] ");
 			if (!runSingleTest(goalClass, goalExpression)) {
 				return;
@@ -284,7 +285,8 @@ public class SNOMEDEvaluation {
 		for (Entry<Thread, StackTraceElement[]> e : Thread.getAllStackTraces().entrySet()) {
 			Thread t = e.getKey();
 			if (!t.getName().equals("main") && !t.getName().equals("Finalizer")
-					&& !t.getName().equals("Reference Handler")) {
+					&& !t.getName().equals("Reference Handler") && !t.getName().equals("process reaper")
+					&& !t.getName().equals("Signal Dispatcher")) {
 				System.out.println("Thread " + t.getName() + ", " + t.getState());
 				for (StackTraceElement el : e.getValue()) {
 					System.out.println(el);
