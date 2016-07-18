@@ -23,7 +23,6 @@ import de.tudresden.inf.lat.uel.core.renderer.StringRenderer;
 import de.tudresden.inf.lat.uel.type.api.AtomManager;
 import de.tudresden.inf.lat.uel.type.api.Goal;
 import de.tudresden.inf.lat.uel.type.api.UnificationAlgorithm;
-import de.tudresden.inf.lat.uel.type.impl.AbstractUnificationAlgorithm;
 import de.tudresden.inf.lat.uel.type.impl.AtomManagerImpl;
 import de.tudresden.inf.lat.uel.type.impl.DefinitionSet;
 import de.tudresden.inf.lat.uel.type.impl.Unifier;
@@ -139,7 +138,8 @@ public class UelModel {
 					}
 
 					if (options.verbosity.level > 0) {
-						System.out.println("Unifier " + unifierList.size() + ":");
+						System.out
+								.println("Unifier " + unifierList.size() + ((options.verbosity.level > 1) ? ":" : ""));
 					}
 
 					switch (options.verbosity) {
@@ -317,7 +317,7 @@ public class UelModel {
 		allUnifiersFound = false;
 		algorithm = UnificationAlgorithmFactory.instantiateAlgorithm(options.unificationAlgorithmName, goal);
 		postprocessor = new UnifierPostprocessor(atomManager, goal, getStringRenderer(null));
-		((AbstractUnificationAlgorithm) algorithm).setShortFormMap(getStringRenderer(null)::getShortForm);
+		algorithm.setShortFormMap(getStringRenderer(null)::getShortForm);
 	}
 
 	private boolean isNew(Unifier newUnifier) {

@@ -1,6 +1,5 @@
 package de.tudresden.inf.lat.uel.rule;
 
-import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -9,7 +8,6 @@ import java.util.Deque;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import de.tudresden.inf.lat.uel.rule.rules.DecompositionRule;
@@ -76,24 +74,17 @@ public class RuleBasedUnificationAlgorithm extends AbstractUnificationAlgorithm 
 	 */
 	public RuleBasedUnificationAlgorithm(Goal goal) {
 		super(goal);
-		this.normalizedGoal = new NormalizedGoal(goal);
 		if (goal.hasNegativePart()) {
 			throw new UnsupportedOperationException(
 					"The rule-based algorithm cannot deal with dissubsubmptions or disequations!");
 		}
+		if (!goal.getTypes().isEmpty()) {
+			throw new UnsupportedOperationException("The rule-based algorithm cannot deal with type information!");
+		}
+		this.normalizedGoal = null;
 		this.assignment = new Assignment();
 		addInfo(keyName, algorithmName);
-		addInfo(keyInitialSubs, normalizedGoal.size());
 		addInfo(keyNumberOfVariables, goal.getAtomManager().getVariables().size());
-
-		for (FlatSubsumption sub : normalizedGoal) {
-			if (sub.getHead().isVariable()) {
-				// subsumptions with a variable on the right-hand side are
-				// always solved
-				sub.setSolved(true);
-			}
-		}
-
 		initRules();
 	}
 
@@ -101,10 +92,6 @@ public class RuleBasedUnificationAlgorithm extends AbstractUnificationAlgorithm 
 	public void cleanup() {
 		// reset computation of results
 		searchStack = null;
-	}
-
-	private boolean addEntry(List<Entry<String, String>> list, String key, String value) {
-		return list.add(new SimpleEntry<String, String>(key, value));
 	}
 
 	@Override
@@ -140,6 +127,19 @@ public class RuleBasedUnificationAlgorithm extends AbstractUnificationAlgorithm 
 	 *         subsumptions
 	 */
 	public boolean computeNextUnifier() throws InterruptedException {
+		if (normalizedGoal == null) {
+			normalizedGoal = new NormalizedGoal(goal);
+			addInfo(keyInitialSubs, normalizedGoal.size());
+			for (FlatSubsumption sub : normalizedGoal) {
+				if (sub.getHead().isVariable()) {
+					// subsumptions with a variable on the right-hand side are
+					// always solved
+					sub.setSolved(true);
+				}
+			}
+			callbackPreprocessing();
+		}
+
 		if (searchStack == null) {
 			searchStack = new ArrayDeque<Result>();
 

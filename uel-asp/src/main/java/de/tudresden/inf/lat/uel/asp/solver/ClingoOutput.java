@@ -11,10 +11,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
+import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import de.tudresden.inf.lat.uel.type.api.Atom;
@@ -57,6 +57,9 @@ public class ClingoOutput implements AspOutput {
 	 * Parse JSON output.
 	 */
 	private void parse(InputStream jsonStream) throws IOException {
+
+//		JsonParser p = new JsonFactory().createJsonParser(jsonStream);
+
 		ObjectMapper mapper = new ObjectMapper();
 		JsonNode root = mapper.readValue(jsonStream, JsonNode.class);
 
@@ -65,26 +68,27 @@ public class ClingoOutput implements AspOutput {
 		if (result.equals(SATISFIABLE) || result.equals(OPTIMUM_FOUND)) {
 			// Witnesses -> assignments (using atomManager)
 			for (JsonNode witness : root.get("Call").get(0).get("Witnesses")) {
-//				System.out.println();
-//				System.out.println();
-//				System.out.println("New Witness!");
-//				System.out.println();
-//				System.out.println();
+				// System.out.println();
+				// System.out.println();
+				// System.out.println("New Witness!");
+				// System.out.println();
+				// System.out.println();
 				Map<Integer, Set<Integer>> assignment = new HashMap<Integer, Set<Integer>>();
-//				Pattern p = Pattern.compile("var\\(x(.*?)\\)");
+				// Pattern p = Pattern.compile("var\\(x(.*?)\\)");
 				for (JsonNode subsumption : witness.get("Value")) {
 					String text = subsumption.asText();
 					if (text.startsWith("relsubs")) {
 						extendAssignment(assignment, text);
-//					} else if (text.startsWith("compatible")) {
-//						System.out.println(text);
-//						Matcher m = p.matcher(text);
-//						System.out.print("Compatible: ");
-//						while (m.find()) {
-//							Integer varId = Integer.parseInt(m.group(1));
-//							System.out.print(solver.parent.printAtom(varId) + " / ");
-//						}
-//						System.out.println();
+						// } else if (text.startsWith("compatible")) {
+						// System.out.println(text);
+						// Matcher m = p.matcher(text);
+						// System.out.print("Compatible: ");
+						// while (m.find()) {
+						// Integer varId = Integer.parseInt(m.group(1));
+						// System.out.print(solver.parent.printAtom(varId) + " /
+						// ");
+						// }
+						// System.out.println();
 					}
 				}
 				if (!assignments.contains(assignment)) {

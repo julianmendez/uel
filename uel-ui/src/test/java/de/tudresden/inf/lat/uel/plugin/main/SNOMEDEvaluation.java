@@ -23,6 +23,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
@@ -36,11 +37,13 @@ import org.semanticweb.owlapi.search.EntitySearcher;
 import com.google.common.base.Stopwatch;
 
 import de.tudresden.inf.lat.uel.core.main.AlternativeUelStarter;
+import de.tudresden.inf.lat.uel.core.main.UnifierIterator;
 import de.tudresden.inf.lat.uel.core.processor.UelOptions;
 import de.tudresden.inf.lat.uel.core.processor.UelOptions.UndefBehavior;
 import de.tudresden.inf.lat.uel.core.processor.UelOptions.Verbosity;
 import de.tudresden.inf.lat.uel.core.processor.UnificationAlgorithmFactory;
-import de.tudresden.inf.lat.uel.plugin.main.SNOMEDResult.SNOMEDStatus;
+import de.tudresden.inf.lat.uel.plugin.main.SNOMEDAlgorithmResult.SNOMEDAlgorithmStatus;
+import de.tudresden.inf.lat.uel.plugin.main.SNOMEDResult.SNOMEDGoalStatus;
 
 /**
  * @author Stefan Borgwardt
@@ -72,9 +75,14 @@ public class SNOMEDEvaluation {
 
 	static final String SNOMED_RESTR_PATH = WORK_DIR + "Ontologies/snomed-restrictions-no-imports.owl";
 
+	static final String[] TEST_ALGORITHMS = new String[] { UnificationAlgorithmFactory.SAT_BASED_ALGORITHM,
+			UnificationAlgorithmFactory.SAT_BASED_ALGORITHM_MINIMAL, UnificationAlgorithmFactory.ASP_BASED_ALGORITHM,
+			UnificationAlgorithmFactory.ASP_BASED_ALGORITHM_MINIMAL };
+
 	static final int MAX_SIBLINGS = 100;
 	static final int MAX_ATOMS = 240;
-	private static final int MAX_TESTS = 1000;
+	static final boolean CHECK_UNIFIERS = true;
+	private static final int MAX_TESTS = 100;
 	private static final long TIMEOUT = 10 * 60 * 1000;
 
 	private static Date startTime;
@@ -106,25 +114,65 @@ public class SNOMEDEvaluation {
 				System.out.println("Saving results to file...");
 				PrintStream out = new PrintStream(OUTPUT_PATH
 						+ new SimpleDateFormat("yyMMddHHmmss").format(Calendar.getInstance().getTime()) + ".txt");
+
+				out.println("* UEL options:");
 				out.println(options);
+
+				out.println("* Test options:");
 				out.println("Timeout (s): " + (TIMEOUT / 1000));
 				out.println("Ontology path: " + SNOMED_MODULE_PATH);
 				out.println("List of goal classes: " + CLASSES_LIST);
 				out.println("Cut-off for number of siblings of the goal class: " + MAX_SIBLINGS);
 				out.println("Cut-off for number of atoms: " + MAX_ATOMS);
-				Format f = new SimpleDateFormat("dd.MM.yy HH:mm:ss");
-				out.println("Start: " + f.format(startTime));
-				out.println("End: " + f.format(Calendar.getInstance().getTime()));
+				out.println("Check unifiers for correctness: " + CHECK_UNIFIERS);
 				out.println();
-				out.println(
-						"Goal class                              |Status    |Build |Size  |Pre   |First |Goal  |All   |Number");
-				out.println(
-						"----------------------------------------+----------+------+------+------+------+------+------+------");
-				for (SNOMEDResult result : results) {
-					out.printf("%-40s|%-10s|%5ds|%6d|%5ds|%5ds|%5ds|%5ds|%6d%n", result.goalClass, result.status,
-							result.buildGoal, result.goalSize, result.preprocessing, result.firstUnifier,
-							result.goalUnifier, result.allUnifiers, result.numberOfSolutions);
+
+				out.println("* Test results:");
+				out.println("Goal class / algorithm                  |  Result  | Time |   #");
+				float successful = 0;
+				float disagreed = 0;
+				float complete = 0;
+				for (int i = 0; i < results.size(); i++) {
+					SNOMEDResult result = results.get(i);
+					out.println("----------------------------------------+----------+------+------");
+					out.printf("%-40s|%-10s|%5ds|%6d%n", result.goalClass, result.goalStatus, result.buildGoal,
+							result.goalSize);
+
+					Set<SNOMEDAlgorithmStatus> collectedResults = new HashSet<SNOMEDAlgorithmStatus>();
+					for (SNOMEDAlgorithmResult algorithmResult : result.algorithmResults) {
+						if ((algorithmResult.status == SNOMEDAlgorithmStatus.SUCCESS)
+								|| (algorithmResult.status == SNOMEDAlgorithmStatus.FAILURE)) {
+							collectedResults.add(algorithmResult.status);
+						}
+						out.printf(" *** %-35s|%-10s|%5ds|%6d%n",
+								UnificationAlgorithmFactory.shortString(algorithmResult.unificationAlgorithmName),
+								algorithmResult.status, algorithmResult.totalTime, algorithmResult.numberOfSolutions);
+					}
+					if (result.goalStatus == SNOMEDGoalStatus.COMPLETE) {
+						// disregard incomplete test cases for averaging
+						if (collectedResults.contains(SNOMEDAlgorithmStatus.SUCCESS)) {
+							successful++;
+							if (collectedResults.contains(SNOMEDAlgorithmStatus.FAILURE)) {
+								disagreed++;
+							}
+						}
+						complete++;
+					}
 				}
+				out.println();
+
+				out.println("* Test summary:");
+				Format f = new SimpleDateFormat("dd.MM.yy HH:mm:ss");
+				out.println("Start time: " + f.format(startTime));
+				out.println("End time: " + f.format(Calendar.getInstance().getTime()));
+				out.println("Total test cases: " + results.size());
+				out.println("Completed test cases: " + ((int) complete) + " ("
+						+ (100 * complete / (float) results.size()) + "% of all test cases)");
+				out.println("Successful test cases: " + ((int) successful) + " (" + (100 * successful / complete)
+						+ "% of all completed test cases)");
+				out.println("Test cases with disagreement: " + ((int) disagreed) + " (" + (100 * disagreed / complete)
+						+ "% of all completed test cases)");
+
 				out.close();
 			} catch (FileNotFoundException ex) {
 				ex.printStackTrace();
@@ -154,7 +202,7 @@ public class SNOMEDEvaluation {
 		options.verbosity = Verbosity.SHORT;
 		options.undefBehavior = UndefBehavior.CONSTANTS;
 		options.snomedMode = true;
-		options.unificationAlgorithmName = UnificationAlgorithmFactory.ASP_BASED_ALGORITHM;
+		options.unificationAlgorithmName = TEST_ALGORITHMS[0];
 		options.expandPrimitiveDefinitions = true;
 		options.restrictUndefContext = true;
 		options.numberOfRoleGroups = 1;
@@ -162,64 +210,71 @@ public class SNOMEDEvaluation {
 		options.noEquivalentSolutions = true;
 		options.numberOfSiblings = -1;
 
-		// 'Difficulty writing (finding)': 30s; new: 21 s / 6,7 min
-		// singleTest("SCT_102938007");
+		try {
 
-		// 'Does not use words (finding)': 12s / 42s
-		// OWLClass goalClass = cls("SCT_288613006");
+			// 'Difficulty writing (finding)': 30s; new: 21 s / 6,7 min
+			// singleTest("SCT_102938007");
 
-		// 'Circumlocution (finding)': too large (1732 atoms), primitive!
-		// OWLClass goalClass = cls("SCT_48364004");
+			// 'Does not use words (finding)': 12s / 42s
+			// OWLClass goalClass = cls("SCT_288613006");
 
-		// 'Finding relating to crying (finding)': too large (1816 atoms)
-		// OWLClass goalClass = cls("SCT_303220007");
+			// 'Circumlocution (finding)': too large (1732 atoms), primitive!
+			// OWLClass goalClass = cls("SCT_48364004");
 
-		// 'Routine procedure (procedure)':
-		// OWLClass goalClass = cls("SCT_373113001");
+			// 'Finding relating to crying (finding)': too large (1816 atoms)
+			// OWLClass goalClass = cls("SCT_303220007");
 
-		// 'Contraception (finding)': impossible
-		// OWLClass goalClass = cls("SCT_13197004");
+			// 'Routine procedure (procedure)':
+			// OWLClass goalClass = cls("SCT_373113001");
 
-		// 'Calculus finding (finding)': too large
-		// OWLClass goalClass = cls("SCT_313413008");
+			// 'Contraception (finding)': impossible
+			// OWLClass goalClass = cls("SCT_13197004");
 
-		// 'Abnormal gallbladder function (finding)': huge (3718 atoms)
-		// OWLClass goalClass = cls("SCT_51047007");
+			// 'Calculus finding (finding)': too large
+			// OWLClass goalClass = cls("SCT_313413008");
 
-		// 'Unable to air laundry (finding)': needs 3 RoleGroups; 1min (5) / >
-		// 20min
-		// OWLClass goalClass = cls("SCT_286073006");
+			// 'Abnormal gallbladder function (finding)': huge (3718 atoms)
+			// OWLClass goalClass = cls("SCT_51047007");
 
-		// 'Echoencephalogram abnormal (finding)': too large
-		// OWLClass goalClass = cls(factory, "SCT_274538008");
+			// 'Unable to air laundry (finding)': needs 3 RoleGroups; 1min (5) /
+			// >
+			// 20min
+			// OWLClass goalClass = cls("SCT_286073006");
 
-		// 'Primary malignant neoplasm of pyriform sinus (disorder)'
-		//
+			// 'Echoencephalogram abnormal (finding)': too large
+			// OWLClass goalClass = cls(factory, "SCT_274538008");
 
-		// 'Entire left kidney (body structure)'
-		// OWLClass goalClass = cls(factory, "SCT_362209008");
+			// 'Primary malignant neoplasm of pyriform sinus (disorder)'
+			//
 
-		// 'Finding related to ability to use contact lenses (finding)'
-		// OWLClass goalClass = cls(factory, "SCT_365239009");
+			// 'Entire left kidney (body structure)'
+			// OWLClass goalClass = cls(factory, "SCT_362209008");
 
-		// 'Biguanide overdose (disorder)'
-		// singleTest("SCT_296872003", snomed, bg);
+			// 'Finding related to ability to use contact lenses (finding)'
+			// OWLClass goalClass = cls(factory, "SCT_365239009");
 
-		// 'Chronic progressive epilepsia partialis continua (disorder)'
-		// singleTest("SCT_39745004");
+			// 'Biguanide overdose (disorder)'
+			// singleTest("SCT_296872003", snomed, bg);
 
-		// randomly select classes with full definition from SNOMED
-		randomTests();
+			// 'Chronic progressive epilepsia partialis continua (disorder)'
+			// singleTest("SCT_39745004");
+
+			// randomly select classes with full definition from SNOMED
+			randomTests();
+
+		} catch (InterruptedException ex) {
+			ex.printStackTrace();
+		}
 	}
 
-	private static void singleTest(String id) {
+	private static void runSingleTest(String id) throws InterruptedException {
 		OWLClass goalClass = cls(id);
 		OWLClassExpression goalExpression = ((OWLEquivalentClassesAxiom) snomed.getAxioms(goalClass, Imports.EXCLUDED)
 				.iterator().next()).getClassExpressionsMinus(goalClass).iterator().next();
 		runSingleTest(goalClass, goalExpression);
 	}
 
-	private static void randomTests() {
+	private static void randomTests() throws InterruptedException {
 		List<OWLEquivalentClassesAxiom> definitions = new ArrayList<OWLEquivalentClassesAxiom>();
 		try {
 			for (String line : Files.readAllLines(Paths.get(CLASSES_LIST))) {
@@ -241,34 +296,60 @@ public class SNOMEDEvaluation {
 			definitions.remove(axiom);
 			OWLClass goalClass = axiom.getNamedClasses().iterator().next();
 			OWLClassExpression goalExpression = axiom.getClassExpressionsMinus(goalClass).iterator().next();
-			printThreadInfo();
 			System.out.println();
 			System.out.print("***** [" + i + "] ");
-			if (!runSingleTest(goalClass, goalExpression)) {
-				return;
-			}
+			runSingleTest(goalClass, goalExpression);
 		}
 	}
 
-	private static boolean runSingleTest(OWLClass goalClass, OWLClassExpression goalExpression) {
+	private static void runSingleTest(OWLClass goalClass, OWLClassExpression goalExpression)
+			throws InterruptedException {
+
 		System.out.println("Goal class: " + EntitySearcher.getAnnotations(goalClass, snomed, factory.getRDFSLabel())
 				.iterator().next().getValue().asLiteral().get().getLiteral());
-		SNOMEDTest test = new SNOMEDTest(options, snomed, bg, goalClass, goalExpression);
-		test.start();
-		try {
-			test.join(TIMEOUT);
-		} catch (InterruptedException ex) {
-			ex.printStackTrace();
-			return false;
-		}
 
-		SNOMEDResult result = test.result;
-		if (test.isAlive()) {
-			test.interrupt();
-			result.status = SNOMEDStatus.TIMEOUT;
+		printThreadInfo();
+		SNOMEDTestInitialization initRunner = new SNOMEDTestInitialization(options, snomed, bg, goalClass,
+				goalExpression);
+		Thread initThread = new Thread(initRunner);
+		initThread.start();
+		initThread.join(TIMEOUT);
+		SNOMEDResult result = initRunner.result;
+		if (initThread.isAlive()) {
+			initThread.interrupt();
+			result.goalStatus = SNOMEDGoalStatus.TIMEOUT;
 		}
 		results.add(result);
-		return true;
+
+		if (result.goalStatus == SNOMEDGoalStatus.SUCCESS) {
+			// the goal was constructed successfully, start unification tests
+			UnifierIterator iterator = initRunner.iterator;
+			OWLOntology pos = initRunner.pos;
+			OWLOntology neg = initRunner.neg;
+			OWLAxiom goalAxiom = initRunner.goalAxiom;
+			initThread = null;
+
+			for (int i = 0; i < TEST_ALGORITHMS.length; i++) {
+				printThreadInfo();
+				System.out.println("** Unification algorithm " + (i + 1) + ": " + TEST_ALGORITHMS[i]);
+				options.unificationAlgorithmName = TEST_ALGORITHMS[i];
+				iterator = iterator.resetModel();
+
+				SNOMEDTest algorithmRunner = new SNOMEDTest(iterator, options, pos, neg, goalAxiom);
+				Thread algorithmThread = new Thread(algorithmRunner);
+				algorithmThread.start();
+				algorithmThread.join(TIMEOUT);
+				SNOMEDAlgorithmResult algorithmResult = algorithmRunner.result;
+				if (algorithmThread.isAlive()) {
+					algorithmThread.interrupt();
+					algorithmResult.status = SNOMEDAlgorithmStatus.TIMEOUT;
+				}
+				result.algorithmResults.add(algorithmResult);
+			}
+
+			// all individual tests for this goal class have been completed
+			result.goalStatus = SNOMEDGoalStatus.COMPLETE;
+		}
 	}
 
 	static long output(Stopwatch timer, String description, boolean reset) {

@@ -148,9 +148,6 @@ public class UelOptions {
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 
-		sb.append("UEL Options:");
-		sb.append(System.lineSeparator());
-
 		sb.append("Expand primitive definitions: ");
 		sb.append(expandPrimitiveDefinitions);
 		sb.append(System.lineSeparator());

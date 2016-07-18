@@ -111,54 +111,54 @@ public abstract class AbstractSatUnificationAlgorithm extends AbstractUnificatio
 	protected SatInput computeSatInput() throws InterruptedException {
 		input = new SatInput();
 
-		System.out.println("a");
+//		System.out.println("a");
 		encodeGoal();
-		System.out.println("b");
+//		System.out.println("b");
 		encodeSubsumptionBetweenConstants();
-		System.out.println("c");
+//		System.out.println("c");
 		encodeSubsumptionBetweenExistentialRestrictions();
-		System.out.println("d");
+//		System.out.println("d");
 		encodeSubsumptionBetweenConstantsAndExistentialRestrictions();
-		System.out.println("e");
+//		System.out.println("e");
 		checkInterrupted();
 
 		encodeTransitivityOfSubsumption();
-		System.out.println("f");
+//		System.out.println("f");
 		checkInterrupted();
 
 		encodeReflexivityOfOrder();
-		System.out.println("g");
+//		System.out.println("g");
 		encodeTransitivityOfOrder();
-		System.out.println("h");
+//		System.out.println("h");
 		checkInterrupted();
 
 		encodeConnectionBetweenOrderAndSubsumption();
-		System.out.println("i");
+//		System.out.println("i");
 
 		if (goal.hasNegativePart()) {
 			// add clauses with auxiliary variables needed for soundness of
 			// disunification
 			encodeConditionsForDissubsumptions();
-			System.out.println("j");
+//			System.out.println("j");
 			checkInterrupted();
 		}
 
 		if (!goal.getTypes().isEmpty()) {
 			// encode type restrictions
 			encodeTypeRestrictions();
-			System.out.println("k");
+//			System.out.println("k");
 			checkInterrupted();
 		}
 
 		if (!goal.getRoleNumberRestrictions().isEmpty()) {
 			encodeRoleNumberRestrictionsAndCompatibility();
-			System.out.println("l");
+//			System.out.println("l");
 			checkInterrupted();
 		}
 
 		if (goal.restrictUndefContext()) {
 			encodeUndefContextRestriction();
-			System.out.println("m");
+//			System.out.println("m");
 			checkInterrupted();
 		}
 

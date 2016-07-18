@@ -95,4 +95,10 @@ public class UnifierIterator implements Iterator<Set<OWLEquivalentClassesAxiom>>
 		throw new UnsupportedOperationException();
 	}
 
+	public UnifierIterator resetModel() {
+		cleanup();
+		uelModel.initializeUnificationAlgorithm();
+		return new UnifierIterator(uelModel);
+	}
+
 }

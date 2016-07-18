@@ -18,12 +18,14 @@ public class AspUnificationAlgorithm extends AbstractUnificationAlgorithm {
 	private boolean initialized;
 	private Unifier currentUnifier;
 	private boolean minimize;
+	private boolean hasNext;
 
 	public AspUnificationAlgorithm(Goal goal, boolean minimize) {
 		super(goal);
 		this.initialized = false;
 		this.currentUnifier = null;
 		this.minimize = minimize;
+		this.hasNext = false;
 	}
 
 	@Override
@@ -41,6 +43,7 @@ public class AspUnificationAlgorithm extends AbstractUnificationAlgorithm {
 		if (!initialized) {
 			aspInput = new AspInput(goal, this);
 			addInfo("ASP encoding", aspInput.getProgram());
+			callbackPreprocessing();
 			AspSolver solver = new ClingoSolver(goal.hasNegativePart(), !goal.getTypes().isEmpty(), minimize, this);
 			try {
 				aspOutput = solver.solve(aspInput);
@@ -50,15 +53,8 @@ public class AspUnificationAlgorithm extends AbstractUnificationAlgorithm {
 			initialized = true;
 		}
 
-		boolean hasNext = aspOutput.hasNext();
-
-		if (Thread.interrupted()) {
-			throw new InterruptedException();
-		}
-
-		if (hasNext) {
-			currentUnifier = toUnifier(aspOutput.next());
-		}
+		hasNext = aspOutput.hasNext();
+		currentUnifier = null;
 		return hasNext;
 	}
 
@@ -67,8 +63,11 @@ public class AspUnificationAlgorithm extends AbstractUnificationAlgorithm {
 		if (aspOutput == null) {
 			throw new IllegalStateException("The unifiers have not been computed yet.");
 		}
-		if (!aspOutput.hasNext()) {
+		if (!hasNext) {
 			throw new IllegalStateException("There are no more unifiers.");
+		}
+		if (currentUnifier == null) {
+			currentUnifier = toUnifier(aspOutput.next());
 		}
 
 		return currentUnifier;

@@ -2,6 +2,7 @@ package de.tudresden.inf.lat.uel.type.api;
 
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.function.Function;
 
 import de.tudresden.inf.lat.uel.type.impl.Unifier;
 
@@ -31,6 +32,15 @@ public interface UnificationAlgorithm {
 	boolean computeNextUnifier() throws InterruptedException;
 
 	/**
+	 * Returns information about the last computation. This information can
+	 * contain, for example, the processor's name or the number of (atom)
+	 * variables required.
+	 * 
+	 * @return information about the last computation
+	 */
+	List<Entry<String, String>> getInfo();
+
+	/**
 	 * Returns the result of the last computation.
 	 * 
 	 * @return the result of the last computation
@@ -40,13 +50,8 @@ public interface UnificationAlgorithm {
 	 */
 	Unifier getUnifier();
 
-	/**
-	 * Returns information about the last computation. This information can
-	 * contain, for example, the processor's name or the number of (atom)
-	 * variables required.
-	 * 
-	 * @return information about the last computation
-	 */
-	public List<Entry<String, String>> getInfo();
+	void setCallbackPreprocessing(Runnable r);
+
+	void setShortFormMap(Function<String, String> map);
 
 }

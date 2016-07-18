@@ -23,12 +23,13 @@ import de.tudresden.inf.lat.uel.type.api.UnificationAlgorithm;
  */
 public abstract class AbstractUnificationAlgorithm implements UnificationAlgorithm {
 
+	private Runnable callbackPreprocessing = null;
 	protected final Set<Integer> conceptNames = new HashSet<Integer>();
 	protected final Goal goal;
 	private List<Entry<String, String>> info = new ArrayList<Entry<String, String>>();
 	protected final Set<Integer> nonVariableAtoms = new HashSet<Integer>();
-	private final Set<Integer> usedAtomIds = new HashSet<Integer>();
 	private Function<String, String> shortFormMap = Function.identity();
+	private final Set<Integer> usedAtomIds = new HashSet<Integer>();
 
 	protected AbstractUnificationAlgorithm(Goal goal) {
 		this.goal = goal;
@@ -43,6 +44,12 @@ public abstract class AbstractUnificationAlgorithm implements UnificationAlgorit
 	protected void addInfo(String key, Object value) {
 		info.removeAll(info.stream().filter(e -> e.getKey().equals(key)).collect(Collectors.toList()));
 		info.add(new SimpleEntry<String, String>(key, value.toString()));
+	}
+
+	protected void callbackPreprocessing() {
+		if (callbackPreprocessing != null) {
+			callbackPreprocessing.run();
+		}
 	}
 
 	protected Set<Integer> getConceptNames() {
@@ -79,8 +86,6 @@ public abstract class AbstractUnificationAlgorithm implements UnificationAlgorit
 		return goal.getAtomManager().getVariables();
 	}
 
-	protected abstract void updateInfo();
-
 	public String printAtom(Integer atomId) {
 		Atom a = goal.getAtomManager().getAtom(atomId);
 		if (a instanceof ExistentialRestriction) {
@@ -105,8 +110,16 @@ public abstract class AbstractUnificationAlgorithm implements UnificationAlgorit
 		return sb.toString();
 	}
 
+	@Override
+	public void setCallbackPreprocessing(Runnable r) {
+		callbackPreprocessing = r;
+	}
+
+	@Override
 	public void setShortFormMap(Function<String, String> map) {
 		shortFormMap = map;
 	}
+
+	protected abstract void updateInfo();
 
 }

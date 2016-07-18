@@ -65,4 +65,8 @@ public class UnificationAlgorithmFactory {
 		return Collections.unmodifiableList(ret);
 	}
 
+	public static Object shortString(String unificationAlgorithmName) {
+		return unificationAlgorithmName.replace("-based algorithm", "").replace(" assignments", "");
+	}
+
 }
