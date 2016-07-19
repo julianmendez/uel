@@ -205,7 +205,7 @@ public class SNOMEDEvaluation {
 		options.unificationAlgorithmName = TEST_ALGORITHMS[0];
 		options.expandPrimitiveDefinitions = true;
 		options.restrictUndefContext = true;
-		options.numberOfRoleGroups = 1;
+		options.numberOfRoleGroups = 2;
 		options.minimizeSolutions = true;
 		options.noEquivalentSolutions = true;
 		options.numberOfSiblings = -1;

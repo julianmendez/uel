@@ -27,6 +27,9 @@
 %        number(R,N), atom(var(X)), M = { subs(var(X),exists(R,C)) }, N < M.
 1 { subs(C,D):compatible(C,D); subs(D,C):compatible(D,C) } :-
         number(R,1), subs(var(X),exists(R,C)), subs(var(X),exists(R,D)), C!=D.
+1 { subs(C,D):compatible(C,D); subs(D,C):compatible(D,C); subs(C,E):compatible(C,E); subs(E,C):compatible(E,C);
+    subs(D,E):compatible(D,E); subs(E,D):compatible(E,D) } :-
+        number(R,2), subs(var(X),exists(R,C)), subs(var(X),exists(R,D)), subs(var(X),exists(R,E)), C!=D, D!=E, C!=E.
 
 % Two variables in the same substitution set must be compatible
 :- subs(var(X),var(Y)), subs(var(X),var(Z)), not compatible(var(Y),var(Z)).

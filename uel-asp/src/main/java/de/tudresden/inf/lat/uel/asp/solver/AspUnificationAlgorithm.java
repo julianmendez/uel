@@ -54,7 +54,9 @@ public class AspUnificationAlgorithm extends AbstractUnificationAlgorithm {
 		}
 
 		hasNext = aspOutput.hasNext();
-		currentUnifier = null;
+		if (hasNext) {
+			currentUnifier = toUnifier(aspOutput.next());
+		}
 		return hasNext;
 	}
 
@@ -67,7 +69,7 @@ public class AspUnificationAlgorithm extends AbstractUnificationAlgorithm {
 			throw new IllegalStateException("There are no more unifiers.");
 		}
 		if (currentUnifier == null) {
-			currentUnifier = toUnifier(aspOutput.next());
+			throw new IllegalStateException("Failed to compute unifier.");
 		}
 
 		return currentUnifier;

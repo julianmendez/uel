@@ -12,9 +12,7 @@ import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
-import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import de.tudresden.inf.lat.uel.type.api.Atom;
@@ -56,9 +54,9 @@ public class ClingoOutput implements AspOutput {
 	/**
 	 * Parse JSON output.
 	 */
-	private void parse(InputStream jsonStream) throws IOException {
+	private void parse(InputStream jsonStream) throws IOException, InterruptedException {
 
-//		JsonParser p = new JsonFactory().createJsonParser(jsonStream);
+		// JsonParser p = new JsonFactory().createJsonParser(jsonStream);
 
 		ObjectMapper mapper = new ObjectMapper();
 		JsonNode root = mapper.readValue(jsonStream, JsonNode.class);
@@ -93,6 +91,10 @@ public class ClingoOutput implements AspOutput {
 				}
 				if (!assignments.contains(assignment)) {
 					assignments.add(assignment);
+				}
+
+				if (Thread.interrupted()) {
+					throw new InterruptedException();
 				}
 			}
 		}
@@ -149,7 +151,8 @@ public class ClingoOutput implements AspOutput {
 		return stats;
 	}
 
-	public boolean hasNext() {
+	@Override
+	public boolean hasNext() throws InterruptedException {
 		if (currentIndex + 1 < assignments.size()) {
 			// we still have pre-computed assignments left
 			return true;
@@ -181,18 +184,13 @@ public class ClingoOutput implements AspOutput {
 	}
 
 	@Override
-	public Map<Integer, Set<Integer>> next() {
+	public Map<Integer, Set<Integer>> next() throws InterruptedException {
 		if (!hasNext()) {
 			throw new NoSuchElementException();
 		}
 
 		currentIndex++;
 		return assignments.get(currentIndex);
-	}
-
-	@Override
-	public void remove() {
-		throw new UnsupportedOperationException();
 	}
 
 }
