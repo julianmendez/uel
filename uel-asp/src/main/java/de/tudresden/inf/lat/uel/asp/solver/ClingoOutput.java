@@ -12,8 +12,10 @@ import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.JsonFactory;
+import org.codehaus.jackson.JsonParseException;
+import org.codehaus.jackson.JsonParser;
+import org.codehaus.jackson.JsonToken;
 
 import de.tudresden.inf.lat.uel.type.api.Atom;
 import de.tudresden.inf.lat.uel.type.api.AtomManager;
@@ -28,22 +30,45 @@ import de.tudresden.inf.lat.uel.type.impl.ExistentialRestriction;
  */
 public class ClingoOutput implements AspOutput {
 
-	private static String SATISFIABLE = "SATISFIABLE";
-	private static String OPTIMUM_FOUND = "OPTIMUM FOUND";
+	private class MyInputStream extends InputStream {
+		InputStream inner;
+		int i = 0;
 
-	private ClingoSolver solver;
-	private AtomManager atomManager;
-	private List<Map<Integer, Set<Integer>>> assignments;
-	private List<Entry<String, String>> stats;
-	private int currentIndex;
-	private boolean finished;
+		MyInputStream(InputStream inner) {
+			this.inner = inner;
+		}
 
-	public ClingoOutput(ClingoSolver solver, AtomManager atomManager) {
+		@Override
+		public int read() throws IOException {
+			i++;
+			if ((i % 4000) == 0) {
+				System.out.print("#");
+			}
+			int ret = inner.read();
+			// System.out.print((char) ret);
+			return ret;
+		}
+
+	}
+
+	private final AtomManager atomManager;
+	private Map<Integer, Set<Integer>> currentAssignment = null;
+	private boolean hasNext = false;
+	private final List<Entry<String, String>> info;
+	private boolean isComputed = false;
+	private JsonParser parser = null;
+	private final InputStream jsonStream;
+	private final ClingoSolver solver;
+
+	public ClingoOutput(InputStream jsonStream, AtomManager atomManager, ClingoSolver solver) throws IOException {
+		this.jsonStream = jsonStream;
 		this.solver = solver;
 		this.atomManager = atomManager;
-		this.assignments = new ArrayList<Map<Integer, Set<Integer>>>();
-		this.currentIndex = -1;
-		this.finished = false;
+		this.info = new ArrayList<Entry<String, String>>();
+	}
+
+	private boolean addInfo(String key, String value) {
+		return info.add(new AbstractMap.SimpleEntry<String, String>(key, value));
 	}
 
 	@Override
@@ -51,63 +76,41 @@ public class ClingoOutput implements AspOutput {
 		solver.cleanup();
 	}
 
-	/**
-	 * Parse JSON output.
-	 */
-	private void parse(InputStream jsonStream) throws IOException, InterruptedException {
-
-		// JsonParser p = new JsonFactory().createJsonParser(jsonStream);
-
-		ObjectMapper mapper = new ObjectMapper();
-		JsonNode root = mapper.readValue(jsonStream, JsonNode.class);
-
-		// Result -> satisfiable
-		String result = root.get("Result").asText();
-		if (result.equals(SATISFIABLE) || result.equals(OPTIMUM_FOUND)) {
-			// Witnesses -> assignments (using atomManager)
-			for (JsonNode witness : root.get("Call").get(0).get("Witnesses")) {
-				// System.out.println();
-				// System.out.println();
-				// System.out.println("New Witness!");
-				// System.out.println();
-				// System.out.println();
-				Map<Integer, Set<Integer>> assignment = new HashMap<Integer, Set<Integer>>();
-				// Pattern p = Pattern.compile("var\\(x(.*?)\\)");
-				for (JsonNode subsumption : witness.get("Value")) {
-					String text = subsumption.asText();
-					if (text.startsWith("relsubs")) {
-						extendAssignment(assignment, text);
-						// } else if (text.startsWith("compatible")) {
-						// System.out.println(text);
-						// Matcher m = p.matcher(text);
-						// System.out.print("Compatible: ");
-						// while (m.find()) {
-						// Integer varId = Integer.parseInt(m.group(1));
-						// System.out.print(solver.parent.printAtom(varId) + " /
-						// ");
-						// }
-						// System.out.println();
-					}
-				}
-				if (!assignments.contains(assignment)) {
-					assignments.add(assignment);
-				}
-
-				if (Thread.interrupted()) {
-					throw new InterruptedException();
-				}
+	private void compute() throws IOException, InterruptedException {
+		if (!isComputed) {
+			if (parser == null) {
+				// initialize the parser and parse the initial portion of the
+				// stream
+				parser = new JsonFactory().createJsonParser(new MyInputStream(jsonStream));
+				parseInfo();
 			}
-		}
 
-		// Solver,Time -> stats
-		stats = new ArrayList<Entry<String, String>>();
-		addEntry(stats, "ASP Solver", root.get("Solver").asText());
-		JsonNode time = root.get("Time");
-		addEntry(stats, "Total time (s)", time.get("Total").asText());
-		addEntry(stats, "Solving time (s)", time.get("Solve").asText());
-		addEntry(stats, "Model time (s)", time.get("Model").asText());
-		addEntry(stats, "Unsat time (s)", time.get("Unsat").asText());
-		addEntry(stats, "CPU time (s)", time.get("CPU").asText());
+			// try to parse the next assignment from the input stream
+			hasNext = parseNextAssignment();
+
+			if (Thread.interrupted()) {
+				hasNext = false;
+				throw new InterruptedException();
+			}
+
+			if (!hasNext) {
+				// we just finished -> parse the remainder of the stream for
+				// additional information
+				parseInfo();
+			}
+
+			isComputed = true;
+		}
+	}
+
+	private void expected(JsonToken token, JsonToken type, String descr) throws IOException, JsonParseException {
+		if (token != type) {
+			expected(descr);
+		}
+	}
+
+	private void expected(String descr) throws JsonParseException {
+		throw new JsonParseException("Expected " + descr + ".", parser.getCurrentLocation());
 	}
 
 	private void extendAssignment(Map<Integer, Set<Integer>> assignment, String subsumption) throws IOException {
@@ -122,6 +125,26 @@ public class ClingoOutput implements AspOutput {
 			assignment.put(varId, subsumers);
 		}
 		subsumers.add(atomId);
+	}
+
+	public List<Entry<String, String>> getInfo() {
+		return info;
+	}
+
+	@Override
+	public boolean hasNext() throws IOException, InterruptedException {
+		compute();
+		return hasNext;
+	}
+
+	@Override
+	public Map<Integer, Set<Integer>> next() throws IOException, InterruptedException {
+		compute();
+		if (!hasNext) {
+			throw new NoSuchElementException();
+		}
+		isComputed = false;
+		return currentAssignment;
 	}
 
 	private Atom parseAtom(String encoding) throws IOException {
@@ -143,54 +166,68 @@ public class ClingoOutput implements AspOutput {
 		}
 	}
 
-	private boolean addEntry(List<Map.Entry<String, String>> list, String key, String value) {
-		return list.add(new AbstractMap.SimpleEntry<String, String>(key, value));
-	}
-
-	public List<Entry<String, String>> getStats() {
-		return stats;
-	}
-
-	@Override
-	public boolean hasNext() throws InterruptedException {
-		if (currentIndex + 1 < assignments.size()) {
-			// we still have pre-computed assignments left
-			return true;
-		} else {
-			// there are no more pre-computed assignments
-			if (finished) {
-				// the computation has finished -> all assignments have been
-				// returned
-				return false;
-			} else {
-				// try to compute more assignments until either clingo reports
-				// that there are no more solutions or we have computed at least
-				// one additional assignment
-				do {
-					finished = solver.computeMoreSolutions();
-					if (Thread.currentThread().isInterrupted()) {
-						return false;
-					}
-					try {
-						parse(solver.getCurrentSolutions());
-					} catch (IOException ex) {
-						throw new RuntimeException(ex);
-					}
-				} while ((currentIndex + 1 >= assignments.size()) && !finished);
-				// check if we now have at least one new assignment
-				return currentIndex + 1 < assignments.size();
+	private void parseInfo() throws IOException {
+		// parse information from the stream, stop when 'Witnesses' entry is
+		// reached
+		while (parser.nextToken() != null) {
+			if (parser.getCurrentToken() == JsonToken.FIELD_NAME) {
+				switch (parser.getCurrentName()) {
+				case "Witnesses":
+					// advance to the first witness and wait until assignments
+					// are requested
+					expected(parser.nextToken(), JsonToken.START_ARRAY, "Expected an array of witnesses.");
+					return;
+				case "Solver":
+					expected(parser.nextToken(), JsonToken.VALUE_STRING, "Expected the solver name and version.");
+					addInfo("ASP solver", parser.getText());
+					break;
+				case "Time":
+					parseTimeInfo();
+					break;
+				}
 			}
 		}
+		// end of stream
+		solver.cleanup();
 	}
 
-	@Override
-	public Map<Integer, Set<Integer>> next() throws InterruptedException {
-		if (!hasNext()) {
-			throw new NoSuchElementException();
+	private boolean parseNextAssignment() throws IOException {
+		if (parser.nextToken() == null) {
+			// stream has already finished -> there are no models at all
+			return false;
+		}
+		if (parser.getCurrentToken() == JsonToken.END_ARRAY) {
+			// end of 'Witnesses' array reached
+			return false;
 		}
 
-		currentIndex++;
-		return assignments.get(currentIndex);
+		expected(parser.getCurrentToken(), JsonToken.START_OBJECT, "start of new model");
+		expected(parser.nextToken(), JsonToken.FIELD_NAME, "model entry");
+		if (!parser.getCurrentName().equals("Value")) {
+			expected("'Value' entry");
+		}
+		expected(parser.nextToken(), JsonToken.START_ARRAY, "start of atom list");
+
+		currentAssignment = new HashMap<Integer, Set<Integer>>();
+		while (parser.nextToken() != JsonToken.END_ARRAY) {
+			expected(parser.getCurrentToken(), JsonToken.VALUE_STRING, "atom");
+			if (!parser.getText().startsWith("relsubs")) {
+				expected("'relsubs' atom");
+			}
+			extendAssignment(currentAssignment, parser.getText());
+		}
+
+		expected(parser.nextToken(), JsonToken.END_OBJECT, "end of model");
+		return true;
+	}
+
+	private void parseTimeInfo() throws IOException {
+		expected(parser.nextToken(), JsonToken.START_OBJECT, "object with timing information");
+		while (parser.nextToken() != JsonToken.END_OBJECT) {
+			expected(parser.getCurrentToken(), JsonToken.FIELD_NAME, "timing entry");
+			expected(parser.nextToken(), JsonToken.VALUE_NUMBER_FLOAT, "time value");
+			addInfo(parser.getCurrentName() + " time (s)", String.format("%.3f", parser.getFloatValue()));
+		}
 	}
 
 }

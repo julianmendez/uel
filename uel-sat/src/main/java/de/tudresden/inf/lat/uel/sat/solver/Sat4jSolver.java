@@ -23,6 +23,7 @@ import de.tudresden.inf.lat.uel.sat.type.SatSolver;
 public class Sat4jSolver implements SatSolver {
 
 	private ISolver solver;
+	private boolean cleanedUp = false;
 
 	/**
 	 * Constructs a new solver.
@@ -31,8 +32,10 @@ public class Sat4jSolver implements SatSolver {
 	}
 
 	public void cleanup() {
-		if (solver != null) {
+		if ((solver != null) && !cleanedUp) {
 			solver.reset();
+			// we only need to reset the solver once
+			cleanedUp = true;
 		}
 	}
 

@@ -76,8 +76,7 @@ public class SNOMEDEvaluation {
 	static final String SNOMED_RESTR_PATH = WORK_DIR + "Ontologies/snomed-restrictions-no-imports.owl";
 
 	static final String[] TEST_ALGORITHMS = new String[] { UnificationAlgorithmFactory.SAT_BASED_ALGORITHM,
-			UnificationAlgorithmFactory.SAT_BASED_ALGORITHM_MINIMAL, UnificationAlgorithmFactory.ASP_BASED_ALGORITHM,
-			UnificationAlgorithmFactory.ASP_BASED_ALGORITHM_MINIMAL };
+			UnificationAlgorithmFactory.ASP_BASED_ALGORITHM };
 
 	static final int MAX_SIBLINGS = 100;
 	static final int MAX_ATOMS = 240;
@@ -259,7 +258,12 @@ public class SNOMEDEvaluation {
 			// 'Chronic progressive epilepsia partialis continua (disorder)'
 			// singleTest("SCT_39745004");
 
-			// randomly select classes with full definition from SNOMED
+			// 'Does control trunk posture (finding)' -> test case for ASP
+			// solver, which returned some incorrect unifiers
+			// runSingleTest("SCT_284124002");
+
+			// randomly select classes with full definition from the SNOMED
+			// module
 			randomTests();
 
 		} catch (InterruptedException ex) {

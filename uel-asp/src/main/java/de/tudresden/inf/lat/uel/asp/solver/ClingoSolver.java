@@ -18,7 +18,7 @@ public class ClingoSolver implements AspSolver {
 	private static String TYPES_PROGRAM = "/compatibility.lp";
 	private static String FINAL_PROGRAM = "/final.lp";
 	private static String CLINGO_COMMAND = "clingo";
-	private static String COMMON_ARGUMENTS = "--project --outf=2"; // --enum-mode=domRec";
+	private static String COMMON_ARGUMENTS = "0 --project --outf=2"; // --enum-mode=domRec";
 	private static String HEURISTIC_ARGUMENTS = "--enum-mode=domRec --dom-mod=5,16 --heu=Domain";
 
 	private final boolean hasNegativePart;
@@ -42,21 +42,17 @@ public class ClingoSolver implements AspSolver {
 				pClingo.destroyForcibly();
 			} else {
 				// normal clingo exit
-				try {
-					handleClingoExitCode();
-				} catch (IOException ex) {
-					throw new RuntimeException(ex);
-				}
+				handleClingoExitCode();
 			}
 		}
 	}
 
-	private void handleClingoExitCode() throws IOException {
+	private void handleClingoExitCode() {
 		int clingoReturnCode = pClingo.exitValue();
 		// successful if there was no exception (lsb=0) and either a
 		// model was found (10) or the search space was exhausted (20)
 		if (((clingoReturnCode & 1) == 1) || (((clingoReturnCode & 10) == 0) && ((clingoReturnCode & 20) == 0))) {
-			throw new IOException("clingo error (return code " + clingoReturnCode + "):" + System.lineSeparator()
+			System.err.println("clingo error (return code " + clingoReturnCode + "):" + System.lineSeparator()
 					+ new OutputStreamBuilder().append(pClingo.getErrorStream()).toString());
 		}
 	}
@@ -73,35 +69,25 @@ public class ClingoSolver implements AspSolver {
 
 	@Override
 	public AspOutput solve(AspInput input) throws IOException {
-		try {
-			// call clingo
-			ProcessBuilder pbClingo = new ProcessBuilder(getClingoArguments());
-			pClingo = pbClingo.start();
+		// call clingo
+		ProcessBuilder pbClingo = new ProcessBuilder(getClingoArguments());
+		pClingo = pbClingo.start();
 
-			// pipe .lp files and input.getProgram() as input
-			OutputStreamBuilder clingoInput = new OutputStreamBuilder(pClingo.getOutputStream());
-			clingoInput.appendResource(UNIFICATION_PROGRAM);
-			if (hasNegativePart) {
-				clingoInput.appendResource(DISUNIFICATION_PROGRAM);
-			}
-			if (types) {
-				clingoInput.appendResource(TYPES_PROGRAM);
-			}
-			clingoInput.appendResource(FINAL_PROGRAM);
-			input.appendProgram(clingoInput);
-			clingoInput.close();
-
-			// start parsing the output stream
-			return new ClingoOutput(pClingo.getInputStream(), input.getAtomManager(), this);
-
-		} catch (InterruptedException | IOException ex) {
-			cleanup();
-			if (ex instanceof InterruptedException) {
-				Thread.currentThread().interrupt();
-			} else {
-				throw new RuntimeException(ex);
-			}
+		// pipe .lp files and input.getProgram() as input
+		OutputStreamBuilder clingoInput = new OutputStreamBuilder(pClingo.getOutputStream());
+		clingoInput.appendResource(UNIFICATION_PROGRAM);
+		if (hasNegativePart) {
+			clingoInput.appendResource(DISUNIFICATION_PROGRAM);
 		}
+		if (types) {
+			clingoInput.appendResource(TYPES_PROGRAM);
+		}
+		clingoInput.appendResource(FINAL_PROGRAM);
+		input.appendProgram(clingoInput);
+		clingoInput.close();
+
+		// start parsing the output stream
+		return new ClingoOutput(pClingo.getInputStream(), input.getAtomManager(), this);
 	}
 
 }

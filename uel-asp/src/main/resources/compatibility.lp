@@ -23,13 +23,24 @@
 %compatible(X,Y) :- compatible(X,Y,_).
 
 % TODO: arbitrary role number restrictions
-%1 { subs(D,E):subs(var(X),exists(R,D)),subs(var(X),exists(R,E)),D!=E } :-
-%        number(R,N), atom(var(X)), M = { subs(var(X),exists(R,C)) }, N < M.
-1 { subs(C,D):compatible(C,D); subs(D,C):compatible(D,C) } :-
+related(C,D) :-
         number(R,1), subs(var(X),exists(R,C)), subs(var(X),exists(R,D)), C!=D.
-1 { subs(C,D):compatible(C,D); subs(D,C):compatible(D,C); subs(C,E):compatible(C,E); subs(E,C):compatible(E,C);
-    subs(D,E):compatible(D,E); subs(E,D):compatible(E,D) } :-
+1 { related(C,D); related(C,E); related(D,E) } :-
         number(R,2), subs(var(X),exists(R,C)), subs(var(X),exists(R,D)), subs(var(X),exists(R,E)), C!=D, D!=E, C!=E.
+1 { related(C,D); related(C,E); related(D,E); related(C,F); related(D,F); related(E,F) } :-
+        number(R,3), subs(var(X),exists(R,C)), subs(var(X),exists(R,D)), subs(var(X),exists(R,E)),
+        subs(var(X),exists(R,F)), C!=D, D!=E, C!=E, E!=F, D!=F, C!=F.
+:- related(C,D), not compatible(C,D).
+1 { subs(C,D); subs(D,C) } :- related(C,D).
+
+
+%:- number(R,1), subs(var(X),exists(R,C)), subs(var(X),exists(R,D)),
+%        not subs(C,D):compatible(C,D); not subs(D,C):compatible(D,C).
+%:- number(R,2), subs(var(X),exists(R,C)), subs(var(X),exists(R,D)), subs(var(X),exists(R,E)),
+%        not subs(C,D):compatible(C,D); not subs(D,C):compatible(D,C); not subs(C,E):compatible(C,E);
+%        not subs(E,C):compatible(E,C); not subs(D,E):compatible(D,E); not subs(E,D):compatible(E,D).
+%{ subs(var(C),var(D)) } :- subs(var(X),exists(R,var(C))), subs(var(X),exists(R,var(D))), C!=D.
+
 
 % Two variables in the same substitution set must be compatible
 :- subs(var(X),var(Y)), subs(var(X),var(Z)), not compatible(var(Y),var(Z)).
@@ -57,3 +68,6 @@ rgtype(rg(X)) :- type(X).
 
 % 'RoleGroup' translates between role group types and normal types
 subs(var(X),T) :- rolegroup(R), subs(var(X),exists(R,C)), rgtype(rg(T)), subtype(C,rg(T)).
+
+% variables inside 'RoleGroup' must have a role group type
+1 { subtype(var(X),T):rgtype(T) } :- rolegroup(R), atom(exists(R,var(X))).

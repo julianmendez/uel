@@ -3,6 +3,7 @@ package de.tudresden.inf.lat.uel.asp.solver;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import de.tudresden.inf.lat.uel.type.api.Definition;
@@ -39,25 +40,24 @@ public class AspUnificationAlgorithm extends AbstractUnificationAlgorithm {
 
 	@Override
 	public boolean computeNextUnifier() throws InterruptedException {
-		// TODO: implement asynchronous execution of ClingoSolver
-		if (!initialized) {
-			aspInput = new AspInput(goal, this);
-			addInfo("ASP encoding", aspInput.getProgram());
-			callbackPreprocessing();
-			AspSolver solver = new ClingoSolver(goal.hasNegativePart(), !goal.getTypes().isEmpty(), minimize, this);
-			try {
+		try {
+			if (!initialized) {
+				aspInput = new AspInput(goal, this);
+				AspSolver solver = new ClingoSolver(goal.hasNegativePart(), !goal.getTypes().isEmpty(), minimize, this);
 				aspOutput = solver.solve(aspInput);
-			} catch (IOException e) {
-				throw new RuntimeException(e);
+				callbackPreprocessing();
+				initialized = true;
 			}
-			initialized = true;
-		}
 
-		hasNext = aspOutput.hasNext();
-		if (hasNext) {
-			currentUnifier = toUnifier(aspOutput.next());
+			hasNext = aspOutput.hasNext();
+			if (hasNext) {
+				currentUnifier = toUnifier(aspOutput.next());
+			}
+			return hasNext;
+		} catch (IOException e) {
+			cleanup();
+			throw new RuntimeException(e);
 		}
-		return hasNext;
 	}
 
 	@Override
@@ -89,5 +89,8 @@ public class AspUnificationAlgorithm extends AbstractUnificationAlgorithm {
 
 	@Override
 	protected void updateInfo() {
+		for (Entry<String, String> e : aspOutput.getInfo()) {
+			addInfo(e.getKey(), e.getValue());
+		}
 	}
 }

@@ -65,13 +65,12 @@ public class AspInput {
 		output.append("% Additional atoms (blank existential restrictions)");
 		output.append(System.lineSeparator());
 		for (Integer remainingAtom : remainingAtoms) {
-			encodeAtom(encoding, goal.getAtomManager().getChild(remainingAtom), emptySet);
 			output.append("atom(");
 			encodeAtom(output, remainingAtom, emptySet);
 			output.append(").");
 			output.append(System.lineSeparator());
 			output.append("atom(");
-			encodeAtom(output);
+			encodeAtom(output, goal.getAtomManager().getChild(remainingAtom), emptySet);
 			output.append(").");
 			output.append(System.lineSeparator());
 		}
@@ -142,7 +141,7 @@ public class AspInput {
 		}
 		output.append(System.lineSeparator());
 
-		output.append("% role number restrictions");
+		output.append("% Role number restrictions");
 		output.append(System.lineSeparator());
 		for (Entry<Integer, Integer> e : goal.getRoleNumberRestrictions().entrySet()) {
 			output.append("number(r");
@@ -173,15 +172,15 @@ public class AspInput {
 		}
 		output.append(System.lineSeparator());
 
-		output.append("% User variables");
-		output.append(System.lineSeparator());
-		for (Integer var : goal.getAtomManager().getUserVariables()) {
-			output.append("relevant(x");
-			output.append(var);
-			output.append(").");
-			output.append(System.lineSeparator());
-		}
-		output.append(System.lineSeparator());
+//		output.append("% User variables");
+//		output.append(System.lineSeparator());
+//		for (Integer var : goal.getAtomManager().getUserVariables()) {
+//			output.append("relevant(x");
+//			output.append(var);
+//			output.append(").");
+//			output.append(System.lineSeparator());
+//		}
+//		output.append(System.lineSeparator());
 	}
 
 	private Integer getOriginalType(Integer roleGroupType) {

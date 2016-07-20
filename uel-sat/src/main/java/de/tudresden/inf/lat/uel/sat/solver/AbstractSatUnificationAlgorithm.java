@@ -111,54 +111,52 @@ public abstract class AbstractSatUnificationAlgorithm extends AbstractUnificatio
 	protected SatInput computeSatInput() throws InterruptedException {
 		input = new SatInput();
 
-//		System.out.println("a");
+		// System.out.println("a");
 		encodeGoal();
-//		System.out.println("b");
+		// System.out.println("b");
 		encodeSubsumptionBetweenConstants();
-//		System.out.println("c");
+		// System.out.println("c");
 		encodeSubsumptionBetweenExistentialRestrictions();
-//		System.out.println("d");
+		// System.out.println("d");
 		encodeSubsumptionBetweenConstantsAndExistentialRestrictions();
-//		System.out.println("e");
+		// System.out.println("e");
 		checkInterrupted();
 
 		encodeTransitivityOfSubsumption();
-//		System.out.println("f");
-		checkInterrupted();
+		// System.out.println("f");
 
 		encodeReflexivityOfOrder();
-//		System.out.println("g");
+		// System.out.println("g");
 		encodeTransitivityOfOrder();
-//		System.out.println("h");
-		checkInterrupted();
+		// System.out.println("h");
 
 		encodeConnectionBetweenOrderAndSubsumption();
-//		System.out.println("i");
+		// System.out.println("i");
 
 		if (goal.hasNegativePart()) {
 			// add clauses with auxiliary variables needed for soundness of
 			// disunification
 			encodeConditionsForDissubsumptions();
-//			System.out.println("j");
+			// System.out.println("j");
 			checkInterrupted();
 		}
 
 		if (!goal.getTypes().isEmpty()) {
 			// encode type restrictions
 			encodeTypeRestrictions();
-//			System.out.println("k");
+			// System.out.println("k");
 			checkInterrupted();
 		}
 
 		if (!goal.getRoleNumberRestrictions().isEmpty()) {
 			encodeRoleNumberRestrictionsAndCompatibility();
-//			System.out.println("l");
+			// System.out.println("l");
 			checkInterrupted();
 		}
 
 		if (goal.restrictUndefContext()) {
 			encodeUndefContextRestriction();
-//			System.out.println("m");
+			// System.out.println("m");
 			checkInterrupted();
 		}
 
@@ -243,7 +241,7 @@ public abstract class AbstractSatUnificationAlgorithm extends AbstractUnificatio
 	}
 
 	private void encodeDissubsumption(Dissubsumption e) {
-		encodeDissubsumption(Collections.<Integer>emptySet(), e);
+		encodeDissubsumption(Collections.<Integer> emptySet(), e);
 	}
 
 	private void encodeDissubsumption(Set<Integer> choiceLiterals, Dissubsumption e) {
@@ -623,32 +621,30 @@ public abstract class AbstractSatUnificationAlgorithm extends AbstractUnificatio
 
 		// 'RoleGroup' translates between 'normal types' and 'role group types'
 		Integer roleGroupId = goal.getAtomManager().getRoleId("http://www.ihtsdo.org/RoleGroup");
-		for (Integer eatomId : getExistentialRestrictions()) {
-			if (goal.getAtomManager().getRoleId(eatomId).equals(roleGroupId)) {
-				Integer childId = goal.getAtomManager().getChild(eatomId);
+		for (Integer eatomId : goal.getAtomManager().getExistentialRestrictions(roleGroupId)) {
+			Integer childId = goal.getAtomManager().getChild(eatomId);
 
-				for (Integer varId : getVariables()) {
-					Integer subsumptionLiteral = subsumption(varId, eatomId);
-					for (Integer type : goal.getRoleGroupTypes().keySet()) {
-						Integer roleGroupType = goal.getRoleGroupTypes().get(type);
-						Integer varTypeLiteral = subsumption(varId, type);
-						Integer childRoleGroupTypeLiteral = subtype(childId, roleGroupType);
+			for (Integer varId : getVariables()) {
+				Integer subsumptionLiteral = subsumption(varId, eatomId);
+				for (Integer type : goal.getRoleGroupTypes().keySet()) {
+					Integer roleGroupType = goal.getRoleGroupTypes().get(type);
+					Integer varTypeLiteral = subsumption(varId, type);
+					Integer childRoleGroupTypeLiteral = subtype(childId, roleGroupType);
 
-						input.addImplication(varTypeLiteral, childRoleGroupTypeLiteral, subsumptionLiteral);
+					input.addImplication(varTypeLiteral, childRoleGroupTypeLiteral, subsumptionLiteral);
 
-						// the following is incorrect, as it presupposes an
-						// equivalence where none need exist
-						// input.addImplication(childRoleGroupTypeLiteral,
-						// varTypeLiteral, subsumptionLiteral);
-					}
+					// the following is incorrect, as it presupposes an
+					// equivalence where none need exist
+					// input.addImplication(childRoleGroupTypeLiteral,
+					// varTypeLiteral, subsumptionLiteral);
 				}
+			}
 
-				// variables occurring inside RoleGroup must have a role group
-				// type
-				if (getVariables().contains(childId)) {
-					input.add(goal.getRoleGroupTypes().values().stream()
-							.map(roleGroupType -> subtype(childId, roleGroupType)).collect(Collectors.toSet()));
-				}
+			// variables occurring inside RoleGroup must have a role group
+			// type
+			if (getVariables().contains(childId)) {
+				input.add(goal.getRoleGroupTypes().values().stream()
+						.map(roleGroupType -> subtype(childId, roleGroupType)).collect(Collectors.toSet()));
 			}
 		}
 	}

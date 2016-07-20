@@ -157,6 +157,8 @@ public class AlternativeUelStarterTest {
 			reasoner.dispose();
 		}
 
+		iterator.cleanup();
+
 		Assert.assertEquals(numberOfUnifiers, actualNumberOfUnifiers);
 	}
 }

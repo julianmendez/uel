@@ -31,6 +31,7 @@ public class OutputStreamBuilder {
 		// http://stackoverflow.com/a/35446009
 		try {
 			while ((length = input.read(buffer)) != -1) {
+				// System.out.write(buffer, 0, length);
 				output.write(buffer, 0, length);
 			}
 			input.close();
@@ -48,6 +49,7 @@ public class OutputStreamBuilder {
 		byte[] data = input.getBytes();
 		if (data.length <= buffer.length) {
 			try {
+				// System.out.write(data);
 				output.write(data);
 			} catch (IOException ex) {
 				throw new RuntimeException(ex);

@@ -1,5 +1,5 @@
 
-relsubs(var(X),C) :- subs(var(X),C), relevant(X), nonvaratom(C).
+relsubs(var(X),C) :- subs(var(X),C), nonvaratom(C).
 
 %#minimize{ relsubs(X,Y) }.
 
