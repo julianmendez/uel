@@ -25,13 +25,13 @@
 % TODO: arbitrary role number restrictions
 related(C,D) :-
         number(R,1), subs(var(X),exists(R,C)), subs(var(X),exists(R,D)), C!=D.
-1 { related(C,D); related(C,E); related(D,E) } :-
+related(C,D) | related(C,E) | related(D,E) :-
         number(R,2), subs(var(X),exists(R,C)), subs(var(X),exists(R,D)), subs(var(X),exists(R,E)), C!=D, D!=E, C!=E.
-1 { related(C,D); related(C,E); related(D,E); related(C,F); related(D,F); related(E,F) } :-
+related(C,D) | related(C,E) | related(D,E) | related(C,F) | related(D,F) | related(E,F) :-
         number(R,3), subs(var(X),exists(R,C)), subs(var(X),exists(R,D)), subs(var(X),exists(R,E)),
         subs(var(X),exists(R,F)), C!=D, D!=E, C!=E, E!=F, D!=F, C!=F.
 :- related(C,D), not compatible(C,D).
-1 { subs(C,D); subs(D,C) } :- related(C,D).
+subs(C,D) | subs(D,C) :- related(C,D).
 
 
 %:- number(R,1), subs(var(X),exists(R,C)), subs(var(X),exists(R,D)),

@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * An object of this class represents a SAT input file.
@@ -69,6 +70,7 @@ public class SatInput {
 	private Collection<Set<Integer>> clauses = new ArrayList<Set<Integer>>();
 	private Integer lastId = 0;
 	private Set<Integer> minimizeLiterals = new HashSet<Integer>();
+	private Collection<Set<Integer>> softClauses = new ArrayList<Set<Integer>>();
 
 	/**
 	 * Constructs a new SAT input.
@@ -108,18 +110,13 @@ public class SatInput {
 		updateLastId(clause);
 	}
 
-	/**
-	 * Adds a set of new non-empty clauses.
-	 * 
-	 * @param clauses
-	 *            set of new non-empty clauses
-	 */
-	public void addAll(Collection<? extends Set<Integer>> clauses) {
-		if (clauses == null) {
-			throw new IllegalArgumentException("Null argument.");
-		}
+	public void addImplication(Integer head, Integer... body) {
+		addImplication(new HashSet<Integer>(Arrays.asList(head)), body);
+	}
 
-		clauses.forEach(this::add);
+	public void addImplication(Set<Integer> head, Integer... body) {
+		Arrays.stream(body).forEach(l -> head.add(-l));
+		add(head);
 	}
 
 	/**
@@ -141,6 +138,19 @@ public class SatInput {
 	public void addMinimizeLiterals(Set<Integer> literals) {
 		minimizeLiterals.addAll(literals);
 		updateLastId(literals);
+	}
+
+	public void addNegativeClause(Integer... body) {
+		addImplication(new HashSet<Integer>(), body);
+	}
+
+	public void addNegativeSoftClause(Integer... body) {
+		addSoftClause(Arrays.stream(body).map(l -> -l).collect(Collectors.toSet()));
+	}
+
+	public void addSoftClause(Set<Integer> clause) {
+		softClauses.add(clause);
+		updateLastId(clause);
 	}
 
 	/**
@@ -168,6 +178,10 @@ public class SatInput {
 	 */
 	public Collection<Set<Integer>> getClauses() {
 		return Collections.unmodifiableCollection(clauses);
+	}
+
+	public Collection<Set<Integer>> getSoftClauses() {
+		return Collections.unmodifiableCollection(softClauses);
 	}
 
 	/**
@@ -233,19 +247,6 @@ public class SatInput {
 
 	private void updateLastId(Collection<Integer> newSet) {
 		lastId = newSet.stream().map(Math::abs).reduce(lastId, Math::max);
-	}
-
-	public void addImplication(Integer head, Integer... body) {
-		addImplication(new HashSet<Integer>(Arrays.asList(head)), body);
-	}
-
-	public void addImplication(Set<Integer> head, Integer... body) {
-		Arrays.stream(body).forEach(l -> head.add(-l));
-		add(head);
-	}
-
-	public void addNegativeClause(Integer... body) {
-		addImplication(new HashSet<Integer>(), body);
 	}
 
 }

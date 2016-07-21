@@ -54,7 +54,7 @@ public abstract class AbstractSatUnificationAlgorithm extends AbstractUnificatio
 	 * An auxiliary variable to hold the SatInput under construction.
 	 */
 	protected SatInput input;
-	private final IndexedSet<Literal> literalManager = new IndexedSetImpl<Literal>();
+	protected final IndexedSet<Literal> literalManager = new IndexedSetImpl<Literal>();
 	/**
 	 * Indicates whether assignments should be minimized.
 	 */
@@ -374,13 +374,15 @@ public abstract class AbstractSatUnificationAlgorithm extends AbstractUnificatio
 			}
 		}
 
-		for (Integer atomId1 : getConceptNames()) {
-			for (Integer atomId2 : getConceptNames()) {
+		for (Integer atomId1 : getVariables()) {
+			for (Integer atomId2 : getVariables()) {
 				if (!goal.areCompatible(atomId1, atomId2)) {
 					// System.out.println("Not compatible: " +
 					// printAtom(atomId1) + " and " + printAtom(atomId2));
 					for (Integer varId : getVariables()) {
-						input.addNegativeClause(subsumption(varId, atomId1), subsumption(varId, atomId2));
+						// TODO make these hard clauses, this is just for
+						// debugging
+						input.addNegativeSoftClause(subsumption(varId, atomId1), subsumption(varId, atomId2));
 					}
 				}
 			}
@@ -488,13 +490,18 @@ public abstract class AbstractSatUnificationAlgorithm extends AbstractUnificatio
 	}
 
 	private void encodeTransitivityOfSubsumption() throws InterruptedException {
+		// TODO check: for soundness of disunification it is enough that atomId1
+		// or atomId2 is a variable!?
 		for (Integer atomId1 : getUsedAtomIds()) {
+			boolean var1 = getVariables().contains(atomId1);
 			for (Integer atomId2 : getUsedAtomIds()) {
-				if (!atomId1.equals(atomId2)) {
-					for (Integer atomId3 : getUsedAtomIds()) {
-						if (!atomId1.equals(atomId3) && !atomId2.equals(atomId3)) {
-							input.addImplication(subsumption(atomId1, atomId3), subsumption(atomId1, atomId2),
-									subsumption(atomId2, atomId3));
+				if (var1 || getVariables().contains(atomId2)) {
+					if (!atomId1.equals(atomId2)) {
+						for (Integer atomId3 : getUsedAtomIds()) {
+							if (!atomId1.equals(atomId3) && !atomId2.equals(atomId3)) {
+								input.addImplication(subsumption(atomId1, atomId3), subsumption(atomId1, atomId2),
+										subsumption(atomId2, atomId3));
+							}
 						}
 					}
 				}
@@ -512,77 +519,21 @@ public abstract class AbstractSatUnificationAlgorithm extends AbstractUnificatio
 			}
 		}
 
-		// // a - all types have themselves as types
-		// for (Integer type : goal.getRoleGroupTypes().keySet()) {
-		// input.add(subtype(type, type));
-		// }
-		//
-		// // b - every other concept name must also have a type
-		// for (Integer conceptNameId : getConceptNames()) {
-		// if (!goal.getTypes().contains(conceptNameId)) {
-		// if (goal.getTypeAssignment().containsKey(conceptNameId)) {
-		// // if there is a direct type hint in the goal, use it ...
-		// input.add(subtype(conceptNameId,
-		// goal.getTypeAssignment().get(conceptNameId)));
-		// } else {
-		// // otherwise only assert that there must exist a type
-		// input.add(goal.getTypes().stream().map(type -> subtype(conceptNameId,
-		// type))
-		// .collect(Collectors.toSet()));
-		// }
-		// }
-		// }
-		//
-		// // c - types are inherited by subconcepts
-		// for (Integer conceptNameId1 : getConceptNames()) {
-		// for (Integer conceptNameId2 : getConceptNames()) {
-		// for (Integer type : goal.getTypes()) {
-		// input.add(implication(subtype(conceptNameId1, type),
-		// subsumption(conceptNameId1, conceptNameId2),
-		// subtype(conceptNameId2, type)));
-		// }
-		// }
-		// }
-		//
-		// // c' - types are inherited by/from UNDEF concept names
-		// for (Integer undefId : goal.getAtomManager().getUndefNames()) {
-		// Integer origId = goal.getAtomManager().removeUndef(undefId);
-		// for (Integer type : goal.getTypes()) {
-		// Integer origTypeLiteral = subtype(origId, type);
-		// Integer undefTypeLiteral = subtype(undefId, type);
-		// input.add(implication(undefTypeLiteral, origTypeLiteral));
-		// input.add(implication(origTypeLiteral, undefTypeLiteral));
-		// }
-		// }
-		//
-		// // d - no concept name can have disjoint types
-		// List<Integer> types = new ArrayList<Integer>(goal.getTypes());
-		// for (int i = 0; i < types.size(); i++) {
-		// for (int j = i + 1; j < types.size(); j++) {
-		// Integer type1 = types.get(i);
-		// Integer type2 = types.get(j);
-		// if (goal.areDisjoint(type1, type2)) {
-		// for (Integer conceptNameId : getConceptNames()) {
-		// input.add(negativeClause(subtype(conceptNameId, type1),
-		// subtype(conceptNameId, type2)));
-		// }
-		// }
-		// }
-		// }
-
 		// TODO move d' and d'' to a new method dealing only with compatibility?
 		// d' - no variable can have incompatible role group types
-		for (List<Integer> typePair : computeSubsets(goal.getRoleGroupTypes().keySet(), 2)) {
-			Integer type1 = typePair.get(0);
-			Integer type2 = typePair.get(1);
-			if (!goal.areCompatible(type1, type2)) {
-				Integer roleGroupType1 = goal.getRoleGroupTypes().get(type1);
-				Integer roleGroupType2 = goal.getRoleGroupTypes().get(type2);
-				for (Integer varId : getVariables()) {
-					input.addNegativeClause(subtype(varId, roleGroupType1), subtype(varId, roleGroupType2));
-				}
-			}
-		}
+		// for (List<Integer> typePair :
+		// computeSubsets(goal.getRoleGroupTypes().keySet(), 2)) {
+		// Integer type1 = typePair.get(0);
+		// Integer type2 = typePair.get(1);
+		// if (!goal.areCompatible(type1, type2)) {
+		// Integer roleGroupType1 = goal.getRoleGroupTypes().get(type1);
+		// Integer roleGroupType2 = goal.getRoleGroupTypes().get(type2);
+		// for (Integer varId : getVariables()) {
+		// input.addNegativeClause(subtype(varId, roleGroupType1),
+		// subtype(varId, roleGroupType2));
+		// }
+		// }
+		// }
 
 		// d'' - no variable can have a role group type and a normal type
 		for (Integer type : goal.getTypes()) {

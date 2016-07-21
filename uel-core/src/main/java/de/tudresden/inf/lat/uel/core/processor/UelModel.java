@@ -316,8 +316,15 @@ public class UelModel {
 		currentUnifierIndex = -1;
 		allUnifiersFound = false;
 		algorithm = UnificationAlgorithmFactory.instantiateAlgorithm(options.unificationAlgorithmName, goal);
-		postprocessor = new UnifierPostprocessor(atomManager, goal, getStringRenderer(null));
 		algorithm.setShortFormMap(getStringRenderer(null)::getShortForm);
+		postprocessor = new UnifierPostprocessor(atomManager, goal, getStringRenderer(null));
+	}
+
+	public void cleanupUnificationAlgorithm() {
+		if (algorithm != null) {
+			algorithm.cleanup();
+			algorithm = null;
+		}
 	}
 
 	private boolean isNew(Unifier newUnifier) {

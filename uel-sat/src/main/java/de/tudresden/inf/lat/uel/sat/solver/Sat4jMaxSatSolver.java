@@ -91,13 +91,25 @@ public class Sat4jMaxSatSolver implements SatSolver {
 			try {
 				solver.addHardClause(new VecInt(SatInput.toArray(clause)));
 			} catch (ContradictionException e) {
-				return new SatOutput(false, Collections.<Integer> emptySet());
+				return new SatOutput(false, Collections.emptySet());
 			}
 
 			if (Thread.interrupted()) {
 				throw new InterruptedException();
 			}
 		}
+		for (Set<Integer> clause : input.getSoftClauses()) {
+			try {
+				solver.addSoftClause(new VecInt(SatInput.toArray(clause)));
+			} catch (ContradictionException e) {
+				return new SatOutput(false, Collections.emptySet());
+			}
+
+			if (Thread.interrupted()) {
+				throw new InterruptedException();
+			}
+		}
+
 		return getSatOutput();
 	}
 

@@ -75,14 +75,18 @@ public class SNOMEDEvaluation {
 
 	static final String SNOMED_RESTR_PATH = WORK_DIR + "Ontologies/snomed-restrictions-no-imports.owl";
 
-	static final String[] TEST_ALGORITHMS = new String[] { UnificationAlgorithmFactory.SAT_BASED_ALGORITHM,
-			UnificationAlgorithmFactory.ASP_BASED_ALGORITHM };
+	static final String[] TEST_ALGORITHMS = new String[] {
+			//
+			UnificationAlgorithmFactory.SAT_BASED_ALGORITHM_MINIMAL
+			// ,
+			// UnificationAlgorithmFactory.ASP_BASED_ALGORITHM
+	};
 
 	static final int MAX_SIBLINGS = 100;
 	static final int MAX_ATOMS = 240;
 	static final boolean CHECK_UNIFIERS = true;
 	private static final int MAX_TESTS = 100;
-	private static final long TIMEOUT = 10 * 60 * 1000;
+	private static final long TIMEOUT = 1000 * 60 * 1000;
 
 	private static Date startTime;
 	private static List<SNOMEDResult> results;
@@ -198,7 +202,7 @@ public class SNOMEDEvaluation {
 		bg = new HashSet<OWLOntology>(Arrays.asList(snomed, snomedRestrictions));
 
 		options = new UelOptions();
-		options.verbosity = Verbosity.SHORT;
+		options.verbosity = Verbosity.NORMAL;
 		options.undefBehavior = UndefBehavior.CONSTANTS;
 		options.snomedMode = true;
 		options.unificationAlgorithmName = TEST_ALGORITHMS[0];
@@ -210,6 +214,15 @@ public class SNOMEDEvaluation {
 		options.numberOfSiblings = -1;
 
 		try {
+			// randomly select classes with full definition from the SNOMED
+			// module
+			// randomTests();
+
+			// Disagreement between SAT and ASP (2 RG)!? (SAT alg. does not find a solution)
+			// runSingleTest("SCT_364805005");
+			runSingleTest("SCT_284782007");
+			// runSingleTest("SCT_365278008");
+			// runSingleTest("SCT_300723007");
 
 			// 'Difficulty writing (finding)': 30s; new: 21 s / 6,7 min
 			// singleTest("SCT_102938007");
@@ -261,10 +274,6 @@ public class SNOMEDEvaluation {
 			// 'Does control trunk posture (finding)' -> test case for ASP
 			// solver, which returned some incorrect unifiers
 			// runSingleTest("SCT_284124002");
-
-			// randomly select classes with full definition from the SNOMED
-			// module
-			randomTests();
 
 		} catch (InterruptedException ex) {
 			ex.printStackTrace();
@@ -345,7 +354,10 @@ public class SNOMEDEvaluation {
 				algorithmThread.join(TIMEOUT);
 				SNOMEDAlgorithmResult algorithmResult = algorithmRunner.result;
 				if (algorithmThread.isAlive()) {
+					System.out.println("Timeout!");
+					printThreadInfo();
 					algorithmThread.interrupt();
+					algorithmThread.join();
 					algorithmResult.status = SNOMEDAlgorithmStatus.TIMEOUT;
 				}
 				result.algorithmResults.add(algorithmResult);

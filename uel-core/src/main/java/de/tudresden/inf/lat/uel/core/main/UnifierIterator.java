@@ -38,7 +38,7 @@ public class UnifierIterator implements Iterator<Set<OWLEquivalentClassesAxiom>>
 	 * Clean up the resources used by UEL once they are no longer needed.
 	 */
 	public void cleanup() {
-		uelModel.getUnificationAlgorithm().cleanup();
+		uelModel.cleanupUnificationAlgorithm();
 	}
 
 	private void compute() {

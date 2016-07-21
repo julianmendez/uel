@@ -72,7 +72,7 @@ public class CNFMaxSatSolver implements SatSolver {
 		Set<Integer> clause = new HashSet<Integer>();
 		String line = reader.readLine();
 		boolean satisfiable = false;
-		;
+
 		while (line != null) {
 			if (line.startsWith("v")) {
 				satisfiable = true;
@@ -116,7 +116,7 @@ public class CNFMaxSatSolver implements SatSolver {
 
 		this.nbVars = input.getLastId();
 		BufferedWriter writer = new BufferedWriter(new FileWriter(this.inputFile));
-		writer.write(input.toWCNF(this.nbVars + 1));
+		writer.write(input.toWCNF((int) Math.pow(this.nbVars + 1, 3)));
 		writer.close();
 
 		return convertToSatOutput(solve());

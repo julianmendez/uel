@@ -7,10 +7,13 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import de.tudresden.inf.lat.uel.sat.literals.Literal;
+import de.tudresden.inf.lat.uel.sat.literals.SubsumptionLiteral;
 import de.tudresden.inf.lat.uel.sat.type.SatOutput;
 import de.tudresden.inf.lat.uel.sat.type.SatSolver;
 import de.tudresden.inf.lat.uel.type.api.Definition;
 import de.tudresden.inf.lat.uel.type.api.Goal;
+import de.tudresden.inf.lat.uel.type.api.Subsumption;
 import de.tudresden.inf.lat.uel.type.impl.DefinitionSet;
 import de.tudresden.inf.lat.uel.type.impl.Unifier;
 
@@ -193,7 +196,7 @@ public class SatUnificationAlgorithm extends AbstractSatUnificationAlgorithm {
 				unifiable = satoutput.isSatisfiable();
 
 				// the SatInput object is not needed anymore
-				input = null;
+				// input = null;
 			} else {
 				Set<Integer> update = computeUpdate();
 				if (update.isEmpty()) {
@@ -210,6 +213,7 @@ public class SatUnificationAlgorithm extends AbstractSatUnificationAlgorithm {
 
 		if (unifiable) {
 			valuation = satoutput.getOutput();
+			outputUnsatisfiedSoftClauses();
 			result = computeUnifier();
 		} else {
 			// release resources used by the solver after all unifiers have been
@@ -219,6 +223,43 @@ public class SatUnificationAlgorithm extends AbstractSatUnificationAlgorithm {
 
 		firstTime = false;
 		return unifiable;
+	}
+
+	private void outputUnsatisfiedSoftClauses() {
+		Set<Set<Integer>> pairs = new HashSet<Set<Integer>>();
+		System.out.println("Unsatisfied incompatibility constraints:");
+		for (Set<Integer> clause : input.getSoftClauses()) {
+			Set<Integer> negClause = clause.stream().map(Math::abs).collect(Collectors.toSet());
+			if (valuation.containsAll(negClause)) {
+				outputClause(clause);
+				pairs.add(negClause.stream().map(l -> literalManager.get(l)).map(Literal::getSecond)
+						.collect(Collectors.toSet()));
+			}
+		}
+		for (Set<Integer> pair : pairs) {
+			System.out.println(pair.stream().map(this::printAtom).collect(Collectors.joining(", ")));
+		}
+	}
+
+	private void outputClause(Set<Integer> clause) {
+		for (Integer lit : clause) {
+			if (lit < 0) {
+				System.out.print("-");
+				lit *= -1;
+			}
+			Literal l = literalManager.get(lit);
+			if (l instanceof SubsumptionLiteral) {
+				System.out.print("[");
+				System.out.print(printAtom(l.getFirst()));
+				System.out.print(" ");
+				System.out.print(Subsumption.CONNECTIVE);
+				System.out.print(" ");
+				System.out.print(printAtom(l.getSecond()));
+				System.out.print("]");
+			}
+			System.out.print(", ");
+		}
+		System.out.println();
 	}
 
 	private Set<Integer> computeSubsumers(Integer varId) {

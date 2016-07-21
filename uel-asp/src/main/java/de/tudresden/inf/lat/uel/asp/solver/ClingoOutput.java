@@ -81,7 +81,7 @@ public class ClingoOutput implements AspOutput {
 			if (parser == null) {
 				// initialize the parser and parse the initial portion of the
 				// stream
-				parser = new JsonFactory().createJsonParser(new MyInputStream(jsonStream));
+				parser = new JsonFactory().createJsonParser(jsonStream);
 				parseInfo();
 			}
 
