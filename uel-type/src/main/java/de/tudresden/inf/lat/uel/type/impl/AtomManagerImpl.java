@@ -138,7 +138,14 @@ public class AtomManagerImpl implements AtomManager {
 
 	@Override
 	public Set<Integer> getExistentialRestrictions(Integer roleId) {
-		return Collections.unmodifiableSet(existentialRestrictions.get(roleId));
+		Set<Integer> ret = existentialRestrictions.get(roleId);
+		if (ret == null) {
+			// in case there are no role group atoms
+			ret = Collections.emptySet();
+		} else {
+			ret = Collections.unmodifiableSet(ret);
+		}
+		return ret;
 	}
 
 	@Override

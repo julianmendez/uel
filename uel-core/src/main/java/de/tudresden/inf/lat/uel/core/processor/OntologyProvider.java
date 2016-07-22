@@ -8,8 +8,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLOntology;
 
@@ -40,9 +40,9 @@ public abstract class OntologyProvider implements ShortFormProvider {
 
 	private String extractShortForm(String id) {
 		IRI iri = IRI.create(id);
-		String shortForm = getShortForm(OWLManager.getOWLDataFactory().getOWLClass(iri));
+		String shortForm = getShortForm(getOWLDataFactory().getOWLClass(iri));
 		if (shortForm == null) {
-			shortForm = getShortForm(OWLManager.getOWLDataFactory().getOWLObjectProperty(iri));
+			shortForm = getShortForm(getOWLDataFactory().getOWLObjectProperty(iri));
 		}
 		if (shortForm == null) {
 			return iri.getShortForm();
@@ -65,6 +65,8 @@ public abstract class OntologyProvider implements ShortFormProvider {
 		}
 		return shortForm;
 	}
+
+	public abstract OWLDataFactory getOWLDataFactory();
 
 	public abstract OWLOntology loadOntology(File file);
 

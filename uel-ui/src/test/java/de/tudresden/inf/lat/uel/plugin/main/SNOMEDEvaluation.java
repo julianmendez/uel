@@ -64,7 +64,7 @@ public class SNOMEDEvaluation {
 			// "Clinical history and observation findings (finding)",
 			"Disease (disorder)", "Event (event)",
 			// "Finding by site (finding)",
-			"Functional finding (finding)", "Observable entity (observable entity)" };
+			"Functional finding (finding)" };
 
 	private static final int[] ROLE_GROUP_NO = new int[] { 1, 2 };
 
@@ -314,7 +314,7 @@ public class SNOMEDEvaluation {
 				.forEach(ax -> definitions.add((OWLEquivalentClassesAxiom) ax));
 
 		Random rnd = new Random();
-		System.out.println("Loading finished.");
+		System.out.println("Loading finished (" + definitions.size() + " classes with full definitions).");
 
 		for (int i = 0; (i < MAX_TESTS) && (definitions.size() > 0); i++) {
 			OWLEquivalentClassesAxiom axiom = definitions.get(rnd.nextInt(definitions.size()));
@@ -322,7 +322,7 @@ public class SNOMEDEvaluation {
 			OWLClass goalClass = axiom.getNamedClasses().iterator().next();
 			OWLClassExpression goalExpression = axiom.getClassExpressionsMinus(goalClass).iterator().next();
 			System.out.println();
-			System.out.print("***** [" + i + "] ");
+			System.out.print("***** [" + (i + 1) + "] ");
 			runSingleTest(goalClass, goalExpression);
 		}
 	}
@@ -341,7 +341,10 @@ public class SNOMEDEvaluation {
 		initThread.join(TIMEOUT);
 		SNOMEDResult result = initRunner.result;
 		if (initThread.isAlive()) {
+			System.out.println("Timeout!");
+			printThreadInfo();
 			initThread.interrupt();
+			initThread.join();
 			result.goalStatus = SNOMEDGoalStatus.TIMEOUT;
 		}
 		results.add(result);
