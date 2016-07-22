@@ -45,7 +45,7 @@ public class SNOMEDStatistics {
 
 	public static void main(String[] args) {
 		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
-		OWLOntology snomed = AlternativeUelStarter.loadOntology(SNOMEDEvaluation.SNOMED_MODULE_PATH, manager);
+		OWLOntology snomed = AlternativeUelStarter.loadOntology(SNOMEDEvaluation.SNOMED_PATH, manager);
 
 		for (OWLSubClassOfAxiom a : snomed.getAxioms(AxiomType.SUBCLASS_OF)) {
 			checkDefinition((OWLClass) a.getSubClass(), a.getSuperClass());

@@ -188,43 +188,22 @@ public class UelOntologyGoal implements Goal {
 	@Override
 	public boolean areCompatible(Integer atomId1, Integer atomId2) {
 		if (ideals.isEmpty()) {
+			// no compatibility information was extracted
 			return true;
 		}
-
-		if (!atomManager.getDefinitionVariables().contains(atomId1) && !atomManager.getConstants().contains(atomId1)) {
-			return true;
-		}
-		if (!atomManager.getDefinitionVariables().contains(atomId2) && !atomManager.getConstants().contains(atomId2)) {
-			return true;
-		}
-
-		if (atomManager.getUndefNames().contains(atomId1)) {
-			atomId1 = atomManager.removeUndef(atomId1);
-		}
-		if (atomManager.getUndefNames().contains(atomId2)) {
-			atomId2 = atomManager.removeUndef(atomId2);
-		}
-
-		// Integer type1 = types.contains(atomId1) ? atomId1 :
-		// typeAssignment.get(atomId1);
-		// Integer type2 = types.contains(atomId2) ? atomId2 :
-		// typeAssignment.get(atomId2);
-		// if ((type1 == null) || (type2 == null) || areDisjoint(type1, type2))
-		// {
-		// return true;
-		// }
 
 		if (atomId1.equals(atomId2)) {
+			// every concept name is compatible with itself
 			return true;
 		}
 
-		for (Set<Integer> ideal : ideals) {
-			if (ideal.contains(atomId1) && ideal.contains(atomId2)) {
-				return true;
-			}
+		if (!(atomManager.getDefinitionVariables().contains(atomId1)
+				&& atomManager.getDefinitionVariables().contains(atomId2))) {
+			// compatibility is only checked for definition variables
+			return true;
 		}
 
-		return false;
+		return ideals.stream().anyMatch(ideal -> ideal.contains(atomId1) && ideal.contains(atomId2));
 	}
 
 	private <S, T> Set<T> collectSets(Set<S> input, Function<S, Set<T>> mapper) {
@@ -272,17 +251,14 @@ public class UelOntologyGoal implements Goal {
 	 * of the background ontology.
 	 */
 	public void extractCompatibilityRelation() {
-		Set<Integer> processed = new HashSet<Integer>();
 		Set<Integer> toProcess = new HashSet<Integer>(
 				Sets.difference(Sets.union(atomManager.getDefinitionVariables(), atomManager.getConstants()),
 						atomManager.getUndefNames()));
 		while (!toProcess.isEmpty()) {
 			Integer varId = toProcess.iterator().next();
-			Set<Integer> superclasses = Sets.union(ontology.getKnownSuperclasses(varId),
-					getAssertedSuperclasses(varId));
+			Set<Integer> superclasses = Sets.union(getAllSuperclasses(varId), getAssertedSuperclasses(varId));
 			ideals.add(superclasses);
-			processed.addAll(superclasses);
-			toProcess.removeAll(processed);
+			toProcess.removeAll(superclasses);
 		}
 
 		// printIdeals(renderer);
@@ -301,11 +277,19 @@ public class UelOntologyGoal implements Goal {
 		// printIdeals(renderer);
 	}
 
+	private Set<Integer> getAllSuperclasses(Integer varId) {
+		UnifierPostprocessor processor = new UnifierPostprocessor(atomManager, this, renderer);
+		return new HashSet<Integer>(
+				Sets.difference(Sets.union(atomManager.getDefinitionVariables(), atomManager.getConstants()),
+						atomManager.getUndefNames())).stream().filter(atomId -> processor.isSubsumed(varId, atomId))
+								.collect(Collectors.toSet());
+	}
+
 	private Set<Integer> getAssertedSuperclasses(Integer varId) {
 		return subsumptions.stream().filter(sub -> (sub.getLeft().size() == 1 && sub.getLeft().contains(varId)))
 				.flatMap(sub -> sub.getRight().stream())
 				.filter(id -> !atomManager.getExistentialRestrictions().contains(id))
-				.flatMap(id -> ontology.getKnownSuperclasses(id).stream()).collect(Collectors.toSet());
+				.flatMap(id -> getAllSuperclasses(id).stream()).collect(Collectors.toSet());
 	}
 
 	private void extractDomainsAndRanges() {

@@ -140,15 +140,23 @@ public class UnifierPostprocessor {
 			return Collections.singleton(atomId);
 		}
 
-		// 'atomId' must be a (non-UNDEF) variable
+		// now 'atomId' must be a (non-UNDEF) variable
 		Set<Integer> definiens = goal.getDefiniens(atomId);
 		if (definiens != null) {
 			// if there exists a background definition, use that one
 			return definiens;
-		} else {
-			// all other variables are expanded using their substitutions
-			return defs.getDefiniens(atomId);
 		}
+
+		definiens = defs.getDefiniens(atomId);
+		if (definiens != null) {
+			// try to expand the variable using its substitution
+			return definiens;
+		}
+
+		// there was no defintion or substitution (e.g. if the unifier is
+		// incomplete, or we have not yet started the unfication algorithm) ->
+		// return the variable itself
+		return Collections.singleton(atomId);
 	}
 
 	private int getFullSize(Integer atomId, DefinitionSet defs) {
@@ -187,6 +195,10 @@ public class UnifierPostprocessor {
 
 	private boolean isSubsumed(Integer leftId, DefinitionSet leftDefs, Integer rightId, DefinitionSet rightDefs) {
 		return isSubsumed(Collections.singleton(leftId), leftDefs, Collections.singleton(rightId), rightDefs);
+	}
+
+	public boolean isSubsumed(Integer leftId, Integer rightId) {
+		return isSubsumed(leftId, DefinitionSet.EMPTY_SET, rightId, DefinitionSet.EMPTY_SET);
 	}
 
 	private boolean isSubsumed(Set<Integer> leftIds, DefinitionSet leftDefs, Integer rightId, DefinitionSet rightDefs) {

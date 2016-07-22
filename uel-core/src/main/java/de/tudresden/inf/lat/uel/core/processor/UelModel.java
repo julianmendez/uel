@@ -96,6 +96,13 @@ public class UelModel {
 		}
 	}
 
+	public void cleanupUnificationAlgorithm() {
+		if (algorithm != null) {
+			algorithm.cleanup();
+			algorithm = null;
+		}
+	}
+
 	/**
 	 * Uses the unification algorithm to obtain the next unifier. This method
 	 * iterates as long as the unification algorithm returns unifiers that are
@@ -107,8 +114,10 @@ public class UelModel {
 	 *             outside
 	 */
 	public boolean computeNextUnifier() throws InterruptedException {
+		boolean first = false;
 		if (!allUnifiersFound) {
 			while (algorithm.computeNextUnifier()) {
+				first = false;
 
 				if (Thread.interrupted()) {
 					throw new InterruptedException();
@@ -129,11 +138,8 @@ public class UelModel {
 
 					if (options.verbosity.level > 1) {
 						if (unifierList.size() == 1) {
-							System.out.println("Information about the algorithm:");
-							for (Entry<String, String> e : algorithm.getInfo()) {
-								System.out.println(e.getKey() + ":");
-								System.out.println(e.getValue());
-							}
+							first = true;
+							printAlgorithmInfo();
 						}
 					}
 
@@ -158,6 +164,11 @@ public class UelModel {
 			}
 		}
 		allUnifiersFound = true;
+		if (options.verbosity.level > 1) {
+			if (!first) {
+				printAlgorithmInfo();
+			}
+		}
 		return false;
 	}
 
@@ -320,15 +331,12 @@ public class UelModel {
 		postprocessor = new UnifierPostprocessor(atomManager, goal, getStringRenderer(null));
 	}
 
-	public void cleanupUnificationAlgorithm() {
-		if (algorithm != null) {
-			algorithm.cleanup();
-			algorithm = null;
-		}
-	}
-
-	private boolean isNew(Unifier newUnifier) {
+	private boolean isNew(Unifier newUnifier) throws InterruptedException {
 		for (Unifier oldUnifier : unifierList) {
+			if (Thread.interrupted()) {
+				throw new InterruptedException();
+			}
+
 			if (postprocessor.areEquivalent(oldUnifier, newUnifier)) {
 				return false;
 			}
@@ -379,6 +387,14 @@ public class UelModel {
 		makeIdsVariables(variables.map(this::getAtomId), userVariables);
 	}
 
+	private void printAlgorithmInfo() {
+		System.out.println("Information about the algorithm:");
+		for (Entry<String, String> e : algorithm.getInfo()) {
+			System.out.println(e.getKey() + ":");
+			System.out.println(e.getValue());
+		}
+	}
+
 	/**
 	 * Prints the current unifier using the default StringRenderer.
 	 * 
@@ -401,7 +417,7 @@ public class UelModel {
 		return getStringRenderer(null).renderGoal(goal, true);
 	}
 
-	public void printGoalInfo() {
+	private void printGoalInfo() {
 		// output unification problem
 		System.out.println("Number of atoms: " + atomManager.size());
 		System.out.println("Number of constants: " + atomManager.getConstants().size());

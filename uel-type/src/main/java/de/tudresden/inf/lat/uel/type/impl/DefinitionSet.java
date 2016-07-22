@@ -19,6 +19,8 @@ public class DefinitionSet extends HashMap<Integer, Definition> implements Itera
 
 	private static final long serialVersionUID = -5104296756025334343L;
 
+	public static DefinitionSet EMPTY_SET = new DefinitionSet(0);
+
 	public DefinitionSet() {
 		super();
 	}

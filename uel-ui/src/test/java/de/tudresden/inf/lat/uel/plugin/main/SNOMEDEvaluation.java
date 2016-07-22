@@ -52,42 +52,41 @@ import de.tudresden.inf.lat.uel.plugin.main.SNOMEDResult.SNOMEDGoalStatus;
 public class SNOMEDEvaluation {
 
 	// private static final String WORK_DIR = "C:\\Users\\Stefan\\Work\\";
-	static final String WORK_DIR = "/Users/stefborg/Documents/";
-	static final String OUTPUT_PATH = WORK_DIR + "Projects/uel-snomed/results";
-	// static final String SNOMED_PATH = WORK_DIR +
-	// "Ontologies/snomed-english-rdf.owl";
-
-	// static final String PARENT_CLASS = "Bodystructure(bodystructure)";
-	// static final String PARENT_CLASS = "Event(event)";
-	// static final String PARENT_CLASS = "Observableentity(observableentity)";
-	// static final String PARENT_CLASS = "Circumlocution(finding)";
-	// static final String PARENT_CLASS = "Bleeding (finding)";
-	// static final String PARENT_CLASS = "Clinical history and observation
-	// findings (finding)";
-	// static final String PARENT_CLASS = "Finding by site (finding)";
-	static final String PARENT_CLASS = "Disease (disorder)";
-	// static final String SNOMED_MODULE_PATH = WORK_DIR + "Ontologies/snomed-"
-	// + PARENT_CLASS + "ModuleNEW.owl";
-	// static final String CLASSES_LIST = WORK_DIR + "Ontologies/" +
-	// PARENT_CLASS + "NEW.txt";
-	static final String SNOMED_MODULE_PATH = WORK_DIR + "Ontologies/snomed-FunctionalFindingModule.owl";
-	static final String CLASSES_LIST = WORK_DIR + "Ontologies/FunctionalFindings.txt";
-
+	private static final String WORK_DIR = "/Users/stefborg/Documents/";
+	private static final String OUTPUT_PATH = WORK_DIR + "Projects/uel-snomed/results-";
+	private static final String SNOMED_MODULE_PATH = WORK_DIR + "Ontologies/snomed-";
+	static final String SNOMED_PATH = SNOMED_MODULE_PATH + "english-rdf.owl";
 	static final String SNOMED_RESTR_PATH = WORK_DIR + "Ontologies/snomed-restrictions-no-imports.owl";
 
-	static final String[] TEST_ALGORITHMS = new String[] {
+	private static final String[] PARENT_CLASSES = new String[] {
+			// "Bleeding (finding)",
+			"Body structure (body structure)", "Clinical finding (finding)",
+			// "Clinical history and observation findings (finding)",
+			"Disease (disorder)", "Event (event)",
+			// "Finding by site (finding)",
+			"Functional finding (finding)", "Observable entity (observable entity)" };
+
+	private static final int[] ROLE_GROUP_NO = new int[] { 1, 2 };
+
+	private static final String[] TEST_ALGORITHMS = new String[] {
 			//
-			UnificationAlgorithmFactory.SAT_BASED_ALGORITHM_MINIMAL
-			// ,
-			// UnificationAlgorithmFactory.ASP_BASED_ALGORITHM
+			UnificationAlgorithmFactory.SAT_BASED_ALGORITHM
+			//
+			,
+			//
+			UnificationAlgorithmFactory.ASP_BASED_ALGORITHM
+			//
 	};
 
 	static final int MAX_SIBLINGS = 100;
 	static final int MAX_ATOMS = 240;
 	static final boolean CHECK_UNIFIERS = true;
-	private static final int MAX_TESTS = 100;
-	private static final long TIMEOUT = 1000 * 60 * 1000;
+	private static final int MAX_TESTS = 50;
+	private static final long TIMEOUT = 5 * 60 * 1000;
 
+	private static String currentParentClass;
+	private static String currentModulePath;
+	private static String currentClassesList;
 	private static Date startTime;
 	private static List<SNOMEDResult> results;
 	private static UelOptions options;
@@ -115,16 +114,17 @@ public class SNOMEDEvaluation {
 		if (results != null) {
 			try {
 				System.out.println("Saving results to file...");
-				PrintStream out = new PrintStream(OUTPUT_PATH
-						+ new SimpleDateFormat("yyMMddHHmmss").format(Calendar.getInstance().getTime()) + ".txt");
+				PrintStream out = new PrintStream(
+						OUTPUT_PATH + new SimpleDateFormat("yyMMddHHmmss").format(Calendar.getInstance().getTime())
+								+ "-" + currentParentClass + "-" + options.numberOfRoleGroups + "RG.txt");
 
 				out.println("* UEL options:");
 				out.println(options);
 
 				out.println("* Test options:");
 				out.println("Timeout (s): " + (TIMEOUT / 1000));
-				out.println("Ontology path: " + SNOMED_MODULE_PATH);
-				out.println("List of goal classes: " + CLASSES_LIST);
+				out.println("Ontology path: " + currentModulePath);
+				out.println("List of goal classes: " + currentClassesList);
 				out.println("Cut-off for number of siblings of the goal class: " + MAX_SIBLINGS);
 				out.println("Cut-off for number of atoms: " + MAX_ATOMS);
 				out.println("Check unifiers for correctness: " + CHECK_UNIFIERS);
@@ -193,22 +193,37 @@ public class SNOMEDEvaluation {
 
 		Runtime.getRuntime().addShutdownHook(new Thread(SNOMEDEvaluation::printResults));
 
+		for (String parentClass : PARENT_CLASSES) {
+			for (int rg : ROLE_GROUP_NO) {
+				runModuleTests(parentClass, rg);
+				System.out.println();
+				System.out.println();
+			}
+		}
+	}
+
+	private static void runModuleTests(String parentClass, int rg) {
+		System.out.println("========== Module tests for parent class: " + parentClass + " [" + rg + " RoleGroup(s)]");
+
+		currentParentClass = parentClass;
+		currentModulePath = SNOMED_MODULE_PATH + parentClass + ".owl";
+		currentClassesList = SNOMED_MODULE_PATH + parentClass + ".txt";
 		startTime = Calendar.getInstance().getTime();
 		results = new ArrayList<SNOMEDResult>();
 		manager = OWLManager.createOWLOntologyManager();
 		factory = manager.getOWLDataFactory();
-		snomed = AlternativeUelStarter.loadOntology(SNOMED_MODULE_PATH, manager);
+		snomed = AlternativeUelStarter.loadOntology(currentModulePath, manager);
 		snomedRestrictions = AlternativeUelStarter.loadOntology(SNOMED_RESTR_PATH, manager);
 		bg = new HashSet<OWLOntology>(Arrays.asList(snomed, snomedRestrictions));
 
 		options = new UelOptions();
-		options.verbosity = Verbosity.NORMAL;
+		options.verbosity = Verbosity.SHORT;
 		options.undefBehavior = UndefBehavior.CONSTANTS;
 		options.snomedMode = true;
 		options.unificationAlgorithmName = TEST_ALGORITHMS[0];
 		options.expandPrimitiveDefinitions = true;
 		options.restrictUndefContext = true;
-		options.numberOfRoleGroups = 2;
+		options.numberOfRoleGroups = rg;
 		options.minimizeSolutions = true;
 		options.noEquivalentSolutions = true;
 		options.numberOfSiblings = -1;
@@ -216,11 +231,12 @@ public class SNOMEDEvaluation {
 		try {
 			// randomly select classes with full definition from the SNOMED
 			// module
-			// randomTests();
+			randomTests();
 
-			// Disagreement between SAT and ASP (2 RG)!? (SAT alg. does not find a solution)
+			// Disagreement between SAT and ASP (2 RG)!? (SAT alg. does not find
+			// a solution) -> fixed with extended compatibility check
 			// runSingleTest("SCT_364805005");
-			runSingleTest("SCT_284782007");
+			// runSingleTest("SCT_284782007");
 			// runSingleTest("SCT_365278008");
 			// runSingleTest("SCT_300723007");
 
@@ -275,9 +291,11 @@ public class SNOMEDEvaluation {
 			// solver, which returned some incorrect unifiers
 			// runSingleTest("SCT_284124002");
 
-		} catch (InterruptedException ex) {
+		} catch (IOException | InterruptedException ex) {
 			ex.printStackTrace();
 		}
+
+		printResults();
 	}
 
 	private static void runSingleTest(String id) throws InterruptedException {
@@ -287,19 +305,13 @@ public class SNOMEDEvaluation {
 		runSingleTest(goalClass, goalExpression);
 	}
 
-	private static void randomTests() throws InterruptedException {
+	private static void randomTests() throws InterruptedException, IOException {
 		List<OWLEquivalentClassesAxiom> definitions = new ArrayList<OWLEquivalentClassesAxiom>();
-		try {
-			for (String line : Files.readAllLines(Paths.get(CLASSES_LIST))) {
-				line = line.substring(1, line.length() - 1);
-				snomed.getAxioms(factory.getOWLClass(IRI.create(line)), Imports.EXCLUDED).stream()
-						.filter(ax -> ax instanceof OWLEquivalentClassesAxiom)
-						.forEach(ax -> definitions.add((OWLEquivalentClassesAxiom) ax));
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-			return;
-		}
+		Files.lines(Paths.get(currentClassesList)).map(line -> line.substring(1, line.length() - 1))
+				.map(line -> factory.getOWLClass(IRI.create(line)))
+				.flatMap(cls -> snomed.getAxioms(cls, Imports.EXCLUDED).stream())
+				.filter(ax -> ax instanceof OWLEquivalentClassesAxiom)
+				.forEach(ax -> definitions.add((OWLEquivalentClassesAxiom) ax));
 
 		Random rnd = new Random();
 		System.out.println("Loading finished.");
@@ -378,7 +390,7 @@ public class SNOMEDEvaluation {
 		return elapsedTime;
 	}
 
-	static void printThreadInfo() {
+	private static void printThreadInfo() {
 		for (Entry<Thread, StackTraceElement[]> e : Thread.getAllStackTraces().entrySet()) {
 			Thread t = e.getKey();
 			if (!t.getName().equals("main") && !t.getName().equals("Finalizer")
