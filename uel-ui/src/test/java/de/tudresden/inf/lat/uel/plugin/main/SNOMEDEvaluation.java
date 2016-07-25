@@ -60,11 +60,13 @@ public class SNOMEDEvaluation {
 
 	private static final String[] PARENT_CLASSES = new String[] {
 			// "Bleeding (finding)",
-			"Body structure (body structure)", "Clinical finding (finding)",
+			// "Body structure (body structure)",
+			// "Clinical finding (finding)",
 			// "Clinical history and observation findings (finding)",
-			"Disease (disorder)", "Event (event)",
-			// "Finding by site (finding)",
-			"Functional finding (finding)" };
+			// "Disease (disorder)", "Event (event)",
+			"Finding by site (finding)",
+			// "Functional finding (finding)",
+	};
 
 	private static final int[] ROLE_GROUP_NO = new int[] { 1, 2 };
 
@@ -193,6 +195,8 @@ public class SNOMEDEvaluation {
 
 		Runtime.getRuntime().addShutdownHook(new Thread(SNOMEDEvaluation::printResults));
 
+		// runSingleTest("Body structure (body structure)", 1, "SCT_272651007");
+
 		for (String parentClass : PARENT_CLASSES) {
 			for (int rg : ROLE_GROUP_NO) {
 				runModuleTests(parentClass, rg);
@@ -205,6 +209,20 @@ public class SNOMEDEvaluation {
 	private static void runModuleTests(String parentClass, int rg) {
 		System.out.println("========== Module tests for parent class: " + parentClass + " [" + rg + " RoleGroup(s)]");
 
+		initializePrivateFields(parentClass, rg);
+
+		try {
+			// randomly select classes with full definition from the SNOMED
+			// module
+			randomTests();
+		} catch (IOException | InterruptedException ex) {
+			ex.printStackTrace();
+		}
+
+		printResults();
+	}
+
+	private static void initializePrivateFields(String parentClass, int rg) {
 		currentParentClass = parentClass;
 		currentModulePath = SNOMED_MODULE_PATH + parentClass + ".owl";
 		currentClassesList = SNOMED_MODULE_PATH + parentClass + ".txt";
@@ -227,82 +245,20 @@ public class SNOMEDEvaluation {
 		options.minimizeSolutions = true;
 		options.noEquivalentSolutions = true;
 		options.numberOfSiblings = -1;
-
-		try {
-			// randomly select classes with full definition from the SNOMED
-			// module
-			randomTests();
-
-			// Disagreement between SAT and ASP (2 RG)!? (SAT alg. does not find
-			// a solution) -> fixed with extended compatibility check
-			// runSingleTest("SCT_364805005");
-			// runSingleTest("SCT_284782007");
-			// runSingleTest("SCT_365278008");
-			// runSingleTest("SCT_300723007");
-
-			// 'Difficulty writing (finding)': 30s; new: 21 s / 6,7 min
-			// singleTest("SCT_102938007");
-
-			// 'Does not use words (finding)': 12s / 42s
-			// OWLClass goalClass = cls("SCT_288613006");
-
-			// 'Circumlocution (finding)': too large (1732 atoms), primitive!
-			// OWLClass goalClass = cls("SCT_48364004");
-
-			// 'Finding relating to crying (finding)': too large (1816 atoms)
-			// OWLClass goalClass = cls("SCT_303220007");
-
-			// 'Routine procedure (procedure)':
-			// OWLClass goalClass = cls("SCT_373113001");
-
-			// 'Contraception (finding)': impossible
-			// OWLClass goalClass = cls("SCT_13197004");
-
-			// 'Calculus finding (finding)': too large
-			// OWLClass goalClass = cls("SCT_313413008");
-
-			// 'Abnormal gallbladder function (finding)': huge (3718 atoms)
-			// OWLClass goalClass = cls("SCT_51047007");
-
-			// 'Unable to air laundry (finding)': needs 3 RoleGroups; 1min (5) /
-			// >
-			// 20min
-			// OWLClass goalClass = cls("SCT_286073006");
-
-			// 'Echoencephalogram abnormal (finding)': too large
-			// OWLClass goalClass = cls(factory, "SCT_274538008");
-
-			// 'Primary malignant neoplasm of pyriform sinus (disorder)'
-			//
-
-			// 'Entire left kidney (body structure)'
-			// OWLClass goalClass = cls(factory, "SCT_362209008");
-
-			// 'Finding related to ability to use contact lenses (finding)'
-			// OWLClass goalClass = cls(factory, "SCT_365239009");
-
-			// 'Biguanide overdose (disorder)'
-			// singleTest("SCT_296872003", snomed, bg);
-
-			// 'Chronic progressive epilepsia partialis continua (disorder)'
-			// singleTest("SCT_39745004");
-
-			// 'Does control trunk posture (finding)' -> test case for ASP
-			// solver, which returned some incorrect unifiers
-			// runSingleTest("SCT_284124002");
-
-		} catch (IOException | InterruptedException ex) {
-			ex.printStackTrace();
-		}
-
-		printResults();
 	}
 
-	private static void runSingleTest(String id) throws InterruptedException {
+	private static void runSingleTest(String parentClass, int rg, String id) {
+		initializePrivateFields(parentClass, rg);
+
 		OWLClass goalClass = cls(id);
 		OWLClassExpression goalExpression = ((OWLEquivalentClassesAxiom) snomed.getAxioms(goalClass, Imports.EXCLUDED)
 				.iterator().next()).getClassExpressionsMinus(goalClass).iterator().next();
-		runSingleTest(goalClass, goalExpression);
+
+		try {
+			runSingleTest(goalClass, goalExpression);
+		} catch (InterruptedException ex) {
+			ex.printStackTrace();
+		}
 	}
 
 	private static void randomTests() throws InterruptedException, IOException {
@@ -355,6 +311,7 @@ public class SNOMEDEvaluation {
 			OWLOntology pos = initRunner.pos;
 			OWLOntology neg = initRunner.neg;
 			OWLAxiom goalAxiom = initRunner.goalAxiom;
+			initRunner = null;
 			initThread = null;
 
 			for (int i = 0; i < TEST_ALGORITHMS.length; i++) {

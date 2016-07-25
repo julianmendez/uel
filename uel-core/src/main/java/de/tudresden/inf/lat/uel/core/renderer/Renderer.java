@@ -325,6 +325,8 @@ public abstract class Renderer<ExpressionType, RoleType, AxiomsType> {
 
 		for (Definition definition : sortDefinitions(unifier.getDefinitions(), sorted)) {
 			if (!restrictToUserVariables || atomManager.getUserVariables().contains(definition.getDefiniendum())) {
+				// if
+				// (!definition.getDefiniens().equals(Collections.singleton(definition.getDefiniendum())))
 				translateAxiom(definition);
 			}
 		}
