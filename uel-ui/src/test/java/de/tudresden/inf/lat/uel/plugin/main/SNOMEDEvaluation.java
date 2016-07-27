@@ -72,16 +72,16 @@ public class SNOMEDEvaluation {
 
 	private static final String[] TEST_ALGORITHMS = new String[] {
 			//
-			UnificationAlgorithmFactory.SAT_BASED_ALGORITHM
+			// UnificationAlgorithmFactory.SAT_BASED_ALGORITHM
 			//
-			,
+			// ,
 			//
 			UnificationAlgorithmFactory.ASP_BASED_ALGORITHM
 			//
 	};
 
-	static final int MAX_SIBLINGS = 100;
-	static final int MAX_ATOMS = 240;
+	static final int MAX_SIBLINGS = -1; // 100
+	static final int MAX_ATOMS = -1; // 240
 	static final boolean CHECK_UNIFIERS = true;
 	private static final int MAX_TESTS = 50;
 	private static final long TIMEOUT = 5 * 60 * 1000;
@@ -118,7 +118,7 @@ public class SNOMEDEvaluation {
 				System.out.println("Saving results to file...");
 				PrintStream out = new PrintStream(
 						OUTPUT_PATH + new SimpleDateFormat("yyMMddHHmmss").format(Calendar.getInstance().getTime())
-								+ "-" + currentParentClass + "-" + options.numberOfRoleGroups + "RG.txt");
+								+ "-" + currentParentClass + "-" + options.numberOfRoleGroups + "RG-nolimit.txt");
 
 				out.println("* UEL options:");
 				out.println(options);
@@ -328,6 +328,10 @@ public class SNOMEDEvaluation {
 				if (algorithmThread.isAlive()) {
 					System.out.println("Timeout!");
 					printThreadInfo();
+					// force cleanup from outside in case the algorithm is
+					// blocking, e.g., waiting for JSON output of clingo
+					// TODO: find non-blocking JSON parser ;-)
+					iterator.cleanup();
 					algorithmThread.interrupt();
 					algorithmThread.join();
 					algorithmResult.status = SNOMEDAlgorithmStatus.TIMEOUT;

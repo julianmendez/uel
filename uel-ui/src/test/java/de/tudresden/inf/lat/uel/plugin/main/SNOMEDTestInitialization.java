@@ -88,7 +88,7 @@ public class SNOMEDTestInitialization implements Runnable {
 		if (options.verbosity.level > 0) {
 			System.out.println("Siblings: " + siblings.size());
 		}
-		if (siblings.size() > SNOMEDEvaluation.MAX_SIBLINGS) {
+		if ((SNOMEDEvaluation.MAX_SIBLINGS > -1) && (siblings.size() > SNOMEDEvaluation.MAX_SIBLINGS)) {
 			System.out.println("Too many siblings!");
 			result.goalStatus = SNOMEDGoalStatus.TOO_LARGE;
 			return;
@@ -117,7 +117,7 @@ public class SNOMEDTestInitialization implements Runnable {
 		if (options.verbosity.level > 0) {
 			System.out.println("Size: " + size);
 		}
-		if (size > SNOMEDEvaluation.MAX_ATOMS) {
+		if ((SNOMEDEvaluation.MAX_ATOMS > -1) && (size > SNOMEDEvaluation.MAX_ATOMS)) {
 			System.out.println("Problem is too large!");
 			result.goalStatus = SNOMEDGoalStatus.TOO_LARGE;
 		} else {

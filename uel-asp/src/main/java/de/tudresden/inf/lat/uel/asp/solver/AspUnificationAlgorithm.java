@@ -55,9 +55,14 @@ public class AspUnificationAlgorithm extends AbstractUnificationAlgorithm {
 			}
 			return hasNext;
 		} catch (IOException e) {
-			cleanup();
-			throw new RuntimeException(e);
+			if (!e.getMessage().contains("Stream closed")) {
+				// ignore 'Stream closed', because it was caused by 'cleanup'
+				// being called from another thread
+				cleanup();
+				throw new RuntimeException(e);
+			}
 		}
+		return false;
 	}
 
 	@Override
