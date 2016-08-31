@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Set;
 
@@ -39,7 +40,7 @@ class OWLUtils {
 	 *             if an error occurred during rendering
 	 */
 	private static String renderKRSS(OWLOntology owlOntology) throws OWLRendererException {
-		StringWriter writer = new StringWriter();
+		PrintWriter writer = new PrintWriter(new StringWriter());
 		KRSS2OWLSyntaxRenderer renderer = new KRSS2OWLSyntaxRenderer();
 		renderer.render(owlOntology, writer);
 		writer.flush();
@@ -56,7 +57,7 @@ class OWLUtils {
 	 *             if an error occurred during rendering
 	 */
 	private static String renderOWL(OWLOntology owlOntology) throws OWLRendererException {
-		StringWriter writer = new StringWriter();
+		PrintWriter writer = new PrintWriter(new StringWriter());
 		OWLXMLRenderer renderer = new OWLXMLRenderer();
 		renderer.render(owlOntology, writer);
 		writer.flush();
@@ -73,7 +74,7 @@ class OWLUtils {
 	 *             if an error occurred during rendering
 	 */
 	private static String renderRDF(OWLOntology owlOntology) throws IOException {
-		StringWriter writer = new StringWriter();
+		PrintWriter writer = new PrintWriter(new StringWriter());
 		RDFXMLRenderer renderer = new RDFXMLRenderer(owlOntology, writer);
 		renderer.render();
 		writer.flush();
