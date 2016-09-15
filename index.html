@@ -256,6 +256,8 @@ $ jar -cf bundle.jar uel-parent-*
 <li><p>You get back an iterator that gives you unifiers in the form of <code>Set&lt;OWLUelClassDefinition&gt;</code> specifying a substitution for every variable. Each <code>OWLUelClassDefinition</code> can be converted into an <code>OWLEquivalentClassesAxiom</code>. It should be the case that the background ontology, extended by the <code>OWLEquivalentClassesAxioms</code> given by one unifier, entails all input subsumptions and does not entail any of the dissubsumptions.</p></li>
 </ul>
 
+<p><code>AlternativeUelStarter</code> marks all UNDEF concepts as variables by default, if you do not want this behaviour, call the method <code>markUndefAsVariables</code> passing <code>false</code> as argument before call <code>modifyOntologyAndSolve</code>.</p>
+
 <p><code>AlternativeUelStarter</code> also provides a simple command-line interface that can be accessed by starting Java directly on this class. The execution options are not documented yet, but can be found in the in the source code of the main method.</p>
 
 <h2>
