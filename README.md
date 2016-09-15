@@ -165,6 +165,8 @@ This small tutorial gives an example of how to use UEL as a Java library. The cl
 
 * You get back an iterator that gives you unifiers in the form of `Set<OWLUelClassDefinition>` specifying a substitution for every variable. Each `OWLUelClassDefinition` can be converted into an `OWLEquivalentClassesAxiom`. It should be the case that the background ontology, extended by the `OWLEquivalentClassesAxioms` given by one unifier, entails all input subsumptions and does not entail any of the dissubsumptions.
 
+`AlternativeUelStarter` marks all UNDEF concepts as variables by default, if you do not want this behaviour, call the method `markUndefAsVariables` passing `false` as argument before call `modifyOntologyAndSolve`.
+
 `AlternativeUelStarter` also provides a simple command-line interface that can be accessed by starting Java directly on this class. The execution options are not documented yet, but can be found in the in the source code of the main method.
 
 
