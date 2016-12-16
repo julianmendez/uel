@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+  "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <link type="text/css" rel="stylesheet" href="style.css" />
+
+  <title>uel</title>
+</head>
+
+<body>
+  <div class="body_content">
+    <div><img src="img/banner.png" alt="uel" /></div>
+
+    <div class="footer">
+     <br />
+    </div>
+
+    <div>
+      <br />
+      <br />
+      <br />
+      <br />
+
+      <div class="content">
+
+      The following tutorial shows how to use <b>UEL</b>. It can be run as a standalone application ...
+      <br/><br/><img src="img/01_standalone.png" alt="UEL as a standalone application" width="530" /><br/><br/>
+      ... or as a plug-in inside Prot&eacute;g&eacute;:
+      <br/><br/><img src="img/02_protege.png" alt="UEL as a Prot&eacute;g&eacute; plug-in" width="530" /><br/><br/>
+      The user interface is the same in both cases. One can open the ontologies describing background knowledge and the unification problems using the "open" button of UEL, or using the Prot&eacute;g&eacute; menu (all ontologies to be used have to be opened in the same Prot&eacute;g&eacute; window).
+      <br/><br/><img src="img/03_open_ontology.png" alt="open an ontology using UEL" width="530" /><br/><br/>
+      For our example, we have openend the ontologies <a href="extra/headinjury.owl">headinjury.owl</a> and <a href="extra/headinjury-dissubsumption.owl">headinjury-dissubsumption.owl</a> and selected them as the positive and the negative part of the (dis)unification problem, respectively. This small example consists of one equation and two dissubsumptions. A more detailed description can be found in <i>Franz Baader, Stefan Borgwardt, and Barbara Morawska: Dismatching and Disunification in EL. In Proc. RTA, 2015</i>. UEL only recognizes OWL axioms of types <i>subClassOf</i> and <i>equivalentClass</i> in these input ontologies. Additionally, up to two background ontologies can be selected to provide background knowledge in the form of acyclic definitions. It is important that all OWL classes that should be shared between the selected ontologies are identified by the same IRIs in all ontologies.
+      <br/><br/><img src="img/04_ontologies_selected.png" alt="example ontologies selected in UEL" width="530" /><br/><br/>
+      The next step is to select a unification algorithm to solve the problem. There are different advantages and disadvantages to each of them, which are discussed in the following publications. The SAT-based algorithm was developed in <i>Franz Baader and Barbara Morawska: SAT Encoding of Unification in EL. In Proc. LPAR, 2010</i>, the rule-based one <i>Franz Baader and Barbara Morawska: Unification in the Description Logic EL. Logical Methods in Computer Science 6(3), 2010</i>. Additionally, an experimental encoding into ASP (answer set programming) has been implemented, which however requires the ASP solver <a href="http://potassco.sourceforge.net/">clingo</a> to be installed and available via the PATH environment variable of the JVM instance UEL is running in. Both the SAT and the ASP encoding provide the option to compute only so-called minimal assignments; for details, see <i>Franz Baader, Stefan Borgwardt, Julian Alfredo Mendez, and Barbara Morawska: UEL: Unification Solver for EL. In Proc. DL, 2012</i>. It should be noted that negative constraints (dissubsumptions and disequations) are currently only supported by the SAT-based algorithm.
+      <br/><br/><img src="img/05_choose_processor.png" alt="choose the unification algorithm" width="530" /><br/><br/>
+      Once an algorithm has been chosen, a click on the arrow button opens a new window that allows to choose which OWL classes are supposed to be treated as variables, and which as constants. Initially, all classes are marked as constants, which are listed in the left column. Using the two first buttons, one can move classes to the second column, to designate them as variables, and back.
+      <br/><br/><img src="img/06_select_variables.png" alt="select some concept names as variables" width="530" /><br/><br/>
+      A click on the third button starts the unification process.
+      <br/><br/><img src="img/07_start_unification.png" alt="start the unification algorithm" width="530" /><br/><br/>
+      Using the arrow buttons in the next window, one can request the computation of the next unifier, as well as navigate within the set of already computed unifiers. The first and fourth button jump to the first and last unifier, respectively. In case the problem has no solution, the text "[not unifiable]" will be displayed after the first unifier has been requested. Depending on the size of the problem and the chosen unification algorithm, the computation may take a long time, even to get just the first unifier.
+      <br/><br/><img src="img/08_request_unifiers.png" alt="request next unifier" width="530" /><br/><br/>
+      In this view, one can also save the currently displayed unifier into an ontology file that contains the displayed definitions for the variables. The recognized file extensions are .krss (for KRSS format as displayed), .owl (for OWL/XML format), and .rdf (for RDF/XML format).
+      <br/><br/><img src="img/09_save_unifier.png" alt="save the current unifier to an ontology file" width="530" /><br/><br/>
+      Using the last button, a new window is opened that contains additonal information about the actual (dis)unification problem that was sent to the unification algorithm. Due to some preprocessing, additional auxiliary variables may have been introduced. This representation can be saved as a text file. In the bottom, some additional statistics about the unification process are displayed, such as the number of generated clauses for the SAT encoding.
+      <br/><br/><img src="img/10_information.png" alt="window showing extra information" width="530" /><br/><br/>
+
+<!--
+<ul style="list-style: none;">
+
+<li>
+
+Once Prot&eacute;g&eacute; has started, we need to choose the tab &quot;UEL&quot;.
+
+We can see the laoded ontology in both combo boxes.
+
+One concept from each ontology is also shown in a text box.
+
+<br /> <br /> <a href="img/screenshot00.png"> <img src="img/screenshot00.png" alt="screenshot 00" width="400" /> </a> <br /> <br /> </li>
+
+<li>
+
+<b>UEL</b> can work using the following algorithms: the <b>SAT-based algorithm</b>, the <b>SAT-based algorithm (minimal assignments)</b> 
+and the <b>Rule-based algorithm</b>.
+
+<br /> <br /> <a href="img/screenshot01.png"> <img src="img/screenshot01.png" alt="screenshot 01" width="400" /> </a> <br /> <br /></li>
+
+<li>
+
+In this example, we choose the SAT-based algorithm.
+
+<br /> <br /> <a href="img/screenshot02.png"> <img src="img/screenshot02.png" alt="screenshot 02" width="400" /> </a> <br /> <br /></li>
+
+<li>
+
+<b>UEL</b> can work with two different ontologies. The &quot;folder&quot; 
+<img src="http://java.sun.com/developer/techDocs/hi/repository/graphicsRepository/toolbarButtonGraphics/general/Open16.gif" alt="open" />
+button opens a new ontology.
+
+<br /> <br /> <a href="img/screenshot03.png"> <img src="img/screenshot03.png" alt="screenshot 03" width="400" /> </a> <br /> <br /></li>
+
+<li>
+
+Once the new ontology is opened, it is possible to choose it at the combo box.
+
+<br /> <br /> <a href="img/screenshot04.png"> <img src="img/screenshot04.png" alt="screenshot 04" width="400" /> </a> <br /> <br /></li>
+
+<li>
+
+In this example we are going to use only one ontology. The text box can be edited. Writing &quot;Patient&quot; and pressing <tt>Enter</tt> will bring the first concept name starting with
+the word &quot;Patient&quot;. The system is case sensitive.
+
+<br /> <br /> <a href="img/screenshot05.png"> <img src="img/screenshot05.png" alt="screenshot 05" width="400" /> </a> <br /> <br /></li>
+
+<li>
+
+The first concept found is &quot;Patient_with_severe_head_injury&quot;. We can see other concepts as well by clicking on the down arrow.
+
+<br /> <br /> <a href="img/screenshot06.png"> <img src="img/screenshot06.png" alt="screenshot 06" width="400" /> </a> <br /> <br /></li>
+
+<li>
+
+We select the concept &quot;Patient_with_severe_injury_at_head&quot; in the second text box.
+
+<br /> <br /> <a href="img/screenshot07.png"> <img src="img/screenshot07.png" alt="screenshot 07" width="400" /> </a> <br /> <br /></li>
+
+<li>
+
+At this point we are ready to unify &quot;Patient_with_severe_head_injury&quot; with &quot;Patient_with_severe_injury_at_head&quot;.
+
+<br /> <br /> <a href="img/screenshot08.png"> <img src="img/screenshot08.png" alt="screenshot 08" width="400" /> </a> <br /> <br /></li>
+
+<li>
+
+We can continue to choose the variables. We need to press the &quot;right arrow&quot;
+<img src="http://java.sun.com/developer/techDocs/hi/repository/graphicsRepository/toolbarButtonGraphics/navigation/Forward16.gif" alt="forward" />
+button.
+
+<br /> <br /> <a href="img/screenshot09.png"> <img src="img/screenshot09.png" alt="screenshot 09" width="400" /> </a> <br /> <br /></li>
+
+<li>
+
+A dialog opens. The &quot;left arrow with bar&quot; 
+<img src="http://java.sun.com/developer/techDocs/hi/repository/graphicsRepository/toolbarButtonGraphics/media/StepBack16.gif" alt="step back" />
+button is to define a concept name as <b>constant</b>.
+
+<br /> <br /> <a href="img/screenshot10.png"> <img src="img/screenshot10.png" alt="screenshot 10" width="400" /> </a> <br /> <br /></li>
+
+<li>
+
+The &quot;right arrow with bar&quot; 
+<img src="http://java.sun.com/developer/techDocs/hi/repository/graphicsRepository/toolbarButtonGraphics/media/StepForward16.gif" alt="step forward" />
+button is to define a concept name as <b>variable</b>.
+
+<br /> <br /> <a href="img/screenshot11.png"> <img src="img/screenshot11.png" alt="screenshot 11" width="400" /> </a> <br /> <br /></li>
+
+<li>
+
+The &quot;right arrow&quot; 
+<img src="http://java.sun.com/developer/techDocs/hi/repository/graphicsRepository/toolbarButtonGraphics/navigation/Forward16.gif" alt="forward" />
+button is to continue with the selected variables.
+
+<br /> <br /> <a href="img/screenshot12.png"> <img src="img/screenshot12.png" alt="screenshot 12" width="400" /> </a> <br /> <br /></li>
+
+<li>
+
+We can choose the concept names by clicking on them with the <tt>Ctrl</tt> key pressed. The can also be chosen one by one.
+
+<br /> <br /> <a href="img/screenshot13.png"> <img src="img/screenshot13.png" alt="screenshot 13" width="400" /> </a> <br /> <br /></li>
+
+<li>
+
+Once they are chosen, we move them to the group of variables.
+
+<br /> <br /> <a href="img/screenshot14.png"> <img src="img/screenshot14.png" alt="screenshot 14" width="400" /> </a> <br /> <br /></li>
+
+<li>
+
+We can always move them back to the group of constants.
+
+When the variables are selected, we can continue to the step of computing the unifier.
+
+<br /> <br /> <a href="img/screenshot15.png"> <img src="img/screenshot15.png" alt="screenshot 15" width="400" /> </a> <br /> <br /></li>
+
+<li>
+
+A dialog opens. The unifier text box is still blank. To compute the first unifier, we need to press the &quot;right arrow&quot;
+<img src="http://java.sun.com/developer/techDocs/hi/repository/graphicsRepository/toolbarButtonGraphics/navigation/Forward16.gif" alt="forward" />
+button.
+
+<br /> <br /> <a href="img/screenshot16.png"> <img src="img/screenshot16.png" alt="screenshot 16" width="400" /> </a> <br /> <br /></li>
+
+<li>
+
+The first unifier is computed. 
+
+<br /> <br /> <a href="img/screenshot17.png"> <img src="img/screenshot17.png" alt="screenshot 17" width="400" /> </a> <br /> <br /></li>
+
+<li>
+
+By pressing the &quot;right arrow&quot; 
+<img src="http://java.sun.com/developer/techDocs/hi/repository/graphicsRepository/toolbarButtonGraphics/navigation/Forward16.gif" alt="forward" />
+button more unifiers may be computed. Each unifier has an identification number.
+
+<br /> <br /> <a href="img/screenshot18.png"> <img src="img/screenshot18.png" alt="screenshot 18" width="400" /> </a> <br /> <br /></li>
+
+<li>
+
+<b>UEL</b> does not repeat the computation of unifiers. Once an identifier is assigned, it keeps the unifier in memory and does not change its identifier.
+
+<br /> <br /> <a href="img/screenshot19.png"> <img src="img/screenshot19.png" alt="screenshot 19" width="400" /> </a> <br /> <br /></li>
+
+<li>
+
+We can always go back to see the previously computed unifiers by using the &quot;left arrow&quot; 
+<img src="http://java.sun.com/developer/techDocs/hi/repository/graphicsRepository/toolbarButtonGraphics/navigation/Back16.gif" alt="back" />
+button.
+
+<br /> <br /> <a href="img/screenshot20.png"> <img src="img/screenshot20.png" alt="screenshot 20" width="400" /> </a> <br /> <br /></li>
+
+<li>
+
+We can also request to compute all the unifiers by pressing the &quot;double right arrow&quot;
+<img src="http://java.sun.com/developer/techDocs/hi/repository/graphicsRepository/toolbarButtonGraphics/media/FastForward16.gif" alt="fast forward" />
+button. <b>UEL</b> will try to use as much resources as possible to perform this computation as fast as possible. 
+It is not suggested to use this button when the approximate number of unifiers is unknown.
+
+<br /> <br /> <a href="img/screenshot21.png"> <img src="img/screenshot21.png" alt="screenshot 21" width="400" /> </a> <br /> <br /></li>
+
+<li>
+
+We can go to the beginning by pressing the &quot;double left arrow&quot;
+<img src="http://java.sun.com/developer/techDocs/hi/repository/graphicsRepository/toolbarButtonGraphics/media/Rewind16.gif" alt="rewind" />
+
+<br /> <br /> <a href="img/screenshot22.png"> <img src="img/screenshot22.png" alt="screenshot 22" width="400" /> </a> <br /> <br /></li>
+
+<li>
+
+The computed unifier can be saved by pressing the &quot;floppy disk&quot;
+<img src="http://java.sun.com/developer/techDocs/hi/repository/graphicsRepository/toolbarButtonGraphics/general/Save16.gif" alt="save" />
+button. The available extensions are: <b>krss</b> (KRSS) and <b>owl</b> (RDF/OWL).
+
+<br /> <br /> <a href="img/screenshot23.png"> <img src="img/screenshot23.png" alt="screenshot 23" width="400" /> </a> <br /> <br /></li>
+
+<li>
+
+Statistical information can be retrieved by pressing the &quot;scroll&quot;
+<img src="http://java.sun.com/developer/techDocs/hi/repository/graphicsRepository/toolbarButtonGraphics/general/History16.gif" alt="history" />
+button.
+
+<br /> <br /> <a href="img/screenshot24.png"> <img src="img/screenshot24.png" alt="screenshot 24" width="400" /> </a> <br /> <br /></li>
+
+<li>
+
+The dialog with statistical information shows the goal, the number of variables, and the number propositions and clauses translated to the SAT solver.
+
+<br /> <br /> <a href="img/screenshot25.png"> <img src="img/screenshot25.png" alt="screenshot 25" width="400" /> </a> <br /> <br /></li>
+
+<li>
+
+The goal can be saved using the same formats as the unifier.
+
+<br /> <br /> <a href="img/screenshot26.png"> <img src="img/screenshot26.png" alt="screenshot 26" width="400" /> </a> <br /> <br /></li>
+
+<li>
+
+For the rule-based algorithm, the presented data is different.
+
+<br /> <br /> <a href="img/screenshot27.png"> <img src="img/screenshot27.png" alt="screenshot 27" width="400" /> </a> <br /> <br /></li>
+
+</ul>
+-->
+
+    </div>
+
+      <p><br />
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
+      </p>
+
+      <div id="footer">
+        <p><a href="http://sourceforge.net/p/uel"><img style="border:0;" src=
+        "http://sourceforge.net/sflogo.php?group_id=1111" alt="SourceForge Logo" /></a>
+        <a href="http://validator.w3.org/check?uri=referer"><img style="border:0;" src=
+        "http://www.w3.org/Icons/valid-xhtml-rdfa" alt="Valid XHTML + RDFa" height="31"
+        width="88" /></a> <a href=
+        "http://jigsaw.w3.org/css-validator/check/referer"><img style=
+        "border:0;width:88px;height:31px" src=
+        "http://jigsaw.w3.org/css-validator/images/vcss" alt=
+        "Valid CSS!" /></a></p><span>2015-04-16</span>
+      </div><br />
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
+    </div>
+
+    <div class="footer">
+      Copyright 2015
+    </div>
+  </div>
+</body>
+</html>
