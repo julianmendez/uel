@@ -120,8 +120,7 @@ See [this page](http://lat.inf.tu-dresden.de/~mendez).
 
 The following tutorial shows how to use UEL. It can be run as a standalone application ...
 
-![UEL as a standalone application](https://julianmendez.github.io/uel/img/01_standalone.png?raw=true)
-
+![UEL as a standalone application](https://github.com/julianmendez/uel/blob/master/docs/img/01_standalone.png?raw=true)
 
 ... or as a plug-in inside Protégé:
 
