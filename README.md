@@ -120,11 +120,11 @@ See [this page](http://lat.inf.tu-dresden.de/~mendez).
 
 The following tutorial shows how to use UEL. It can be run as a standalone application ...
 
-<img src="https://github.com/julianmendez/uel/blob/master/docs/img/01_standalone.png" alt="UEL as a standalone application">
+<img src="https://github.com/julianmendez/uel/blob/master/docs/img/01_standalone.png?raw=true" alt="UEL as a standalone application">
 
 ... or as a plug-in inside Protégé:
 
-![UEL as a Protégé plug-in](https://github.com/julianmendez/uel/blob/master/docs/img/02_protege.png)
+![UEL as a Protégé plug-in](https://github.com/julianmendez/uel/blob/master/docs/img/02_protege.png?raw=true)
 
 The user interface is the same in both cases. One can open the ontologies describing background knowledge and the unification problems using the "open" button of UEL, or using the Protégé menu (all ontologies to be used have to be opened in the same Protégé window).
 
