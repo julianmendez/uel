@@ -352,6 +352,8 @@ public class RuleBasedUnificationAlgorithm implements UnificationAlgorithm {
 	 *            the considered subsumption
 	 * @param previous
 	 *            the previous result or 'null' if this is the first try
+	 * @param currentAssignment
+	 *            current assignment
 	 * @return the result of the rule application or 'null' if no more rule
 	 *         applications are possible
 	 */
@@ -383,6 +385,7 @@ public class RuleBasedUnificationAlgorithm implements UnificationAlgorithm {
 	 *            the new assignment that will replace the current assignment;
 	 *            if this is 'null', then the change will be computed from
 	 *            'res.getNewSubsumers()'
+	 * @return <code>true</code> if and only if the execution was successful
 	 */
 	private boolean commitResult(Result res, Assignment newAssignment) {
 		// solve subsumption that triggered the rule

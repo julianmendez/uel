@@ -53,6 +53,11 @@ public class ClingoOutput implements AspOutput {
 
 	/**
 	 * Parse JSON output.
+	 * 
+	 * @param jsonStream
+	 *            JSON stream
+	 * @throws IOException
+	 *             if something went wrong with I/O
 	 */
 	private void parse(InputStream jsonStream) throws IOException {
 		ObjectMapper mapper = new ObjectMapper();

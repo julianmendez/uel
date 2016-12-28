@@ -513,6 +513,9 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 
 	/**
 	 * Clauses created in Step 1
+	 * 
+	 * @param input
+	 *            input
 	 */
 	private void runStep1(SatInput input) {
 		// encode positive part of the goal
@@ -653,6 +656,9 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 
 	/**
 	 * Step 2.1
+	 * 
+	 * @param input
+	 *            input
 	 */
 	private void runStep2_1(SatInput input) {
 		for (Integer atomId1 : getConstants()) {
@@ -677,6 +683,9 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 
 	/**
 	 * Step 2.4
+	 * 
+	 * @param input
+	 *            input
 	 */
 	private void runStep2_4(SatInput input) {
 		for (Integer atomId1 : getConstants()) {
@@ -701,6 +710,11 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 	 * Step 2.5
 	 *
 	 * Transitivity of dis-subsumption
+	 * 
+	 * @param input
+	 *            input
+	 * @throws InterruptedException
+	 *             if the thread was interrupted
 	 */
 	private void runStep2_5(SatInput input) throws InterruptedException {
 		Collection<Integer> atomIds = getUsedAtomIds();
@@ -733,6 +747,10 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 	 * Step 3.1
 	 *
 	 * Reflexivity for order literals
+	 * 
+	 * @param input
+	 *            input
+	 * 
 	 */
 	private void runStep3_1_r(SatInput input) {
 		for (Integer atomId1 : getVariables()) {
@@ -746,6 +764,12 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 	 * Step 3.1
 	 *
 	 * Transitivity for order literals
+	 * 
+	 * @param input
+	 *            input
+	 * @throws InterruptedException
+	 *             if the thread was interrupted
+	 * 
 	 */
 	private void runStep3_1_t(SatInput input) throws InterruptedException {
 		for (Integer atomId1 : getVariables()) {
@@ -776,6 +800,9 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 
 	/**
 	 * Step 3.2 Disjunction between order literals and dis-subsumption
+	 * 
+	 * @param input
+	 *            input
 	 */
 	private void runStep3_2(SatInput input) {
 		for (Integer atomId1 : getExistentialRestrictions()) {
@@ -795,6 +822,9 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 
 	/**
 	 * Step 2.2 and Step 2.3
+	 * 
+	 * @param input
+	 *            input
 	 */
 	private void runSteps2_2_N_2_3(SatInput input) {
 		for (Integer atomId1 : getExistentialRestrictions()) {
