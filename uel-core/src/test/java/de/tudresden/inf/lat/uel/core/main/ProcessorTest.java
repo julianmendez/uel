@@ -38,6 +38,7 @@ import de.tudresden.inf.lat.uel.type.impl.Unifier;
 @RunWith(value = Parameterized.class)
 public class ProcessorTest {
 
+	static final char COMMENT_CHAR = '#';
 	private static final String apath = "src/test/resources/";
 	private static final String conceptC = "C";
 	private static final String conceptD = "D";
@@ -99,6 +100,25 @@ public class ProcessorTest {
 		return reasoner;
 	}
 
+	/**
+	 * Returns the next line read ignoring comments. A comment is a line
+	 * starting with a distinguish comment character. This method does not
+	 * ignore empty lines.
+	 * 
+	 * @param reader
+	 *            reader
+	 * @return the next line read ignoring comments
+	 * @throws IOException
+	 *             if something went wrong with I/O
+	 */
+	static String readNextLine(BufferedReader reader) throws IOException {
+		String ret = reader.readLine();
+		while (ret != null && ret.startsWith("" + COMMENT_CHAR)) {
+			ret = reader.readLine();
+		}
+		return ret;
+	}
+
 	@Parameters(name = "{index}: {0}, {4}")
 	public static Collection<Object[]> data() {
 		Collection<Object[]> data = new ArrayList<Object[]>();
@@ -111,17 +131,17 @@ public class ProcessorTest {
 				String ontologyName = fileName + krss;
 				BufferedReader configFile = new BufferedReader(new FileReader(fileName + test));
 
-				Set<String> varNames = parseSet(configFile.readLine());
-				Set<String> undefVarNames = parseSet(configFile.readLine());
+				Set<String> varNames = parseSet(readNextLine(configFile));
+				Set<String> undefVarNames = parseSet(readNextLine(configFile));
 
-				String algorithmName = configFile.readLine();
+				String algorithmName = readNextLine(configFile);
 				while (algorithmName != null) {
-					Integer nbUnifiers = Integer.parseInt(configFile.readLine());
+					Integer nbUnifiers = Integer.parseInt(readNextLine(configFile));
 					if (!algorithmName.contains("ASP")) {
 						data.add(new Object[] { ontologyName, varNames, undefVarNames, nbUnifiers, algorithmName });
 					}
 
-					algorithmName = configFile.readLine();
+					algorithmName = readNextLine(configFile);
 				}
 				configFile.close();
 
