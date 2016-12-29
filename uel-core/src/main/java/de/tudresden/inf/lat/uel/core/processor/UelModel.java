@@ -238,7 +238,7 @@ public class UelModel {
 	 * @return the list of loaded ontologies
 	 */
 	public List<OWLOntology> getOntologyList() {
-		List<OWLOntology> list = new ArrayList<OWLOntology>();
+		List<OWLOntology> list = new ArrayList<>();
 		list.add(EMPTY_ONTOLOGY);
 		list.addAll(provider.getOntologies());
 		return list;
@@ -312,7 +312,7 @@ public class UelModel {
 	 * @return the current set of user variable names
 	 */
 	public Set<String> getUserVariableNames() {
-		Set<String> names = new HashSet<String>();
+		Set<String> names = new HashSet<>();
 		for (Integer varId : atomManager.getUserVariables()) {
 			names.add(atomManager.printConceptName(varId));
 		}

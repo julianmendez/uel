@@ -106,14 +106,14 @@ public class RuleBasedUnificationAlgorithm extends AbstractUnificationAlgorithm 
 	 * unification in EL w.r.t. the empty TBox.
 	 */
 	private void initRules() {
-		staticEagerRules = new ArrayList<EagerRule>();
+		staticEagerRules = new ArrayList<>();
 		staticEagerRules.add(new EagerGroundSolvingRule());
 		staticEagerRules.add(new EagerSolving1Rule());
 		staticEagerRules.add(new EagerConflictRule());
-		dynamicEagerRules = new ArrayList<EagerRule>();
+		dynamicEagerRules = new ArrayList<>();
 		dynamicEagerRules.add(new EagerSolving2Rule());
 		dynamicEagerRules.add(new EagerExtensionRule());
-		nondeterministicRules = new ArrayList<Rule>();
+		nondeterministicRules = new ArrayList<>();
 		nondeterministicRules.add(new DecompositionRule());
 		nondeterministicRules.add(new ExtensionRule());
 	}
@@ -141,7 +141,7 @@ public class RuleBasedUnificationAlgorithm extends AbstractUnificationAlgorithm 
 		}
 
 		if (searchStack == null) {
-			searchStack = new ArrayDeque<Result>();
+			searchStack = new ArrayDeque<>();
 
 			// apply eager rules to each unsolved subsumption
 			Result res = applyEagerRules(normalizedGoal, staticEagerRules, null);
@@ -176,7 +176,7 @@ public class RuleBasedUnificationAlgorithm extends AbstractUnificationAlgorithm 
 		AtomManager atomManager = goal.getAtomManager();
 		DefinitionSet definitions = new DefinitionSet(atomManager.getVariables().size());
 		for (Integer varId : atomManager.getVariables()) {
-			Set<Integer> body = new HashSet<Integer>();
+			Set<Integer> body = new HashSet<>();
 			for (Atom subsumer : assignment.getSubsumers(atomManager.getAtom(varId))) {
 				body.add(atomManager.getIndex(subsumer));
 			}

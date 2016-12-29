@@ -95,7 +95,7 @@ public class ProcessorTest {
 
 	@Parameters(name = "{index}: {0}, {4}")
 	public static Collection<Object[]> data() {
-		Collection<Object[]> data = new ArrayList<Object[]>();
+		Collection<Object[]> data = new ArrayList<>();
 
 		System.out.println("Preparing tests.");
 		for (int i = 1; i <= maxTest; i++) {

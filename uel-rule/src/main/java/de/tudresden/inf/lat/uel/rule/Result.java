@@ -16,9 +16,9 @@ public final class Result {
 
 	private final FlatSubsumption subsumption;
 	private final Application application;
-	private final Set<FlatSubsumption> newUnsolvedSubsumptions = new HashSet<FlatSubsumption>();
-	private final Set<FlatSubsumption> newSolvedSubsumptions = new HashSet<FlatSubsumption>();
-	private final Set<FlatSubsumption> solvedSubsumptions = new HashSet<FlatSubsumption>();
+	private final Set<FlatSubsumption> newUnsolvedSubsumptions = new HashSet<>();
+	private final Set<FlatSubsumption> newSolvedSubsumptions = new HashSet<>();
+	private final Set<FlatSubsumption> solvedSubsumptions = new HashSet<>();
 	private final Assignment newSubsumers = new Assignment();
 	private boolean successful;
 

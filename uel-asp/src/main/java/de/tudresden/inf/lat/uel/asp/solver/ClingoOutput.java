@@ -121,7 +121,7 @@ public class ClingoOutput implements AspOutput {
 
 		Set<Integer> subsumers = assignment.get(varId);
 		if (subsumers == null) {
-			subsumers = new HashSet<Integer>();
+			subsumers = new HashSet<>();
 			assignment.put(varId, subsumers);
 		}
 		subsumers.add(atomId);

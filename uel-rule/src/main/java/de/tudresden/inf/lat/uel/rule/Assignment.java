@@ -16,7 +16,7 @@ import de.tudresden.inf.lat.uel.type.api.Atom;
  */
 public class Assignment {
 
-	private final Map<Atom, Set<Atom>> subs = new HashMap<Atom, Set<Atom>>();
+	private final Map<Atom, Set<Atom>> subs = new HashMap<>();
 
 	/**
 	 * Create an empty assignment.
@@ -146,7 +146,7 @@ public class Assignment {
 	private Set<Atom> getOrInit(Atom var) {
 		Set<Atom> flatAtoms = subs.get(var);
 		if (flatAtoms == null) {
-			flatAtoms = new HashSet<Atom>();
+			flatAtoms = new HashSet<>();
 			subs.put(var, flatAtoms);
 		}
 		return flatAtoms;

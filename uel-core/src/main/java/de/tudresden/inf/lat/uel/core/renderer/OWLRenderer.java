@@ -59,7 +59,7 @@ public class OWLRenderer extends Renderer<OWLClassExpression, OWLObjectProperty,
 
 	@Override
 	protected void initialize() {
-		axioms = new HashSet<OWLAxiom>();
+		axioms = new HashSet<>();
 		expr = null;
 	}
 

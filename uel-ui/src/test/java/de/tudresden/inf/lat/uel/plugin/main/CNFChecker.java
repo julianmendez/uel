@@ -52,7 +52,7 @@ public class CNFChecker {
 	private void constructInput(String cnfFile) throws IOException {
 		BufferedReader reader = new BufferedReader(new FileReader(cnfFile));
 		final AtomManager atomManager = new AtomManagerImpl();
-		final Set<Equation> equations = new HashSet<Equation>();
+		final Set<Equation> equations = new HashSet<>();
 
 		String[] line;
 		// ignore initial comments and empty lines
@@ -100,7 +100,7 @@ public class CNFChecker {
 			}
 
 			// construct concept names for all literals in this clause
-			Set<Integer> literals = new HashSet<Integer>();
+			Set<Integer> literals = new HashSet<>();
 			for (int litIdx = 0; litIdx < line.length - 1; litIdx++) {
 				int literal = Integer.parseInt(line[litIdx]);
 				if (literal == 0) {
@@ -200,7 +200,7 @@ public class CNFChecker {
 	}
 
 	private static <T> Set<T> set(T a, T b) {
-		Set<T> set = new HashSet<T>();
+		Set<T> set = new HashSet<>();
 		set.add(a);
 		set.add(b);
 		return set;

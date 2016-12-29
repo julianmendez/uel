@@ -73,22 +73,18 @@ public class Labeler {
 	}
 
 	private Map<String, String> readMap(File mapFile) throws IOException {
-		Map<String, String> ret = new TreeMap<String, String>();
+		Map<String, String> ret = new TreeMap<>();
 		BufferedReader reader = new BufferedReader(new FileReader(mapFile));
-		String line = "";
-		while (line != null) {
-			line = reader.readLine();
-			if (line != null) {
-				StringTokenizer stok = new StringTokenizer(line, "\t");
+		reader.lines().forEach(line -> {
+			StringTokenizer stok = new StringTokenizer(line, "\t");
+			if (stok.hasMoreTokens()) {
+				String key = stok.nextToken();
 				if (stok.hasMoreTokens()) {
-					String key = stok.nextToken();
-					if (stok.hasMoreTokens()) {
-						String value = stok.nextToken();
-						ret.put(toXMLEncoding(key), toXMLEncoding(value));
-					}
+					String value = stok.nextToken();
+					ret.put(toXMLEncoding(key), toXMLEncoding(value));
 				}
 			}
-		}
+		});
 		reader.close();
 		return ret;
 	}
@@ -97,14 +93,10 @@ public class Labeler {
 		Map<String, String> nameMap = readMap(mapFile);
 		BufferedWriter writer = new BufferedWriter(new FileWriter(outputFile));
 		BufferedReader reader = new BufferedReader(new FileReader(inputFile));
-		String line = "";
-		while (line != null) {
-			line = reader.readLine();
-			if (line != null) {
-				line = processTag(line, nameMap, classRdfAbout, classEnd);
-				line = processTag(line, nameMap, objectPropertyRdfAbout, objectPropertyEnd);
-				writer.write(line + "\n");
-			}
+		for (String line = reader.readLine(); line != null; line = reader.readLine()) {
+			line = processTag(line, nameMap, classRdfAbout, classEnd);
+			line = processTag(line, nameMap, objectPropertyRdfAbout, objectPropertyEnd);
+			writer.write(line + "\n");
 		}
 		writer.flush();
 		reader.close();

@@ -162,7 +162,7 @@ class RefineView extends UelDialog {
 	 */
 	public void updateSelectionPanel(Map<LabelId, List<LabelId>> unifier) {
 		selectionPanel.removeAll();
-		content = new HashMap<LabelId, JList<LabelId>>();
+		content = new HashMap<>();
 
 		int rowCount = 0;
 		for (LabelId var : unifier.keySet()) {

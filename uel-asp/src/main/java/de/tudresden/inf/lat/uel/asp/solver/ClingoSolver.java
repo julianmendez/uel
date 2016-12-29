@@ -58,7 +58,7 @@ public class ClingoSolver implements AspSolver {
 	}
 
 	private List<String> getClingoArguments() {
-		List<String> arguments = new ArrayList<String>();
+		List<String> arguments = new ArrayList<>();
 		arguments.add(CLINGO_COMMAND);
 		arguments.addAll(Arrays.asList(COMMON_ARGUMENTS.split(" ")));
 		if (minimize) {

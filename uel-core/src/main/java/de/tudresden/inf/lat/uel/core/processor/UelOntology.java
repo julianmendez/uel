@@ -153,7 +153,7 @@ public class UelOntology {
 
 	private Set<Integer> flattenConjunction(OWLObjectIntersectionOf conjunction, Set<Definition> newDefinitions,
 			Set<Integer> newNames) {
-		Set<Integer> atomIds = new HashSet<Integer>();
+		Set<Integer> atomIds = new HashSet<>();
 		for (OWLClassExpression operand : conjunction.getOperands()) {
 			atomIds.addAll(flattenClassExpression(operand, newDefinitions, newNames, false));
 		}

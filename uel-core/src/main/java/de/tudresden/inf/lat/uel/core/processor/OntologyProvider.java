@@ -34,7 +34,7 @@ public abstract class OntologyProvider implements ShortFormProvider {
 		return ret;
 	}
 
-	private final Map<String, String> cache = new HashMap<String, String>();
+	private final Map<String, String> cache = new HashMap<>();
 
 	public abstract OWLOntology createOntology();
 

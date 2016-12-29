@@ -107,12 +107,12 @@ class VarSelectionView extends UelDialog {
 	}
 
 	public void setConstants(List<LabelId> constants) {
-		this.listConstants.setListData(new Vector<LabelId>(constants));
+		this.listConstants.setListData(new Vector<>(constants));
 		this.listConstants.clearSelection();
 	}
 
 	public void setVariables(List<LabelId> variables) {
-		this.listVariables.setListData(new Vector<LabelId>(variables));
+		this.listVariables.setListData(new Vector<>(variables));
 		this.listVariables.clearSelection();
 	}
 
