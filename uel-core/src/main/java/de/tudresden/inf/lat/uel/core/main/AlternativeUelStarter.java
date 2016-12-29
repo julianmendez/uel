@@ -47,7 +47,7 @@ public class AlternativeUelStarter {
 			throw new IllegalArgumentException("Null argument.");
 		}
 		this.ontologyManager = ontology.getOWLOntologyManager();
-		this.ontologies = new HashSet<OWLOntology>();
+		this.ontologies = new HashSet<>();
 		this.ontologies.add(ontology);
 	}
 
@@ -194,7 +194,7 @@ public class AlternativeUelStarter {
 			}
 
 			OWLDataFactory factory = OWLManager.getOWLDataFactory();
-			Set<OWLClass> variables = new HashSet<OWLClass>();
+			Set<OWLClass> variables = new HashSet<>();
 
 			for (String line : Files.readAllLines(Paths.get(filename))) {
 				if (!line.isEmpty()) {

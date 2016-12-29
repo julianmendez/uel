@@ -40,7 +40,7 @@ public class Choice {
 	}
 
 	public Set<Integer> getChoiceLiterals(int j) {
-		Set<Integer> literals = new HashSet<Integer>();
+		Set<Integer> literals = new HashSet<>();
 		for (int i = 0; i < log; i++) {
 			int digitMask = (int) Math.pow(2, i);
 			boolean digitIsOne = (j & digitMask) == digitMask;

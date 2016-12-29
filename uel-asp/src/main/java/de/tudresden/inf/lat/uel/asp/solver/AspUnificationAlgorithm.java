@@ -90,7 +90,7 @@ public class AspUnificationAlgorithm implements UnificationAlgorithm {
 	}
 
 	private Unifier toUnifier(Map<Integer, Set<Integer>> assignment) {
-		Set<Definition> definitions = new HashSet<Definition>();
+		Set<Definition> definitions = new HashSet<>();
 		for (Integer varId : goal.getAtomManager().getVariables()) {
 			Set<Integer> body = assignment.get(varId);
 			if (body == null) {

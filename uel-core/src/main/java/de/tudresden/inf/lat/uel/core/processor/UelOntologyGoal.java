@@ -29,11 +29,11 @@ import de.tudresden.inf.lat.uel.type.api.Subsumption;
  */
 class UelOntologyGoal implements Goal {
 
-	private final Set<Definition> definitions = new HashSet<Definition>();
-	private final Set<Equation> equations = new HashSet<Equation>();
-	private final Set<Disequation> disequations = new HashSet<Disequation>();
-	private final Set<Subsumption> subsumptions = new HashSet<Subsumption>();
-	private final Set<Dissubsumption> dissubsumptions = new HashSet<Dissubsumption>();
+	private final Set<Definition> definitions = new HashSet<>();
+	private final Set<Equation> equations = new HashSet<>();
+	private final Set<Disequation> disequations = new HashSet<>();
+	private final Set<Subsumption> subsumptions = new HashSet<>();
+	private final Set<Dissubsumption> dissubsumptions = new HashSet<>();
 	private final AtomManager atomManager;
 	private UelOntology ontology;
 
@@ -92,7 +92,7 @@ class UelOntologyGoal implements Goal {
 	}
 
 	private <T extends Axiom> T createAxiom(Class<T> type, OWLClassExpression left, OWLClassExpression right) {
-		Set<Definition> newDefinitions = new HashSet<Definition>();
+		Set<Definition> newDefinitions = new HashSet<>();
 		Set<Integer> leftIds = ontology.processClassExpression(left, newDefinitions);
 		Set<Integer> rightIds = ontology.processClassExpression(right, newDefinitions);
 		T newAxiom;
@@ -154,7 +154,7 @@ class UelOntologyGoal implements Goal {
 	private Definition processPrimitiveDefinition(Definition def) {
 		Integer defId = def.getDefiniendum();
 		Integer undefId = atomManager.createUndefConceptName(defId);
-		Set<Integer> newRightIds = new HashSet<Integer>(def.getRight());
+		Set<Integer> newRightIds = new HashSet<>(def.getRight());
 		newRightIds.add(undefId);
 		return new Definition(defId, newRightIds, false);
 	}

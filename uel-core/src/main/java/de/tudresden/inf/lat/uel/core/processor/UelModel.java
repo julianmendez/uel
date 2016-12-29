@@ -186,7 +186,7 @@ public class UelModel {
 	 * @return the list of loaded ontologies
 	 */
 	public List<OWLOntology> getOntologyList() {
-		List<OWLOntology> list = new ArrayList<OWLOntology>();
+		List<OWLOntology> list = new ArrayList<>();
 		list.add(EMPTY_ONTOLOGY);
 		list.addAll(provider.getOntologies());
 		return list;
@@ -240,7 +240,7 @@ public class UelModel {
 	 * @return the current set of user variable names
 	 */
 	public Set<String> getUserVariableNames() {
-		Set<String> names = new HashSet<String>();
+		Set<String> names = new HashSet<>();
 		for (Integer varId : atomManager.getUserVariables()) {
 			names.add(atomManager.printConceptName(varId));
 		}
@@ -331,7 +331,7 @@ public class UelModel {
 	public void makeAllUndefClassesUserVariables() {
 		// mark all "_UNDEF" variables as user variables
 		// copy the list of constants since we need to modify it
-		Set<Integer> constants = new HashSet<Integer>(atomManager.getConstants());
+		Set<Integer> constants = new HashSet<>(atomManager.getConstants());
 		for (Integer atomId : constants) {
 			String name = atomManager.printConceptName(atomId);
 			if (name.endsWith(AtomManager.UNDEF_SUFFIX)) {
@@ -474,7 +474,7 @@ public class UelModel {
 			Set<OWLEquivalentClassesAxiom> disequations, OWLClass owlThingAlias, boolean resetShortFormCache) {
 
 		algorithm = null;
-		unifierList = new ArrayList<Unifier>();
+		unifierList = new ArrayList<>();
 		currentUnifierIndex = -1;
 		allUnifiersFound = false;
 		atomManager = new AtomManagerImpl();

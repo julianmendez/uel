@@ -139,17 +139,17 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 	private static final String usingMinimalAssignments = "only minimal assignments";
 
 	private boolean firstTime = true;
-	private final IndexedSet<Literal> literalManager = new IndexedSetImpl<Literal>();
+	private final IndexedSet<Literal> literalManager = new IndexedSetImpl<>();
 	private long numberOfClauses = 0;
 	private final boolean onlyMinimalAssignments;
 	private Unifier result;
 	private Solver solver;
-	private final Map<Integer, Set<Integer>> subsumers = new HashMap<Integer, Set<Integer>>();
-	private final Set<Integer> trueLiterals = new HashSet<Integer>();
-	private final Set<Integer> nonVariableAtoms = new HashSet<Integer>();
-	private final Set<Integer> usedAtomIds = new HashSet<Integer>();
+	private final Map<Integer, Set<Integer>> subsumers = new HashMap<>();
+	private final Set<Integer> trueLiterals = new HashSet<>();
+	private final Set<Integer> nonVariableAtoms = new HashSet<>();
+	private final Set<Integer> usedAtomIds = new HashSet<>();
 	private final Goal goal;
-	private Set<Integer> update = new HashSet<Integer>();
+	private Set<Integer> update = new HashSet<>();
 
 	public SatUnificationAlgorithm(Goal goal, boolean useMinimalAssignments) {
 		if (goal == null) {
@@ -181,7 +181,7 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 	private boolean addToSetOfSubsumers(Integer atomId1, Integer atomId2) {
 		Set<Integer> ret = subsumers.get(atomId1);
 		if (ret == null) {
-			ret = new HashSet<Integer>();
+			ret = new HashSet<>();
 			subsumers.put(atomId1, ret);
 		}
 		return ret.add(atomId2);
@@ -399,7 +399,7 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 
 	@Override
 	public List<Entry<String, String>> getInfo() {
-		List<Entry<String, String>> ret = new ArrayList<Entry<String, String>>();
+		List<Entry<String, String>> ret = new ArrayList<>();
 		addEntry(ret, keyName, algorithmName);
 
 		if (this.onlyMinimalAssignments) {
@@ -446,7 +446,7 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 	private Set<Integer> getSetOfSubsumers(Integer atomId) {
 		Set<Integer> list = subsumers.get(atomId);
 		if (list == null) {
-			list = new HashSet<Integer>();
+			list = new HashSet<>();
 			subsumers.put(atomId, list);
 		}
 		return list;
@@ -466,9 +466,9 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 	}
 
 	private Set<Definition> getUpdatedDefinitions() {
-		Set<Definition> definitions = new HashSet<Definition>();
+		Set<Definition> definitions = new HashSet<>();
 		for (Integer leftPartId : getVariables()) {
-			definitions.add(new Definition(leftPartId, new HashSet<Integer>(getSetOfSubsumers(leftPartId)), false));
+			definitions.add(new Definition(leftPartId, new HashSet<>(getSetOfSubsumers(leftPartId)), false));
 		}
 		return definitions;
 	}
@@ -491,7 +491,7 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 	 */
 	public void reset() {
 
-		update = new HashSet<Integer>();
+		update = new HashSet<>();
 
 		for (Integer key : literalManager.getIndices()) {
 			setLiteralValue(key, false);
@@ -505,7 +505,7 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 	private void resetSetOfSubsumers(Integer atomId) {
 		Set<Integer> list = subsumers.get(atomId);
 		if (list == null) {
-			list = new HashSet<Integer>();
+			list = new HashSet<>();
 			subsumers.put(atomId, list);
 		}
 		list.clear();
@@ -563,7 +563,7 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 	private void runStep1SubsumptionVariable(Set<Integer> leftIds, Integer rightId, SatInput input) {
 		for (Integer atomId : getNonVariableAtoms()) {
 			if (!leftIds.contains(atomId)) {
-				Set<Integer> clause = new HashSet<Integer>();
+				Set<Integer> clause = new HashSet<>();
 				clause.add(getMinusSubsumptionLiteral(rightId, atomId));
 				for (Integer leftId : leftIds) {
 					clause.add(getSubsumptionLiteral(leftId, atomId));
@@ -574,7 +574,7 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 	}
 
 	private void runStep1SubsumptionNonVariableAtom(Set<Integer> leftIds, Integer rightId, SatInput input) {
-		Set<Integer> clause = new HashSet<Integer>();
+		Set<Integer> clause = new HashSet<>();
 		for (Integer leftId : leftIds) {
 			clause.add(getSubsumptionLiteral(leftId, rightId));
 		}
@@ -631,7 +631,7 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 
 			// Under the current choice, 'rightId' is subsumed by 'atomId'
 			// ...
-			Set<Integer> clause = new HashSet<Integer>(currentChoiceLiterals);
+			Set<Integer> clause = new HashSet<>(currentChoiceLiterals);
 			clause.add(getSubsumptionLiteral(rightId, atomId));
 			input.add(clause);
 
@@ -648,7 +648,7 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 			Integer rightId, SatInput input) {
 		Set<Integer> clause;
 		for (Integer leftId : leftIds) {
-			clause = new HashSet<Integer>(choiceLiterals);
+			clause = new HashSet<>(choiceLiterals);
 			clause.add(getMinusSubsumptionLiteral(leftId, rightId));
 			input.add(clause);
 		}
@@ -665,7 +665,7 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 
 			for (Integer atomId2 : getConstants()) {
 				if (!atomId1.equals(atomId2)) {
-					Set<Integer> clause = new HashSet<Integer>();
+					Set<Integer> clause = new HashSet<>();
 					clause.add(getMinusSubsumptionLiteral(atomId1, atomId2));
 					input.add(clause);
 				}
@@ -673,7 +673,7 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 
 			if (goal.hasNegativePart()) {
 				// positive clause needed for soundness of disunification
-				Set<Integer> clause = new HashSet<Integer>();
+				Set<Integer> clause = new HashSet<>();
 				clause.add(getSubsumptionLiteral(atomId1, atomId1));
 				input.add(clause);
 			}
@@ -692,12 +692,12 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 
 			for (Integer atomId2 : getExistentialRestrictions()) {
 				{
-					Set<Integer> clause = new HashSet<Integer>();
+					Set<Integer> clause = new HashSet<>();
 					clause.add(getMinusSubsumptionLiteral(atomId1, atomId2));
 					input.add(clause);
 				}
 
-				Set<Integer> clause = new HashSet<Integer>();
+				Set<Integer> clause = new HashSet<>();
 				clause.add(getMinusSubsumptionLiteral(atomId2, atomId1));
 				input.add(clause);
 
@@ -727,7 +727,7 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 					for (Integer atomId3 : atomIds) {
 
 						if (!atomId1.equals(atomId3) && !atomId2.equals(atomId3)) {
-							Set<Integer> clause = new HashSet<Integer>();
+							Set<Integer> clause = new HashSet<>();
 							clause.add(getMinusSubsumptionLiteral(atomId1, atomId2));
 							clause.add(getMinusSubsumptionLiteral(atomId2, atomId3));
 							clause.add(getSubsumptionLiteral(atomId1, atomId3));
@@ -754,7 +754,7 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 	 */
 	private void runStep3_1_r(SatInput input) {
 		for (Integer atomId1 : getVariables()) {
-			Set<Integer> clause = new HashSet<Integer>();
+			Set<Integer> clause = new HashSet<>();
 			clause.add(getMinusOrderLiteral(atomId1, atomId1));
 			input.add(clause);
 		}
@@ -780,7 +780,7 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 
 					if (!atomId1.equals(atomId2) && !atomId2.equals(atomId3)) {
 
-						Set<Integer> clause = new HashSet<Integer>();
+						Set<Integer> clause = new HashSet<>();
 						clause.add(getMinusOrderLiteral(atomId1, atomId2));
 						clause.add(getMinusOrderLiteral(atomId2, atomId3));
 						clause.add(getOrderLiteral(atomId1, atomId3));
@@ -811,7 +811,7 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 
 			if (getVariables().contains(childId)) {
 				for (Integer atomId2 : getVariables()) {
-					Set<Integer> clause = new HashSet<Integer>();
+					Set<Integer> clause = new HashSet<>();
 					clause.add(getOrderLiteral(atomId2, childId));
 					clause.add(getMinusSubsumptionLiteral(atomId2, atomId1));
 					input.add(clause);
@@ -843,7 +843,7 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 					 */
 
 					if (!role1.equals(role2)) {
-						Set<Integer> clause = new HashSet<Integer>();
+						Set<Integer> clause = new HashSet<>();
 						clause.add(getMinusSubsumptionLiteral(atomId1, atomId2));
 						input.add(clause);
 
@@ -856,7 +856,7 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 						Integer child2 = goal.getAtomManager().getChild(atomId2);
 
 						if (!child1.equals(child2)) {
-							Set<Integer> clause = new HashSet<Integer>();
+							Set<Integer> clause = new HashSet<>();
 							clause.add(getSubsumptionLiteral(child1, child2));
 							clause.add(getMinusSubsumptionLiteral(atomId1, atomId2));
 							input.add(clause);
@@ -865,7 +865,7 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 						if (goal.hasNegativePart()) {
 							// converse clause needed for soundness of
 							// disunification
-							Set<Integer> clause = new HashSet<Integer>();
+							Set<Integer> clause = new HashSet<>();
 							clause.add(getSubsumptionLiteral(atomId1, atomId2));
 							clause.add(getMinusSubsumptionLiteral(child1, child2));
 							input.add(clause);
@@ -880,7 +880,7 @@ public class SatUnificationAlgorithm implements UnificationAlgorithm {
 			if (goal.hasNegativePart()) {
 				// converse clause (as above) for trival subsumption
 				// between an existential restriction and itself
-				Set<Integer> clause = new HashSet<Integer>();
+				Set<Integer> clause = new HashSet<>();
 				clause.add(getSubsumptionLiteral(atomId1, atomId1));
 				input.add(clause);
 			}

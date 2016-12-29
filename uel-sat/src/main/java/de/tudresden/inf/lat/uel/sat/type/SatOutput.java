@@ -14,7 +14,7 @@ import java.util.TreeSet;
  */
 public class SatOutput {
 
-	private Set<Integer> clause = new TreeSet<Integer>();
+	private Set<Integer> clause = new TreeSet<>();
 	private boolean satisfiable = false;
 
 	/**

@@ -31,8 +31,8 @@ class UelOntology {
 	private static final String flatteningVariablePrefix = "var";
 	private int flatteningVariableIndex = 0;
 
-	private final Set<Integer> visited = new HashSet<Integer>();
-	private final Map<Integer, OWLClass> nameMap = new HashMap<Integer, OWLClass>();
+	private final Set<Integer> visited = new HashSet<>();
+	private final Map<Integer, OWLClass> nameMap = new HashMap<>();
 	private final AtomManager atomManager;
 	private final Set<OWLOntology> ontologies;
 	private final OWLClass top;
@@ -83,7 +83,7 @@ class UelOntology {
 
 	private Set<Integer> flattenConjunction(OWLObjectIntersectionOf conjunction, Set<Definition> newDefinitions,
 			Set<Integer> newNames) {
-		Set<Integer> atomIds = new HashSet<Integer>();
+		Set<Integer> atomIds = new HashSet<>();
 		for (OWLClassExpression operand : conjunction.getOperands()) {
 			atomIds.addAll(flattenClassExpression(operand, newDefinitions, newNames));
 		}
@@ -120,7 +120,7 @@ class UelOntology {
 	}
 
 	public Set<Integer> processClassExpression(OWLClassExpression expression, Set<Definition> newDefinitions) {
-		Set<Integer> toVisit = new HashSet<Integer>();
+		Set<Integer> toVisit = new HashSet<>();
 		Set<Integer> conjunction = flattenClassExpression(expression, newDefinitions, toVisit);
 
 		while (!toVisit.isEmpty()) {
@@ -169,7 +169,7 @@ class UelOntology {
 	}
 
 	private OWLClassExpression loadDefinition(OWLClass cls) {
-		Set<OWLClassExpression> possibleDefinitions = new HashSet<OWLClassExpression>();
+		Set<OWLClassExpression> possibleDefinitions = new HashSet<>();
 		for (OWLOntology ontology : ontologies) {
 			for (OWLEquivalentClassesAxiom definingAxiom : ontology.getEquivalentClassesAxioms(cls)) {
 				possibleDefinitions.addAll(definingAxiom.getClassExpressionsMinus(cls));
@@ -185,7 +185,7 @@ class UelOntology {
 	}
 
 	private OWLClassExpression loadPrimitiveDefinition(OWLClass cls) {
-		Set<OWLClassExpression> allDefinitions = new HashSet<OWLClassExpression>();
+		Set<OWLClassExpression> allDefinitions = new HashSet<>();
 		for (OWLOntology ontology : ontologies) {
 			for (OWLSubClassOfAxiom definingAxiom : ontology.getSubClassAxiomsForSubClass(cls)) {
 				OWLClassExpression superClass = definingAxiom.getSuperClass();

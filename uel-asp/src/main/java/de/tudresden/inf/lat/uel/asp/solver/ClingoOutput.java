@@ -41,7 +41,7 @@ public class ClingoOutput implements AspOutput {
 	public ClingoOutput(ClingoSolver solver, AtomManager atomManager) {
 		this.solver = solver;
 		this.atomManager = atomManager;
-		this.assignments = new ArrayList<Map<Integer, Set<Integer>>>();
+		this.assignments = new ArrayList<>();
 		this.currentIndex = -1;
 		this.finished = false;
 	}
@@ -68,7 +68,7 @@ public class ClingoOutput implements AspOutput {
 		if (result.equals(SATISFIABLE) || result.equals(OPTIMUM_FOUND)) {
 			// Witnesses -> assignments (using atomManager)
 			for (JsonNode witness : root.get("Call").get(0).get("Witnesses")) {
-				Map<Integer, Set<Integer>> assignment = new HashMap<Integer, Set<Integer>>();
+				Map<Integer, Set<Integer>> assignment = new HashMap<>();
 				for (JsonNode subsumption : witness.get("Value")) {
 					String text = subsumption.asText();
 					if (text.startsWith("relsubs")) {
@@ -82,7 +82,7 @@ public class ClingoOutput implements AspOutput {
 		}
 
 		// Solver,Time -> stats
-		stats = new ArrayList<Entry<String, String>>();
+		stats = new ArrayList<>();
 		addEntry(stats, "ASP Solver", root.get("Solver").asText());
 		JsonNode time = root.get("Time");
 		addEntry(stats, "Total time (s)", time.get("Total").asText());
@@ -100,7 +100,7 @@ public class ClingoOutput implements AspOutput {
 
 		Set<Integer> subsumers = assignment.get(varId);
 		if (subsumers == null) {
-			subsumers = new HashSet<Integer>();
+			subsumers = new HashSet<>();
 			assignment.put(varId, subsumers);
 		}
 		subsumers.add(atomId);

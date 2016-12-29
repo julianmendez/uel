@@ -51,7 +51,7 @@ public class AlternativeUelStarterTest {
 
 	@Parameters(name = "{index}")
 	public static Collection<Object[]> data() {
-		Collection<Object[]> data = new ArrayList<Object[]>();
+		Collection<Object[]> data = new ArrayList<>();
 
 		for (int i = 1; i <= maxTest; i++) {
 			try {

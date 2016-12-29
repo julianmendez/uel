@@ -53,7 +53,7 @@ class NormalizedGoal implements Set<FlatSubsumption> {
 	}
 
 	private static Set<FlatSubsumption> convertInput(Goal input) {
-		Set<FlatSubsumption> flatSubsumptions = new HashSet<FlatSubsumption>();
+		Set<FlatSubsumption> flatSubsumptions = new HashSet<>();
 		for (Definition d : input.getDefinitions()) {
 			convert(d, input.getAtomManager(), flatSubsumptions);
 		}
@@ -68,7 +68,7 @@ class NormalizedGoal implements Set<FlatSubsumption> {
 	}
 
 	private static List<Atom> toAtoms(Set<Integer> atomIds, AtomManager atomManager) {
-		List<Atom> atoms = new ArrayList<Atom>();
+		List<Atom> atoms = new ArrayList<>();
 		for (Integer atomId : atomIds) {
 			atoms.add(atomManager.getAtom(atomId));
 		}
@@ -89,8 +89,8 @@ class NormalizedGoal implements Set<FlatSubsumption> {
 	NormalizedGoal(Goal input) {
 		goal = convertInput(input);
 		maxSize = goal.size();
-		variableBodyIndex = new HashMap<Atom, Set<FlatSubsumption>>();
-		variableHeadIndex = new HashMap<Atom, Set<FlatSubsumption>>();
+		variableBodyIndex = new HashMap<>();
+		variableHeadIndex = new HashMap<>();
 		for (FlatSubsumption sub : goal) {
 			addToIndex(sub);
 		}
@@ -157,7 +157,7 @@ class NormalizedGoal implements Set<FlatSubsumption> {
 	 *         operation
 	 */
 	Set<FlatSubsumption> expand(Assignment assign) {
-		Set<FlatSubsumption> newSubs = new HashSet<FlatSubsumption>();
+		Set<FlatSubsumption> newSubs = new HashSet<>();
 		for (Atom var : assign.getKeys()) {
 			for (FlatSubsumption sub : getOrInitHeadIndex(var)) {
 				expand(sub, assign.getSubsumers(var), newSubs);
@@ -177,7 +177,7 @@ class NormalizedGoal implements Set<FlatSubsumption> {
 	 *         operation
 	 */
 	Set<FlatSubsumption> expand(FlatSubsumption sub, Set<Atom> subsumers) {
-		Set<FlatSubsumption> newSubs = new HashSet<FlatSubsumption>();
+		Set<FlatSubsumption> newSubs = new HashSet<>();
 		expand(sub, subsumers, newSubs);
 		return newSubs;
 	}
@@ -203,14 +203,14 @@ class NormalizedGoal implements Set<FlatSubsumption> {
 
 	private Set<FlatSubsumption> getOrInitBodyIndex(Atom var) {
 		if (!variableBodyIndex.containsKey(var)) {
-			variableBodyIndex.put(var, new HashSet<FlatSubsumption>());
+			variableBodyIndex.put(var, new HashSet<>());
 		}
 		return variableBodyIndex.get(var);
 	}
 
 	private Set<FlatSubsumption> getOrInitHeadIndex(Atom var) {
 		if (!variableHeadIndex.containsKey(var)) {
-			variableHeadIndex.put(var, new HashSet<FlatSubsumption>());
+			variableHeadIndex.put(var, new HashSet<>());
 		}
 		return variableHeadIndex.get(var);
 	}

@@ -73,7 +73,7 @@ public class Labeler {
 	}
 
 	private Map<String, String> readMap(File mapFile) throws IOException {
-		Map<String, String> ret = new TreeMap<String, String>();
+		Map<String, String> ret = new TreeMap<>();
 		BufferedReader reader = new BufferedReader(new FileReader(mapFile));
 		reader.lines().forEach(line -> {
 			StringTokenizer stok = new StringTokenizer(line, "\t");

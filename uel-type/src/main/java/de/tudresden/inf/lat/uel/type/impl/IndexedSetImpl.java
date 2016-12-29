@@ -19,8 +19,8 @@ import de.tudresden.inf.lat.uel.type.api.IndexedSet;
  */
 public class IndexedSetImpl<T> implements IndexedSet<T> {
 
-	private Map<Integer, T> invMap = new HashMap<Integer, T>();
-	private Map<T, Integer> map = new HashMap<T, Integer>();
+	private Map<Integer, T> invMap = new HashMap<>();
+	private Map<T, Integer> map = new HashMap<>();
 	private Integer maxIndex = 0;
 
 	/**

@@ -113,7 +113,7 @@ public class RuleBasedUnificationAlgorithm implements UnificationAlgorithm {
 	}
 
 	public List<Entry<String, String>> getInfo() {
-		List<Entry<String, String>> ret = new ArrayList<Entry<String, String>>();
+		List<Entry<String, String>> ret = new ArrayList<>();
 		addEntry(ret, keyName, algorithmName);
 		addEntry(ret, keyInitialSubs, "" + initialSize);
 		addEntry(ret, keyMaxSubs, "" + goal.getMaxSize());
@@ -128,14 +128,14 @@ public class RuleBasedUnificationAlgorithm implements UnificationAlgorithm {
 	 * unification in EL w.r.t. the empty TBox.
 	 */
 	private void initRules() {
-		staticEagerRules = new ArrayList<EagerRule>();
+		staticEagerRules = new ArrayList<>();
 		staticEagerRules.add(new EagerGroundSolvingRule());
 		staticEagerRules.add(new EagerSolving1Rule());
 		staticEagerRules.add(new EagerConflictRule());
-		dynamicEagerRules = new ArrayList<EagerRule>();
+		dynamicEagerRules = new ArrayList<>();
 		dynamicEagerRules.add(new EagerSolving2Rule());
 		dynamicEagerRules.add(new EagerExtensionRule());
-		nondeterministicRules = new ArrayList<Rule>();
+		nondeterministicRules = new ArrayList<>();
 		nondeterministicRules.add(new DecompositionRule());
 		nondeterministicRules.add(new ExtensionRule());
 	}
@@ -150,7 +150,7 @@ public class RuleBasedUnificationAlgorithm implements UnificationAlgorithm {
 	 */
 	public boolean computeNextUnifier() throws InterruptedException {
 		if (searchStack == null) {
-			searchStack = new ArrayDeque<Result>();
+			searchStack = new ArrayDeque<>();
 
 			// apply eager rules to each unsolved subsumption
 			Result res = applyEagerRules(goal, staticEagerRules, null);
@@ -183,9 +183,9 @@ public class RuleBasedUnificationAlgorithm implements UnificationAlgorithm {
 	public Unifier getUnifier() {
 		// convert current assignment to a set of definitions
 		AtomManager atomManager = input.getAtomManager();
-		Set<Definition> definitions = new HashSet<Definition>();
+		Set<Definition> definitions = new HashSet<>();
 		for (Integer varId : atomManager.getVariables()) {
-			Set<Integer> body = new HashSet<Integer>();
+			Set<Integer> body = new HashSet<>();
 			for (Atom subsumer : assignment.getSubsumers(atomManager.getAtom(varId))) {
 				body.add(atomManager.getIndex(subsumer));
 			}

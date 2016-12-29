@@ -42,7 +42,7 @@ public class Sat4jMaxSatSolver implements Solver {
 
 	private SatOutput getSatOutput() {
 		IOptimizationProblem problem = new PseudoOptDecorator(solver, false);
-		Set<Integer> model = new TreeSet<Integer>();
+		Set<Integer> model = new TreeSet<>();
 		boolean satisfiable = false;
 		// int counter = 0;
 		try {

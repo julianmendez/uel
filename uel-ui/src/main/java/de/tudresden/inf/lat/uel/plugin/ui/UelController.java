@@ -200,7 +200,7 @@ public class UelController {
 	 *            reset short form cache
 	 */
 	public void setupGoal(boolean resetShortFormCache) {
-		Set<OWLOntology> bgOntologies = new HashSet<OWLOntology>();
+		Set<OWLOntology> bgOntologies = new HashSet<>();
 		bgOntologies.add(view.getSelectedOntologyBg00());
 		bgOntologies.add(view.getSelectedOntologyBg01());
 		model.setupGoal(bgOntologies, view.getSelectedOntologyPos(), view.getSelectedOntologyNeg(), null,

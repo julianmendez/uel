@@ -64,7 +64,7 @@ public class MiniSatSolver implements Solver {
 		BufferedReader satoutputReader = new BufferedReader(new FileReader(satoutput));
 		String line = satoutputReader.readLine();
 		boolean satisfiable = false;
-		Set<Integer> clause = new HashSet<Integer>();
+		Set<Integer> clause = new HashSet<>();
 		if (line.trim().equals(Solver.SAT)) {
 			satisfiable = true;
 			StringTokenizer stok = new StringTokenizer(satoutputReader.readLine());

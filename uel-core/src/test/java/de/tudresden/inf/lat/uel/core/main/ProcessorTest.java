@@ -121,7 +121,7 @@ public class ProcessorTest {
 
 	@Parameters(name = "{index}: {0}, {4}")
 	public static Collection<Object[]> data() {
-		Collection<Object[]> data = new ArrayList<Object[]>();
+		Collection<Object[]> data = new ArrayList<>();
 
 		System.out.println("Preparing tests.");
 		for (int i = 1; i <= maxTest; i++) {
@@ -158,13 +158,13 @@ public class ProcessorTest {
 		if (input.equals("")) {
 			return Collections.emptySet();
 		} else {
-			return new HashSet<String>(Arrays.asList(input.split(",")));
+			return new HashSet<>(Arrays.asList(input.split(",")));
 		}
 	}
 
 	@Test
 	public void tryOntology() throws OWLOntologyCreationException, IOException, InterruptedException {
-		Map<String, OWLClass> idClassMap = new HashMap<String, OWLClass>();
+		Map<String, OWLClass> idClassMap = new HashMap<>();
 		OWLOntology owlOntology = loadKRSSOntology(ontologyName);
 		OWLOntologyManager ontologyManager = owlOntology.getOWLOntologyManager();
 		UelModel uelModel = new UelModel(new BasicOntologyProvider(ontologyManager));
@@ -180,7 +180,7 @@ public class ProcessorTest {
 
 		uelModel.setupGoal(Collections.singleton(owlOntology), positiveProblem, negativeProblem, null, true);
 
-		Set<OWLClass> variables = new HashSet<OWLClass>();
+		Set<OWLClass> variables = new HashSet<>();
 		// variables.add(idClassMap.get(conceptC));
 		// variables.add(idClassMap.get(conceptD));
 		for (String var : varNames) {

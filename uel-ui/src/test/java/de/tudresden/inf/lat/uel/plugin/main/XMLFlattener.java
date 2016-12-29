@@ -84,12 +84,12 @@ public class XMLFlattener {
 	}
 
 	private Set<String> preProcessDocument(Document doc) {
-		Set<String> ret = new TreeSet<String>();
+		Set<String> ret = new TreeSet<>();
 		Node mainNode = getMainNode(doc);
 		if (mainNode != null) {
 			NodeList nodeList = mainNode.getChildNodes();
 			for (int i = 0; i < nodeList.getLength(); i++) {
-				Map<String, String> nodeInfo = new TreeMap<String, String>();
+				Map<String, String> nodeInfo = new TreeMap<>();
 				processNode("", nodeList.item(i), nodeInfo);
 				ret.addAll(nodeInfo.keySet());
 			}
@@ -102,7 +102,7 @@ public class XMLFlattener {
 		if (mainNode != null) {
 			NodeList nodeList = mainNode.getChildNodes();
 			for (int i = 0; i < nodeList.getLength(); i++) {
-				Map<String, String> nodeInfo = new TreeMap<String, String>();
+				Map<String, String> nodeInfo = new TreeMap<>();
 				processNode("", nodeList.item(i), nodeInfo);
 				renderRecord(keySet, nodeInfo, writer);
 			}

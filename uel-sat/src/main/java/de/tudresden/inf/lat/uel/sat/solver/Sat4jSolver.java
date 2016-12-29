@@ -38,7 +38,7 @@ public class Sat4jSolver implements Solver {
 
 	private SatOutput getSatOutput() {
 		IProblem problem = solver;
-		Set<Integer> model = new TreeSet<Integer>();
+		Set<Integer> model = new TreeSet<>();
 		boolean satisfiable;
 		try {
 			satisfiable = problem.isSatisfiable();

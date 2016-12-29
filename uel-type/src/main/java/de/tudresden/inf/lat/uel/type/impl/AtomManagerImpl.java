@@ -12,15 +12,15 @@ import de.tudresden.inf.lat.uel.type.api.IndexedSet;
 
 public class AtomManagerImpl implements AtomManager {
 
-	private final IndexedSet<Atom> atoms = new IndexedSetImpl<Atom>();
-	private final Map<Integer, Integer> childMap = new HashMap<Integer, Integer>();
-	private final IndexedSet<String> conceptNames = new IndexedSetImpl<String>();
-	private final Set<Integer> constants = new HashSet<Integer>();
-	private final Set<Integer> definitionVariables = new HashSet<Integer>();
-	private final Set<Integer> flatteningVariables = new HashSet<Integer>();
-	private final IndexedSet<String> roleNames = new IndexedSetImpl<String>();
-	private final Set<Integer> userVariables = new HashSet<Integer>();
-	private final Set<Integer> variables = new HashSet<Integer>();
+	private final IndexedSet<Atom> atoms = new IndexedSetImpl<>();
+	private final Map<Integer, Integer> childMap = new HashMap<>();
+	private final IndexedSet<String> conceptNames = new IndexedSetImpl<>();
+	private final Set<Integer> constants = new HashSet<>();
+	private final Set<Integer> definitionVariables = new HashSet<>();
+	private final Set<Integer> flatteningVariables = new HashSet<>();
+	private final IndexedSet<String> roleNames = new IndexedSetImpl<>();
+	private final Set<Integer> userVariables = new HashSet<>();
+	private final Set<Integer> variables = new HashSet<>();
 
 	public AtomManagerImpl() {
 	}

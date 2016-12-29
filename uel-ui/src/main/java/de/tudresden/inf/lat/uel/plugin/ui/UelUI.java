@@ -192,7 +192,7 @@ class UelUI {
 	}
 
 	static <T> JList<T> createList(List<T> data, String toolTipText, boolean border) {
-		return setupList(new JList<T>(new Vector<T>(data)), toolTipText, border);
+		return setupList(new JList<T>(new Vector<>(data)), toolTipText, border);
 	}
 
 	static JScrollPane createScrollableTextArea(JTextArea textArea, String toolTipText) {

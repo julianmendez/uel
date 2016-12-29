@@ -69,7 +69,7 @@ public class CNFMaxSatSolver implements Solver {
 
 		BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
 
-		Set<Integer> clause = new HashSet<Integer>();
+		Set<Integer> clause = new HashSet<>();
 		boolean[] satisfiable = new boolean[1];
 		satisfiable[0] = false;
 		reader.lines() //

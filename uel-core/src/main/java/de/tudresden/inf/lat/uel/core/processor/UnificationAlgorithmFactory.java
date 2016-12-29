@@ -56,7 +56,7 @@ public class UnificationAlgorithmFactory {
 	 * @return all the algorithms that this factory can construct
 	 */
 	public static List<String> getAlgorithmNames() {
-		List<String> ret = new ArrayList<String>();
+		List<String> ret = new ArrayList<>();
 		ret.add(SAT_BASED_ALGORITHM);
 		ret.add(SAT_BASED_ALGORITHM_MINIMAL);
 		ret.add(RULE_BASED_ALGORITHM);

@@ -65,9 +65,9 @@ public class SatInput {
 		return ret;
 	}
 
-	private Collection<Set<Integer>> clauses = new ArrayList<Set<Integer>>();
+	private Collection<Set<Integer>> clauses = new ArrayList<>();
 	private Integer lastId = 0;
-	private Set<Integer> minimizeLiterals = new HashSet<Integer>();
+	private Set<Integer> minimizeLiterals = new HashSet<>();
 
 	/**
 	 * Constructs a new SAT input.

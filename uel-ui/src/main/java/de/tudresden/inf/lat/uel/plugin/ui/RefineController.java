@@ -113,7 +113,7 @@ class RefineController {
 	}
 
 	private void updateView() {
-		Map<LabelId, List<LabelId>> map = new HashMap<LabelId, List<LabelId>>();
+		Map<LabelId, List<LabelId>> map = new HashMap<>();
 		Set<Definition> definitions = model.getCurrentUnifier().getDefinitions();
 		StringRenderer renderer = model.getStringRenderer(definitions);
 
