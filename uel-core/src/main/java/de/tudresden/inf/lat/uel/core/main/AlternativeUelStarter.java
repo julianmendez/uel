@@ -179,10 +179,7 @@ public class AlternativeUelStarter {
 		try {
 			BufferedReader reader = new BufferedReader(
 					new InputStreamReader(AlternativeUelStarter.class.getResourceAsStream("/help")));
-			String line = null;
-			while ((line = reader.readLine()) != null) {
-				System.out.println(line);
-			}
+			reader.lines().forEach(line -> System.out.println(line));
 			System.out.flush();
 			reader.close();
 		} catch (IOException ex) {
@@ -245,8 +242,7 @@ public class AlternativeUelStarter {
 			Set<OWLEquivalentClassesAxiom> disequations, Set<OWLClass> variables, String algorithmName) {
 
 		UelModel uelModel = new UelModel(new BasicOntologyProvider(ontologyManager));
-		uelModel.setupGoal(ontologies, subsumptions, equations, dissubsumptions, disequations, owlThingAlias,
-				true);
+		uelModel.setupGoal(ontologies, subsumptions, equations, dissubsumptions, disequations, owlThingAlias, true);
 
 		return modifyOntologyAndSolve(uelModel, variables, algorithmName);
 	}

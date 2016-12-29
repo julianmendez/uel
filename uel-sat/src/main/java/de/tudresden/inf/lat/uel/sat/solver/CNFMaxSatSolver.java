@@ -70,24 +70,22 @@ public class CNFMaxSatSolver implements Solver {
 		BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
 
 		Set<Integer> clause = new HashSet<Integer>();
-		String line = reader.readLine();
-		boolean satisfiable = false;
-		;
-		while (line != null) {
-			if (line.startsWith("v")) {
-				satisfiable = true;
-				StringTokenizer stok = new StringTokenizer(line.substring(2));
-				while (stok.hasMoreTokens()) {
-					clause.add(Integer.parseInt(stok.nextToken()));
-				}
-			}
-			line = reader.readLine();
-		}
+		boolean[] satisfiable = new boolean[1];
+		satisfiable[0] = false;
+		reader.lines() //
+				.filter(line -> line.startsWith("v")) //
+				.forEach(line -> {
+					satisfiable[0] = true;
+					StringTokenizer stok = new StringTokenizer(line.substring(2));
+					while (stok.hasMoreTokens()) {
+						clause.add(Integer.parseInt(stok.nextToken()));
+					}
+				});
 		reader.close();
 		p.destroy();
 		clause.remove(Solver.END_OF_CLAUSE);
 
-		return new SatOutput(satisfiable, clause);
+		return new SatOutput(satisfiable[0], clause);
 	}
 
 	private void initCommandOptions(String command, String[] options) {
