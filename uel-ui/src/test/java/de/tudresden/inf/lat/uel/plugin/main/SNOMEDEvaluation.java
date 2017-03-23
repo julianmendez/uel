@@ -61,14 +61,14 @@ public class SNOMEDEvaluation {
 	private static final String[] PARENT_CLASSES = new String[] {
 			// "Bleeding (finding)",
 			// "Body structure (body structure)",
-			// "Clinical finding (finding)",
+			"Clinical finding (finding)",
 			// "Clinical history and observation findings (finding)",
 			// "Disease (disorder)", "Event (event)",
-			"Finding by site (finding)",
+			// "Finding by site (finding)",
 			// "Functional finding (finding)",
 	};
 
-	private static final int[] ROLE_GROUP_NO = new int[] { 1, 2 };
+	private static final int[] ROLE_GROUP_NO = new int[] { 1 };
 
 	private static final String[] TEST_ALGORITHMS = new String[] {
 			//
@@ -83,7 +83,7 @@ public class SNOMEDEvaluation {
 	static final int MAX_SIBLINGS = -1; // 100
 	static final int MAX_ATOMS = -1; // 240
 	static final boolean CHECK_UNIFIERS = true;
-	private static final int MAX_TESTS = 50;
+	private static final int MAX_TESTS = 500;
 	private static final long TIMEOUT = 5 * 60 * 1000;
 
 	private static String currentParentClass;
@@ -314,30 +314,32 @@ public class SNOMEDEvaluation {
 			initRunner = null;
 			initThread = null;
 
-			for (int i = 0; i < TEST_ALGORITHMS.length; i++) {
-				printThreadInfo();
-				System.out.println("** Unification algorithm " + (i + 1) + ": " + TEST_ALGORITHMS[i]);
-				options.unificationAlgorithmName = TEST_ALGORITHMS[i];
-				iterator = iterator.resetModel();
-
-				SNOMEDTest algorithmRunner = new SNOMEDTest(iterator, options, pos, neg, goalAxiom);
-				Thread algorithmThread = new Thread(algorithmRunner);
-				algorithmThread.start();
-				algorithmThread.join(TIMEOUT);
-				SNOMEDAlgorithmResult algorithmResult = algorithmRunner.result;
-				if (algorithmThread.isAlive()) {
-					System.out.println("Timeout!");
-					printThreadInfo();
-					// force cleanup from outside in case the algorithm is
-					// blocking, e.g., waiting for JSON output of clingo
-					// TODO: find non-blocking JSON parser ;-)
-					iterator.cleanup();
-					algorithmThread.interrupt();
-					algorithmThread.join();
-					algorithmResult.status = SNOMEDAlgorithmStatus.TIMEOUT;
-				}
-				result.algorithmResults.add(algorithmResult);
-			}
+			// for (int i = 0; i < TEST_ALGORITHMS.length; i++) {
+			// printThreadInfo();
+			// System.out.println("** Unification algorithm " + (i + 1) + ": " +
+			// TEST_ALGORITHMS[i]);
+			// options.unificationAlgorithmName = TEST_ALGORITHMS[i];
+			// iterator = iterator.resetModel();
+			//
+			// SNOMEDTest algorithmRunner = new SNOMEDTest(iterator, options,
+			// pos, neg, goalAxiom);
+			// Thread algorithmThread = new Thread(algorithmRunner);
+			// algorithmThread.start();
+			// algorithmThread.join(TIMEOUT);
+			// SNOMEDAlgorithmResult algorithmResult = algorithmRunner.result;
+			// if (algorithmThread.isAlive()) {
+			// System.out.println("Timeout!");
+			// printThreadInfo();
+			// // force cleanup from outside in case the algorithm is
+			// // blocking, e.g., waiting for JSON output of clingo
+			// // TODO: find non-blocking JSON parser ;-)
+			// iterator.cleanup();
+			// algorithmThread.interrupt();
+			// algorithmThread.join();
+			// algorithmResult.status = SNOMEDAlgorithmStatus.TIMEOUT;
+			// }
+			// result.algorithmResults.add(algorithmResult);
+			// }
 
 			// all individual tests for this goal class have been completed
 			result.goalStatus = SNOMEDGoalStatus.COMPLETE;

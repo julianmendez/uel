@@ -10,6 +10,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.semanticweb.owlapi.model.AxiomType;
@@ -274,7 +276,7 @@ public class UelOntologyGoal implements Goal {
 		}
 		ideals.removeAll(notMaximal);
 
-		// printIdeals(renderer);
+		printIdeals(renderer);
 	}
 
 	private Set<Integer> getAllSuperclasses(Integer varId) {
@@ -615,8 +617,19 @@ public class UelOntologyGoal implements Goal {
 
 	private void printIdeals(StringRenderer renderer) {
 		int i = 1;
+		Pattern paren = Pattern.compile("\\(.*\\)");
 		for (Set<Integer> ideal : ideals) {
-			System.out.println(renderer.renderAtomList("Ideal " + i, ideal));
+			Set<Integer> topLevel = Sets.intersection(ideal, types);
+			if (topLevel.size() > 1) {
+				if (topLevel.stream().map(atomId -> renderer.renderAtom(atomId, false)).map(str -> {
+					Matcher m = paren.matcher(str);
+					m.find();
+					return m.group();
+				}).distinct().count() > 1) {
+					System.out.println(renderer.renderAtomList("Ideal " + i, topLevel));
+					System.out.println(renderer.renderAtomList("Ideal " + i, ideal));
+				}
+			}
 			i++;
 		}
 		System.out.println("#####################");
