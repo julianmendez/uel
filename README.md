@@ -1,10 +1,10 @@
 # [UEL](https://julianmendez.github.io/uel/)
 
 [![Build Status](https://travis-ci.org/julianmendez/uel.png?branch=master)](https://travis-ci.org/julianmendez/uel)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/de.tu-dresden.inf.lat.uel/uel-parent/badge.svg)](http://search.maven.org/#search|ga|1|g%3A%22de.tu-dresden.inf.lat.uel%22)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/de.tu-dresden.inf.lat.uel/uel-parent/badge.svg)](https://search.maven.org/#search|ga|1|g%3A%22de.tu-dresden.inf.lat.uel%22)
 
 
-**UEL**, unification solver for [EL](http://dl.kr.org/), is a plug-in for [Protégé](http://protege.stanford.edu/) that uses the [OWL API](https://owlcs.github.io/owlapi/).
+**UEL**, unification solver for [EL](http://dl.kr.org/), is a plug-in for [Protégé](https://protege.stanford.edu/) that uses the [OWL API](https://owlcs.github.io/owlapi/).
 
 
 ## Dependency
@@ -73,7 +73,7 @@ where *NEW_VERSION* is the new version.
 
 ## Authors
 
-[Barbara Morawska](http://lat.inf.tu-dresden.de/~morawska/), [Stefan Borgwardt](http://lat.inf.tu-dresden.de/~stefborg/), [Julian Mendez](http://lat.inf.tu-dresden.de/~mendez/)
+[Barbara Morawska](https://lat.inf.tu-dresden.de/~morawska/), [Stefan Borgwardt](https://lat.inf.tu-dresden.de/~stefborg/), [Julian Mendez](https://lat.inf.tu-dresden.de/~mendez/)
 
 
 ## License
@@ -113,7 +113,7 @@ See [release notes](https://github.com/julianmendez/uel/blob/master/RELEASE-NOTE
 
 
 ## Support
-See [this page](http://lat.inf.tu-dresden.de/~mendez).
+See [this page](https://lat.inf.tu-dresden.de/~mendez).
 
 
 ## Tutorial - UEL as application
@@ -172,7 +172,7 @@ This small tutorial gives an example of how to use UEL as a Java library. The cl
  * The subsumptions and equations that are to be made false by the unifiers ("dissubsumptions" and "disequations"). The input format is the same as above. Dissubsumptions and disequations are currently only supported by the SAT and ASP processors (see #4 below).
  * A `Set<OWLClass>` containing all class names that are to be treated as variables for the unification.
 
- * A `String` designating the unification algorithm ("processor") to be used, as defined in `UelProcessorFactory`. There is an inefficient *RULE_BASED_ALGORITHM*, a more mature *SAT_BASED_ALGORITHM* (using the [Sat4j library](http://www.sat4j.org/)) with the option to only return "subset-minimal" solutions [1], and an *ASP_BASED_ALGORITHM* (using the ASP solver [Clingo](http://potassco.sourceforge.net/)) that as of April 2016 is still under development. If you want to try the ASP algorithm, we can send you more detailed information on how to install Clingo and set up UEL to use it.
+ * A `String` designating the unification algorithm ("processor") to be used, as defined in `UelProcessorFactory`. There is an inefficient *RULE_BASED_ALGORITHM*, a more mature *SAT_BASED_ALGORITHM* (using the [Sat4j library](https://www.sat4j.org/)) with the option to only return "subset-minimal" solutions [1], and an *ASP_BASED_ALGORITHM* (using the ASP solver [Clingo](http://potassco.sourceforge.net/)) that as of April 2016 is still under development. If you want to try the ASP algorithm, we can send you more detailed information on how to install Clingo and set up UEL to use it.
 
 * You get back an iterator that gives you unifiers in the form of `Set<OWLUelClassDefinition>` specifying a substitution for every variable. Each `OWLUelClassDefinition` can be converted into an `OWLEquivalentClassesAxiom`. It should be the case that the background ontology, extended by the `OWLEquivalentClassesAxioms` given by one unifier, entails all input subsumptions and does not entail any of the dissubsumptions.
 
