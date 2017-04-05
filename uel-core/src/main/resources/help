@@ -20,4 +20,4 @@ Options:
              background ontology and sets 'http://www.ihtsdo.org/SCT_138875005'
              as owl:Thing alias (can be overridden by '-t' option).
 
-More about UEL: http://julianmendez.github.io/uel/
+More about UEL: https://julianmendez.github.io/uel/

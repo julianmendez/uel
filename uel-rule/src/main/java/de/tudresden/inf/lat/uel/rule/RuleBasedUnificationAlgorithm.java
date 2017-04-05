@@ -36,7 +36,7 @@ import de.tudresden.inf.lat.uel.type.impl.Unifier;
  * Morawska. 'Unification in the description logic EL w.r.t. cycle-restricted
  * TBoxes'. LTCS-Report 11-05, Chair for Automata Theory, Institute for
  * Theoretical Computer Science, Technische Universitaet Dresden, Dresden,
- * Germany, 2011. See http://lat.inf.tu-dresden.de/research/reports.html.
+ * Germany, 2011. See https://lat.inf.tu-dresden.de/research/reports.html.
  * 
  * Based on the algorithm in: Franz Baader and Barbara Morawska. 'Unification in
  * the description logic EL'. Logical Methods in Computer Science, 6(3), 2010.
