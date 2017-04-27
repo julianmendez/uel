@@ -61,7 +61,7 @@
 			<dependency>
 				<groupId>org.ow2.sat4j</groupId>
 				<artifactId>org.ow2.sat4j.maxsat</artifactId>
-				<version>2.3.5</version>
+				<version>${sat4j.version}</version>
 			</dependency>
 
 			<dependency>
@@ -91,8 +91,9 @@
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
 
-		<owlapi.version>4.2.5</owlapi.version>
-		<protege.version>5.0.0</protege.version>
+		<owlapi.version>4.2.8</owlapi.version>
+		<protege.version>5.2.0</protege.version>
+		<sat4j.version>2.3.5</sat4j.version>
 		<jcel.version>0.23.0</jcel.version>
 	</properties>
 
