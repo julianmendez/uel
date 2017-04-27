@@ -43,7 +43,7 @@ public class UelModel {
 
 	private static OWLOntology createEmptyOntology() {
 		try {
-			return OWLManager.createOWLOntologyManager().createOntology(IRI.create("empty"));
+			return OWLManager.createOWLOntologyManager().createOntology(IRI.create("empty:"));
 		} catch (OWLOntologyCreationException e) {
 			throw new RuntimeException(e);
 		}
