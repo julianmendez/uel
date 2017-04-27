@@ -94,7 +94,7 @@
 		<owlapi.version>4.2.8</owlapi.version>
 		<protege.version>5.2.0</protege.version>
 		<sat4j.version>2.3.5</sat4j.version>
-		<jcel.version>0.23.0</jcel.version>
+		<jcel.version>0.24.0</jcel.version>
 	</properties>
 
 	<build>
