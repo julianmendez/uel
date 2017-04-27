@@ -40,6 +40,12 @@
 			</dependency>
 
 			<dependency>
+				<groupId>edu.stanford.protege</groupId>
+				<artifactId>protege-editor-core</artifactId>
+				<version>5.0.0</version>
+			</dependency>
+
+			<dependency>
 				<groupId>de.tu-dresden.inf.lat.jcel</groupId>
 				<artifactId>jcel-owlapi</artifactId>
 				<version>0.23.2</version>
