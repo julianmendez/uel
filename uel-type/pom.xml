@@ -7,6 +7,15 @@
 	<artifactId>uel-type</artifactId>
 	<packaging>jar</packaging>
 
+	<dependencies>
+
+		<dependency>
+			<groupId>de.tu-dresden.inf.lat.util</groupId>
+			<artifactId>util-map</artifactId>
+		</dependency>
+
+	</dependencies>
+
 	<parent>
 		<groupId>de.tu-dresden.inf.lat.uel</groupId>
 		<artifactId>uel-parent</artifactId>
