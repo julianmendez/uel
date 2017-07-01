@@ -113,7 +113,7 @@ See [release notes](https://julianmendez.github.io/uel/RELEASE-NOTES.html).
 
 
 ## Support
-See [this page](https://lat.inf.tu-dresden.de/~mendez).
+Any questions or bug reports are truly welcome. Please feel free to contact the authors.
 
 
 ## Tutorial - UEL as application
