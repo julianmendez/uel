@@ -73,7 +73,7 @@ where *NEW_VERSION* is the new version.
 
 ## Authors
 
-[Barbara Morawska](https://lat.inf.tu-dresden.de/~morawska/), [Stefan Borgwardt](https://lat.inf.tu-dresden.de/~stefborg/), [Julian Mendez](https://lat.inf.tu-dresden.de/~mendez/)
+[Barbara Morawska](https://lat.inf.tu-dresden.de/~morawska/), [Stefan Borgwardt](https://lat.inf.tu-dresden.de/~stefborg/), [Julian Mendez](https://julianmendez.github.io)
 
 
 ## License
