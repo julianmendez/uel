@@ -103,6 +103,7 @@
 							@uel-core-${project.version}.jar,
 							@uel-ui-${project.version}.jar,
 							@uel-protege-${project.version}.jar,
+							@util-map-${util.version}.jar,
 							lib/org/ow2/sat4j/org.ow2.sat4j.core/2.3.5/org.ow2.sat4j.core-2.3.5.jar=org.ow2.sat4j.core-2.3.5.jar,
 							lib/org/ow2/sat4j/org.ow2.sat4j.pb/2.3.5/org.ow2.sat4j.pb-2.3.5.jar=org.ow2.sat4j.pb-2.3.5.jar,
 							lib/org/ow2/sat4j/org.ow2.sat4j.maxsat/2.3.5/org.ow2.sat4j.maxsat-2.3.5.jar=org.ow2.sat4j.maxsat-2.3.5.jar,
