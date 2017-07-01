@@ -109,7 +109,7 @@ where *NEW_VERSION* is the new version.
 
 
 ## Release Notes
-See [release notes](https://github.com/julianmendez/uel/blob/master/RELEASE-NOTES.md).
+See [release notes](https://julianmendez.github.io/uel/RELEASE-NOTES.html).
 
 
 ## Support
