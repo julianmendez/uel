@@ -54,9 +54,9 @@ public class SNOMEDEvaluation {
 	// private static final String WORK_DIR = "C:\\Users\\Stefan\\Work\\";
 	private static final String WORK_DIR = "/Users/stefborg/Documents/";
 	private static final String OUTPUT_PATH = WORK_DIR + "Projects/uel-snomed/results-";
-	private static final String SNOMED_MODULE_PATH = WORK_DIR + "Ontologies/snomed-";
-	static final String SNOMED_PATH = SNOMED_MODULE_PATH + "english-rdf.owl";
-	static final String SNOMED_RESTR_PATH = WORK_DIR + "Ontologies/snomed-restrictions-no-imports.owl";
+	private static final String SNOMED_MODULE_PATH = WORK_DIR + "Ontologies/snomed2017-";
+	static final String SNOMED_PATH = SNOMED_MODULE_PATH + "english.owl";
+	static final String SNOMED_RESTR_PATH = SNOMED_MODULE_PATH + "restrictions-no-imports.owl";
 
 	private static final String[] PARENT_CLASSES = new String[] {
 			// "Bleeding (finding)",
@@ -102,14 +102,14 @@ public class SNOMEDEvaluation {
 		if (factory == null) {
 			factory = OWLManager.getOWLDataFactory();
 		}
-		return factory.getOWLClass(IRI.create("http://www.ihtsdo.org/" + name));
+		return factory.getOWLClass(IRI.create("http://snomed.info/id/" + name));
 	}
 
 	static OWLObjectProperty prp(String name) {
 		if (factory == null) {
 			factory = OWLManager.getOWLDataFactory();
 		}
-		return factory.getOWLObjectProperty(IRI.create("http://www.ihtsdo.org/" + name));
+		return factory.getOWLObjectProperty(IRI.create("http://snomed.info/id/" + name));
 	}
 
 	static void printResults() {

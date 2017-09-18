@@ -41,7 +41,7 @@ public class SNOMEDStatistics {
 	private static int maxOtherRoles = 0;
 	private static OWLClass maxOtherRolesClass = null;
 	private static OWLClassExpression maxOtherRolesDef = null;
-	private static OWLObjectProperty roleGroup = SNOMEDEvaluation.prp("RoleGroup");
+	private static OWLObjectProperty roleGroup = SNOMEDEvaluation.prp("609096000");
 
 	public static void main(String[] args) {
 		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
@@ -109,10 +109,11 @@ public class SNOMEDStatistics {
 		long c = restrictions.stream().filter(r -> !r.getProperty().equals(roleGroup))
 				.map(r -> r.getProperty().asOWLObjectProperty()).peek(rolesWithoutRoleGroup::add).count();
 		if (c > 0) {
-			if (c > 2) {
-				System.out.println("The definition of " + definiendum + " does not use RoleGroup:"
-						+ System.lineSeparator() + definiens);
-			}
+			// if (c > 2) {
+			// System.out.println("The definition of " + definiendum + " does
+			// not use RoleGroup:"
+			// + System.lineSeparator() + definiens);
+			// }
 			occurrencesWithoutRoleGroup++;
 			siblingsOfRolesWithoutRoleGroup += restrictions.size();
 		} else {
@@ -123,6 +124,16 @@ public class SNOMEDStatistics {
 				maxRoleGroupsDef = definiens;
 			}
 			restrictions.stream().forEach(r -> checkInnerRestrictions(definiendum, definiens, r.getFiller()));
+		}
+
+		Set<OWLClass> parents = getClasses(definiens);
+		if (parents.size() > 1) {
+			Set<String> hierarchies = parents.stream().map(cls -> cls.toString().split("\\("))
+					.filter(arr -> arr.length > 1).map(arr -> arr[1]).collect(Collectors.toSet());
+			if (hierarchies.size() > 1) {
+				System.out.println("The definition of " + definiendum
+						+ " contains two parents from different hierarchies:" + System.lineSeparator() + definiens);
+			}
 		}
 	}
 
@@ -167,4 +178,8 @@ public class SNOMEDStatistics {
 				.map(OWLObjectSomeValuesFrom.class::cast).collect(Collectors.toSet());
 	}
 
+	private static Set<OWLClass> getClasses(OWLClassExpression expr) {
+		return expr.asConjunctSet().stream().filter(e -> e instanceof OWLClass).map(OWLClass.class::cast)
+				.collect(Collectors.toSet());
+	}
 }
