@@ -27,6 +27,7 @@ import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
+import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLOntology;
@@ -54,19 +55,16 @@ public class SNOMEDEvaluation {
 	// private static final String WORK_DIR = "C:\\Users\\Stefan\\Work\\";
 	private static final String WORK_DIR = "/Users/stefborg/Documents/";
 	private static final String OUTPUT_PATH = WORK_DIR + "Projects/uel-snomed/results-";
-	private static final String SNOMED_MODULE_PATH = WORK_DIR + "Ontologies/snomed2017-";
+	static final String SNOMED_MODULE_PATH = WORK_DIR + "Ontologies/snomed2017-";
 	static final String SNOMED_PATH = SNOMED_MODULE_PATH + "english.owl";
 	static final String SNOMED_RESTR_PATH = SNOMED_MODULE_PATH + "restrictions-no-imports.owl";
 
-	private static final String[] PARENT_CLASSES = new String[] {
-			// "Bleeding (finding)",
-			// "Body structure (body structure)",
-			// "Clinical finding (finding)",
-			// "Clinical history and observation findings (finding)",
-			// "Disease (disorder)", "Event (event)",
-			"Finding by site (finding)",
-			// "Functional finding (finding)",
-	};
+	public static final String[] PARENT_CLASSES = new String[] { "Bleeding (finding)",
+			"Body structure (body structure)", "Anatomical or acquired body structure (body structure)",
+			"Body structure, altered from its original anatomical structure (morphologic abnormality)",
+			"Clinical finding (finding)", "Clinical history and observation findings (finding)", "Disease (disorder)",
+			"Event (event)", "Finding by site (finding)", "Functional finding (finding)",
+			"Observable entity (observable entity)", };
 
 	private static final int[] ROLE_GROUP_NO = new int[] { 1, 2 };
 
@@ -286,8 +284,7 @@ public class SNOMEDEvaluation {
 	private static void runSingleTest(OWLClass goalClass, OWLClassExpression goalExpression)
 			throws InterruptedException {
 
-		System.out.println("Goal class: " + EntitySearcher.getAnnotations(goalClass, snomed, factory.getRDFSLabel())
-				.iterator().next().getValue().asLiteral().get().getLiteral());
+		System.out.println("Goal class: " + getLabel(goalClass));
 
 		printThreadInfo();
 		SNOMEDTestInitialization initRunner = new SNOMEDTestInitialization(options, snomed, bg, goalClass,
@@ -342,6 +339,11 @@ public class SNOMEDEvaluation {
 			// all individual tests for this goal class have been completed
 			result.goalStatus = SNOMEDGoalStatus.COMPLETE;
 		}
+	}
+
+	private static String getLabel(OWLEntity entity) {
+		return EntitySearcher.getAnnotations(entity, snomed, factory.getRDFSLabel()).iterator().next().getValue()
+				.asLiteral().get().getLiteral();
 	}
 
 	static long output(Stopwatch timer, String description, boolean reset) {

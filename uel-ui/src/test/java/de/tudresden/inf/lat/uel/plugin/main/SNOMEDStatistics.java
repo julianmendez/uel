@@ -14,12 +14,14 @@ import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
+import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLObjectSomeValuesFrom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
+import org.semanticweb.owlapi.search.EntitySearcher;
 
 import de.tudresden.inf.lat.uel.core.main.AlternativeUelStarter;
 
@@ -43,9 +45,12 @@ public class SNOMEDStatistics {
 	private static OWLClassExpression maxOtherRolesDef = null;
 	private static OWLObjectProperty roleGroup = SNOMEDEvaluation.prp("609096000");
 
+	private static OWLOntologyManager manager;
+	private static OWLOntology snomed;
+
 	public static void main(String[] args) {
-		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
-		OWLOntology snomed = AlternativeUelStarter.loadOntology(SNOMEDEvaluation.SNOMED_PATH, manager);
+		manager = OWLManager.createOWLOntologyManager();
+		snomed = AlternativeUelStarter.loadOntology(SNOMEDEvaluation.SNOMED_PATH, manager);
 
 		for (OWLSubClassOfAxiom a : snomed.getAxioms(AxiomType.SUBCLASS_OF)) {
 			checkDefinition((OWLClass) a.getSubClass(), a.getSuperClass());
@@ -66,13 +71,13 @@ public class SNOMEDStatistics {
 					+ (((float) siblingsOfRolesWithoutRoleGroup) / ((float) occurrencesWithoutRoleGroup)));
 			System.out.println("Roles that occur without RoleGroup:");
 			for (OWLObjectProperty prop : rolesWithoutRoleGroup) {
-				System.out.println(prop);
+				System.out.println(getLabel(prop));
 			}
 		}
 		System.out.println();
 		{
 			System.out.println("Maximum number of RoleGroups in one definition: " + maxRoleGroups);
-			System.out.println("Definition of " + maxRoleGroupsClass + ": " + maxRoleGroupsDef);
+			System.out.println("Definition of " + getLabel(maxRoleGroupsClass) + ": " + maxRoleGroupsDef);
 			int sum = 0;
 			int num = 0;
 			for (Entry<Integer, Integer> e : roleGroups.entrySet()) {
@@ -85,21 +90,26 @@ public class SNOMEDStatistics {
 		System.out.println();
 		{
 			System.out.println("Maximum number of occurrences of the same role within one RoleGroup: " + maxOtherRoles);
-			System.out.println("Definition of " + maxOtherRolesClass + ": " + maxOtherRolesDef);
+			System.out.println("Definition of " + getLabel(maxOtherRolesClass) + ": " + maxOtherRolesDef);
 			int sum = 0;
 			int num = 0;
 			for (Entry<OWLObjectProperty, Map<Integer, Integer>> e1 : otherRoles.entrySet()) {
 				for (Entry<Integer, Integer> e2 : e1.getValue().entrySet()) {
 					num += e2.getValue();
 					sum += e2.getKey() * e2.getValue();
-					System.out.println(
-							"RoleGroups with " + e2.getKey() + " occurrences of " + e1.getKey() + ": " + e2.getValue());
+					System.out.println("RoleGroups with " + e2.getKey() + " occurrences of " + getLabel(e1.getKey())
+							+ ": " + e2.getValue());
 				}
 			}
 			System.out.println("Average number of occurrences of a single role in a RoleGroup: "
 					+ (((float) sum) / ((float) num)));
 		}
 		System.out.println();
+	}
+
+	private static String getLabel(OWLEntity entity) {
+		return EntitySearcher.getAnnotations(entity, snomed, manager.getOWLDataFactory().getRDFSLabel()).iterator()
+				.next().getValue().asLiteral().get().getLiteral();
 	}
 
 	private static void checkDefinition(OWLClass definiendum, OWLClassExpression definiens) {
@@ -128,11 +138,14 @@ public class SNOMEDStatistics {
 
 		Set<OWLClass> parents = getClasses(definiens);
 		if (parents.size() > 1) {
-			Set<String> hierarchies = parents.stream().map(cls -> cls.toString().split("\\("))
-					.filter(arr -> arr.length > 1).map(arr -> arr[1]).collect(Collectors.toSet());
+			Set<String> hierarchies = parents.stream().map(cls -> getLabel(cls).split("[\\(\\)]"))
+					// .peek(arr -> System.out.println(String.join(" | ", arr)))
+					.filter(arr -> arr.length > 1)
+					.map(arr -> arr[arr.length - 1].substring(0, arr[arr.length - 1].length()))
+					.collect(Collectors.toSet());
+			// System.out.println();
 			if (hierarchies.size() > 1) {
-				System.out.println("The definition of " + definiendum
-						+ " contains two parents from different hierarchies:" + System.lineSeparator() + definiens);
+				System.out.println(String.join(" and ", hierarchies) + "          " + getLabel(definiendum));
 			}
 		}
 	}
