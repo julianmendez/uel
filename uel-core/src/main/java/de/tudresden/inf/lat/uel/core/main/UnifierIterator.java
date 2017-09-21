@@ -21,6 +21,7 @@ public class UnifierIterator implements Iterator<Set<OWLEquivalentClassesAxiom>>
 
 	private boolean hasNext = false;
 	private boolean isComputed = false;
+	private boolean cleaned = false;
 	private UelModel uelModel;
 	private Unifier unifier;
 
@@ -37,11 +38,28 @@ public class UnifierIterator implements Iterator<Set<OWLEquivalentClassesAxiom>>
 	/**
 	 * Clean up the resources used by UEL once they are no longer needed.
 	 */
-	public void cleanup() {
-		uelModel.cleanupUnificationAlgorithm();
+	public synchronized void cleanup() {
+		if (!cleaned) {
+			cleaned = true;
+			// System.out.println("Thread '" + Thread.currentThread().getName()
+			// + "' started executing 'cleanup()' on "
+			// + this.toString() + " at "
+			// + new SimpleDateFormat("dd.MM.yy
+			// HH:mm:ss").format(Calendar.getInstance().getTime()));
+			uelModel.cleanupUnificationAlgorithm();
+			// System.out.println("'cleaned' is now true ("
+			// + new SimpleDateFormat("dd.MM.yy
+			// HH:mm:ss").format(Calendar.getInstance().getTime()) + ").");
+		}
 	}
 
 	private void compute() {
+		if (cleaned) {
+			isComputed = true;
+			hasNext = false;
+			return;
+		}
+
 		if (!isComputed) {
 			try {
 				hasNext = uelModel.computeNextUnifier();

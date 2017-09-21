@@ -15,6 +15,7 @@ import org.semanticweb.owlapi.formats.OWLXMLDocumentFormat;
 import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
@@ -22,11 +23,7 @@ import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
-import org.semanticweb.owlapi.model.parameters.Imports;
-import org.semanticweb.owlapi.model.parameters.Navigation;
 import org.semanticweb.owlapi.search.EntitySearcher;
-
-import com.google.common.collect.Sets;
 
 import de.tudresden.inf.lat.uel.core.main.AlternativeUelStarter;
 
@@ -48,13 +45,16 @@ public class SNOMEDModuleExtractor {
 			OWLClass root = findClass(rootName);
 
 			Set<OWLClass> hierarchy = getDescendants(root);
+			Files.write(Paths.get(SNOMEDEvaluation.SNOMED_MODULE_PATH + rootName + "-labels.txt"),
+					hierarchy.stream().map(SNOMEDModuleExtractor::getLabel).collect(Collectors.toList()));
+			System.out.println("Saved labels of classses (" + hierarchy.size() + " classes).");
+
 			Files.write(Paths.get(SNOMEDEvaluation.SNOMED_MODULE_PATH + rootName + ".txt"),
 					hierarchy.stream().map(OWLClass::toString).collect(Collectors.toList()));
 			System.out.println("Saved classes list (" + hierarchy.size() + " classes).");
 
 			OWLOntology module = manager.createOntology(getDefinitions(hierarchy));
 			manager.addAxioms(module, getAnnotations(module));
-
 			manager.saveOntology(module, new OWLXMLDocumentFormat(),
 					Files.newOutputStream(Paths.get(SNOMEDEvaluation.SNOMED_MODULE_PATH + rootName + ".owl")));
 			System.out.println("Saved ontology module (" + module.getLogicalAxiomCount() + " axioms).");
@@ -83,41 +83,70 @@ public class SNOMEDModuleExtractor {
 	}
 
 	private static Set<OWLClass> getDescendants(OWLClass root) {
-		Set<OWLClass> descendants = new HashSet<>();
-		Set<OWLClass> toVisit = new HashSet<>();
-		toVisit.add(root);
+		return snomed.getClassesInSignature().stream().filter(cls -> isSubclass(cls, root)).collect(Collectors.toSet());
 
-		while (!toVisit.isEmpty()) {
-			OWLClass cls = toVisit.iterator().next();
-			// System.out.println(getLabel(cls));
-			for (OWLClass newCls : getChildren(cls)) {
-				if (!descendants.contains(newCls)) {
-					toVisit.add(newCls);
-				}
-			}
-			toVisit.remove(cls);
-			descendants.add(cls);
+		// Set<OWLClass> descendants = new HashSet<>();
+		// Set<OWLClass> toVisit = new HashSet<>();
+		// toVisit.add(root);
+		//
+		// while (!toVisit.isEmpty()) {
+		// OWLClass cls = toVisit.iterator().next();
+		// // System.out.println(getLabel(cls));
+		// for (OWLClass newCls : getChildren(cls)) {
+		// if (!descendants.contains(newCls)) {
+		// toVisit.add(newCls);
+		// }
+		// }
+		// toVisit.remove(cls);
+		// descendants.add(cls);
+		// }
+		//
+		// return descendants;
+	}
+
+	private static boolean isSubclass(OWLClass cls1, OWLClass cls2) {
+		if (cls1.equals(cls2)) {
+			return true;
 		}
 
-		return descendants;
+		OWLAxiom def = getDefinition(cls1);
+		if (def == null) {
+			return false;
+		}
+
+		OWLClassExpression defExpr = null;
+		if (def instanceof OWLEquivalentClassesAxiom) {
+			defExpr = ((OWLEquivalentClassesAxiom) def).getClassExpressionsMinus(cls1).iterator().next();
+		}
+		if (def instanceof OWLSubClassOfAxiom) {
+			defExpr = ((OWLSubClassOfAxiom) def).getSuperClass();
+		}
+		if (defExpr == null) {
+			throw new RuntimeException("Illegal type of definition for " + getLabel(cls1) + "!");
+		}
+
+		return defExpr.asConjunctSet().stream().filter(expr -> !expr.isAnonymous()).map(expr -> expr.asOWLClass())
+				.anyMatch(cls -> isSubclass(cls, cls2));
 	}
 
-	private static Set<OWLClass> getChildren(OWLClass parent) {
-		return Sets
-				.union(snomed
-						.getAxioms(OWLEquivalentClassesAxiom.class, parent, Imports.EXCLUDED,
-								Navigation.IN_SUPER_POSITION)
-						.stream()
-						.filter(ax -> ax.getClassExpressions().stream()
-								.anyMatch(expr -> expr.asConjunctSet().contains(parent)))
-						.flatMap(ax -> ax.getNamedClasses().stream()).collect(Collectors.toSet()),
-						snomed
-								.getAxioms(OWLSubClassOfAxiom.class, parent, Imports.EXCLUDED,
-										Navigation.IN_SUPER_POSITION)
-								.stream().filter(ax -> ax.getSuperClass().asConjunctSet().contains(parent))
-								.map(ax -> ax.getSubClass()).filter(cls -> !cls.isAnonymous())
-								.map(cls -> cls.asOWLClass()).collect(Collectors.toSet()));
-	}
+	// private static Set<OWLClass> getChildren(OWLClass parent) {
+	// return Sets
+	// .union(snomed
+	// .getAxioms(OWLEquivalentClassesAxiom.class, parent, Imports.EXCLUDED,
+	// Navigation.IN_SUPER_POSITION)
+	// .stream()
+	// .filter(ax -> ax.getClassExpressions().stream()
+	// .anyMatch(expr -> expr.asConjunctSet().contains(parent)))
+	// .flatMap(ax ->
+	// ax.getNamedClasses().stream()).collect(Collectors.toSet()),
+	// snomed
+	// .getAxioms(OWLSubClassOfAxiom.class, parent, Imports.EXCLUDED,
+	// Navigation.IN_SUPER_POSITION)
+	// .stream().filter(ax ->
+	// ax.getSuperClass().asConjunctSet().contains(parent))
+	// .map(ax -> ax.getSubClass()).filter(cls -> !cls.isAnonymous())
+	// .map(cls -> cls.asOWLClass()).collect(Collectors.toSet()));
+	// }
 
 	private static Set<OWLAxiom> getDefinitions(Set<OWLClass> toVisit) {
 		Set<OWLAxiom> definitions = new HashSet<>();
@@ -148,7 +177,7 @@ public class SNOMEDModuleExtractor {
 		axioms.addAll(snomed.getEquivalentClassesAxioms(cls));
 		axioms.addAll(snomed.getSubClassAxiomsForSubClass(cls));
 		if (axioms.size() > 1) {
-			throw new RuntimeException("More than one definition for " + cls + "!");
+			throw new RuntimeException("More than one definition for " + getLabel(cls) + "!");
 		}
 		if (axioms.size() == 1) {
 			return axioms.iterator().next();

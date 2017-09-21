@@ -269,7 +269,7 @@ public class UelModel {
 			return owlThingAlias;
 		else if (snomedMode)
 			// 'SNOMED CT Concept'
-			return OWLManager.getOWLDataFactory().getOWLClass(IRI.create("http://www.ihtsdo.org/SCT_138875005"));
+			return OWLManager.getOWLDataFactory().getOWLClass(IRI.create("http://snomed.info/id/138875005"));
 		else
 			// owl:Thing
 			return OWLManager.getOWLDataFactory().getOWLThing();

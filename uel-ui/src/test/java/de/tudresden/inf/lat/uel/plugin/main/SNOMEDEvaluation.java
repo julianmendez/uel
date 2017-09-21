@@ -59,27 +59,44 @@ public class SNOMEDEvaluation {
 	static final String SNOMED_PATH = SNOMED_MODULE_PATH + "english.owl";
 	static final String SNOMED_RESTR_PATH = SNOMED_MODULE_PATH + "restrictions-no-imports.owl";
 
-	public static final String[] PARENT_CLASSES = new String[] { "Bleeding (finding)",
-			"Body structure (body structure)", "Anatomical or acquired body structure (body structure)",
-			"Body structure, altered from its original anatomical structure (morphologic abnormality)",
-			"Clinical finding (finding)", "Clinical history and observation findings (finding)", "Disease (disorder)",
-			"Event (event)", "Finding by site (finding)", "Functional finding (finding)",
-			"Observable entity (observable entity)", };
+	public static final String[] PARENT_CLASSES = new String[] {
+			//
+			// "Bleeding (finding)",
+			//
+			// "Body structure (body structure)",
+			//
+			// "Anatomical structure (body structure)",
+			//
+			// "Morphologically abnormal structure (morphologic abnormality)",
+			//
+			// "Clinical finding (finding)",
+			//
+			// "Clinical history and observation findings (finding)",
+			//
+			// "Disease (disorder)",
+			//
+			"Event (event)",
+			//
+			"Finding by site (finding)",
+			//
+			"Functional finding (finding)",
+			//
+			"Observable entity (observable entity)",
+			//
+	};
 
 	private static final int[] ROLE_GROUP_NO = new int[] { 1, 2 };
 
 	private static final String[] TEST_ALGORITHMS = new String[] {
 			//
-			// UnificationAlgorithmFactory.SAT_BASED_ALGORITHM
+			UnificationAlgorithmFactory.SAT_BASED_ALGORITHM,
 			//
-			// ,
-			//
-			UnificationAlgorithmFactory.ASP_BASED_ALGORITHM
+			// UnificationAlgorithmFactory.ASP_BASED_ALGORITHM,
 			//
 	};
 
-	static final int MAX_SIBLINGS = -1; // 100
-	static final int MAX_ATOMS = -1; // 240
+	static final int MAX_SIBLINGS = 100;
+	static final int MAX_ATOMS = 240;
 	static final boolean CHECK_UNIFIERS = true;
 	private static final int MAX_TESTS = 50;
 	private static final long TIMEOUT = 5 * 60 * 1000;
@@ -132,6 +149,7 @@ public class SNOMEDEvaluation {
 
 				out.println("* Test results:");
 				out.println("Goal class / algorithm                  |  Result  | Time |   #");
+				float solutions = 0;
 				float successful = 0;
 				float disagreed = 0;
 				float complete = 0;
@@ -150,6 +168,9 @@ public class SNOMEDEvaluation {
 						out.printf(" *** %-35s|%-10s|%5ds|%6d%n",
 								UnificationAlgorithmFactory.shortString(algorithmResult.unificationAlgorithmName),
 								algorithmResult.status, algorithmResult.totalTime, algorithmResult.numberOfSolutions);
+						if (algorithmResult.status == SNOMEDAlgorithmStatus.SUCCESS) {
+							solutions += algorithmResult.numberOfSolutions;
+						}
 					}
 					if (result.goalStatus == SNOMEDGoalStatus.COMPLETE) {
 						// disregard incomplete test cases for averaging
@@ -173,6 +194,7 @@ public class SNOMEDEvaluation {
 						+ (100 * complete / (float) results.size()) + "% of all test cases)");
 				out.println("Successful test cases: " + ((int) successful) + " (" + (100 * successful / complete)
 						+ "% of all completed test cases)");
+				out.println("Average number of solutions for successful test cases: " + (solutions / successful));
 				out.println("Test cases with disagreement: " + ((int) disagreed) + " (" + (100 * disagreed / complete)
 						+ "% of all completed test cases)");
 
@@ -319,26 +341,49 @@ public class SNOMEDEvaluation {
 
 				SNOMEDTest algorithmRunner = new SNOMEDTest(iterator, options, pos, neg, goalAxiom);
 				Thread algorithmThread = new Thread(algorithmRunner);
+				algorithmThread.setUncaughtExceptionHandler((t, ex) -> {
+					printCurrentTime();
+					ex.printStackTrace();
+				});
+
 				algorithmThread.start();
 				algorithmThread.join(TIMEOUT);
 				SNOMEDAlgorithmResult algorithmResult = algorithmRunner.result;
+
 				if (algorithmThread.isAlive()) {
 					System.out.println("Timeout!");
 					printThreadInfo();
+
+					algorithmThread.interrupt();
+					algorithmThread.join(1000);
+					try {
+						algorithmThread.stop();
+					} catch (ThreadDeath t) {
+					}
 					// force cleanup from outside in case the algorithm is
 					// blocking, e.g., waiting for JSON output of clingo
 					// TODO: find non-blocking JSON parser ;-)
-					iterator.cleanup();
-					algorithmThread.interrupt();
-					algorithmThread.join();
+					// TODO: find a way to interrupt MiniSat
+					try {
+						iterator.cleanup();
+					} catch (RuntimeException ex) {
+						printCurrentTime();
+						ex.printStackTrace();
+					}
+
 					algorithmResult.status = SNOMEDAlgorithmStatus.TIMEOUT;
 				}
+
 				result.algorithmResults.add(algorithmResult);
 			}
 
 			// all individual tests for this goal class have been completed
 			result.goalStatus = SNOMEDGoalStatus.COMPLETE;
 		}
+	}
+
+	private static void printCurrentTime() {
+		System.out.println(new SimpleDateFormat("dd.MM.yy HH:mm:ss").format(Calendar.getInstance().getTime()));
 	}
 
 	private static String getLabel(OWLEntity entity) {

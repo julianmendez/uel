@@ -51,8 +51,8 @@ public class SNOMEDTest implements Runnable {
 	public void run() {
 		try {
 			computeUnifiers();
-		} catch (Throwable t) {
-			t.printStackTrace();
+		} catch (Exception ex) {
+			ex.printStackTrace();
 			result.status = SNOMEDAlgorithmStatus.ERROR;
 		} finally {
 			if (iterator != null) {
