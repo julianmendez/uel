@@ -61,19 +61,19 @@ public class SNOMEDEvaluation {
 
 	public static final String[] PARENT_CLASSES = new String[] {
 			//
-			// "Bleeding (finding)",
+			"Bleeding (finding)",
 			//
-			// "Body structure (body structure)",
+			"Body structure (body structure)",
 			//
-			// "Anatomical structure (body structure)",
+			"Anatomical structure (body structure)",
 			//
-			// "Morphologically abnormal structure (morphologic abnormality)",
+			"Morphologically abnormal structure (morphologic abnormality)",
 			//
-			// "Clinical finding (finding)",
+			"Clinical finding (finding)",
 			//
-			// "Clinical history and observation findings (finding)",
+			"Clinical history and observation findings (finding)",
 			//
-			// "Disease (disorder)",
+			"Disease (disorder)",
 			//
 			"Event (event)",
 			//
@@ -85,7 +85,7 @@ public class SNOMEDEvaluation {
 			//
 	};
 
-	private static final int[] ROLE_GROUP_NO = new int[] { 1, 2 };
+	private static final int[] ROLE_GROUP_NO = new int[] { 2 };
 
 	private static final String[] TEST_ALGORITHMS = new String[] {
 			//
@@ -105,6 +105,7 @@ public class SNOMEDEvaluation {
 	private static String currentModulePath;
 	private static String currentClassesList;
 	private static Date startTime;
+	private static Stopwatch elapsedTimer;
 	private static List<SNOMEDResult> results;
 	private static UelOptions options;
 	private static OWLOntologyManager manager;
@@ -133,7 +134,7 @@ public class SNOMEDEvaluation {
 				System.out.println("Saving results to file...");
 				PrintStream out = new PrintStream(
 						OUTPUT_PATH + new SimpleDateFormat("yyMMddHHmmss").format(Calendar.getInstance().getTime())
-								+ "-" + currentParentClass + "-" + options.numberOfRoleGroups + "RG-nolimit.txt");
+								+ "-" + currentParentClass + "-" + options.numberOfRoleGroups + "RG.txt");
 
 				out.println("* UEL options:");
 				out.println(options);
@@ -149,15 +150,20 @@ public class SNOMEDEvaluation {
 
 				out.println("* Test results:");
 				out.println("Goal class / algorithm                  |  Result  | Time |   #");
-				float solutions = 0;
 				float successful = 0;
 				float disagreed = 0;
 				float complete = 0;
+				float successSolutions = 0;
+				float failureSolutions = 0;
+				float successTimes = 0;
+				float failureTimes = 0;
+				float totalTimes = 0;
 				for (int i = 0; i < results.size(); i++) {
 					SNOMEDResult result = results.get(i);
 					out.println("----------------------------------------+----------+------+------");
 					out.printf("%-40s|%-10s|%5ds|%6d%n", result.goalClass, result.goalStatus, result.buildGoal,
 							result.goalSize);
+					totalTimes += result.buildGoal;
 
 					Set<SNOMEDAlgorithmStatus> collectedResults = new HashSet<SNOMEDAlgorithmStatus>();
 					for (SNOMEDAlgorithmResult algorithmResult : result.algorithmResults) {
@@ -165,12 +171,18 @@ public class SNOMEDEvaluation {
 								|| (algorithmResult.status == SNOMEDAlgorithmStatus.FAILURE)) {
 							collectedResults.add(algorithmResult.status);
 						}
+						if (algorithmResult.status == SNOMEDAlgorithmStatus.SUCCESS) {
+							successSolutions += algorithmResult.numberOfSolutions;
+							successTimes += algorithmResult.totalTime;
+						}
+						if (algorithmResult.status == SNOMEDAlgorithmStatus.FAILURE) {
+							failureSolutions += algorithmResult.numberOfSolutions;
+							failureTimes += algorithmResult.totalTime;
+						}
 						out.printf(" *** %-35s|%-10s|%5ds|%6d%n",
 								UnificationAlgorithmFactory.shortString(algorithmResult.unificationAlgorithmName),
 								algorithmResult.status, algorithmResult.totalTime, algorithmResult.numberOfSolutions);
-						if (algorithmResult.status == SNOMEDAlgorithmStatus.SUCCESS) {
-							solutions += algorithmResult.numberOfSolutions;
-						}
+						totalTimes += algorithmResult.totalTime;
 					}
 					if (result.goalStatus == SNOMEDGoalStatus.COMPLETE) {
 						// disregard incomplete test cases for averaging
@@ -180,7 +192,9 @@ public class SNOMEDEvaluation {
 								disagreed++;
 							}
 						}
-						complete++;
+						if (!collectedResults.isEmpty()) {
+							complete++;
+						}
 					}
 				}
 				out.println();
@@ -189,14 +203,34 @@ public class SNOMEDEvaluation {
 				Format f = new SimpleDateFormat("dd.MM.yy HH:mm:ss");
 				out.println("Start time: " + f.format(startTime));
 				out.println("End time: " + f.format(Calendar.getInstance().getTime()));
+				out.println("Elapsed time: " + elapsedTimer.elapsed(TimeUnit.SECONDS) + " s");
+				out.println("Elapsed time (without ontology loading time): " + totalTimes + " s");
+				out.println();
+
 				out.println("Total test cases: " + results.size());
 				out.println("Completed test cases: " + ((int) complete) + " ("
 						+ (100 * complete / (float) results.size()) + "% of all test cases)");
 				out.println("Successful test cases: " + ((int) successful) + " (" + (100 * successful / complete)
 						+ "% of all completed test cases)");
-				out.println("Average number of solutions for successful test cases: " + (solutions / successful));
+				out.println();
+
+				out.println("Average time of successful test cases: " + (successTimes / successful));
+				out.println("    (only valid if just one algorithm was tested)");
+				out.println(
+						"Average number of solutions for successful test cases: " + (successSolutions / successful));
+				out.println("    (only valid if just one algorithm was tested)");
+				out.println();
+
+				out.println("Average time of failed test cases: " + (failureTimes / (complete - successful)));
+				out.println("    (only valid if just one algorithm was tested)");
+				out.println("Average number of solutions for failed test cases: "
+						+ (failureSolutions / (complete - successful)));
+				out.println("    (only valid if just one algorithm was tested)");
+				out.println();
+
 				out.println("Test cases with disagreement: " + ((int) disagreed) + " (" + (100 * disagreed / complete)
 						+ "% of all completed test cases)");
+				out.println("    (only relevant if more than one algorithm was tested)");
 
 				out.close();
 			} catch (FileNotFoundException ex) {
@@ -247,6 +281,7 @@ public class SNOMEDEvaluation {
 		currentModulePath = SNOMED_MODULE_PATH + parentClass + ".owl";
 		currentClassesList = SNOMED_MODULE_PATH + parentClass + ".txt";
 		startTime = Calendar.getInstance().getTime();
+		elapsedTimer = Stopwatch.createStarted();
 		results = new ArrayList<SNOMEDResult>();
 		manager = OWLManager.createOWLOntologyManager();
 		factory = manager.getOWLDataFactory();
@@ -319,8 +354,12 @@ public class SNOMEDEvaluation {
 			System.out.println("Timeout!");
 			printThreadInfo();
 			initThread.interrupt();
-			initThread.join();
+			initThread.join(1000);
+			if (initThread.isAlive()) {
+				initThread.stop();
+			}
 			result.goalStatus = SNOMEDGoalStatus.TIMEOUT;
+			result.buildGoal = TIMEOUT / 1000;
 		}
 		results.add(result);
 
@@ -356,22 +395,25 @@ public class SNOMEDEvaluation {
 
 					algorithmThread.interrupt();
 					algorithmThread.join(1000);
-					try {
-						algorithmThread.stop();
-					} catch (ThreadDeath t) {
-					}
-					// force cleanup from outside in case the algorithm is
-					// blocking, e.g., waiting for JSON output of clingo
-					// TODO: find non-blocking JSON parser ;-)
-					// TODO: find a way to interrupt MiniSat
-					try {
-						iterator.cleanup();
-					} catch (RuntimeException ex) {
-						printCurrentTime();
-						ex.printStackTrace();
+					if (algorithmThread.isAlive()) {
+						try {
+							algorithmThread.stop();
+						} catch (ThreadDeath t) {
+						}
+						// force cleanup from outside in case the algorithm is
+						// blocking, e.g., waiting for JSON output of clingo
+						// TODO: find non-blocking JSON parser ;-)
+						// TODO: find a way to interrupt MiniSat
+						try {
+							iterator.cleanup();
+						} catch (RuntimeException ex) {
+							printCurrentTime();
+							ex.printStackTrace();
+						}
 					}
 
 					algorithmResult.status = SNOMEDAlgorithmStatus.TIMEOUT;
+					algorithmResult.totalTime = TIMEOUT / 1000;
 				}
 
 				result.algorithmResults.add(algorithmResult);
