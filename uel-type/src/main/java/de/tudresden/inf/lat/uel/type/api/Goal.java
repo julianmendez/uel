@@ -138,5 +138,21 @@ public interface Goal {
 	default boolean isTop(Integer id) {
 		return false;
 	}
+	
+	/**
+	 * Retrieves the URI of the 'RoleGroup' in SNOMED CT.
+	 * @return RoleGroup uri
+	 */
+	default String SNOMED_RoleGroup_URI() {
+		return null;
+	}
+	
+	/**
+	 * Retrieves the URI of 'SNOMED CT Concept' in SNOMED CT.
+	 * @return SNOMED CT Concept uri
+	 */
+	default String SNOMED_CT_Concept_URI() {
+		return null;
+	}
 
 }

@@ -404,7 +404,7 @@ public abstract class AbstractSatUnificationAlgorithm extends AbstractUnificatio
 	}
 
 	private void encodeRoleGroupRestrictions() {
-		Integer roleGroupId = goal.getAtomManager().getRoleId("http://www.ihtsdo.org/RoleGroup");
+		Integer roleGroupId = goal.getAtomManager().getRoleId(goal.SNOMED_RoleGroup_URI());
 		for (Integer eatomId : goal.getAtomManager().getExistentialRestrictions(roleGroupId)) {
 			Integer childId = goal.getAtomManager().getChild(eatomId);
 

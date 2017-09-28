@@ -17,7 +17,7 @@ Options:
   -h         Prints this help message
   -i         Prints additional information about the unfication process
   -s         Activates 'SNOMED' mode. Loads information about types from the
-             background ontology and sets 'http://www.ihtsdo.org/SCT_138875005'
+             background ontology and sets 'http://snomed.info/id/138875005'
              as owl:Thing alias (can be overridden by '-t' option).
 
 More about UEL: https://julianmendez.github.io/uel/

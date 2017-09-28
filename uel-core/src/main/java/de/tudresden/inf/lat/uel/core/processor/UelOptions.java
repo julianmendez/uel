@@ -144,6 +144,20 @@ public class UelOptions {
 	 */
 	public Verbosity verbosity = Verbosity.SILENT;
 
+	/**
+	 * Contains the URI for the 'RoleGroup' in SNOMED CT.
+	 * 
+	 * Default: 'http://snomed.info/id/609096000'
+	 */
+	public String snomedRoleGroupUri = "http://snomed.info/id/609096000";
+
+	/**
+	 * Contains the URI for the 'SNOMED CT Concept' in SNOMED CT.
+	 * 
+	 * Default: 'http://snomed.info/id/138875005'
+	 */
+	public String snomedCtConceptUri = "http://snomed.info/id/138875005";
+
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();

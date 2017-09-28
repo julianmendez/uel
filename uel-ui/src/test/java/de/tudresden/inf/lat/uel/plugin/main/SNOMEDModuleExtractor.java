@@ -43,6 +43,20 @@ public class SNOMEDModuleExtractor {
 		for (String rootName : SNOMEDEvaluation.PARENT_CLASSES) {
 			System.out.println(rootName);
 			OWLClass root = findClass(rootName);
+			rootName = rootName.replace('/', '-');
+
+			// manager = OWLManager.createOWLOntologyManager();
+			// snomed = AlternativeUelStarter
+			// .loadOntology(SNOMEDEvaluation.SNOMED_MODULE_PATH +
+			// rootName.replace('/', '-') + ".owl", manager);
+			// OWLClass root = findClass(rootName);
+			// System.out.println("Total number of classes: " +
+			// snomed.getClassesInSignature().size());
+			// System.out.println("Number of definitions in hierarchy: "
+			// +
+			// getDescendants(root).stream().map(SNOMEDModuleExtractor::getDefinition)
+			// .filter(ax -> (ax != null) && (ax instanceof
+			// OWLEquivalentClassesAxiom)).count());
 
 			Set<OWLClass> hierarchy = getDescendants(root);
 			Files.write(Paths.get(SNOMEDEvaluation.SNOMED_MODULE_PATH + rootName + "-labels.txt"),

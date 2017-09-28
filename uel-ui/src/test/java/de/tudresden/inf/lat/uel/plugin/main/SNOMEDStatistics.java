@@ -24,6 +24,7 @@ import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 import org.semanticweb.owlapi.search.EntitySearcher;
 
 import de.tudresden.inf.lat.uel.core.main.AlternativeUelStarter;
+import de.tudresden.inf.lat.uel.core.processor.UelOptions;
 
 /**
  * @author Stefan Borgwardt
@@ -43,7 +44,7 @@ public class SNOMEDStatistics {
 	private static int maxOtherRoles = 0;
 	private static OWLClass maxOtherRolesClass = null;
 	private static OWLClassExpression maxOtherRolesDef = null;
-	private static OWLObjectProperty roleGroup = SNOMEDEvaluation.prp("609096000");
+	private static OWLObjectProperty roleGroup = SNOMEDEvaluation.prp(new UelOptions().snomedRoleGroupUri);
 
 	private static OWLOntologyManager manager;
 	private static OWLOntology snomed;
@@ -136,18 +137,18 @@ public class SNOMEDStatistics {
 			restrictions.stream().forEach(r -> checkInnerRestrictions(definiendum, definiens, r.getFiller()));
 		}
 
-		Set<OWLClass> parents = getClasses(definiens);
-		if (parents.size() > 1) {
-			Set<String> hierarchies = parents.stream().map(cls -> getLabel(cls).split("[\\(\\)]"))
-					// .peek(arr -> System.out.println(String.join(" | ", arr)))
-					.filter(arr -> arr.length > 1)
-					.map(arr -> arr[arr.length - 1].substring(0, arr[arr.length - 1].length()))
-					.collect(Collectors.toSet());
-			// System.out.println();
-			if (hierarchies.size() > 1) {
-				System.out.println(String.join(" and ", hierarchies) + "          " + getLabel(definiendum));
-			}
-		}
+//		Set<OWLClass> parents = getClasses(definiens);
+//		if (parents.size() > 1) {
+//			Set<String> hierarchies = parents.stream().map(cls -> getLabel(cls).split("[\\(\\)]"))
+//					// .peek(arr -> System.out.println(String.join(" | ", arr)))
+//					.filter(arr -> arr.length > 1)
+//					.map(arr -> arr[arr.length - 1].substring(0, arr[arr.length - 1].length()))
+//					.collect(Collectors.toSet());
+//			// System.out.println();
+//			if (hierarchies.size() > 1) {
+//				System.out.println(String.join(" and ", hierarchies) + "          " + getLabel(definiendum));
+//			}
+//		}
 	}
 
 	private static <T> void addToMap(Map<T, Integer> map, T key) {

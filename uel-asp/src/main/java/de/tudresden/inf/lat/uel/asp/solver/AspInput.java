@@ -1,6 +1,5 @@
 package de.tudresden.inf.lat.uel.asp.solver;
 
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -123,7 +122,7 @@ public class AspInput {
 		output.append("% 'RoleGroup'");
 		output.append(System.lineSeparator());
 		output.append("rolegroup(r");
-		output.append(goal.getAtomManager().getRoleId("http://www.ihtsdo.org/RoleGroup"));
+		output.append(goal.getAtomManager().getRoleId(goal.SNOMED_RoleGroup_URI()));
 		output.append(").");
 		output.append(System.lineSeparator());
 		output.append(System.lineSeparator());
@@ -172,15 +171,15 @@ public class AspInput {
 		}
 		output.append(System.lineSeparator());
 
-//		output.append("% User variables");
-//		output.append(System.lineSeparator());
-//		for (Integer var : goal.getAtomManager().getUserVariables()) {
-//			output.append("relevant(x");
-//			output.append(var);
-//			output.append(").");
-//			output.append(System.lineSeparator());
-//		}
-//		output.append(System.lineSeparator());
+		// output.append("% User variables");
+		// output.append(System.lineSeparator());
+		// for (Integer var : goal.getAtomManager().getUserVariables()) {
+		// output.append("relevant(x");
+		// output.append(var);
+		// output.append(").");
+		// output.append(System.lineSeparator());
+		// }
+		// output.append(System.lineSeparator());
 	}
 
 	private Integer getOriginalType(Integer roleGroupType) {

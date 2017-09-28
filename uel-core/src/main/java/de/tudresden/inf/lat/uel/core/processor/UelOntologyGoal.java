@@ -56,10 +56,9 @@ public class UelOntologyGoal implements Goal {
 	private final Map<Integer, Integer> roleGroupTypes = new HashMap<Integer, Integer>();
 	private final Map<Integer, Integer> roleNumberRestrictions = new HashMap<Integer, Integer>();
 	private final Set<Subsumption> subsumptions = new HashSet<Subsumption>();
-
 	private final Map<Integer, Integer> typeAssignment = new HashMap<Integer, Integer>();
-
 	private final Set<Integer> types = new HashSet<Integer>();
+	private final String snomedRoleGroupUri, snomedCtConceptUri;
 
 	/**
 	 * Construct a new goal for UEL.
@@ -72,11 +71,14 @@ public class UelOntologyGoal implements Goal {
 	 * @param ontology
 	 *            the background ontology
 	 */
-	public UelOntologyGoal(AtomManager manager, UelOntology ontology, StringRenderer renderer) {
+	public UelOntologyGoal(AtomManager manager, UelOntology ontology, StringRenderer renderer,
+			String snomedRoleGroupUri, String snomedCtConceptUri) {
 		this.atomManager = manager;
 		this.ontology = ontology;
 		this.renderer = renderer;
 		this.top = ontology.getTop();
+		this.snomedRoleGroupUri = snomedRoleGroupUri;
+		this.snomedCtConceptUri = snomedCtConceptUri;
 	}
 
 	private final Integer top;
@@ -669,4 +671,15 @@ public class UelOntologyGoal implements Goal {
 	public void setRestrictUndefContext(boolean restrictUndefContext) {
 		this.restrictUndefContext = restrictUndefContext;
 	}
+
+	@Override
+	public String SNOMED_RoleGroup_URI() {
+		return snomedRoleGroupUri;
+	}
+
+	@Override
+	public String SNOMED_CT_Concept_URI() {
+		return snomedCtConceptUri;
+	}
+
 }

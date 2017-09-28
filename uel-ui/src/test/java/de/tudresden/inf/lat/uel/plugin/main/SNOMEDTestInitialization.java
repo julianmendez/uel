@@ -77,8 +77,8 @@ public class SNOMEDTestInitialization implements Runnable {
 		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
 		OWLDataFactory factory = manager.getOWLDataFactory();
 
-		OWLClass x = SNOMEDEvaluation.cls("X");
-		OWLClass top = SNOMEDEvaluation.cls("138875005");
+		OWLClass x = SNOMEDEvaluation.cls("http://snomed.info/id/X");
+		OWLClass top = SNOMEDEvaluation.cls(options.snomedCtConceptUri);
 		Set<OWLClass> vars = new HashSet<OWLClass>(Arrays.asList(x));
 
 		UelOntology ont = new UelOntology(new AtomManagerImpl(), Collections.singleton(snomed), top, true);

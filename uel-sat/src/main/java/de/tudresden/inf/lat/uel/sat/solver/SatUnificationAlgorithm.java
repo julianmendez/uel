@@ -155,9 +155,10 @@ public class SatUnificationAlgorithm extends AbstractSatUnificationAlgorithm {
 					solver = new Sat4jSolver();
 				}
 				computeSatInput();
+
 				//// DEBUG
 				// StringBuffer sbuf = new StringBuffer();
-				// for (Set<Integer> clause : satInput.getClauses()) {
+				// for (Set<Integer> clause : input.getClauses()) {
 				// for (Integer literalId : clause) {
 				// if (literalId < 0) {
 				// sbuf.append("-");
@@ -167,27 +168,29 @@ public class SatUnificationAlgorithm extends AbstractSatUnificationAlgorithm {
 				// if (literal == null) {
 				// sbuf.append("NULL");
 				// } else if (literal instanceof OrderLiteral) {
-				// OrderLiteral ol = (OrderLiteral) literal;
-				// Integer f = ol.getFirst();
-				// Integer s = ol.getSecond();
-				// appendAtom(sbuf, f);
+				// appendAtom(sbuf, literal.getFirst());
 				// sbuf.append(" > ");
-				// appendAtom(sbuf, s);
+				// appendAtom(sbuf, literal.getSecond());
 				// } else if (literal instanceof SubsumptionLiteral) {
-				// SubsumptionLiteral sl = (SubsumptionLiteral) literal;
-				// Integer f = sl.getFirst();
-				// Integer s = sl.getSecond();
-				// appendAtom(sbuf, f);
+				// appendAtom(sbuf, literal.getFirst());
 				// sbuf.append(" ⊑ ");
-				// appendAtom(sbuf, s);
+				// appendAtom(sbuf, literal.getSecond());
 				// } else if (literal instanceof ChoiceLiteral) {
 				// sbuf.append("c");
 				// sbuf.append(((ChoiceLiteral) literal).hashCode());
+				// } else if (literal instanceof SubtypeLiteral) {
+				// sbuf.append("type(");
+				// appendAtom(sbuf, literal.getFirst());
+				// sbuf.append(", ");
+				// appendAtom(sbuf, literal.getSecond());
+				// sbuf.append(")");
 				// }
 				// sbuf.append("] ");
 				// }
-				// sbuf.append(Solver.NEWLINE);
+				// sbuf.append("\n");
 				// }
+				// System.out.println(sbuf);
+
 				callbackPreprocessing();
 				satoutput = solver.solve(input);
 				unifiable = satoutput.isSatisfiable();
@@ -222,45 +225,15 @@ public class SatUnificationAlgorithm extends AbstractSatUnificationAlgorithm {
 		return unifiable;
 	}
 
-	// only for debugging
-	// private void outputUnsatisfiedSoftClauses() {
-	// Set<Set<Integer>> pairs = new HashSet<Set<Integer>>();
-	// System.out.println("Unsatisfied incompatibility constraints:");
-	// for (Set<Integer> clause : input.getSoftClauses()) {
-	// Set<Integer> negClause =
-	// clause.stream().map(Math::abs).collect(Collectors.toSet());
-	// if (valuation.containsAll(negClause)) {
-	// outputClause(clause);
-	// pairs.add(negClause.stream().map(l ->
-	// literalManager.get(l)).map(Literal::getSecond)
-	// .collect(Collectors.toSet()));
+	// private void appendAtom(StringBuffer sbuf, Integer atomId) {
+	// if (goal.getAtomManager().getExistentialRestrictions().contains(atomId))
+	// {
+	// sbuf.append("∃" + goal.getAtomManager().printRoleName(atomId) + "."
+	// +
+	// goal.getAtomManager().printConceptName(goal.getAtomManager().getChild(atomId)));
+	// } else {
+	// sbuf.append(goal.getAtomManager().printConceptName(atomId));
 	// }
-	// }
-	// for (Set<Integer> pair : pairs) {
-	// System.out.println(pair.stream().map(this::printAtom).collect(Collectors.joining(",
-	// ")));
-	// }
-	// }
-	//
-	// private void outputClause(Set<Integer> clause) {
-	// for (Integer lit : clause) {
-	// if (lit < 0) {
-	// System.out.print("-");
-	// lit *= -1;
-	// }
-	// Literal l = literalManager.get(lit);
-	// if (l instanceof SubsumptionLiteral) {
-	// System.out.print("[");
-	// System.out.print(printAtom(l.getFirst()));
-	// System.out.print(" ");
-	// System.out.print(Subsumption.CONNECTIVE);
-	// System.out.print(" ");
-	// System.out.print(printAtom(l.getSecond()));
-	// System.out.print("]");
-	// }
-	// System.out.print(", ");
-	// }
-	// System.out.println();
 	// }
 
 	private Set<Integer> computeSubsumers(Integer varId) {

@@ -269,7 +269,7 @@ public class UelModel {
 			return owlThingAlias;
 		else if (snomedMode)
 			// 'SNOMED CT Concept'
-			return OWLManager.getOWLDataFactory().getOWLClass(IRI.create("http://snomed.info/id/138875005"));
+			return OWLManager.getOWLDataFactory().getOWLClass(IRI.create(options.snomedCtConceptUri));
 		else
 			// owl:Thing
 			return OWLManager.getOWLDataFactory().getOWLThing();
@@ -550,7 +550,7 @@ public class UelModel {
 		OWLClass owlThing = getOWLThing(options.owlThingAlias, options.snomedMode);
 		goal = new UelOntologyGoal(atomManager,
 				new UelOntology(atomManager, bgOntologies, owlThing, options.expandPrimitiveDefinitions),
-				getStringRenderer(null));
+				getStringRenderer(null), options.snomedRoleGroupUri, options.snomedCtConceptUri);
 
 		if (positiveProblem != null) {
 			goal.addPositiveAxioms(positiveProblem.getAxioms());

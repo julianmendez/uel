@@ -20,8 +20,10 @@ import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
@@ -61,27 +63,23 @@ public class SNOMEDEvaluation {
 
 	public static final String[] PARENT_CLASSES = new String[] {
 			//
-			"Bleeding (finding)",
+			"Pharmaceutical / biologic product (product)",
 			//
-			"Body structure (body structure)",
+			"Procedure (procedure)",
 			//
-			"Anatomical structure (body structure)",
+			// "Body structure (body structure)",
 			//
-			"Morphologically abnormal structure (morphologic abnormality)",
+			// "Clinical finding (finding)",
 			//
-			"Clinical finding (finding)",
+			// "Clinical history and observation findings (finding)",
 			//
-			"Clinical history and observation findings (finding)",
+			// "Disease (disorder)",
 			//
-			"Disease (disorder)",
+			// "Event (event)",
 			//
-			"Event (event)",
+			// "Finding by site (finding)",
 			//
-			"Finding by site (finding)",
-			//
-			"Functional finding (finding)",
-			//
-			"Observable entity (observable entity)",
+			// "Observable entity (observable entity)",
 			//
 	};
 
@@ -110,22 +108,22 @@ public class SNOMEDEvaluation {
 	private static UelOptions options;
 	private static OWLOntologyManager manager;
 	private static OWLDataFactory factory;
-	private static OWLOntology snomed;
+	private static OWLOntology snomedModule;
 	private static OWLOntology snomedRestrictions;
 	private static Set<OWLOntology> bg;
 
-	static OWLClass cls(String name) {
+	static OWLClass cls(String uri) {
 		if (factory == null) {
 			factory = OWLManager.getOWLDataFactory();
 		}
-		return factory.getOWLClass(IRI.create("http://snomed.info/id/" + name));
+		return factory.getOWLClass(IRI.create(uri));
 	}
 
-	static OWLObjectProperty prp(String name) {
+	static OWLObjectProperty prp(String uri) {
 		if (factory == null) {
 			factory = OWLManager.getOWLDataFactory();
 		}
-		return factory.getOWLObjectProperty(IRI.create("http://snomed.info/id/" + name));
+		return factory.getOWLObjectProperty(IRI.create(uri));
 	}
 
 	static void printResults() {
@@ -249,7 +247,13 @@ public class SNOMEDEvaluation {
 
 		Runtime.getRuntime().addShutdownHook(new Thread(SNOMEDEvaluation::printResults));
 
-		// runSingleTest("Body structure (body structure)", 1, "SCT_272651007");
+		// 'Difficulty writing (finding)'
+		// runSingleTest("Clinical history and observation findings (finding)",
+		// 0, "http://snomed.info/id/102938007");
+
+		// for (int rg : ROLE_GROUP_NO) {
+		// runFullTests(rg);
+		// }
 
 		for (String parentClass : PARENT_CLASSES) {
 			for (int rg : ROLE_GROUP_NO) {
@@ -276,21 +280,39 @@ public class SNOMEDEvaluation {
 		printResults();
 	}
 
+	private static void runFullTests(int rg) {
+		System.out.println("========== Full tests for SNOMED CT [" + rg + " RoleGroup(s)]");
+
+		initializePrivateFields(null, rg);
+		try {
+			randomTests();
+		} catch (IOException | InterruptedException ex) {
+			ex.printStackTrace();
+		}
+
+		printResults();
+	}
+
 	private static void initializePrivateFields(String parentClass, int rg) {
 		currentParentClass = parentClass;
-		currentModulePath = SNOMED_MODULE_PATH + parentClass + ".owl";
-		currentClassesList = SNOMED_MODULE_PATH + parentClass + ".txt";
+		if (parentClass != null) {
+			currentModulePath = SNOMED_MODULE_PATH + parentClass.replace('/', '-') + ".owl";
+			currentClassesList = SNOMED_MODULE_PATH + parentClass.replace('/', '-') + ".txt";
+		} else {
+			currentModulePath = SNOMED_PATH;
+			currentClassesList = null;
+		}
 		startTime = Calendar.getInstance().getTime();
 		elapsedTimer = Stopwatch.createStarted();
 		results = new ArrayList<SNOMEDResult>();
 		manager = OWLManager.createOWLOntologyManager();
 		factory = manager.getOWLDataFactory();
-		snomed = AlternativeUelStarter.loadOntology(currentModulePath, manager);
+		snomedModule = AlternativeUelStarter.loadOntology(currentModulePath, manager);
 		snomedRestrictions = AlternativeUelStarter.loadOntology(SNOMED_RESTR_PATH, manager);
-		bg = new HashSet<OWLOntology>(Arrays.asList(snomed, snomedRestrictions));
+		bg = new HashSet<OWLOntology>(Arrays.asList(snomedModule, snomedRestrictions));
 
 		options = new UelOptions();
-		options.verbosity = Verbosity.SHORT;
+		options.verbosity = Verbosity.FULL;
 		options.undefBehavior = UndefBehavior.CONSTANTS;
 		options.snomedMode = true;
 		options.unificationAlgorithmName = TEST_ALGORITHMS[0];
@@ -306,8 +328,9 @@ public class SNOMEDEvaluation {
 		initializePrivateFields(parentClass, rg);
 
 		OWLClass goalClass = cls(id);
-		OWLClassExpression goalExpression = ((OWLEquivalentClassesAxiom) snomed.getAxioms(goalClass, Imports.EXCLUDED)
-				.iterator().next()).getClassExpressionsMinus(goalClass).iterator().next();
+		OWLClassExpression goalExpression = ((OWLEquivalentClassesAxiom) snomedModule
+				.getAxioms(goalClass, Imports.EXCLUDED).iterator().next()).getClassExpressionsMinus(goalClass)
+						.iterator().next();
 
 		try {
 			runSingleTest(goalClass, goalExpression);
@@ -318,11 +341,15 @@ public class SNOMEDEvaluation {
 
 	private static void randomTests() throws InterruptedException, IOException {
 		List<OWLEquivalentClassesAxiom> definitions = new ArrayList<OWLEquivalentClassesAxiom>();
-		Files.lines(Paths.get(currentClassesList)).map(line -> line.substring(1, line.length() - 1))
-				.map(line -> factory.getOWLClass(IRI.create(line)))
-				.flatMap(cls -> snomed.getAxioms(cls, Imports.EXCLUDED).stream())
-				.filter(ax -> ax instanceof OWLEquivalentClassesAxiom)
-				.forEach(ax -> definitions.add((OWLEquivalentClassesAxiom) ax));
+		if (currentClassesList != null) {
+			definitions = Files.lines(Paths.get(currentClassesList)).map(line -> line.substring(1, line.length() - 1))
+					.map(line -> factory.getOWLClass(IRI.create(line)))
+					.flatMap(cls -> snomedModule.getAxioms(cls, Imports.EXCLUDED).stream())
+					.filter(OWLEquivalentClassesAxiom.class::isInstance).map(OWLEquivalentClassesAxiom.class::cast)
+					.collect(Collectors.toList());
+		} else {
+			definitions = snomedModule.getAxioms(AxiomType.EQUIVALENT_CLASSES).stream().collect(Collectors.toList());
+		}
 
 		Random rnd = new Random();
 		System.out.println("Loading finished (" + definitions.size() + " classes with full definitions).");
@@ -344,7 +371,7 @@ public class SNOMEDEvaluation {
 		System.out.println("Goal class: " + getLabel(goalClass));
 
 		printThreadInfo();
-		SNOMEDTestInitialization initRunner = new SNOMEDTestInitialization(options, snomed, bg, goalClass,
+		SNOMEDTestInitialization initRunner = new SNOMEDTestInitialization(options, snomedModule, bg, goalClass,
 				goalExpression);
 		Thread initThread = new Thread(initRunner);
 		initThread.start();
@@ -429,7 +456,7 @@ public class SNOMEDEvaluation {
 	}
 
 	private static String getLabel(OWLEntity entity) {
-		return EntitySearcher.getAnnotations(entity, snomed, factory.getRDFSLabel()).iterator().next().getValue()
+		return EntitySearcher.getAnnotations(entity, snomedModule, factory.getRDFSLabel()).iterator().next().getValue()
 				.asLiteral().get().getLiteral();
 	}
 
