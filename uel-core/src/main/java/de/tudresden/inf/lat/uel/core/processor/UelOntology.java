@@ -45,8 +45,10 @@ public class UelOntology {
 
 	private static final String flatteningVariablePrefix = "var";
 
-	private static Function<OWLClassExpression, Set<OWLClass>> getNamedDisjuncts = e -> e.asDisjunctSet().stream()
-			.filter(expr -> !expr.isAnonymous()).map(expr -> expr.asOWLClass()).collect(Collectors.toSet());
+	private Set<OWLClass> getNamedDisjuncts(OWLClassExpression e) {
+		return e.asDisjunctSet().stream().filter(expr -> !expr.isAnonymous()).map(expr -> expr.asOWLClass())
+				.filter(cls -> !getDirectSuperclasses(cls).isEmpty()).collect(Collectors.toSet());
+	}
 
 	private static <R> Function<Set<OWLClassExpression>, R> exception(String message) {
 		return e -> {
@@ -331,7 +333,8 @@ public class UelOntology {
 	public Set<OWLClass> getDomain(Integer roleId) {
 		OWLObjectProperty prop = toOWLObjectProperty(roleId);
 		return extractInformation(ont -> getDomain(ont, prop),
-				exception("Multiple candidate domains found for property: " + prop), getNamedDisjuncts, () -> null);
+				exception("Multiple candidate domains found for property: " + prop), this::getNamedDisjuncts,
+				() -> null);
 	}
 
 	private Stream<OWLClassExpression> getDomain(OWLOntology ont, OWLObjectProperty prop) {
@@ -447,7 +450,8 @@ public class UelOntology {
 	public Set<OWLClass> getRange(Integer roleId) {
 		OWLObjectProperty prop = toOWLObjectProperty(roleId);
 		return extractInformation(ont -> getRange(ont, prop),
-				exception("Multiple candidate ranges found for property: " + prop), getNamedDisjuncts, () -> null);
+				exception("Multiple candidate ranges found for property: " + prop), this::getNamedDisjuncts,
+				() -> null);
 	}
 
 	private Stream<OWLClassExpression> getRange(OWLOntology ont, OWLObjectProperty prop) {
