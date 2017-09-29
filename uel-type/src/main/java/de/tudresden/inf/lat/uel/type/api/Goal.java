@@ -134,6 +134,10 @@ public interface Goal {
 	default boolean areCompatible(Integer atomId1, Integer atomId2) {
 		return true;
 	}
+	
+	default boolean isCommonSubsumee(Integer subsumee, Integer subsumer1, Integer subsumer2) {
+		return false;
+	}
 
 	default boolean isTop(Integer id) {
 		return false;

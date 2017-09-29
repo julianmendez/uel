@@ -197,6 +197,8 @@ public abstract class StringRenderer extends Renderer<String, String, String> {
 			elementTranslator.apply(element);
 			sb.append(separator);
 		}
-		sb.setLength(sb.length() - separator.length());
+		if (!set.isEmpty()) {
+			sb.setLength(sb.length() - separator.length());
+		}
 	}
 }

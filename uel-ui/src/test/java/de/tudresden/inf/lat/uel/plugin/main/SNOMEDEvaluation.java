@@ -63,23 +63,35 @@ public class SNOMEDEvaluation {
 
 	public static final String[] PARENT_CLASSES = new String[] {
 			//
+			"Body structure (body structure)",
+			//
+			//// "Anatomical structure (body structure)",
+			//
+			//// "Morphologically abnormal structure (morphologic abnormality)",
+			//
+			"Clinical finding (finding)",
+			//
+			"Clinical history and observation findings (finding)",
+			//
+			"Functional finding (finding)",
+			//
+			"Disease (disorder)",
+			//
+			//// "Adverse reaction (disorder)",
+			//
+			"Poisoning (disorder)",
+			//
+			//// "Traumatic injury (disorder)",
+			//
+			"Finding by site (finding)",
+			//
+			"Event (event)",
+			//
+			"Observable entity (observable entity)",
+			//
 			"Pharmaceutical / biologic product (product)",
 			//
 			"Procedure (procedure)",
-			//
-			// "Body structure (body structure)",
-			//
-			// "Clinical finding (finding)",
-			//
-			// "Clinical history and observation findings (finding)",
-			//
-			// "Disease (disorder)",
-			//
-			// "Event (event)",
-			//
-			// "Finding by site (finding)",
-			//
-			// "Observable entity (observable entity)",
 			//
 	};
 
@@ -96,7 +108,7 @@ public class SNOMEDEvaluation {
 	static final int MAX_SIBLINGS = 100;
 	static final int MAX_ATOMS = 240;
 	static final boolean CHECK_UNIFIERS = true;
-	private static final int MAX_TESTS = 50;
+	private static final int MAX_TESTS = 100;
 	private static final long TIMEOUT = 5 * 60 * 1000;
 
 	private static String currentParentClass;
@@ -130,6 +142,9 @@ public class SNOMEDEvaluation {
 		if (results != null) {
 			try {
 				System.out.println("Saving results to file...");
+				if (currentParentClass != null) {
+					currentParentClass = currentParentClass.replace('/', '-');
+				}
 				PrintStream out = new PrintStream(
 						OUTPUT_PATH + new SimpleDateFormat("yyMMddHHmmss").format(Calendar.getInstance().getTime())
 								+ "-" + currentParentClass + "-" + options.numberOfRoleGroups + "RG.txt");
@@ -249,11 +264,11 @@ public class SNOMEDEvaluation {
 
 		// 'Difficulty writing (finding)'
 		// runSingleTest("Clinical history and observation findings (finding)",
-		// 0, "http://snomed.info/id/102938007");
+		// 2, "http://snomed.info/id/102938007");
 
-		// for (int rg : ROLE_GROUP_NO) {
-		// runFullTests(rg);
-		// }
+		// 'Does use the elements of language (finding)'
+		// runSingleTest("Functional finding (finding)", 0,
+		// "http://snomed.info/id/288606006");
 
 		for (String parentClass : PARENT_CLASSES) {
 			for (int rg : ROLE_GROUP_NO) {
@@ -261,6 +276,10 @@ public class SNOMEDEvaluation {
 				System.out.println();
 				System.out.println();
 			}
+		}
+
+		for (int rg : ROLE_GROUP_NO) {
+			runFullTests(rg);
 		}
 	}
 
@@ -312,7 +331,7 @@ public class SNOMEDEvaluation {
 		bg = new HashSet<OWLOntology>(Arrays.asList(snomedModule, snomedRestrictions));
 
 		options = new UelOptions();
-		options.verbosity = Verbosity.FULL;
+		options.verbosity = Verbosity.SHORT;
 		options.undefBehavior = UndefBehavior.CONSTANTS;
 		options.snomedMode = true;
 		options.unificationAlgorithmName = TEST_ALGORITHMS[0];

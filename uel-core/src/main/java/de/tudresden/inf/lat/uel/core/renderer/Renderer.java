@@ -325,9 +325,8 @@ public abstract class Renderer<ExpressionType, RoleType, AxiomsType> {
 
 		for (Definition definition : sortDefinitions(unifier.getDefinitions(), sorted)) {
 			if (!restrictToUserVariables || atomManager.getUserVariables().contains(definition.getDefiniendum())) {
-				// if
-				// (!definition.getDefiniens().equals(Collections.singleton(definition.getDefiniendum())))
-				translateAxiom(definition);
+				if (!definition.getDefiniens().equals(Collections.singleton(definition.getDefiniendum())))
+					translateAxiom(definition);
 			}
 		}
 
@@ -336,7 +335,9 @@ public abstract class Renderer<ExpressionType, RoleType, AxiomsType> {
 			// is only meaningful in 'SNOMED mode'
 			if (unifier.getTypeAssignment() != null) {
 				for (Integer atomId : sortNames(unifier.getTypeAssignment().keySet(), sorted)) {
+					// if (!unifier.getTypeAssignment().get(atomId).isEmpty()) {
 					translateAtomList("Types of " + renderName(atomId), unifier.getTypeAssignment().get(atomId));
+					// }
 				}
 			}
 		}

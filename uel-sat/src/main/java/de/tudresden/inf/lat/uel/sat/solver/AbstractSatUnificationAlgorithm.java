@@ -433,24 +433,46 @@ public abstract class AbstractSatUnificationAlgorithm extends AbstractUnificatio
 		for (Integer roleId : goal.getAtomManager().getRoleIds()) {
 			int number = goal.getRoleNumberRestrictions().get(roleId);
 			if (number > 0) {
+				// 'roleId' is only allowed to have 'number' existential
+				// restrictions in a conjunction
 				Set<Integer> ex = goal.getAtomManager().getExistentialRestrictions(roleId);
 				for (List<Integer> subset : computeSubsets(ex, number + 1)) {
 					checkInterrupted();
 
+					// for each collection of 'number'+1 such restrictions, ...
 					Set<Integer> options = new HashSet<Integer>();
+					Set<Integer> eatomOptions = new HashSet<Integer>();
+					Set<Integer> otherEAtoms = new HashSet<Integer>(ex);
+					otherEAtoms.removeAll(subset);
 					Set<Integer> variableChildren = subset.stream()
 							.map(atomId -> goal.getAtomManager().getChild(atomId)).filter(getVariables()::contains)
 							.collect(Collectors.toSet());
 					for (List<Integer> twoVariableChildren : computeSubsets(variableChildren, 2)) {
+						// ... there must be two of them whose children are
+						// compatible ...
 						Integer varChild1 = twoVariableChildren.get(0);
 						Integer varChild2 = twoVariableChildren.get(1);
 						if (goal.areCompatible(varChild1, varChild2)) {
+							// ... and either one subsumes the other ...
 							options.add(subsumption(varChild1, varChild2));
 							options.add(subsumption(varChild2, varChild1));
+
+							// ... or both subsume a third one that is also
+							// present in the conjunction.
+							for (Integer eatomId : otherEAtoms) {
+								Integer otherChild = goal.getAtomManager().getChild(eatomId);
+								if (getVariables().contains(otherChild)
+										&& goal.isCommonSubsumee(otherChild, varChild1, varChild2)) {
+									eatomOptions.add(eatomId);
+								}
+							}
 						}
 					}
 					for (Integer varId : getVariables()) {
 						Set<Integer> clause = new HashSet<Integer>(options);
+						for (Integer eatomId : eatomOptions) {
+							clause.add(subsumption(varId, eatomId));
+						}
 						for (Integer eatomId : subset) {
 							clause.add(-subsumption(varId, eatomId));
 						}

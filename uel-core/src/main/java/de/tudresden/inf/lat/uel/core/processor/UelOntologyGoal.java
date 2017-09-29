@@ -1,6 +1,7 @@
 package de.tudresden.inf.lat.uel.core.processor;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -43,20 +44,21 @@ public class UelOntologyGoal implements Goal {
 
 	private final AtomManager atomManager;
 	private final DefinitionSet definitions = new DefinitionSet();
-	private final Map<Integer, Integer> directSupertype = new HashMap<Integer, Integer>();
-	private final Set<Disequation> disequations = new HashSet<Disequation>();
-	private final Set<Dissubsumption> dissubsumptions = new HashSet<Dissubsumption>();
-	private final Map<Integer, Set<Integer>> domains = new HashMap<Integer, Set<Integer>>();
-	private final Set<Equation> equations = new HashSet<Equation>();
-	private final Set<Set<Integer>> ideals = new HashSet<Set<Integer>>();
+
+	private final Map<Integer, Integer> directSupertype = new HashMap<>();
+	private final Set<Disequation> disequations = new HashSet<>();
+	private final Set<Dissubsumption> dissubsumptions = new HashSet<>();
+	private final Map<Integer, Set<Integer>> domains = new HashMap<>();
+	private final Set<Equation> equations = new HashSet<>();
+	private final Map<Integer, Set<Integer>> subsumers = new HashMap<>();
 	private UelOntology ontology;
-	private final Map<Integer, Set<Integer>> ranges = new HashMap<Integer, Set<Integer>>();
+	private final Map<Integer, Set<Integer>> ranges = new HashMap<>();
 	private StringRenderer renderer;
 	private boolean restrictUndefContext = false;
-	private final Map<Integer, Integer> roleGroupTypes = new HashMap<Integer, Integer>();
-	private final Map<Integer, Integer> roleNumberRestrictions = new HashMap<Integer, Integer>();
-	private final Set<Subsumption> subsumptions = new HashSet<Subsumption>();
-	private final Map<Integer, Integer> typeAssignment = new HashMap<Integer, Integer>();
+	private final Map<Integer, Integer> roleGroupTypes = new HashMap<>();
+	private final Map<Integer, Integer> roleNumberRestrictions = new HashMap<>();
+	private final Set<Subsumption> subsumptions = new HashSet<>();
+	private final Map<Integer, Integer> typeAssignment = new HashMap<>();
 	private final Set<Integer> types = new HashSet<Integer>();
 	private final String snomedRoleGroupUri, snomedCtConceptUri;
 
@@ -189,7 +191,7 @@ public class UelOntologyGoal implements Goal {
 
 	@Override
 	public boolean areCompatible(Integer atomId1, Integer atomId2) {
-		if (ideals.isEmpty()) {
+		if (subsumers.isEmpty()) {
 			// no compatibility information was extracted
 			return true;
 		}
@@ -205,7 +207,7 @@ public class UelOntologyGoal implements Goal {
 			return true;
 		}
 
-		return ideals.stream().anyMatch(ideal -> ideal.contains(atomId1) && ideal.contains(atomId2));
+		return subsumers.values().stream().anyMatch(ideal -> ideal.contains(atomId1) && ideal.contains(atomId2));
 	}
 
 	private <S, T> Set<T> collectSets(Set<S> input, Function<S, Set<T>> mapper) {
@@ -253,28 +255,24 @@ public class UelOntologyGoal implements Goal {
 	 * of the background ontology.
 	 */
 	public void extractCompatibilityRelation() {
-		Set<Integer> toProcess = new HashSet<Integer>(
-				Sets.difference(Sets.union(atomManager.getDefinitionVariables(), atomManager.getConstants()),
-						atomManager.getUndefNames()));
-		while (!toProcess.isEmpty()) {
-			Integer varId = toProcess.iterator().next();
-			Set<Integer> superclasses = Sets.union(getAllSuperclasses(varId), getAssertedSuperclasses(varId));
-			ideals.add(superclasses);
-			toProcess.removeAll(superclasses);
+		for (Integer varId : Sets.difference(
+				Sets.union(atomManager.getDefinitionVariables(), atomManager.getConstants()),
+				atomManager.getUndefNames())) {
+			subsumers.put(varId, Sets.union(getAllSuperclasses(varId), getAssertedSuperclasses(varId)));
 		}
 
 		// printIdeals(renderer);
 
 		// remove redundant ideals
-		Set<Set<Integer>> notMaximal = new HashSet<Set<Integer>>();
-		for (Set<Integer> ideal1 : ideals) {
-			for (Set<Integer> ideal2 : ideals) {
-				if (!ideal1.equals(ideal2) && ideal1.containsAll(ideal2)) {
-					notMaximal.add(ideal2);
-				}
-			}
-		}
-		ideals.removeAll(notMaximal);
+		// Set<Set<Integer>> notMaximal = new HashSet<Set<Integer>>();
+		// for (Set<Integer> ideal1 : ideals) {
+		// for (Set<Integer> ideal2 : ideals) {
+		// if (!ideal1.equals(ideal2) && ideal1.containsAll(ideal2)) {
+		// notMaximal.add(ideal2);
+		// }
+		// }
+		// }
+		// ideals.removeAll(notMaximal);
 
 		// printIdeals(renderer);
 	}
@@ -577,7 +575,7 @@ public class UelOntologyGoal implements Goal {
 	public void introduceRoleNumberRestrictions(int numberOfRoleGroups) {
 		for (Integer roleId : atomManager.getRoleIds()) {
 			String roleName = atomManager.getRoleName(roleId);
-			if (roleName.contains("RoleGroup")) {
+			if (roleName.equals(snomedRoleGroupUri)) {
 				// restrict the number of RoleGroups in the same substitution
 				// set
 				roleNumberRestrictions.put(roleId, numberOfRoleGroups);
@@ -615,15 +613,15 @@ public class UelOntologyGoal implements Goal {
 				&& notInAxioms(dissubsumptions, atomId);
 	}
 
-	private void printIdeals(StringRenderer renderer) {
-		int i = 1;
-		for (Set<Integer> ideal : ideals) {
-			System.out.println(renderer.renderAtomList("Ideal " + i, ideal));
-			i++;
-		}
-		System.out.println("#####################");
-		System.out.println();
-	}
+	// private void printIdeals(StringRenderer renderer) {
+	// int i = 1;
+	// for (Set<Integer> ideal : ideals) {
+	// System.out.println(renderer.renderAtomList("Ideal " + i, ideal));
+	// i++;
+	// }
+	// System.out.println("#####################");
+	// System.out.println();
+	// }
 
 	private Set<Integer> processClasses(Set<OWLClass> classes, boolean onlyTypes) {
 		Set<Definition> newDefinitions = new HashSet<Definition>();
@@ -682,4 +680,12 @@ public class UelOntologyGoal implements Goal {
 		return snomedCtConceptUri;
 	}
 
+	@Override
+	public boolean isCommonSubsumee(Integer subsumee, Integer subsumer1, Integer subsumer2) {
+		Set<Integer> ideal = subsumers.get(subsumee);
+		if (ideal == null) {
+			return false;
+		}
+		return ideal.containsAll(Arrays.asList(subsumer1, subsumer2));
+	}
 }
