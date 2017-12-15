@@ -1,7 +1,9 @@
 # [UEL](https://julianmendez.github.io/uel/)
 
-[![Build Status](https://travis-ci.org/julianmendez/uel.png?branch=master)](https://travis-ci.org/julianmendez/uel)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/de.tu-dresden.inf.lat.uel/uel-parent/badge.svg)](https://search.maven.org/#search|ga|1|g%3A%22de.tu-dresden.inf.lat.uel%22)
+[![build](https://travis-ci.org/julianmendez/uel.png?branch=master)](https://travis-ci.org/julianmendez/uel)
+[![maven central](https://maven-badges.herokuapp.com/maven-central/de.tu-dresden.inf.lat.uel/uel-parent/badge.svg)](https://search.maven.org/#search|ga|1|g%3A%22de.tu-dresden.inf.lat.uel%22)
+[![license](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0.txt)
+[![license](https://img.shields.io/badge/license-LGPL%203.0-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0.txt)
 
 
 **UEL**, unification solver for [EL](http://dl.kr.org/), is a plug-in for [Protégé](https://protege.stanford.edu/) that uses the [OWL API](https://owlcs.github.io/owlapi/).
