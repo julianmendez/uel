@@ -5,7 +5,6 @@
 [![license](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0.txt)
 [![license](https://img.shields.io/badge/license-LGPL%203.0-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0.txt)
 
-
 **UEL**, unification solver for [EL](http://dl.kr.org/), is a plug-in for [Protégé](https://protege.stanford.edu/) that uses the [OWL API](https://owlcs.github.io/owlapi/).
 
 
@@ -89,16 +88,15 @@ where *NEW_VERSION* is the new version.
   * [The Central Repository](https://repo1.maven.org/maven2/de/tu-dresden/inf/lat/uel/)
   * [older versions](https://sourceforge.net/projects/uel/files/):
 
-
 | version            | zip   | release date | Java | OWL API | Protégé       |
 |:-------------------|:------|:-------------|:----:|:--------|:--------------|
 | uel-1.5.0-SNAPSHOT |       |              | 8    | 4.2.5   | 5.0.0         |
-| [uel-1.4.0](https://sourceforge.net/projects/uel/files/uel/1.4.0/plugin/de.tu-dresden.inf.lat.uel-1.4.0.jar/download)   | [(zip)](https://sourceforge.net/projects/uel/files/uel/1.4.0/zip/uel-1.4.0.zip/download)   | 2016-04-11  | 8    | 4.1.3   | 5.0.0-beta-23 | 
+| [uel-1.4.0](https://sourceforge.net/projects/uel/files/uel/1.4.0/plugin/de.tu-dresden.inf.lat.uel-1.4.0.jar/download)   | [(zip)](https://sourceforge.net/projects/uel/files/uel/1.4.0/zip/uel-1.4.0.zip/download)   | 2016-04-11  | 8    | 4.1.3   | 5.0.0-beta-23 |
 | [uel-1.3.1](https://sourceforge.net/projects/uel/files/uel/1.3.1/plugin/de.tu-dresden.inf.lat.uel-1.3.1.jar/download)   | [(zip)](https://sourceforge.net/projects/uel/files/uel/1.3.1/zip/uel-1.3.1.zip/download)   | 2015-09-09  | 7    | 3.5.1   | 5.0.0-beta-17 |
-| [uel-1.3.0](https://sourceforge.net/projects/uel/files/uel/1.3.0/plugin/de.tudresden.inf.lat.uel.jar/download)   | [(zip)](https://sourceforge.net/projects/uel/files/uel/1.3.0/zip/uel-1.3.0.zip/download) |	2015-04-15  | 7    | 3.5.0   | 4.3           |
-| [uel-1.2.0](https://sourceforge.net/projects/uel/files/uel/1.2.0/plugin/de.tudresden.inf.lat.uel.jar/download)   | [(zip)](https://sourceforge.net/projects/uel/files/uel/1.2.0/zip/uel-1.2.0.zip/download) |	2012-04-30  | 6    | 3.2.4   | 4.1           |
-| [uel-1.1.0](https://sourceforge.net/projects/uel/files/uel/1.1.0/plugin/de.tudresden.inf.lat.uel.jar/download)   | [(zip)](https://sourceforge.net/projects/uel/files/uel/1.1.0/zip/uel-1.1.0.zip/download) |	2012-03-09  | 6    | 3.2.4   | 4.1           |
-| [uel-1.0.0](https://sourceforge.net/projects/uel/files/uel/1.0.0/plugin/de.tudresden.inf.lat.uel.jar/download)   | [(zip)](https://sourceforge.net/projects/uel/files/uel/1.0.0/zip/uel-1.0.0.zip/download) |	2012-01-27  | 6    | 3.2.4   | 4.1           |
+| [uel-1.3.0](https://sourceforge.net/projects/uel/files/uel/1.3.0/plugin/de.tudresden.inf.lat.uel.jar/download)   | [(zip)](https://sourceforge.net/projects/uel/files/uel/1.3.0/zip/uel-1.3.0.zip/download) |    2015-04-15  | 7    | 3.5.0   | 4.3           |
+| [uel-1.2.0](https://sourceforge.net/projects/uel/files/uel/1.2.0/plugin/de.tudresden.inf.lat.uel.jar/download)   | [(zip)](https://sourceforge.net/projects/uel/files/uel/1.2.0/zip/uel-1.2.0.zip/download) |    2012-04-30  | 6    | 3.2.4   | 4.1           |
+| [uel-1.1.0](https://sourceforge.net/projects/uel/files/uel/1.1.0/plugin/de.tudresden.inf.lat.uel.jar/download)   | [(zip)](https://sourceforge.net/projects/uel/files/uel/1.1.0/zip/uel-1.1.0.zip/download) |    2012-03-09  | 6    | 3.2.4   | 4.1           |
+| [uel-1.0.0](https://sourceforge.net/projects/uel/files/uel/1.0.0/plugin/de.tudresden.inf.lat.uel.jar/download)   | [(zip)](https://sourceforge.net/projects/uel/files/uel/1.0.0/zip/uel-1.0.0.zip/download) |    2012-01-27  | 6    | 3.2.4   | 4.1           |
 
 
 ## Installation and use
@@ -192,4 +190,5 @@ This small tutorial gives an example of how to use UEL as a Java library. The cl
 [3] Franz Baader and Barbara Morawska. SAT Encoding of Unification in EL. In Proc. LPAR, 2010.
 
 [4] Franz Baader and Barbara Morawska. Unification in the Description Logic EL. Logical Methods in Computer Science 6(3), 2010.
+
 
