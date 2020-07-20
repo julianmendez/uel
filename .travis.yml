@@ -4,7 +4,13 @@
 # https://travis-ci.org/
 #
 
+---
+
 language: java
+
+os: linux
+
+dist: bionic
 
 jdk:
   - openjdk11
@@ -18,11 +24,9 @@ install:
   - mvn install -DskipTests=true -Dmaven.javadoc.skip=false -B -V
 
 script:
- - mvn test -B -DargLine="-Xmx8G"
+  - mvn test -B -DargLine="-Xmx8G"
 
 after_success:
   - mvn clean cobertura:cobertura coveralls:report
-
-sudo: false
 
 
