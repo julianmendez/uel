@@ -1,7 +1,6 @@
 
 ![uel](https://github.com/julianmendez/uel/blob/master/docs/img/banner.png?raw=true)
 
-
 The following tutorial shows how to use **UEL**. It can be run as a standalone application ...
 
 ![UEL as a standalone application](https://github.com/julianmendez/uel/blob/master/docs/img/01_standalone.png?raw=true))
@@ -41,4 +40,5 @@ In this view, one can also save the currently displayed unifier into an ontology
 Using the last button, a new window is opened that contains additonal information about the actual (dis)unification problem that was sent to the unification algorithm. Due to some preprocessing, additional auxiliary variables may have been introduced. This representation can be saved as a text file. In the bottom, some additional statistics about the unification process are displayed, such as the number of generated clauses for the SAT encoding.
 
 ![window showing extra information](https://github.com/julianmendez/uel/blob/master/docs/img/10_information.png?raw=true))
+
 
