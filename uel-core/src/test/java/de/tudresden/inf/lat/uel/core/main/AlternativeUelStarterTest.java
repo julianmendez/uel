@@ -6,12 +6,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
+import java.util.stream.Stream;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
@@ -22,7 +23,6 @@ import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import de.tudresden.inf.lat.jcel.owlapi.main.JcelReasonerFactory;
 import de.tudresden.inf.lat.uel.core.processor.UnificationAlgorithmFactory;
 
-@RunWith(value = Parameterized.class)
 public class AlternativeUelStarterTest {
 
 	private static final String apath = "src/test/resources/";
@@ -34,24 +34,8 @@ public class AlternativeUelStarterTest {
 	private static final String testFilename = ".test";
 	private static final int maxTest = 4;
 
-	private OWLOntology mainOntology;
-	private OWLOntology subsumptions;
-	private OWLOntology dissubsumptions;
-	private Set<OWLClass> variables;
-	private Integer numberOfUnifiers;
-
-	public AlternativeUelStarterTest(OWLOntology mainOntology, OWLOntology subsumptions, OWLOntology dissubsumptions,
-			Set<OWLClass> variables, Integer numberOfUnifiers) {
-		this.mainOntology = mainOntology;
-		this.subsumptions = subsumptions;
-		this.dissubsumptions = dissubsumptions;
-		this.variables = variables;
-		this.numberOfUnifiers = numberOfUnifiers;
-	}
-
-	@Parameters(name = "{index}")
-	public static Collection<Object[]> data() {
-		Collection<Object[]> data = new ArrayList<>();
+	private static Stream<Arguments> data() {
+		Collection<Arguments> data = new ArrayList<>();
 
 		for (int i = 1; i <= maxTest; i++) {
 			try {
@@ -66,17 +50,19 @@ public class AlternativeUelStarterTest {
 				Integer numberOfUnifiers = Integer.parseInt(testFile.readLine());
 				testFile.close();
 
-				data.add(new Object[] { mainOntology, subsumptions, dissubsumptions, variables, numberOfUnifiers });
+				data.add(Arguments.of(mainOntology, subsumptions, dissubsumptions, variables, numberOfUnifiers));
 			} catch (OWLOntologyCreationException | IOException ex) {
 				throw new RuntimeException(ex);
 			}
 		}
 
-		return data;
+		return data.stream();
 	}
 
-	@Test
-	public void tryOntology() throws OWLOntologyCreationException, IOException {
+	@ParameterizedTest(name = "{index}")
+	@MethodSource("data")
+	public void tryOntology(OWLOntology mainOntology, OWLOntology subsumptions, OWLOntology dissubsumptions,
+							Set<OWLClass> variables, Integer numberOfUnifiers) throws OWLOntologyCreationException, IOException {
 
 		AlternativeUelStarter starter = new AlternativeUelStarter(mainOntology);
 		// starter.setVerbose(true);
@@ -106,16 +92,16 @@ public class AlternativeUelStarterTest {
 
 			for (OWLAxiom pos : subsumptions.getAxioms()) {
 				// System.out.println(pos + ": " + reasoner.isEntailed(pos));
-				Assert.assertTrue(reasoner.isEntailed(pos));
+				Assertions.assertTrue(reasoner.isEntailed(pos));
 			}
 			for (OWLAxiom neg : dissubsumptions.getAxioms()) {
 				// System.out.println(neg + ": " + reasoner.isEntailed(neg));
-				Assert.assertTrue(!reasoner.isEntailed(neg));
+				Assertions.assertTrue(!reasoner.isEntailed(neg));
 			}
 
 			reasoner.dispose();
 		}
 
-		Assert.assertEquals(numberOfUnifiers, actualNumberOfUnifiers);
+		Assertions.assertEquals(numberOfUnifiers, actualNumberOfUnifiers);
 	}
 }

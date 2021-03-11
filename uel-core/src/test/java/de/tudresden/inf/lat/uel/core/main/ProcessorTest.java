@@ -12,12 +12,13 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Stream;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.io.StreamDocumentSource;
 import org.semanticweb.owlapi.krss2.parser.KRSS2OWLParser;
@@ -35,7 +36,6 @@ import de.tudresden.inf.lat.uel.core.processor.BasicOntologyProvider;
 import de.tudresden.inf.lat.uel.core.processor.UelModel;
 import de.tudresden.inf.lat.uel.type.impl.Unifier;
 
-@RunWith(value = Parameterized.class)
 public class ProcessorTest {
 
 	static final char COMMENT_CHAR = '#';
@@ -47,12 +47,6 @@ public class ProcessorTest {
 	private static final String test = ".test";
 	private static final int maxTest = 17;
 
-	private String ontologyName;
-	private Set<String> varNames;
-	private Set<String> undefVarNames;
-	private Integer numberOfUnifiers;
-	private String algorithmName;
-
 	String getMemoryUsage() {
 		long totalMemory = Runtime.getRuntime().totalMemory() / 0x100000;
 		long freeMemory = Runtime.getRuntime().freeMemory() / 0x100000;
@@ -63,16 +57,6 @@ public class ProcessorTest {
 		sbuf.append("" + freeMemory);
 		sbuf.append(" MB)");
 		return sbuf.toString();
-	}
-
-	public ProcessorTest(String ontologyName, Set<String> varNames, Set<String> undefVarNames, Integer numberOfUnifiers,
-			String algorithmName) {
-		this.ontologyName = ontologyName;
-		this.varNames = varNames;
-		this.undefVarNames = undefVarNames;
-		this.numberOfUnifiers = numberOfUnifiers;
-		this.algorithmName = algorithmName;
-		System.out.println("Testing " + ontologyName + " with " + algorithmName + " " + getMemoryUsage() + ".");
 	}
 
 	static OWLOntology loadKRSSOntology(String input) throws OWLOntologyCreationException, IOException {
@@ -119,9 +103,8 @@ public class ProcessorTest {
 		return ret;
 	}
 
-	@Parameters(name = "{index}: {0}, {4}")
-	public static Collection<Object[]> data() {
-		Collection<Object[]> data = new ArrayList<>();
+	private static Stream<Arguments> data() {
+		Collection<Arguments> data = new ArrayList<>();
 
 		System.out.println("Preparing tests.");
 		for (int i = 1; i <= maxTest; i++) {
@@ -138,7 +121,7 @@ public class ProcessorTest {
 				while (algorithmName != null) {
 					Integer nbUnifiers = Integer.parseInt(readNextLine(configFile));
 					if (!algorithmName.contains("ASP")) {
-						data.add(new Object[] { ontologyName, varNames, undefVarNames, nbUnifiers, algorithmName });
+						data.add(Arguments.of(ontologyName, varNames, undefVarNames, nbUnifiers, algorithmName));
 					}
 
 					algorithmName = readNextLine(configFile);
@@ -151,7 +134,7 @@ public class ProcessorTest {
 		}
 		System.out.println("Tests are prepared.");
 
-		return data;
+		return data.stream();
 	}
 
 	private static Set<String> parseSet(String input) {
@@ -162,8 +145,11 @@ public class ProcessorTest {
 		}
 	}
 
-	@Test
-	public void tryOntology() throws OWLOntologyCreationException, IOException, InterruptedException {
+	@ParameterizedTest(name = "{index}: {0}, {4}")
+	@MethodSource("data")
+	public void tryOntology(String ontologyName, Set<String> varNames, Set<String> undefVarNames, Integer numberOfUnifiers,
+							String algorithmName) throws OWLOntologyCreationException, IOException, InterruptedException {
+		System.out.println("Testing " + ontologyName + " with " + algorithmName + " " + getMemoryUsage() + ".");
 		Map<String, OWLClass> idClassMap = new HashMap<>();
 		OWLOntology owlOntology = loadKRSSOntology(ontologyName);
 		OWLOntologyManager ontologyManager = owlOntology.getOWLOntologyManager();
@@ -214,11 +200,11 @@ public class ProcessorTest {
 			OWLReasoner reasoner = createReasoner(extendedOntology);
 			Node<OWLClass> node = reasoner.getEquivalentClasses(idClassMap.get(conceptC));
 			OWLClass elem = idClassMap.get(conceptD);
-			Assert.assertTrue(node.contains(elem));
+			Assertions.assertTrue(node.contains(elem));
 			reasoner.dispose();
 		}
 
-		Assert.assertEquals(numberOfUnifiers, (Integer) uelModel.getUnifierList().size());
+		Assertions.assertEquals(numberOfUnifiers, (Integer) uelModel.getUnifierList().size());
 		System.out.println("Test OK " + getMemoryUsage() + ".");
 	}
 
