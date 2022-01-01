@@ -13,11 +13,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.api.Assertions;
+
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.io.StreamDocumentSource;
 import org.semanticweb.owlapi.krss2.parser.KRSS2OWLParser;
@@ -42,7 +39,6 @@ import de.tudresden.inf.lat.uel.core.processor.UelOptions.Verbosity;
 import de.tudresden.inf.lat.uel.type.api.AtomManager;
 import de.tudresden.inf.lat.uel.type.impl.Unifier;
 
-@RunWith(value = Parameterized.class)
 public class ProcessorTest {
 
 	static final char COMMENT_CHAR = '#';
@@ -93,7 +89,6 @@ public class ProcessorTest {
 		return ret;
 	}
 
-	@Parameters(name = "{index}: {0}, {4}")
 	public static Collection<Object[]> data() {
 		Collection<Object[]> data = new ArrayList<>();
 
@@ -179,7 +174,6 @@ public class ProcessorTest {
 		return sbuf.toString();
 	}
 
-	@Test
 	public void tryOntology() throws OWLOntologyCreationException, IOException, InterruptedException {
 		OWLOntology owlOntology = loadKRSSOntology(ontologyName);
 		OWLOntologyManager manager = owlOntology.getOWLOntologyManager();
@@ -226,11 +220,11 @@ public class ProcessorTest {
 			OWLReasoner reasoner = createReasoner(extendedOntology);
 			Node<OWLClass> node = reasoner.getEquivalentClasses(c);
 			OWLClass elem = d;
-			Assert.assertTrue(node.contains(elem));
+			Assertions.assertTrue(node.contains(elem));
 			reasoner.dispose();
 		}
 
-		Assert.assertEquals(numberOfUnifiers, (Integer) uelModel.getUnifierList().size());
+		Assertions.assertEquals(numberOfUnifiers, (Integer) uelModel.getUnifierList().size());
 		System.out.println("Test OK " + getMemoryUsage() + ".");
 	}
 

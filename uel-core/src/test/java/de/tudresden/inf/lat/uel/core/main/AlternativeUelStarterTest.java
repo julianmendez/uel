@@ -7,11 +7,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.api.Assertions;
+
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
@@ -33,7 +30,6 @@ import de.tudresden.inf.lat.uel.core.processor.UnificationAlgorithmFactory;
  * @author Stefan Borgwardt
  *
  */
-@RunWith(value = Parameterized.class)
 public class AlternativeUelStarterTest {
 
 	private static final String apath = "src/test/resources/";
@@ -80,7 +76,6 @@ public class AlternativeUelStarterTest {
 	 * 
 	 * @return a Collection of parameter combinations, as required by JUnit
 	 */
-	@Parameters(name = "{index}")
 	public static Collection<Object[]> data() {
 		Collection<Object[]> data = new ArrayList<>();
 
@@ -113,7 +108,6 @@ public class AlternativeUelStarterTest {
 	 *             indicates that the ontology for verifying the results could
 	 *             not be created
 	 */
-	@Test
 	public void tryOntology() throws OWLOntologyCreationException {
 
 		UelOptions options = new UelOptions();
@@ -147,11 +141,11 @@ public class AlternativeUelStarterTest {
 
 			for (OWLAxiom pos : subsumptions.getAxioms()) {
 				// System.out.println(pos + ": " + reasoner.isEntailed(pos));
-				Assert.assertTrue(reasoner.isEntailed(pos));
+				Assertions.assertTrue(reasoner.isEntailed(pos));
 			}
 			for (OWLAxiom neg : dissubsumptions.getAxioms()) {
 				// System.out.println(neg + ": " + reasoner.isEntailed(neg));
-				Assert.assertTrue(!reasoner.isEntailed(neg));
+				Assertions.assertTrue(!reasoner.isEntailed(neg));
 			}
 
 			reasoner.dispose();
@@ -159,6 +153,6 @@ public class AlternativeUelStarterTest {
 
 		iterator.cleanup();
 
-		Assert.assertEquals(numberOfUnifiers, actualNumberOfUnifiers);
+		Assertions.assertEquals(numberOfUnifiers, actualNumberOfUnifiers);
 	}
 }

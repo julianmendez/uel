@@ -13,7 +13,7 @@
 	<parent>
 		<groupId>de.tu-dresden.inf.lat</groupId>
 		<artifactId>lat-parent</artifactId>
-		<version>0.1.4</version>
+		<version>0.1.5</version>
 		<relativePath></relativePath>
 	</parent>
 
@@ -27,9 +27,15 @@
 			</dependency>
 
 			<dependency>
-				<groupId>junit</groupId>
-				<artifactId>junit</artifactId>
-				<version>4.12</version>
+				<!--
+				JUnit 5
+				[[https://junit.org/junit5]]
+				[[https://github.com/junit-team/junit5]]
+				[[https://repo1.maven.org/maven2/org/junit/jupiter/junit-jupiter-params]]
+				-->
+				<groupId>org.junit.jupiter</groupId>
+				<artifactId>junit-jupiter-params</artifactId>
+				<version>5.8.2</version>
 				<scope>test</scope>
 			</dependency>
 
@@ -71,9 +77,15 @@
 			</dependency>
 
 			<dependency>
-				<groupId>org.codehaus.jackson</groupId>
-				<artifactId>jackson-mapper-asl</artifactId>
-				<version>1.9.13</version>
+				<!--
+				jackson-databind
+				General data-binding package for Jackson.
+				[[https://github.com/FasterXML/jackson-databind]]
+				[[https://repo1.maven.org/maven2/com/fasterxml/jackson/core/jackson-databind]]
+				-->
+				<groupId>com.fasterxml.jackson.core</groupId>
+				<artifactId>jackson-databind</artifactId>
+				<version>2.12.2</version>
 			</dependency>
 
 		</dependencies>
@@ -98,28 +110,13 @@
 		<maven.compiler.target>1.8</maven.compiler.target>
 
 		<util.version>0.1.0</util.version>
-		<owlapi.version>4.2.8</owlapi.version>
-		<protege.version>5.2.0</protege.version>
+		<owlapi.version>4.5.9</owlapi.version>
+		<protege.version>5.5.0</protege.version>
 		<sat4j.version>2.3.5</sat4j.version>
 		<jcel.version>0.24.1</jcel.version>
 	</properties>
 
 	<build>
-		<pluginManagement>
-			<plugins>
-
-				<plugin>
-					<!--
-					[[https://repo1.maven.org/maven2/org/apache/felix/maven-bundle-plugin/]]
-					-->
-					<groupId>org.apache.felix</groupId>
-					<artifactId>maven-bundle-plugin</artifactId>
-					<version>5.1.1</version>
-				</plugin>
-
-			</plugins>
-		</pluginManagement>
-
 		<plugins>
 
 			<plugin>
