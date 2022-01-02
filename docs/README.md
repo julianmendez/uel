@@ -90,13 +90,13 @@ where *NEW_VERSION* is the new version.
 
 | version            | zip   | release date | Java | OWL API | Protégé       |
 |:-------------------|:------|:-------------|:----:|:--------|:--------------|
-| uel-1.5.0-SNAPSHOT |       |              | 8    | 4.2.5   | 5.0.0         |
-| [uel-1.4.0](https://sourceforge.net/projects/uel/files/uel/1.4.0/plugin/de.tu-dresden.inf.lat.uel-1.4.0.jar/download)   | [(zip)](https://sourceforge.net/projects/uel/files/uel/1.4.0/zip/uel-1.4.0.zip/download)   | 2016-04-11  | 8    | 4.1.3   | 5.0.0-beta-23 |
-| [uel-1.3.1](https://sourceforge.net/projects/uel/files/uel/1.3.1/plugin/de.tu-dresden.inf.lat.uel-1.3.1.jar/download)   | [(zip)](https://sourceforge.net/projects/uel/files/uel/1.3.1/zip/uel-1.3.1.zip/download)   | 2015-09-09  | 7    | 3.5.1   | 5.0.0-beta-17 |
-| [uel-1.3.0](https://sourceforge.net/projects/uel/files/uel/1.3.0/plugin/de.tudresden.inf.lat.uel.jar/download)   | [(zip)](https://sourceforge.net/projects/uel/files/uel/1.3.0/zip/uel-1.3.0.zip/download) |    2015-04-15  | 7    | 3.5.0   | 4.3           |
-| [uel-1.2.0](https://sourceforge.net/projects/uel/files/uel/1.2.0/plugin/de.tudresden.inf.lat.uel.jar/download)   | [(zip)](https://sourceforge.net/projects/uel/files/uel/1.2.0/zip/uel-1.2.0.zip/download) |    2012-04-30  | 6    | 3.2.4   | 4.1           |
-| [uel-1.1.0](https://sourceforge.net/projects/uel/files/uel/1.1.0/plugin/de.tudresden.inf.lat.uel.jar/download)   | [(zip)](https://sourceforge.net/projects/uel/files/uel/1.1.0/zip/uel-1.1.0.zip/download) |    2012-03-09  | 6    | 3.2.4   | 4.1           |
-| [uel-1.0.0](https://sourceforge.net/projects/uel/files/uel/1.0.0/plugin/de.tudresden.inf.lat.uel.jar/download)   | [(zip)](https://sourceforge.net/projects/uel/files/uel/1.0.0/zip/uel-1.0.0.zip/download) |    2012-01-27  | 6    | 3.2.4   | 4.1           |
+| uel-1.5.0-SNAPSHOT |       |              |  11  | 4.5.9   | 5.5.0         |
+| [uel-1.4.0](https://sourceforge.net/projects/uel/files/uel/1.4.0/plugin/de.tu-dresden.inf.lat.uel-1.4.0.jar/download)   | [(zip)](https://sourceforge.net/projects/uel/files/uel/1.4.0/zip/uel-1.4.0.zip/download)   | 2016-04-11  |  8   | 4.1.3   | 5.0.0-beta-23 |
+| [uel-1.3.1](https://sourceforge.net/projects/uel/files/uel/1.3.1/plugin/de.tu-dresden.inf.lat.uel-1.3.1.jar/download)   | [(zip)](https://sourceforge.net/projects/uel/files/uel/1.3.1/zip/uel-1.3.1.zip/download)   | 2015-09-09  |  7   | 3.5.1   | 5.0.0-beta-17 |
+| [uel-1.3.0](https://sourceforge.net/projects/uel/files/uel/1.3.0/plugin/de.tudresden.inf.lat.uel.jar/download)   | [(zip)](https://sourceforge.net/projects/uel/files/uel/1.3.0/zip/uel-1.3.0.zip/download) |    2015-04-15  |  7   | 3.5.0   | 4.3           |
+| [uel-1.2.0](https://sourceforge.net/projects/uel/files/uel/1.2.0/plugin/de.tudresden.inf.lat.uel.jar/download)   | [(zip)](https://sourceforge.net/projects/uel/files/uel/1.2.0/zip/uel-1.2.0.zip/download) |    2012-04-30  |  6   | 3.2.4   | 4.1           |
+| [uel-1.1.0](https://sourceforge.net/projects/uel/files/uel/1.1.0/plugin/de.tudresden.inf.lat.uel.jar/download)   | [(zip)](https://sourceforge.net/projects/uel/files/uel/1.1.0/zip/uel-1.1.0.zip/download) |    2012-03-09  |  6   | 3.2.4   | 4.1           |
+| [uel-1.0.0](https://sourceforge.net/projects/uel/files/uel/1.0.0/plugin/de.tudresden.inf.lat.uel.jar/download)   | [(zip)](https://sourceforge.net/projects/uel/files/uel/1.0.0/zip/uel-1.0.0.zip/download) |    2012-01-27  |  6   | 3.2.4   | 4.1           |
 
 
 ## Installation and use
