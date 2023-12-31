@@ -86,7 +86,7 @@
 						<Bundle-Category>protege</Bundle-Category>
 						<Bundle-Description>UEL library</Bundle-Description>
 						<Bundle-Vendor>Chair of Automata Theory - TU Dresden</Bundle-Vendor>
-						<Bundle-DocURL>https://lat.inf.tu-dresden.de</Bundle-DocURL>
+						<Bundle-DocURL>https://tu-dresden.de/ing/informatik/thi/lat</Bundle-DocURL>
 						<Main-Class>${mainClass}</Main-Class>
 						<Include-Resource>
 							{maven-resources}, {maven-dependencies},
