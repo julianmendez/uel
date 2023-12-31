@@ -13,7 +13,7 @@
 	<parent>
 		<groupId>de.tu-dresden.inf.lat</groupId>
 		<artifactId>lat-parent</artifactId>
-		<version>0.1.5</version>
+		<version>0.1.7</version>
 		<relativePath></relativePath>
 	</parent>
 
@@ -21,9 +21,132 @@
 		<dependencies>
 
 			<dependency>
+				<!--
+				util
+				[[https://julianmendez.github.io/util/]]
+				[[https://github.com/julianmendez/util]]
+				[[https://repo1.maven.org/maven2/de/tu-dresden/inf/lat/util]]
+				-->
 				<groupId>de.tu-dresden.inf.lat.util</groupId>
 				<artifactId>util-map</artifactId>
 				<version>${util.version}</version>
+			</dependency>
+
+			<dependency>
+				<!--
+				OWL API (distribution)
+				[[https://owlcs.github.io/owlapi/]]
+				[[https://github.com/owlcs/owlapi]]
+				[[https://repo1.maven.org/maven2/net/sourceforge/owlapi/owlapi-distribution/]]
+				-->
+				<groupId>net.sourceforge.owlapi</groupId>
+				<artifactId>owlapi-distribution</artifactId>
+				<version>${owlapi.version}</version>
+			</dependency>
+
+			<dependency>
+				<!--
+				OWL API (osgidistribution)
+				[[https://owlcs.github.io/owlapi/]]
+				[[https://github.com/owlcs/owlapi]]
+				[[https://repo1.maven.org/maven2/net/sourceforge/owlapi/owlapi-osgidistribution/]]
+				-->
+				<groupId>net.sourceforge.owlapi</groupId>
+				<artifactId>owlapi-osgidistribution</artifactId>
+				<version>${owlapi.version}</version>
+			</dependency>
+
+			<dependency>
+				<!--
+				Protege (editor owl)
+				[[https://protege.stanford.edu]]
+				[[https://github.com/protegeproject/protege]]
+				[[https://repo1.maven.org/maven2/edu/stanford/protege/protege-editor-owl/]]
+				-->
+				<groupId>edu.stanford.protege</groupId>
+				<artifactId>protege-editor-owl</artifactId>
+				<version>${protege.version}</version>
+			</dependency>
+
+			<dependency>
+				<!--
+				Protege (editor core)
+				[[https://protege.stanford.edu]]
+				[[https://github.com/protegeproject/protege]]
+				[[https://repo1.maven.org/maven2/edu/stanford/protege/protege-editor-core/]]
+				-->
+				<groupId>edu.stanford.protege</groupId>
+				<artifactId>protege-editor-core</artifactId>
+				<version>${protege.version}</version>
+			</dependency>
+
+			<dependency>
+				<!--
+				Sat4j
+				[[http://sat4j.org]]
+				[[https://gitlab.ow2.org/sat4j/sat4j]]
+				[[https://repo1.maven.org/maven2/org/ow2/sat4j/org.ow2.sat4j.maxsat/]]
+				-->
+				<groupId>org.ow2.sat4j</groupId>
+				<artifactId>org.ow2.sat4j.maxsat</artifactId>
+				<version>${sat4j.version}</version>
+			</dependency>
+
+			<dependency>
+				<!--
+				Jackson core
+				[[https://github.com/FasterXML/jackson-core]]
+				[[https://repo1.maven.org/maven2/com/fasterxml/jackson/core/jackson-core/]]
+				-->
+				<groupId>com.fasterxml.jackson.core</groupId>
+				<artifactId>jackson-core</artifactId>
+				<version>${jackson.version}</version>
+			</dependency>
+
+			<dependency>
+				<!--
+				Jackson annotations
+				[[https://github.com/FasterXML/jackson-annotations]]
+				[[https://repo1.maven.org/maven2/com/fasterxml/jackson/core/jackson-annotations/]]
+				-->
+				<groupId>com.fasterxml.jackson.core</groupId>
+				<artifactId>jackson-annotations</artifactId>
+				<version>${jackson.version}</version>
+			</dependency>
+
+			<dependency>
+				<!--
+				Jackson data-bind
+				[[https://github.com/FasterXML/jackson-databind]]
+				[[https://repo1.maven.org/maven2/com/fasterxml/jackson/core/jackson-databind]]
+				-->
+				<groupId>com.fasterxml.jackson.core</groupId>
+				<artifactId>jackson-databind</artifactId>
+				<version>${jackson.version}</version>
+			</dependency>
+
+			<dependency>
+				<!--
+				Apache Commons CLI
+				[[https://github.com/apache/commons-cli]]
+				[[https://repo1.maven.org/maven2/commons-cli/commons-cli/]]
+				-->
+				<groupId>commons-cli</groupId>
+				<artifactId>commons-cli</artifactId>
+				<version>${commonscli.version}</version>
+			</dependency>
+
+			<dependency>
+				<!--
+				jcel
+				[[https://julianmendez.github.io/jcel/]]
+				[[https://github.com/julianmendez/jcel]]
+				[[https://repo1.maven.org/maven2/de/tu-dresden/inf/lat/jcel]]
+				-->
+				<groupId>de.tu-dresden.inf.lat.jcel</groupId>
+				<artifactId>jcel-owlapi</artifactId>
+				<version>${jcel.version}</version>
+				<scope>test</scope>
 			</dependency>
 
 			<dependency>
@@ -35,57 +158,8 @@
 				-->
 				<groupId>org.junit.jupiter</groupId>
 				<artifactId>junit-jupiter-params</artifactId>
-				<version>5.8.2</version>
+				<version>5.9.3</version>
 				<scope>test</scope>
-			</dependency>
-
-			<dependency>
-				<groupId>net.sourceforge.owlapi</groupId>
-				<artifactId>owlapi-distribution</artifactId>
-				<version>${owlapi.version}</version>
-			</dependency>
-
-			<dependency>
-				<groupId>net.sourceforge.owlapi</groupId>
-				<artifactId>owlapi-osgidistribution</artifactId>
-				<version>${owlapi.version}</version>
-			</dependency>
-
-			<dependency>
-				<groupId>edu.stanford.protege</groupId>
-				<artifactId>protege-editor-owl</artifactId>
-				<version>${protege.version}</version>
-			</dependency>
-
-			<dependency>
-				<groupId>edu.stanford.protege</groupId>
-				<artifactId>protege-editor-core</artifactId>
-				<version>${protege.version}</version>
-			</dependency>
-
-			<dependency>
-				<groupId>de.tu-dresden.inf.lat.jcel</groupId>
-				<artifactId>jcel-owlapi</artifactId>
-				<version>${jcel.version}</version>
-				<scope>test</scope>
-			</dependency>
-
-			<dependency>
-				<groupId>org.ow2.sat4j</groupId>
-				<artifactId>org.ow2.sat4j.maxsat</artifactId>
-				<version>${sat4j.version}</version>
-			</dependency>
-
-			<dependency>
-				<!--
-				jackson-databind
-				General data-binding package for Jackson.
-				[[https://github.com/FasterXML/jackson-databind]]
-				[[https://repo1.maven.org/maven2/com/fasterxml/jackson/core/jackson-databind]]
-				-->
-				<groupId>com.fasterxml.jackson.core</groupId>
-				<artifactId>jackson-databind</artifactId>
-				<version>2.12.2</version>
 			</dependency>
 
 		</dependencies>
@@ -112,8 +186,10 @@
 		<util.version>0.1.0</util.version>
 		<owlapi.version>4.5.9</owlapi.version>
 		<protege.version>5.5.0</protege.version>
-		<sat4j.version>2.3.5</sat4j.version>
+		<sat4j.version>2.3.6</sat4j.version>
 		<jcel.version>0.24.1</jcel.version>
+		<jackson.version>2.16.0</jackson.version>
+		<commonscli.version>1.6.0</commonscli.version>
 	</properties>
 
 	<build>
@@ -169,8 +245,9 @@
 
 		<developer>
 			<id>julianmendez</id>
-			<name>Julian Mendez</name>
+			<name>Julian Alfredo Mendez</name>
 			<email>julian.mendez@gmail.com</email>
+			<url>https://julianmendez.github.io</url>
 		</developer>
 
 		<developer>
