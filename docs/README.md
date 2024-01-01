@@ -1,11 +1,12 @@
 # [UEL](https://julianmendez.github.io/uel/)
 
-[![build](https://github.com/julianmendez/uel/workflows/Java%20CI/badge.svg)](https://github.com/julianmendez/uel/actions)
-[![maven central](https://maven-badges.herokuapp.com/maven-central/de.tu-dresden.inf.lat.uel/uel-parent/badge.svg)](https://search.maven.org/#search|ga|1|g%3A%22de.tu-dresden.inf.lat.uel%22)
-[![license](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0.txt)
-[![license](https://img.shields.io/badge/license-LGPL%203.0-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0.txt)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)][license1]
+[![license](https://img.shields.io/badge/License-LGPL%203.0-blue.svg)][license2]
+[![Maven Central](https://img.shields.io/maven-central/v/de.tu-dresden.inf.lat.uel/uel-parent.
+svg)][maven-central]
+[![build](https://github.com/julianmendez/uel/workflows/Java%20CI/badge.svg)][build-status]
 
-**UEL**, unification solver for [EL](http://dl.kr.org/), is a plug-in for [Protégé](https://protege.stanford.edu/) that uses the [OWL API](https://owlcs.github.io/owlapi/).
+**UEL**, unification solver for [EL][description-logics], is a plug-in for [Protégé][protege] that uses the [OWL API][owl-api].
 
 
 ## Dependency
@@ -43,7 +44,7 @@ and once offline, use:
 $ mvn --offline clean install
 ```
 
-The bundles uploaded to [Sonatype](https://oss.sonatype.org/) are created with:
+The bundles uploaded to [Sonatype][sonatype] are created with:
 
 ```
 $ mvn clean install -DperformRelease=true
@@ -74,19 +75,19 @@ where *NEW_VERSION* is the new version.
 
 ## Authors
 
-[Barbara Morawska](https://lat.inf.tu-dresden.de/~morawska/), [Stefan Borgwardt](https://lat.inf.tu-dresden.de/~stefborg/), [Julian Mendez](https://julianmendez.github.io)
+[Barbara Morawska][author1], [Stefan Borgwardt][author2], [Julian Alfredo Mendez][author3]
 
 
 ## License
 
-[Apache License Version 2.0](https://www.apache.org/licenses/LICENSE-2.0.txt), [GNU Lesser General Public License version 3](https://www.gnu.org/licenses/lgpl-3.0.txt)
+[Apache License Version 2.0][license1], [GNU Lesser General Public License version 3][license2]
 
 
 ## Download
 
-  * [all-in-one ZIP file](https://sourceforge.net/projects/uel/files/uel/1.4.0/zip/uel-1.4.0.zip/download)
-  * [The Central Repository](https://repo1.maven.org/maven2/de/tu-dresden/inf/lat/uel/)
-  * [older versions](https://sourceforge.net/projects/uel/files/):
+  * [all-in-one ZIP file][zip-file]
+  * [The Central Repository][central-repository]
+  * [older versions][older-versions]:
 
 | version            | zip   | release date | Java | OWL API | Protégé       |
 |:-------------------|:------|:-------------|:----:|:--------|:--------------|
@@ -101,7 +102,8 @@ where *NEW_VERSION* is the new version.
 
 ## Installation and use
 
-* as a **plugin**: in the all-in-one ZIP file, find the JAR file in directory `.../plugin` and copy it into the Protege plugin directory (`.../plugins`).
+* as a **plugin**: in the all-in-one ZIP file, find the JAR file in directory `.../plugin`
+  and copy it into the Protégé plugin directory (`.../plugins`).
 
 * as a **library**: in the all-in-one ZIP file, find the JAR file in directory `.../library` and use it as a library.
 
@@ -109,7 +111,7 @@ where *NEW_VERSION* is the new version.
 
 
 ## Release Notes
-See [release notes](https://julianmendez.github.io/uel/RELEASE-NOTES.html).
+See [release notes][release-notes].
 
 
 ## Support
@@ -190,5 +192,22 @@ This small tutorial gives an example of how to use UEL as a Java library. The cl
 [3] Franz Baader and Barbara Morawska. SAT Encoding of Unification in EL. In Proc. LPAR, 2010.
 
 [4] Franz Baader and Barbara Morawska. Unification in the Description Logic EL. Logical Methods in Computer Science 6(3), 2010.
+
+[author1]: https://lat.inf.tu-dresden.de/~morawska/
+[author2]: https://lat.inf.tu-dresden.de/~stefborg/
+[author3]: https://julianmendez.github.io
+[license1]: https://www.apache.org/licenses/LICENSE-2.0.txt
+[license2]: https://www.gnu.org/licenses/lgpl-3.0.txt
+[maven-central]: https://search.maven.org/artifact/de.tu-dresden.inf.lat.uel/uel-ui
+[build-status]: https://github.com/julianmendez/uel/actions
+[central-repository]: https://repo1.maven.org/maven2/de/tu-dresden/inf/lat/uel/
+[zip-file]: https://sourceforge.net/projects/uel/files/uel/1.4.0/zip/uel-1.4.0.zip/download
+[older-versions]: https://sourceforge.net/projects/uel/files/
+[release-notes]: https://julianmendez.github.io/uel/RELEASE-NOTES.html
+[sonatype]: https://oss.sonatype.org
+[java]: https://www.oracle.com/java/technologies/
+[description-logics]: http://dl.kr.org
+[owl-api]: https://owlcs.github.io/owlapi/
+[protege]: https://protege.stanford.edu
 
 
