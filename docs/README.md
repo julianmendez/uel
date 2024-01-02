@@ -1,9 +1,8 @@
 # [UEL](https://julianmendez.github.io/uel/)
 
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)][license1]
-[![license](https://img.shields.io/badge/License-LGPL%203.0-blue.svg)][license2]
-[![Maven Central](https://img.shields.io/maven-central/v/de.tu-dresden.inf.lat.uel/uel-parent.
-svg)][maven-central]
+[![License 1](https://img.shields.io/badge/License%201-Apache%202.0-blue.svg)][license1]
+[![license 2](https://img.shields.io/badge/License%202-LGPL%203.0-blue.svg)][license2]
+[![Maven Central](https://img.shields.io/maven-central/v/de.tu-dresden.inf.lat.uel/uel-parent.svg?label=Maven%20Central)][maven-central]
 [![build](https://github.com/julianmendez/uel/workflows/Java%20CI/badge.svg)][build-status]
 
 **UEL**, unification solver for [EL][description-logics], is a plug-in for [Protégé][protege] that uses the [OWL API][owl-api].
@@ -181,6 +180,11 @@ This small tutorial gives an example of how to use UEL as a Java library. The cl
 `AlternativeUelStarter` marks all UNDEF concepts as variables by default, if you do not want this behaviour, call the method `markUndefAsVariables` passing `false` as argument before call `modifyOntologyAndSolve`.
 
 `AlternativeUelStarter` also provides a simple command-line interface that can be accessed by starting Java directly on this class. The execution options are not documented yet, but can be found in the in the source code of the main method.
+
+
+## Contact
+
+In case you need more information, please contact [julianmendez][author3].
 
 
 ## References
