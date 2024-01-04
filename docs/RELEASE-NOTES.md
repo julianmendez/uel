@@ -1,20 +1,19 @@
-## Release Notes
 ---
 - - summary:
-    - v1.5.0 (unreleased), Java 8, OWL API 4.5.9, Protege 5.5.0
-    - v1.4.0 (2016-04-11), Java 8, OWL API 4.1.3, Protege 5.0.0-beta-23
-    - v1.3.1 (2015-09-09), Java 7, OWL API 3.5.1, Protege 5.0.0-beta-17
-    - v1.3.0 (2015-04-15), Java 7, OWL API 3.5.0, Protege 4.3
-    - v1.2.0 (2012-04-30), Java 6, OWL API 3.2.4, Protege 4.1
-    - v1.1.0 (2012-03-09), Java 6, OWL API 3.2.4, Protege 4.1
-    - v1.0.0 (2012-01-27), Java 6, OWL API 3.2.4, Protege 4.1
-- - version: v1.5.0
+    - v1.4.1 (unreleased), Java 8, OWL API 4.5.26, Protege 5.5.0
+    - v1.4.0 (2016-04-11), Java 8, OWL API 4.1.3 , Protege 5.0.0-beta-23
+    - v1.3.1 (2015-09-09), Java 7, OWL API 3.5.1 , Protege 5.0.0-beta-17
+    - v1.3.0 (2015-04-15), Java 7, OWL API 3.5.0 , Protege 4.3
+    - v1.2.0 (2012-04-30), Java 6, OWL API 3.2.4 , Protege 4.1
+    - v1.1.0 (2012-03-09), Java 6, OWL API 3.2.4 , Protege 4.1
+    - v1.0.0 (2012-01-27), Java 6, OWL API 3.2.4 , Protege 4.1
+- - version: v1.4.1
   - date: unreleased
   - features:
-    - uses the OWL API 4.5.9
-    - can be used as a plug-in for Protege 5.5.0
+    - uses the OWL API 4.5.26
+    - can be used as a plug-in for Protege 5.5.0, tested with Protege 5.6.3
   - build: $ `mvn clean install`
-  - release: target/uel-1.5.0.zip
+  - release: target/uel-1.4.1.zip
 - - version: v1.4.0
   - date: '2016-04-11'
   - features:
@@ -74,3 +73,5 @@
     - $ `cd uel/uel.plugin`
     - $ `ant -buildfile build-bundle.xml`
   - release: uel/uel.plugin/target/de.tudresden.inf.lat.uel.jar
+
+
