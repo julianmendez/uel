@@ -94,7 +94,19 @@
 
 			<dependency>
 				<!--
+				Apache Commons CLI
+				[[https://github.com/apache/commons-cli]]
+				[[https://repo1.maven.org/maven2/commons-cli/commons-cli/]]
+				-->
+				<groupId>commons-cli</groupId>
+				<artifactId>commons-cli</artifactId>
+				<version>${commonscli.version}</version>
+			</dependency>
+
+			<dependency>
+				<!--
 				Jackson core
+				(required by OWL API)
 				[[https://github.com/FasterXML/jackson-core]]
 				[[https://repo1.maven.org/maven2/com/fasterxml/jackson/core/jackson-core/]]
 				-->
@@ -105,18 +117,8 @@
 
 			<dependency>
 				<!--
-				Jackson annotations
-				[[https://github.com/FasterXML/jackson-annotations]]
-				[[https://repo1.maven.org/maven2/com/fasterxml/jackson/core/jackson-annotations/]]
-				-->
-				<groupId>com.fasterxml.jackson.core</groupId>
-				<artifactId>jackson-annotations</artifactId>
-				<version>${jackson.version}</version>
-			</dependency>
-
-			<dependency>
-				<!--
 				Jackson data-bind
+				(required by OWL API)
 				[[https://github.com/FasterXML/jackson-databind]]
 				[[https://repo1.maven.org/maven2/com/fasterxml/jackson/core/jackson-databind]]
 				-->
@@ -127,13 +129,66 @@
 
 			<dependency>
 				<!--
-				Apache Commons CLI
-				[[https://github.com/apache/commons-cli]]
-				[[https://repo1.maven.org/maven2/commons-cli/commons-cli/]]
+				Jackson annotations
+				(required by OWL API)
+				[[https://github.com/FasterXML/jackson-annotations]]
+				[[https://repo1.maven.org/maven2/com/fasterxml/jackson/core/jackson-annotations/]]
 				-->
-				<groupId>commons-cli</groupId>
-				<artifactId>commons-cli</artifactId>
-				<version>${commonscli.version}</version>
+				<groupId>com.fasterxml.jackson.core</groupId>
+				<artifactId>jackson-annotations</artifactId>
+				<version>${jackson.version}</version>
+			</dependency>
+
+			<dependency>
+				<!--
+				Logback core
+				(required by Protege)
+				[[https://logback.qos.ch]]
+				[[https://github.com/qos-ch/logback]]
+				[[https://repo1.maven.org/maven2/ch/qos/logback/logback-core/]]
+				-->
+				<groupId>ch.qos.logback</groupId>
+				<artifactId>logback-core</artifactId>
+				<version>${logback.version}</version>
+			</dependency>
+
+			<dependency>
+				<!--
+				Logback classic
+				(required by Protege)
+				[[https://logback.qos.ch]]
+				[[https://github.com/qos-ch/logback]]
+				[[https://repo1.maven.org/maven2/ch/qos/logback/logback-classic/]]
+				-->
+				<groupId>ch.qos.logback</groupId>
+				<artifactId>logback-classic</artifactId>
+				<version>${logback.version}</version>
+			</dependency>
+
+			<dependency>
+				<!--
+				Eclipse JGit
+				(required by Protege)
+				[[https://www.eclipse.org/jgit/]]
+				[[https://git.eclipse.org/r/plugins/gitiles/jgit/jgit/]]
+				[[https://repo1.maven.org/maven2/org/eclipse/jgit/org.eclipse.jgit/]]
+				-->
+				<groupId>org.eclipse.jgit</groupId>
+				<artifactId>org.eclipse.jgit</artifactId>
+				<version>${jgit.version}</version>
+			</dependency>
+
+			<dependency>
+				<!--
+				Google Guava
+				(required by OWL API and Protege, but Protege uses an older version)
+				[[https://www.eclipse.org/jgit/]]
+				[[https://github.com/google/guava]]
+				[[https://repo1.maven.org/maven2/com/google/guava/guava/]]
+				-->
+				<groupId>com.google.guava</groupId>
+				<artifactId>guava</artifactId>
+				<version>${guava.version}</version>
 			</dependency>
 
 			<dependency>
@@ -158,7 +213,7 @@
 				-->
 				<groupId>org.junit.jupiter</groupId>
 				<artifactId>junit-jupiter-params</artifactId>
-				<version>5.9.3</version>
+				<version>${junit.version}</version>
 				<scope>test</scope>
 			</dependency>
 
@@ -188,8 +243,12 @@
 		<protege.version>5.5.0</protege.version>
 		<sat4j.version>2.3.6</sat4j.version>
 		<jcel.version>0.24.1</jcel.version>
-		<jackson.version>2.16.0</jackson.version>
+		<junit.version>5.9.3</junit.version>
 		<commonscli.version>1.6.0</commonscli.version>
+		<jackson.version>2.16.0</jackson.version>
+		<logback.version>1.4.14</logback.version>
+		<jgit.version>6.8.0.202311291450-r</jgit.version>
+		<guava.version>32.1.3-jre</guava.version>
 	</properties>
 
 	<build>
