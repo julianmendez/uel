@@ -50,16 +50,72 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		
-		<jackson.version>2.16.0</jackson.version>
-		<commonscli.version>1.6.0</commonscli.version>
 
 		<mainClass>de.tudresden.inf.lat.uel.plugin.main.UelStandalone</mainClass>
 
+		<guava.package>com.google.common.base;version="[18,33)"</guava.package>
+
 		<bundle.activator>org.protege.editor.core.plugin.DefaultPluginActivator</bundle.activator>
-		<bundle.classpath>.,lib/org/ow2/sat4j/org.ow2.sat4j.core/${sat4j.version}/org.ow2.sat4j.core-${sat4j.version}.jar,lib/org/ow2/sat4j/org.ow2.sat4j.pb/${sat4j.version}/org.ow2.sat4j.pb-${sat4j.version}.jar,lib/org/ow2/sat4j/org.ow2.sat4j.maxsat/${sat4j.version}/org.ow2.sat4j.maxsat-${sat4j.version}.jar,lib/commons-cli/commons-cli/${commonscli.version}/commons-cli-${commonscli.version}.jar,lib/com/fasterxml/jackson/core/jackson-core/${jackson.version}/jackson-core-${jackson.version}.jar,lib/com/fasterxml/jackson/core/jackson-core/${jackson.version}/jackson-core-${jackson.version}.jar,lib/com/fasterxml/jackson/core/jackson-annotations/${jackson.version}/jackson-annotations-${jackson.version}.jar,lib/com/fasterxml/jackson/core/jackson-annotations/${jackson.version}/jackson-annotations-${jackson.version}.jar,lib/com/fasterxml/jackson/core/jackson-databind/${jackson.version}/jackson-databind-${jackson.version}.jar</bundle.classpath>
-		<import.package>javax.accessibility,javax.swing,javax.swing.border,org.osgi.framework,org.protege.editor.core.plugin,org.protege.editor.core.ui.workspace,org.semanticweb.*;resolution:=optional,org.joda.time.*;resolution:=optional,*</import.package>
-		<require.bundle>org.eclipse.equinox.registry,org.eclipse.equinox.common,org.protege.editor.core.application,org.protege.editor.owl,org.semanticweb.owl.owlapi</require.bundle>
+
+		<bundle.classpath>
+			.,
+			lib/org/ow2/sat4j/org.ow2.sat4j.core/${sat4j.version}/org.ow2.sat4j.core-${sat4j.version}.jar,
+			lib/org/ow2/sat4j/org.ow2.sat4j.pb/${sat4j.version}/org.ow2.sat4j.pb-${sat4j.version}.jar,
+			lib/org/ow2/sat4j/org.ow2.sat4j.maxsat/${sat4j.version}/org.ow2.sat4j.maxsat-${sat4j.version}.jar,
+			lib/commons-cli/commons-cli/${commonscli.version}/commons-cli-${commonscli.version}.jar,
+			lib/com/fasterxml/jackson/core/jackson-core/${jackson.version}/jackson-core-${jackson.version}.jar,
+			lib/com/fasterxml/jackson/core/jackson-annotations/${jackson.version}/jackson-annotations-${jackson.version}.jar,
+			lib/com/fasterxml/jackson/core/jackson-databind/${jackson.version}/jackson-databind-${jackson.version}.jar
+		</bundle.classpath>
+
+		<import.package>
+			org.protege.editor.core.plugin,
+			org.w3c.dom,
+			org.xml.sax,
+			${guava.package},
+			javax.swing,
+			javax.swing.border,
+			javax.imageio,
+			javax.xml.datatype,
+			javax.xml.namespace,
+			javax.xml.parsers,
+			javax.xml.transform,
+			javax.xml.transform.dom,
+			javax.xml.transform.stream,
+			javax.accessibility,
+			org.osgi.framework
+		</import.package>
+
+		<require.bundle>
+			org.eclipse.equinox.registry,
+			org.eclipse.equinox.common,
+			org.protege.editor.core.application,
+			org.protege.editor.owl,
+			org.semanticweb.owl.owlapi
+		</require.bundle>
+
+		<include.resource>
+			{maven-resources}, {maven-dependencies},
+			@uel-type-${project.version}.jar,
+			@uel-asp-${project.version}.jar,
+			@uel-rule-${project.version}.jar,
+			@uel-sat-${project.version}.jar,
+			@uel-core-${project.version}.jar,
+			@uel-ui-${project.version}.jar,
+			@uel-protege-${project.version}.jar,
+			@util-map-${util.version}.jar,
+			lib/org/ow2/sat4j/org.ow2.sat4j.core/${sat4j.version}/org.ow2.sat4j.core-${sat4j.version}.jar=org.ow2.sat4j.core-${sat4j.version}.jar,
+			lib/org/ow2/sat4j/org.ow2.sat4j.pb/${sat4j.version}/org.ow2.sat4j.pb-${sat4j.version}.jar=org.ow2.sat4j.pb-${sat4j.version}.jar,
+			lib/org/ow2/sat4j/org.ow2.sat4j.maxsat/${sat4j.version}/org.ow2.sat4j.maxsat-${sat4j.version}.jar=org.ow2.sat4j.maxsat-${sat4j.version}.jar,
+			lib/commons-cli/commons-cli/${commonscli.version}/commons-cli-${commonscli.version}.jar=commons-cli-${commonscli.version}.jar,
+			lib/com/fasterxml/jackson/core/jackson-core/${jackson.version}/jackson-core-${jackson.version}.jar=jackson-core-${jackson.version}.jar,
+			lib/com/fasterxml/jackson/core/jackson-annotations/${jackson.version}/jackson-annotations-${jackson.version}.jar=jackson-annotations-${jackson.version}.jar,
+			lib/com/fasterxml/jackson/core/jackson-databind/${jackson.version}/jackson-databind-${jackson.version}.jar=jackson-databind-${jackson.version}.jar,
+			LICENSE.txt=../docs/LICENSE.txt,
+			COPYING.txt=../docs/COPYING.txt,
+			COPYING-LESSER.txt=../docs/COPYING-LESSER.txt
+		</include.resource>
+
 	</properties>
 
 	<build>
@@ -122,27 +178,7 @@
 						<Bundle-ClassPath>${bundle.classpath}</Bundle-ClassPath>
 						<Import-Package>${import.package}</Import-Package>
 						<Require-Bundle>${require.bundle}</Require-Bundle>
-						<Include-Resource>
-							{maven-resources}, {maven-dependencies},
-							@uel-type-${project.version}.jar,
-							@uel-asp-${project.version}.jar,
-							@uel-rule-${project.version}.jar,
-							@uel-sat-${project.version}.jar,
-							@uel-core-${project.version}.jar,
-							@uel-ui-${project.version}.jar,
-							@uel-protege-${project.version}.jar,
-							@util-map-${util.version}.jar,
-							lib/org/ow2/sat4j/org.ow2.sat4j.core/${sat4j.version}/org.ow2.sat4j.core-${sat4j.version}.jar=org.ow2.sat4j.core-${sat4j.version}.jar,
-							lib/org/ow2/sat4j/org.ow2.sat4j.pb/${sat4j.version}/org.ow2.sat4j.pb-${sat4j.version}.jar=org.ow2.sat4j.pb-${sat4j.version}.jar,
-							lib/org/ow2/sat4j/org.ow2.sat4j.maxsat/${sat4j.version}/org.ow2.sat4j.maxsat-${sat4j.version}.jar=org.ow2.sat4j.maxsat-${sat4j.version}.jar,
-							lib/commons-cli/commons-cli/${commonscli.version}/commons-cli-${commonscli.version}.jar=commons-cli-${commonscli.version}.jar,
-							lib/com/fasterxml/jackson/core/jackson-core/${jackson.version}/jackson-core-${jackson.version}.jar=jackson-core-${jackson.version}.jar,
-							lib/com/fasterxml/jackson/core/jackson-annotations/${jackson.version}/jackson-annotations-${jackson.version}.jar=jackson-annotations-${jackson.version}.jar,
-							lib/com/fasterxml/jackson/core/jackson-databind/${jackson.version}/jackson-databind-${jackson.version}.jar=jackson-databind-${jackson.version}.jar,
-							LICENSE.txt=../docs/LICENSE.txt,
-							COPYING.txt=../docs/COPYING.txt,
-							COPYING-LESSER.txt=../docs/COPYING-LESSER.txt
-						</Include-Resource>
+						<Include-Resource>${include.resource}</Include-Resource>
 					</instructions>
 				</configuration>
 			</plugin>
