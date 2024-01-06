@@ -14,7 +14,7 @@
 <dependency>
   <groupId>de.tu-dresden.inf.lat.uel</groupId>
   <artifactId>uel-ui</artifactId>
-  <version>1.4.0</version>
+  <version>1.4.1</version>
 </dependency>
 ```
 
@@ -86,27 +86,29 @@ where *NEW_VERSION* is the new version.
 
   * [all-in-one ZIP file][zip-file]
   * [The Central Repository][central-repository]
-  * [older versions][older-versions]:
+  * [older versions][older-versions]
 
-| version              | zip                   | release date | Java | OWL API | Protégé       |
-|:---------------------|:----------------------|:-------------|:----:|:--------|:--------------|
-| [uel-1.4.1][uel-141] | [(zip)][uel-140-zip]  | (unreleased) |  11  | 4.5.26  | 5.5.0         |
-| [uel-1.4.0][uel-140] | [(zip)][uel-140-zip]  | 2016-04-11   |  8   | 4.1.3   | 5.0.0-beta-23 |
-| [uel-1.3.1][uel-131] | [(zip)][uel-131-zip]  | 2015-09-09   |  7   | 3.5.1   | 5.0.0-beta-17 |
-| [uel-1.3.0][uel-130] | [(zip)][uel-130-zip]  | 2015-04-15   |  7   | 3.5.0   | 4.3           |
-| [uel-1.2.0][uel-120] | [(zip)][uel-120-zip]  | 2012-04-30   |  6   | 3.2.4   | 4.1           |
-| [uel-1.1.0][uel-110] | [(zip)][uel-110-zip]  | 2012-03-09   |  6   | 3.2.4   | 4.1           |
-| [uel-1.0.0][uel-100] | [(zip)][uel-100-zip]  | 2012-01-27   |  6   | 3.2.4   | 4.1           |
+| version              | zip                  | release date | Java | OWL API | Protégé       |
+|:---------------------|:---------------------|:-------------|:----:|:--------|:--------------|
+| [uel-1.4.1][uel-141] | [(zip)][uel-141-zip] | 2024-01-06   |  11  | 4.5.26  | 5.5.0         |
+| [uel-1.4.0][uel-140] | [(zip)][uel-140-zip] | 2016-04-11   |  8   | 4.1.3   | 5.0.0-beta-23 |
+| [uel-1.3.1][uel-131] | [(zip)][uel-131-zip] | 2015-09-09   |  7   | 3.5.1   | 5.0.0-beta-17 |
+| [uel-1.3.0][uel-130] | [(zip)][uel-130-zip] | 2015-04-15   |  7   | 3.5.0   | 4.3           |
+| [uel-1.2.0][uel-120] | [(zip)][uel-120-zip] | 2012-04-30   |  6   | 3.2.4   | 4.1           |
+| [uel-1.1.0][uel-110] | [(zip)][uel-110-zip] | 2012-03-09   |  6   | 3.2.4   | 4.1           |
+| [uel-1.0.0][uel-100] | [(zip)][uel-100-zip] | 2012-01-27   |  6   | 3.2.4   | 4.1           |
 
 
 ## Installation and use
 
-* as a **plugin**: in the all-in-one ZIP file, find the JAR file in directory `.../plugin`
-  and copy it into the Protégé plugin directory (`.../plugins`).
+* as a **plugin**: in the all-in-one ZIP file, find the JAR file in directory `plugin`
+  and copy it into the Protégé plugin directory (`plugins`).
 
-* as a **library**: in the all-in-one ZIP file, find the JAR file in directory `.../library` and use it as a library.
+* as a **library**: in the all-in-one ZIP file, find the JAR file in directory `library`
+  and use it as a library.
 
-* as a **standalone**: in the all-in-one ZIP file, find the JAR file in directory `.../standalone` and run it with `java -jar uel.jar`.
+* as a **standalone**: in the all-in-one ZIP file, find the JAR file in directory
+  `standalone` and run it with `java -jar uel.jar`.
 
 
 ## Release Notes
