@@ -131,11 +131,11 @@ The following tutorial shows how to use UEL. It can be run as a standalone appli
 
 The user interface is the same in both cases. One can open the ontologies describing background knowledge and the unification problems using the "open" button of UEL, or using the Protégé menu (all ontologies to be used have to be opened in the same Protégé window).
 
-For our example, we have opened the ontologies [headinjury.owl](https://github.com/julianmendez/uel/blob/master/docs/extra/headinjury.owl) and [headinjury-dissubsumption.owl](https://github.com/julianmendez/uel/blob/master/docs/extra/headinjury-dissubsumption.owl) and selected them as the positive and the negative part of the (dis)unification problem, respectively. This small example consists of one equation and two dissubsumptions. A more detailed description can be found in [2]. UEL only recognizes OWL axioms of types subClassOf and equivalentClass in these input ontologies. Additionally, up to two background ontologies can be selected to provide background knowledge in the form of acyclic definitions. It is important that all OWL classes that should be shared between the selected ontologies are identified by the same IRIs in all ontologies.
+For our example, we have opened the ontologies [headinjury.owl](https://github.com/julianmendez/uel/blob/master/docs/extra/headinjury.owl) and [headinjury-dissubsumption.owl](https://github.com/julianmendez/uel/blob/master/docs/extra/headinjury-dissubsumption.owl) and selected them as the positive and the negative part of the (dis)unification problem, respectively. This small example consists of one equation and two dissubsumptions. A more detailed description can be found in [3]. UEL only recognizes OWL axioms of types subClassOf and equivalentClass in these input ontologies. Additionally, up to two background ontologies can be selected to provide background knowledge in the form of acyclic definitions. It is important that all OWL classes that should be shared between the selected ontologies are identified by the same IRIs in all ontologies.
 
 ![example ontologies selected in UEL](https://github.com/julianmendez/uel/blob/master/docs/img/04_ontologies_selected.png?raw=true)
 
-The next step is to select a unification algorithm to solve the problem. There are different advantages and disadvantages to each of them, which are discussed in the following publications. The SAT-based algorithm was developed in [3], the rule-based one in [4]. Additionally, an experimental encoding into ASP (answer set programming) has been implemented, which however requires the ASP solver [clingo](http://potassco.sourceforge.net/) to be installed and available via the PATH environment variable of the JVM instance UEL is running in. Both the SAT and the ASP encoding provide the option to compute only so-called minimal assignments; for details, see [1]. It should be noted that negative constraints (dissubsumptions and disequations) are currently only supported by the SAT-based algorithm.
+The next step is to select a unification algorithm to solve the problem. There are different advantages and disadvantages to each of them, which are discussed in the following publications. The SAT-based algorithm was developed in [4], the rule-based one in [5]. Additionally, an experimental encoding into ASP (answer set programming) has been implemented, which however requires the ASP solver [clingo](http://potassco.sourceforge.net/) to be installed and available via the PATH environment variable of the JVM instance UEL is running in. Both the SAT and the ASP encoding provide the option to compute only so-called minimal assignments; for details, see [1] and [2]. It should be noted that negative constraints (dissubsumptions and disequations) are currently only supported by the SAT-based algorithm.
 
 ![choose the unification algorithm](https://github.com/julianmendez/uel/blob/master/docs/img/05_choose_processor.png?raw=true)
 
@@ -175,7 +175,7 @@ This small tutorial gives an example of how to use UEL as a Java library. The cl
  * The subsumptions and equations that are to be made false by the unifiers ("dissubsumptions" and "disequations"). The input format is the same as above. Dissubsumptions and disequations are currently only supported by the SAT and ASP processors (see #4 below).
  * A `Set<OWLClass>` containing all class names that are to be treated as variables for the unification.
 
- * A `String` designating the unification algorithm ("processor") to be used, as defined in `UnificationAlgorithmFactory`. There is an inefficient *RULE_BASED_ALGORITHM*, a more mature *SAT_BASED_ALGORITHM* (using the [Sat4j library](https://www.sat4j.org/)) with the option to only return "subset-minimal" solutions [1], and an *ASP_BASED_ALGORITHM* (using the ASP solver [Clingo](http://potassco.sourceforge.net/)) that as of April 2016 is still under development. If you want to try the ASP algorithm, we can send you more detailed information on how to install Clingo and set up UEL to use it.
+ * A `String` designating the unification algorithm ("processor") to be used, as defined in `UnificationAlgorithmFactory`. There is an inefficient *RULE_BASED_ALGORITHM*, a more mature *SAT_BASED_ALGORITHM* (using the [Sat4j library][sat4j]) with the option to only return "subset-minimal" solutions [1], and an *ASP_BASED_ALGORITHM* (using the ASP solver [Clingo](http://potassco.sourceforge.net/)) that as of April 2016 is still under development. If you want to try the ASP algorithm, we can send you more detailed information on how to install Clingo and set up UEL to use it.
 
 * You get back an iterator that gives you unifiers in the form of `Set<OWLUelClassDefinition>` specifying a substitution for every variable. Each `OWLUelClassDefinition` can be converted into an `OWLEquivalentClassesAxiom`. It should be the case that the background ontology, extended by the `OWLEquivalentClassesAxioms` given by one unifier, entails all input subsumptions and does not entail any of the dissubsumptions.
 
@@ -191,13 +191,50 @@ In case you need more information, please contact [julianmendez][author3].
 
 ## References
 
-[1] Franz Baader, Stefan Borgwardt, Julian Alfredo Mendez, and Barbara Morawska. UEL: Unification solver for EL. In Proc. DL, 2012. [(PDF)](http://ceur-ws.org/Vol-846/paper_8.pdf)
+[1] Franz Baader, Stefan Borgwardt, Julian Alfredo Mendez, and Barbara Morawska:
+    **UEL: Unification Solver for EL**
+    In Yevgeny Kazakov, Domenico Lembo, and Frank Wolter, editors,
+    Proceedings of the 25th International Workshop on Description Logics (DL'12),
+    volume 846, CEUR Workshop Proceedings, pages 26—36, 2012.
+    &nbsp; [ceur-ws.org](https://ceur-ws.org/Vol-846/paper_8.pdf)
+    &nbsp; [Abstract](https://tu-dresden.de/ing/informatik/thi/lat/forschung/veroeffentlichungen#BBMM-DL-12:abstract)
+    &nbsp; [BibTeX](https://tu-dresden.de/ing/informatik/thi/lat/forschung/veroeffentlichungen#BBMM-DL-12:bibtex)
+    &nbsp; [PDF](https://lat.inf.tu-dresden.de/research/papers/2012/BBMM-DL-12.pdf)
+    &nbsp; [Details](https://iccl.inf.tu-dresden.de/web/LATPub504)
 
-[2] Franz Baader, Stefan Borgwardt, and Barbara Morawska. Dismatching and Disunification in EL. In Proc. RTA, 2015.
+[2] Franz Baader, Julian Mendez, and Barbara Morawska:
+    **UEL: Unification Solver for the Description Logic EL &ndash; System Description.**
+    In Proceedings of the 6th International Joint Conference on Automated Reasoning (IJCAR'12),
+    volume 7364 of Lecture Notes in Artificial Intelligence, pages 45—51. Manchester, UK, Springer-Verlag, 2012.
+    &nbsp; DOI:[10.1007/978-3-642-31365-3_6](https://doi.org/10.1007/978-3-642-31365-3_6)
+    &nbsp; [Abstract](https://tu-dresden.de/ing/informatik/thi/lat/forschung/veroeffentlichungen#BaMM-IJCAR-12:abstract)
+    &nbsp; [BibTeX](https://tu-dresden.de/ing/informatik/thi/lat/forschung/veroeffentlichungen#BaMM-IJCAR-12:bibtex)
+    &nbsp; [PDF](https://lat.inf.tu-dresden.de/research/papers/2012/BaMM-IJCAR-12.pdf)
+    &nbsp; [Details](https://iccl.inf.tu-dresden.de/web/LATPub496)
 
-[3] Franz Baader and Barbara Morawska. SAT Encoding of Unification in EL. In Proc. LPAR, 2010.
+[3] Franz Baader, Stefan Borgwardt, and Barbara Morawska.
+    **Dismatching and Local Disunification in EL**
+    In Maribel Fernández, editor,
+    Proceedings of the 26th International Conference on Rewriting Techniques and Applications (RTA’15),
+    volume 36 of Leibniz International Proceedings in Informatics, 40–56, 2015. Dagstuhl Publishing
+    Dismatching and Disunification in EL.
+    &nbsp; DOI:[10.4230/LIPIcs.RTA.2015.40](http://doi.org/10.4230/LIPIcs.RTA.2015.40)
+    &nbsp; [PDF](https://iccl.inf.tu-dresden.de/w/images/7/78/BaBM-RTA15.pdf)
+    &nbsp; [Details](https://iccl.inf.tu-dresden.de/web/Inproceedings3035)
 
-[4] Franz Baader and Barbara Morawska. Unification in the Description Logic EL. Logical Methods in Computer Science 6(3), 2010.
+[4] Franz Baader and Barbara Morawska.
+    **SAT Encoding of Unification in EL**
+    In Christian G. Fermüller and Andrei Voronkov, editors,
+    Proceedings of the 17th International Conference on Logic for Programming, Artifical Intelligence, and Reasoning (LPAR-17),
+    volume 6397 of Lecture Notes in Computer Science (subline Advanced Research in Computing and Software Science), 97-111,  2010. Springer
+    &nbsp; [PDF](https://iccl.inf.tu-dresden.de/w/images/1/1c/BaMo-LPAR-10.pdf)
+    &nbsp; [Details](https://iccl.inf.tu-dresden.de/web/LATPub452)
+
+[5] Franz Baader and Barbara Morawska.
+    **Unification in the Description Logic EL**
+    Logical Methods in Computer Science, 6(3), 2010
+    &nbsp; [PDF](https://iccl.inf.tu-dresden.de/w/images/1/1b/BaMo-LMCS09.pdf)
+    &nbsp; [Details](https://iccl.inf.tu-dresden.de/web/LATPub453)
 
 [author1]: https://lat.inf.tu-dresden.de/~morawska/
 [author2]: https://lat.inf.tu-dresden.de/~stefborg/
@@ -215,6 +252,7 @@ In case you need more information, please contact [julianmendez][author3].
 [description-logics]: http://dl.kr.org
 [owl-api]: https://owlcs.github.io/owlapi/
 [protege]: https://protege.stanford.edu
+[sat4j]: http://www.sat4j.org
 [uel-141]: https://sourceforge.net/projects/uel/files/uel/1.4.1/plugin/de.tu-dresden.inf.lat.uel-1.4.1.jar/download
 [uel-141-zip]: https://sourceforge.net/projects/uel/files/uel/1.4.1/zip/uel-1.4.1.zip/download
 [uel-140]: https://sourceforge.net/projects/uel/files/uel/1.4.0/plugin/de.tu-dresden.inf.lat.uel-1.4.0.jar/download
