@@ -21,12 +21,37 @@
 			<artifactId>owlapi-osgidistribution</artifactId>
 		</dependency>
 
+		<dependency>
+			<groupId>org.ow2.sat4j</groupId>
+			<artifactId>org.ow2.sat4j.maxsat</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-core</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-annotations</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>commons-cli</groupId>
+			<artifactId>commons-cli</artifactId>
+		</dependency>
+
 	</dependencies>
 
 	<parent>
 		<groupId>de.tu-dresden.inf.lat.uel</groupId>
 		<artifactId>uel-parent</artifactId>
-		<version>1.5.0-SNAPSHOT</version>
+		<version>1.4.1</version>
 	</parent>
 
 	<properties>
@@ -68,7 +93,7 @@
 										<Bundle-Category>protege</Bundle-Category>
 										<Bundle-Description>UEL standalone</Bundle-Description>
 										<Bundle-Vendor>Chair of Automata Theory - TU Dresden</Bundle-Vendor>
-										<Bundle-DocURL>https://lat.inf.tu-dresden.de</Bundle-DocURL>
+										<Bundle-DocURL>https://tu-dresden.de/ing/informatik/thi/lat</Bundle-DocURL>
 										<Bundle-ClassPath>.</Bundle-ClassPath>
 										<Import-Package>${import.package}</Import-Package>
 										<Main-Class>${mainClass}</Main-Class>

@@ -1,11 +1,11 @@
 # [UEL](https://julianmendez.github.io/uel/)
 
-[![build](https://github.com/julianmendez/uel/workflows/Java%20CI/badge.svg)](https://github.com/julianmendez/uel/actions)
-[![maven central](https://maven-badges.herokuapp.com/maven-central/de.tu-dresden.inf.lat.uel/uel-parent/badge.svg)](https://search.maven.org/#search|ga|1|g%3A%22de.tu-dresden.inf.lat.uel%22)
-[![license](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0.txt)
-[![license](https://img.shields.io/badge/license-LGPL%203.0-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0.txt)
+[![License 1](https://img.shields.io/badge/License%201-Apache%202.0-blue.svg)][license1]
+[![license 2](https://img.shields.io/badge/License%202-LGPL%203.0-blue.svg)][license2]
+[![Maven Central](https://img.shields.io/maven-central/v/de.tu-dresden.inf.lat.uel/uel-parent.svg?label=Maven%20Central)][maven-central]
+[![build](https://github.com/julianmendez/uel/workflows/Java%20CI/badge.svg)][build-status]
 
-**UEL**, unification solver for [EL](http://dl.kr.org/), is a plug-in for [Protégé](https://protege.stanford.edu/) that uses the [OWL API](https://owlcs.github.io/owlapi/).
+**UEL**, unification solver for [EL][description-logics], is a plug-in for [Protégé][protege] that uses the [OWL API][owl-api].
 
 
 ## Dependency
@@ -14,7 +14,7 @@
 <dependency>
   <groupId>de.tu-dresden.inf.lat.uel</groupId>
   <artifactId>uel-ui</artifactId>
-  <version>1.4.0</version>
+  <version>1.4.1</version>
 </dependency>
 ```
 
@@ -43,7 +43,7 @@ and once offline, use:
 $ mvn --offline clean install
 ```
 
-The bundles uploaded to [Sonatype](https://oss.sonatype.org/) are created with:
+The bundles uploaded to [Sonatype][sonatype] are created with:
 
 ```
 $ mvn clean install -DperformRelease=true
@@ -74,42 +74,45 @@ where *NEW_VERSION* is the new version.
 
 ## Authors
 
-[Barbara Morawska](https://lat.inf.tu-dresden.de/~morawska/), [Stefan Borgwardt](https://lat.inf.tu-dresden.de/~stefborg/), [Julian Mendez](https://julianmendez.github.io)
+[Barbara Morawska][author1], [Stefan Borgwardt][author2], [Julian Alfredo Mendez][author3]
 
 
 ## License
 
-[Apache License Version 2.0](https://www.apache.org/licenses/LICENSE-2.0.txt), [GNU Lesser General Public License version 3](https://www.gnu.org/licenses/lgpl-3.0.txt)
+[Apache License Version 2.0][license1], [GNU Lesser General Public License version 3][license2]
 
 
 ## Download
 
-  * [all-in-one ZIP file](https://sourceforge.net/projects/uel/files/uel/1.4.0/zip/uel-1.4.0.zip/download)
-  * [The Central Repository](https://repo1.maven.org/maven2/de/tu-dresden/inf/lat/uel/)
-  * [older versions](https://sourceforge.net/projects/uel/files/):
+  * [all-in-one ZIP file][zip-file]
+  * [The Central Repository][central-repository]
+  * [older versions][older-versions]
 
-| version            | zip   | release date | Java | OWL API | Protégé       |
-|:-------------------|:------|:-------------|:----:|:--------|:--------------|
-| uel-1.5.0-SNAPSHOT |       |              |  11  | 4.5.9   | 5.5.0         |
-| [uel-1.4.0](https://sourceforge.net/projects/uel/files/uel/1.4.0/plugin/de.tu-dresden.inf.lat.uel-1.4.0.jar/download)   | [(zip)](https://sourceforge.net/projects/uel/files/uel/1.4.0/zip/uel-1.4.0.zip/download)   | 2016-04-11  |  8   | 4.1.3   | 5.0.0-beta-23 |
-| [uel-1.3.1](https://sourceforge.net/projects/uel/files/uel/1.3.1/plugin/de.tu-dresden.inf.lat.uel-1.3.1.jar/download)   | [(zip)](https://sourceforge.net/projects/uel/files/uel/1.3.1/zip/uel-1.3.1.zip/download)   | 2015-09-09  |  7   | 3.5.1   | 5.0.0-beta-17 |
-| [uel-1.3.0](https://sourceforge.net/projects/uel/files/uel/1.3.0/plugin/de.tudresden.inf.lat.uel.jar/download)   | [(zip)](https://sourceforge.net/projects/uel/files/uel/1.3.0/zip/uel-1.3.0.zip/download) |    2015-04-15  |  7   | 3.5.0   | 4.3           |
-| [uel-1.2.0](https://sourceforge.net/projects/uel/files/uel/1.2.0/plugin/de.tudresden.inf.lat.uel.jar/download)   | [(zip)](https://sourceforge.net/projects/uel/files/uel/1.2.0/zip/uel-1.2.0.zip/download) |    2012-04-30  |  6   | 3.2.4   | 4.1           |
-| [uel-1.1.0](https://sourceforge.net/projects/uel/files/uel/1.1.0/plugin/de.tudresden.inf.lat.uel.jar/download)   | [(zip)](https://sourceforge.net/projects/uel/files/uel/1.1.0/zip/uel-1.1.0.zip/download) |    2012-03-09  |  6   | 3.2.4   | 4.1           |
-| [uel-1.0.0](https://sourceforge.net/projects/uel/files/uel/1.0.0/plugin/de.tudresden.inf.lat.uel.jar/download)   | [(zip)](https://sourceforge.net/projects/uel/files/uel/1.0.0/zip/uel-1.0.0.zip/download) |    2012-01-27  |  6   | 3.2.4   | 4.1           |
+| version              | zip                  | release date | Java | OWL API | Protégé       |
+|:---------------------|:---------------------|:-------------|:----:|:--------|:--------------|
+| [uel-1.4.1][uel-141] | [(zip)][uel-141-zip] | 2024-01-06   |  11  | 4.5.26  | 5.5.0         |
+| [uel-1.4.0][uel-140] | [(zip)][uel-140-zip] | 2016-04-11   |  8   | 4.1.3   | 5.0.0-beta-23 |
+| [uel-1.3.1][uel-131] | [(zip)][uel-131-zip] | 2015-09-09   |  7   | 3.5.1   | 5.0.0-beta-17 |
+| [uel-1.3.0][uel-130] | [(zip)][uel-130-zip] | 2015-04-15   |  7   | 3.5.0   | 4.3           |
+| [uel-1.2.0][uel-120] | [(zip)][uel-120-zip] | 2012-04-30   |  6   | 3.2.4   | 4.1           |
+| [uel-1.1.0][uel-110] | [(zip)][uel-110-zip] | 2012-03-09   |  6   | 3.2.4   | 4.1           |
+| [uel-1.0.0][uel-100] | [(zip)][uel-100-zip] | 2012-01-27   |  6   | 3.2.4   | 4.1           |
 
 
 ## Installation and use
 
-* as a **plugin**: in the all-in-one ZIP file, find the JAR file in directory `.../plugin` and copy it into the Protege plugin directory (`.../plugins`).
+* as a **plugin**: in the all-in-one ZIP file, find the JAR file in directory `plugin`
+  and copy it into the Protégé plugin directory (`plugins`).
 
-* as a **library**: in the all-in-one ZIP file, find the JAR file in directory `.../library` and use it as a library.
+* as a **library**: in the all-in-one ZIP file, find the JAR file in directory `library`
+  and use it as a library.
 
-* as a **standalone**: in the all-in-one ZIP file, find the JAR file in directory `.../standalone` and run it with `java -jar uel.jar`.
+* as a **standalone**: in the all-in-one ZIP file, find the JAR file in directory
+  `standalone` and run it with `java -jar uel.jar`.
 
 
 ## Release Notes
-See [release notes](https://julianmendez.github.io/uel/RELEASE-NOTES.html).
+See [release notes][release-notes].
 
 
 ## Support
@@ -181,6 +184,11 @@ This small tutorial gives an example of how to use UEL as a Java library. The cl
 `AlternativeUelStarter` also provides a simple command-line interface that can be accessed by starting Java directly on this class. The execution options are not documented yet, but can be found in the in the source code of the main method.
 
 
+## Contact
+
+In case you need more information, please contact [julianmendez][author3].
+
+
 ## References
 
 [1] Franz Baader, Stefan Borgwardt, Julian Alfredo Mendez, and Barbara Morawska. UEL: Unification solver for EL. In Proc. DL, 2012. [(PDF)](http://ceur-ws.org/Vol-846/paper_8.pdf)
@@ -190,5 +198,36 @@ This small tutorial gives an example of how to use UEL as a Java library. The cl
 [3] Franz Baader and Barbara Morawska. SAT Encoding of Unification in EL. In Proc. LPAR, 2010.
 
 [4] Franz Baader and Barbara Morawska. Unification in the Description Logic EL. Logical Methods in Computer Science 6(3), 2010.
+
+[author1]: https://lat.inf.tu-dresden.de/~morawska/
+[author2]: https://lat.inf.tu-dresden.de/~stefborg/
+[author3]: https://julianmendez.github.io
+[license1]: https://www.apache.org/licenses/LICENSE-2.0.txt
+[license2]: https://www.gnu.org/licenses/lgpl-3.0.txt
+[maven-central]: https://search.maven.org/artifact/de.tu-dresden.inf.lat.uel/uel-ui
+[build-status]: https://github.com/julianmendez/uel/actions
+[central-repository]: https://repo1.maven.org/maven2/de/tu-dresden/inf/lat/uel/
+[zip-file]: https://sourceforge.net/projects/uel/files/uel/1.4.0/zip/uel-1.4.0.zip/download
+[older-versions]: https://sourceforge.net/projects/uel/files/
+[release-notes]: https://julianmendez.github.io/uel/RELEASE-NOTES.html
+[sonatype]: https://oss.sonatype.org
+[java]: https://www.oracle.com/java/technologies/
+[description-logics]: http://dl.kr.org
+[owl-api]: https://owlcs.github.io/owlapi/
+[protege]: https://protege.stanford.edu
+[uel-141]: https://sourceforge.net/projects/uel/files/uel/1.4.1/plugin/de.tu-dresden.inf.lat.uel-1.4.1.jar/download
+[uel-141-zip]: https://sourceforge.net/projects/uel/files/uel/1.4.1/zip/uel-1.4.1.zip/download
+[uel-140]: https://sourceforge.net/projects/uel/files/uel/1.4.0/plugin/de.tu-dresden.inf.lat.uel-1.4.0.jar/download
+[uel-140-zip]: https://sourceforge.net/projects/uel/files/uel/1.4.0/zip/uel-1.4.0.zip/download
+[uel-131]: https://sourceforge.net/projects/uel/files/uel/1.3.1/plugin/de.tu-dresden.inf.lat.uel-1.3.1.jar/download
+[uel-131-zip]: https://sourceforge.net/projects/uel/files/uel/1.3.1/zip/uel-1.3.1.zip/download
+[uel-130]: https://sourceforge.net/projects/uel/files/uel/1.3.0/plugin/de.tudresden.inf.lat.uel.jar/download
+[uel-130-zip]: https://sourceforge.net/projects/uel/files/uel/1.3.0/zip/uel-1.3.0.zip/download
+[uel-120]: https://sourceforge.net/projects/uel/files/uel/1.2.0/plugin/de.tudresden.inf.lat.uel.jar/download
+[uel-120-zip]: https://sourceforge.net/projects/uel/files/uel/1.2.0/zip/uel-1.2.0.zip/download
+[uel-110]: https://sourceforge.net/projects/uel/files/uel/1.1.0/plugin/de.tudresden.inf.lat.uel.jar/download
+[uel-110-zip]: https://sourceforge.net/projects/uel/files/uel/1.1.0/zip/uel-1.1.0.zip/download
+[uel-100]: https://sourceforge.net/projects/uel/files/uel/1.0.0/plugin/de.tudresden.inf.lat.uel.jar/download
+[uel-100-zip]: https://sourceforge.net/projects/uel/files/uel/1.0.0/zip/uel-1.0.0.zip/download
 
 
