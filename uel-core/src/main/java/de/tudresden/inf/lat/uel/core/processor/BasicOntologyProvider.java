@@ -4,10 +4,12 @@
 package de.tudresden.inf.lat.uel.core.processor;
 
 import java.io.File;
+import java.util.Iterator;
 import java.util.Set;
 
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.OWLAnnotation;
+import org.semanticweb.owlapi.model.OWLAnnotationProperty;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
@@ -51,11 +53,18 @@ public class BasicOntologyProvider extends OntologyProvider {
 
 	@Override
 	public String getShortForm(OWLEntity entity) {
-		for (OWLAnnotation annotation : EntitySearcher.getAnnotations(entity, manager.getOntologies(),
-				OWLManager.getOWLDataFactory().getRDFSLabel())) {
-			return annotation.getValue().toString();
+		String result = null;
+		Iterable<OWLOntology> ontologies = manager.getOntologies();
+		if (ontologies.iterator().hasNext()) {
+			OWLOntology ontology = ontologies.iterator().next();
+			OWLAnnotationProperty annotationProperty = OWLManager.getOWLDataFactory().getRDFSLabel();
+			Iterator<OWLAnnotation> annotationsIterator = EntitySearcher.getAnnotations(entity, ontology, annotationProperty).iterator();
+			if (annotationsIterator.hasNext()) {
+				OWLAnnotation annotation = annotationsIterator.next();
+				result = annotation.getValue().toString();
+			}
 		}
-
-		return null;
+		return result;
 	}
+
 }
